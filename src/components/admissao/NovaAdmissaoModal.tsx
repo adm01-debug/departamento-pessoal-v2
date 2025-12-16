@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { departamentosDefault } from '@/types/colaborador';
 import { MaskedInput } from '@/components/ui/masked-input';
+import { validateCPF, unmask } from '@/lib/masks';
 
 interface NovaAdmissaoModalProps {
   open: boolean;
@@ -61,12 +62,36 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
   const [formData, setFormData] = useState<Partial<NovaAdmissaoData>>({});
   const [dateOpen, setDateOpen] = useState(false);
   const [birthDateOpen, setBirthDateOpen] = useState(false);
+  const [cpfError, setCpfError] = useState<string | null>(null);
+
+  const validateCpfField = (cpf: string) => {
+    if (!cpf || unmask(cpf).length === 0) {
+      setCpfError(null);
+      return true;
+    }
+    if (unmask(cpf).length < 11) {
+      setCpfError('CPF incompleto');
+      return false;
+    }
+    if (!validateCPF(cpf)) {
+      setCpfError('CPF inválido - dígitos verificadores incorretos');
+      return false;
+    }
+    setCpfError(null);
+    return true;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.candidatoNome || !formData.cargo || !formData.departamento || !formData.dataPrevisao) {
       toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    // Validar CPF se preenchido
+    if (formData.cpf && !validateCpfField(formData.cpf)) {
+      toast.error('CPF inválido');
       return;
     }
 
@@ -129,8 +154,16 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                   mask="cpf"
                   placeholder="000.000.000-00"
                   value={formData.cpf || ''}
-                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, cpf: e.target.value });
+                    if (cpfError) setCpfError(null);
+                  }}
+                  onBlur={(e) => validateCpfField(e.target.value)}
+                  className={cpfError ? 'border-destructive' : ''}
                 />
+                {cpfError && (
+                  <p className="text-xs text-destructive mt-1">{cpfError}</p>
+                )}
               </div>
 
               <div>
