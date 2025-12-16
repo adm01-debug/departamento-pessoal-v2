@@ -1,0 +1,293 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { 
+  AlertTriangle, 
+  CheckCircle, 
+  Settings, 
+  TrendingUp, 
+  Activity,
+  Bell,
+  BellOff
+} from 'lucide-react';
+
+interface IndicatorLimits {
+  turnoverWarning: number;
+  turnoverCritical: number;
+  absenteeismWarning: number;
+  absenteeismCritical: number;
+}
+
+interface IndicatorAlertsCardProps {
+  turnoverRate: number;
+  absenteeismRate: number;
+  limits?: IndicatorLimits;
+  onLimitsChange?: (limits: IndicatorLimits) => void;
+}
+
+const DEFAULT_LIMITS: IndicatorLimits = {
+  turnoverWarning: 10,
+  turnoverCritical: 20,
+  absenteeismWarning: 3,
+  absenteeismCritical: 5,
+};
+
+type AlertLevel = 'ok' | 'warning' | 'critical';
+
+interface Alert {
+  id: string;
+  indicator: string;
+  message: string;
+  level: AlertLevel;
+  value: number;
+  limit: number;
+  icon: React.ElementType;
+}
+
+export function IndicatorAlertsCard({ 
+  turnoverRate, 
+  absenteeismRate,
+  limits: externalLimits,
+  onLimitsChange
+}: IndicatorAlertsCardProps) {
+  const [localLimits, setLocalLimits] = useState<IndicatorLimits>(DEFAULT_LIMITS);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  
+  const limits = externalLimits || localLimits;
+
+  const getAlertLevel = (value: number, warningLimit: number, criticalLimit: number): AlertLevel => {
+    if (value >= criticalLimit) return 'critical';
+    if (value >= warningLimit) return 'warning';
+    return 'ok';
+  };
+
+  const turnoverLevel = getAlertLevel(turnoverRate, limits.turnoverWarning, limits.turnoverCritical);
+  const absenteeismLevel = getAlertLevel(absenteeismRate, limits.absenteeismWarning, limits.absenteeismCritical);
+
+  const alerts: Alert[] = [];
+
+  if (turnoverLevel === 'critical') {
+    alerts.push({
+      id: 'turnover-critical',
+      indicator: 'Turnover',
+      message: `Taxa de turnover crítica: ${turnoverRate.toFixed(1)}% (limite: ${limits.turnoverCritical}%)`,
+      level: 'critical',
+      value: turnoverRate,
+      limit: limits.turnoverCritical,
+      icon: TrendingUp
+    });
+  } else if (turnoverLevel === 'warning') {
+    alerts.push({
+      id: 'turnover-warning',
+      indicator: 'Turnover',
+      message: `Taxa de turnover em alerta: ${turnoverRate.toFixed(1)}% (limite: ${limits.turnoverWarning}%)`,
+      level: 'warning',
+      value: turnoverRate,
+      limit: limits.turnoverWarning,
+      icon: TrendingUp
+    });
+  }
+
+  if (absenteeismLevel === 'critical') {
+    alerts.push({
+      id: 'absenteeism-critical',
+      indicator: 'Absenteísmo',
+      message: `Taxa de absenteísmo crítica: ${absenteeismRate.toFixed(1)}% (limite: ${limits.absenteeismCritical}%)`,
+      level: 'critical',
+      value: absenteeismRate,
+      limit: limits.absenteeismCritical,
+      icon: Activity
+    });
+  } else if (absenteeismLevel === 'warning') {
+    alerts.push({
+      id: 'absenteeism-warning',
+      indicator: 'Absenteísmo',
+      message: `Taxa de absenteísmo em alerta: ${absenteeismRate.toFixed(1)}% (limite: ${limits.absenteeismWarning}%)`,
+      level: 'warning',
+      value: absenteeismRate,
+      limit: limits.absenteeismWarning,
+      icon: Activity
+    });
+  }
+
+  const handleLimitsChange = (newLimits: IndicatorLimits) => {
+    setLocalLimits(newLimits);
+    onLimitsChange?.(newLimits);
+  };
+
+  const getLevelColor = (level: AlertLevel) => {
+    switch (level) {
+      case 'critical': return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'warning': return 'text-warning bg-warning/10 border-warning/20';
+      default: return 'text-success bg-success/10 border-success/20';
+    }
+  };
+
+  const getLevelBadge = (level: AlertLevel) => {
+    switch (level) {
+      case 'critical': return <Badge variant="destructive">Crítico</Badge>;
+      case 'warning': return <Badge className="bg-warning text-warning-foreground">Alerta</Badge>;
+      default: return <Badge className="bg-success text-success-foreground">Normal</Badge>;
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          {alerts.length > 0 ? (
+            <Bell className="w-5 h-5 text-warning animate-pulse" />
+          ) : (
+            <BellOff className="w-5 h-5 text-muted-foreground" />
+          )}
+          Alertas de Indicadores
+        </CardTitle>
+        <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end">
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm">Configurar Limites</h4>
+              
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Turnover (%)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs">Alerta</Label>
+                      <Input 
+                        type="number" 
+                        value={limits.turnoverWarning}
+                        onChange={(e) => handleLimitsChange({
+                          ...limits,
+                          turnoverWarning: Number(e.target.value)
+                        })}
+                        className="h-8"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Crítico</Label>
+                      <Input 
+                        type="number" 
+                        value={limits.turnoverCritical}
+                        onChange={(e) => handleLimitsChange({
+                          ...limits,
+                          turnoverCritical: Number(e.target.value)
+                        })}
+                        className="h-8"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Absenteísmo (%)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs">Alerta</Label>
+                      <Input 
+                        type="number" 
+                        value={limits.absenteeismWarning}
+                        onChange={(e) => handleLimitsChange({
+                          ...limits,
+                          absenteeismWarning: Number(e.target.value)
+                        })}
+                        className="h-8"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Crítico</Label>
+                      <Input 
+                        type="number" 
+                        value={limits.absenteeismCritical}
+                        onChange={(e) => handleLimitsChange({
+                          ...limits,
+                          absenteeismCritical: Number(e.target.value)
+                        })}
+                        className="h-8"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                size="sm" 
+                className="w-full"
+                onClick={() => setSettingsOpen(false)}
+              >
+                Aplicar
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </CardHeader>
+      <CardContent>
+        {/* Status Overview */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className={`p-3 rounded-lg border ${getLevelColor(turnoverLevel)}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium">Turnover</span>
+              {getLevelBadge(turnoverLevel)}
+            </div>
+            <p className="text-xl font-bold">{turnoverRate.toFixed(1)}%</p>
+            <p className="text-xs opacity-70">
+              Limites: {limits.turnoverWarning}% / {limits.turnoverCritical}%
+            </p>
+          </div>
+          <div className={`p-3 rounded-lg border ${getLevelColor(absenteeismLevel)}`}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium">Absenteísmo</span>
+              {getLevelBadge(absenteeismLevel)}
+            </div>
+            <p className="text-xl font-bold">{absenteeismRate.toFixed(1)}%</p>
+            <p className="text-xs opacity-70">
+              Limites: {limits.absenteeismWarning}% / {limits.absenteeismCritical}%
+            </p>
+          </div>
+        </div>
+
+        {/* Alert List */}
+        {alerts.length > 0 ? (
+          <div className="space-y-2">
+            {alerts.map((alert) => (
+              <div 
+                key={alert.id}
+                className={`flex items-start gap-3 p-3 rounded-lg border ${
+                  alert.level === 'critical' 
+                    ? 'bg-destructive/5 border-destructive/20' 
+                    : 'bg-warning/5 border-warning/20'
+                }`}
+              >
+                <div className={`p-1.5 rounded-full ${
+                  alert.level === 'critical' 
+                    ? 'bg-destructive/20 text-destructive' 
+                    : 'bg-warning/20 text-warning'
+                }`}>
+                  <AlertTriangle className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{alert.indicator}</p>
+                  <p className="text-xs text-muted-foreground">{alert.message}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+            <CheckCircle className="w-10 h-10 mb-2 text-success" />
+            <p className="text-sm font-medium">Todos os indicadores normais</p>
+            <p className="text-xs">Nenhum alerta ativo no momento</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
