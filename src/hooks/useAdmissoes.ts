@@ -176,8 +176,14 @@ export function useAdmissoes() {
   const converterParaColaborador = async (admissao: Admissao) => {
     try {
       // Validar campos obrigatórios
-      if (!admissao.cpf || !admissao.data_nascimento || !admissao.sexo || !admissao.nome_mae) {
-        toast.error('Preencha todos os dados pessoais antes de converter para colaborador');
+      const camposFaltantes: string[] = [];
+      if (!admissao.cpf) camposFaltantes.push('CPF');
+      if (!admissao.data_nascimento) camposFaltantes.push('Data de Nascimento');
+      if (!admissao.sexo) camposFaltantes.push('Sexo');
+      if (!admissao.nome_mae) camposFaltantes.push('Nome da Mãe');
+      
+      if (camposFaltantes.length > 0) {
+        toast.error(`Preencha os dados obrigatórios: ${camposFaltantes.join(', ')}`);
         throw new Error('Dados incompletos para conversão');
       }
 

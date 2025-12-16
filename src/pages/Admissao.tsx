@@ -382,6 +382,10 @@ export default function AdmissaoPage() {
           etapa: etapaLabels[selectedAdmissao.etapa],
           progresso: getProgress(selectedAdmissao),
           dataPrevisao: selectedAdmissao.data_prevista,
+          cpf: selectedAdmissao.cpf,
+          data_nascimento: selectedAdmissao.data_nascimento,
+          sexo: selectedAdmissao.sexo,
+          nome_mae: selectedAdmissao.nome_mae,
         } : null}
         onAdvanceStage={handleAdvanceStage}
         onConvertToColaborador={handleConvertToColaborador}

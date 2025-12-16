@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   User, FileText, Stethoscope, FileSignature, Send, BookOpen, 
   CheckCircle2, Clock, AlertTriangle, ChevronRight, Pencil
@@ -43,6 +44,10 @@ interface AdmissaoChecklistModalProps {
     etapa: string;
     progresso: number;
     dataPrevisao: string;
+    cpf?: string | null;
+    data_nascimento?: string | null;
+    sexo?: string | null;
+    nome_mae?: string | null;
   } | null;
   onAdvanceStage?: () => void;
   onConvertToColaborador?: () => void;
@@ -169,7 +174,22 @@ export function AdmissaoChecklistModal({
     return currentStage.items.filter(i => i.required).every(i => i.completed);
   };
 
+  const isDadosPessoaisIncompletos = () => {
+    return !admissao.cpf || !admissao.data_nascimento || !admissao.sexo || !admissao.nome_mae;
+  };
+
+  const getCamposFaltantes = (): string[] => {
+    const campos: string[] = [];
+    if (!admissao.cpf) campos.push('CPF');
+    if (!admissao.data_nascimento) campos.push('Data de Nascimento');
+    if (!admissao.sexo) campos.push('Sexo');
+    if (!admissao.nome_mae) campos.push('Nome da Mãe');
+    return campos;
+  };
+
   const isComplete = getTotalProgress() === 100;
+  const dadosIncompletos = isDadosPessoaisIncompletos();
+  const camposFaltantes = getCamposFaltantes();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -297,10 +317,36 @@ export function AdmissaoChecklistModal({
               Fechar
             </Button>
             {isComplete ? (
-              <Button onClick={onConvertToColaborador} className="gap-2">
-                <User className="w-4 h-4" />
-                Criar Colaborador
-              </Button>
+              dadosIncompletos ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Button disabled className="gap-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          Criar Colaborador
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="font-medium mb-1">Dados pessoais incompletos:</p>
+                      <ul className="text-xs list-disc pl-4">
+                        {camposFaltantes.map(campo => (
+                          <li key={campo}>{campo}</li>
+                        ))}
+                      </ul>
+                      <p className="text-xs mt-2 text-muted-foreground">
+                        Clique em "Editar Dados" para completar.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button onClick={onConvertToColaborador} className="gap-2">
+                  <User className="w-4 h-4" />
+                  Criar Colaborador
+                </Button>
+              )
             ) : (
               <Button
                 onClick={onAdvanceStage}
