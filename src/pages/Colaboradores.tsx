@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Plus, MoreVertical, X, SlidersHorizontal } from 'lucide-react';
+import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,11 +18,18 @@ const statusLabels: Record<string, string> = {
 
 const statusOptions = ['todos', 'ativo', 'ferias', 'afastado', 'desligado', 'admissao'];
 
+type SortColumn = 'nome' | 'dataAdmissao' | 'departamento' | null;
+type SortDirection = 'asc' | 'desc';
+
 export default function Colaboradores() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [departamentoFilter, setDepartamentoFilter] = useState('todos');
   const [cargoFilter, setCargoFilter] = useState('todos');
+  
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   
   // Modal state
   const [selectedColaborador, setSelectedColaborador] = useState<Colaborador | null>(null);
@@ -39,9 +46,9 @@ export default function Colaboradores() {
     return ['todos', ...unique.sort()];
   }, []);
 
-  // Filtrar colaboradores
+  // Filtrar e ordenar colaboradores
   const filteredColaboradores = useMemo(() => {
-    return mockColaboradores.filter(c => {
+    let result = mockColaboradores.filter(c => {
       const matchSearch = search === '' || 
         c.nome.toLowerCase().includes(search.toLowerCase()) ||
         c.matricula.toLowerCase().includes(search.toLowerCase()) ||
@@ -54,7 +61,51 @@ export default function Colaboradores() {
 
       return matchSearch && matchStatus && matchDepartamento && matchCargo;
     });
-  }, [search, statusFilter, departamentoFilter, cargoFilter]);
+
+    // Aplicar ordenação
+    if (sortColumn) {
+      result = [...result].sort((a, b) => {
+        let comparison = 0;
+        
+        if (sortColumn === 'nome') {
+          comparison = a.nome.localeCompare(b.nome, 'pt-BR');
+        } else if (sortColumn === 'dataAdmissao') {
+          comparison = new Date(a.dataAdmissao).getTime() - new Date(b.dataAdmissao).getTime();
+        } else if (sortColumn === 'departamento') {
+          comparison = a.departamento.localeCompare(b.departamento, 'pt-BR');
+        }
+        
+        return sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    return result;
+  }, [search, statusFilter, departamentoFilter, cargoFilter, sortColumn, sortDirection]);
+
+  // Função para alternar ordenação
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortColumn(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  // Componente do ícone de ordenação
+  const SortIcon = ({ column }: { column: SortColumn }) => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground/50" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="w-3.5 h-3.5 text-primary" />
+      : <ArrowDown className="w-3.5 h-3.5 text-primary" />;
+  };
 
   // Verificar se há filtros ativos
   const hasActiveFilters = statusFilter !== 'todos' || departamentoFilter !== 'todos' || cargoFilter !== 'todos' || search !== '';
@@ -214,10 +265,35 @@ export default function Colaboradores() {
         <table className="w-full">
           <thead className="bg-muted/50">
             <tr>
-              <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Colaborador</th>
+              <th 
+                className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none"
+                onClick={() => handleSort('nome')}
+              >
+                <div className="flex items-center gap-1.5">
+                  Colaborador
+                  <SortIcon column="nome" />
+                </div>
+              </th>
               <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Matrícula</th>
               <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Cargo</th>
-              <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Departamento</th>
+              <th 
+                className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none"
+                onClick={() => handleSort('departamento')}
+              >
+                <div className="flex items-center gap-1.5">
+                  Departamento
+                  <SortIcon column="departamento" />
+                </div>
+              </th>
+              <th 
+                className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none"
+                onClick={() => handleSort('dataAdmissao')}
+              >
+                <div className="flex items-center gap-1.5">
+                  Data Admissão
+                  <SortIcon column="dataAdmissao" />
+                </div>
+              </th>
               <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
               <th className="text-right p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Ações</th>
             </tr>
@@ -267,6 +343,11 @@ export default function Colaboradores() {
                     </td>
                     <td className="p-4">
                       <span className="text-sm text-muted-foreground">{colab.departamento}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(colab.dataAdmissao).toLocaleDateString('pt-BR')}
+                      </span>
                     </td>
                     <td className="p-4">
                       <Badge className={cn("gap-1.5", colors.bg, colors.text, "border-0")}>
