@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockColaboradores, statusColors, Colaborador } from '@/data/mockData';
 import { ColaboradorModal } from '@/components/colaboradores/ColaboradorModal';
+import { NovoColaboradorModal } from '@/components/colaboradores/NovoColaboradorModal';
 import { cn } from '@/lib/utils';
 
 const statusLabels: Record<string, string> = {
@@ -34,6 +35,7 @@ export default function Colaboradores() {
   // Modal state
   const [selectedColaborador, setSelectedColaborador] = useState<Colaborador | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [novoModalOpen, setNovoModalOpen] = useState(false);
 
   // Extrair valores únicos para os filtros
   const departamentos = useMemo(() => {
@@ -136,7 +138,7 @@ export default function Colaboradores() {
           <h1 className="text-2xl font-display font-bold text-foreground">Colaboradores</h1>
           <p className="text-muted-foreground text-sm">Gestão do cadastro de colaboradores</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setNovoModalOpen(true)}>
           <Plus className="w-4 h-4" />
           Novo Colaborador
         </Button>
@@ -394,6 +396,12 @@ export default function Colaboradores() {
         colaborador={selectedColaborador}
         open={modalOpen}
         onOpenChange={setModalOpen}
+      />
+
+      {/* Modal Novo Colaborador */}
+      <NovoColaboradorModal 
+        open={novoModalOpen}
+        onOpenChange={setNovoModalOpen}
       />
     </div>
   );
