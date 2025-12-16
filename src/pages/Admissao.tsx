@@ -24,9 +24,9 @@ export default function AdmissaoPage() {
     admissoes, 
     loading, 
     createAdmissao, 
-    updateAdmissao,
     advanceStage, 
     getProgress,
+    converterParaColaborador,
     etapaLabels,
     etapaOrder
   } = useAdmissoes();
@@ -74,8 +74,9 @@ export default function AdmissaoPage() {
 
   const handleConvertToColaborador = async () => {
     if (!selectedAdmissao) return;
-    await updateAdmissao(selectedAdmissao.id, { etapa: 'esocial' });
+    await converterParaColaborador(selectedAdmissao);
     setChecklistOpen(false);
+    setSelectedAdmissao(null);
   };
 
   if (loading) {

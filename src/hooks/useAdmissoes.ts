@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useColaboradores } from './useColaboradores';
 
 export type EtapaAdmissao = 
   | 'solicitacao'
@@ -11,6 +12,9 @@ export type EtapaAdmissao =
   | 'contrato'
   | 'assinatura'
   | 'esocial';
+
+// Etapa final que indica admissão concluída
+const ETAPA_CONCLUIDA = 'esocial';
 
 export interface Admissao {
   id: string;
@@ -67,6 +71,7 @@ export function useAdmissoes() {
   const [admissoes, setAdmissoes] = useState<Admissao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { createColaborador } = useColaboradores();
 
   const fetchAdmissoes = async () => {
     try {
@@ -148,6 +153,38 @@ export function useAdmissoes() {
       const nextEtapa = etapaOrder[currentIndex + 1];
       await updateAdmissao(admissao.id, { etapa: nextEtapa });
       toast.success(`Avançado para: ${etapaLabels[nextEtapa]}`);
+      return nextEtapa;
+    }
+    return admissao.etapa;
+  };
+
+  // Converter admissão concluída em colaborador
+  const converterParaColaborador = async (admissao: Admissao) => {
+    try {
+      // Criar o colaborador com os dados da admissão
+      const novoColaborador = await createColaborador({
+        nome_completo: admissao.nome,
+        cargo: admissao.cargo,
+        departamento: admissao.departamento,
+        salario_base: admissao.salario_proposto,
+        data_admissao: admissao.data_prevista,
+        data_nascimento: new Date().toISOString().split('T')[0], // Placeholder - deve ser preenchido depois
+        sexo: 'masculino' as const, // Placeholder
+        estado_civil: 'solteiro' as const,
+        cpf: '000.000.000-00', // Placeholder - deve ser atualizado
+        nome_mae: 'A definir', // Placeholder
+        tipo_contrato: 'clt' as const,
+        status: 'ativo' as const,
+      });
+
+      // Remover a admissão da lista (ou marcar como concluída)
+      await deleteAdmissao(admissao.id);
+      
+      toast.success(`${admissao.nome} foi adicionado como colaborador!`);
+      return novoColaborador;
+    } catch (err: any) {
+      toast.error('Erro ao converter admissão: ' + err.message);
+      throw err;
     }
   };
 
@@ -171,7 +208,9 @@ export function useAdmissoes() {
     advanceStage,
     updateChecklist,
     getProgress,
+    converterParaColaborador,
     etapaLabels,
     etapaOrder,
+    ETAPA_CONCLUIDA,
   };
 }
