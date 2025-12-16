@@ -14,6 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
+      ajustes_ponto: {
+        Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          campo_alterado: string
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          motivo: string
+          registro_ponto_id: string
+          status: string | null
+          valor_anterior: string | null
+          valor_novo: string | null
+        }
+        Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          campo_alterado: string
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          motivo: string
+          registro_ponto_id: string
+          status?: string | null
+          valor_anterior?: string | null
+          valor_novo?: string | null
+        }
+        Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          campo_alterado?: string
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          motivo?: string
+          registro_ponto_id?: string
+          status?: string | null
+          valor_anterior?: string | null
+          valor_novo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ajustes_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ajustes_ponto_registro_ponto_id_fkey"
+            columns: ["registro_ponto_id"]
+            isOneToOne: false
+            referencedRelation: "registros_ponto"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      banco_horas: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data: string
+          horas: unknown
+          id: string
+          motivo: string | null
+          registro_ponto_id: string | null
+          saldo_anterior: unknown
+          saldo_atual: unknown
+          tipo: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data: string
+          horas: unknown
+          id?: string
+          motivo?: string | null
+          registro_ponto_id?: string | null
+          saldo_anterior?: unknown
+          saldo_atual?: unknown
+          tipo: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          horas?: unknown
+          id?: string
+          motivo?: string | null
+          registro_ponto_id?: string | null
+          saldo_anterior?: unknown
+          saldo_atual?: unknown
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_registro_ponto_id_fkey"
+            columns: ["registro_ponto_id"]
+            isOneToOne: false
+            referencedRelation: "registros_ponto"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaboradores: {
         Row: {
           agencia: string | null
@@ -369,6 +486,36 @@ export type Database = {
           },
         ]
       }
+      feriados: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          data: string
+          descricao: string
+          id: string
+          tipo: string | null
+          uf: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          data: string
+          descricao: string
+          id?: string
+          tipo?: string | null
+          uf?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          data?: string
+          descricao?: string
+          id?: string
+          tipo?: string | null
+          uf?: string | null
+        }
+        Relationships: []
+      }
       folhas_pagamento: {
         Row: {
           competencia: string
@@ -671,6 +818,39 @@ export type Database = {
         }
         Relationships: []
       }
+      periodos_ponto: {
+        Row: {
+          competencia: string
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          fechado_em: string | null
+          fechado_por: string | null
+          id: string
+          status: string | null
+        }
+        Insert: {
+          competencia: string
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          fechado_em?: string | null
+          fechado_por?: string | null
+          id?: string
+          status?: string | null
+        }
+        Update: {
+          competencia?: string
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          fechado_em?: string | null
+          fechado_por?: string | null
+          id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -706,6 +886,86 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      registros_ponto: {
+        Row: {
+          aprovado: boolean | null
+          aprovado_em: string | null
+          aprovado_por: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data: string
+          entrada_1: string | null
+          entrada_2: string | null
+          entrada_3: string | null
+          horas_extras: unknown
+          horas_falta: unknown
+          horas_trabalhadas: unknown
+          id: string
+          justificativa: string | null
+          observacoes: string | null
+          saida_1: string | null
+          saida_2: string | null
+          saida_3: string | null
+          tipo_dia: string | null
+          updated_at: string
+        }
+        Insert: {
+          aprovado?: boolean | null
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data: string
+          entrada_1?: string | null
+          entrada_2?: string | null
+          entrada_3?: string | null
+          horas_extras?: unknown
+          horas_falta?: unknown
+          horas_trabalhadas?: unknown
+          id?: string
+          justificativa?: string | null
+          observacoes?: string | null
+          saida_1?: string | null
+          saida_2?: string | null
+          saida_3?: string | null
+          tipo_dia?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aprovado?: boolean | null
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          entrada_1?: string | null
+          entrada_2?: string | null
+          entrada_3?: string | null
+          horas_extras?: unknown
+          horas_falta?: unknown
+          horas_trabalhadas?: unknown
+          id?: string
+          justificativa?: string | null
+          observacoes?: string | null
+          saida_1?: string | null
+          saida_2?: string | null
+          saida_3?: string | null
+          tipo_dia?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rubricas_folha: {
         Row: {
