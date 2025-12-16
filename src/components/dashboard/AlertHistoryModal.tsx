@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, subDays, subMonths, startOfDay, endOfDay } from 'date-fns';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { format, subDays, subMonths, startOfDay, endOfDay, parseISO, eachDayOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2, History, AlertTriangle, TrendingUp, Activity, CalendarIcon, Filter, X } from 'lucide-react';
+import { Loader2, History, AlertTriangle, TrendingUp, Activity, CalendarIcon, Filter, X, BarChart3, List } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 interface AlertHistoryItem {
   id: string;
@@ -42,6 +44,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [tipoFilter, setTipoFilter] = useState<string>('all');
   const [nivelFilter, setNivelFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string>('chart');
 
   useEffect(() => {
     if (open) {
@@ -117,6 +120,39 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
     setNivelFilter('all');
   };
 
+  const chartData = useMemo(() => {
+    if (!startDate || !endDate || history.length === 0) return [];
+
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+    
+    return days.map(day => {
+      const dayStr = format(day, 'yyyy-MM-dd');
+      const dayAlerts = history.filter(h => 
+        format(parseISO(h.created_at), 'yyyy-MM-dd') === dayStr
+      );
+      
+      return {
+        date: format(day, 'dd/MM', { locale: ptBR }),
+        fullDate: dayStr,
+        total: dayAlerts.length,
+        warning: dayAlerts.filter(a => a.nivel === 'warning').length,
+        critical: dayAlerts.filter(a => a.nivel === 'critical').length,
+        turnover: dayAlerts.filter(a => a.tipo === 'turnover').length,
+        absenteismo: dayAlerts.filter(a => a.tipo === 'absenteismo').length,
+      };
+    });
+  }, [history, startDate, endDate]);
+
+  const summaryStats = useMemo(() => {
+    const total = history.length;
+    const critical = history.filter(h => h.nivel === 'critical').length;
+    const warning = history.filter(h => h.nivel === 'warning').length;
+    const turnover = history.filter(h => h.tipo === 'turnover').length;
+    const absenteismo = history.filter(h => h.tipo === 'absenteismo').length;
+    
+    return { total, critical, warning, turnover, absenteismo };
+  }, [history]);
+
   const getTypeIcon = (tipo: string) => {
     switch (tipo) {
       case 'turnover':
@@ -154,7 +190,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh]">
+      <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <History className="w-5 h-5" />
@@ -258,60 +294,159 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
-        ) : history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <History className="w-12 h-12 mb-3 opacity-50" />
-            <p className="text-sm font-medium">Nenhum alerta encontrado</p>
-            <p className="text-xs">Tente ajustar os filtros</p>
-          </div>
         ) : (
-          <ScrollArea className="h-[450px] pr-4">
-            <div className="space-y-3">
-              {history.map((item) => (
-                <div
-                  key={item.id}
-                  className={`p-4 rounded-lg border ${
-                    item.nivel === 'critical'
-                      ? 'bg-destructive/5 border-destructive/20'
-                      : 'bg-warning/5 border-warning/20'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`p-2 rounded-full ${
-                          item.nivel === 'critical'
-                            ? 'bg-destructive/20 text-destructive'
-                            : 'bg-warning/20 text-warning'
-                        }`}
-                      >
-                        {getTypeIcon(item.tipo)}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">
-                            {getTypeLabel(item.tipo)}
-                          </span>
-                          {getLevelBadge(item.nivel)}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {item.mensagem}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                          <span>Valor: {item.valor.toFixed(1)}%</span>
-                          <span>Limite: {item.limite}%</span>
-                        </div>
-                      </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full max-w-[300px] grid-cols-2">
+              <TabsTrigger value="chart" className="gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Gráfico
+              </TabsTrigger>
+              <TabsTrigger value="list" className="gap-2">
+                <List className="w-4 h-4" />
+                Lista
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="chart" className="mt-4">
+              {history.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                  <BarChart3 className="w-12 h-12 mb-3 opacity-50" />
+                  <p className="text-sm font-medium">Nenhum dado para exibir</p>
+                  <p className="text-xs">Tente ajustar os filtros</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Summary Cards */}
+                  <div className="grid grid-cols-5 gap-3">
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <div className="text-2xl font-bold">{summaryStats.total}</div>
+                      <div className="text-xs text-muted-foreground">Total</div>
                     </div>
-                    <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
-                      <div>{format(new Date(item.created_at), 'dd/MM/yyyy', { locale: ptBR })}</div>
-                      <div>{format(new Date(item.created_at), 'HH:mm', { locale: ptBR })}</div>
+                    <div className="p-3 rounded-lg bg-destructive/10 text-center">
+                      <div className="text-2xl font-bold text-destructive">{summaryStats.critical}</div>
+                      <div className="text-xs text-muted-foreground">Críticos</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-warning/10 text-center">
+                      <div className="text-2xl font-bold text-warning">{summaryStats.warning}</div>
+                      <div className="text-xs text-muted-foreground">Alertas</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-primary/10 text-center">
+                      <div className="text-2xl font-bold text-primary">{summaryStats.turnover}</div>
+                      <div className="text-xs text-muted-foreground">Turnover</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-secondary text-center">
+                      <div className="text-2xl font-bold">{summaryStats.absenteismo}</div>
+                      <div className="text-xs text-muted-foreground">Absenteísmo</div>
                     </div>
                   </div>
+
+                  {/* Trend Chart */}
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 11 }} 
+                          className="text-muted-foreground"
+                          interval="preserveStartEnd"
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 11 }} 
+                          className="text-muted-foreground"
+                          allowDecimals={false}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--popover))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            fontSize: '12px'
+                          }}
+                          formatter={(value: number, name: string) => {
+                            const labels: Record<string, string> = {
+                              warning: 'Alertas',
+                              critical: 'Críticos'
+                            };
+                            return [value, labels[name] || name];
+                          }}
+                        />
+                        <Legend 
+                          formatter={(value) => {
+                            const labels: Record<string, string> = {
+                              warning: 'Alertas',
+                              critical: 'Críticos'
+                            };
+                            return labels[value] || value;
+                          }}
+                        />
+                        <Bar dataKey="warning" stackId="a" fill="hsl(var(--warning))" radius={[0, 0, 0, 0]} />
+                        <Bar dataKey="critical" stackId="a" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </ScrollArea>
+              )}
+            </TabsContent>
+
+            <TabsContent value="list" className="mt-4">
+              {history.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                  <History className="w-12 h-12 mb-3 opacity-50" />
+                  <p className="text-sm font-medium">Nenhum alerta encontrado</p>
+                  <p className="text-xs">Tente ajustar os filtros</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[380px] pr-4">
+                  <div className="space-y-3">
+                    {history.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`p-4 rounded-lg border ${
+                          item.nivel === 'critical'
+                            ? 'bg-destructive/5 border-destructive/20'
+                            : 'bg-warning/5 border-warning/20'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3">
+                            <div
+                              className={`p-2 rounded-full ${
+                                item.nivel === 'critical'
+                                  ? 'bg-destructive/20 text-destructive'
+                                  : 'bg-warning/20 text-warning'
+                              }`}
+                            >
+                              {getTypeIcon(item.tipo)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-sm">
+                                  {getTypeLabel(item.tipo)}
+                                </span>
+                                {getLevelBadge(item.nivel)}
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {item.mensagem}
+                              </p>
+                              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                                <span>Valor: {item.valor.toFixed(1)}%</span>
+                                <span>Limite: {item.limite}%</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right text-xs text-muted-foreground whitespace-nowrap">
+                            <div>{format(new Date(item.created_at), 'dd/MM/yyyy', { locale: ptBR })}</div>
+                            <div>{format(new Date(item.created_at), 'HH:mm', { locale: ptBR })}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </TabsContent>
+          </Tabs>
         )}
 
         <div className="flex justify-end pt-2">
