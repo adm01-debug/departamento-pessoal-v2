@@ -516,6 +516,105 @@ export type Database = {
         }
         Relationships: []
       }
+      ferias: {
+        Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_fim: string
+          data_inicio: string
+          data_pagamento: string | null
+          descontos_inss: number | null
+          descontos_irrf: number | null
+          dias_abono: number | null
+          dias_gozo: number
+          id: string
+          observacoes: string | null
+          periodo_aquisitivo_id: string | null
+          salario_base: number
+          status: string | null
+          updated_at: string
+          valor_abono: number | null
+          valor_ferias: number
+          valor_liquido: number
+          valor_terco: number
+          valor_terco_abono: number | null
+          valor_total: number
+          vender_abono: boolean | null
+        }
+        Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_fim: string
+          data_inicio: string
+          data_pagamento?: string | null
+          descontos_inss?: number | null
+          descontos_irrf?: number | null
+          dias_abono?: number | null
+          dias_gozo: number
+          id?: string
+          observacoes?: string | null
+          periodo_aquisitivo_id?: string | null
+          salario_base: number
+          status?: string | null
+          updated_at?: string
+          valor_abono?: number | null
+          valor_ferias: number
+          valor_liquido: number
+          valor_terco: number
+          valor_terco_abono?: number | null
+          valor_total: number
+          vender_abono?: boolean | null
+        }
+        Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string
+          data_inicio?: string
+          data_pagamento?: string | null
+          descontos_inss?: number | null
+          descontos_irrf?: number | null
+          dias_abono?: number | null
+          dias_gozo?: number
+          id?: string
+          observacoes?: string | null
+          periodo_aquisitivo_id?: string | null
+          salario_base?: number
+          status?: string | null
+          updated_at?: string
+          valor_abono?: number | null
+          valor_ferias?: number
+          valor_liquido?: number
+          valor_terco?: number
+          valor_terco_abono?: number | null
+          valor_total?: number
+          vender_abono?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_periodo_aquisitivo_id_fkey"
+            columns: ["periodo_aquisitivo_id"]
+            isOneToOne: false
+            referencedRelation: "periodos_aquisitivos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       folhas_pagamento: {
         Row: {
           competencia: string
@@ -622,6 +721,44 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_ferias: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ferias_id: string
+          id: string
+          observacao: string | null
+          status_anterior: string | null
+          status_novo: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ferias_id: string
+          id?: string
+          observacao?: string | null
+          status_anterior?: string | null
+          status_novo: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ferias_id?: string
+          id?: string
+          observacao?: string | null
+          status_anterior?: string | null
+          status_novo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_ferias_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
             referencedColumns: ["id"]
           },
         ]
@@ -817,6 +954,53 @@ export type Database = {
           vigencia_inicio?: string
         }
         Relationships: []
+      }
+      periodos_aquisitivos: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          dias_descontados: number | null
+          dias_direito: number
+          faltas_periodo: number | null
+          id: string
+          numero_periodo: number
+          status: string | null
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          dias_descontados?: number | null
+          dias_direito?: number
+          faltas_periodo?: number | null
+          id?: string
+          numero_periodo?: number
+          status?: string | null
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          dias_descontados?: number | null
+          dias_direito?: number
+          faltas_periodo?: number | null
+          id?: string
+          numero_periodo?: number
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "periodos_aquisitivos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       periodos_ponto: {
         Row: {
@@ -1014,7 +1198,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
     }
     Enums: {
       escolaridade:
