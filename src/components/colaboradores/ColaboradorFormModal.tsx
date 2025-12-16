@@ -4,18 +4,25 @@ import { z } from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { MaskedInput } from '@/components/ui/masked-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, Pencil, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Colaborador } from '@/data/mockData';
+import { validateCPF, unmask } from '@/lib/masks';
 
 const colaboradorSchema = z.object({
   nome: z.string()
     .trim()
     .min(3, 'Nome deve ter pelo menos 3 caracteres')
     .max(100, 'Nome deve ter no máximo 100 caracteres'),
+  cpf: z.string()
+    .min(14, 'CPF deve estar completo')
+    .refine((val) => validateCPF(val), {
+      message: 'CPF inválido',
+    }),
   matricula: z.string()
     .trim()
     .min(1, 'Matrícula é obrigatória')
@@ -77,6 +84,7 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     resolver: zodResolver(colaboradorSchema),
     defaultValues: {
       nome: '',
+      cpf: '',
       matricula: '',
       cargo: '',
       departamento: '',
@@ -92,6 +100,7 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     if (colaborador && open) {
       form.reset({
         nome: colaborador.nome,
+        cpf: (colaborador as any).cpf || '',
         matricula: colaborador.matricula,
         cargo: colaborador.cargo,
         departamento: colaborador.departamento,
@@ -103,6 +112,7 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     } else if (!open) {
       form.reset({
         nome: '',
+        cpf: '',
         matricula: '',
         cargo: '',
         departamento: '',
@@ -169,6 +179,26 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
                       placeholder="Ex: João Silva Santos" 
                       {...field} 
                       className="bg-background"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* CPF */}
+            <FormField
+              control={form.control}
+              name="cpf"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>CPF *</FormLabel>
+                  <FormControl>
+                    <MaskedInput 
+                      mask="cpf"
+                      value={field.value}
+                      onValueChange={(_, maskedValue) => field.onChange(maskedValue)}
+                      className="bg-background font-mono"
                     />
                   </FormControl>
                   <FormMessage />
