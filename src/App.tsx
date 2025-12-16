@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import Colaboradores from "./pages/Colaboradores";
@@ -16,6 +18,7 @@ import Beneficios from "./pages/Beneficios";
 import Desligamento from "./pages/Desligamento";
 import Relatorios from "./pages/Relatorios";
 import Perfil from "./pages/Perfil";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,25 +27,32 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="dark">
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/colaboradores" element={<Colaboradores />} />
-              <Route path="/admissao" element={<Admissao />} />
-              <Route path="/ponto" element={<Ponto />} />
-              <Route path="/ferias" element={<Ferias />} />
-              <Route path="/afastamentos" element={<Afastamentos />} />
-              <Route path="/folha" element={<Folha />} />
-              <Route path="/beneficios" element={<Beneficios />} />
-              <Route path="/desligamento" element={<Desligamento />} />
-              <Route path="/relatorios" element={<Relatorios />} />
-              <Route path="/perfil" element={<Perfil />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route element={
+                <ProtectedRoute>
+                  <MainLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/colaboradores" element={<Colaboradores />} />
+                <Route path="/admissao" element={<Admissao />} />
+                <Route path="/ponto" element={<Ponto />} />
+                <Route path="/ferias" element={<Ferias />} />
+                <Route path="/afastamentos" element={<Afastamentos />} />
+                <Route path="/folha" element={<Folha />} />
+                <Route path="/beneficios" element={<Beneficios />} />
+                <Route path="/desligamento" element={<Desligamento />} />
+                <Route path="/relatorios" element={<Relatorios />} />
+                <Route path="/perfil" element={<Perfil />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
