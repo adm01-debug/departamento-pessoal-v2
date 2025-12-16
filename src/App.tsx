@@ -15,6 +15,7 @@ import Folha from "./pages/Folha";
 import Beneficios from "./pages/Beneficios";
 import Desligamento from "./pages/Desligamento";
 import Relatorios from "./pages/Relatorios";
+import Perfil from "./pages/Perfil";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/beneficios" element={<Beneficios />} />
               <Route path="/desligamento" element={<Desligamento />} />
               <Route path="/relatorios" element={<Relatorios />} />
+              <Route path="/perfil" element={<Perfil />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
