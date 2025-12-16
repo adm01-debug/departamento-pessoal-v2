@@ -36,7 +36,7 @@ export default function Afastamentos() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="font-semibold text-sm text-foreground">Atenção: Afastamento > 15 dias</h3>
+            <h3 className="font-semibold text-sm text-foreground">Atenção: Afastamento {'>'} 15 dias</h3>
             <p className="text-sm text-muted-foreground mt-1">
               Carlos Lima - Acidente de Trabalho - 16 dias. Necessário encaminhamento ao INSS.
             </p>

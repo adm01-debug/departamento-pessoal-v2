@@ -116,7 +116,7 @@ export const mockDepartamentos = [
   { id: '5', nome: 'Administrativo', colaboradores: 4 },
 ];
 
-export const mockCalendarioEventos = [
+export const mockCalendarioEventos: { data: string; tipo: 'ferias' | 'admissao' | 'feriado' | 'pagamento' | 'afastamento'; titulo: string }[] = [
   { data: '2025-12-18', tipo: 'admissao', titulo: 'Admissão Ana Vendedora' },
   { data: '2025-12-20', tipo: 'admissao', titulo: 'Admissão Maria Designer' },
   { data: '2025-12-25', tipo: 'feriado', titulo: 'Natal' },
