@@ -318,6 +318,117 @@ export type Database = {
           },
         ]
       }
+      eventos_variaveis: {
+        Row: {
+          colaborador_id: string
+          competencia: string
+          created_at: string
+          created_by: string | null
+          id: string
+          observacao: string | null
+          referencia: number | null
+          rubrica_id: string
+          valor: number
+        }
+        Insert: {
+          colaborador_id: string
+          competencia: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          observacao?: string | null
+          referencia?: number | null
+          rubrica_id: string
+          valor: number
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          observacao?: string | null
+          referencia?: number | null
+          rubrica_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_variaveis_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_rubrica_id_fkey"
+            columns: ["rubrica_id"]
+            isOneToOne: false
+            referencedRelation: "rubricas_folha"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folhas_pagamento: {
+        Row: {
+          competencia: string
+          created_at: string
+          created_by: string | null
+          data_calculo: string | null
+          data_fechamento: string | null
+          data_pagamento: string | null
+          id: string
+          observacoes: string | null
+          status: Database["public"]["Enums"]["status_folha"]
+          tipo: string
+          total_colaboradores: number | null
+          total_descontos: number | null
+          total_fgts: number | null
+          total_inss_patronal: number | null
+          total_liquido: number | null
+          total_proventos: number | null
+          updated_at: string
+        }
+        Insert: {
+          competencia: string
+          created_at?: string
+          created_by?: string | null
+          data_calculo?: string | null
+          data_fechamento?: string | null
+          data_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: Database["public"]["Enums"]["status_folha"]
+          tipo?: string
+          total_colaboradores?: number | null
+          total_descontos?: number | null
+          total_fgts?: number | null
+          total_inss_patronal?: number | null
+          total_liquido?: number | null
+          total_proventos?: number | null
+          updated_at?: string
+        }
+        Update: {
+          competencia?: string
+          created_at?: string
+          created_by?: string | null
+          data_calculo?: string | null
+          data_fechamento?: string | null
+          data_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: Database["public"]["Enums"]["status_folha"]
+          tipo?: string
+          total_colaboradores?: number | null
+          total_descontos?: number | null
+          total_fgts?: number | null
+          total_inss_patronal?: number | null
+          total_liquido?: number | null
+          total_proventos?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       historico_cargo: {
         Row: {
           cargo_anterior: string | null
@@ -368,6 +479,198 @@ export type Database = {
           },
         ]
       }
+      holerites: {
+        Row: {
+          base_fgts: number | null
+          base_inss: number | null
+          base_irrf: number | null
+          colaborador_cargo: string
+          colaborador_cpf: string
+          colaborador_departamento: string
+          colaborador_id: string
+          colaborador_matricula: string | null
+          colaborador_nome: string
+          created_at: string
+          dependentes_irrf: number | null
+          faltas_dias: number | null
+          folha_id: string
+          horas_extras_100: number | null
+          horas_extras_50: number | null
+          id: string
+          liquido: number
+          salario_base: number
+          total_descontos: number
+          total_proventos: number
+          valor_fgts: number | null
+          valor_inss: number | null
+          valor_irrf: number | null
+        }
+        Insert: {
+          base_fgts?: number | null
+          base_inss?: number | null
+          base_irrf?: number | null
+          colaborador_cargo: string
+          colaborador_cpf: string
+          colaborador_departamento: string
+          colaborador_id: string
+          colaborador_matricula?: string | null
+          colaborador_nome: string
+          created_at?: string
+          dependentes_irrf?: number | null
+          faltas_dias?: number | null
+          folha_id: string
+          horas_extras_100?: number | null
+          horas_extras_50?: number | null
+          id?: string
+          liquido?: number
+          salario_base: number
+          total_descontos?: number
+          total_proventos?: number
+          valor_fgts?: number | null
+          valor_inss?: number | null
+          valor_irrf?: number | null
+        }
+        Update: {
+          base_fgts?: number | null
+          base_inss?: number | null
+          base_irrf?: number | null
+          colaborador_cargo?: string
+          colaborador_cpf?: string
+          colaborador_departamento?: string
+          colaborador_id?: string
+          colaborador_matricula?: string | null
+          colaborador_nome?: string
+          created_at?: string
+          dependentes_irrf?: number | null
+          faltas_dias?: number | null
+          folha_id?: string
+          horas_extras_100?: number | null
+          horas_extras_50?: number | null
+          id?: string
+          liquido?: number
+          salario_base?: number
+          total_descontos?: number
+          total_proventos?: number
+          valor_fgts?: number | null
+          valor_inss?: number | null
+          valor_irrf?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holerites_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holerites_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lancamentos_folha: {
+        Row: {
+          automatico: boolean | null
+          created_at: string
+          holerite_id: string
+          id: string
+          referencia: number | null
+          rubrica_codigo: string
+          rubrica_descricao: string
+          rubrica_id: string
+          tipo: Database["public"]["Enums"]["tipo_evento_folha"]
+          valor: number
+        }
+        Insert: {
+          automatico?: boolean | null
+          created_at?: string
+          holerite_id: string
+          id?: string
+          referencia?: number | null
+          rubrica_codigo: string
+          rubrica_descricao: string
+          rubrica_id: string
+          tipo: Database["public"]["Enums"]["tipo_evento_folha"]
+          valor: number
+        }
+        Update: {
+          automatico?: boolean | null
+          created_at?: string
+          holerite_id?: string
+          id?: string
+          referencia?: number | null
+          rubrica_codigo?: string
+          rubrica_descricao?: string
+          rubrica_id?: string
+          tipo?: Database["public"]["Enums"]["tipo_evento_folha"]
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lancamentos_folha_holerite_id_fkey"
+            columns: ["holerite_id"]
+            isOneToOne: false
+            referencedRelation: "holerites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_folha_rubrica_id_fkey"
+            columns: ["rubrica_id"]
+            isOneToOne: false
+            referencedRelation: "rubricas_folha"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parametros_fiscais: {
+        Row: {
+          aliquota: number | null
+          ativo: boolean | null
+          created_at: string
+          deducao: number | null
+          faixa: number | null
+          id: string
+          tipo: string
+          valor_final: number | null
+          valor_fixo: number | null
+          valor_inicial: number | null
+          vigencia_fim: string | null
+          vigencia_inicio: string
+        }
+        Insert: {
+          aliquota?: number | null
+          ativo?: boolean | null
+          created_at?: string
+          deducao?: number | null
+          faixa?: number | null
+          id?: string
+          tipo: string
+          valor_final?: number | null
+          valor_fixo?: number | null
+          valor_inicial?: number | null
+          vigencia_fim?: string | null
+          vigencia_inicio: string
+        }
+        Update: {
+          aliquota?: number | null
+          ativo?: boolean | null
+          created_at?: string
+          deducao?: number | null
+          faixa?: number | null
+          id?: string
+          tipo?: string
+          valor_final?: number | null
+          valor_fixo?: number | null
+          valor_inicial?: number | null
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -404,6 +707,48 @@ export type Database = {
         }
         Relationships: []
       }
+      rubricas_folha: {
+        Row: {
+          ativo: boolean | null
+          automatico: boolean | null
+          codigo: string
+          created_at: string
+          descricao: string
+          formula: string | null
+          id: string
+          incide_fgts: boolean | null
+          incide_inss: boolean | null
+          incide_irrf: boolean | null
+          tipo: Database["public"]["Enums"]["tipo_evento_folha"]
+        }
+        Insert: {
+          ativo?: boolean | null
+          automatico?: boolean | null
+          codigo: string
+          created_at?: string
+          descricao: string
+          formula?: string | null
+          id?: string
+          incide_fgts?: boolean | null
+          incide_inss?: boolean | null
+          incide_irrf?: boolean | null
+          tipo: Database["public"]["Enums"]["tipo_evento_folha"]
+        }
+        Update: {
+          ativo?: boolean | null
+          automatico?: boolean | null
+          codigo?: string
+          created_at?: string
+          descricao?: string
+          formula?: string | null
+          id?: string
+          incide_fgts?: boolean | null
+          incide_inss?: boolean | null
+          incide_irrf?: boolean | null
+          tipo?: Database["public"]["Enums"]["tipo_evento_folha"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -436,6 +781,7 @@ export type Database = {
         | "afastado"
         | "desligado"
         | "pendente"
+      status_folha: "aberta" | "calculada" | "fechada" | "paga"
       tipo_conta: "corrente" | "poupanca" | "salario"
       tipo_contrato:
         | "clt"
@@ -444,6 +790,7 @@ export type Database = {
         | "temporario"
         | "intermitente"
         | "aprendiz"
+      tipo_evento_folha: "provento" | "desconto" | "informativo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -598,6 +945,7 @@ export const Constants = {
         "desligado",
         "pendente",
       ],
+      status_folha: ["aberta", "calculada", "fechada", "paga"],
       tipo_conta: ["corrente", "poupanca", "salario"],
       tipo_contrato: [
         "clt",
@@ -607,6 +955,7 @@ export const Constants = {
         "intermitente",
         "aprendiz",
       ],
+      tipo_evento_folha: ["provento", "desconto", "informativo"],
     },
   },
 } as const
