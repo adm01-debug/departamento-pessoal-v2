@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil } from 'lucide-react';
+import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -39,6 +39,11 @@ export default function AdmissaoPage() {
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [novaAdmissaoOpen, setNovaAdmissaoOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
+
+  // Verificar se dados pessoais estão incompletos
+  const isDadosIncompletos = (adm: AdmissaoType) => {
+    return !adm.cpf || !adm.data_nascimento || !adm.sexo || !adm.nome_mae;
+  };
 
   // Agrupar por etapa
   const admissoesPorEtapa = etapaOrder.map(etapa => ({
@@ -164,11 +169,15 @@ export default function AdmissaoPage() {
                 )}>
                   {admissoes.map((adm) => {
                     const progress = getProgress(adm);
+                    const dadosIncompletos = isDadosIncompletos(adm);
                     return (
                       <div 
                         key={adm.id}
                         onClick={() => handleOpenChecklist(adm)}
-                        className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer group"
+                        className={cn(
+                          "p-4 rounded-lg bg-card border shadow-sm hover-lift cursor-pointer group",
+                          dadosIncompletos ? "border-warning/50" : "border-border"
+                        )}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -194,6 +203,14 @@ export default function AdmissaoPage() {
                         <h4 className="font-medium text-sm text-foreground mb-1">{adm.nome}</h4>
                         <p className="text-xs text-muted-foreground mb-2">{adm.cargo}</p>
                         <p className="text-xs text-muted-foreground">{adm.departamento}</p>
+                        
+                        {/* Indicador de dados incompletos */}
+                        {dadosIncompletos && (
+                          <div className="flex items-center gap-1.5 mt-2 text-warning">
+                            <AlertTriangle className="w-3 h-3" />
+                            <span className="text-xs">Dados pessoais incompletos</span>
+                          </div>
+                        )}
                         
                         {/* Progress bar */}
                         <div className="mt-3">
@@ -243,6 +260,7 @@ export default function AdmissaoPage() {
               <tbody>
                 {admissoes.map((adm) => {
                   const progress = getProgress(adm);
+                  const dadosIncompletos = isDadosIncompletos(adm);
                   return (
                     <tr key={adm.id} className="border-t hover:bg-muted/30">
                       <td className="p-3">
@@ -252,7 +270,15 @@ export default function AdmissaoPage() {
                               {adm.nome.split(' ').map(n => n[0]).slice(0, 2).join('')}
                             </span>
                           </div>
-                          <span className="font-medium text-sm">{adm.nome}</span>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-sm">{adm.nome}</span>
+                            {dadosIncompletos && (
+                              <span className="flex items-center gap-1 text-warning text-xs">
+                                <AlertTriangle className="w-3 h-3" />
+                                Dados incompletos
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td className="p-3 text-sm">{adm.cargo}</td>
