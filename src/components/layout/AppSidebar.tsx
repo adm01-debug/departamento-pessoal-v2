@@ -11,13 +11,16 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
-  Search
+  Search,
+  LogOut
 } from 'lucide-react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', color: 'text-primary' },
@@ -39,6 +42,23 @@ interface AppSidebarProps {
 export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Logout realizado com sucesso');
+    navigate('/auth');
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <aside 
@@ -127,24 +147,39 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-sidebar-border">
+        <div className="p-4 border-t border-sidebar-border space-y-2">
           <NavLink
             to="/perfil"
             className={cn(
-              "flex items-center gap-3 p-2 -m-2 rounded-lg transition-colors",
+              "flex items-center gap-3 p-2 rounded-lg transition-colors",
               location.pathname === '/perfil' 
                 ? "bg-sidebar-accent" 
                 : "hover:bg-sidebar-accent/50"
             )}
           >
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-xs font-semibold text-primary">AS</span>
+              <span className="text-xs font-semibold text-primary">
+                {profile?.nome ? getInitials(profile.nome) : '??'}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">Ana Silva</p>
-              <p className="text-xs text-muted-foreground">Analista DP</p>
+              <p className="text-sm font-medium text-foreground truncate">
+                {profile?.nome || 'Carregando...'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {profile?.cargo || 'Usuário'}
+              </p>
             </div>
           </NavLink>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4" />
+            Sair
+          </Button>
         </div>
       )}
     </aside>

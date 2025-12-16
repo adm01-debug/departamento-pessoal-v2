@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,12 +13,12 @@ import { MaskedInput } from '@/components/ui/masked-input';
 import { User, Bell, Shield, Palette, Mail, Building2, Camera, Save, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useAuth } from '@/hooks/useAuth';
 
 // Validation schemas
 const profileSchema = z.object({
   nome: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100, 'Nome muito longo'),
-  email: z.string().email('E-mail inválido').max(255, 'E-mail muito longo'),
-  telefone: z.string().regex(/^\(\d{2}\)\s?\d{4,5}-\d{4}$/, 'Telefone inválido. Use: (11) 99999-9999'),
+  telefone: z.string().optional(),
 });
 
 const passwordSchema = z.object({
@@ -32,20 +32,20 @@ const passwordSchema = z.object({
   path: ['confirmarSenha'],
 });
 
-type ProfileErrors = { nome?: string; email?: string; telefone?: string };
+type ProfileErrors = { nome?: string; telefone?: string };
 type PasswordErrors = { senhaAtual?: string; novaSenha?: string; confirmarSenha?: string };
 
 export default function Perfil() {
+  const { user, profile, updateProfile } = useAuth();
+  
   const [profileData, setProfileData] = useState({
-    nome: 'Ana Silva',
-    email: 'ana.silva@promobrindes.com.br',
-    telefone: '(11) 98765-4321',
-    cargo: 'Analista de Departamento Pessoal',
-    departamento: 'Recursos Humanos',
-    matricula: 'PB-2024-001'
+    nome: '',
+    telefone: '',
+    cargo: '',
+    departamento: '',
   });
 
-  const [originalProfileData] = useState({ ...profileData });
+  const [originalProfileData, setOriginalProfileData] = useState({ ...profileData });
   const [profileErrors, setProfileErrors] = useState<ProfileErrors>({});
 
   const [passwordData, setPasswordData] = useState({
@@ -77,9 +77,31 @@ export default function Perfil() {
     onConfirm: () => void;
   }>({ open: false, title: '', description: '', onConfirm: () => {} });
 
+  // Load profile data when available
+  useEffect(() => {
+    if (profile) {
+      const data = {
+        nome: profile.nome || '',
+        telefone: profile.telefone || '',
+        cargo: profile.cargo || 'Usuário',
+        departamento: profile.departamento || '',
+      };
+      setProfileData(data);
+      setOriginalProfileData(data);
+    }
+  }, [profile]);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   const hasProfileChanges = () => {
     return profileData.nome !== originalProfileData.nome ||
-           profileData.email !== originalProfileData.email ||
            profileData.telefone !== originalProfileData.telefone;
   };
 
@@ -123,8 +145,17 @@ export default function Perfil() {
       open: true,
       title: 'Confirmar alterações',
       description: 'Deseja salvar as alterações no seu perfil? Esta ação atualizará suas informações pessoais.',
-      onConfirm: () => {
-        toast.success('Perfil atualizado com sucesso!');
+      onConfirm: async () => {
+        const { error } = await updateProfile({
+          nome: profileData.nome,
+          telefone: profileData.telefone,
+        });
+        if (error) {
+          toast.error('Erro ao atualizar perfil');
+        } else {
+          toast.success('Perfil atualizado com sucesso!');
+          setOriginalProfileData({ ...profileData });
+        }
         setConfirmDialog({ ...confirmDialog, open: false });
       }
     });
@@ -207,8 +238,10 @@ export default function Perfil() {
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
               <Avatar className="w-24 h-24 border-4 border-primary/20">
-                <AvatarImage src="" />
-                <AvatarFallback className="text-2xl font-bold bg-primary/20 text-primary">AS</AvatarFallback>
+                <AvatarImage src={profile?.avatar_url || ''} />
+                <AvatarFallback className="text-2xl font-bold bg-primary/20 text-primary">
+                  {profileData.nome ? getInitials(profileData.nome) : '??'}
+                </AvatarFallback>
               </Avatar>
               <Button size="icon" variant="secondary" className="absolute -bottom-1 -right-1 rounded-full w-8 h-8">
                 <Camera className="w-4 h-4" />
@@ -220,17 +253,17 @@ export default function Perfil() {
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Building2 className="w-4 h-4" />
-                  {profileData.departamento}
+                  {profileData.departamento || 'Não definido'}
                 </span>
                 <span className="flex items-center gap-1">
                   <Mail className="w-4 h-4" />
-                  {profileData.email}
+                  {user?.email}
                 </span>
               </div>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-xs text-muted-foreground">Matrícula</p>
-              <p className="text-lg font-mono font-semibold text-primary">{profileData.matricula}</p>
+              <p className="text-xs text-muted-foreground">ID do Usuário</p>
+              <p className="text-sm font-mono font-medium text-primary truncate max-w-[150px]">{user?.id?.slice(0, 8)}...</p>
             </div>
           </div>
         </CardContent>
@@ -286,16 +319,11 @@ export default function Perfil() {
                   <Input 
                     id="email" 
                     type="email"
-                    value={profileData.email}
-                    onChange={(e) => {
-                      setProfileData({ ...profileData, email: e.target.value });
-                      if (profileErrors.email) setProfileErrors({ ...profileErrors, email: undefined });
-                    }}
-                    className={profileErrors.email ? 'border-destructive' : ''}
+                    value={user?.email || ''}
+                    disabled
+                    className="bg-muted"
                   />
-                  {profileErrors.email && (
-                    <p className="text-xs text-destructive">{profileErrors.email}</p>
-                  )}
+                  <p className="text-xs text-muted-foreground">O e-mail não pode ser alterado</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone</Label>
