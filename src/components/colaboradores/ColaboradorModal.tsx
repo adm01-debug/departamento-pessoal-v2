@@ -16,7 +16,8 @@ import {
   FileText,
   Umbrella,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Pencil
 } from 'lucide-react';
 
 const statusLabels: Record<string, string> = {
@@ -31,9 +32,10 @@ interface ColaboradorModalProps {
   colaborador: Colaborador | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit?: (colaborador: Colaborador) => void;
 }
 
-export function ColaboradorModal({ colaborador, open, onOpenChange }: ColaboradorModalProps) {
+export function ColaboradorModal({ colaborador, open, onOpenChange, onEdit }: ColaboradorModalProps) {
   if (!colaborador) return null;
 
   const colors = statusColors[colaborador.status];
@@ -173,13 +175,24 @@ export function ColaboradorModal({ colaborador, open, onOpenChange }: Colaborado
 
         {/* Actions */}
         <div className="flex gap-2 mt-6 pt-4 border-t border-border">
+          <Button 
+            variant="default" 
+            className="gap-2"
+            onClick={() => {
+              onOpenChange(false);
+              onEdit?.(colaborador);
+            }}
+          >
+            <Pencil className="w-4 h-4" />
+            Editar
+          </Button>
           <Button variant="outline" className="flex-1 gap-2">
             <FileText className="w-4 h-4" />
             Documentos
           </Button>
           <Button variant="outline" className="flex-1 gap-2">
             <Umbrella className="w-4 h-4" />
-            Solicitar Férias
+            Férias
           </Button>
           <Button variant="outline" className="flex-1 gap-2">
             <TrendingUp className="w-4 h-4" />
