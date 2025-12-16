@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { User, Bell, Shield, Palette, Mail, Phone, Building2, Camera, Save, AlertTriangle } from 'lucide-react';
+import { MaskedInput } from '@/components/ui/masked-input';
+import { User, Bell, Shield, Palette, Mail, Building2, Camera, Save, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -33,15 +34,6 @@ const passwordSchema = z.object({
 
 type ProfileErrors = { nome?: string; email?: string; telefone?: string };
 type PasswordErrors = { senhaAtual?: string; novaSenha?: string; confirmarSenha?: string };
-
-const formatPhone = (value: string): string => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  if (digits.length === 0) return '';
-  if (digits.length <= 2) return `(${digits}`;
-  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-};
 
 export default function Perfil() {
   const [profileData, setProfileData] = useState({
@@ -307,15 +299,14 @@ export default function Perfil() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone</Label>
-                  <Input 
-                    id="telefone" 
+                  <MaskedInput 
+                    id="telefone"
+                    mask="phone"
                     value={profileData.telefone}
-                    onChange={(e) => {
-                      const formatted = formatPhone(e.target.value);
-                      setProfileData({ ...profileData, telefone: formatted });
+                    onValueChange={(_, maskedValue) => {
+                      setProfileData({ ...profileData, telefone: maskedValue });
                       if (profileErrors.telefone) setProfileErrors({ ...profileErrors, telefone: undefined });
                     }}
-                    placeholder="(11) 99999-9999"
                     className={profileErrors.telefone ? 'border-destructive' : ''}
                   />
                   {profileErrors.telefone && (
