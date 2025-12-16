@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      admissoes: {
+        Row: {
+          cargo: string
+          checklist_comprovante_endereco: boolean | null
+          checklist_contrato_assinado: boolean | null
+          checklist_ctps: boolean | null
+          checklist_documentos_pessoais: boolean | null
+          checklist_esocial_enviado: boolean | null
+          checklist_exame_admissional: boolean | null
+          checklist_foto: boolean | null
+          created_at: string
+          created_by: string | null
+          data_prevista: string
+          departamento: string
+          etapa: Database["public"]["Enums"]["etapa_admissao"]
+          id: string
+          nome: string
+          observacoes: string | null
+          salario_proposto: number
+          updated_at: string
+        }
+        Insert: {
+          cargo: string
+          checklist_comprovante_endereco?: boolean | null
+          checklist_contrato_assinado?: boolean | null
+          checklist_ctps?: boolean | null
+          checklist_documentos_pessoais?: boolean | null
+          checklist_esocial_enviado?: boolean | null
+          checklist_exame_admissional?: boolean | null
+          checklist_foto?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          data_prevista: string
+          departamento: string
+          etapa?: Database["public"]["Enums"]["etapa_admissao"]
+          id?: string
+          nome: string
+          observacoes?: string | null
+          salario_proposto: number
+          updated_at?: string
+        }
+        Update: {
+          cargo?: string
+          checklist_comprovante_endereco?: boolean | null
+          checklist_contrato_assinado?: boolean | null
+          checklist_ctps?: boolean | null
+          checklist_documentos_pessoais?: boolean | null
+          checklist_esocial_enviado?: boolean | null
+          checklist_exame_admissional?: boolean | null
+          checklist_foto?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          data_prevista?: string
+          departamento?: string
+          etapa?: Database["public"]["Enums"]["etapa_admissao"]
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          salario_proposto?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       afastamentos: {
         Row: {
           atestado_numero: string | null
@@ -530,6 +593,110 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dependentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      desligamentos: {
+        Row: {
+          aviso_previo: number | null
+          checklist_calculo_rescisao: boolean | null
+          checklist_comunicacao: boolean | null
+          checklist_devolucao_equipamentos: boolean | null
+          checklist_documentacao: boolean | null
+          checklist_esocial: boolean | null
+          checklist_homologacao: boolean | null
+          checklist_pagamento: boolean | null
+          checklist_revogacao_acessos: boolean | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_aviso: string | null
+          data_desligamento: string
+          decimo_terceiro: number | null
+          ferias_proporcionais: number | null
+          ferias_vencidas: number | null
+          id: string
+          motivo: string | null
+          multa_fgts: number | null
+          salario_base: number
+          saldo_salario: number | null
+          status: string
+          terco_constitucional: number | null
+          tipo: Database["public"]["Enums"]["tipo_desligamento"]
+          total_descontos: number | null
+          total_proventos: number | null
+          updated_at: string
+          valor_liquido: number | null
+        }
+        Insert: {
+          aviso_previo?: number | null
+          checklist_calculo_rescisao?: boolean | null
+          checklist_comunicacao?: boolean | null
+          checklist_devolucao_equipamentos?: boolean | null
+          checklist_documentacao?: boolean | null
+          checklist_esocial?: boolean | null
+          checklist_homologacao?: boolean | null
+          checklist_pagamento?: boolean | null
+          checklist_revogacao_acessos?: boolean | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_aviso?: string | null
+          data_desligamento: string
+          decimo_terceiro?: number | null
+          ferias_proporcionais?: number | null
+          ferias_vencidas?: number | null
+          id?: string
+          motivo?: string | null
+          multa_fgts?: number | null
+          salario_base?: number
+          saldo_salario?: number | null
+          status?: string
+          terco_constitucional?: number | null
+          tipo: Database["public"]["Enums"]["tipo_desligamento"]
+          total_descontos?: number | null
+          total_proventos?: number | null
+          updated_at?: string
+          valor_liquido?: number | null
+        }
+        Update: {
+          aviso_previo?: number | null
+          checklist_calculo_rescisao?: boolean | null
+          checklist_comunicacao?: boolean | null
+          checklist_devolucao_equipamentos?: boolean | null
+          checklist_documentacao?: boolean | null
+          checklist_esocial?: boolean | null
+          checklist_homologacao?: boolean | null
+          checklist_pagamento?: boolean | null
+          checklist_revogacao_acessos?: boolean | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_aviso?: string | null
+          data_desligamento?: string
+          decimo_terceiro?: number | null
+          ferias_proporcionais?: number | null
+          ferias_vencidas?: number | null
+          id?: string
+          motivo?: string | null
+          multa_fgts?: number | null
+          salario_base?: number
+          saldo_salario?: number | null
+          status?: string
+          terco_constitucional?: number | null
+          tipo?: Database["public"]["Enums"]["tipo_desligamento"]
+          total_descontos?: number | null
+          total_proventos?: number | null
+          updated_at?: string
+          valor_liquido?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "desligamentos_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
@@ -1476,6 +1643,15 @@ export type Database = {
         | "viuvo"
         | "separado"
         | "uniao_estavel"
+      etapa_admissao:
+        | "solicitacao"
+        | "documentos"
+        | "validacao"
+        | "pendente"
+        | "exame"
+        | "contrato"
+        | "assinatura"
+        | "esocial"
       sexo: "masculino" | "feminino"
       status_afastamento: "ativo" | "encerrado" | "cancelado" | "prorrogado"
       status_colaborador:
@@ -1506,6 +1682,13 @@ export type Database = {
         | "temporario"
         | "intermitente"
         | "aprendiz"
+      tipo_desligamento:
+        | "sem_justa_causa"
+        | "justa_causa"
+        | "pedido_demissao"
+        | "acordo"
+        | "fim_contrato"
+        | "falecimento"
       tipo_evento_folha: "provento" | "desconto" | "informativo"
     }
     CompositeTypes: {
@@ -1653,6 +1836,16 @@ export const Constants = {
         "separado",
         "uniao_estavel",
       ],
+      etapa_admissao: [
+        "solicitacao",
+        "documentos",
+        "validacao",
+        "pendente",
+        "exame",
+        "contrato",
+        "assinatura",
+        "esocial",
+      ],
       sexo: ["masculino", "feminino"],
       status_afastamento: ["ativo", "encerrado", "cancelado", "prorrogado"],
       status_colaborador: [
@@ -1685,6 +1878,14 @@ export const Constants = {
         "temporario",
         "intermitente",
         "aprendiz",
+      ],
+      tipo_desligamento: [
+        "sem_justa_causa",
+        "justa_causa",
+        "pedido_demissao",
+        "acordo",
+        "fim_contrato",
+        "falecimento",
       ],
       tipo_evento_folha: ["provento", "desconto", "informativo"],
     },
