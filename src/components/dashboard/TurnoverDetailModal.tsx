@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { UserPlus, UserMinus, Calendar, Building2, Briefcase, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserPlus, UserMinus, Calendar, Building2, Briefcase, Loader2, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -26,10 +27,14 @@ interface MovimentacaoColaborador {
 export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: TurnoverDetailModalProps) {
   const [loading, setLoading] = useState(false);
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoColaborador[]>([]);
+  const [filtroTipo, setFiltroTipo] = useState<'todos' | 'admissao' | 'desligamento'>('todos');
+  const [filtroDepartamento, setFiltroDepartamento] = useState<string>('todos');
 
   useEffect(() => {
     if (open && mes) {
       fetchMovimentacoes();
+      setFiltroTipo('todos');
+      setFiltroDepartamento('todos');
     }
   }, [open, mes]);
 
@@ -87,8 +92,23 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
     }
   };
 
-  const admissoes = movimentacoes.filter(m => m.tipo === 'admissao');
-  const desligamentos = movimentacoes.filter(m => m.tipo === 'desligamento');
+  // Lista única de departamentos
+  const departamentos = useMemo(() => {
+    const deps = [...new Set(movimentacoes.map(m => m.departamento))].filter(Boolean).sort();
+    return deps;
+  }, [movimentacoes]);
+
+  // Filtragem
+  const movimentacoesFiltradas = useMemo(() => {
+    return movimentacoes.filter(m => {
+      const matchTipo = filtroTipo === 'todos' || m.tipo === filtroTipo;
+      const matchDep = filtroDepartamento === 'todos' || m.departamento === filtroDepartamento;
+      return matchTipo && matchDep;
+    });
+  }, [movimentacoes, filtroTipo, filtroDepartamento]);
+
+  const admissoes = movimentacoesFiltradas.filter(m => m.tipo === 'admissao');
+  const desligamentos = movimentacoesFiltradas.filter(m => m.tipo === 'desligamento');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,7 +125,33 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
+            {/* Filtros */}
+            <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <Select value={filtroTipo} onValueChange={(v) => setFiltroTipo(v as typeof filtroTipo)}>
+                <SelectTrigger className="w-[160px] h-9">
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todas movimentações</SelectItem>
+                  <SelectItem value="admissao">Apenas admissões</SelectItem>
+                  <SelectItem value="desligamento">Apenas desligamentos</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filtroDepartamento} onValueChange={setFiltroDepartamento}>
+                <SelectTrigger className="w-[180px] h-9">
+                  <SelectValue placeholder="Departamento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos departamentos</SelectItem>
+                  {departamentos.map(dep => (
+                    <SelectItem key={dep} value={dep}>{dep}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Summary */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-success/10 border border-success/20">
@@ -125,15 +171,17 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
             </div>
 
             {/* Lista de Movimentações */}
-            <ScrollArea className="h-[350px] pr-4">
-              {movimentacoes.length === 0 ? (
+            <ScrollArea className="h-[300px] pr-4">
+              {movimentacoesFiltradas.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                   <Calendar className="w-12 h-12 mb-4 opacity-50" />
-                  <p>Nenhuma movimentação neste mês</p>
+                  <p>{filtroTipo !== 'todos' || filtroDepartamento !== 'todos' 
+                    ? 'Nenhuma movimentação encontrada com os filtros aplicados' 
+                    : 'Nenhuma movimentação neste mês'}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {movimentacoes.map((mov) => (
+                  {movimentacoesFiltradas.map((mov) => (
                     <div 
                       key={`${mov.id}-${mov.tipo}`}
                       className="flex items-start gap-4 p-4 rounded-lg bg-muted/50 border border-border hover:bg-muted/80 transition-colors"
