@@ -128,7 +128,15 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
       {/* Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-sidebar-border">
-          <div className="flex items-center gap-3">
+          <NavLink
+            to="/perfil"
+            className={cn(
+              "flex items-center gap-3 p-2 -m-2 rounded-lg transition-colors",
+              location.pathname === '/perfil' 
+                ? "bg-sidebar-accent" 
+                : "hover:bg-sidebar-accent/50"
+            )}
+          >
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
               <span className="text-xs font-semibold text-primary">AS</span>
             </div>
@@ -136,7 +144,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
               <p className="text-sm font-medium text-foreground truncate">Ana Silva</p>
               <p className="text-xs text-muted-foreground">Analista DP</p>
             </div>
-          </div>
+          </NavLink>
         </div>
       )}
     </aside>
