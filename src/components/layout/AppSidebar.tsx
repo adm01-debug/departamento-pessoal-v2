@@ -10,7 +10,8 @@ import {
   UserMinus, 
   BarChart3,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Search
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -31,7 +32,11 @@ const menuItems = [
   { icon: BarChart3, label: 'Relatórios', path: '/relatorios', color: 'text-muted-foreground' },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onSearchOpen?: () => void;
+}
+
+export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
@@ -66,6 +71,28 @@ export function AppSidebar() {
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
+      </div>
+
+      {/* Search Button */}
+      <div className="px-2 py-2">
+        <Button
+          variant="outline"
+          className={cn(
+            "w-full justify-start gap-2 text-muted-foreground hover:text-foreground bg-sidebar-accent/30",
+            collapsed && "justify-center px-0"
+          )}
+          onClick={onSearchOpen}
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          {!collapsed && (
+            <>
+              <span className="flex-1 text-left text-sm">Buscar...</span>
+              <kbd className="hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Navigation */}
