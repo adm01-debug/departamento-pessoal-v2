@@ -18,12 +18,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, User, Briefcase, Building2, DollarSign } from 'lucide-react';
+import { CalendarIcon, User, Briefcase, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { departamentosDefault } from '@/types/colaborador';
+import { MaskedInput } from '@/components/ui/masked-input';
 
 interface NovaAdmissaoModalProps {
   open: boolean;
@@ -38,13 +39,28 @@ export interface NovaAdmissaoData {
   salarioProposto: number;
   dataPrevisao: Date;
   observacoes?: string;
+  cpf?: string;
+  dataNascimento?: Date;
+  sexo?: string;
   email?: string;
   telefone?: string;
+  estadoCivil?: string;
+  nomeMae?: string;
 }
+
+const estadosCivis = [
+  { value: 'solteiro', label: 'Solteiro(a)' },
+  { value: 'casado', label: 'Casado(a)' },
+  { value: 'divorciado', label: 'Divorciado(a)' },
+  { value: 'viuvo', label: 'Viúvo(a)' },
+  { value: 'separado', label: 'Separado(a)' },
+  { value: 'uniao_estavel', label: 'União Estável' },
+];
 
 export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissaoModalProps) {
   const [formData, setFormData] = useState<Partial<NovaAdmissaoData>>({});
   const [dateOpen, setDateOpen] = useState(false);
+  const [birthDateOpen, setBirthDateOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,8 +77,13 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
       salarioProposto: formData.salarioProposto || 0,
       dataPrevisao: formData.dataPrevisao,
       observacoes: formData.observacoes,
+      cpf: formData.cpf,
+      dataNascimento: formData.dataNascimento,
+      sexo: formData.sexo,
       email: formData.email,
       telefone: formData.telefone,
+      estadoCivil: formData.estadoCivil,
+      nomeMae: formData.nomeMae,
     });
 
     setFormData({});
@@ -72,7 +93,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="w-5 h-5 text-primary" />
@@ -80,9 +101,14 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Dados do Candidato */}
           <div className="space-y-4">
+            <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Dados Pessoais
+            </h4>
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <Label htmlFor="candidatoNome">
@@ -93,6 +119,97 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                   placeholder="Nome do candidato"
                   value={formData.candidatoNome || ''}
                   onChange={(e) => setFormData({ ...formData, candidatoNome: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="cpf">CPF</Label>
+                <MaskedInput
+                  id="cpf"
+                  mask="cpf"
+                  placeholder="000.000.000-00"
+                  value={formData.cpf || ''}
+                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label>Data de Nascimento</Label>
+                <Popover open={birthDateOpen} onOpenChange={setBirthDateOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !formData.dataNascimento && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.dataNascimento
+                        ? format(formData.dataNascimento, "dd/MM/yyyy", { locale: ptBR })
+                        : "Selecione"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.dataNascimento}
+                      onSelect={(date) => {
+                        setFormData({ ...formData, dataNascimento: date });
+                        setBirthDateOpen(false);
+                      }}
+                      locale={ptBR}
+                      disabled={(date) => date > new Date()}
+                      captionLayout="dropdown-buttons"
+                      fromYear={1950}
+                      toYear={new Date().getFullYear()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
+                <Label htmlFor="sexo">Sexo</Label>
+                <Select
+                  value={formData.sexo}
+                  onValueChange={(value) => setFormData({ ...formData, sexo: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="masculino">Masculino</SelectItem>
+                    <SelectItem value="feminino">Feminino</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="estadoCivil">Estado Civil</Label>
+                <Select
+                  value={formData.estadoCivil}
+                  onValueChange={(value) => setFormData({ ...formData, estadoCivil: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {estadosCivis.map((ec) => (
+                      <SelectItem key={ec.value} value={ec.value}>
+                        {ec.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="col-span-2">
+                <Label htmlFor="nomeMae">Nome da Mãe</Label>
+                <Input
+                  id="nomeMae"
+                  placeholder="Nome completo da mãe"
+                  value={formData.nomeMae || ''}
+                  onChange={(e) => setFormData({ ...formData, nomeMae: e.target.value })}
                 />
               </div>
 
@@ -109,8 +226,9 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
 
               <div>
                 <Label htmlFor="telefone">Telefone</Label>
-                <Input
+                <MaskedInput
                   id="telefone"
+                  mask="phone"
                   placeholder="(00) 00000-0000"
                   value={formData.telefone || ''}
                   onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
@@ -120,7 +238,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
           </div>
 
           {/* Dados da Vaga */}
-          <div className="space-y-4 pt-2">
+          <div className="space-y-4">
             <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Dados da Vaga
