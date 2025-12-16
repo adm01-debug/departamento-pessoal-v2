@@ -1,12 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfYear, endOfYear, startOfMonth, endOfMonth, format, subMonths, differenceInDays, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface TurnoverData {
   admissoes: number;
   desligamentos: number;
   totalColaboradores: number;
   turnoverRate: number;
+}
+
+interface TurnoverMonthData {
+  mes: string;
+  mesLabel: string;
+  admissoes: number;
+  desligamentos: number;
+  turnoverRate: number;
+  totalColaboradores: number;
 }
 
 interface AbsenteeismData {
@@ -27,6 +37,7 @@ interface PayrollCostData {
 
 interface IndicadoresDP {
   turnover: TurnoverData;
+  turnoverEvolution: TurnoverMonthData[];
   absenteeism: AbsenteeismData[];
   payrollCost: PayrollCostData[];
   kpis: {
@@ -115,7 +126,67 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
     }
   });
 
-  // Query para afastamentos (absenteísmo)
+  // Query para evolução do turnover (últimos 12 meses)
+  const turnoverEvolutionQuery = useQuery({
+    queryKey: ['indicadores-turnover-evolution'],
+    queryFn: async () => {
+      const months: TurnoverMonthData[] = [];
+      
+      // Buscar todos os colaboradores com datas de admissão e desligamento
+      const { data: colaboradores, error } = await supabase
+        .from('colaboradores')
+        .select('id, data_admissao, data_desligamento, status');
+      
+      if (error) throw error;
+      
+      // Processar os últimos 12 meses
+      for (let i = 11; i >= 0; i--) {
+        const monthDate = subMonths(now, i);
+        const monthStart = format(startOfMonth(monthDate), 'yyyy-MM-dd');
+        const monthEnd = format(endOfMonth(monthDate), 'yyyy-MM-dd');
+        const mesKey = format(monthDate, 'yyyy-MM');
+        const mesLabel = format(monthDate, 'MMM/yy', { locale: ptBR });
+        
+        // Contar admissões no mês
+        const admissoes = colaboradores?.filter(c => {
+          const admDate = c.data_admissao;
+          return admDate >= monthStart && admDate <= monthEnd;
+        }).length || 0;
+        
+        // Contar desligamentos no mês
+        const desligamentos = colaboradores?.filter(c => {
+          const deslDate = c.data_desligamento;
+          return deslDate && deslDate >= monthStart && deslDate <= monthEnd;
+        }).length || 0;
+        
+        // Estimar total de colaboradores ativos no final do mês
+        const totalAtivos = colaboradores?.filter(c => {
+          const admDate = c.data_admissao;
+          const deslDate = c.data_desligamento;
+          const wasAdmittedBefore = admDate <= monthEnd;
+          const wasNotDismissedYet = !deslDate || deslDate > monthEnd;
+          return wasAdmittedBefore && wasNotDismissedYet;
+        }).length || 1;
+        
+        // Calcular taxa de turnover mensal
+        const turnoverRate = totalAtivos > 0 
+          ? ((admissoes + desligamentos) / 2) / totalAtivos * 100 
+          : 0;
+        
+        months.push({
+          mes: mesKey,
+          mesLabel: mesLabel.charAt(0).toUpperCase() + mesLabel.slice(1),
+          admissoes,
+          desligamentos,
+          turnoverRate,
+          totalColaboradores: totalAtivos
+        });
+      }
+      
+      return months;
+    }
+  });
+
   const afastamentosQuery = useQuery({
     queryKey: ['indicadores-afastamentos', competenciaAtual],
     queryFn: async () => {
@@ -251,12 +322,14 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   const processData = (): IndicadoresDP => {
     const loading = colaboradoresQuery.isLoading || 
                     turnoverQuery.isLoading || 
+                    turnoverEvolutionQuery.isLoading ||
                     afastamentosQuery.isLoading ||
                     pontoQuery.isLoading ||
                     folhaQuery.isLoading;
 
     const colaboradores = colaboradoresQuery.data || [];
     const turnoverData = turnoverQuery.data || { admissoes: 0, desligamentos: 0, total: 1 };
+    const turnoverEvolution = turnoverEvolutionQuery.data || [];
     const afastamentos = afastamentosQuery.data || [];
     const registrosPonto = pontoQuery.data || [];
     const folhaData = folhaQuery.data || { holerites: [], usarSalarioBase: true };
@@ -358,6 +431,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         totalColaboradores: turnoverData.total,
         turnoverRate
       },
+      turnoverEvolution,
       absenteeism: absenteeismByDept,
       payrollCost,
       kpis: {
