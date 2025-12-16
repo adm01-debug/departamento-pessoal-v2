@@ -82,3 +82,80 @@ export const unmask = (value: string): string => onlyDigits(value);
 export const applyMask = (value: string, maskType: MaskType): string => {
   return masks[maskType](value);
 };
+
+// CPF Validation with check digit verification
+export const validateCPF = (cpf: string): boolean => {
+  const digits = onlyDigits(cpf);
+  
+  if (digits.length !== 11) return false;
+  
+  // Check for known invalid patterns (all same digits)
+  if (/^(\d)\1{10}$/.test(digits)) return false;
+  
+  // Validate first check digit
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(digits[i]) * (10 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits[9])) return false;
+  
+  // Validate second check digit
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(digits[i]) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits[10])) return false;
+  
+  return true;
+};
+
+// CNPJ Validation with check digit verification
+export const validateCNPJ = (cnpj: string): boolean => {
+  const digits = onlyDigits(cnpj);
+  
+  if (digits.length !== 14) return false;
+  
+  // Check for known invalid patterns (all same digits)
+  if (/^(\d)\1{13}$/.test(digits)) return false;
+  
+  // Validate first check digit
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(digits[i]) * weights1[i];
+  }
+  let remainder = sum % 11;
+  const digit1 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit1 !== parseInt(digits[12])) return false;
+  
+  // Validate second check digit
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  sum = 0;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(digits[i]) * weights2[i];
+  }
+  remainder = sum % 11;
+  const digit2 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit2 !== parseInt(digits[13])) return false;
+  
+  return true;
+};
+
+// Validate CPF or CNPJ based on length
+export const validateCPFCNPJ = (value: string): { valid: boolean; type: 'cpf' | 'cnpj' | null } => {
+  const digits = onlyDigits(value);
+  
+  if (digits.length === 11) {
+    return { valid: validateCPF(value), type: 'cpf' };
+  }
+  
+  if (digits.length === 14) {
+    return { valid: validateCNPJ(value), type: 'cnpj' };
+  }
+  
+  return { valid: false, type: null };
+};
