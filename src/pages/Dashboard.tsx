@@ -25,6 +25,7 @@ import { AdmissionsLineChart } from '@/components/dashboard/AdmissionsLineChart'
 import { MiniCalendar } from '@/components/dashboard/MiniCalendar';
 import { TurnoverGauge } from '@/components/dashboard/TurnoverGauge';
 import { TurnoverEvolutionChart } from '@/components/dashboard/TurnoverEvolutionChart';
+import { TurnoverYearComparisonChart } from '@/components/dashboard/TurnoverYearComparisonChart';
 import { AbsenteeismChart } from '@/components/dashboard/AbsenteeismChart';
 import { PayrollCostChart } from '@/components/dashboard/PayrollCostChart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -228,19 +229,28 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Evolução do Turnover */}
-      <div className="p-5 rounded-xl bg-card border border-border">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-warning" />
-            Evolução do Turnover
-          </h3>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-            Últimos 12 meses
-          </span>
+      {/* Gráficos de Turnover */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Evolução do Turnover */}
+        <div className="p-5 rounded-xl bg-card border border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-warning" />
+              Evolução do Turnover
+            </h3>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              Últimos 12 meses
+            </span>
+          </div>
+          <TurnoverEvolutionChart 
+            data={indicadores.turnoverEvolution} 
+            loading={indicadores.loading}
+          />
         </div>
-        <TurnoverEvolutionChart 
-          data={indicadores.turnoverEvolution} 
+
+        {/* Comparativo Anual */}
+        <TurnoverYearComparisonChart 
+          data={indicadores.turnoverYearComparison}
           loading={indicadores.loading}
         />
       </div>

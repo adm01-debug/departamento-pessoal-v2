@@ -19,6 +19,13 @@ interface TurnoverMonthData {
   totalColaboradores: number;
 }
 
+interface TurnoverYearData {
+  ano: number;
+  admissoes: number;
+  desligamentos: number;
+  turnover: number;
+}
+
 interface AbsenteeismData {
   departamento: string;
   faltas: number;
@@ -38,6 +45,7 @@ interface PayrollCostData {
 interface IndicadoresDP {
   turnover: TurnoverData;
   turnoverEvolution: TurnoverMonthData[];
+  turnoverYearComparison: TurnoverYearData[];
   absenteeism: AbsenteeismData[];
   payrollCost: PayrollCostData[];
   kpis: {
@@ -187,6 +195,64 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
     }
   });
 
+  // Query para comparativo anual de turnover (últimos 5 anos)
+  const turnoverYearQuery = useQuery({
+    queryKey: ['indicadores-turnover-year-comparison'],
+    queryFn: async () => {
+      const currentYear = now.getFullYear();
+      const years: TurnoverYearData[] = [];
+      
+      // Buscar todos os colaboradores
+      const { data: colaboradores, error } = await supabase
+        .from('colaboradores')
+        .select('id, data_admissao, data_desligamento, status');
+      
+      if (error) throw error;
+      
+      // Processar os últimos 5 anos
+      for (let i = 4; i >= 0; i--) {
+        const year = currentYear - i;
+        const yearStart = `${year}-01-01`;
+        const yearEnd = `${year}-12-31`;
+        
+        // Contar admissões no ano
+        const admissoes = colaboradores?.filter(c => {
+          const admDate = c.data_admissao;
+          return admDate >= yearStart && admDate <= yearEnd;
+        }).length || 0;
+        
+        // Contar desligamentos no ano
+        const desligamentos = colaboradores?.filter(c => {
+          const deslDate = c.data_desligamento;
+          return deslDate && deslDate >= yearStart && deslDate <= yearEnd;
+        }).length || 0;
+        
+        // Estimar total de colaboradores ativos no final do ano
+        const totalAtivos = colaboradores?.filter(c => {
+          const admDate = c.data_admissao;
+          const deslDate = c.data_desligamento;
+          const wasAdmittedBefore = admDate <= yearEnd;
+          const wasNotDismissedYet = !deslDate || deslDate > yearEnd;
+          return wasAdmittedBefore && wasNotDismissedYet;
+        }).length || 1;
+        
+        // Calcular taxa de turnover anual
+        const turnover = totalAtivos > 0 
+          ? ((admissoes + desligamentos) / 2) / totalAtivos * 100 
+          : 0;
+        
+        years.push({
+          ano: year,
+          admissoes,
+          desligamentos,
+          turnover: Math.round(turnover * 10) / 10
+        });
+      }
+      
+      return years;
+    }
+  });
+
   const afastamentosQuery = useQuery({
     queryKey: ['indicadores-afastamentos', competenciaAtual],
     queryFn: async () => {
@@ -323,6 +389,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
     const loading = colaboradoresQuery.isLoading || 
                     turnoverQuery.isLoading || 
                     turnoverEvolutionQuery.isLoading ||
+                    turnoverYearQuery.isLoading ||
                     afastamentosQuery.isLoading ||
                     pontoQuery.isLoading ||
                     folhaQuery.isLoading;
@@ -330,6 +397,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
     const colaboradores = colaboradoresQuery.data || [];
     const turnoverData = turnoverQuery.data || { admissoes: 0, desligamentos: 0, total: 1 };
     const turnoverEvolution = turnoverEvolutionQuery.data || [];
+    const turnoverYearComparison = turnoverYearQuery.data || [];
     const afastamentos = afastamentosQuery.data || [];
     const registrosPonto = pontoQuery.data || [];
     const folhaData = folhaQuery.data || { holerites: [], usarSalarioBase: true };
@@ -432,6 +500,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         turnoverRate
       },
       turnoverEvolution,
+      turnoverYearComparison,
       absenteeism: absenteeismByDept,
       payrollCost,
       kpis: {
