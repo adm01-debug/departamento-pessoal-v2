@@ -10,12 +10,14 @@ import {
   AlertTriangle,
   PieChart,
   BarChart3,
+  TrendingUp,
   Calendar as CalendarIcon
 } from 'lucide-react';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { AlertsList } from '@/components/dashboard/AlertsList';
 import { DepartmentBarChart } from '@/components/dashboard/DepartmentBarChart';
 import { StatusPieChart } from '@/components/dashboard/StatusPieChart';
+import { AdmissionsLineChart } from '@/components/dashboard/AdmissionsLineChart';
 import { MiniCalendar } from '@/components/dashboard/MiniCalendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockKPIs, mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
@@ -200,6 +202,20 @@ export default function Dashboard() {
           </div>
           <StatusPieChart colaboradores={filteredColaboradores} />
         </div>
+      </div>
+
+      {/* Gráfico de Evolução */}
+      <div className="p-5 rounded-xl bg-card border border-border">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-success" />
+            Evolução de Admissões
+          </h3>
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+            Últimos 12 meses
+          </span>
+        </div>
+        <AdmissionsLineChart colaboradores={mockColaboradores} months={12} />
       </div>
 
       {/* Alertas */}
