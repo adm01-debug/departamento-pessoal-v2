@@ -3,6 +3,7 @@ import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, Ale
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { AdmissaoChecklistModal } from '@/components/admissao/AdmissaoChecklistModal';
 import { NovaAdmissaoModal, NovaAdmissaoData } from '@/components/admissao/NovaAdmissaoModal';
@@ -43,6 +44,16 @@ export default function AdmissaoPage() {
   // Verificar se dados pessoais estão incompletos
   const isDadosIncompletos = (adm: AdmissaoType) => {
     return !adm.cpf || !adm.data_nascimento || !adm.sexo || !adm.nome_mae;
+  };
+
+  // Obter lista de campos faltantes
+  const getCamposFaltantes = (adm: AdmissaoType): string[] => {
+    const campos: string[] = [];
+    if (!adm.cpf) campos.push('CPF');
+    if (!adm.data_nascimento) campos.push('Data de Nascimento');
+    if (!adm.sexo) campos.push('Sexo');
+    if (!adm.nome_mae) campos.push('Nome da Mãe');
+    return campos;
   };
 
   // Agrupar por etapa
@@ -206,10 +217,24 @@ export default function AdmissaoPage() {
                         
                         {/* Indicador de dados incompletos */}
                         {dadosIncompletos && (
-                          <div className="flex items-center gap-1.5 mt-2 text-warning">
-                            <AlertTriangle className="w-3 h-3" />
-                            <span className="text-xs">Dados pessoais incompletos</span>
-                          </div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-1.5 mt-2 text-warning cursor-help">
+                                  <AlertTriangle className="w-3 h-3" />
+                                  <span className="text-xs">Dados pessoais incompletos</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="font-medium mb-1">Campos faltantes:</p>
+                                <ul className="text-xs list-disc pl-4">
+                                  {getCamposFaltantes(adm).map(campo => (
+                                    <li key={campo}>{campo}</li>
+                                  ))}
+                                </ul>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
                         
                         {/* Progress bar */}
@@ -273,10 +298,24 @@ export default function AdmissaoPage() {
                           <div className="flex flex-col">
                             <span className="font-medium text-sm">{adm.nome}</span>
                             {dadosIncompletos && (
-                              <span className="flex items-center gap-1 text-warning text-xs">
-                                <AlertTriangle className="w-3 h-3" />
-                                Dados incompletos
-                              </span>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="flex items-center gap-1 text-warning text-xs cursor-help">
+                                      <AlertTriangle className="w-3 h-3" />
+                                      Dados incompletos
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="font-medium mb-1">Campos faltantes:</p>
+                                    <ul className="text-xs list-disc pl-4">
+                                      {getCamposFaltantes(adm).map(campo => (
+                                        <li key={campo}>{campo}</li>
+                                      ))}
+                                    </ul>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             )}
                           </div>
                         </div>
