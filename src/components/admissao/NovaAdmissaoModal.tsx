@@ -63,6 +63,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
   const [dateOpen, setDateOpen] = useState(false);
   const [birthDateOpen, setBirthDateOpen] = useState(false);
   const [cpfError, setCpfError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const validateCpfField = (cpf: string) => {
     if (!cpf || unmask(cpf).length === 0) {
@@ -81,6 +82,20 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
     return true;
   };
 
+  const validateEmailField = (email: string) => {
+    if (!email || email.trim().length === 0) {
+      setEmailError(null);
+      return true;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('E-mail inválido');
+      return false;
+    }
+    setEmailError(null);
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -92,6 +107,12 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
     // Validar CPF se preenchido
     if (formData.cpf && !validateCpfField(formData.cpf)) {
       toast.error('CPF inválido');
+      return;
+    }
+
+    // Validar e-mail se preenchido
+    if (formData.email && !validateEmailField(formData.email)) {
+      toast.error('E-mail inválido');
       return;
     }
 
@@ -253,8 +274,16 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                   type="email"
                   placeholder="email@exemplo.com"
                   value={formData.email || ''}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    if (emailError) setEmailError(null);
+                  }}
+                  onBlur={(e) => validateEmailField(e.target.value)}
+                  className={emailError ? 'border-destructive' : ''}
                 />
+                {emailError && (
+                  <p className="text-xs text-destructive mt-1">{emailError}</p>
+                )}
               </div>
 
               <div>
