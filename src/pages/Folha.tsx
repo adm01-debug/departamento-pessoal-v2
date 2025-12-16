@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
   Wallet, CheckCircle, Clock, FileText, Plus, Calculator, 
   Users, Banknote, TrendingUp, ChevronRight, Loader2, 
-  Eye, Download, Trash2, PlayCircle, Lock, AlertCircle
+  Eye, Download, Trash2, PlayCircle, Lock, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ import {
   useCalculoFolha 
 } from '@/hooks/useFolhaPagamento';
 import { useColaboradores } from '@/hooks/useColaboradores';
+import { useIntegracaoPontoFolha, formatarMinutos } from '@/hooks/useIntegracaoPontoFolha';
 import { 
   FolhaPagamento, 
   Holerite,
@@ -43,6 +44,7 @@ export default function Folha() {
   const { colaboradores } = useColaboradores();
   const { rubricas } = useRubricas();
   const { calcularFolha, calculating } = useCalculoFolha();
+  const { exportarParaFolha, isExportando } = useIntegracaoPontoFolha();
   
   const [selectedFolhaId, setSelectedFolhaId] = useState<string | null>(null);
   const [newFolhaOpen, setNewFolhaOpen] = useState(false);
@@ -310,6 +312,15 @@ export default function Folha() {
           <div className="flex gap-3 pt-4 border-t border-border">
             {selectedFolha.status === 'aberta' && (
               <>
+                <Button 
+                  onClick={() => exportarParaFolha(selectedFolha.competencia)} 
+                  disabled={isExportando}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  {isExportando ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                  {isExportando ? 'Importando...' : 'Importar Ponto'}
+                </Button>
                 <Button 
                   onClick={handleCalcular} 
                   disabled={calculating || colaboradores.length === 0}

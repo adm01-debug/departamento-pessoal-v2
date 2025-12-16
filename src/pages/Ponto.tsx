@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Clock, Calendar, Download, CheckCircle, AlertTriangle, User, Plus, Save } from 'lucide-react';
+import { Clock, Calendar, Download, CheckCircle, AlertTriangle, User, Plus, Save, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { usePonto } from '@/hooks/usePonto';
+import { useIntegracaoPontoFolha } from '@/hooks/useIntegracaoPontoFolha';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -36,6 +37,7 @@ export default function Ponto() {
 
   const { colaboradores, loading: loadingColaboradores } = useColaboradores();
   const { useRegistrosPonto, useFeriados, calcularResumoMensal, registrarPonto, isRegistrando } = usePonto();
+  const { exportarParaFolha, isExportando } = useIntegracaoPontoFolha();
 
   const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') || [];
   const colaboradorSelecionado = colaboradoresAtivos.find(c => c.id === colaboradorId);
@@ -184,6 +186,15 @@ export default function Ponto() {
           <p className="text-muted-foreground text-sm">Espelho de ponto e banco de horas</p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => exportarParaFolha(competencia)}
+            disabled={isExportando}
+          >
+            {isExportando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {isExportando ? 'Exportando...' : 'Exportar p/ Folha'}
+          </Button>
           <Button variant="outline" className="gap-2">
             <Download className="w-4 h-4" />
             Exportar PDF
