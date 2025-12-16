@@ -1,8 +1,13 @@
-import { Plus, FileText, Clock, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, FileText, Clock, CheckCircle, List, Calendar, LayoutGrid, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { mockAdmissoes } from '@/data/mockData';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { mockAdmissoes, AdmissaoItem } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { AdmissaoChecklistModal } from '@/components/admissao/AdmissaoChecklistModal';
+import { NovaAdmissaoModal, NovaAdmissaoData } from '@/components/admissao/NovaAdmissaoModal';
+import { toast } from 'sonner';
 
 const etapas = [
   'Solicitação Recebida',
@@ -10,7 +15,6 @@ const etapas = [
   'Validação',
   'Exame Admissional',
   'Contrato',
-  'Assinatura',
   'eSocial',
   'Onboarding',
   'Concluído'
@@ -21,14 +25,72 @@ const etapaColors: Record<string, string> = {
   'Coleta de Documentos': 'bg-warning/20 border-warning',
   'Validação': 'bg-primary/20 border-primary',
   'Exame Admissional': 'bg-success/20 border-success',
+  'Contrato': 'bg-loggi/20 border-loggi',
+  'eSocial': 'bg-info/20 border-info',
+  'Onboarding': 'bg-primary/20 border-primary',
+  'Concluído': 'bg-success/20 border-success',
 };
 
 export default function Admissao() {
+  const [admissoes, setAdmissoes] = useState<AdmissaoItem[]>(mockAdmissoes);
+  const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'calendario'>('kanban');
+  const [selectedAdmissao, setSelectedAdmissao] = useState<AdmissaoItem | null>(null);
+  const [checklistOpen, setChecklistOpen] = useState(false);
+  const [novaAdmissaoOpen, setNovaAdmissaoOpen] = useState(false);
+
   // Agrupar por etapa
-  const admissoesPorEtapa = etapas.slice(0, 5).map(etapa => ({
+  const admissoesPorEtapa = etapas.map(etapa => ({
     etapa,
-    admissoes: mockAdmissoes.filter(a => a.etapa === etapa)
+    admissoes: admissoes.filter(a => a.etapa === etapa)
   }));
+
+  const handleOpenChecklist = (admissao: AdmissaoItem) => {
+    setSelectedAdmissao(admissao);
+    setChecklistOpen(true);
+  };
+
+  const handleNovaAdmissao = (data: NovaAdmissaoData) => {
+    const novaAdmissao: AdmissaoItem = {
+      id: String(admissoes.length + 1),
+      candidatoNome: data.candidatoNome,
+      cargo: data.cargo,
+      departamento: data.departamento,
+      etapa: 'Solicitação Recebida',
+      progresso: 0,
+      dataPrevisao: data.dataPrevisao.toISOString().split('T')[0],
+    };
+    setAdmissoes([...admissoes, novaAdmissao]);
+  };
+
+  const handleAdvanceStage = () => {
+    if (!selectedAdmissao) return;
+    
+    const currentIndex = etapas.indexOf(selectedAdmissao.etapa);
+    if (currentIndex < etapas.length - 1) {
+      const nextEtapa = etapas[currentIndex + 1];
+      const newProgress = Math.round(((currentIndex + 2) / etapas.length) * 100);
+      
+      setAdmissoes(prev => prev.map(a => 
+        a.id === selectedAdmissao.id 
+          ? { ...a, etapa: nextEtapa, progresso: newProgress }
+          : a
+      ));
+      setSelectedAdmissao({ ...selectedAdmissao, etapa: nextEtapa, progresso: newProgress });
+      toast.success(`Avançado para: ${nextEtapa}`);
+    }
+  };
+
+  const handleConvertToColaborador = () => {
+    if (!selectedAdmissao) return;
+    
+    setAdmissoes(prev => prev.map(a => 
+      a.id === selectedAdmissao.id 
+        ? { ...a, etapa: 'Concluído', progresso: 100 }
+        : a
+    ));
+    setChecklistOpen(false);
+    toast.success(`${selectedAdmissao.candidatoNome} adicionado como colaborador!`);
+  };
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -38,83 +100,182 @@ export default function Admissao() {
           <h1 className="text-2xl font-display font-bold text-foreground">Admissão</h1>
           <p className="text-muted-foreground text-sm">Processos admissionais em andamento</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setNovaAdmissaoOpen(true)}>
           <Plus className="w-4 h-4" />
           Nova Admissão
         </Button>
       </div>
 
       {/* View Toggle */}
-      <div className="flex gap-2">
-        <Button variant="secondary" size="sm">🗂️ Kanban</Button>
-        <Button variant="ghost" size="sm">📋 Lista</Button>
-        <Button variant="ghost" size="sm">📅 Calendário</Button>
-      </div>
+      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
+        <TabsList>
+          <TabsTrigger value="kanban" className="gap-2">
+            <LayoutGrid className="w-4 h-4" />
+            Kanban
+          </TabsTrigger>
+          <TabsTrigger value="lista" className="gap-2">
+            <List className="w-4 h-4" />
+            Lista
+          </TabsTrigger>
+          <TabsTrigger value="calendario" className="gap-2">
+            <Calendar className="w-4 h-4" />
+            Calendário
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Kanban Board */}
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-        {admissoesPorEtapa.map(({ etapa, admissoes }) => (
-          <div key={etapa} className="flex-shrink-0 w-72">
-            {/* Column Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-foreground">{etapa}</h3>
-                <Badge variant="secondary" className="text-xs">{admissoes.length}</Badge>
+        {/* Kanban View */}
+        <TabsContent value="kanban" className="mt-4">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
+            {admissoesPorEtapa.map(({ etapa, admissoes }) => (
+              <div key={etapa} className="flex-shrink-0 w-72">
+                {/* Column Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-foreground">{etapa}</h3>
+                    <Badge variant="secondary" className="text-xs">{admissoes.length}</Badge>
+                  </div>
+                </div>
+
+                {/* Column Content */}
+                <div className={cn(
+                  "min-h-[400px] p-2 rounded-xl border-2 border-dashed space-y-3",
+                  etapaColors[etapa] || 'bg-muted/20 border-border'
+                )}>
+                  {admissoes.map((adm) => (
+                    <div 
+                      key={adm.id}
+                      onClick={() => handleOpenChecklist(adm)}
+                      className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-primary">
+                            {adm.candidatoNome.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {adm.progresso}%
+                        </Badge>
+                      </div>
+                      
+                      <h4 className="font-medium text-sm text-foreground mb-1">{adm.candidatoNome}</h4>
+                      <p className="text-xs text-muted-foreground mb-2">{adm.cargo}</p>
+                      <p className="text-xs text-muted-foreground">{adm.departamento}</p>
+                      
+                      {/* Progress bar */}
+                      <div className="mt-3">
+                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary rounded-full transition-all"
+                            style={{ width: `${adm.progresso}%` }}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span>Prev: {new Date(adm.dataPrevisao).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                    </div>
+                  ))}
+
+                  {admissoes.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
+                      <FileText className="w-8 h-8 mb-2 opacity-50" />
+                      <p className="text-xs">Nenhuma admissão</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-
-            {/* Column Content */}
-            <div className={cn(
-              "min-h-[400px] p-2 rounded-xl border-2 border-dashed space-y-3",
-              etapaColors[etapa] || 'bg-muted/20 border-border'
-            )}>
-              {admissoes.map((adm) => (
-                <div 
-                  key={adm.id}
-                  className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-xs font-semibold text-primary">
-                        {adm.candidatoNome.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                      </span>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {adm.progresso}%
-                    </Badge>
-                  </div>
-                  
-                  <h4 className="font-medium text-sm text-foreground mb-1">{adm.candidatoNome}</h4>
-                  <p className="text-xs text-muted-foreground mb-2">{adm.cargo}</p>
-                  <p className="text-xs text-muted-foreground">{adm.departamento}</p>
-                  
-                  {/* Progress bar */}
-                  <div className="mt-3">
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${adm.progresso}%` }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span>Prev: {new Date(adm.dataPrevisao).toLocaleDateString('pt-BR')}</span>
-                  </div>
-                </div>
-              ))}
-
-              {admissoes.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-                  <FileText className="w-8 h-8 mb-2 opacity-50" />
-                  <p className="text-xs">Nenhuma admissão</p>
-                </div>
-              )}
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </TabsContent>
+
+        {/* Lista View */}
+        <TabsContent value="lista" className="mt-4">
+          <div className="rounded-lg border">
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="text-left p-3 text-sm font-medium">Candidato</th>
+                  <th className="text-left p-3 text-sm font-medium">Cargo</th>
+                  <th className="text-left p-3 text-sm font-medium">Departamento</th>
+                  <th className="text-left p-3 text-sm font-medium">Etapa</th>
+                  <th className="text-left p-3 text-sm font-medium">Progresso</th>
+                  <th className="text-left p-3 text-sm font-medium">Previsão</th>
+                  <th className="text-left p-3 text-sm font-medium">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admissoes.map((adm) => (
+                  <tr key={adm.id} className="border-t hover:bg-muted/30">
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-primary">
+                            {adm.candidatoNome.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                          </span>
+                        </div>
+                        <span className="font-medium text-sm">{adm.candidatoNome}</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-sm">{adm.cargo}</td>
+                    <td className="p-3 text-sm">{adm.departamento}</td>
+                    <td className="p-3">
+                      <Badge variant="secondary" className="text-xs">{adm.etapa}</Badge>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary rounded-full"
+                            style={{ width: `${adm.progresso}%` }}
+                          />
+                        </div>
+                        <span className="text-xs">{adm.progresso}%</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-sm">
+                      {new Date(adm.dataPrevisao).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td className="p-3">
+                      <Button size="sm" variant="ghost" onClick={() => handleOpenChecklist(adm)}>
+                        Checklist
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
+
+        {/* Calendário View */}
+        <TabsContent value="calendario" className="mt-4">
+          <div className="p-8 rounded-lg border bg-muted/20 text-center">
+            <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Visualização em Calendário</h3>
+            <p className="text-muted-foreground text-sm">
+              Em breve: visualize as admissões por data prevista no calendário
+            </p>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Modals */}
+      <AdmissaoChecklistModal
+        open={checklistOpen}
+        onOpenChange={setChecklistOpen}
+        admissao={selectedAdmissao}
+        onAdvanceStage={handleAdvanceStage}
+        onConvertToColaborador={handleConvertToColaborador}
+      />
+
+      <NovaAdmissaoModal
+        open={novaAdmissaoOpen}
+        onOpenChange={setNovaAdmissaoOpen}
+        onSubmit={handleNovaAdmissao}
+      />
     </div>
   );
 }
