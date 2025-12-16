@@ -14,7 +14,8 @@ import {
   Calendar as CalendarIcon,
   RefreshCcw,
   Activity,
-  DollarSign
+  DollarSign,
+  Loader2
 } from 'lucide-react';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { AlertsList } from '@/components/dashboard/AlertsList';
@@ -26,9 +27,10 @@ import { TurnoverGauge } from '@/components/dashboard/TurnoverGauge';
 import { AbsenteeismChart } from '@/components/dashboard/AbsenteeismChart';
 import { PayrollCostChart } from '@/components/dashboard/PayrollCostChart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { mockKPIs, mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
+import { mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
 import { subMonths, subQuarters, subYears, isAfter } from 'date-fns';
+import { useIndicadoresDP } from '@/hooks/useIndicadoresDP';
 
 type PeriodFilter = 'all' | 'month' | 'quarter' | 'year';
 
@@ -41,7 +43,11 @@ const periodLabels: Record<PeriodFilter, string> = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [period, setPeriod] = useState<PeriodFilter>('all');
+  const [period, setPeriod] = useState<PeriodFilter>('year');
+  
+  // Hook para indicadores de DP com dados reais
+  const indicadoresPeriodo = period === 'all' ? 'year' : period;
+  const indicadores = useIndicadoresDP(indicadoresPeriodo as 'month' | 'quarter' | 'year');
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { 
@@ -52,7 +58,7 @@ export default function Dashboard() {
     }).format(value);
   };
 
-  // Filtrar colaboradores por período de admissão
+  // Filtrar colaboradores por período de admissão (para gráficos visuais)
   const filteredColaboradores = useMemo(() => {
     if (period === 'all') return mockColaboradores;
 
@@ -78,46 +84,6 @@ export default function Dashboard() {
     );
   }, [period]);
 
-  // Dados mockados para indicadores de DP
-  const dpIndicators = useMemo(() => {
-    // Simulação de dados de turnover
-    const admissoes = 5; // admissões no período
-    const desligamentos = 2; // desligamentos no período
-    const totalColaboradores = mockKPIs.colaboradoresAtivos;
-    
-    // Taxa de turnover: ((Admissões + Desligamentos) / 2) / Total * 100
-    const turnoverRate = ((admissoes + desligamentos) / 2) / totalColaboradores * 100;
-
-    // Dados de absenteísmo por departamento
-    const absenteeismData = [
-      { departamento: 'Gravação', faltas: 8, atestados: 12, taxaAbsenteismo: 4.2 },
-      { departamento: 'Comercial', faltas: 3, atestados: 5, taxaAbsenteismo: 2.1 },
-      { departamento: 'Artes', faltas: 2, atestados: 4, taxaAbsenteismo: 1.8 },
-      { departamento: 'Logística', faltas: 5, atestados: 8, taxaAbsenteismo: 5.5 },
-      { departamento: 'Administrativo', faltas: 1, atestados: 2, taxaAbsenteismo: 1.2 },
-      { departamento: 'Financeiro', faltas: 0, atestados: 1, taxaAbsenteismo: 0.8 },
-    ];
-
-    // Custo de folha por departamento
-    const payrollCostData = [
-      { departamento: 'Gravação', custoTotal: 63000, colaboradores: 18, custoMedio: 3500 },
-      { departamento: 'Comercial', custoTotal: 45600, colaboradores: 12, custoMedio: 3800 },
-      { departamento: 'Artes', custoTotal: 33600, colaboradores: 8, custoMedio: 4200 },
-      { departamento: 'Logística', custoTotal: 19200, colaboradores: 6, custoMedio: 3200 },
-      { departamento: 'Administrativo', custoTotal: 14000, colaboradores: 4, custoMedio: 3500 },
-      { departamento: 'Financeiro', custoTotal: 9600, colaboradores: 3, custoMedio: 3200 },
-    ];
-
-    return {
-      admissoes,
-      desligamentos,
-      totalColaboradores,
-      turnoverRate,
-      absenteeismData,
-      payrollCostData,
-    };
-  }, []);
-
   return (
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
@@ -127,8 +93,17 @@ export default function Dashboard() {
           <p className="text-muted-foreground text-sm">Visão geral do Departamento Pessoal</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass">
-          <span className="status-dot status-dot-success" />
-          <span className="text-sm text-muted-foreground">Sistema Online</span>
+          {indicadores.loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Carregando...</span>
+            </>
+          ) : (
+            <>
+              <span className="status-dot status-dot-success" />
+              <span className="text-sm text-muted-foreground">Dados atualizados</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -137,7 +112,7 @@ export default function Dashboard() {
         <KPICard 
           icon={Users} 
           label="Colaboradores Ativos" 
-          value={mockKPIs.colaboradoresAtivos}
+          value={indicadores.kpis.colaboradoresAtivos}
           subtitle="colaboradores"
           colorClass="text-info"
           onClick={() => navigate('/colaboradores')}
@@ -145,7 +120,7 @@ export default function Dashboard() {
         <KPICard 
           icon={UserPlus} 
           label="Admissões em Curso" 
-          value={mockKPIs.admissoesEmCurso}
+          value={indicadores.kpis.admissoesEmCurso}
           subtitle="em processo"
           colorClass="text-success"
           onClick={() => navigate('/admissao')}
@@ -153,7 +128,7 @@ export default function Dashboard() {
         <KPICard 
           icon={Umbrella} 
           label="Férias Este Mês" 
-          value={mockKPIs.feriasEsteMes}
+          value={indicadores.kpis.feriasEsteMes}
           subtitle="programadas"
           colorClass="text-warning"
           onClick={() => navigate('/ferias')}
@@ -161,7 +136,7 @@ export default function Dashboard() {
         <KPICard 
           icon={Heart} 
           label="Afastados Hoje" 
-          value={mockKPIs.afastadosHoje}
+          value={indicadores.kpis.afastadosHoje}
           subtitle="licenças ativas"
           colorClass="text-loggi"
           onClick={() => navigate('/afastamentos')}
@@ -169,7 +144,7 @@ export default function Dashboard() {
         <KPICard 
           icon={Clock} 
           label="Pontos Pendentes" 
-          value={mockKPIs.pontosPendentes}
+          value={indicadores.kpis.pontosPendentes}
           subtitle="aguardando aprovação"
           colorClass="text-info"
           onClick={() => navigate('/ponto')}
@@ -177,23 +152,23 @@ export default function Dashboard() {
         <KPICard 
           icon={Wallet} 
           label="Folha Projetada" 
-          value={formatCurrency(mockKPIs.folhaProjetada)}
-          trend={{ value: 3, positive: false }}
+          value={formatCurrency(indicadores.kpis.folhaProjetada)}
+          trend={indicadores.kpis.folhaProjetada > 0 ? { value: 3, positive: false } : undefined}
           colorClass="text-sales"
           onClick={() => navigate('/folha')}
         />
         <KPICard 
           icon={UserMinus} 
           label="Desligamentos" 
-          value={mockKPIs.desligamentosEmCurso}
-          subtitle="em andamento"
+          value={indicadores.kpis.desligamentosEmCurso}
+          subtitle="no período"
           colorClass="text-destructive"
           onClick={() => navigate('/desligamento')}
         />
         <KPICard 
           icon={AlertTriangle} 
           label="Alertas Urgentes" 
-          value={mockKPIs.alertasUrgentes}
+          value={indicadores.kpis.alertasUrgentes}
           subtitle="requerem ação"
           colorClass="text-destructive"
         />
@@ -213,9 +188,9 @@ export default function Dashboard() {
             </span>
           </div>
           <TurnoverGauge 
-            admissoes={dpIndicators.admissoes}
-            desligamentos={dpIndicators.desligamentos}
-            totalColaboradores={dpIndicators.totalColaboradores}
+            admissoes={indicadores.turnover.admissoes}
+            desligamentos={indicadores.turnover.desligamentos}
+            totalColaboradores={indicadores.turnover.totalColaboradores}
           />
         </div>
 
@@ -230,7 +205,9 @@ export default function Dashboard() {
               Mês atual
             </span>
           </div>
-          <AbsenteeismChart data={dpIndicators.absenteeismData} />
+          <AbsenteeismChart data={indicadores.absenteeism.length > 0 ? indicadores.absenteeism : [
+            { departamento: 'Sem dados', faltas: 0, atestados: 0, taxaAbsenteismo: 0 }
+          ]} />
         </div>
 
         {/* Custo de Folha */}
@@ -244,7 +221,9 @@ export default function Dashboard() {
               {periodLabels[period]}
             </span>
           </div>
-          <PayrollCostChart data={dpIndicators.payrollCostData} />
+          <PayrollCostChart data={indicadores.payrollCost.length > 0 ? indicadores.payrollCost : [
+            { departamento: 'Sem dados', custoTotal: 0, colaboradores: 0, custoMedio: 0 }
+          ]} />
         </div>
       </div>
 
