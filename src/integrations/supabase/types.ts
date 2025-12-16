@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      afastamentos: {
+        Row: {
+          atestado_numero: string | null
+          cid: string | null
+          cid_descricao: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_fim_prevista: string
+          data_fim_real: string | null
+          data_inicio: string
+          data_pericia: string | null
+          dias_empresa: number | null
+          dias_inss: number | null
+          dias_total: number | null
+          id: string
+          medico_crm: string | null
+          medico_nome: string | null
+          numero_beneficio: string | null
+          observacoes: string | null
+          status: Database["public"]["Enums"]["status_afastamento"] | null
+          tipo: Database["public"]["Enums"]["tipo_afastamento"]
+          updated_at: string
+        }
+        Insert: {
+          atestado_numero?: string | null
+          cid?: string | null
+          cid_descricao?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_fim_prevista: string
+          data_fim_real?: string | null
+          data_inicio: string
+          data_pericia?: string | null
+          dias_empresa?: number | null
+          dias_inss?: number | null
+          dias_total?: number | null
+          id?: string
+          medico_crm?: string | null
+          medico_nome?: string | null
+          numero_beneficio?: string | null
+          observacoes?: string | null
+          status?: Database["public"]["Enums"]["status_afastamento"] | null
+          tipo: Database["public"]["Enums"]["tipo_afastamento"]
+          updated_at?: string
+        }
+        Update: {
+          atestado_numero?: string | null
+          cid?: string | null
+          cid_descricao?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_fim_prevista?: string
+          data_fim_real?: string | null
+          data_inicio?: string
+          data_pericia?: string | null
+          dias_empresa?: number | null
+          dias_inss?: number | null
+          dias_total?: number | null
+          id?: string
+          medico_crm?: string | null
+          medico_nome?: string | null
+          numero_beneficio?: string | null
+          observacoes?: string | null
+          status?: Database["public"]["Enums"]["status_afastamento"] | null
+          tipo?: Database["public"]["Enums"]["tipo_afastamento"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "afastamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ajustes_ponto: {
         Row: {
           aprovado_em: string | null
@@ -347,6 +427,42 @@ export type Database = {
         }
         Relationships: []
       }
+      config_afastamentos: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          dias_empresa_maximo: number | null
+          dias_maximos: number | null
+          dias_minimos: number | null
+          id: string
+          pago_empresa: boolean | null
+          pago_inss: boolean | null
+          tipo: Database["public"]["Enums"]["tipo_afastamento"]
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          dias_empresa_maximo?: number | null
+          dias_maximos?: number | null
+          dias_minimos?: number | null
+          id?: string
+          pago_empresa?: boolean | null
+          pago_inss?: boolean | null
+          tipo: Database["public"]["Enums"]["tipo_afastamento"]
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          dias_empresa_maximo?: number | null
+          dias_maximos?: number | null
+          dias_minimos?: number | null
+          id?: string
+          pago_empresa?: boolean | null
+          pago_inss?: boolean | null
+          tipo?: Database["public"]["Enums"]["tipo_afastamento"]
+        }
+        Relationships: []
+      }
       dependentes: {
         Row: {
           colaborador_id: string
@@ -390,6 +506,44 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos_afastamento: {
+        Row: {
+          afastamento_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          nome_arquivo: string
+          tipo: string
+          url: string
+        }
+        Insert: {
+          afastamento_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome_arquivo: string
+          tipo: string
+          url: string
+        }
+        Update: {
+          afastamento_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome_arquivo?: string
+          tipo?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_afastamento_afastamento_id_fkey"
+            columns: ["afastamento_id"]
+            isOneToOne: false
+            referencedRelation: "afastamentos"
             referencedColumns: ["id"]
           },
         ]
@@ -1071,6 +1225,53 @@ export type Database = {
         }
         Relationships: []
       }
+      prorrogacoes_afastamento: {
+        Row: {
+          afastamento_id: string
+          created_at: string
+          created_by: string | null
+          data_fim_anterior: string
+          data_fim_nova: string
+          data_pericia: string | null
+          dias_adicionais: number
+          id: string
+          motivo: string | null
+          numero_beneficio_novo: string | null
+        }
+        Insert: {
+          afastamento_id: string
+          created_at?: string
+          created_by?: string | null
+          data_fim_anterior: string
+          data_fim_nova: string
+          data_pericia?: string | null
+          dias_adicionais: number
+          id?: string
+          motivo?: string | null
+          numero_beneficio_novo?: string | null
+        }
+        Update: {
+          afastamento_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_fim_anterior?: string
+          data_fim_nova?: string
+          data_pericia?: string | null
+          dias_adicionais?: number
+          id?: string
+          motivo?: string | null
+          numero_beneficio_novo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prorrogacoes_afastamento_afastamento_id_fkey"
+            columns: ["afastamento_id"]
+            isOneToOne: false
+            referencedRelation: "afastamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registros_ponto: {
         Row: {
           aprovado: boolean | null
@@ -1219,6 +1420,7 @@ export type Database = {
         | "separado"
         | "uniao_estavel"
       sexo: "masculino" | "feminino"
+      status_afastamento: "ativo" | "encerrado" | "cancelado" | "prorrogado"
       status_colaborador:
         | "ativo"
         | "ferias"
@@ -1226,6 +1428,19 @@ export type Database = {
         | "desligado"
         | "pendente"
       status_folha: "aberta" | "calculada" | "fechada" | "paga"
+      tipo_afastamento:
+        | "doenca"
+        | "acidente_trabalho"
+        | "acidente_trajeto"
+        | "licenca_maternidade"
+        | "licenca_paternidade"
+        | "licenca_casamento"
+        | "licenca_obito"
+        | "licenca_nao_remunerada"
+        | "servico_militar"
+        | "mandato_sindical"
+        | "suspensao_disciplinar"
+        | "outros"
       tipo_conta: "corrente" | "poupanca" | "salario"
       tipo_contrato:
         | "clt"
@@ -1382,6 +1597,7 @@ export const Constants = {
         "uniao_estavel",
       ],
       sexo: ["masculino", "feminino"],
+      status_afastamento: ["ativo", "encerrado", "cancelado", "prorrogado"],
       status_colaborador: [
         "ativo",
         "ferias",
@@ -1390,6 +1606,20 @@ export const Constants = {
         "pendente",
       ],
       status_folha: ["aberta", "calculada", "fechada", "paga"],
+      tipo_afastamento: [
+        "doenca",
+        "acidente_trabalho",
+        "acidente_trajeto",
+        "licenca_maternidade",
+        "licenca_paternidade",
+        "licenca_casamento",
+        "licenca_obito",
+        "licenca_nao_remunerada",
+        "servico_militar",
+        "mandato_sindical",
+        "suspensao_disciplinar",
+        "outros",
+      ],
       tipo_conta: ["corrente", "poupanca", "salario"],
       tipo_contrato: [
         "clt",
