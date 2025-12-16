@@ -14,6 +14,360 @@ export type Database = {
   }
   public: {
     Tables: {
+      colaboradores: {
+        Row: {
+          agencia: string | null
+          bairro: string | null
+          banco_codigo: string | null
+          banco_nome: string | null
+          cargo: string
+          cbo: string | null
+          celular: string | null
+          centro_custo: string | null
+          cep: string | null
+          certificado_reservista: string | null
+          cidade: string | null
+          cnh_categoria: string | null
+          cnh_numero: string | null
+          cnh_validade: string | null
+          complemento: string | null
+          conta: string | null
+          cpf: string
+          created_at: string
+          created_by: string | null
+          ctps_data_emissao: string | null
+          ctps_numero: string | null
+          ctps_serie: string | null
+          ctps_uf: string | null
+          cursos_certificacoes: string | null
+          data_admissao: string
+          data_desligamento: string | null
+          data_nascimento: string
+          departamento: string
+          email: string | null
+          escolaridade: Database["public"]["Enums"]["escolaridade"] | null
+          estado_civil: Database["public"]["Enums"]["estado_civil"]
+          formacao: string | null
+          foto_url: string | null
+          horario_entrada: string | null
+          horario_saida: string | null
+          id: string
+          intervalo_minutos: number | null
+          jornada_semanal: number | null
+          local_trabalho: string | null
+          logradouro: string | null
+          matricula: string | null
+          nacionalidade: string | null
+          naturalidade_cidade: string | null
+          naturalidade_uf: string | null
+          nome_completo: string
+          nome_mae: string
+          nome_pai: string | null
+          nome_social: string | null
+          numero: string | null
+          observacoes: string | null
+          pis_pasep: string | null
+          pix_chave: string | null
+          pix_tipo: string | null
+          rg: string | null
+          rg_data_emissao: string | null
+          rg_orgao_emissor: string | null
+          rg_uf: string | null
+          salario_base: number
+          sexo: Database["public"]["Enums"]["sexo"]
+          status: Database["public"]["Enums"]["status_colaborador"]
+          telefone: string | null
+          tipo_conta: Database["public"]["Enums"]["tipo_conta"] | null
+          tipo_contrato: Database["public"]["Enums"]["tipo_contrato"]
+          tipo_salario: string | null
+          titulo_eleitor: string | null
+          titulo_secao: string | null
+          titulo_zona: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          agencia?: string | null
+          bairro?: string | null
+          banco_codigo?: string | null
+          banco_nome?: string | null
+          cargo: string
+          cbo?: string | null
+          celular?: string | null
+          centro_custo?: string | null
+          cep?: string | null
+          certificado_reservista?: string | null
+          cidade?: string | null
+          cnh_categoria?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          complemento?: string | null
+          conta?: string | null
+          cpf: string
+          created_at?: string
+          created_by?: string | null
+          ctps_data_emissao?: string | null
+          ctps_numero?: string | null
+          ctps_serie?: string | null
+          ctps_uf?: string | null
+          cursos_certificacoes?: string | null
+          data_admissao: string
+          data_desligamento?: string | null
+          data_nascimento: string
+          departamento: string
+          email?: string | null
+          escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
+          estado_civil?: Database["public"]["Enums"]["estado_civil"]
+          formacao?: string | null
+          foto_url?: string | null
+          horario_entrada?: string | null
+          horario_saida?: string | null
+          id?: string
+          intervalo_minutos?: number | null
+          jornada_semanal?: number | null
+          local_trabalho?: string | null
+          logradouro?: string | null
+          matricula?: string | null
+          nacionalidade?: string | null
+          naturalidade_cidade?: string | null
+          naturalidade_uf?: string | null
+          nome_completo: string
+          nome_mae: string
+          nome_pai?: string | null
+          nome_social?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          pis_pasep?: string | null
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          rg?: string | null
+          rg_data_emissao?: string | null
+          rg_orgao_emissor?: string | null
+          rg_uf?: string | null
+          salario_base: number
+          sexo: Database["public"]["Enums"]["sexo"]
+          status?: Database["public"]["Enums"]["status_colaborador"]
+          telefone?: string | null
+          tipo_conta?: Database["public"]["Enums"]["tipo_conta"] | null
+          tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"]
+          tipo_salario?: string | null
+          titulo_eleitor?: string | null
+          titulo_secao?: string | null
+          titulo_zona?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agencia?: string | null
+          bairro?: string | null
+          banco_codigo?: string | null
+          banco_nome?: string | null
+          cargo?: string
+          cbo?: string | null
+          celular?: string | null
+          centro_custo?: string | null
+          cep?: string | null
+          certificado_reservista?: string | null
+          cidade?: string | null
+          cnh_categoria?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          complemento?: string | null
+          conta?: string | null
+          cpf?: string
+          created_at?: string
+          created_by?: string | null
+          ctps_data_emissao?: string | null
+          ctps_numero?: string | null
+          ctps_serie?: string | null
+          ctps_uf?: string | null
+          cursos_certificacoes?: string | null
+          data_admissao?: string
+          data_desligamento?: string | null
+          data_nascimento?: string
+          departamento?: string
+          email?: string | null
+          escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
+          estado_civil?: Database["public"]["Enums"]["estado_civil"]
+          formacao?: string | null
+          foto_url?: string | null
+          horario_entrada?: string | null
+          horario_saida?: string | null
+          id?: string
+          intervalo_minutos?: number | null
+          jornada_semanal?: number | null
+          local_trabalho?: string | null
+          logradouro?: string | null
+          matricula?: string | null
+          nacionalidade?: string | null
+          naturalidade_cidade?: string | null
+          naturalidade_uf?: string | null
+          nome_completo?: string
+          nome_mae?: string
+          nome_pai?: string | null
+          nome_social?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          pis_pasep?: string | null
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          rg?: string | null
+          rg_data_emissao?: string | null
+          rg_orgao_emissor?: string | null
+          rg_uf?: string | null
+          salario_base?: number
+          sexo?: Database["public"]["Enums"]["sexo"]
+          status?: Database["public"]["Enums"]["status_colaborador"]
+          telefone?: string | null
+          tipo_conta?: Database["public"]["Enums"]["tipo_conta"] | null
+          tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"]
+          tipo_salario?: string | null
+          titulo_eleitor?: string | null
+          titulo_secao?: string | null
+          titulo_zona?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      dependentes: {
+        Row: {
+          colaborador_id: string
+          cpf: string | null
+          created_at: string
+          data_nascimento: string
+          id: string
+          nome: string
+          para_irrf: boolean | null
+          para_plano_saude: boolean | null
+          para_salario_familia: boolean | null
+          parentesco: string
+        }
+        Insert: {
+          colaborador_id: string
+          cpf?: string | null
+          created_at?: string
+          data_nascimento: string
+          id?: string
+          nome: string
+          para_irrf?: boolean | null
+          para_plano_saude?: boolean | null
+          para_salario_familia?: boolean | null
+          parentesco: string
+        }
+        Update: {
+          colaborador_id?: string
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string
+          id?: string
+          nome?: string
+          para_irrf?: boolean | null
+          para_plano_saude?: boolean | null
+          para_salario_familia?: boolean | null
+          parentesco?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dependentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos_colaborador: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          nome_arquivo: string
+          tamanho_bytes: number | null
+          tipo: string
+          url: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome_arquivo: string
+          tamanho_bytes?: number | null
+          tipo: string
+          url: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome_arquivo?: string
+          tamanho_bytes?: number | null
+          tipo?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_cargo: {
+        Row: {
+          cargo_anterior: string | null
+          cargo_novo: string
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_alteracao: string
+          id: string
+          motivo: string | null
+          observacao: string | null
+          salario_anterior: number | null
+          salario_novo: number
+        }
+        Insert: {
+          cargo_anterior?: string | null
+          cargo_novo: string
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_alteracao: string
+          id?: string
+          motivo?: string | null
+          observacao?: string | null
+          salario_anterior?: number | null
+          salario_novo: number
+        }
+        Update: {
+          cargo_anterior?: string | null
+          cargo_novo?: string
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_alteracao?: string
+          id?: string
+          motivo?: string | null
+          observacao?: string | null
+          salario_anterior?: number | null
+          salario_novo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_cargo_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -58,7 +412,38 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      escolaridade:
+        | "fundamental_incompleto"
+        | "fundamental_completo"
+        | "medio_incompleto"
+        | "medio_completo"
+        | "superior_incompleto"
+        | "superior_completo"
+        | "pos_graduacao"
+        | "mestrado"
+        | "doutorado"
+      estado_civil:
+        | "solteiro"
+        | "casado"
+        | "divorciado"
+        | "viuvo"
+        | "separado"
+        | "uniao_estavel"
+      sexo: "masculino" | "feminino"
+      status_colaborador:
+        | "ativo"
+        | "ferias"
+        | "afastado"
+        | "desligado"
+        | "pendente"
+      tipo_conta: "corrente" | "poupanca" | "salario"
+      tipo_contrato:
+        | "clt"
+        | "pj"
+        | "estagiario"
+        | "temporario"
+        | "intermitente"
+        | "aprendiz"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -185,6 +570,43 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      escolaridade: [
+        "fundamental_incompleto",
+        "fundamental_completo",
+        "medio_incompleto",
+        "medio_completo",
+        "superior_incompleto",
+        "superior_completo",
+        "pos_graduacao",
+        "mestrado",
+        "doutorado",
+      ],
+      estado_civil: [
+        "solteiro",
+        "casado",
+        "divorciado",
+        "viuvo",
+        "separado",
+        "uniao_estavel",
+      ],
+      sexo: ["masculino", "feminino"],
+      status_colaborador: [
+        "ativo",
+        "ferias",
+        "afastado",
+        "desligado",
+        "pendente",
+      ],
+      tipo_conta: ["corrente", "poupanca", "salario"],
+      tipo_contrato: [
+        "clt",
+        "pj",
+        "estagiario",
+        "temporario",
+        "intermitente",
+        "aprendiz",
+      ],
+    },
   },
 } as const

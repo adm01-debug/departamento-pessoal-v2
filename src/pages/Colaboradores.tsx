@@ -1,34 +1,32 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight, Loader2, Database } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { mockColaboradores, statusColors, Colaborador } from '@/data/mockData';
-import { ColaboradorModal } from '@/components/colaboradores/ColaboradorModal';
-import { ColaboradorFormModal, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormModal';
+import { ColaboradorFormCompleto, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormCompleto';
+import { useColaboradores } from '@/hooks/useColaboradores';
+import { ColaboradorDB, statusColaboradorLabels } from '@/types/colaborador';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { unmask } from '@/lib/masks';
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
-const statusLabels: Record<string, string> = {
-  ativo: 'Ativo',
-  ferias: 'Férias',
-  afastado: 'Afastado',
-  desligado: 'Desligado',
-  admissao: 'Em Admissão',
+const statusColors: Record<string, { bg: string; text: string; dot: string }> = {
+  ativo: { bg: 'bg-success/10', text: 'text-success', dot: 'bg-success' },
+  ferias: { bg: 'bg-warning/10', text: 'text-warning', dot: 'bg-warning' },
+  afastado: { bg: 'bg-loggi/10', text: 'text-loggi', dot: 'bg-loggi' },
+  desligado: { bg: 'bg-muted', text: 'text-muted-foreground', dot: 'bg-muted-foreground' },
+  pendente: { bg: 'bg-info/10', text: 'text-info', dot: 'bg-info' },
 };
-
-const statusOptions = ['todos', 'ativo', 'ferias', 'afastado', 'desligado', 'admissao'];
 
 type SortColumn = 'nome' | 'dataAdmissao' | 'departamento' | null;
 type SortDirection = 'asc' | 'desc';
 
 export default function Colaboradores() {
-  // Lista de colaboradores (state local para persistência)
-  const [colaboradores, setColaboradores] = useState<Colaborador[]>(mockColaboradores);
+  const { colaboradores, loading, error, createColaborador, updateColaborador, deleteColaborador, fetchColaboradores } = useColaboradores();
   
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
@@ -40,12 +38,11 @@ export default function Colaboradores() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   
   // Modal state
-  const [selectedColaborador, setSelectedColaborador] = useState<Colaborador | null>(null);
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
-  const [editingColaborador, setEditingColaborador] = useState<Colaborador | null>(null);
+  const [editingColaborador, setEditingColaborador] = useState<ColaboradorDB | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [colaboradorToDelete, setColaboradorToDelete] = useState<Colaborador | null>(null);
+  const [colaboradorToDelete, setColaboradorToDelete] = useState<ColaboradorDB | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,41 +59,87 @@ export default function Colaboradores() {
     return ['todos', ...unique.sort()];
   }, [colaboradores]);
 
+  const statusOptions = ['todos', 'ativo', 'ferias', 'afastado', 'desligado', 'pendente'];
+
   // Handler para criar/editar colaborador
-  const handleSaveColaborador = (data: ColaboradorFormData, isEdit: boolean) => {
-    if (isEdit && editingColaborador) {
-      // Atualizar colaborador existente
-      setColaboradores(prev => prev.map(c => 
-        c.id === editingColaborador.id
-          ? {
-              ...c,
-              nome: data.nome,
-              matricula: data.matricula,
-              cargo: data.cargo,
-              departamento: data.departamento,
-              status: data.status,
-              dataAdmissao: data.dataAdmissao,
-              salario: parseFloat(data.salario),
-              gestor: data.gestor || undefined,
-            }
-          : c
-      ));
-    } else {
-      // Criar novo colaborador
-      const novoColaborador: Colaborador = {
-        id: `${Date.now()}`,
-        nome: data.nome,
-        matricula: data.matricula,
+  const handleSaveColaborador = async (data: ColaboradorFormData, isEdit: boolean) => {
+    try {
+      const colaboradorData = {
+        nome_completo: data.nome_completo,
+        nome_social: data.nome_social || null,
+        cpf: unmask(data.cpf),
+        rg: data.rg || null,
+        rg_orgao_emissor: data.rg_orgao_emissor || null,
+        rg_uf: data.rg_uf || null,
+        rg_data_emissao: data.rg_data_emissao || null,
+        data_nascimento: data.data_nascimento,
+        sexo: data.sexo,
+        estado_civil: data.estado_civil,
+        nacionalidade: data.nacionalidade || null,
+        naturalidade_cidade: data.naturalidade_cidade || null,
+        naturalidade_uf: data.naturalidade_uf || null,
+        nome_mae: data.nome_mae,
+        nome_pai: data.nome_pai || null,
+        pis_pasep: data.pis_pasep || null,
+        ctps_numero: data.ctps_numero || null,
+        ctps_serie: data.ctps_serie || null,
+        ctps_uf: data.ctps_uf || null,
+        ctps_data_emissao: data.ctps_data_emissao || null,
+        titulo_eleitor: data.titulo_eleitor || null,
+        titulo_zona: data.titulo_zona || null,
+        titulo_secao: data.titulo_secao || null,
+        certificado_reservista: data.certificado_reservista || null,
+        cnh_numero: data.cnh_numero || null,
+        cnh_categoria: data.cnh_categoria || null,
+        cnh_validade: data.cnh_validade || null,
+        email: data.email || null,
+        telefone: data.telefone || null,
+        celular: data.celular || null,
+        cep: data.cep || null,
+        logradouro: data.logradouro || null,
+        numero: data.numero || null,
+        complemento: data.complemento || null,
+        bairro: data.bairro || null,
+        cidade: data.cidade || null,
+        uf: data.uf || null,
+        banco_codigo: data.banco_codigo || null,
+        banco_nome: data.banco_nome || null,
+        agencia: data.agencia || null,
+        conta: data.conta || null,
+        tipo_conta: data.tipo_conta || null,
+        pix_tipo: data.pix_tipo || null,
+        pix_chave: data.pix_chave || null,
+        matricula: data.matricula || null,
+        data_admissao: data.data_admissao,
+        data_desligamento: data.data_desligamento || null,
+        tipo_contrato: data.tipo_contrato,
         cargo: data.cargo,
         departamento: data.departamento,
+        centro_custo: data.centro_custo || null,
+        local_trabalho: data.local_trabalho || null,
+        cbo: data.cbo || null,
+        salario_base: parseFloat(data.salario_base),
+        tipo_salario: data.tipo_salario || null,
+        jornada_semanal: data.jornada_semanal ? parseInt(data.jornada_semanal) : null,
+        horario_entrada: data.horario_entrada || null,
+        horario_saida: data.horario_saida || null,
+        intervalo_minutos: data.intervalo_minutos ? parseInt(data.intervalo_minutos) : null,
+        escolaridade: data.escolaridade || null,
+        formacao: data.formacao || null,
+        cursos_certificacoes: data.cursos_certificacoes || null,
         status: data.status,
-        dataAdmissao: data.dataAdmissao,
-        salario: parseFloat(data.salario),
-        gestor: data.gestor || undefined,
+        observacoes: data.observacoes || null,
       };
-      setColaboradores(prev => [novoColaborador, ...prev]);
+
+      if (isEdit && editingColaborador) {
+        await updateColaborador(editingColaborador.id, colaboradorData);
+      } else {
+        await createColaborador(colaboradorData as any);
+      }
+      setEditingColaborador(null);
+    } catch (err) {
+      // Error already handled in hook
     }
-    setEditingColaborador(null);
   };
 
   // Abrir modal para novo colaborador
@@ -106,27 +149,31 @@ export default function Colaboradores() {
   };
 
   // Abrir modal para editar colaborador
-  const handleOpenEditModal = (colaborador: Colaborador) => {
+  const handleOpenEditModal = (colaborador: ColaboradorDB) => {
     setEditingColaborador(colaborador);
     setFormModalOpen(true);
   };
 
   // Abrir confirmação de exclusão
-  const handleOpenDeleteConfirm = (colaborador: Colaborador) => {
+  const handleOpenDeleteConfirm = (colaborador: ColaboradorDB, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setColaboradorToDelete(colaborador);
     setDeleteConfirmOpen(true);
   };
 
   // Confirmar exclusão
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (colaboradorToDelete) {
-      setColaboradores(prev => prev.filter(c => c.id !== colaboradorToDelete.id));
-      toast({
-        title: 'Colaborador excluído',
-        description: `${colaboradorToDelete.nome} foi removido com sucesso.`,
-      });
-      setColaboradorToDelete(null);
-      setDeleteConfirmOpen(false);
+      setIsDeleting(true);
+      try {
+        await deleteColaborador(colaboradorToDelete.id);
+        setColaboradorToDelete(null);
+        setDeleteConfirmOpen(false);
+      } catch (err) {
+        // Error already handled in hook
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -134,10 +181,11 @@ export default function Colaboradores() {
   const filteredColaboradores = useMemo(() => {
     let result = colaboradores.filter(c => {
       const matchSearch = search === '' || 
-        c.nome.toLowerCase().includes(search.toLowerCase()) ||
-        c.matricula.toLowerCase().includes(search.toLowerCase()) ||
+        c.nome_completo.toLowerCase().includes(search.toLowerCase()) ||
+        (c.matricula?.toLowerCase().includes(search.toLowerCase())) ||
         c.cargo.toLowerCase().includes(search.toLowerCase()) ||
-        c.departamento.toLowerCase().includes(search.toLowerCase());
+        c.departamento.toLowerCase().includes(search.toLowerCase()) ||
+        c.cpf.includes(unmask(search));
       
       const matchStatus = statusFilter === 'todos' || c.status === statusFilter;
       const matchDepartamento = departamentoFilter === 'todos' || c.departamento === departamentoFilter;
@@ -152,9 +200,9 @@ export default function Colaboradores() {
         let comparison = 0;
         
         if (sortColumn === 'nome') {
-          comparison = a.nome.localeCompare(b.nome, 'pt-BR');
+          comparison = a.nome_completo.localeCompare(b.nome_completo, 'pt-BR');
         } else if (sortColumn === 'dataAdmissao') {
-          comparison = new Date(a.dataAdmissao).getTime() - new Date(b.dataAdmissao).getTime();
+          comparison = new Date(a.data_admissao).getTime() - new Date(b.data_admissao).getTime();
         } else if (sortColumn === 'departamento') {
           comparison = a.departamento.localeCompare(b.departamento, 'pt-BR');
         }
@@ -228,10 +276,20 @@ export default function Colaboradores() {
     setCargoFilter('todos');
   };
 
-  const handleRowClick = (colaborador: Colaborador) => {
-    setSelectedColaborador(colaborador);
-    setDetailModalOpen(true);
+  const getInitials = (nome: string) => {
+    return nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   };
+
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Carregando colaboradores...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -239,7 +297,7 @@ export default function Colaboradores() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Colaboradores</h1>
-          <p className="text-muted-foreground text-sm">Gestão do cadastro de colaboradores</p>
+          <p className="text-muted-foreground text-sm">Gestão completa do cadastro de colaboradores</p>
         </div>
         <Button className="gap-2" onClick={handleOpenNewModal}>
           <Plus className="w-4 h-4" />
@@ -254,7 +312,7 @@ export default function Colaboradores() {
           <div className="relative flex-1 min-w-[280px] max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Buscar por nome, matrícula, cargo, departamento..."
+              placeholder="Buscar por nome, matrícula, cargo, CPF..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-10"
@@ -277,7 +335,7 @@ export default function Colaboradores() {
             <SelectContent className="bg-popover border border-border z-50">
               {statusOptions.map(status => (
                 <SelectItem key={status} value={status}>
-                  {status === 'todos' ? 'Todos Status' : statusLabels[status]}
+                  {status === 'todos' ? 'Todos Status' : statusColaboradorLabels[status as keyof typeof statusColaboradorLabels]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -329,7 +387,7 @@ export default function Colaboradores() {
             </span>
             {statusFilter !== 'todos' && (
               <Badge variant="secondary" className="gap-1 pr-1">
-                Status: {statusLabels[statusFilter]}
+                Status: {statusColaboradorLabels[statusFilter as keyof typeof statusColaboradorLabels]}
                 <button onClick={() => setStatusFilter('todos')} className="ml-1 hover:bg-muted rounded p-0.5">
                   <X className="w-3 h-3" />
                 </button>
@@ -404,9 +462,27 @@ export default function Colaboradores() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filteredColaboradores.length === 0 ? (
+            {colaboradores.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center">
+                <td colSpan={7} className="p-12 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                      <Database className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Nenhum colaborador cadastrado</p>
+                      <p className="text-sm text-muted-foreground mt-1">Comece adicionando o primeiro colaborador</p>
+                    </div>
+                    <Button onClick={handleOpenNewModal} className="mt-2 gap-2">
+                      <Plus className="w-4 h-4" />
+                      Novo Colaborador
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ) : filteredColaboradores.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="p-8 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Search className="w-8 h-8 text-muted-foreground/50" />
                     <p className="text-sm text-muted-foreground">Nenhum colaborador encontrado</p>
@@ -420,28 +496,28 @@ export default function Colaboradores() {
               </tr>
             ) : (
               paginatedColaboradores.map((colab) => {
-                const colors = statusColors[colab.status];
+                const colors = statusColors[colab.status] || statusColors.pendente;
                 return (
                   <tr 
                     key={colab.id} 
                     className="hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={() => handleRowClick(colab)}
+                    onClick={() => handleOpenEditModal(colab)}
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                           <span className="text-sm font-semibold text-primary">
-                            {colab.nome.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                            {getInitials(colab.nome_completo)}
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-foreground">{colab.nome}</p>
-                          <p className="text-xs text-muted-foreground">Desde {new Date(colab.dataAdmissao).toLocaleDateString('pt-BR')}</p>
+                          <p className="text-sm font-medium text-foreground">{colab.nome_completo}</p>
+                          <p className="text-xs text-muted-foreground">Desde {new Date(colab.data_admissao).toLocaleDateString('pt-BR')}</p>
                         </div>
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="text-sm text-foreground font-mono">{colab.matricula}</span>
+                      <span className="text-sm text-foreground font-mono">{colab.matricula || '-'}</span>
                     </td>
                     <td className="p-4">
                       <span className="text-sm text-foreground">{colab.cargo}</span>
@@ -451,27 +527,37 @@ export default function Colaboradores() {
                     </td>
                     <td className="p-4">
                       <span className="text-sm text-muted-foreground">
-                        {new Date(colab.dataAdmissao).toLocaleDateString('pt-BR')}
+                        {new Date(colab.data_admissao).toLocaleDateString('pt-BR')}
                       </span>
                     </td>
                     <td className="p-4">
                       <Badge className={cn("gap-1.5", colors.bg, colors.text, "border-0")}>
                         <span className={cn("w-1.5 h-1.5 rounded-full", colors.dot)} />
-                        {statusLabels[colab.status]}
+                        {statusColaboradorLabels[colab.status]}
                       </Badge>
                     </td>
                     <td className="p-4 text-right">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRowClick(colab);
-                        }}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEditModal(colab);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={(e) => handleOpenDeleteConfirm(colab, e)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -544,7 +630,7 @@ export default function Colaboradores() {
               variant="outline" 
               size="sm" 
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || totalPages === 0}
               className="gap-1"
             >
               Próximo
@@ -554,17 +640,8 @@ export default function Colaboradores() {
         </div>
       )}
 
-      {/* Modal de Detalhes */}
-      <ColaboradorModal 
-        colaborador={selectedColaborador}
-        open={detailModalOpen}
-        onOpenChange={setDetailModalOpen}
-        onEdit={handleOpenEditModal}
-        onDelete={handleOpenDeleteConfirm}
-      />
-
-      {/* Modal Form (Novo/Editar) */}
-      <ColaboradorFormModal 
+      {/* Modal Form Completo (Novo/Editar) */}
+      <ColaboradorFormCompleto 
         open={formModalOpen}
         onOpenChange={setFormModalOpen}
         colaborador={editingColaborador}
@@ -577,16 +654,18 @@ export default function Colaboradores() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir <strong>{colaboradorToDelete?.nome}</strong>? 
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir <strong>{colaboradorToDelete?.nome_completo}</strong>? 
+              Esta ação não pode ser desfeita e todos os dados relacionados serão perdidos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-2"
             >
+              {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
