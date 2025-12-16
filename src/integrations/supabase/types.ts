@@ -856,6 +856,36 @@ export type Database = {
         }
         Relationships: []
       }
+      historico_alertas: {
+        Row: {
+          created_at: string
+          id: string
+          limite: number
+          mensagem: string
+          nivel: string
+          tipo: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          limite: number
+          mensagem: string
+          nivel: string
+          tipo: string
+          valor: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          limite?: number
+          mensagem?: string
+          nivel?: string
+          tipo?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       historico_cargo: {
         Row: {
           cargo_anterior: string | null
