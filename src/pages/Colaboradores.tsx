@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,8 @@ import { ColaboradorModal } from '@/components/colaboradores/ColaboradorModal';
 import { ColaboradorFormModal, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormModal';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+
+const ITEMS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
 const statusLabels: Record<string, string> = {
   ativo: 'Ativo',
@@ -44,6 +46,10 @@ export default function Colaboradores() {
   const [editingColaborador, setEditingColaborador] = useState<Colaborador | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [colaboradorToDelete, setColaboradorToDelete] = useState<Colaborador | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Extrair valores únicos para os filtros
   const departamentos = useMemo(() => {
@@ -159,6 +165,27 @@ export default function Colaboradores() {
 
     return result;
   }, [colaboradores, search, statusFilter, departamentoFilter, cargoFilter, sortColumn, sortDirection]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, departamentoFilter, cargoFilter]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredColaboradores.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedColaboradores = filteredColaboradores.slice(startIndex, endIndex);
+
+  // Pagination handlers
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1);
+  };
 
   // Função para alternar ordenação
   const handleSort = (column: SortColumn) => {
@@ -392,7 +419,7 @@ export default function Colaboradores() {
                 </td>
               </tr>
             ) : (
-              filteredColaboradores.map((colab) => {
+              paginatedColaboradores.map((colab) => {
                 const colors = statusColors[colab.status];
                 return (
                   <tr 
@@ -456,13 +483,73 @@ export default function Colaboradores() {
 
       {/* Pagination */}
       {filteredColaboradores.length > 0 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Mostrando 1-{filteredColaboradores.length} de {filteredColaboradores.length}
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>Anterior</Button>
-            <Button variant="outline" size="sm" disabled>Próximo</Button>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              Mostrando {startIndex + 1}-{Math.min(endIndex, filteredColaboradores.length)} de {filteredColaboradores.length}
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Itens por página:</span>
+              <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                <SelectTrigger className="w-[70px] h-8 bg-card">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50">
+                  {ITEMS_PER_PAGE_OPTIONS.map(option => (
+                    <SelectItem key={option} value={option.toString()}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="gap-1"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Anterior
+            </Button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
+                    className="w-8 h-8 p-0"
+                    onClick={() => goToPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="gap-1"
+            >
+              Próximo
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       )}
