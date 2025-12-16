@@ -463,6 +463,33 @@ export type Database = {
         }
         Relationships: []
       }
+      config_alertas_indicadores: {
+        Row: {
+          created_at: string
+          id: string
+          limite_atencao: number
+          limite_critico: number
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          limite_atencao: number
+          limite_critico: number
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          limite_atencao?: number
+          limite_critico?: number
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dependentes: {
         Row: {
           colaborador_id: string
