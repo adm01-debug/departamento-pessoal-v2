@@ -26,7 +26,7 @@ import { format, differenceInDays, differenceInMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { mockColaboradores } from '@/data/mockData';
+import { useColaboradores } from '@/hooks/useColaboradores';
 
 interface DesligamentoModalProps {
   open: boolean;
@@ -97,14 +97,15 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
   const [motivoDetalhado, setMotivoDetalhado] = useState('');
   const [dateOpen, setDateOpen] = useState(false);
 
-  const colaboradoresAtivos = mockColaboradores.filter(c => c.status === 'ativo');
+  const { colaboradores } = useColaboradores();
+  const colaboradoresAtivos = colaboradores.filter(c => c.status === 'ativo');
   const colaboradorSelecionado = colaboradoresAtivos.find(c => c.id === colaboradorId);
 
   const calculo = useMemo<CalculoRescisao | null>(() => {
     if (!colaboradorSelecionado || !tipoDesligamento || !dataDesligamento) return null;
 
-    const salario = colaboradorSelecionado.salario;
-    const dataAdmissao = new Date(colaboradorSelecionado.dataAdmissao);
+    const salario = colaboradorSelecionado.salario_base;
+    const dataAdmissao = new Date(colaboradorSelecionado.data_admissao);
     const diasTrabalhados = differenceInDays(dataDesligamento, new Date(dataDesligamento.getFullYear(), dataDesligamento.getMonth(), 1)) + 1;
     const mesesTrabalhados = differenceInMonths(dataDesligamento, dataAdmissao);
     const mesesAno = dataDesligamento.getMonth() + 1;
@@ -243,7 +244,7 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
                       <SelectItem key={col.id} value={col.id}>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4" />
-                          <span>{col.nome}</span>
+                          <span>{col.nome_completo}</span>
                           <span className="text-muted-foreground">• {col.cargo}</span>
                         </div>
                       </SelectItem>
@@ -257,7 +258,7 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <span className="text-muted-foreground">Matrícula:</span>{' '}
-                      <span className="font-medium">{colaboradorSelecionado.matricula}</span>
+                      <span className="font-medium">{colaboradorSelecionado.matricula || '-'}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Departamento:</span>{' '}
@@ -265,7 +266,7 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
                     </div>
                     <div>
                       <span className="text-muted-foreground">Salário:</span>{' '}
-                      <span className="font-medium">{formatCurrency(colaboradorSelecionado.salario)}</span>
+                      <span className="font-medium">{formatCurrency(colaboradorSelecionado.salario_base)}</span>
                     </div>
                   </div>
                 </div>

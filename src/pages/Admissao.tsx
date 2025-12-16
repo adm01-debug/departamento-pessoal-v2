@@ -1,96 +1,90 @@
 import { useState } from 'react';
-import { Plus, FileText, Clock, CheckCircle, List, Calendar, LayoutGrid, User } from 'lucide-react';
+import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockAdmissoes, AdmissaoItem } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { AdmissaoChecklistModal } from '@/components/admissao/AdmissaoChecklistModal';
 import { NovaAdmissaoModal, NovaAdmissaoData } from '@/components/admissao/NovaAdmissaoModal';
-import { toast } from 'sonner';
-
-const etapas = [
-  'Solicitação Recebida',
-  'Coleta de Documentos',
-  'Validação',
-  'Exame Admissional',
-  'Contrato',
-  'eSocial',
-  'Onboarding',
-  'Concluído'
-];
+import { useAdmissoes, Admissao as AdmissaoType, EtapaAdmissao } from '@/hooks/useAdmissoes';
 
 const etapaColors: Record<string, string> = {
   'Solicitação Recebida': 'bg-info/20 border-info',
   'Coleta de Documentos': 'bg-warning/20 border-warning',
   'Validação': 'bg-primary/20 border-primary',
+  'Pendente': 'bg-muted/20 border-muted-foreground',
   'Exame Admissional': 'bg-success/20 border-success',
   'Contrato': 'bg-loggi/20 border-loggi',
-  'eSocial': 'bg-info/20 border-info',
-  'Onboarding': 'bg-primary/20 border-primary',
-  'Concluído': 'bg-success/20 border-success',
+  'Assinatura': 'bg-info/20 border-info',
+  'eSocial': 'bg-primary/20 border-primary',
 };
 
-export default function Admissao() {
-  const [admissoes, setAdmissoes] = useState<AdmissaoItem[]>(mockAdmissoes);
+export default function AdmissaoPage() {
+  const { 
+    admissoes, 
+    loading, 
+    createAdmissao, 
+    updateAdmissao,
+    advanceStage, 
+    getProgress,
+    etapaLabels,
+    etapaOrder
+  } = useAdmissoes();
+  
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'calendario'>('kanban');
-  const [selectedAdmissao, setSelectedAdmissao] = useState<AdmissaoItem | null>(null);
+  const [selectedAdmissao, setSelectedAdmissao] = useState<AdmissaoType | null>(null);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [novaAdmissaoOpen, setNovaAdmissaoOpen] = useState(false);
 
   // Agrupar por etapa
-  const admissoesPorEtapa = etapas.map(etapa => ({
+  const admissoesPorEtapa = etapaOrder.map(etapa => ({
     etapa,
+    label: etapaLabels[etapa],
     admissoes: admissoes.filter(a => a.etapa === etapa)
   }));
 
-  const handleOpenChecklist = (admissao: AdmissaoItem) => {
+  const handleOpenChecklist = (admissao: AdmissaoType) => {
     setSelectedAdmissao(admissao);
     setChecklistOpen(true);
   };
 
-  const handleNovaAdmissao = (data: NovaAdmissaoData) => {
-    const novaAdmissao: AdmissaoItem = {
-      id: String(admissoes.length + 1),
-      candidatoNome: data.candidatoNome,
+  const handleNovaAdmissao = async (data: NovaAdmissaoData) => {
+    await createAdmissao({
+      nome: data.candidatoNome,
       cargo: data.cargo,
       departamento: data.departamento,
-      etapa: 'Solicitação Recebida',
-      progresso: 0,
-      dataPrevisao: data.dataPrevisao.toISOString().split('T')[0],
-    };
-    setAdmissoes([...admissoes, novaAdmissao]);
+      salario_proposto: data.salarioProposto || 0,
+      data_prevista: data.dataPrevisao.toISOString().split('T')[0],
+      observacoes: data.observacoes,
+    });
   };
 
-  const handleAdvanceStage = () => {
+  const handleAdvanceStage = async () => {
     if (!selectedAdmissao) return;
-    
-    const currentIndex = etapas.indexOf(selectedAdmissao.etapa);
-    if (currentIndex < etapas.length - 1) {
-      const nextEtapa = etapas[currentIndex + 1];
-      const newProgress = Math.round(((currentIndex + 2) / etapas.length) * 100);
-      
-      setAdmissoes(prev => prev.map(a => 
-        a.id === selectedAdmissao.id 
-          ? { ...a, etapa: nextEtapa, progresso: newProgress }
-          : a
-      ));
-      setSelectedAdmissao({ ...selectedAdmissao, etapa: nextEtapa, progresso: newProgress });
-      toast.success(`Avançado para: ${nextEtapa}`);
+    await advanceStage(selectedAdmissao);
+    // Refresh selected admissao
+    const currentIndex = etapaOrder.indexOf(selectedAdmissao.etapa);
+    if (currentIndex < etapaOrder.length - 1) {
+      setSelectedAdmissao({
+        ...selectedAdmissao,
+        etapa: etapaOrder[currentIndex + 1]
+      });
     }
   };
 
-  const handleConvertToColaborador = () => {
+  const handleConvertToColaborador = async () => {
     if (!selectedAdmissao) return;
-    
-    setAdmissoes(prev => prev.map(a => 
-      a.id === selectedAdmissao.id 
-        ? { ...a, etapa: 'Concluído', progresso: 100 }
-        : a
-    ));
+    await updateAdmissao(selectedAdmissao.id, { etapa: 'esocial' });
     setChecklistOpen(false);
-    toast.success(`${selectedAdmissao.candidatoNome} adicionado como colaborador!`);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -126,12 +120,12 @@ export default function Admissao() {
         {/* Kanban View */}
         <TabsContent value="kanban" className="mt-4">
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
-            {admissoesPorEtapa.map(({ etapa, admissoes }) => (
+            {admissoesPorEtapa.map(({ etapa, label, admissoes }) => (
               <div key={etapa} className="flex-shrink-0 w-72">
                 {/* Column Header */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-foreground">{etapa}</h3>
+                    <h3 className="text-sm font-semibold text-foreground">{label}</h3>
                     <Badge variant="secondary" className="text-xs">{admissoes.length}</Badge>
                   </div>
                 </div>
@@ -139,45 +133,48 @@ export default function Admissao() {
                 {/* Column Content */}
                 <div className={cn(
                   "min-h-[400px] p-2 rounded-xl border-2 border-dashed space-y-3",
-                  etapaColors[etapa] || 'bg-muted/20 border-border'
+                  etapaColors[label] || 'bg-muted/20 border-border'
                 )}>
-                  {admissoes.map((adm) => (
-                    <div 
-                      key={adm.id}
-                      onClick={() => handleOpenChecklist(adm)}
-                      className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-xs font-semibold text-primary">
-                            {adm.candidatoNome.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                          </span>
+                  {admissoes.map((adm) => {
+                    const progress = getProgress(adm);
+                    return (
+                      <div 
+                        key={adm.id}
+                        onClick={() => handleOpenChecklist(adm)}
+                        className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-xs font-semibold text-primary">
+                              {adm.nome.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                            </span>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {progress}%
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className="text-xs">
-                          {adm.progresso}%
-                        </Badge>
-                      </div>
-                      
-                      <h4 className="font-medium text-sm text-foreground mb-1">{adm.candidatoNome}</h4>
-                      <p className="text-xs text-muted-foreground mb-2">{adm.cargo}</p>
-                      <p className="text-xs text-muted-foreground">{adm.departamento}</p>
-                      
-                      {/* Progress bar */}
-                      <div className="mt-3">
-                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full transition-all"
-                            style={{ width: `${adm.progresso}%` }}
-                          />
+                        
+                        <h4 className="font-medium text-sm text-foreground mb-1">{adm.nome}</h4>
+                        <p className="text-xs text-muted-foreground mb-2">{adm.cargo}</p>
+                        <p className="text-xs text-muted-foreground">{adm.departamento}</p>
+                        
+                        {/* Progress bar */}
+                        <div className="mt-3">
+                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary rounded-full transition-all"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          <span>Prev: {new Date(adm.data_prevista).toLocaleDateString('pt-BR')}</span>
                         </div>
                       </div>
-                      
-                      <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        <span>Prev: {new Date(adm.dataPrevisao).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   {admissoes.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
@@ -207,44 +204,47 @@ export default function Admissao() {
                 </tr>
               </thead>
               <tbody>
-                {admissoes.map((adm) => (
-                  <tr key={adm.id} className="border-t hover:bg-muted/30">
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-xs font-semibold text-primary">
-                            {adm.candidatoNome.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                          </span>
+                {admissoes.map((adm) => {
+                  const progress = getProgress(adm);
+                  return (
+                    <tr key={adm.id} className="border-t hover:bg-muted/30">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-xs font-semibold text-primary">
+                              {adm.nome.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                            </span>
+                          </div>
+                          <span className="font-medium text-sm">{adm.nome}</span>
                         </div>
-                        <span className="font-medium text-sm">{adm.candidatoNome}</span>
-                      </div>
-                    </td>
-                    <td className="p-3 text-sm">{adm.cargo}</td>
-                    <td className="p-3 text-sm">{adm.departamento}</td>
-                    <td className="p-3">
-                      <Badge variant="secondary" className="text-xs">{adm.etapa}</Badge>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full"
-                            style={{ width: `${adm.progresso}%` }}
-                          />
+                      </td>
+                      <td className="p-3 text-sm">{adm.cargo}</td>
+                      <td className="p-3 text-sm">{adm.departamento}</td>
+                      <td className="p-3">
+                        <Badge variant="secondary" className="text-xs">{etapaLabels[adm.etapa]}</Badge>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary rounded-full"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <span className="text-xs">{progress}%</span>
                         </div>
-                        <span className="text-xs">{adm.progresso}%</span>
-                      </div>
-                    </td>
-                    <td className="p-3 text-sm">
-                      {new Date(adm.dataPrevisao).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td className="p-3">
-                      <Button size="sm" variant="ghost" onClick={() => handleOpenChecklist(adm)}>
-                        Checklist
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-3 text-sm">
+                        {new Date(adm.data_prevista).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="p-3">
+                        <Button size="sm" variant="ghost" onClick={() => handleOpenChecklist(adm)}>
+                          Checklist
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -266,7 +266,15 @@ export default function Admissao() {
       <AdmissaoChecklistModal
         open={checklistOpen}
         onOpenChange={setChecklistOpen}
-        admissao={selectedAdmissao}
+        admissao={selectedAdmissao ? {
+          id: selectedAdmissao.id,
+          candidatoNome: selectedAdmissao.nome,
+          cargo: selectedAdmissao.cargo,
+          departamento: selectedAdmissao.departamento,
+          etapa: etapaLabels[selectedAdmissao.etapa],
+          progresso: getProgress(selectedAdmissao),
+          dataPrevisao: selectedAdmissao.data_prevista,
+        } : null}
         onAdvanceStage={handleAdvanceStage}
         onConvertToColaborador={handleConvertToColaborador}
       />

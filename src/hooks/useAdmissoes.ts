@@ -1,0 +1,177 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+export type EtapaAdmissao = 
+  | 'solicitacao'
+  | 'documentos'
+  | 'validacao'
+  | 'pendente'
+  | 'exame'
+  | 'contrato'
+  | 'assinatura'
+  | 'esocial';
+
+export interface Admissao {
+  id: string;
+  nome: string;
+  cargo: string;
+  departamento: string;
+  salario_proposto: number;
+  data_prevista: string;
+  etapa: EtapaAdmissao;
+  observacoes?: string;
+  created_at: string;
+  updated_at: string;
+  checklist_documentos_pessoais: boolean;
+  checklist_comprovante_endereco: boolean;
+  checklist_foto: boolean;
+  checklist_ctps: boolean;
+  checklist_exame_admissional: boolean;
+  checklist_contrato_assinado: boolean;
+  checklist_esocial_enviado: boolean;
+}
+
+export interface AdmissaoInsert {
+  nome: string;
+  cargo: string;
+  departamento: string;
+  salario_proposto: number;
+  data_prevista: string;
+  observacoes?: string;
+}
+
+const etapaLabels: Record<EtapaAdmissao, string> = {
+  solicitacao: 'Solicitação Recebida',
+  documentos: 'Coleta de Documentos',
+  validacao: 'Validação',
+  pendente: 'Pendente',
+  exame: 'Exame Admissional',
+  contrato: 'Contrato',
+  assinatura: 'Assinatura',
+  esocial: 'eSocial',
+};
+
+const etapaOrder: EtapaAdmissao[] = [
+  'solicitacao',
+  'documentos',
+  'validacao',
+  'pendente',
+  'exame',
+  'contrato',
+  'assinatura',
+  'esocial',
+];
+
+export function useAdmissoes() {
+  const [admissoes, setAdmissoes] = useState<Admissao[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchAdmissoes = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('admissoes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAdmissoes((data || []) as Admissao[]);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Erro ao buscar admissões:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmissoes();
+  }, []);
+
+  const createAdmissao = async (data: AdmissaoInsert) => {
+    try {
+      const { data: newAdmissao, error } = await supabase
+        .from('admissoes')
+        .insert(data)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setAdmissoes(prev => [newAdmissao as Admissao, ...prev]);
+      toast.success('Admissão criada com sucesso!');
+      return newAdmissao;
+    } catch (err: any) {
+      toast.error('Erro ao criar admissão: ' + err.message);
+      throw err;
+    }
+  };
+
+  const updateAdmissao = async (id: string, data: Partial<Admissao>) => {
+    try {
+      const { data: updated, error } = await supabase
+        .from('admissoes')
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setAdmissoes(prev => prev.map(a => a.id === id ? updated as Admissao : a));
+      return updated;
+    } catch (err: any) {
+      toast.error('Erro ao atualizar admissão: ' + err.message);
+      throw err;
+    }
+  };
+
+  const deleteAdmissao = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('admissoes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setAdmissoes(prev => prev.filter(a => a.id !== id));
+      toast.success('Admissão removida!');
+    } catch (err: any) {
+      toast.error('Erro ao remover admissão: ' + err.message);
+      throw err;
+    }
+  };
+
+  const advanceStage = async (admissao: Admissao) => {
+    const currentIndex = etapaOrder.indexOf(admissao.etapa);
+    if (currentIndex < etapaOrder.length - 1) {
+      const nextEtapa = etapaOrder[currentIndex + 1];
+      await updateAdmissao(admissao.id, { etapa: nextEtapa });
+      toast.success(`Avançado para: ${etapaLabels[nextEtapa]}`);
+    }
+  };
+
+  const updateChecklist = async (id: string, field: string, value: boolean) => {
+    await updateAdmissao(id, { [field]: value });
+  };
+
+  const getProgress = (admissao: Admissao) => {
+    const currentIndex = etapaOrder.indexOf(admissao.etapa);
+    return Math.round(((currentIndex + 1) / etapaOrder.length) * 100);
+  };
+
+  return {
+    admissoes,
+    loading,
+    error,
+    fetchAdmissoes,
+    createAdmissao,
+    updateAdmissao,
+    deleteAdmissao,
+    advanceStage,
+    updateChecklist,
+    getProgress,
+    etapaLabels,
+    etapaOrder,
+  };
+}
