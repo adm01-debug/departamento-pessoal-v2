@@ -320,6 +320,10 @@ export default function AdmissaoPage() {
         } : null}
         onAdvanceStage={handleAdvanceStage}
         onConvertToColaborador={handleConvertToColaborador}
+        onEdit={() => {
+          setChecklistOpen(false);
+          setEditarOpen(true);
+        }}
       />
 
       <NovaAdmissaoModal
