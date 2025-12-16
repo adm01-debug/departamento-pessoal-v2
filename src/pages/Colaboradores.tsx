@@ -23,6 +23,9 @@ type SortColumn = 'nome' | 'dataAdmissao' | 'departamento' | null;
 type SortDirection = 'asc' | 'desc';
 
 export default function Colaboradores() {
+  // Lista de colaboradores (state local para persistência)
+  const [colaboradores, setColaboradores] = useState<Colaborador[]>(mockColaboradores);
+  
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [departamentoFilter, setDepartamentoFilter] = useState('todos');
@@ -39,18 +42,43 @@ export default function Colaboradores() {
 
   // Extrair valores únicos para os filtros
   const departamentos = useMemo(() => {
-    const unique = [...new Set(mockColaboradores.map(c => c.departamento))];
+    const unique = [...new Set(colaboradores.map(c => c.departamento))];
     return ['todos', ...unique.sort()];
-  }, []);
+  }, [colaboradores]);
 
   const cargos = useMemo(() => {
-    const unique = [...new Set(mockColaboradores.map(c => c.cargo))];
+    const unique = [...new Set(colaboradores.map(c => c.cargo))];
     return ['todos', ...unique.sort()];
-  }, []);
+  }, [colaboradores]);
+
+  // Handler para adicionar novo colaborador
+  const handleNovoColaborador = (data: {
+    nome: string;
+    matricula: string;
+    cargo: string;
+    departamento: string;
+    dataAdmissao: string;
+    salario: string;
+    gestor?: string;
+    status: 'ativo' | 'admissao';
+  }) => {
+    const novoColaborador: Colaborador = {
+      id: `${Date.now()}`,
+      nome: data.nome,
+      matricula: data.matricula,
+      cargo: data.cargo,
+      departamento: data.departamento,
+      status: data.status,
+      dataAdmissao: data.dataAdmissao,
+      salario: parseFloat(data.salario),
+      gestor: data.gestor || undefined,
+    };
+    setColaboradores(prev => [novoColaborador, ...prev]);
+  };
 
   // Filtrar e ordenar colaboradores
   const filteredColaboradores = useMemo(() => {
-    let result = mockColaboradores.filter(c => {
+    let result = colaboradores.filter(c => {
       const matchSearch = search === '' || 
         c.nome.toLowerCase().includes(search.toLowerCase()) ||
         c.matricula.toLowerCase().includes(search.toLowerCase()) ||
@@ -82,7 +110,7 @@ export default function Colaboradores() {
     }
 
     return result;
-  }, [search, statusFilter, departamentoFilter, cargoFilter, sortColumn, sortDirection]);
+  }, [colaboradores, search, statusFilter, departamentoFilter, cargoFilter, sortColumn, sortDirection]);
 
   // Função para alternar ordenação
   const handleSort = (column: SortColumn) => {
@@ -255,9 +283,9 @@ export default function Colaboradores() {
       {/* Results Count */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {filteredColaboradores.length === mockColaboradores.length 
-            ? `${mockColaboradores.length} colaboradores`
-            : `${filteredColaboradores.length} de ${mockColaboradores.length} colaboradores`
+          {filteredColaboradores.length === colaboradores.length 
+            ? `${colaboradores.length} colaboradores`
+            : `${filteredColaboradores.length} de ${colaboradores.length} colaboradores`
           }
         </p>
       </div>
@@ -402,6 +430,7 @@ export default function Colaboradores() {
       <NovoColaboradorModal 
         open={novoModalOpen}
         onOpenChange={setNovoModalOpen}
+        onSuccess={handleNovoColaborador}
       />
     </div>
   );
