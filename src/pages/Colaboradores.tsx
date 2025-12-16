@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { mockColaboradores, statusColors } from '@/data/mockData';
+import { mockColaboradores, statusColors, Colaborador } from '@/data/mockData';
+import { ColaboradorModal } from '@/components/colaboradores/ColaboradorModal';
 import { cn } from '@/lib/utils';
 
 const statusLabels: Record<string, string> = {
@@ -22,6 +23,10 @@ export default function Colaboradores() {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [departamentoFilter, setDepartamentoFilter] = useState('todos');
   const [cargoFilter, setCargoFilter] = useState('todos');
+  
+  // Modal state
+  const [selectedColaborador, setSelectedColaborador] = useState<Colaborador | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Extrair valores únicos para os filtros
   const departamentos = useMemo(() => {
@@ -65,6 +70,11 @@ export default function Colaboradores() {
     setStatusFilter('todos');
     setDepartamentoFilter('todos');
     setCargoFilter('todos');
+  };
+
+  const handleRowClick = (colaborador: Colaborador) => {
+    setSelectedColaborador(colaborador);
+    setModalOpen(true);
   };
 
   return (
@@ -231,7 +241,11 @@ export default function Colaboradores() {
               filteredColaboradores.map((colab) => {
                 const colors = statusColors[colab.status];
                 return (
-                  <tr key={colab.id} className="hover:bg-muted/30 transition-colors cursor-pointer">
+                  <tr 
+                    key={colab.id} 
+                    className="hover:bg-muted/30 transition-colors cursor-pointer"
+                    onClick={() => handleRowClick(colab)}
+                  >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -261,7 +275,15 @@ export default function Colaboradores() {
                       </Badge>
                     </td>
                     <td className="p-4 text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRowClick(colab);
+                        }}
+                      >
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </td>
@@ -285,6 +307,13 @@ export default function Colaboradores() {
           </div>
         </div>
       )}
+
+      {/* Modal de Detalhes */}
+      <ColaboradorModal 
+        colaborador={selectedColaborador}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </div>
   );
 }
