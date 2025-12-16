@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { 
   User, FileText, Stethoscope, FileSignature, Send, BookOpen, 
-  CheckCircle2, Clock, AlertTriangle, ChevronRight
+  CheckCircle2, Clock, AlertTriangle, ChevronRight, Pencil
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +46,7 @@ interface AdmissaoChecklistModalProps {
   } | null;
   onAdvanceStage?: () => void;
   onConvertToColaborador?: () => void;
+  onEdit?: () => void;
 }
 
 const initialChecklist: ChecklistStage[] = [
@@ -128,6 +129,7 @@ export function AdmissaoChecklistModal({
   admissao,
   onAdvanceStage,
   onConvertToColaborador,
+  onEdit,
 }: AdmissaoChecklistModalProps) {
   const [checklist, setChecklist] = useState<ChecklistStage[]>(initialChecklist);
 
@@ -173,16 +175,24 @@ export function AdmissaoChecklistModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <div className="font-semibold">{admissao.candidatoNome}</div>
-              <div className="text-sm font-normal text-muted-foreground">
-                {admissao.cargo} • {admissao.departamento}
+          <DialogTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <User className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <div className="font-semibold">{admissao.candidatoNome}</div>
+                <div className="text-sm font-normal text-muted-foreground">
+                  {admissao.cargo} • {admissao.departamento}
+                </div>
               </div>
             </div>
+            {onEdit && (
+              <Button variant="outline" size="sm" onClick={onEdit} className="gap-2">
+                <Pencil className="w-4 h-4" />
+                Editar Dados
+              </Button>
+            )}
           </DialogTitle>
         </DialogHeader>
 
