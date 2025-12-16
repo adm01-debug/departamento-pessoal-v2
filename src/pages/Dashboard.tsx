@@ -6,13 +6,16 @@ import {
   Clock, 
   Wallet, 
   UserMinus, 
-  AlertTriangle 
+  AlertTriangle,
+  PieChart,
+  BarChart3
 } from 'lucide-react';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { AlertsList } from '@/components/dashboard/AlertsList';
-import { DepartmentChart } from '@/components/dashboard/DepartmentChart';
+import { DepartmentBarChart } from '@/components/dashboard/DepartmentBarChart';
+import { StatusPieChart } from '@/components/dashboard/StatusPieChart';
 import { MiniCalendar } from '@/components/dashboard/MiniCalendar';
-import { mockKPIs, mockAlertas, mockDepartamentos, mockCalendarioEventos } from '@/data/mockData';
+import { mockKPIs, mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -108,18 +111,29 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Content Grid */}
+      {/* Charts Grid */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Departamentos */}
+        {/* Gráfico por Departamento */}
         <div className="p-5 rounded-xl bg-card border border-border">
           <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Users className="w-4 h-4 text-primary" />
+            <BarChart3 className="w-4 h-4 text-primary" />
             Colaboradores por Departamento
           </h3>
-          <DepartmentChart departamentos={mockDepartamentos} />
+          <DepartmentBarChart colaboradores={mockColaboradores} />
         </div>
 
-        {/* Alertas */}
+        {/* Gráfico por Status */}
+        <div className="p-5 rounded-xl bg-card border border-border relative">
+          <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <PieChart className="w-4 h-4 text-info" />
+            Distribuição por Status
+          </h3>
+          <StatusPieChart colaboradores={mockColaboradores} />
+        </div>
+      </div>
+
+      {/* Alertas */}
+      <div className="grid md:grid-cols-2 gap-6">
         <div className="p-5 rounded-xl bg-card border border-border">
           <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-destructive" />
@@ -127,14 +141,14 @@ export default function Dashboard() {
           </h3>
           <AlertsList alertas={mockAlertas.slice(0, 5)} />
         </div>
-      </div>
 
-      {/* Calendar */}
-      <div className="p-5 rounded-xl bg-card border border-border">
-        <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-          📅 Calendário do Mês
-        </h3>
-        <MiniCalendar eventos={mockCalendarioEventos} />
+        {/* Calendar */}
+        <div className="p-5 rounded-xl bg-card border border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            📅 Calendário do Mês
+          </h3>
+          <MiniCalendar eventos={mockCalendarioEventos} />
+        </div>
       </div>
     </div>
   );
