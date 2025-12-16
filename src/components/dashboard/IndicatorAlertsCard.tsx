@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,8 +12,12 @@ import {
   TrendingUp, 
   Activity,
   Bell,
-  BellOff
+  BellOff,
+  Loader2,
+  Save
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface IndicatorLimits {
   turnoverWarning: number;
@@ -25,8 +29,6 @@ interface IndicatorLimits {
 interface IndicatorAlertsCardProps {
   turnoverRate: number;
   absenteeismRate: number;
-  limits?: IndicatorLimits;
-  onLimitsChange?: (limits: IndicatorLimits) => void;
 }
 
 const DEFAULT_LIMITS: IndicatorLimits = {
@@ -50,14 +52,84 @@ interface Alert {
 
 export function IndicatorAlertsCard({ 
   turnoverRate, 
-  absenteeismRate,
-  limits: externalLimits,
-  onLimitsChange
+  absenteeismRate
 }: IndicatorAlertsCardProps) {
-  const [localLimits, setLocalLimits] = useState<IndicatorLimits>(DEFAULT_LIMITS);
+  const [limits, setLimits] = useState<IndicatorLimits>(DEFAULT_LIMITS);
+  const [editingLimits, setEditingLimits] = useState<IndicatorLimits>(DEFAULT_LIMITS);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  
-  const limits = externalLimits || localLimits;
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Load limits from database
+  useEffect(() => {
+    async function loadLimits() {
+      try {
+        const { data, error } = await supabase
+          .from('config_alertas_indicadores')
+          .select('tipo, limite_atencao, limite_critico');
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const turnoverConfig = data.find(d => d.tipo === 'turnover');
+          const absenteeismConfig = data.find(d => d.tipo === 'absenteismo');
+
+          const loadedLimits: IndicatorLimits = {
+            turnoverWarning: turnoverConfig?.limite_atencao ?? DEFAULT_LIMITS.turnoverWarning,
+            turnoverCritical: turnoverConfig?.limite_critico ?? DEFAULT_LIMITS.turnoverCritical,
+            absenteeismWarning: absenteeismConfig?.limite_atencao ?? DEFAULT_LIMITS.absenteeismWarning,
+            absenteeismCritical: absenteeismConfig?.limite_critico ?? DEFAULT_LIMITS.absenteeismCritical,
+          };
+
+          setLimits(loadedLimits);
+          setEditingLimits(loadedLimits);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar limites:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadLimits();
+  }, []);
+
+  // Save limits to database
+  const saveLimits = async () => {
+    setSaving(true);
+    try {
+      // Update turnover limits
+      const { error: turnoverError } = await supabase
+        .from('config_alertas_indicadores')
+        .update({
+          limite_atencao: editingLimits.turnoverWarning,
+          limite_critico: editingLimits.turnoverCritical
+        })
+        .eq('tipo', 'turnover');
+
+      if (turnoverError) throw turnoverError;
+
+      // Update absenteeism limits
+      const { error: absenteeismError } = await supabase
+        .from('config_alertas_indicadores')
+        .update({
+          limite_atencao: editingLimits.absenteeismWarning,
+          limite_critico: editingLimits.absenteeismCritical
+        })
+        .eq('tipo', 'absenteismo');
+
+      if (absenteeismError) throw absenteeismError;
+
+      setLimits(editingLimits);
+      setSettingsOpen(false);
+      toast.success('Limites salvos com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar limites:', error);
+      toast.error('Erro ao salvar limites');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const getAlertLevel = (value: number, warningLimit: number, criticalLimit: number): AlertLevel => {
     if (value >= criticalLimit) return 'critical';
@@ -114,11 +186,6 @@ export function IndicatorAlertsCard({
     });
   }
 
-  const handleLimitsChange = (newLimits: IndicatorLimits) => {
-    setLocalLimits(newLimits);
-    onLimitsChange?.(newLimits);
-  };
-
   const getLevelColor = (level: AlertLevel) => {
     switch (level) {
       case 'critical': return 'text-destructive bg-destructive/10 border-destructive/20';
@@ -135,6 +202,23 @@ export function IndicatorAlertsCard({
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setEditingLimits(limits);
+    }
+    setSettingsOpen(open);
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -146,7 +230,7 @@ export function IndicatorAlertsCard({
           )}
           Alertas de Indicadores
         </CardTitle>
-        <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <Popover open={settingsOpen} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Settings className="w-4 h-4" />
@@ -164,9 +248,9 @@ export function IndicatorAlertsCard({
                       <Label className="text-xs">Alerta</Label>
                       <Input 
                         type="number" 
-                        value={limits.turnoverWarning}
-                        onChange={(e) => handleLimitsChange({
-                          ...limits,
+                        value={editingLimits.turnoverWarning}
+                        onChange={(e) => setEditingLimits({
+                          ...editingLimits,
                           turnoverWarning: Number(e.target.value)
                         })}
                         className="h-8"
@@ -176,9 +260,9 @@ export function IndicatorAlertsCard({
                       <Label className="text-xs">Crítico</Label>
                       <Input 
                         type="number" 
-                        value={limits.turnoverCritical}
-                        onChange={(e) => handleLimitsChange({
-                          ...limits,
+                        value={editingLimits.turnoverCritical}
+                        onChange={(e) => setEditingLimits({
+                          ...editingLimits,
                           turnoverCritical: Number(e.target.value)
                         })}
                         className="h-8"
@@ -194,9 +278,9 @@ export function IndicatorAlertsCard({
                       <Label className="text-xs">Alerta</Label>
                       <Input 
                         type="number" 
-                        value={limits.absenteeismWarning}
-                        onChange={(e) => handleLimitsChange({
-                          ...limits,
+                        value={editingLimits.absenteeismWarning}
+                        onChange={(e) => setEditingLimits({
+                          ...editingLimits,
                           absenteeismWarning: Number(e.target.value)
                         })}
                         className="h-8"
@@ -206,9 +290,9 @@ export function IndicatorAlertsCard({
                       <Label className="text-xs">Crítico</Label>
                       <Input 
                         type="number" 
-                        value={limits.absenteeismCritical}
-                        onChange={(e) => handleLimitsChange({
-                          ...limits,
+                        value={editingLimits.absenteeismCritical}
+                        onChange={(e) => setEditingLimits({
+                          ...editingLimits,
                           absenteeismCritical: Number(e.target.value)
                         })}
                         className="h-8"
@@ -221,9 +305,20 @@ export function IndicatorAlertsCard({
               <Button 
                 size="sm" 
                 className="w-full"
-                onClick={() => setSettingsOpen(false)}
+                onClick={saveLimits}
+                disabled={saving}
               >
-                Aplicar
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Salvar Limites
+                  </>
+                )}
               </Button>
             </div>
           </PopoverContent>
