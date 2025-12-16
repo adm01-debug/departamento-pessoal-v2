@@ -11,7 +11,10 @@ import {
   PieChart,
   BarChart3,
   TrendingUp,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  RefreshCcw,
+  Activity,
+  DollarSign
 } from 'lucide-react';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { AlertsList } from '@/components/dashboard/AlertsList';
@@ -19,6 +22,9 @@ import { DepartmentBarChart } from '@/components/dashboard/DepartmentBarChart';
 import { StatusPieChart } from '@/components/dashboard/StatusPieChart';
 import { AdmissionsLineChart } from '@/components/dashboard/AdmissionsLineChart';
 import { MiniCalendar } from '@/components/dashboard/MiniCalendar';
+import { TurnoverGauge } from '@/components/dashboard/TurnoverGauge';
+import { AbsenteeismChart } from '@/components/dashboard/AbsenteeismChart';
+import { PayrollCostChart } from '@/components/dashboard/PayrollCostChart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockKPIs, mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
@@ -71,6 +77,46 @@ export default function Dashboard() {
       isAfter(new Date(c.dataAdmissao), startDate)
     );
   }, [period]);
+
+  // Dados mockados para indicadores de DP
+  const dpIndicators = useMemo(() => {
+    // Simulação de dados de turnover
+    const admissoes = 5; // admissões no período
+    const desligamentos = 2; // desligamentos no período
+    const totalColaboradores = mockKPIs.colaboradoresAtivos;
+    
+    // Taxa de turnover: ((Admissões + Desligamentos) / 2) / Total * 100
+    const turnoverRate = ((admissoes + desligamentos) / 2) / totalColaboradores * 100;
+
+    // Dados de absenteísmo por departamento
+    const absenteeismData = [
+      { departamento: 'Gravação', faltas: 8, atestados: 12, taxaAbsenteismo: 4.2 },
+      { departamento: 'Comercial', faltas: 3, atestados: 5, taxaAbsenteismo: 2.1 },
+      { departamento: 'Artes', faltas: 2, atestados: 4, taxaAbsenteismo: 1.8 },
+      { departamento: 'Logística', faltas: 5, atestados: 8, taxaAbsenteismo: 5.5 },
+      { departamento: 'Administrativo', faltas: 1, atestados: 2, taxaAbsenteismo: 1.2 },
+      { departamento: 'Financeiro', faltas: 0, atestados: 1, taxaAbsenteismo: 0.8 },
+    ];
+
+    // Custo de folha por departamento
+    const payrollCostData = [
+      { departamento: 'Gravação', custoTotal: 63000, colaboradores: 18, custoMedio: 3500 },
+      { departamento: 'Comercial', custoTotal: 45600, colaboradores: 12, custoMedio: 3800 },
+      { departamento: 'Artes', custoTotal: 33600, colaboradores: 8, custoMedio: 4200 },
+      { departamento: 'Logística', custoTotal: 19200, colaboradores: 6, custoMedio: 3200 },
+      { departamento: 'Administrativo', custoTotal: 14000, colaboradores: 4, custoMedio: 3500 },
+      { departamento: 'Financeiro', custoTotal: 9600, colaboradores: 3, custoMedio: 3200 },
+    ];
+
+    return {
+      admissoes,
+      desligamentos,
+      totalColaboradores,
+      turnoverRate,
+      absenteeismData,
+      payrollCostData,
+    };
+  }, []);
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -151,6 +197,55 @@ export default function Dashboard() {
           subtitle="requerem ação"
           colorClass="text-destructive"
         />
+      </div>
+
+      {/* Indicadores de DP */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {/* Turnover */}
+        <div className="p-5 rounded-xl bg-card border border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <RefreshCcw className="w-4 h-4 text-warning" />
+              Taxa de Turnover
+            </h3>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              Último ano
+            </span>
+          </div>
+          <TurnoverGauge 
+            admissoes={dpIndicators.admissoes}
+            desligamentos={dpIndicators.desligamentos}
+            totalColaboradores={dpIndicators.totalColaboradores}
+          />
+        </div>
+
+        {/* Absenteísmo */}
+        <div className="p-5 rounded-xl bg-card border border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Activity className="w-4 h-4 text-destructive" />
+              Absenteísmo por Departamento
+            </h3>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              Mês atual
+            </span>
+          </div>
+          <AbsenteeismChart data={dpIndicators.absenteeismData} />
+        </div>
+
+        {/* Custo de Folha */}
+        <div className="p-5 rounded-xl bg-card border border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-success" />
+              Custo de Folha por Departamento
+            </h3>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              {periodLabels[period]}
+            </span>
+          </div>
+          <PayrollCostChart data={dpIndicators.payrollCostData} />
+        </div>
       </div>
 
       {/* Filtro de Período */}
