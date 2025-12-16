@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { UserPlus, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { UserPlus, Pencil, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Colaborador } from '@/data/mockData';
 
 const colaboradorSchema = z.object({
   nome: z.string()
@@ -36,12 +37,12 @@ const colaboradorSchema = z.object({
     .trim()
     .max(100, 'Nome do gestor deve ter no máximo 100 caracteres')
     .optional(),
-  status: z.enum(['ativo', 'admissao'], {
+  status: z.enum(['ativo', 'admissao', 'ferias', 'afastado', 'desligado'], {
     required_error: 'Selecione um status',
   }),
 });
 
-type ColaboradorFormData = z.infer<typeof colaboradorSchema>;
+export type ColaboradorFormData = z.infer<typeof colaboradorSchema>;
 
 const departamentos = [
   'Gravação',
@@ -53,14 +54,24 @@ const departamentos = [
   'Produção',
 ];
 
-interface NovoColaboradorModalProps {
+const statusOptions = [
+  { value: 'admissao', label: 'Em Admissão' },
+  { value: 'ativo', label: 'Ativo' },
+  { value: 'ferias', label: 'Férias' },
+  { value: 'afastado', label: 'Afastado' },
+  { value: 'desligado', label: 'Desligado' },
+];
+
+interface ColaboradorFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: (data: ColaboradorFormData) => void;
+  colaborador?: Colaborador | null;
+  onSuccess?: (data: ColaboradorFormData, isEdit: boolean) => void;
 }
 
-export function NovoColaboradorModal({ open, onOpenChange, onSuccess }: NovoColaboradorModalProps) {
+export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSuccess }: ColaboradorFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditMode = !!colaborador;
 
   const form = useForm<ColaboradorFormData>({
     resolver: zodResolver(colaboradorSchema),
@@ -76,28 +87,50 @@ export function NovoColaboradorModal({ open, onOpenChange, onSuccess }: NovoCola
     },
   });
 
+  // Preencher form quando editar
+  useEffect(() => {
+    if (colaborador && open) {
+      form.reset({
+        nome: colaborador.nome,
+        matricula: colaborador.matricula,
+        cargo: colaborador.cargo,
+        departamento: colaborador.departamento,
+        dataAdmissao: colaborador.dataAdmissao,
+        salario: colaborador.salario.toString(),
+        gestor: colaborador.gestor || '',
+        status: colaborador.status,
+      });
+    } else if (!open) {
+      form.reset({
+        nome: '',
+        matricula: '',
+        cargo: '',
+        departamento: '',
+        dataAdmissao: '',
+        salario: '',
+        gestor: '',
+        status: 'admissao',
+      });
+    }
+  }, [colaborador, open, form]);
+
   const onSubmit = async (data: ColaboradorFormData) => {
     setIsSubmitting(true);
     
-    // Simular delay de API
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 600));
     
     toast({
-      title: 'Colaborador cadastrado!',
-      description: `${data.nome} foi adicionado com sucesso.`,
+      title: isEditMode ? 'Colaborador atualizado!' : 'Colaborador cadastrado!',
+      description: `${data.nome} foi ${isEditMode ? 'atualizado' : 'adicionado'} com sucesso.`,
     });
     
-    onSuccess?.(data);
-    form.reset();
+    onSuccess?.(data, isEditMode);
     onOpenChange(false);
     setIsSubmitting(false);
   };
 
   const handleClose = (open: boolean) => {
     if (!isSubmitting) {
-      if (!open) {
-        form.reset();
-      }
       onOpenChange(open);
     }
   };
@@ -107,11 +140,18 @@ export function NovoColaboradorModal({ open, onOpenChange, onSuccess }: NovoCola
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
-            <UserPlus className="w-5 h-5 text-primary" />
-            Novo Colaborador
+            {isEditMode ? (
+              <Pencil className="w-5 h-5 text-primary" />
+            ) : (
+              <UserPlus className="w-5 h-5 text-primary" />
+            )}
+            {isEditMode ? 'Editar Colaborador' : 'Novo Colaborador'}
           </DialogTitle>
           <DialogDescription>
-            Preencha os dados abaixo para cadastrar um novo colaborador.
+            {isEditMode 
+              ? 'Atualize os dados do colaborador abaixo.'
+              : 'Preencha os dados abaixo para cadastrar um novo colaborador.'
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -257,8 +297,11 @@ export function NovoColaboradorModal({ open, onOpenChange, onSuccess }: NovoCola
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-popover border border-border z-50">
-                        <SelectItem value="admissao">Em Admissão</SelectItem>
-                        <SelectItem value="ativo">Ativo</SelectItem>
+                        {statusOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -304,8 +347,8 @@ export function NovoColaboradorModal({ open, onOpenChange, onSuccess }: NovoCola
                   </>
                 ) : (
                   <>
-                    <UserPlus className="w-4 h-4" />
-                    Cadastrar
+                    {isEditMode ? <Pencil className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                    {isEditMode ? 'Salvar' : 'Cadastrar'}
                   </>
                 )}
               </Button>

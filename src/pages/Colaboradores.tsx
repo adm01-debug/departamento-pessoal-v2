@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockColaboradores, statusColors, Colaborador } from '@/data/mockData';
 import { ColaboradorModal } from '@/components/colaboradores/ColaboradorModal';
-import { NovoColaboradorModal } from '@/components/colaboradores/NovoColaboradorModal';
+import { ColaboradorFormModal, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormModal';
 import { cn } from '@/lib/utils';
 
 const statusLabels: Record<string, string> = {
@@ -37,8 +37,9 @@ export default function Colaboradores() {
   
   // Modal state
   const [selectedColaborador, setSelectedColaborador] = useState<Colaborador | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [novoModalOpen, setNovoModalOpen] = useState(false);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [editingColaborador, setEditingColaborador] = useState<Colaborador | null>(null);
 
   // Extrair valores únicos para os filtros
   const departamentos = useMemo(() => {
@@ -51,29 +52,53 @@ export default function Colaboradores() {
     return ['todos', ...unique.sort()];
   }, [colaboradores]);
 
-  // Handler para adicionar novo colaborador
-  const handleNovoColaborador = (data: {
-    nome: string;
-    matricula: string;
-    cargo: string;
-    departamento: string;
-    dataAdmissao: string;
-    salario: string;
-    gestor?: string;
-    status: 'ativo' | 'admissao';
-  }) => {
-    const novoColaborador: Colaborador = {
-      id: `${Date.now()}`,
-      nome: data.nome,
-      matricula: data.matricula,
-      cargo: data.cargo,
-      departamento: data.departamento,
-      status: data.status,
-      dataAdmissao: data.dataAdmissao,
-      salario: parseFloat(data.salario),
-      gestor: data.gestor || undefined,
-    };
-    setColaboradores(prev => [novoColaborador, ...prev]);
+  // Handler para criar/editar colaborador
+  const handleSaveColaborador = (data: ColaboradorFormData, isEdit: boolean) => {
+    if (isEdit && editingColaborador) {
+      // Atualizar colaborador existente
+      setColaboradores(prev => prev.map(c => 
+        c.id === editingColaborador.id
+          ? {
+              ...c,
+              nome: data.nome,
+              matricula: data.matricula,
+              cargo: data.cargo,
+              departamento: data.departamento,
+              status: data.status,
+              dataAdmissao: data.dataAdmissao,
+              salario: parseFloat(data.salario),
+              gestor: data.gestor || undefined,
+            }
+          : c
+      ));
+    } else {
+      // Criar novo colaborador
+      const novoColaborador: Colaborador = {
+        id: `${Date.now()}`,
+        nome: data.nome,
+        matricula: data.matricula,
+        cargo: data.cargo,
+        departamento: data.departamento,
+        status: data.status,
+        dataAdmissao: data.dataAdmissao,
+        salario: parseFloat(data.salario),
+        gestor: data.gestor || undefined,
+      };
+      setColaboradores(prev => [novoColaborador, ...prev]);
+    }
+    setEditingColaborador(null);
+  };
+
+  // Abrir modal para novo colaborador
+  const handleOpenNewModal = () => {
+    setEditingColaborador(null);
+    setFormModalOpen(true);
+  };
+
+  // Abrir modal para editar colaborador
+  const handleOpenEditModal = (colaborador: Colaborador) => {
+    setEditingColaborador(colaborador);
+    setFormModalOpen(true);
   };
 
   // Filtrar e ordenar colaboradores
@@ -155,7 +180,7 @@ export default function Colaboradores() {
 
   const handleRowClick = (colaborador: Colaborador) => {
     setSelectedColaborador(colaborador);
-    setModalOpen(true);
+    setDetailModalOpen(true);
   };
 
   return (
@@ -166,7 +191,7 @@ export default function Colaboradores() {
           <h1 className="text-2xl font-display font-bold text-foreground">Colaboradores</h1>
           <p className="text-muted-foreground text-sm">Gestão do cadastro de colaboradores</p>
         </div>
-        <Button className="gap-2" onClick={() => setNovoModalOpen(true)}>
+        <Button className="gap-2" onClick={handleOpenNewModal}>
           <Plus className="w-4 h-4" />
           Novo Colaborador
         </Button>
@@ -422,15 +447,17 @@ export default function Colaboradores() {
       {/* Modal de Detalhes */}
       <ColaboradorModal 
         colaborador={selectedColaborador}
-        open={modalOpen}
-        onOpenChange={setModalOpen}
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        onEdit={handleOpenEditModal}
       />
 
-      {/* Modal Novo Colaborador */}
-      <NovoColaboradorModal 
-        open={novoModalOpen}
-        onOpenChange={setNovoModalOpen}
-        onSuccess={handleNovoColaborador}
+      {/* Modal Form (Novo/Editar) */}
+      <ColaboradorFormModal 
+        open={formModalOpen}
+        onOpenChange={setFormModalOpen}
+        colaborador={editingColaborador}
+        onSuccess={handleSaveColaborador}
       />
     </div>
   );
