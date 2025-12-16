@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2 } from 'lucide-react';
+import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { AdmissaoChecklistModal } from '@/components/admissao/AdmissaoChecklistModal';
 import { NovaAdmissaoModal, NovaAdmissaoData } from '@/components/admissao/NovaAdmissaoModal';
+import { EditarAdmissaoModal } from '@/components/admissao/EditarAdmissaoModal';
 import { useAdmissoes, Admissao as AdmissaoType, EtapaAdmissao } from '@/hooks/useAdmissoes';
+import { toast } from 'sonner';
 
 const etapaColors: Record<string, string> = {
   'Solicitação Recebida': 'bg-info/20 border-info',
@@ -24,6 +26,7 @@ export default function AdmissaoPage() {
     admissoes, 
     loading, 
     createAdmissao, 
+    updateAdmissao,
     advanceStage, 
     getProgress,
     converterParaColaborador,
@@ -35,6 +38,7 @@ export default function AdmissaoPage() {
   const [selectedAdmissao, setSelectedAdmissao] = useState<AdmissaoType | null>(null);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [novaAdmissaoOpen, setNovaAdmissaoOpen] = useState(false);
+  const [editarOpen, setEditarOpen] = useState(false);
 
   // Agrupar por etapa
   const admissoesPorEtapa = etapaOrder.map(etapa => ({
@@ -84,6 +88,21 @@ export default function AdmissaoPage() {
     await converterParaColaborador(selectedAdmissao);
     setChecklistOpen(false);
     setSelectedAdmissao(null);
+  };
+
+  const handleEditAdmissao = (admissao: AdmissaoType, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedAdmissao(admissao);
+    setEditarOpen(true);
+  };
+
+  const handleSaveAdmissao = async (id: string, data: Partial<AdmissaoType>) => {
+    await updateAdmissao(id, data);
+    toast.success('Admissão atualizada com sucesso!');
+    // Update local selected admissao if open
+    if (selectedAdmissao?.id === id) {
+      setSelectedAdmissao({ ...selectedAdmissao, ...data } as AdmissaoType);
+    }
   };
 
   if (loading) {
@@ -149,7 +168,7 @@ export default function AdmissaoPage() {
                       <div 
                         key={adm.id}
                         onClick={() => handleOpenChecklist(adm)}
-                        className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer"
+                        className="p-4 rounded-lg bg-card border border-border shadow-sm hover-lift cursor-pointer group"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -157,9 +176,19 @@ export default function AdmissaoPage() {
                               {adm.nome.split(' ').map(n => n[0]).slice(0, 2).join('')}
                             </span>
                           </div>
-                          <Badge variant="outline" className="text-xs">
-                            {progress}%
-                          </Badge>
+                          <div className="flex items-center gap-1">
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => handleEditAdmissao(adm, e)}
+                            >
+                              <Pencil className="w-3 h-3" />
+                            </Button>
+                            <Badge variant="outline" className="text-xs">
+                              {progress}%
+                            </Badge>
+                          </div>
                         </div>
                         
                         <h4 className="font-medium text-sm text-foreground mb-1">{adm.nome}</h4>
@@ -246,9 +275,15 @@ export default function AdmissaoPage() {
                         {new Date(adm.data_prevista).toLocaleDateString('pt-BR')}
                       </td>
                       <td className="p-3">
-                        <Button size="sm" variant="ghost" onClick={() => handleOpenChecklist(adm)}>
-                          Checklist
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => handleEditAdmissao(adm)}>
+                            <Pencil className="w-3 h-3 mr-1" />
+                            Editar
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => handleOpenChecklist(adm)}>
+                            Checklist
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -291,6 +326,13 @@ export default function AdmissaoPage() {
         open={novaAdmissaoOpen}
         onOpenChange={setNovaAdmissaoOpen}
         onSubmit={handleNovaAdmissao}
+      />
+
+      <EditarAdmissaoModal
+        open={editarOpen}
+        onOpenChange={setEditarOpen}
+        admissao={selectedAdmissao}
+        onSave={handleSaveAdmissao}
       />
     </div>
   );
