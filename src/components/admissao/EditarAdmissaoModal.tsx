@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MaskedInput } from "@/components/ui/masked-input";
 import { Textarea } from "@/components/ui/textarea";
+import { validateCPF, unmask } from "@/lib/masks";
+import { toast } from "sonner";
 
 interface Admissao {
   id: string;
@@ -48,6 +50,24 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
     nome_mae: "",
     observacoes: "",
   });
+  const [cpfError, setCpfError] = useState<string | null>(null);
+
+  const validateCpfField = (cpf: string) => {
+    if (!cpf || unmask(cpf).length === 0) {
+      setCpfError(null);
+      return true;
+    }
+    if (unmask(cpf).length < 11) {
+      setCpfError('CPF incompleto');
+      return false;
+    }
+    if (!validateCPF(cpf)) {
+      setCpfError('CPF inválido - dígitos verificadores incorretos');
+      return false;
+    }
+    setCpfError(null);
+    return true;
+  };
 
   useEffect(() => {
     if (admissao) {
@@ -72,6 +92,11 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (admissao) {
+      // Validar CPF se preenchido
+      if (formData.cpf && !validateCpfField(formData.cpf)) {
+        toast.error('CPF inválido');
+        return;
+      }
       onSave(admissao.id, formData);
       onOpenChange(false);
     }
@@ -162,9 +187,17 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
                   id="cpf"
                   mask="cpf"
                   value={formData.cpf}
-                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, cpf: e.target.value });
+                    if (cpfError) setCpfError(null);
+                  }}
+                  onBlur={(e) => validateCpfField(e.target.value)}
                   placeholder="000.000.000-00"
+                  className={cpfError ? 'border-destructive' : ''}
                 />
+                {cpfError && (
+                  <p className="text-xs text-destructive mt-1">{cpfError}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="data_nascimento">Data de Nascimento *</Label>
