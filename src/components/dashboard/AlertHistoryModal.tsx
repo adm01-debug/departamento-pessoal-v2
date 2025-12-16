@@ -17,7 +17,7 @@ import { ptBR } from 'date-fns/locale';
 import { Loader2, History, AlertTriangle, TrendingUp, Activity, CalendarIcon, Filter, X, BarChart3, List } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar } from 'recharts';
 
 interface AlertHistoryItem {
   id: string;
@@ -125,7 +125,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
 
     const days = eachDayOfInterval({ start: startDate, end: endDate });
     
-    return days.map(day => {
+    const rawData = days.map(day => {
       const dayStr = format(day, 'yyyy-MM-dd');
       const dayAlerts = history.filter(h => 
         format(parseISO(h.created_at), 'yyyy-MM-dd') === dayStr
@@ -139,6 +139,19 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
         critical: dayAlerts.filter(a => a.nivel === 'critical').length,
         turnover: dayAlerts.filter(a => a.tipo === 'turnover').length,
         absenteismo: dayAlerts.filter(a => a.tipo === 'absenteismo').length,
+      };
+    });
+
+    // Calculate 7-day moving average
+    const windowSize = 7;
+    return rawData.map((item, index) => {
+      const start = Math.max(0, index - windowSize + 1);
+      const window = rawData.slice(start, index + 1);
+      const avg = window.reduce((sum, d) => sum + d.total, 0) / window.length;
+      
+      return {
+        ...item,
+        movingAvg: Math.round(avg * 100) / 100,
       };
     });
   }, [history, startDate, endDate]);
@@ -343,7 +356,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
                   {/* Trend Chart */}
                   <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                      <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                         <XAxis 
                           dataKey="date" 
@@ -366,7 +379,8 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
                           formatter={(value: number, name: string) => {
                             const labels: Record<string, string> = {
                               warning: 'Alertas',
-                              critical: 'Críticos'
+                              critical: 'Críticos',
+                              movingAvg: 'Média Móvel (7d)'
                             };
                             return [value, labels[name] || name];
                           }}
@@ -375,14 +389,23 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
                           formatter={(value) => {
                             const labels: Record<string, string> = {
                               warning: 'Alertas',
-                              critical: 'Críticos'
+                              critical: 'Críticos',
+                              movingAvg: 'Média Móvel (7d)'
                             };
                             return labels[value] || value;
                           }}
                         />
                         <Bar dataKey="warning" stackId="a" fill="hsl(var(--warning))" radius={[0, 0, 0, 0]} />
                         <Bar dataKey="critical" stackId="a" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
-                      </BarChart>
+                        <Line 
+                          type="monotone" 
+                          dataKey="movingAvg" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={2}
+                          dot={false}
+                          strokeDasharray="5 5"
+                        />
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
