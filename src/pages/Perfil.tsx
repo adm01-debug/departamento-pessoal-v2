@@ -8,8 +8,31 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Bell, Shield, Palette, Mail, Phone, Building2, Camera, Save } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { User, Bell, Shield, Palette, Mail, Phone, Building2, Camera, Save, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+// Validation schemas
+const profileSchema = z.object({
+  nome: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100, 'Nome muito longo'),
+  email: z.string().email('E-mail inválido').max(255, 'E-mail muito longo'),
+  telefone: z.string().regex(/^\(\d{2}\)\s?\d{4,5}-\d{4}$/, 'Telefone inválido. Use: (11) 99999-9999'),
+});
+
+const passwordSchema = z.object({
+  senhaAtual: z.string().min(1, 'Senha atual é obrigatória'),
+  novaSenha: z.string().min(8, 'Nova senha deve ter pelo menos 8 caracteres')
+    .regex(/[A-Z]/, 'Deve conter pelo menos uma letra maiúscula')
+    .regex(/[0-9]/, 'Deve conter pelo menos um número'),
+  confirmarSenha: z.string(),
+}).refine((data) => data.novaSenha === data.confirmarSenha, {
+  message: 'Senhas não coincidem',
+  path: ['confirmarSenha'],
+});
+
+type ProfileErrors = { nome?: string; email?: string; telefone?: string };
+type PasswordErrors = { senhaAtual?: string; novaSenha?: string; confirmarSenha?: string };
 
 export default function Perfil() {
   const [profileData, setProfileData] = useState({
@@ -20,6 +43,16 @@ export default function Perfil() {
     departamento: 'Recursos Humanos',
     matricula: 'PB-2024-001'
   });
+
+  const [originalProfileData] = useState({ ...profileData });
+  const [profileErrors, setProfileErrors] = useState<ProfileErrors>({});
+
+  const [passwordData, setPasswordData] = useState({
+    senhaAtual: '',
+    novaSenha: '',
+    confirmarSenha: ''
+  });
+  const [passwordErrors, setPasswordErrors] = useState<PasswordErrors>({});
 
   const [notifications, setNotifications] = useState({
     emailAdmissoes: true,
@@ -36,20 +69,131 @@ export default function Perfil() {
     itensPerPage: '10'
   });
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  }>({ open: false, title: '', description: '', onConfirm: () => {} });
+
+  const hasProfileChanges = () => {
+    return profileData.nome !== originalProfileData.nome ||
+           profileData.email !== originalProfileData.email ||
+           profileData.telefone !== originalProfileData.telefone;
+  };
+
+  const validateProfile = () => {
+    const result = profileSchema.safeParse(profileData);
+    if (!result.success) {
+      const errors: ProfileErrors = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof ProfileErrors;
+        errors[field] = err.message;
+      });
+      setProfileErrors(errors);
+      return false;
+    }
+    setProfileErrors({});
+    return true;
+  };
+
+  const validatePassword = () => {
+    const result = passwordSchema.safeParse(passwordData);
+    if (!result.success) {
+      const errors: PasswordErrors = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof PasswordErrors;
+        errors[field] = err.message;
+      });
+      setPasswordErrors(errors);
+      return false;
+    }
+    setPasswordErrors({});
+    return true;
+  };
+
   const handleSaveProfile = () => {
-    toast.success('Perfil atualizado com sucesso!');
+    if (!validateProfile()) {
+      toast.error('Corrija os erros antes de salvar');
+      return;
+    }
+
+    setConfirmDialog({
+      open: true,
+      title: 'Confirmar alterações',
+      description: 'Deseja salvar as alterações no seu perfil? Esta ação atualizará suas informações pessoais.',
+      onConfirm: () => {
+        toast.success('Perfil atualizado com sucesso!');
+        setConfirmDialog({ ...confirmDialog, open: false });
+      }
+    });
   };
 
   const handleSaveNotifications = () => {
-    toast.success('Preferências de notificação salvas!');
+    setConfirmDialog({
+      open: true,
+      title: 'Salvar preferências de notificação',
+      description: 'Deseja salvar suas preferências de notificação?',
+      onConfirm: () => {
+        toast.success('Preferências de notificação salvas!');
+        setConfirmDialog({ ...confirmDialog, open: false });
+      }
+    });
   };
 
   const handleSavePreferences = () => {
-    toast.success('Preferências do sistema salvas!');
+    setConfirmDialog({
+      open: true,
+      title: 'Salvar preferências do sistema',
+      description: 'Deseja salvar suas preferências do sistema?',
+      onConfirm: () => {
+        toast.success('Preferências do sistema salvas!');
+        setConfirmDialog({ ...confirmDialog, open: false });
+      }
+    });
+  };
+
+  const handleChangePassword = () => {
+    if (!validatePassword()) {
+      toast.error('Corrija os erros antes de alterar a senha');
+      return;
+    }
+
+    setConfirmDialog({
+      open: true,
+      title: 'Alterar senha',
+      description: 'Tem certeza que deseja alterar sua senha? Você precisará usar a nova senha no próximo login.',
+      onConfirm: () => {
+        toast.success('Senha alterada com sucesso!');
+        setPasswordData({ senhaAtual: '', novaSenha: '', confirmarSenha: '' });
+        setConfirmDialog({ ...confirmDialog, open: false });
+      }
+    });
   };
 
   return (
     <div className="space-y-6">
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-warning" />
+              {confirmDialog.title}
+            </DialogTitle>
+            <DialogDescription>{confirmDialog.description}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
+              Cancelar
+            </Button>
+            <Button onClick={confirmDialog.onConfirm}>
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-display font-bold text-foreground">Meu Perfil</h1>
@@ -126,8 +270,15 @@ export default function Perfil() {
                   <Input 
                     id="nome" 
                     value={profileData.nome}
-                    onChange={(e) => setProfileData({ ...profileData, nome: e.target.value })}
+                    onChange={(e) => {
+                      setProfileData({ ...profileData, nome: e.target.value });
+                      if (profileErrors.nome) setProfileErrors({ ...profileErrors, nome: undefined });
+                    }}
+                    className={profileErrors.nome ? 'border-destructive' : ''}
                   />
+                  {profileErrors.nome && (
+                    <p className="text-xs text-destructive">{profileErrors.nome}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
@@ -135,16 +286,31 @@ export default function Perfil() {
                     id="email" 
                     type="email"
                     value={profileData.email}
-                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                    onChange={(e) => {
+                      setProfileData({ ...profileData, email: e.target.value });
+                      if (profileErrors.email) setProfileErrors({ ...profileErrors, email: undefined });
+                    }}
+                    className={profileErrors.email ? 'border-destructive' : ''}
                   />
+                  {profileErrors.email && (
+                    <p className="text-xs text-destructive">{profileErrors.email}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone</Label>
                   <Input 
                     id="telefone" 
                     value={profileData.telefone}
-                    onChange={(e) => setProfileData({ ...profileData, telefone: e.target.value })}
+                    onChange={(e) => {
+                      setProfileData({ ...profileData, telefone: e.target.value });
+                      if (profileErrors.telefone) setProfileErrors({ ...profileErrors, telefone: undefined });
+                    }}
+                    placeholder="(11) 99999-9999"
+                    className={profileErrors.telefone ? 'border-destructive' : ''}
                   />
+                  {profileErrors.telefone && (
+                    <p className="text-xs text-destructive">{profileErrors.telefone}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cargo">Cargo</Label>
@@ -157,7 +323,11 @@ export default function Perfil() {
                 </div>
               </div>
               <div className="flex justify-end pt-4">
-                <Button onClick={handleSaveProfile} className="gap-2">
+                <Button 
+                  onClick={handleSaveProfile} 
+                  className="gap-2"
+                  disabled={!hasProfileChanges()}
+                >
                   <Save className="w-4 h-4" />
                   Salvar Alterações
                 </Button>
@@ -332,16 +502,56 @@ export default function Perfil() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="senha-atual">Senha Atual</Label>
-                  <Input id="senha-atual" type="password" placeholder="••••••••" />
+                  <Input 
+                    id="senha-atual" 
+                    type="password" 
+                    placeholder="••••••••"
+                    value={passwordData.senhaAtual}
+                    onChange={(e) => {
+                      setPasswordData({ ...passwordData, senhaAtual: e.target.value });
+                      if (passwordErrors.senhaAtual) setPasswordErrors({ ...passwordErrors, senhaAtual: undefined });
+                    }}
+                    className={passwordErrors.senhaAtual ? 'border-destructive' : ''}
+                  />
+                  {passwordErrors.senhaAtual && (
+                    <p className="text-xs text-destructive">{passwordErrors.senhaAtual}</p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="nova-senha">Nova Senha</Label>
-                    <Input id="nova-senha" type="password" placeholder="••••••••" />
+                    <Input 
+                      id="nova-senha" 
+                      type="password" 
+                      placeholder="••••••••"
+                      value={passwordData.novaSenha}
+                      onChange={(e) => {
+                        setPasswordData({ ...passwordData, novaSenha: e.target.value });
+                        if (passwordErrors.novaSenha) setPasswordErrors({ ...passwordErrors, novaSenha: undefined });
+                      }}
+                      className={passwordErrors.novaSenha ? 'border-destructive' : ''}
+                    />
+                    {passwordErrors.novaSenha && (
+                      <p className="text-xs text-destructive">{passwordErrors.novaSenha}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground">Mínimo 8 caracteres, 1 maiúscula e 1 número</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmar-senha">Confirmar Nova Senha</Label>
-                    <Input id="confirmar-senha" type="password" placeholder="••••••••" />
+                    <Input 
+                      id="confirmar-senha" 
+                      type="password" 
+                      placeholder="••••••••"
+                      value={passwordData.confirmarSenha}
+                      onChange={(e) => {
+                        setPasswordData({ ...passwordData, confirmarSenha: e.target.value });
+                        if (passwordErrors.confirmarSenha) setPasswordErrors({ ...passwordErrors, confirmarSenha: undefined });
+                      }}
+                      className={passwordErrors.confirmarSenha ? 'border-destructive' : ''}
+                    />
+                    {passwordErrors.confirmarSenha && (
+                      <p className="text-xs text-destructive">{passwordErrors.confirmarSenha}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -365,7 +575,11 @@ export default function Perfil() {
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button className="gap-2">
+                <Button 
+                  onClick={handleChangePassword} 
+                  className="gap-2"
+                  disabled={!passwordData.senhaAtual && !passwordData.novaSenha && !passwordData.confirmarSenha}
+                >
                   <Save className="w-4 h-4" />
                   Alterar Senha
                 </Button>
