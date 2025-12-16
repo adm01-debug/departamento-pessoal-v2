@@ -17,7 +17,8 @@ import {
   Umbrella,
   Clock,
   TrendingUp,
-  Pencil
+  Pencil,
+  Trash2
 } from 'lucide-react';
 
 const statusLabels: Record<string, string> = {
@@ -33,9 +34,10 @@ interface ColaboradorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: (colaborador: Colaborador) => void;
+  onDelete?: (colaborador: Colaborador) => void;
 }
 
-export function ColaboradorModal({ colaborador, open, onOpenChange, onEdit }: ColaboradorModalProps) {
+export function ColaboradorModal({ colaborador, open, onOpenChange, onEdit, onDelete }: ColaboradorModalProps) {
   if (!colaborador) return null;
 
   const colors = statusColors[colaborador.status];
@@ -194,9 +196,16 @@ export function ColaboradorModal({ colaborador, open, onOpenChange, onEdit }: Co
             <Umbrella className="w-4 h-4" />
             Férias
           </Button>
-          <Button variant="outline" className="flex-1 gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Histórico
+          <Button 
+            variant="outline" 
+            className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={() => {
+              onOpenChange(false);
+              onDelete?.(colaborador);
+            }}
+          >
+            <Trash2 className="w-4 h-4" />
+            Excluir
           </Button>
         </div>
       </DialogContent>

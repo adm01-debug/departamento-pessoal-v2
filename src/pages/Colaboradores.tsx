@@ -4,9 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { mockColaboradores, statusColors, Colaborador } from '@/data/mockData';
 import { ColaboradorModal } from '@/components/colaboradores/ColaboradorModal';
 import { ColaboradorFormModal, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormModal';
+import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const statusLabels: Record<string, string> = {
@@ -40,6 +42,8 @@ export default function Colaboradores() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [editingColaborador, setEditingColaborador] = useState<Colaborador | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [colaboradorToDelete, setColaboradorToDelete] = useState<Colaborador | null>(null);
 
   // Extrair valores únicos para os filtros
   const departamentos = useMemo(() => {
@@ -99,6 +103,25 @@ export default function Colaboradores() {
   const handleOpenEditModal = (colaborador: Colaborador) => {
     setEditingColaborador(colaborador);
     setFormModalOpen(true);
+  };
+
+  // Abrir confirmação de exclusão
+  const handleOpenDeleteConfirm = (colaborador: Colaborador) => {
+    setColaboradorToDelete(colaborador);
+    setDeleteConfirmOpen(true);
+  };
+
+  // Confirmar exclusão
+  const handleConfirmDelete = () => {
+    if (colaboradorToDelete) {
+      setColaboradores(prev => prev.filter(c => c.id !== colaboradorToDelete.id));
+      toast({
+        title: 'Colaborador excluído',
+        description: `${colaboradorToDelete.nome} foi removido com sucesso.`,
+      });
+      setColaboradorToDelete(null);
+      setDeleteConfirmOpen(false);
+    }
   };
 
   // Filtrar e ordenar colaboradores
@@ -450,6 +473,7 @@ export default function Colaboradores() {
         open={detailModalOpen}
         onOpenChange={setDetailModalOpen}
         onEdit={handleOpenEditModal}
+        onDelete={handleOpenDeleteConfirm}
       />
 
       {/* Modal Form (Novo/Editar) */}
@@ -459,6 +483,28 @@ export default function Colaboradores() {
         colaborador={editingColaborador}
         onSuccess={handleSaveColaborador}
       />
+
+      {/* Confirmação de Exclusão */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir <strong>{colaboradorToDelete?.nome}</strong>? 
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
