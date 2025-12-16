@@ -28,6 +28,7 @@ import { TurnoverEvolutionChart } from '@/components/dashboard/TurnoverEvolution
 import { TurnoverYearComparisonChart } from '@/components/dashboard/TurnoverYearComparisonChart';
 import { AbsenteeismChart } from '@/components/dashboard/AbsenteeismChart';
 import { PayrollCostChart } from '@/components/dashboard/PayrollCostChart';
+import { IndicatorAlertsCard } from '@/components/dashboard/IndicatorAlertsCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
@@ -50,6 +51,13 @@ export default function Dashboard() {
   // Hook para indicadores de DP com dados reais
   const indicadoresPeriodo = period === 'all' ? 'year' : period;
   const indicadores = useIndicadoresDP(indicadoresPeriodo as 'month' | 'quarter' | 'year');
+
+  // Calcular taxa média de absenteísmo
+  const avgAbsenteeismRate = useMemo(() => {
+    if (indicadores.absenteeism.length === 0) return 0;
+    const total = indicadores.absenteeism.reduce((acc, d) => acc + d.taxaAbsenteismo, 0);
+    return total / indicadores.absenteeism.length;
+  }, [indicadores.absenteeism]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { 
@@ -177,7 +185,13 @@ export default function Dashboard() {
       </div>
 
       {/* Indicadores de DP */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Alertas de Indicadores */}
+        <IndicatorAlertsCard 
+          turnoverRate={indicadores.turnover.turnoverRate}
+          absenteeismRate={avgAbsenteeismRate}
+        />
+
         {/* Turnover */}
         <div className="p-5 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between mb-4">
