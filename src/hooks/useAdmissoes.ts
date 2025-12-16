@@ -25,6 +25,13 @@ export interface Admissao {
   data_prevista: string;
   etapa: EtapaAdmissao;
   observacoes?: string;
+  cpf?: string;
+  data_nascimento?: string;
+  sexo?: string;
+  email?: string;
+  telefone?: string;
+  estado_civil?: string;
+  nome_mae?: string;
   created_at: string;
   updated_at: string;
   checklist_documentos_pessoais: boolean;
@@ -43,6 +50,13 @@ export interface AdmissaoInsert {
   salario_proposto: number;
   data_prevista: string;
   observacoes?: string;
+  cpf?: string;
+  data_nascimento?: string;
+  sexo?: string;
+  email?: string;
+  telefone?: string;
+  estado_civil?: string;
+  nome_mae?: string;
 }
 
 const etapaLabels: Record<EtapaAdmissao, string> = {
@@ -161,6 +175,12 @@ export function useAdmissoes() {
   // Converter admissão concluída em colaborador
   const converterParaColaborador = async (admissao: Admissao) => {
     try {
+      // Validar campos obrigatórios
+      if (!admissao.cpf || !admissao.data_nascimento || !admissao.sexo || !admissao.nome_mae) {
+        toast.error('Preencha todos os dados pessoais antes de converter para colaborador');
+        throw new Error('Dados incompletos para conversão');
+      }
+
       // Criar o colaborador com os dados da admissão
       const novoColaborador = await createColaborador({
         nome_completo: admissao.nome,
@@ -168,22 +188,26 @@ export function useAdmissoes() {
         departamento: admissao.departamento,
         salario_base: admissao.salario_proposto,
         data_admissao: admissao.data_prevista,
-        data_nascimento: new Date().toISOString().split('T')[0], // Placeholder - deve ser preenchido depois
-        sexo: 'masculino' as const, // Placeholder
-        estado_civil: 'solteiro' as const,
-        cpf: '000.000.000-00', // Placeholder - deve ser atualizado
-        nome_mae: 'A definir', // Placeholder
+        data_nascimento: admissao.data_nascimento,
+        sexo: admissao.sexo as 'masculino' | 'feminino',
+        estado_civil: (admissao.estado_civil || 'solteiro') as any,
+        cpf: admissao.cpf,
+        nome_mae: admissao.nome_mae,
+        email: admissao.email,
+        celular: admissao.telefone,
         tipo_contrato: 'clt' as const,
         status: 'ativo' as const,
       });
 
-      // Remover a admissão da lista (ou marcar como concluída)
+      // Remover a admissão da lista
       await deleteAdmissao(admissao.id);
       
       toast.success(`${admissao.nome} foi adicionado como colaborador!`);
       return novoColaborador;
     } catch (err: any) {
-      toast.error('Erro ao converter admissão: ' + err.message);
+      if (err.message !== 'Dados incompletos para conversão') {
+        toast.error('Erro ao converter admissão: ' + err.message);
+      }
       throw err;
     }
   };

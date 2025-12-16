@@ -56,6 +56,13 @@ export default function AdmissaoPage() {
       salario_proposto: data.salarioProposto || 0,
       data_prevista: data.dataPrevisao.toISOString().split('T')[0],
       observacoes: data.observacoes,
+      cpf: data.cpf,
+      data_nascimento: data.dataNascimento?.toISOString().split('T')[0],
+      sexo: data.sexo,
+      email: data.email,
+      telefone: data.telefone,
+      estado_civil: data.estadoCivil,
+      nome_mae: data.nomeMae,
     });
   };
 

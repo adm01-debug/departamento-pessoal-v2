@@ -24,15 +24,22 @@ export type Database = {
           checklist_esocial_enviado: boolean | null
           checklist_exame_admissional: boolean | null
           checklist_foto: boolean | null
+          cpf: string | null
           created_at: string
           created_by: string | null
+          data_nascimento: string | null
           data_prevista: string
           departamento: string
+          email: string | null
+          estado_civil: string | null
           etapa: Database["public"]["Enums"]["etapa_admissao"]
           id: string
           nome: string
+          nome_mae: string | null
           observacoes: string | null
           salario_proposto: number
+          sexo: string | null
+          telefone: string | null
           updated_at: string
         }
         Insert: {
@@ -44,15 +51,22 @@ export type Database = {
           checklist_esocial_enviado?: boolean | null
           checklist_exame_admissional?: boolean | null
           checklist_foto?: boolean | null
+          cpf?: string | null
           created_at?: string
           created_by?: string | null
+          data_nascimento?: string | null
           data_prevista: string
           departamento: string
+          email?: string | null
+          estado_civil?: string | null
           etapa?: Database["public"]["Enums"]["etapa_admissao"]
           id?: string
           nome: string
+          nome_mae?: string | null
           observacoes?: string | null
           salario_proposto: number
+          sexo?: string | null
+          telefone?: string | null
           updated_at?: string
         }
         Update: {
@@ -64,15 +78,22 @@ export type Database = {
           checklist_esocial_enviado?: boolean | null
           checklist_exame_admissional?: boolean | null
           checklist_foto?: boolean | null
+          cpf?: string | null
           created_at?: string
           created_by?: string | null
+          data_nascimento?: string | null
           data_prevista?: string
           departamento?: string
+          email?: string | null
+          estado_civil?: string | null
           etapa?: Database["public"]["Enums"]["etapa_admissao"]
           id?: string
           nome?: string
+          nome_mae?: string | null
           observacoes?: string | null
           salario_proposto?: number
+          sexo?: string | null
+          telefone?: string | null
           updated_at?: string
         }
         Relationships: []
