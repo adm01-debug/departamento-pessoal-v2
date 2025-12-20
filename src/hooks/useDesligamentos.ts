@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { differenceInDays, differenceInMonths } from 'date-fns';
+import { useEmpresas } from './useEmpresas';
 
 export type TipoDesligamento = 
   | 'sem_justa_causa'
@@ -30,6 +31,7 @@ export interface Desligamento {
   total_proventos: number;
   total_descontos: number;
   valor_liquido: number;
+  empresa_id?: string;
   checklist_comunicacao: boolean;
   checklist_documentacao: boolean;
   checklist_calculo_rescisao: boolean;
@@ -59,6 +61,7 @@ export interface DesligamentoInsert {
   total_proventos: number;
   total_descontos: number;
   valor_liquido: number;
+  empresa_id?: string;
 }
 
 export interface CalculoRescisao {
@@ -89,14 +92,21 @@ export function useDesligamentos() {
   const [desligamentos, setDesligamentos] = useState<Desligamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { empresaAtualId } = useEmpresas();
 
   const fetchDesligamentos = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from('desligamentos')
         .select('*')
         .order('created_at', { ascending: false });
+
+      if (empresaAtualId) {
+        query = query.eq('empresa_id', empresaAtualId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setDesligamentos((data || []) as Desligamento[]);
@@ -110,7 +120,7 @@ export function useDesligamentos() {
 
   useEffect(() => {
     fetchDesligamentos();
-  }, []);
+  }, [empresaAtualId]);
 
   const calcularRescisao = (
     salario: number,
@@ -201,7 +211,7 @@ export function useDesligamentos() {
     try {
       const { data: newDesligamento, error } = await supabase
         .from('desligamentos')
-        .insert(data)
+        .insert({ ...data, empresa_id: empresaAtualId })
         .select()
         .single();
 

@@ -3,22 +3,31 @@ import { supabase } from '@/integrations/supabase/client';
 import { ColaboradorDB, Dependente, HistoricoCargo, DocumentoColaborador } from '@/types/colaborador';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
+import { useEmpresas } from './useEmpresas';
 
 export function useColaboradores() {
   const [colaboradores, setColaboradores] = useState<ColaboradorDB[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { empresaAtualId } = useEmpresas();
 
   const fetchColaboradores = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from('colaboradores')
         .select('*')
         .order('nome_completo', { ascending: true });
+
+      // Filtrar por empresa se houver uma selecionada
+      if (empresaAtualId) {
+        query = query.eq('empresa_id', empresaAtualId);
+      }
+
+      const { data, error: fetchError } = await query;
 
       if (fetchError) throw fetchError;
       
@@ -34,7 +43,7 @@ export function useColaboradores() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [empresaAtualId]);
 
   useEffect(() => {
     if (user) {
@@ -46,7 +55,7 @@ export function useColaboradores() {
     try {
       const { data: newColaborador, error } = await supabase
         .from('colaboradores')
-        .insert([{ ...data, created_by: user?.id }])
+        .insert([{ ...data, created_by: user?.id, empresa_id: empresaAtualId }])
         .select()
         .single();
 
