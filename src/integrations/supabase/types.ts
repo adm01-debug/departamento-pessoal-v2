@@ -1702,6 +1702,208 @@ export type Database = {
           },
         ]
       }
+      onboarding_colaborador: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_conclusao: string | null
+          data_inicio: string
+          id: string
+          progresso: number | null
+          status: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_conclusao?: string | null
+          data_inicio?: string
+          id?: string
+          progresso?: number | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_conclusao?: string | null
+          data_inicio?: string
+          id?: string
+          progresso?: number | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_colaborador_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_tarefas: {
+        Row: {
+          categoria: string
+          concluida: boolean | null
+          concluida_por: string | null
+          created_at: string
+          data_conclusao: string | null
+          data_prazo: string | null
+          descricao: string | null
+          id: string
+          observacoes: string | null
+          onboarding_id: string
+          ordem: number
+          template_tarefa_id: string | null
+          titulo: string
+        }
+        Insert: {
+          categoria?: string
+          concluida?: boolean | null
+          concluida_por?: string | null
+          created_at?: string
+          data_conclusao?: string | null
+          data_prazo?: string | null
+          descricao?: string | null
+          id?: string
+          observacoes?: string | null
+          onboarding_id: string
+          ordem?: number
+          template_tarefa_id?: string | null
+          titulo: string
+        }
+        Update: {
+          categoria?: string
+          concluida?: boolean | null
+          concluida_por?: string | null
+          created_at?: string
+          data_conclusao?: string | null
+          data_prazo?: string | null
+          descricao?: string | null
+          id?: string
+          observacoes?: string | null
+          onboarding_id?: string
+          ordem?: number
+          template_tarefa_id?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_tarefas_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_colaborador"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_tarefas_template_tarefa_id_fkey"
+            columns: ["template_tarefa_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_template_tarefas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_template_tarefas: {
+        Row: {
+          categoria: string
+          created_at: string
+          descricao: string | null
+          dias_prazo: number | null
+          id: string
+          obrigatoria: boolean | null
+          ordem: number
+          responsavel_tipo: string | null
+          template_id: string
+          titulo: string
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          dias_prazo?: number | null
+          id?: string
+          obrigatoria?: boolean | null
+          ordem?: number
+          responsavel_tipo?: string | null
+          template_id: string
+          titulo: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          dias_prazo?: number | null
+          id?: string
+          obrigatoria?: boolean | null
+          ordem?: number
+          responsavel_tipo?: string | null
+          template_id?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_template_tarefas_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_templates: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_templates_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parametros_fiscais: {
         Row: {
           aliquota: number | null

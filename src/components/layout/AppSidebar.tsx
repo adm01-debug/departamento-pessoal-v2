@@ -17,7 +17,10 @@ import {
   Calendar,
   Building2,
   Shield,
-  PenTool
+  PenTool,
+  UserCircle,
+  Network,
+  ClipboardList
 } from 'lucide-react';
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -44,6 +47,9 @@ const menuItems = [
   { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
   { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
   { icon: PenTool, label: 'Assinaturas', path: '/assinaturas', color: 'text-info' },
+  { icon: UserCircle, label: 'Meu Portal', path: '/portal', color: 'text-success' },
+  { icon: Network, label: 'Organograma', path: '/organograma', color: 'text-info' },
+  { icon: ClipboardList, label: 'Onboarding', path: '/onboarding', color: 'text-success' },
 ];
 
 interface AppSidebarProps {

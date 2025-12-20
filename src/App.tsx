@@ -22,6 +22,9 @@ import FeriadosPage from "./pages/Feriados";
 import Perfil from "./pages/Perfil";
 import Usuarios from "./pages/Usuarios";
 import Assinaturas from "./pages/Assinaturas";
+import PortalColaborador from "./pages/PortalColaborador";
+import Organograma from "./pages/Organograma";
+import Onboarding from "./pages/Onboarding";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -57,6 +60,9 @@ const App = () => (
                 <Route path="/perfil" element={<Perfil />} />
                 <Route path="/usuarios" element={<Usuarios />} />
                 <Route path="/assinaturas" element={<Assinaturas />} />
+                <Route path="/portal" element={<PortalColaborador />} />
+                <Route path="/organograma" element={<Organograma />} />
+                <Route path="/onboarding" element={<Onboarding />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
