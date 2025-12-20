@@ -20,6 +20,8 @@ import Relatorios from "./pages/Relatorios";
 import Auditoria from "./pages/Auditoria";
 import FeriadosPage from "./pages/Feriados";
 import Perfil from "./pages/Perfil";
+import Usuarios from "./pages/Usuarios";
+import Assinaturas from "./pages/Assinaturas";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +55,8 @@ const App = () => (
                 <Route path="/auditoria" element={<Auditoria />} />
                 <Route path="/feriados" element={<FeriadosPage />} />
                 <Route path="/perfil" element={<Perfil />} />
+                <Route path="/usuarios" element={<Usuarios />} />
+                <Route path="/assinaturas" element={<Assinaturas />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

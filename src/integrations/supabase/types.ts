@@ -910,6 +910,72 @@ export type Database = {
           },
         ]
       }
+      documentos_assinatura: {
+        Row: {
+          assinado_em: string | null
+          assinado_por: string | null
+          assinatura_base64: string | null
+          colaborador_id: string
+          conteudo_url: string | null
+          created_at: string
+          created_by: string | null
+          empresa_id: string | null
+          hash_documento: string | null
+          id: string
+          ip_assinatura: string | null
+          status: string
+          tipo_documento: string
+          titulo: string
+        }
+        Insert: {
+          assinado_em?: string | null
+          assinado_por?: string | null
+          assinatura_base64?: string | null
+          colaborador_id: string
+          conteudo_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string | null
+          hash_documento?: string | null
+          id?: string
+          ip_assinatura?: string | null
+          status?: string
+          tipo_documento: string
+          titulo: string
+        }
+        Update: {
+          assinado_em?: string | null
+          assinado_por?: string | null
+          assinatura_base64?: string | null
+          colaborador_id?: string
+          conteudo_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string | null
+          hash_documento?: string | null
+          id?: string
+          ip_assinatura?: string | null
+          status?: string
+          tipo_documento?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_assinatura_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_assinatura_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_colaborador: {
         Row: {
           colaborador_id: string

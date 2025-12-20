@@ -15,7 +15,9 @@ import {
   LogOut,
   History,
   Calendar,
-  Building2
+  Building2,
+  Shield,
+  PenTool
 } from 'lucide-react';
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -40,6 +42,8 @@ const menuItems = [
   { icon: Calendar, label: 'Feriados', path: '/feriados', color: 'text-warning' },
   { icon: BarChart3, label: 'Relatórios', path: '/relatorios', color: 'text-muted-foreground' },
   { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
+  { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
+  { icon: PenTool, label: 'Assinaturas', path: '/assinaturas', color: 'text-info' },
 ];
 
 interface AppSidebarProps {
