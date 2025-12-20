@@ -15,7 +15,7 @@ import {
   UserPlus, Pencil, Loader2, User, FileText, MapPin, 
   Building2, Banknote, GraduationCap, Clock, Save, Search
 } from 'lucide-react';
-import { validateCPF, validatePIS, validateRG, getRGFormatInfo, unmask } from '@/lib/masks';
+import { validateCPF, validatePIS, validateRG, getRGFormatInfo, validateTituloEleitor, unmask } from '@/lib/masks';
 import {
   ColaboradorDB,
   EstadoCivil,
@@ -132,6 +132,18 @@ const colaboradorSchema = z.object({
         code: z.ZodIssueCode.custom,
         message: result.message || 'RG inválido para o estado selecionado',
         path: ['rg'],
+      });
+    }
+  }
+  
+  // Validação de Título de Eleitor
+  if (data.titulo_eleitor && data.titulo_eleitor.trim()) {
+    const result = validateTituloEleitor(data.titulo_eleitor);
+    if (!result.valid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: result.message || 'Título de eleitor inválido',
+        path: ['titulo_eleitor'],
       });
     }
   }
@@ -625,7 +637,16 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                     <FormField control={form.control} name="titulo_eleitor" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Título de Eleitor</FormLabel>
-                        <FormControl><Input placeholder="Número" {...field} className="bg-background" /></FormControl>
+                        <FormControl>
+                          <MaskedInput 
+                            mask="tituloEleitor" 
+                            placeholder="0000 0000 0000" 
+                            value={field.value || ''} 
+                            onValueChange={(_, masked) => field.onChange(masked)} 
+                            className="bg-background font-mono" 
+                          />
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )} />
 
