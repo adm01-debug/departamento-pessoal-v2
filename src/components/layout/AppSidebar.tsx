@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Search,
   LogOut,
-  History
+  History,
+  Calendar
 } from 'lucide-react';
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -34,6 +35,7 @@ const menuItems = [
   { icon: Wallet, label: 'Folha', path: '/folha', color: 'text-sales' },
   { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-store' },
   { icon: UserMinus, label: 'Desligamento', path: '/desligamento', color: 'text-destructive' },
+  { icon: Calendar, label: 'Feriados', path: '/feriados', color: 'text-warning' },
   { icon: BarChart3, label: 'Relatórios', path: '/relatorios', color: 'text-muted-foreground' },
   { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
 ];
