@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { 
   FileText, Download, Calendar, Users, Wallet, Clock, Umbrella, Heart, 
-  UserMinus, BarChart3, Plus, Loader2, FileSpreadsheet, File, ChevronDown
+  UserMinus, BarChart3, Plus, Loader2, FileSpreadsheet, File, ChevronDown,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRelatorios, FormatoRelatorio } from '@/hooks/useRelatorios';
 import { useColaboradores } from '@/hooks/useColaboradores';
+import { useAgendamentoRelatorios } from '@/hooks/useAgendamentoRelatorios';
+import { AgendamentoRelatoriosModal } from '@/components/relatorios/AgendamentoRelatoriosModal';
 import { format } from 'date-fns';
 import {
   DropdownMenu,
@@ -93,14 +96,9 @@ const categorias: CategoriaConfig[] = [
   },
 ];
 
-const relatoriosAgendados = [
-  { nome: 'Aniversariantes do Mês', frequencia: 'Todo dia 1º', destino: 'RH, Diretoria' },
-  { nome: 'Férias a Vencer', frequencia: 'Todo dia 15', destino: 'Gestores' },
-  { nome: 'Resumo Folha', frequencia: 'Após fechamento', destino: 'Financeiro' },
-];
-
 export default function Relatorios() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [agendamentoModalOpen, setAgendamentoModalOpen] = useState(false);
   const [selectedRelatorio, setSelectedRelatorio] = useState<RelatorioConfig | null>(null);
   const [formato, setFormato] = useState<FormatoRelatorio>('PDF');
   const [colaboradorId, setColaboradorId] = useState('');
@@ -112,6 +110,7 @@ export default function Relatorios() {
 
   const relatorios = useRelatorios();
   const { colaboradores } = useColaboradores();
+  const { agendamentos } = useAgendamentoRelatorios();
 
   const handleOpenModal = (rel: RelatorioConfig) => {
     setSelectedRelatorio(rel);
@@ -436,27 +435,56 @@ export default function Relatorios() {
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-sm text-foreground">Relatórios Agendados</h3>
+            {agendamentos && agendamentos.length > 0 && (
+              <Badge variant="secondary" className="text-xs">{agendamentos.length}</Badge>
+            )}
           </div>
-          <Button size="sm" variant="outline" className="gap-1">
-            <Plus className="w-3 h-3" />
-            Agendar
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" className="gap-1" onClick={() => setAgendamentoModalOpen(true)}>
+              <Settings className="w-3 h-3" />
+              Gerenciar
+            </Button>
+            <Button size="sm" variant="default" className="gap-1" onClick={() => setAgendamentoModalOpen(true)}>
+              <Plus className="w-3 h-3" />
+              Agendar
+            </Button>
+          </div>
         </div>
         <div className="space-y-3">
-          {relatoriosAgendados.map((rel, i) => (
-            <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-primary" />
+          {agendamentos && agendamentos.length > 0 ? (
+            agendamentos.slice(0, 3).map((ag) => (
+              <div key={ag.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">{ag.nome}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {ag.frequencia === 'diario' ? 'Diário' : ag.frequencia === 'semanal' ? 'Semanal' : 'Mensal'} às {ag.hora_envio?.slice(0, 5)} - {ag.email_destinatario}
+                  </p>
+                </div>
+                <Badge variant={ag.ativo ? "default" : "secondary"}>{ag.ativo ? "Ativo" : "Pausado"}</Badge>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">{rel.nome}</p>
-                <p className="text-xs text-muted-foreground">{rel.frequencia} - Enviar para: {rel.destino}</p>
-              </div>
-              <Button size="sm" variant="ghost">Editar</Button>
+            ))
+          ) : (
+            <div className="text-center py-6 text-muted-foreground">
+              <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Nenhum relatório agendado</p>
+              <Button size="sm" variant="link" onClick={() => setAgendamentoModalOpen(true)}>
+                Criar primeiro agendamento
+              </Button>
             </div>
-          ))}
+          )}
+          {agendamentos && agendamentos.length > 3 && (
+            <Button variant="ghost" size="sm" className="w-full" onClick={() => setAgendamentoModalOpen(true)}>
+              Ver todos ({agendamentos.length})
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Modal de Agendamento */}
+      <AgendamentoRelatoriosModal open={agendamentoModalOpen} onOpenChange={setAgendamentoModalOpen} />
 
       {/* Modal de Parâmetros */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
