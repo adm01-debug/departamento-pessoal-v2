@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      admissao_tokens: {
+        Row: {
+          admissao_id: string
+          assinado_em: string | null
+          assinatura_base64: string | null
+          contrato_assinado: boolean | null
+          contrato_gerado: boolean | null
+          created_at: string
+          dados_preenchidos: boolean | null
+          data_expiracao: string
+          documentos_enviados: boolean | null
+          email_candidato: string | null
+          id: string
+          ip_assinatura: string | null
+          telefone_candidato: string | null
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          admissao_id: string
+          assinado_em?: string | null
+          assinatura_base64?: string | null
+          contrato_assinado?: boolean | null
+          contrato_gerado?: boolean | null
+          created_at?: string
+          dados_preenchidos?: boolean | null
+          data_expiracao?: string
+          documentos_enviados?: boolean | null
+          email_candidato?: string | null
+          id?: string
+          ip_assinatura?: string | null
+          telefone_candidato?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          admissao_id?: string
+          assinado_em?: string | null
+          assinatura_base64?: string | null
+          contrato_assinado?: boolean | null
+          contrato_gerado?: boolean | null
+          created_at?: string
+          dados_preenchidos?: boolean | null
+          data_expiracao?: string
+          documentos_enviados?: boolean | null
+          email_candidato?: string | null
+          id?: string
+          ip_assinatura?: string | null
+          telefone_candidato?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admissao_tokens_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admissoes: {
         Row: {
           cargo: string
@@ -922,6 +984,56 @@ export type Database = {
           },
         ]
       }
+      documentos_admissao: {
+        Row: {
+          admissao_id: string
+          created_at: string
+          id: string
+          nome_arquivo: string
+          observacoes: string | null
+          tamanho_bytes: number | null
+          tipo: string
+          url: string
+          validado: boolean | null
+          validado_em: string | null
+          validado_por: string | null
+        }
+        Insert: {
+          admissao_id: string
+          created_at?: string
+          id?: string
+          nome_arquivo: string
+          observacoes?: string | null
+          tamanho_bytes?: number | null
+          tipo: string
+          url: string
+          validado?: boolean | null
+          validado_em?: string | null
+          validado_por?: string | null
+        }
+        Update: {
+          admissao_id?: string
+          created_at?: string
+          id?: string
+          nome_arquivo?: string
+          observacoes?: string | null
+          tamanho_bytes?: number | null
+          tipo?: string
+          url?: string
+          validado?: boolean | null
+          validado_em?: string | null
+          validado_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_admissao_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_afastamento: {
         Row: {
           afastamento_id: string
@@ -1748,6 +1860,50 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notificacoes_admissao: {
+        Row: {
+          admissao_id: string
+          assunto: string | null
+          canal: string
+          created_at: string
+          erro: string | null
+          id: string
+          mensagem: string | null
+          status: string | null
+          tipo: string
+        }
+        Insert: {
+          admissao_id: string
+          assunto?: string | null
+          canal: string
+          created_at?: string
+          erro?: string | null
+          id?: string
+          mensagem?: string | null
+          status?: string | null
+          tipo: string
+        }
+        Update: {
+          admissao_id?: string
+          assunto?: string | null
+          canal?: string
+          created_at?: string
+          erro?: string | null
+          id?: string
+          mensagem?: string | null
+          status?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_admissao_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
             referencedColumns: ["id"]
           },
         ]
