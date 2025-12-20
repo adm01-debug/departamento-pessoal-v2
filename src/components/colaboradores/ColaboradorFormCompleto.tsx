@@ -75,7 +75,7 @@ const colaboradorSchema = z.object({
   celular: z.string().max(16).optional().or(z.literal('')),
 
   // Endereço
-  cep: z.string().max(10).optional().or(z.literal('')),
+  cep: z.string().max(10).optional().or(z.literal('')).refine(val => !val || unmask(val).length === 0 || unmask(val).length === 8, { message: 'CEP deve ter 8 dígitos' }),
   logradouro: z.string().max(200).optional().or(z.literal('')),
   numero: z.string().max(20).optional().or(z.literal('')),
   complemento: z.string().max(100).optional().or(z.literal('')),
@@ -136,6 +136,7 @@ interface ColaboradorFormCompletoProps {
 
 export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuccess }: ColaboradorFormCompletoProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingCep, setIsFetchingCep] = useState(false);
   const [activeTab, setActiveTab] = useState('pessoal');
   const isEditMode = !!colaborador;
 
@@ -293,17 +294,35 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
   const handleCepBlur = async (cep: string) => {
     const cleanCep = unmask(cep);
     if (cleanCep.length === 8) {
+      setIsFetchingCep(true);
       try {
         const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
         const data = await response.json();
-        if (!data.erro) {
+        if (data.erro) {
+          toast({
+            title: 'CEP não encontrado',
+            description: 'Verifique o CEP informado e tente novamente.',
+            variant: 'destructive',
+          });
+        } else {
           form.setValue('logradouro', data.logradouro || '');
           form.setValue('bairro', data.bairro || '');
           form.setValue('cidade', data.localidade || '');
           form.setValue('uf', data.uf || '');
+          toast({
+            title: 'Endereço encontrado',
+            description: `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`,
+          });
         }
       } catch (err) {
         console.error('Erro ao buscar CEP:', err);
+        toast({
+          title: 'Erro ao buscar CEP',
+          description: 'Não foi possível consultar o CEP. Tente novamente.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsFetchingCep(false);
       }
     }
   };
@@ -636,13 +655,21 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                       <FormItem>
                         <FormLabel>CEP</FormLabel>
                         <FormControl>
-                          <MaskedInput 
-                            mask="cep" 
-                            value={field.value || ''} 
-                            onValueChange={(_, masked) => field.onChange(masked)} 
-                            onBlur={() => handleCepBlur(field.value || '')}
-                            className="bg-background font-mono" 
-                          />
+                          <div className="relative">
+                            <MaskedInput 
+                              mask="cep" 
+                              value={field.value || ''} 
+                              onValueChange={(_, masked) => field.onChange(masked)} 
+                              onBlur={() => handleCepBlur(field.value || '')}
+                              className="bg-background font-mono" 
+                              disabled={isFetchingCep}
+                            />
+                            {isFetchingCep && (
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                              </div>
+                            )}
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
