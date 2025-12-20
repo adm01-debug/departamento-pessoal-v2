@@ -13,8 +13,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { 
   UserPlus, Pencil, Loader2, User, FileText, MapPin, 
-  Building2, Banknote, GraduationCap, Clock, Save, Search
+  Building2, Banknote, GraduationCap, Clock, Save, Search, FolderOpen
 } from 'lucide-react';
+import { DocumentosColaborador } from './DocumentosColaborador';
 import { validateCPF, validatePIS, validateRG, getRGFormatInfo, validateTituloEleitor, validateCNH, unmask } from '@/lib/masks';
 import {
   ColaboradorDB,
@@ -377,6 +378,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
     { value: 'contrato', label: 'Contrato', icon: Building2 },
     { value: 'bancario', label: 'Bancário', icon: Banknote },
     { value: 'outros', label: 'Outros', icon: GraduationCap },
+    ...(isEditMode && colaborador ? [{ value: 'arquivos', label: 'Arquivos', icon: FolderOpen }] : []),
   ];
 
   return (
@@ -395,7 +397,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 overflow-hidden flex flex-col">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
-              <TabsList className="grid grid-cols-6 mb-4">
+              <TabsList className={`grid mb-4 ${isEditMode && colaborador ? 'grid-cols-7' : 'grid-cols-6'}`}>
                 {tabItems.map(tab => (
                   <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 text-xs">
                     <tab.icon className="w-3.5 h-3.5" />
@@ -1075,6 +1077,22 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                     )} />
                   </div>
                 </TabsContent>
+
+                {/* Arquivos - Apenas no modo edição */}
+                {isEditMode && colaborador && (
+                  <TabsContent value="arquivos" className="space-y-4 mt-0">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-medium text-foreground">Documentos Digitalizados</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Faça upload dos documentos do colaborador (RG, CPF, CTPS, etc.)
+                      </p>
+                    </div>
+                    <DocumentosColaborador 
+                      colaboradorId={colaborador.id} 
+                      colaboradorNome={colaborador.nome_completo}
+                    />
+                  </TabsContent>
+                )}
               </div>
             </Tabs>
 
