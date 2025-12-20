@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight, Loader2, Database } from 'lucide-react';
+import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight, Loader2, Database, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ColaboradorFormCompleto, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormCompleto';
 import { ExportDropdown } from '@/components/ExportDropdown';
+import { ImportacaoColaboradoresModal } from '@/components/colaboradores/ImportacaoColaboradoresModal';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { ColaboradorDB, statusColaboradorLabels } from '@/types/colaborador';
 import { toast } from '@/hooks/use-toast';
@@ -45,6 +46,7 @@ export default function Colaboradores() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [colaboradorToDelete, setColaboradorToDelete] = useState<ColaboradorDB | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -322,6 +324,10 @@ export default function Colaboradores() {
             }}
             disabled={filteredColaboradores.length === 0}
           />
+          <Button variant="outline" className="gap-2" onClick={() => setImportModalOpen(true)}>
+            <Upload className="w-4 h-4" />
+            Importar
+          </Button>
           <Button className="gap-2" onClick={handleOpenNewModal}>
             <Plus className="w-4 h-4" />
             Novo Colaborador
@@ -695,6 +701,13 @@ export default function Colaboradores() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal de Importação */}
+      <ImportacaoColaboradoresModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        onSuccess={() => fetchColaboradores()}
+      />
     </div>
   );
 }
