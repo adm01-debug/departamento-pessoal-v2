@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   User, FileText, Stethoscope, FileSignature, Send, BookOpen, 
-  CheckCircle2, Clock, AlertTriangle, ChevronRight, Pencil
+  CheckCircle2, Clock, AlertTriangle, ChevronRight, Pencil, Link
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,6 +52,7 @@ interface AdmissaoChecklistModalProps {
   onAdvanceStage?: () => void;
   onConvertToColaborador?: () => void;
   onEdit?: () => void;
+  onOpenContratacaoDigital?: () => void;
 }
 
 const initialChecklist: ChecklistStage[] = [
@@ -135,6 +136,7 @@ export function AdmissaoChecklistModal({
   onAdvanceStage,
   onConvertToColaborador,
   onEdit,
+  onOpenContratacaoDigital,
 }: AdmissaoChecklistModalProps) {
   const [checklist, setChecklist] = useState<ChecklistStage[]>(initialChecklist);
 
@@ -211,6 +213,12 @@ export function AdmissaoChecklistModal({
               <Button variant="outline" size="sm" onClick={onEdit} className="gap-2">
                 <Pencil className="w-4 h-4" />
                 Editar Dados
+              </Button>
+            )}
+            {onOpenContratacaoDigital && (
+              <Button variant="outline" size="sm" onClick={onOpenContratacaoDigital} className="gap-2 ml-2">
+                <Link className="w-4 h-4" />
+                Link Digital
               </Button>
             )}
           </DialogTitle>

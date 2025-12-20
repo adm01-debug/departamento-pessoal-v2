@@ -564,3 +564,227 @@ function extenso(valor: number): string {
   
   return resultado;
 }
+
+export interface HoleriteData {
+  competencia: string;
+  colaborador_nome: string;
+  colaborador_cpf: string;
+  colaborador_matricula?: string;
+  colaborador_cargo: string;
+  colaborador_departamento: string;
+  salario_base: number;
+  total_proventos: number;
+  total_descontos: number;
+  liquido: number;
+  valor_inss?: number;
+  valor_irrf?: number;
+  valor_fgts?: number;
+  horas_extras_50?: number;
+  horas_extras_100?: number;
+  faltas_dias?: number;
+  empresa_nome?: string;
+  empresa_cnpj?: string;
+}
+
+export function gerarHoleritePDF(dados: HoleriteData): void {
+  const doc = new jsPDF('portrait', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  
+  // Header da Empresa
+  doc.setFillColor(59, 130, 246);
+  doc.rect(0, 0, pageWidth, 28, 'F');
+  
+  doc.setFontSize(14);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.text(dados.empresa_nome || 'EMPRESA', pageWidth / 2, 12, { align: 'center' });
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`CNPJ: ${dados.empresa_cnpj || '00.000.000/0001-00'}`, pageWidth / 2, 20, { align: 'center' });
+  
+  // Título do documento
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DEMONSTRATIVO DE PAGAMENTO', pageWidth / 2, 38, { align: 'center' });
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Competência: ${dados.competencia}`, pageWidth / 2, 45, { align: 'center' });
+  
+  let yPos = 55;
+  
+  // Dados do Colaborador
+  doc.setFillColor(240, 240, 240);
+  doc.rect(10, yPos, pageWidth - 20, 25, 'F');
+  doc.setFontSize(9);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('COLABORADOR:', 14, yPos + 7);
+  doc.setFont('helvetica', 'normal');
+  doc.text(dados.colaborador_nome, 50, yPos + 7);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('CPF:', 14, yPos + 14);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatCPF(dados.colaborador_cpf), 50, yPos + 14);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('MATRÍCULA:', 110, yPos + 7);
+  doc.setFont('helvetica', 'normal');
+  doc.text(dados.colaborador_matricula || '-', 140, yPos + 7);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('CARGO:', 14, yPos + 21);
+  doc.setFont('helvetica', 'normal');
+  doc.text(dados.colaborador_cargo, 50, yPos + 21);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('DEPTO:', 110, yPos + 14);
+  doc.setFont('helvetica', 'normal');
+  doc.text(dados.colaborador_departamento, 140, yPos + 14);
+  
+  yPos += 35;
+  
+  // Tabela de Proventos e Descontos
+  const proventos: [string, string, string][] = [
+    ['Código', 'Descrição', 'Valor'],
+    ['001', 'Salário Base', formatCurrency(dados.salario_base)],
+  ];
+  
+  if (dados.horas_extras_50 && dados.horas_extras_50 > 0) {
+    proventos.push(['002', 'Horas Extras 50%', formatCurrency(dados.horas_extras_50)]);
+  }
+  if (dados.horas_extras_100 && dados.horas_extras_100 > 0) {
+    proventos.push(['003', 'Horas Extras 100%', formatCurrency(dados.horas_extras_100)]);
+  }
+  
+  const descontos: [string, string, string][] = [
+    ['Código', 'Descrição', 'Valor'],
+  ];
+  
+  if (dados.valor_inss && dados.valor_inss > 0) {
+    descontos.push(['101', 'INSS', formatCurrency(dados.valor_inss)]);
+  }
+  if (dados.valor_irrf && dados.valor_irrf > 0) {
+    descontos.push(['102', 'IRRF', formatCurrency(dados.valor_irrf)]);
+  }
+  if (dados.faltas_dias && dados.faltas_dias > 0) {
+    const valorFalta = (dados.salario_base / 30) * dados.faltas_dias;
+    descontos.push(['103', `Faltas (${dados.faltas_dias} dias)`, formatCurrency(valorFalta)]);
+  }
+  
+  // Proventos
+  doc.setFont('helvetica', 'bold');
+  doc.setFillColor(34, 197, 94);
+  doc.setTextColor(255, 255, 255);
+  doc.rect(10, yPos, (pageWidth - 25) / 2, 7, 'F');
+  doc.text('PROVENTOS', 14, yPos + 5);
+  
+  // Descontos
+  doc.setFillColor(239, 68, 68);
+  doc.rect(10 + (pageWidth - 25) / 2 + 5, yPos, (pageWidth - 25) / 2, 7, 'F');
+  doc.text('DESCONTOS', 14 + (pageWidth - 25) / 2 + 5, yPos + 5);
+  
+  doc.setTextColor(0, 0, 0);
+  yPos += 7;
+  
+  // Tabela Proventos
+  autoTable(doc, {
+    startY: yPos,
+    head: [proventos[0]],
+    body: proventos.slice(1),
+    theme: 'grid',
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+    columnStyles: {
+      0: { cellWidth: 15 },
+      1: { cellWidth: 45 },
+      2: { cellWidth: 25, halign: 'right' },
+    },
+    tableWidth: (pageWidth - 25) / 2,
+    margin: { left: 10 },
+  });
+  
+  const proventosEndY = (doc as any).lastAutoTable.finalY;
+  
+  // Tabela Descontos
+  autoTable(doc, {
+    startY: yPos,
+    head: [descontos[0]],
+    body: descontos.slice(1).length > 0 ? descontos.slice(1) : [['', 'Sem descontos', '']],
+    theme: 'grid',
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+    columnStyles: {
+      0: { cellWidth: 15 },
+      1: { cellWidth: 45 },
+      2: { cellWidth: 25, halign: 'right' },
+    },
+    tableWidth: (pageWidth - 25) / 2,
+    margin: { left: 10 + (pageWidth - 25) / 2 + 5 },
+  });
+  
+  const descontosEndY = (doc as any).lastAutoTable.finalY;
+  yPos = Math.max(proventosEndY, descontosEndY) + 10;
+  
+  // Totais
+  doc.setFillColor(240, 240, 240);
+  doc.rect(10, yPos, pageWidth - 20, 25, 'F');
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  
+  doc.text('Total Proventos:', 14, yPos + 8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatCurrency(dados.total_proventos), 70, yPos + 8);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('Total Descontos:', 14, yPos + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatCurrency(dados.total_descontos), 70, yPos + 16);
+  
+  // FGTS
+  doc.setFont('helvetica', 'bold');
+  doc.text('Base FGTS:', 110, yPos + 8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatCurrency(dados.total_proventos), 150, yPos + 8);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.text('FGTS do Mês:', 110, yPos + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatCurrency(dados.valor_fgts || dados.total_proventos * 0.08), 150, yPos + 16);
+  
+  yPos += 30;
+  
+  // Líquido
+  doc.setFillColor(59, 130, 246);
+  doc.rect(10, yPos, pageWidth - 20, 12, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('LÍQUIDO A RECEBER:', 14, yPos + 8);
+  doc.text(formatCurrency(dados.liquido), pageWidth - 14, yPos + 8, { align: 'right' });
+  
+  yPos += 25;
+  doc.setTextColor(0, 0, 0);
+  
+  // Assinatura
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.line(14, yPos + 20, 90, yPos + 20);
+  doc.text('Assinatura do Colaborador', 52, yPos + 26, { align: 'center' });
+  
+  doc.text(`Data: ${format(new Date(), "dd/MM/yyyy", { locale: ptBR })}`, pageWidth - 14, yPos + 26, { align: 'right' });
+  
+  // Footer
+  const pageHeight = doc.internal.pageSize.getHeight();
+  doc.setFontSize(7);
+  doc.setTextColor(128, 128, 128);
+  doc.text('Este documento é uma representação do demonstrativo de pagamento e não substitui o documento oficial.', pageWidth / 2, pageHeight - 10, { align: 'center' });
+  
+  // Save
+  const competenciaNome = dados.competencia.replace('/', '-');
+  doc.save(`holerite_${competenciaNome}_${dados.colaborador_nome.replace(/\s+/g, '_')}.pdf`);
+}
