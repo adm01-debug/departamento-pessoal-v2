@@ -18,6 +18,7 @@ import Beneficios from "./pages/Beneficios";
 import Desligamento from "./pages/Desligamento";
 import Relatorios from "./pages/Relatorios";
 import Auditoria from "./pages/Auditoria";
+import FeriadosPage from "./pages/Feriados";
 import Perfil from "./pages/Perfil";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/desligamento" element={<Desligamento />} />
                 <Route path="/relatorios" element={<Relatorios />} />
                 <Route path="/auditoria" element={<Auditoria />} />
+                <Route path="/feriados" element={<FeriadosPage />} />
                 <Route path="/perfil" element={<Perfil />} />
               </Route>
               <Route path="*" element={<NotFound />} />
