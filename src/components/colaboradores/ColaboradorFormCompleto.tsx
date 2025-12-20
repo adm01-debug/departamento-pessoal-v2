@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { 
   UserPlus, Pencil, Loader2, User, FileText, MapPin, 
-  Building2, Banknote, GraduationCap, Clock, Save
+  Building2, Banknote, GraduationCap, Clock, Save, Search
 } from 'lucide-react';
 import { validateCPF, validatePIS, unmask } from '@/lib/masks';
 import {
@@ -655,20 +655,32 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                       <FormItem>
                         <FormLabel>CEP</FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <MaskedInput 
-                              mask="cep" 
-                              value={field.value || ''} 
-                              onValueChange={(_, masked) => field.onChange(masked)} 
-                              onBlur={() => handleCepBlur(field.value || '')}
-                              className="bg-background font-mono" 
-                              disabled={isFetchingCep}
-                            />
-                            {isFetchingCep && (
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                              </div>
-                            )}
+                          <div className="flex gap-2">
+                            <div className="relative flex-1">
+                              <MaskedInput 
+                                mask="cep" 
+                                value={field.value || ''} 
+                                onValueChange={(_, masked) => field.onChange(masked)} 
+                                onBlur={() => handleCepBlur(field.value || '')}
+                                className="bg-background font-mono" 
+                                disabled={isFetchingCep}
+                              />
+                              {isFetchingCep && (
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="icon"
+                              onClick={() => handleCepBlur(field.value || '')}
+                              disabled={isFetchingCep || unmask(field.value || '').length !== 8}
+                              title="Buscar endereço"
+                            >
+                              <Search className="h-4 w-4" />
+                            </Button>
                           </div>
                         </FormControl>
                         <FormMessage />
