@@ -52,6 +52,7 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
   });
   const [cpfError, setCpfError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [telefoneError, setTelefoneError] = useState<string | null>(null);
 
   const validateCpfField = (cpf: string) => {
     if (!cpf || unmask(cpf).length === 0) {
@@ -81,6 +82,24 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
       return false;
     }
     setEmailError(null);
+    return true;
+  };
+
+  const validateTelefoneField = (telefone: string) => {
+    if (!telefone || unmask(telefone).length === 0) {
+      setTelefoneError(null);
+      return true;
+    }
+    const digits = unmask(telefone);
+    if (digits.length < 10) {
+      setTelefoneError('Telefone incompleto');
+      return false;
+    }
+    if (digits.length > 11) {
+      setTelefoneError('Telefone inválido');
+      return false;
+    }
+    setTelefoneError(null);
     return true;
   };
 
@@ -115,6 +134,11 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
       // Validar e-mail se preenchido
       if (formData.email && !validateEmailField(formData.email)) {
         toast.error('E-mail inválido');
+        return;
+      }
+      // Validar telefone se preenchido
+      if (formData.telefone && !validateTelefoneField(formData.telefone)) {
+        toast.error('Telefone inválido');
         return;
       }
       onSave(admissao.id, formData);
@@ -301,9 +325,17 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
                   id="telefone"
                   mask="phone"
                   value={formData.telefone}
-                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, telefone: e.target.value });
+                    if (telefoneError) setTelefoneError(null);
+                  }}
+                  onBlur={(e) => validateTelefoneField(e.target.value)}
                   placeholder="(00) 00000-0000"
+                  className={telefoneError ? 'border-destructive' : ''}
                 />
+                {telefoneError && (
+                  <p className="text-xs text-destructive mt-1">{telefoneError}</p>
+                )}
               </div>
             </div>
           </div>
