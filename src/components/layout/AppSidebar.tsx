@@ -20,7 +20,9 @@ import {
   PenTool,
   UserCircle,
   Network,
-  ClipboardList
+  ClipboardList,
+  FileCheck,
+  Calculator
 } from 'lucide-react';
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -50,6 +52,8 @@ const menuItems = [
   { icon: UserCircle, label: 'Meu Portal', path: '/portal', color: 'text-success' },
   { icon: Network, label: 'Organograma', path: '/organograma', color: 'text-info' },
   { icon: ClipboardList, label: 'Onboarding', path: '/onboarding', color: 'text-success' },
+  { icon: FileCheck, label: 'Documentos', path: '/documentos', color: 'text-warning' },
+  { icon: Calculator, label: 'Contábil', path: '/contabil', color: 'text-info' },
 ];
 
 interface AppSidebarProps {

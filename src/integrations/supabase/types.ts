@@ -872,6 +872,56 @@ export type Database = {
           },
         ]
       }
+      documento_templates: {
+        Row: {
+          ativo: boolean | null
+          categoria: string
+          conteudo_html: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          tipo: string
+          updated_at: string
+          variaveis: Json | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria?: string
+          conteudo_html: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          tipo: string
+          updated_at?: string
+          variaveis?: Json | null
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string
+          conteudo_html?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          tipo?: string
+          updated_at?: string
+          variaveis?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documento_templates_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_afastamento: {
         Row: {
           afastamento_id: string

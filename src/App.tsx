@@ -25,6 +25,8 @@ import Assinaturas from "./pages/Assinaturas";
 import PortalColaborador from "./pages/PortalColaborador";
 import Organograma from "./pages/Organograma";
 import Onboarding from "./pages/Onboarding";
+import GestaoDocumentos from "./pages/GestaoDocumentos";
+import IntegracaoContabil from "./pages/IntegracaoContabil";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -63,6 +65,8 @@ const App = () => (
                 <Route path="/portal" element={<PortalColaborador />} />
                 <Route path="/organograma" element={<Organograma />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/documentos" element={<GestaoDocumentos />} />
+                <Route path="/contabil" element={<IntegracaoContabil />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
