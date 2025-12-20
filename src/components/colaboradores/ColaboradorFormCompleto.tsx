@@ -15,7 +15,7 @@ import {
   UserPlus, Pencil, Loader2, User, FileText, MapPin, 
   Building2, Banknote, GraduationCap, Clock, Save
 } from 'lucide-react';
-import { validateCPF, unmask } from '@/lib/masks';
+import { validateCPF, validatePIS, unmask } from '@/lib/masks';
 import {
   ColaboradorDB,
   EstadoCivil,
@@ -56,7 +56,7 @@ const colaboradorSchema = z.object({
   nome_pai: z.string().trim().max(150).optional().or(z.literal('')),
 
   // Documentos Trabalhistas
-  pis_pasep: z.string().max(14).optional().or(z.literal('')),
+  pis_pasep: z.string().max(14).optional().or(z.literal('')).refine(val => !val || unmask(val).length === 0 || unmask(val).length === 11, { message: 'PIS/PASEP deve ter 11 dígitos' }).refine(val => !val || unmask(val).length === 0 || validatePIS(val), { message: 'PIS/PASEP inválido' }),
   ctps_numero: z.string().max(20).optional().or(z.literal('')),
   ctps_serie: z.string().max(10).optional().or(z.literal('')),
   ctps_uf: z.string().max(2).optional().or(z.literal('')),
@@ -528,7 +528,14 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                     <FormField control={form.control} name="pis_pasep" render={({ field }) => (
                       <FormItem>
                         <FormLabel>PIS/PASEP</FormLabel>
-                        <FormControl><Input placeholder="000.00000.00-0" {...field} className="bg-background font-mono" /></FormControl>
+                        <FormControl>
+                          <MaskedInput 
+                            mask="pis" 
+                            placeholder="000.00000.00-0" 
+                            {...field} 
+                            className="bg-background font-mono" 
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
