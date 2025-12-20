@@ -1414,6 +1414,38 @@ export type Database = {
           },
         ]
       }
+      log_envio_relatorios: {
+        Row: {
+          agendamento_id: string | null
+          created_at: string
+          id: string
+          mensagem: string | null
+          status: string
+        }
+        Insert: {
+          agendamento_id?: string | null
+          created_at?: string
+          id?: string
+          mensagem?: string | null
+          status: string
+        }
+        Update: {
+          agendamento_id?: string | null
+          created_at?: string
+          id?: string
+          mensagem?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "log_envio_relatorios_agendamento_id_fkey"
+            columns: ["agendamento_id"]
+            isOneToOne: false
+            referencedRelation: "relatorios_agendados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notificacoes: {
         Row: {
           created_at: string
@@ -1770,6 +1802,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      relatorios_agendados: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          created_by: string | null
+          dia_mes: number | null
+          dia_semana: number | null
+          email_destinatario: string
+          formato: string
+          frequencia: string
+          hora_envio: string
+          id: string
+          nome: string
+          parametros: Json | null
+          proximo_envio: string | null
+          tipo_relatorio: string
+          ultimo_envio: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          dia_mes?: number | null
+          dia_semana?: number | null
+          email_destinatario: string
+          formato?: string
+          frequencia: string
+          hora_envio?: string
+          id?: string
+          nome: string
+          parametros?: Json | null
+          proximo_envio?: string | null
+          tipo_relatorio: string
+          ultimo_envio?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          dia_mes?: number | null
+          dia_semana?: number | null
+          email_destinatario?: string
+          formato?: string
+          frequencia?: string
+          hora_envio?: string
+          id?: string
+          nome?: string
+          parametros?: Json | null
+          proximo_envio?: string | null
+          tipo_relatorio?: string
+          ultimo_envio?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       rubricas_folha: {
         Row: {

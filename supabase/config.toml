@@ -1,1 +1,7 @@
 project_id = "pljkphaxtafbfnnnbpdj"
+
+[functions.enviar-relatorio]
+verify_jwt = false
+
+[functions.processar-agendamentos]
+verify_jwt = false
