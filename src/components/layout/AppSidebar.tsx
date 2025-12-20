@@ -14,6 +14,7 @@ import {
   Search,
   LogOut
 } from 'lucide-react';
+import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -81,6 +82,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
           </div>
         )}
         <div className="flex items-center gap-1">
+          <NotificacoesDropdown />
           <ThemeToggle />
           <Button 
             variant="ghost" 

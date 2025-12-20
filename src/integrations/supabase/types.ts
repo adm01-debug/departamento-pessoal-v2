@@ -1309,6 +1309,45 @@ export type Database = {
           },
         ]
       }
+      notificacoes: {
+        Row: {
+          created_at: string
+          data_referencia: string | null
+          entidade_id: string | null
+          entidade_tipo: string | null
+          id: string
+          lida: boolean | null
+          mensagem: string
+          tipo: string
+          titulo: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_referencia?: string | null
+          entidade_id?: string | null
+          entidade_tipo?: string | null
+          id?: string
+          lida?: boolean | null
+          mensagem: string
+          tipo: string
+          titulo: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_referencia?: string | null
+          entidade_id?: string | null
+          entidade_tipo?: string | null
+          id?: string
+          lida?: boolean | null
+          mensagem?: string
+          tipo?: string
+          titulo?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       parametros_fiscais: {
         Row: {
           aliquota: number | null
