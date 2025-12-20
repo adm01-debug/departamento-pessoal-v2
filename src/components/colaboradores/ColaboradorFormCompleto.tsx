@@ -15,7 +15,7 @@ import {
   UserPlus, Pencil, Loader2, User, FileText, MapPin, 
   Building2, Banknote, GraduationCap, Clock, Save, Search
 } from 'lucide-react';
-import { validateCPF, validatePIS, unmask } from '@/lib/masks';
+import { validateCPF, validatePIS, validateRG, getRGFormatInfo, unmask } from '@/lib/masks';
 import {
   ColaboradorDB,
   EstadoCivil,
@@ -123,6 +123,18 @@ const colaboradorSchema = z.object({
   
   // Observações
   observacoes: z.string().max(1000).optional().or(z.literal('')),
+}).superRefine((data, ctx) => {
+  // Validação de RG baseada no estado
+  if (data.rg && data.rg.trim()) {
+    const result = validateRG(data.rg, data.rg_uf || undefined);
+    if (!result.valid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: result.message || 'RG inválido para o estado selecionado',
+        path: ['rg'],
+      });
+    }
+  }
 });
 
 export type ColaboradorFormData = z.infer<typeof colaboradorSchema>;
@@ -482,13 +494,28 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                     </div>
 
                     {/* RG */}
-                    <FormField control={form.control} name="rg" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>RG</FormLabel>
-                        <FormControl><Input placeholder="Número do RG" {...field} className="bg-background" /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
+                    <FormField control={form.control} name="rg" render={({ field }) => {
+                      const rgUf = form.watch('rg_uf');
+                      const formatInfo = rgUf ? getRGFormatInfo(rgUf) : 'Selecione o estado para ver o formato';
+                      return (
+                        <FormItem>
+                          <FormLabel>RG</FormLabel>
+                          <FormControl>
+                            <MaskedInput 
+                              mask="rg" 
+                              value={field.value || ''} 
+                              onValueChange={(_, masked) => field.onChange(masked)} 
+                              className="bg-background font-mono" 
+                              placeholder="00.000.000-0"
+                            />
+                          </FormControl>
+                          {rgUf && (
+                            <p className="text-xs text-muted-foreground">{formatInfo}</p>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }} />
 
                     <div className="flex gap-2">
                       <FormField control={form.control} name="rg_orgao_emissor" render={({ field }) => (
@@ -500,7 +527,14 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                       <FormField control={form.control} name="rg_uf" render={({ field }) => (
                         <FormItem className="w-24">
                           <FormLabel>UF</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={(value) => {
+                            field.onChange(value);
+                            // Revalidate RG when UF changes
+                            const currentRg = form.getValues('rg');
+                            if (currentRg) {
+                              form.trigger('rg');
+                            }
+                          }} value={field.value}>
                             <FormControl><SelectTrigger className="bg-background"><SelectValue placeholder="UF" /></SelectTrigger></FormControl>
                             <SelectContent className="bg-popover border border-border z-50 max-h-[200px]">
                               {ufOptions.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}
