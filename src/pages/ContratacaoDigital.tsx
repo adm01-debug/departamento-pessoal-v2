@@ -250,15 +250,18 @@ export default function ContratacaoDigital() {
     }
   };
 
+  // Verificar documentos obrigatórios faltando
+  const documentosObrigatoriosFaltando = DOCUMENTOS_NECESSARIOS
+    .filter(d => d.obrigatorio && !documentosEnviados[d.tipo]);
+
+  const todosDocumentosObrigatoriosEnviados = documentosObrigatoriosFaltando.length === 0;
+
   const handleConcluirDocumentos = async () => {
     if (!tokenData) return;
     
-    // Verificar documentos obrigatórios
-    const obrigatoriosFaltando = DOCUMENTOS_NECESSARIOS
-      .filter(d => d.obrigatorio && !documentosEnviados[d.tipo]);
-
-    if (obrigatoriosFaltando.length > 0) {
-      toast.error(`Documentos obrigatórios faltando: ${obrigatoriosFaltando.map(d => d.label).join(', ')}`);
+    // Verificar documentos obrigatórios (bloqueio real)
+    if (!todosDocumentosObrigatoriosEnviados) {
+      toast.error(`Documentos obrigatórios faltando: ${documentosObrigatoriosFaltando.map(d => d.label).join(', ')}`);
       return;
     }
 
@@ -317,12 +320,16 @@ export default function ContratacaoDigital() {
         throw uploadError;
       }
 
-      // Obter URL pública (ou signed URL se privado)
-      const { data: urlData } = supabase.storage
+      // Gerar signed URL (bucket privado)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('assinaturas')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 ano de validade
 
-      const assinaturaUrl = urlData?.publicUrl || fileName;
+      if (signedUrlError) {
+        console.error('Erro ao gerar signed URL:', signedUrlError);
+      }
+
+      const assinaturaUrl = signedUrlData?.signedUrl || fileName;
 
       const { error } = await supabase
         .from('admissao_tokens')
@@ -715,11 +722,23 @@ export default function ContratacaoDigital() {
                 </div>
               ))}
 
+              {!todosDocumentosObrigatoriosEnviados && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>
+                    Documentos obrigatórios faltando: {documentosObrigatoriosFaltando.map(d => d.label).join(', ')}
+                  </span>
+                </div>
+              )}
+
               <div className="flex justify-between pt-4">
                 <Button variant="outline" onClick={() => setCurrentStep(1)}>
                   Voltar
                 </Button>
-                <Button onClick={handleConcluirDocumentos} disabled={saving}>
+                <Button 
+                  onClick={handleConcluirDocumentos} 
+                  disabled={saving || !todosDocumentosObrigatoriosEnviados}
+                >
                   {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                   Concluir Documentos
                 </Button>
