@@ -1578,6 +1578,33 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          action: string
+          allowed: boolean
+          created_at: string
+          id: string
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          action: string
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          resource?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1586,6 +1613,7 @@ export type Database = {
           departamento: string | null
           id: string
           nome: string
+          role_display: string | null
           telefone: string | null
           updated_at: string
           user_id: string
@@ -1597,6 +1625,7 @@ export type Database = {
           departamento?: string | null
           id?: string
           nome?: string
+          role_display?: string | null
           telefone?: string | null
           updated_at?: string
           user_id: string
@@ -1608,6 +1637,7 @@ export type Database = {
           departamento?: string | null
           id?: string
           nome?: string
+          role_display?: string | null
           telefone?: string | null
           updated_at?: string
           user_id?: string
@@ -1822,14 +1852,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
+      get_user_roles: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"][]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      app_role: "admin" | "gestor" | "rh" | "user"
       escolaridade:
         | "fundamental_incompleto"
         | "fundamental_completo"
@@ -2021,6 +2088,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "gestor", "rh", "user"],
       escolaridade: [
         "fundamental_incompleto",
         "fundamental_completo",
