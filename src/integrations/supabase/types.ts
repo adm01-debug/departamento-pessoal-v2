@@ -238,6 +238,51 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          acao: string
+          campos_alterados: string[] | null
+          created_at: string
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          id: string
+          ip_address: string | null
+          registro_id: string
+          tabela: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          acao: string
+          campos_alterados?: string[] | null
+          created_at?: string
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          ip_address?: string | null
+          registro_id: string
+          tabela: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          acao?: string
+          campos_alterados?: string[] | null
+          created_at?: string
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          ip_address?: string | null
+          registro_id?: string
+          tabela?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       banco_horas: {
         Row: {
           colaborador_id: string
@@ -291,6 +336,66 @@ export type Database = {
             columns: ["registro_ponto_id"]
             isOneToOne: false
             referencedRelation: "registros_ponto"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficios_colaborador: {
+        Row: {
+          ativo: boolean | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_fim: string | null
+          data_inicio: string
+          desconto: number | null
+          id: string
+          observacoes: string | null
+          tipo_beneficio_id: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          ativo?: boolean | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string
+          desconto?: number | null
+          id?: string
+          observacoes?: string | null
+          tipo_beneficio_id: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          ativo?: boolean | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string
+          desconto?: number | null
+          id?: string
+          observacoes?: string | null
+          tipo_beneficio_id?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficios_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficios_colaborador_tipo_beneficio_id_fkey"
+            columns: ["tipo_beneficio_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_beneficio"
             referencedColumns: ["id"]
           },
         ]
@@ -1675,6 +1780,45 @@ export type Database = {
           incide_inss?: boolean | null
           incide_irrf?: boolean | null
           tipo?: Database["public"]["Enums"]["tipo_evento_folha"]
+        }
+        Relationships: []
+      }
+      tipos_beneficio: {
+        Row: {
+          ativo: boolean | null
+          codigo: string
+          created_at: string
+          desconto_colaborador: number | null
+          descricao: string | null
+          icone: string | null
+          id: string
+          nome: string
+          operadora: string | null
+          valor_padrao: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          codigo: string
+          created_at?: string
+          desconto_colaborador?: number | null
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          nome: string
+          operadora?: string | null
+          valor_padrao?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          codigo?: string
+          created_at?: string
+          desconto_colaborador?: number | null
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          nome?: string
+          operadora?: string | null
+          valor_padrao?: number | null
         }
         Relationships: []
       }
