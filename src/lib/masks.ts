@@ -1,6 +1,6 @@
 // Mask utility functions for Brazilian document formats
 
-export type MaskType = 'cpf' | 'cnpj' | 'cpfCnpj' | 'phone' | 'cep' | 'date' | 'currency' | 'rg' | 'pis';
+export type MaskType = 'cpf' | 'cnpj' | 'cpfCnpj' | 'phone' | 'cep' | 'date' | 'currency' | 'rg' | 'pis' | 'tituloEleitor';
 
 const onlyDigits = (value: string): string => value.replace(/\D/g, '');
 
@@ -73,6 +73,13 @@ export const masks = {
     if (digits.length <= 10) return `${digits.slice(0, 3)}.${digits.slice(3, 8)}.${digits.slice(8)}`;
     return `${digits.slice(0, 3)}.${digits.slice(3, 8)}.${digits.slice(8, 10)}-${digits.slice(10)}`;
   },
+
+  tituloEleitor: (value: string): string => {
+    const digits = onlyDigits(value).slice(0, 12);
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 8) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+    return `${digits.slice(0, 4)} ${digits.slice(4, 8)} ${digits.slice(8)}`;
+  },
 };
 
 export const placeholders: Record<MaskType, string> = {
@@ -85,6 +92,7 @@ export const placeholders: Record<MaskType, string> = {
   currency: 'R$ 0,00',
   rg: '00.000.000-0',
   pis: '000.00000.00-0',
+  tituloEleitor: '0000 0000 0000',
 };
 
 export const unmask = (value: string): string => onlyDigits(value);
@@ -267,4 +275,76 @@ export const getRGFormatInfo = (uf: string): string => {
     return `${format.description} (ex: ${format.example})`;
   }
   return 'Formato padrão: 7-9 dígitos';
+};
+
+// Título de Eleitor validation
+// The voter ID has 12 digits: 8 sequential + 2 state code + 2 check digits
+export const validateTituloEleitor = (titulo: string): { valid: boolean; message?: string } => {
+  if (!titulo) return { valid: true }; // Optional field
+  
+  const digits = onlyDigits(titulo);
+  
+  if (digits.length === 0) return { valid: true };
+  
+  if (digits.length !== 12) {
+    return { valid: false, message: 'Título de eleitor deve ter 12 dígitos' };
+  }
+  
+  // Check for all same digits (invalid)
+  if (/^(\d)\1{11}$/.test(digits)) {
+    return { valid: false, message: 'Título de eleitor inválido' };
+  }
+  
+  // Extract parts
+  const sequencial = digits.slice(0, 8);
+  const estadoCod = digits.slice(8, 10);
+  const dv1 = parseInt(digits[10]);
+  const dv2 = parseInt(digits[11]);
+  
+  // State code must be between 01 and 28 (Brazilian electoral zones)
+  const estadoNum = parseInt(estadoCod);
+  if (estadoNum < 1 || estadoNum > 28) {
+    return { valid: false, message: 'Código de estado do título inválido' };
+  }
+  
+  // Calculate first check digit (mod 11 of first 8 digits)
+  const weights1 = [2, 3, 4, 5, 6, 7, 8, 9];
+  let sum1 = 0;
+  for (let i = 0; i < 8; i++) {
+    sum1 += parseInt(sequencial[i]) * weights1[i];
+  }
+  let resto1 = sum1 % 11;
+  let calcDv1 = resto1 === 0 ? 0 : 11 - resto1;
+  if (calcDv1 === 11) calcDv1 = 0;
+  
+  // Special rule for SP (01) and MG (02): if rest is 0, dv1 = 1
+  if ((estadoCod === '01' || estadoCod === '02') && resto1 === 0) {
+    calcDv1 = 1;
+  }
+  
+  if (calcDv1 !== dv1) {
+    return { valid: false, message: 'Título de eleitor inválido (dígito verificador 1)' };
+  }
+  
+  // Calculate second check digit (mod 11 of state code + dv1)
+  const weights2 = [7, 8, 9];
+  let sum2 = 0;
+  sum2 += parseInt(estadoCod[0]) * weights2[0];
+  sum2 += parseInt(estadoCod[1]) * weights2[1];
+  sum2 += dv1 * weights2[2];
+  
+  let resto2 = sum2 % 11;
+  let calcDv2 = resto2 === 0 ? 0 : 11 - resto2;
+  if (calcDv2 === 11) calcDv2 = 0;
+  
+  // Special rule for SP (01) and MG (02): if rest is 0, dv2 = 1
+  if ((estadoCod === '01' || estadoCod === '02') && resto2 === 0) {
+    calcDv2 = 1;
+  }
+  
+  if (calcDv2 !== dv2) {
+    return { valid: false, message: 'Título de eleitor inválido (dígito verificador 2)' };
+  }
+  
+  return { valid: true };
 };
