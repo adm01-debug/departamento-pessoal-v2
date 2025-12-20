@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  LogOut
+  LogOut,
+  History
 } from 'lucide-react';
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -34,6 +35,7 @@ const menuItems = [
   { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-store' },
   { icon: UserMinus, label: 'Desligamento', path: '/desligamento', color: 'text-destructive' },
   { icon: BarChart3, label: 'Relatórios', path: '/relatorios', color: 'text-muted-foreground' },
+  { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
 ];
 
 interface AppSidebarProps {
