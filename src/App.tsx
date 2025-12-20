@@ -27,6 +27,7 @@ import Organograma from "./pages/Organograma";
 import Onboarding from "./pages/Onboarding";
 import GestaoDocumentos from "./pages/GestaoDocumentos";
 import IntegracaoContabil from "./pages/IntegracaoContabil";
+import ContratacaoDigital from "./pages/ContratacaoDigital";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +43,7 @@ const App = () => (
             <Sonner />
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/contratacao" element={<ContratacaoDigital />} />
               <Route element={
                 <ProtectedRoute>
                   <MainLayout />
