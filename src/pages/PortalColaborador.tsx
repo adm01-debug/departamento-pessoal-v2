@@ -29,6 +29,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { gerarHoleritePDF } from '@/lib/documentosPDF';
 
 export default function PortalColaborador() {
   const { user, profile, updateProfile } = useAuth();
@@ -315,7 +316,31 @@ export default function PortalColaborador() {
                           </p>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          gerarHoleritePDF({
+                            competencia: holerite.folhas_pagamento?.competencia || 'N/A',
+                            colaborador_nome: holerite.colaborador_nome,
+                            colaborador_cpf: holerite.colaborador_cpf,
+                            colaborador_matricula: holerite.colaborador_matricula,
+                            colaborador_cargo: holerite.colaborador_cargo,
+                            colaborador_departamento: holerite.colaborador_departamento,
+                            salario_base: holerite.salario_base,
+                            total_proventos: holerite.total_proventos,
+                            total_descontos: holerite.total_descontos,
+                            liquido: holerite.liquido,
+                            valor_inss: holerite.valor_inss,
+                            valor_irrf: holerite.valor_irrf,
+                            valor_fgts: holerite.valor_fgts,
+                            horas_extras_50: holerite.horas_extras_50,
+                            horas_extras_100: holerite.horas_extras_100,
+                            faltas_dias: holerite.faltas_dias,
+                          });
+                          toast.success('PDF gerado com sucesso!');
+                        }}
+                      >
                         <Download className="h-4 w-4 mr-2" />
                         Baixar
                       </Button>

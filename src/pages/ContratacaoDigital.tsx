@@ -286,11 +286,50 @@ export default function ContratacaoDigital() {
     if (!tokenData) return;
     
     try {
+      // Capturar IP do cliente
+      let ipAddress: string | null = null;
+      try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        ipAddress = ipData.ip;
+      } catch (err) {
+        console.warn('Não foi possível capturar o IP:', err);
+      }
+
+      // Converter base64 para blob e fazer upload no Storage
+      const base64Data = assinaturaBase64.replace(/^data:image\/\w+;base64,/, '');
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+
+      const fileName = `${tokenData.admissao_id}/assinatura_${Date.now()}.png`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('assinaturas')
+        .upload(fileName, blob, { contentType: 'image/png' });
+
+      if (uploadError) {
+        console.error('Erro no upload da assinatura:', uploadError);
+        throw uploadError;
+      }
+
+      // Obter URL pública (ou signed URL se privado)
+      const { data: urlData } = supabase.storage
+        .from('assinaturas')
+        .getPublicUrl(fileName);
+
+      const assinaturaUrl = urlData?.publicUrl || fileName;
+
       const { error } = await supabase
         .from('admissao_tokens')
         .update({
           contrato_assinado: true,
-          assinatura_base64: assinaturaBase64,
+          assinatura_url: assinaturaUrl,
+          ip_assinatura: ipAddress,
           assinado_em: new Date().toISOString(),
         })
         .eq('id', tokenData.id);

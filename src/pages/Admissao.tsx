@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, AlertTriangle } from 'lucide-react';
+import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, AlertTriangle, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import { AdmissaoChecklistModal } from '@/components/admissao/AdmissaoChecklistModal';
 import { NovaAdmissaoModal, NovaAdmissaoData } from '@/components/admissao/NovaAdmissaoModal';
 import { EditarAdmissaoModal } from '@/components/admissao/EditarAdmissaoModal';
+import { ContratacaoDigitalModal } from '@/components/admissao/ContratacaoDigitalModal';
+import { CalendarioAdmissoes } from '@/components/admissao/CalendarioAdmissoes';
 import { useAdmissoes, Admissao as AdmissaoType, EtapaAdmissao } from '@/hooks/useAdmissoes';
 import { toast } from 'sonner';
 
@@ -40,6 +42,7 @@ export default function AdmissaoPage() {
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [novaAdmissaoOpen, setNovaAdmissaoOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
+  const [contratacaoDigitalOpen, setContratacaoDigitalOpen] = useState(false);
 
   // Verificar se dados pessoais estão incompletos
   const isDadosIncompletos = (adm: AdmissaoType) => {
@@ -358,15 +361,22 @@ export default function AdmissaoPage() {
           </div>
         </TabsContent>
 
-        {/* Calendário View */}
         <TabsContent value="calendario" className="mt-4">
-          <div className="p-8 rounded-lg border bg-muted/20 text-center">
-            <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">Visualização em Calendário</h3>
-            <p className="text-muted-foreground text-sm">
-              Em breve: visualize as admissões por data prevista no calendário
-            </p>
-          </div>
+          <CalendarioAdmissoes 
+            admissoes={admissoes.map(a => ({
+              id: a.id,
+              nome: a.nome,
+              cargo: a.cargo,
+              departamento: a.departamento,
+              data_prevista: a.data_prevista,
+              etapa: a.etapa
+            }))}
+            etapaLabels={etapaLabels}
+            onSelectAdmissao={(adm) => {
+              const fullAdm = admissoes.find(a => a.id === adm.id);
+              if (fullAdm) handleOpenChecklist(fullAdm);
+            }}
+          />
         </TabsContent>
       </Tabs>
 
@@ -393,6 +403,10 @@ export default function AdmissaoPage() {
           setChecklistOpen(false);
           setEditarOpen(true);
         }}
+        onOpenContratacaoDigital={() => {
+          setChecklistOpen(false);
+          setContratacaoDigitalOpen(true);
+        }}
       />
 
       <NovaAdmissaoModal
@@ -406,6 +420,12 @@ export default function AdmissaoPage() {
         onOpenChange={setEditarOpen}
         admissao={selectedAdmissao}
         onSave={handleSaveAdmissao}
+      />
+
+      <ContratacaoDigitalModal
+        open={contratacaoDigitalOpen}
+        onOpenChange={setContratacaoDigitalOpen}
+        admissao={selectedAdmissao}
       />
     </div>
   );

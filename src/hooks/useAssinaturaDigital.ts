@@ -102,6 +102,16 @@ export function useAssinaturaDigital() {
       documentoId: string; 
       assinaturaBase64: string;
     }) => {
+      // Capturar IP do cliente via API externa
+      let ipAddress: string | null = null;
+      try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        ipAddress = ipData.ip;
+      } catch (err) {
+        console.warn('Não foi possível capturar o IP:', err);
+      }
+
       const { error } = await supabase
         .from('documentos_assinatura')
         .update({
@@ -109,6 +119,7 @@ export function useAssinaturaDigital() {
           assinatura_base64: assinaturaBase64,
           assinado_em: new Date().toISOString(),
           assinado_por: user?.id,
+          ip_assinatura: ipAddress,
         })
         .eq('id', documentoId);
       

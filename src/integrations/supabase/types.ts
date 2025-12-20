@@ -19,6 +19,7 @@ export type Database = {
           admissao_id: string
           assinado_em: string | null
           assinatura_base64: string | null
+          assinatura_url: string | null
           contrato_assinado: boolean | null
           contrato_gerado: boolean | null
           created_at: string
@@ -36,6 +37,7 @@ export type Database = {
           admissao_id: string
           assinado_em?: string | null
           assinatura_base64?: string | null
+          assinatura_url?: string | null
           contrato_assinado?: boolean | null
           contrato_gerado?: boolean | null
           created_at?: string
@@ -53,6 +55,7 @@ export type Database = {
           admissao_id?: string
           assinado_em?: string | null
           assinatura_base64?: string | null
+          assinatura_url?: string | null
           contrato_assinado?: boolean | null
           contrato_gerado?: boolean | null
           created_at?: string
