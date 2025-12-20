@@ -3,9 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Afastamento, AfastamentoComColaborador, ConfigAfastamento, TipoAfastamento, StatusAfastamento } from '@/types/afastamento';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
+import { useEmpresas } from './useEmpresas';
 
 export const useAfastamentos = () => {
   const queryClient = useQueryClient();
+  const { empresaAtualId } = useEmpresas();
 
   // Buscar configurações de afastamentos
   const useConfigAfastamentos = () => {
@@ -30,7 +32,7 @@ export const useAfastamentos = () => {
     ano?: number 
   }) => {
     return useQuery({
-      queryKey: ['afastamentos', filtros],
+      queryKey: ['afastamentos', filtros, empresaAtualId],
       queryFn: async () => {
         let query = supabase
           .from('afastamentos')
@@ -40,6 +42,9 @@ export const useAfastamentos = () => {
           `)
           .order('data_inicio', { ascending: false });
         
+        if (empresaAtualId) {
+          query = query.eq('empresa_id', empresaAtualId);
+        }
         if (filtros?.colaboradorId) {
           query = query.eq('colaborador_id', filtros.colaboradorId);
         }
@@ -131,7 +136,7 @@ export const useAfastamentos = () => {
     mutationFn: async (afastamento: Omit<Afastamento, 'id' | 'created_at' | 'updated_at' | 'dias_total'>) => {
       const { data, error } = await supabase
         .from('afastamentos')
-        .insert(afastamento)
+        .insert({ ...afastamento, empresa_id: empresaAtualId })
         .select()
         .single();
       
@@ -288,9 +293,9 @@ export const useAfastamentos = () => {
   // Buscar afastamentos ativos (para alertas)
   const useAfastamentosAtivos = () => {
     return useQuery({
-      queryKey: ['afastamentos-ativos'],
+      queryKey: ['afastamentos-ativos', empresaAtualId],
       queryFn: async () => {
-        const { data, error } = await supabase
+        let query = supabase
           .from('afastamentos')
           .select(`
             *,
@@ -299,6 +304,11 @@ export const useAfastamentos = () => {
           .in('status', ['ativo', 'prorrogado'])
           .order('data_fim_prevista', { ascending: true });
         
+        if (empresaAtualId) {
+          query = query.eq('empresa_id', empresaAtualId);
+        }
+        
+        const { data, error } = await query;
         if (error) throw error;
         return data.map((a: any) => ({
           ...a,

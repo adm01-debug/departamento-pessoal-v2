@@ -12,19 +12,27 @@ import { ColaboradorDB } from '@/types/colaborador';
 import { calcularINSS, calcularIRRF, calcularFGTS, calcularINSSPatronal } from '@/lib/calculosTrabalhistas';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
+import { useEmpresas } from './useEmpresas';
 
 export function useFolhasPagamento() {
   const [folhas, setFolhas] = useState<FolhaPagamento[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { empresaAtualId } = useEmpresas();
 
   const fetchFolhas = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from('folhas_pagamento')
         .select('*')
         .order('competencia', { ascending: false });
+
+      if (empresaAtualId) {
+        query = query.eq('empresa_id', empresaAtualId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setFolhas((data || []) as FolhaPagamento[]);
@@ -34,7 +42,7 @@ export function useFolhasPagamento() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [empresaAtualId]);
 
   useEffect(() => {
     if (user) fetchFolhas();
@@ -44,7 +52,7 @@ export function useFolhasPagamento() {
     try {
       const { data, error } = await supabase
         .from('folhas_pagamento')
-        .insert([{ competencia, tipo, created_by: user?.id }])
+        .insert([{ competencia, tipo, created_by: user?.id, empresa_id: empresaAtualId }])
         .select()
         .single();
 
@@ -254,15 +262,22 @@ export function useEventosVariaveis(competencia: string) {
 export function useCalculoFolha() {
   const [calculating, setCalculating] = useState(false);
   const { user } = useAuth();
+  const { empresaAtualId } = useEmpresas();
 
   const calcularFolha = async (folhaId: string, competencia: string) => {
     setCalculating(true);
     try {
-      // 1. Buscar colaboradores ativos
-      const { data: colaboradores, error: colabError } = await supabase
+      // 1. Buscar colaboradores ativos (filtrado por empresa)
+      let queryColaboradores = supabase
         .from('colaboradores')
         .select('*')
         .eq('status', 'ativo');
+      
+      if (empresaAtualId) {
+        queryColaboradores = queryColaboradores.eq('empresa_id', empresaAtualId);
+      }
+
+      const { data: colaboradores, error: colabError } = await queryColaboradores;
 
       if (colabError) throw colabError;
       if (!colaboradores || colaboradores.length === 0) {
@@ -502,23 +517,19 @@ export function useCalculoFolha() {
         .update({
           status: 'calculada',
           data_calculo: new Date().toISOString(),
+          total_colaboradores: colaboradores.length,
           total_proventos: totalProventos,
           total_descontos: totalDescontos,
           total_liquido: totalLiquido,
           total_fgts: totalFGTS,
           total_inss_patronal: totalINSSPatronal,
-          total_colaboradores: colaboradores.length,
         })
         .eq('id', folhaId);
 
       if (updateError) throw updateError;
 
-      toast({ 
-        title: 'Folha calculada!', 
-        description: `${colaboradores.length} colaboradores processados` 
-      });
-
-      return { success: true, colaboradoresProcessados: colaboradores.length };
+      toast({ title: 'Folha calculada!', description: `${colaboradores.length} holerites gerados.` });
+      return true;
     } catch (err: any) {
       console.error('Erro ao calcular folha:', err);
       toast({ title: 'Erro no cálculo', description: err.message, variant: 'destructive' });

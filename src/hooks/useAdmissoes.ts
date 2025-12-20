@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useColaboradores } from './useColaboradores';
+import { useEmpresas } from './useEmpresas';
 
 export type EtapaAdmissao = 
   | 'solicitacao'
@@ -32,6 +33,7 @@ export interface Admissao {
   telefone?: string;
   estado_civil?: string;
   nome_mae?: string;
+  empresa_id?: string;
   created_at: string;
   updated_at: string;
   checklist_documentos_pessoais: boolean;
@@ -57,6 +59,7 @@ export interface AdmissaoInsert {
   telefone?: string;
   estado_civil?: string;
   nome_mae?: string;
+  empresa_id?: string;
 }
 
 const etapaLabels: Record<EtapaAdmissao, string> = {
@@ -86,14 +89,21 @@ export function useAdmissoes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { createColaborador } = useColaboradores();
+  const { empresaAtualId } = useEmpresas();
 
   const fetchAdmissoes = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from('admissoes')
         .select('*')
         .order('created_at', { ascending: false });
+
+      if (empresaAtualId) {
+        query = query.eq('empresa_id', empresaAtualId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setAdmissoes((data || []) as Admissao[]);
@@ -107,13 +117,13 @@ export function useAdmissoes() {
 
   useEffect(() => {
     fetchAdmissoes();
-  }, []);
+  }, [empresaAtualId]);
 
   const createAdmissao = async (data: AdmissaoInsert) => {
     try {
       const { data: newAdmissao, error } = await supabase
         .from('admissoes')
-        .insert(data)
+        .insert({ ...data, empresa_id: empresaAtualId })
         .select()
         .single();
 

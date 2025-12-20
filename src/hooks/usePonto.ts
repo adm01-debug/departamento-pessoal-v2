@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { RegistroPonto, BancoHoras, Feriado, EspelhoPonto, ResumoMensal } from '@/types/ponto';
+import { useEmpresas } from './useEmpresas';
 
 // Helper para converter interval do Postgres para minutos
 const intervalToMinutes = (interval: string | null): number => {
@@ -41,6 +42,7 @@ const calcularHorasTrabalhadas = (registro: Partial<RegistroPonto>): number => {
 
 export const usePonto = () => {
   const queryClient = useQueryClient();
+  const { empresaAtualId } = useEmpresas();
 
   // Buscar registros de ponto por colaborador e período
   const useRegistrosPonto = (colaboradorId: string | null, dataInicio: string, dataFim: string) => {
@@ -66,14 +68,19 @@ export const usePonto = () => {
   // Buscar feriados
   const useFeriados = (ano: number) => {
     return useQuery({
-      queryKey: ['feriados', ano],
+      queryKey: ['feriados', ano, empresaAtualId],
       queryFn: async () => {
-        const { data, error } = await supabase
+        let query = supabase
           .from('feriados')
           .select('*')
           .gte('data', `${ano}-01-01`)
           .lte('data', `${ano}-12-31`);
         
+        if (empresaAtualId) {
+          query = query.or(`empresa_id.eq.${empresaAtualId},empresa_id.is.null`);
+        }
+        
+        const { data, error } = await query;
         if (error) throw error;
         return data as Feriado[];
       }
@@ -133,6 +140,7 @@ export const usePonto = () => {
         .from('registros_ponto')
         .upsert({
           ...registro,
+          empresa_id: empresaAtualId,
           horas_trabalhadas: horasTrabalhadas + ':00',
           horas_extras: horasExtras,
           horas_falta: horasFalta
@@ -292,4 +300,36 @@ export const usePonto = () => {
     calcularResumoMensal,
     isRegistrando: registrarPontoMutation.isPending
   };
+};
+
+// Hook para resumo de ponto (sem alterações significativas, apenas adicionando empresa)
+export const useResumoPonto = (competencia: string) => {
+  const { empresaAtualId } = useEmpresas();
+  
+  return useQuery({
+    queryKey: ['resumo-ponto', competencia, empresaAtualId],
+    queryFn: async () => {
+      const [ano, mes] = competencia.split('-').map(Number);
+      const dataInicio = `${competencia}-01`;
+      const ultimoDia = new Date(ano, mes, 0).getDate();
+      const dataFim = `${competencia}-${ultimoDia}`;
+
+      let query = supabase
+        .from('registros_ponto')
+        .select(`
+          *,
+          colaboradores!inner(nome_completo, cargo, departamento, empresa_id)
+        `)
+        .gte('data', dataInicio)
+        .lte('data', dataFim);
+
+      if (empresaAtualId) {
+        query = query.eq('empresa_id', empresaAtualId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    }
+  });
 };

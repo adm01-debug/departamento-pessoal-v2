@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { PeriodoAquisitivo, Ferias, CalculoFerias, StatusFerias } from '@/types/ferias';
 import { calcularINSS, calcularIRRF } from '@/lib/calculosTrabalhistas';
 import { addDays, differenceInDays, addYears, format, parseISO } from 'date-fns';
+import { useEmpresas } from './useEmpresas';
 
 // Calcular dias de direito baseado em faltas (CLT Art. 130)
 export const calcularDiasDireito = (faltas: number): number => {
@@ -67,6 +68,7 @@ export const calcularFerias = (
 
 export const useFerias = () => {
   const queryClient = useQueryClient();
+  const { empresaAtualId } = useEmpresas();
 
   // Buscar períodos aquisitivos de um colaborador
   const usePeriodosAquisitivos = (colaboradorId: string | null) => {
@@ -90,7 +92,7 @@ export const useFerias = () => {
   // Buscar todas as férias (com filtros opcionais)
   const useFeriasQuery = (filtros?: { colaboradorId?: string; status?: StatusFerias; ano?: number }) => {
     return useQuery({
-      queryKey: ['ferias', filtros],
+      queryKey: ['ferias', filtros, empresaAtualId],
       queryFn: async () => {
         let query = supabase
           .from('ferias')
@@ -100,6 +102,9 @@ export const useFerias = () => {
           `)
           .order('data_inicio', { ascending: true });
         
+        if (empresaAtualId) {
+          query = query.eq('empresa_id', empresaAtualId);
+        }
         if (filtros?.colaboradorId) {
           query = query.eq('colaborador_id', filtros.colaboradorId);
         }
@@ -191,7 +196,7 @@ export const useFerias = () => {
     mutationFn: async (ferias: Omit<Ferias, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('ferias')
-        .insert(ferias)
+        .insert({ ...ferias, empresa_id: empresaAtualId })
         .select()
         .single();
       
