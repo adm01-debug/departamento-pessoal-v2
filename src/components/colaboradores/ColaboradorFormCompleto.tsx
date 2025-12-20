@@ -15,7 +15,7 @@ import {
   UserPlus, Pencil, Loader2, User, FileText, MapPin, 
   Building2, Banknote, GraduationCap, Clock, Save, Search
 } from 'lucide-react';
-import { validateCPF, validatePIS, validateRG, getRGFormatInfo, validateTituloEleitor, unmask } from '@/lib/masks';
+import { validateCPF, validatePIS, validateRG, getRGFormatInfo, validateTituloEleitor, validateCNH, unmask } from '@/lib/masks';
 import {
   ColaboradorDB,
   EstadoCivil,
@@ -144,6 +144,18 @@ const colaboradorSchema = z.object({
         code: z.ZodIssueCode.custom,
         message: result.message || 'Título de eleitor inválido',
         path: ['titulo_eleitor'],
+      });
+    }
+  }
+  
+  // Validação de CNH
+  if (data.cnh_numero && data.cnh_numero.trim()) {
+    const result = validateCNH(data.cnh_numero);
+    if (!result.valid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: result.message || 'CNH inválida',
+        path: ['cnh_numero'],
       });
     }
   }
@@ -677,7 +689,16 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                     <FormField control={form.control} name="cnh_numero" render={({ field }) => (
                       <FormItem>
                         <FormLabel>CNH - Número</FormLabel>
-                        <FormControl><Input placeholder="Número" {...field} className="bg-background" /></FormControl>
+                        <FormControl>
+                          <MaskedInput 
+                            mask="cnh" 
+                            placeholder="00000000000" 
+                            value={field.value || ''} 
+                            onValueChange={(_, masked) => field.onChange(masked)} 
+                            className="bg-background font-mono" 
+                          />
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )} />
 

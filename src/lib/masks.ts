@@ -1,6 +1,6 @@
 // Mask utility functions for Brazilian document formats
 
-export type MaskType = 'cpf' | 'cnpj' | 'cpfCnpj' | 'phone' | 'cep' | 'date' | 'currency' | 'rg' | 'pis' | 'tituloEleitor';
+export type MaskType = 'cpf' | 'cnpj' | 'cpfCnpj' | 'phone' | 'cep' | 'date' | 'currency' | 'rg' | 'pis' | 'tituloEleitor' | 'cnh';
 
 const onlyDigits = (value: string): string => value.replace(/\D/g, '');
 
@@ -80,6 +80,11 @@ export const masks = {
     if (digits.length <= 8) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
     return `${digits.slice(0, 4)} ${digits.slice(4, 8)} ${digits.slice(8)}`;
   },
+
+  cnh: (value: string): string => {
+    const digits = onlyDigits(value).slice(0, 11);
+    return digits;
+  },
 };
 
 export const placeholders: Record<MaskType, string> = {
@@ -93,6 +98,7 @@ export const placeholders: Record<MaskType, string> = {
   rg: '00.000.000-0',
   pis: '000.00000.00-0',
   tituloEleitor: '0000 0000 0000',
+  cnh: '00000000000',
 };
 
 export const unmask = (value: string): string => onlyDigits(value);
@@ -344,6 +350,59 @@ export const validateTituloEleitor = (titulo: string): { valid: boolean; message
   
   if (calcDv2 !== dv2) {
     return { valid: false, message: 'Título de eleitor inválido (dígito verificador 2)' };
+  }
+  
+  return { valid: true };
+};
+
+// CNH (Carteira Nacional de Habilitação) validation
+// CNH has 11 digits: 9 sequential digits + 2 check digits
+export const validateCNH = (cnh: string): { valid: boolean; message?: string } => {
+  if (!cnh) return { valid: true }; // Optional field
+  
+  const digits = onlyDigits(cnh);
+  
+  if (digits.length === 0) return { valid: true };
+  
+  if (digits.length !== 11) {
+    return { valid: false, message: 'CNH deve ter 11 dígitos' };
+  }
+  
+  // Check for all same digits (invalid)
+  if (/^(\d)\1{10}$/.test(digits)) {
+    return { valid: false, message: 'CNH inválida' };
+  }
+  
+  // Calculate first check digit
+  let sum1 = 0;
+  let dsc = 0;
+  
+  for (let i = 0, j = 9; i < 9; i++, j--) {
+    sum1 += parseInt(digits[i]) * j;
+  }
+  
+  let resto1 = sum1 % 11;
+  let dv1 = resto1 >= 10 ? 0 : resto1;
+  
+  if (resto1 === 10) {
+    dsc = 2;
+  }
+  
+  // Calculate second check digit
+  let sum2 = 0;
+  
+  for (let i = 0, j = 1; i < 9; i++, j++) {
+    sum2 += parseInt(digits[i]) * j;
+  }
+  
+  let resto2 = (sum2 % 11) - dsc;
+  let dv2 = resto2 < 0 ? resto2 + 11 : (resto2 >= 10 ? 0 : resto2);
+  
+  const calcDv = `${dv1}${dv2}`;
+  const actualDv = digits.slice(9);
+  
+  if (calcDv !== actualDv) {
+    return { valid: false, message: 'CNH inválida (dígitos verificadores incorretos)' };
   }
   
   return { valid: true };
