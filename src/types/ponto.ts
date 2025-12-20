@@ -7,6 +7,7 @@ export type TipoFeriado = 'nacional' | 'estadual' | 'municipal' | 'facultativo';
 export interface RegistroPonto {
   id: string;
   colaborador_id: string;
+  empresa_id?: string | null;
   data: string;
   entrada_1: string | null;
   saida_1: string | null;

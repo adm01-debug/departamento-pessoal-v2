@@ -19,6 +19,7 @@ export interface DadosCNPJ {
   complemento: string;
   bairro: string;
   municipio: string;
+  cidade: string;
   uf: string;
   cep: string;
   telefone: string;
@@ -72,6 +73,7 @@ export function useConsultaCNPJ() {
         complemento: data.complemento || '',
         bairro: data.bairro || '',
         municipio: data.municipio || '',
+        cidade: data.municipio || '',
         uf: data.uf || '',
         cep: data.cep || '',
         telefone: data.telefone || '',

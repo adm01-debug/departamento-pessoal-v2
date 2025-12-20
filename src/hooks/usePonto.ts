@@ -202,10 +202,11 @@ export const usePonto = () => {
     let totalMinutosExtras = 0;
     let totalMinutosFalta = 0;
 
-    (registros || []).forEach((reg: RegistroPonto) => {
-      totalMinutosTrabalhados += intervalToMinutes(reg.horas_trabalhadas);
-      totalMinutosExtras += intervalToMinutes(reg.horas_extras);
-      totalMinutosFalta += intervalToMinutes(reg.horas_falta);
+    (registros || []).forEach((reg) => {
+      const registro = reg as RegistroPonto;
+      totalMinutosTrabalhados += intervalToMinutes(registro.horas_trabalhadas);
+      totalMinutosExtras += intervalToMinutes(registro.horas_extras);
+      totalMinutosFalta += intervalToMinutes(registro.horas_falta);
     });
 
     // Buscar saldo do banco de horas

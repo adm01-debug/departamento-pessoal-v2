@@ -14,7 +14,8 @@ import {
   Search,
   LogOut,
   History,
-  Calendar
+  Calendar,
+  Building2
 } from 'lucide-react';
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -24,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', color: 'text-primary' },
@@ -73,30 +75,38 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
       )}
     >
       {/* Header */}
-      <div className="p-4 border-b border-sidebar-border flex items-center justify-between">
+      <div className="p-4 border-b border-sidebar-border flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          {!collapsed && (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="font-display font-bold text-foreground text-sm">Sistema DP</h1>
+                <p className="text-xs text-muted-foreground">Depto. Pessoal</p>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-1">
+            <NotificacoesDropdown />
+            <ThemeToggle />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setCollapsed(!collapsed)}
+              className="h-8 w-8"
+            >
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </Button>
+          </div>
+        </div>
+        {/* Seletor de Empresa */}
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-              <Users className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="font-display font-bold text-foreground text-sm">Promo Brindes</h1>
-              <p className="text-xs text-muted-foreground">Depto. Pessoal</p>
-            </div>
+          <div className="pt-2">
+            <EmpresaSelector />
           </div>
         )}
-        <div className="flex items-center gap-1">
-          <NotificacoesDropdown />
-          <ThemeToggle />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setCollapsed(!collapsed)}
-            className="h-8 w-8"
-          >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-        </div>
       </div>
 
       {/* Search Button */}
