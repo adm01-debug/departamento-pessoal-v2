@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { ExportDropdown } from '@/components/ExportDropdown';
+import { formatters, ExportColumn } from '@/lib/exportUtils';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { useFerias, calcularFerias, calcularDiasDireito } from '@/hooks/useFerias';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
@@ -172,10 +174,34 @@ export default function Ferias() {
           <h1 className="text-2xl font-display font-bold text-foreground">Férias</h1>
           <p className="text-muted-foreground text-sm">Gestão de férias e períodos aquisitivos</p>
         </div>
-        <Button className="gap-2" onClick={() => setDialogOpen(true)}>
-          <Plus className="w-4 h-4" />
-          Programar Férias
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            defaultFilename={`ferias_${anoFiltro}`}
+            options={{
+              title: `Relatório de Férias - ${anoFiltro}`,
+              subtitle: `Total: ${ferias?.length || 0} registros`,
+              columns: [
+                { key: 'colaborador_nome', header: 'Colaborador', width: 30 },
+                { key: 'data_inicio', header: 'Início', width: 12, format: formatters.date },
+                { key: 'data_fim', header: 'Fim', width: 12, format: formatters.date },
+                { key: 'dias_gozo', header: 'Dias Gozo', width: 10 },
+                { key: 'dias_abono', header: 'Abono', width: 8 },
+                { key: 'valor_total', header: 'Valor Bruto', width: 15, format: formatters.currency },
+                { key: 'valor_liquido', header: 'Valor Líquido', width: 15, format: formatters.currency },
+                { key: 'status', header: 'Status', width: 12 },
+              ] as ExportColumn[],
+              data: (ferias || []).map(f => ({
+                ...f,
+                colaborador_nome: colaboradoresAtivos.find(c => c.id === f.colaborador_id)?.nome_completo || '-',
+              })) as unknown as Record<string, unknown>[],
+            }}
+            disabled={!ferias || ferias.length === 0}
+          />
+          <Button className="gap-2" onClick={() => setDialogOpen(true)}>
+            <Plus className="w-4 h-4" />
+            Programar Férias
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

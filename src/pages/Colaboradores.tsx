@@ -6,11 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ColaboradorFormCompleto, ColaboradorFormData } from '@/components/colaboradores/ColaboradorFormCompleto';
+import { ExportDropdown } from '@/components/ExportDropdown';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { ColaboradorDB, statusColaboradorLabels } from '@/types/colaborador';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { unmask } from '@/lib/masks';
+import { formatters, ExportColumn } from '@/lib/exportUtils';
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
@@ -299,10 +301,32 @@ export default function Colaboradores() {
           <h1 className="text-2xl font-display font-bold text-foreground">Colaboradores</h1>
           <p className="text-muted-foreground text-sm">Gestão completa do cadastro de colaboradores</p>
         </div>
-        <Button className="gap-2" onClick={handleOpenNewModal}>
-          <Plus className="w-4 h-4" />
-          Novo Colaborador
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            defaultFilename="colaboradores"
+            options={{
+              title: 'Relatório de Colaboradores',
+              subtitle: `Total: ${filteredColaboradores.length} colaboradores`,
+              columns: [
+                { key: 'nome_completo', header: 'Nome', width: 30 },
+                { key: 'cpf', header: 'CPF', width: 15, format: formatters.cpf },
+                { key: 'cargo', header: 'Cargo', width: 20 },
+                { key: 'departamento', header: 'Departamento', width: 20 },
+                { key: 'data_admissao', header: 'Admissão', width: 12, format: formatters.date },
+                { key: 'salario_base', header: 'Salário', width: 15, format: formatters.currency },
+                { key: 'status', header: 'Status', width: 12, format: formatters.status },
+                { key: 'email', header: 'E-mail', width: 25 },
+                { key: 'celular', header: 'Celular', width: 15, format: formatters.phone },
+              ] as ExportColumn[],
+              data: filteredColaboradores as unknown as Record<string, unknown>[],
+            }}
+            disabled={filteredColaboradores.length === 0}
+          />
+          <Button className="gap-2" onClick={handleOpenNewModal}>
+            <Plus className="w-4 h-4" />
+            Novo Colaborador
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}

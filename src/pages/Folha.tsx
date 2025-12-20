@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { ExportDropdown } from '@/components/ExportDropdown';
+import { formatters, ExportColumn } from '@/lib/exportUtils';
 import { 
   useFolhasPagamento, 
   useHolerites, 
@@ -228,16 +230,42 @@ export default function Folha() {
 
           {/* Tabs: Holerites / Eventos */}
           <Tabs defaultValue="holerites" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="holerites" className="gap-2">
-                <Users className="w-4 h-4" />
-                Holerites ({holerites.length})
-              </TabsTrigger>
-              <TabsTrigger value="eventos" className="gap-2">
-                <FileText className="w-4 h-4" />
-                Eventos Variáveis ({eventos.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="holerites" className="gap-2">
+                  <Users className="w-4 h-4" />
+                  Holerites ({holerites.length})
+                </TabsTrigger>
+                <TabsTrigger value="eventos" className="gap-2">
+                  <FileText className="w-4 h-4" />
+                  Eventos Variáveis ({eventos.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              {holerites.length > 0 && (
+                <ExportDropdown
+                  defaultFilename={`folha_${selectedFolha.competencia}`}
+                  options={{
+                    title: `Folha de Pagamento - ${formatCompetenciaFull(selectedFolha.competencia)}`,
+                    subtitle: `Total: ${holerites.length} colaboradores | Líquido: ${formatCurrency(selectedFolha.total_liquido)}`,
+                    columns: [
+                      { key: 'colaborador_nome', header: 'Colaborador', width: 30 },
+                      { key: 'colaborador_matricula', header: 'Matrícula', width: 12 },
+                      { key: 'colaborador_cargo', header: 'Cargo', width: 20 },
+                      { key: 'colaborador_departamento', header: 'Departamento', width: 18 },
+                      { key: 'salario_base', header: 'Salário Base', width: 15, format: formatters.currency },
+                      { key: 'total_proventos', header: 'Proventos', width: 15, format: formatters.currency },
+                      { key: 'total_descontos', header: 'Descontos', width: 15, format: formatters.currency },
+                      { key: 'liquido', header: 'Líquido', width: 15, format: formatters.currency },
+                      { key: 'valor_fgts', header: 'FGTS', width: 12, format: formatters.currency },
+                      { key: 'valor_inss', header: 'INSS', width: 12, format: formatters.currency },
+                      { key: 'valor_irrf', header: 'IRRF', width: 12, format: formatters.currency },
+                    ] as ExportColumn[],
+                    data: holerites as unknown as Record<string, unknown>[],
+                  }}
+                />
+              )}
+            </div>
 
             <TabsContent value="holerites">
               {loadingHolerites ? (
