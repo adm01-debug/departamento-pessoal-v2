@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { RegistroPonto, BancoHoras, Feriado, EspelhoPonto, ResumoMensal } from '@/types/ponto';
 import { useEmpresas } from './useEmpresas';
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 // Helper para converter interval do Postgres para minutos
 const intervalToMinutes = (interval: string | null): number => {
