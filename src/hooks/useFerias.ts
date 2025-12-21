@@ -5,6 +5,7 @@ import { PeriodoAquisitivo, Ferias, CalculoFerias, StatusFerias } from '@/types/
 import { calcularINSS, calcularIRRF } from '@/lib/calculosTrabalhistas';
 import { addDays, differenceInDays, addYears, format, parseISO } from 'date-fns';
 import { useEmpresas } from './useEmpresas';
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 // Calcular dias de direito baseado em faltas (CLT Art. 130)
 export const calcularDiasDireito = (faltas: number): number => {
@@ -119,7 +120,7 @@ export const useFerias = () => {
         const { data, error } = await query;
         if (error) throw error;
         
-        return data.map((f: any) => ({
+        return data.map((f: unknown) => ({
           ...f,
           colaborador_nome: f.colaboradores?.nome_completo,
           colaborador_cargo: f.colaboradores?.cargo,
