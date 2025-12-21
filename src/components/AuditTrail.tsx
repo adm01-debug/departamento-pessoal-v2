@@ -2,19 +2,22 @@ import { Activity, User, Clock, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAuditoria, TipoAcao, Entidade } from '@/hooks/useAuditoria';
+import { useHistoricoRegistro, AuditLog } from '@/hooks/useAuditoria';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 interface AuditTrailProps {
-  entidade: Entidade;
+  entidade: string;
   entidadeId: string;
   maxItems?: number;
   className?: string;
 }
 
-const acaoLabels: Record<TipoAcao, string> = {
+const acaoLabels: Record<string, string> = {
+  INSERT: 'Criou',
+  UPDATE: 'Editou',
+  DELETE: 'Excluiu',
   criar: 'Criou',
   editar: 'Editou',
   excluir: 'Excluiu',
@@ -28,7 +31,10 @@ const acaoLabels: Record<TipoAcao, string> = {
   sync: 'Sincronizou',
 };
 
-const acaoColors: Record<TipoAcao, string> = {
+const acaoColors: Record<string, string> = {
+  INSERT: 'bg-success/20 text-success',
+  UPDATE: 'bg-info/20 text-info',
+  DELETE: 'bg-destructive/20 text-destructive',
   criar: 'bg-success/20 text-success',
   editar: 'bg-info/20 text-info',
   excluir: 'bg-destructive/20 text-destructive',
@@ -43,8 +49,7 @@ const acaoColors: Record<TipoAcao, string> = {
 };
 
 export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: AuditTrailProps) {
-  const { useLogsPorEntidade } = useAuditoria();
-  const { data: logs, isLoading } = useLogsPorEntidade(entidade, entidadeId);
+  const { data: logs = [], isLoading } = useHistoricoRegistro(entidade, entidadeId);
 
   if (isLoading) {
     return (
@@ -74,7 +79,7 @@ export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: A
   return (
     <ScrollArea className={cn("h-[300px]", className)}>
       <div className="space-y-4 pr-4">
-        {logs.slice(0, maxItems).map((log, index) => (
+        {logs.slice(0, maxItems).map((log: AuditLog, index: number) => (
           <div key={log.id} className="relative flex gap-3">
             {/* Timeline line */}
             {index < logs.slice(0, maxItems).length - 1 && (
@@ -84,7 +89,7 @@ export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: A
             {/* Icon */}
             <div className={cn(
               "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10",
-              acaoColors[log.acao as TipoAcao]
+              acaoColors[log.acao] || 'bg-muted'
             )}>
               <FileText className="w-4 h-4" />
             </div>
@@ -93,7 +98,7 @@ export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: A
             <div className="flex-1 min-w-0 pb-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline" className="text-xs">
-                  {acaoLabels[log.acao as TipoAcao]}
+                  {acaoLabels[log.acao] || log.acao}
                 </Badge>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="w-3 h-3" />
@@ -101,7 +106,7 @@ export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: A
                 </span>
               </div>
               
-              <p className="text-sm mt-1">{log.descricao}</p>
+              <p className="text-sm mt-1">{log.descricao || `Ação: ${log.acao} na tabela ${log.tabela}`}</p>
               
               {log.user_email && (
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
