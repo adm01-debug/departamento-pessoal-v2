@@ -70,7 +70,7 @@ export default function Assinaturas() {
     setTitulo('');
   };
 
-  const handleAssinar = (doc: any) => {
+  const handleAssinar = (doc: unknown) => {
     setDocumentoSelecionado(doc);
     setAssinarModalOpen(true);
   };
@@ -104,7 +104,7 @@ export default function Assinaturas() {
     }
   };
 
-  const filtrarDocumentos = (docs: any[]) => {
+  const filtrarDocumentos = (docs: unknown[]) => {
     return docs.filter(d => 
       d.titulo?.toLowerCase().includes(search.toLowerCase()) ||
       d.colaboradores?.nome_completo?.toLowerCase().includes(search.toLowerCase()) ||
@@ -214,7 +214,7 @@ export default function Assinaturas() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {filtrarDocumentos(documentosPendentes).map((doc: any) => (
+                    {filtrarDocumentos(documentosPendentes).map((doc: unknown) => (
                       <div 
                         key={doc.id}
                         className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -282,7 +282,7 @@ export default function Assinaturas() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {filtrarDocumentos(documentosAssinados).map((doc: any) => (
+                    {filtrarDocumentos(documentosAssinados).map((doc: unknown) => (
                       <div 
                         key={doc.id}
                         className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
