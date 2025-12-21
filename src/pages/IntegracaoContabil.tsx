@@ -166,8 +166,7 @@ export default function IntegracaoContabil() {
   const exportarCSV = (dados: unknown[]) => {
     const headers = Object.keys(dados[0]).join(';');
     const rows = dados.map(d => Object.values(d).join(';'));
-    const csv = [headers, ...rows].join('
-');
+    const csv = [headers, ...rows].join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -187,14 +186,12 @@ export default function IntegracaoContabil() {
         txt += `${d.nome.substring(0, 40).padEnd(40, ' ')}`;
         txt += `${(d.salario_base * 100).toFixed(0).padStart(12, '0')}`;
         txt += `${(d.liquido * 100).toFixed(0).padStart(12, '0')}`;
-        txt += '
-';
+        txt += '\n';
       });
     } else {
       // Formato padrão (legível)
       dados.forEach(d => {
-        txt += `CPF: ${d.cpf} | Nome: ${d.nome} | Líquido: R$ ${d.liquido.toFixed(2)}
-`;
+        txt += `CPF: ${d.cpf} | Nome: ${d.nome} | Líquido: R$ ${d.liquido.toFixed(2)}\n`;
       });
     }
     

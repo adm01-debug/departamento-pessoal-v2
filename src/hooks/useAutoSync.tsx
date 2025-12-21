@@ -280,13 +280,13 @@ export function useAutoSync() {
 // COMPONENTE: AutoSyncStatus
 // ============================================
 
-export function AutoSyncStatusBadge() {
+export function AutoSyncStatusBadge(): JSX.Element {
   const { config, status } = useAutoSync();
 
   if (!config?.habilitado) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
-        <span className="w-2 h-2 rounded-full bg-muted-foreground"></span>
+        <span className="w-2 h-2 rounded-full bg-muted-foreground" />
         Auto-sync desabilitado
       </span>
     );
@@ -295,7 +295,7 @@ export function AutoSyncStatusBadge() {
   if (status.rodando) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-info/20 text-info">
-        <span className="w-2 h-2 rounded-full bg-info animate-pulse"></span>
+        <span className="w-2 h-2 rounded-full bg-info animate-pulse" />
         Sincronizando...
       </span>
     );
@@ -304,7 +304,7 @@ export function AutoSyncStatusBadge() {
   if (status.erro) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-destructive/20 text-destructive">
-        <span className="w-2 h-2 rounded-full bg-destructive"></span>
+        <span className="w-2 h-2 rounded-full bg-destructive" />
         Erro no último sync
       </span>
     );
@@ -312,7 +312,7 @@ export function AutoSyncStatusBadge() {
 
   return (
     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-success/20 text-success">
-      <span className="w-2 h-2 rounded-full bg-success"></span>
+      <span className="w-2 h-2 rounded-full bg-success" />
       Auto-sync ativo
     </span>
   );

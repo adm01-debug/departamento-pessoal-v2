@@ -89,5 +89,5 @@ export const sanitizeColaborador = (data: Record<string, unknown>): Record<strin
 // Previne SQL injection em strings (para uso em queries raw)
 export const escapeSql = (str: string): string => {
   if (!str) return '';
-  return str.replace(/'/g, "''").replace(/\/g, '\\');
+  return str.replace(/'/g, "''").replace(/\\/g, '\\\\');
 };

@@ -25,16 +25,12 @@ const formatoDescricao: Record<FormatoArquivo, { label: string; descricao: strin
   csv: {
     label: 'CSV (Planilha)',
     descricao: 'Arquivo separado por vírgula ou ponto-e-vírgula',
-    exemplo: 'matricula;data;entrada_1;saida_1;entrada_2;saida_2
-001;2025-12-01;08:00;12:00;13:00;17:00',
+    exemplo: 'matricula;data;entrada_1;saida_1;entrada_2;saida_2\n001;2025-12-01;08:00;12:00;13:00;17:00',
   },
   txt_rep: {
     label: 'TXT REP (Relógio)',
     descricao: 'Arquivo de registro eletrônico de ponto',
-    exemplo: '001|01122025|0800
-001|01122025|1200
-001|01122025|1300
-001|01122025|1700',
+    exemplo: '001|01122025|0800\n001|01122025|1200\n001|01122025|1300\n001|01122025|1700',
   },
 };
 

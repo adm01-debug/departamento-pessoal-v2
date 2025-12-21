@@ -278,8 +278,7 @@ export const usePontoMelhorado = () => {
 
     try {
       const texto = await arquivo.text();
-      const linhas = texto.split('
-').filter(l => l.trim());
+      const linhas = texto.split('\n').filter(l => l.trim());
       
       // Buscar colaboradores para mapear
       const { data: colaboradores } = await supabase

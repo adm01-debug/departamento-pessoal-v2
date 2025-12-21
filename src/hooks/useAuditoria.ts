@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Tipos exportados para uso em componentes
+export type TipoAcao = 'criar' | 'editar' | 'excluir' | 'visualizar' | 'exportar' | 'importar' | 'aprovar' | 'rejeitar' | 'login' | 'logout' | 'sync';
+export type Entidade = 'colaborador' | 'admissao' | 'desligamento' | 'ferias' | 'afastamento' | 'ponto' | 'folha' | 'empresa';
+
 export interface AuditLog {
   id: string;
   tabela: string;
@@ -14,6 +18,7 @@ export interface AuditLog {
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;
+  descricao?: string;
 }
 
 interface FiltrosAuditoria {
