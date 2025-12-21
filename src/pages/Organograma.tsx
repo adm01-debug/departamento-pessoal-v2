@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 
 interface DepartmentNode {
   name: string;
-  colaboradores: any[];
+  colaboradores: unknown[];
   expanded: boolean;
 }
 
@@ -147,7 +147,7 @@ export default function Organograma() {
               />
             </div>
 
-            <Select value={viewMode} onValueChange={(v: any) => setViewMode(v)}>
+            <Select value={viewMode} onValueChange={(v: unknown) => setViewMode(v)}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>

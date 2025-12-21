@@ -59,7 +59,7 @@ export function useRelatorios() {
       let query = supabase.from('colaboradores').select('*');
       
       if (filtro?.departamento) query = query.eq('departamento', filtro.departamento);
-      if (filtro?.status) query = query.eq('status', filtro.status as any);
+      if (filtro?.status) query = query.eq('status', filtro.status as unknown);
       
       const { data, error } = await query.order('nome_completo');
       if (error) throw error;
@@ -339,7 +339,7 @@ export function useRelatorios() {
       
       if (error) throw error;
 
-      const resultado = (data || []).map((f: any) => ({
+      const resultado = (data || []).map((f: unknown) => ({
         colaborador: f.colaboradores?.nome_completo,
         departamento: f.colaboradores?.departamento,
         data_inicio: f.data_inicio,
@@ -386,7 +386,7 @@ export function useRelatorios() {
       if (error) throw error;
 
       const hoje = new Date();
-      const resultado = (data || []).map((p: any) => {
+      const resultado = (data || []).map((p: unknown) => {
         const dataLimite = new Date(p.data_fim);
         dataLimite.setFullYear(dataLimite.getFullYear() + 1);
         const diasRestantes = differenceInDays(dataLimite, hoje);
@@ -402,7 +402,7 @@ export function useRelatorios() {
           dias_restantes: diasRestantes,
           situacao: diasRestantes < 0 ? 'VENCIDO' : diasRestantes < 30 ? 'URGENTE' : 'OK',
         };
-      }).filter((p: any) => p.dias_restantes < 90);
+      }).filter((p: unknown) => p.dias_restantes < 90);
 
       const columns: ExportColumn[] = [
         { key: 'colaborador', header: 'Colaborador', width: 25 },
@@ -443,7 +443,7 @@ export function useRelatorios() {
       const { data, error } = await query.order('tipo');
       if (error) throw error;
 
-      const resultado = (data || []).map((a: any) => ({
+      const resultado = (data || []).map((a: unknown) => ({
         colaborador: a.colaboradores?.nome_completo,
         departamento: a.colaboradores?.departamento,
         tipo: a.tipo.replace(/_/g, ' ').toUpperCase(),
@@ -504,8 +504,8 @@ export function useRelatorios() {
         }
         acc[c.departamento].total++;
         
-        const afastColab = (afastamentos || []).filter((a: any) => a.colaborador_id === c.id);
-        afastColab.forEach((a: any) => {
+        const afastColab = (afastamentos || []).filter((a: unknown) => a.colaborador_id === c.id);
+        afastColab.forEach((a: unknown) => {
           acc[c.departamento].diasPerdidos += a.dias_total || 0;
         });
         
@@ -618,7 +618,7 @@ export function useRelatorios() {
         falecimento: 'Falecimento',
       };
 
-      const resultado = (data || []).map((d: any) => ({
+      const resultado = (data || []).map((d: unknown) => ({
         colaborador: d.colaboradores?.nome_completo,
         departamento: d.colaboradores?.departamento,
         cargo: d.colaboradores?.cargo,
@@ -675,7 +675,7 @@ export function useRelatorios() {
       
       if (error) throw error;
 
-      const resultado = (data || []).map((r: any) => ({
+      const resultado = (data || []).map((r: unknown) => ({
         data: r.data,
         tipo: r.tipo_dia,
         entrada_1: r.entrada_1 || '-',
@@ -725,7 +725,7 @@ export function useRelatorios() {
       const { data: colaboradores, error } = await query;
       if (error) throw error;
 
-      const resultado: any[] = [];
+      const resultado: unknown[] = [];
       
       for (const colab of colaboradores || []) {
         const { data: banco } = await supabase

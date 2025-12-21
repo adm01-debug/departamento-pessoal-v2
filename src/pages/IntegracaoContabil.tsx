@@ -87,7 +87,7 @@ export default function IntegracaoContabil() {
     enabled: !!config.competencia
   });
 
-  const competencias = [...new Set(folhas.map((f: any) => f.competencia))];
+  const competencias = [...new Set(folhas.map((f: unknown) => f.competencia))];
 
   const handleExportar = async () => {
     if (holerites.length === 0) {
@@ -116,9 +116,9 @@ export default function IntegracaoContabil() {
   };
 
   const gerarDadosExportacao = () => {
-    const linhas: any[] = [];
+    const linhas: unknown[] = [];
     
-    holerites.forEach((holerite: any) => {
+    holerites.forEach((holerite: unknown) => {
       // Linha do colaborador
       const linhaBase = {
         competencia: config.competencia,
@@ -142,7 +142,7 @@ export default function IntegracaoContabil() {
     return linhas;
   };
 
-  const exportarXLSX = (dados: any[]) => {
+  const exportarXLSX = (dados: unknown[]) => {
     const ws = XLSX.utils.json_to_sheet(dados);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Folha de Pagamento');
@@ -163,10 +163,11 @@ export default function IntegracaoContabil() {
     XLSX.writeFile(wb, `folha_${config.competencia}_${config.layout}.xlsx`);
   };
 
-  const exportarCSV = (dados: any[]) => {
+  const exportarCSV = (dados: unknown[]) => {
     const headers = Object.keys(dados[0]).join(';');
     const rows = dados.map(d => Object.values(d).join(';'));
-    const csv = [headers, ...rows].join('\n');
+    const csv = [headers, ...rows].join('
+');
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -175,7 +176,7 @@ export default function IntegracaoContabil() {
     link.click();
   };
 
-  const exportarTXT = (dados: any[]) => {
+  const exportarTXT = (dados: unknown[]) => {
     let txt = '';
     
     if (config.layout === 'dominio') {
@@ -186,12 +187,14 @@ export default function IntegracaoContabil() {
         txt += `${d.nome.substring(0, 40).padEnd(40, ' ')}`;
         txt += `${(d.salario_base * 100).toFixed(0).padStart(12, '0')}`;
         txt += `${(d.liquido * 100).toFixed(0).padStart(12, '0')}`;
-        txt += '\n';
+        txt += '
+';
       });
     } else {
       // Formato padrão (legível)
       dados.forEach(d => {
-        txt += `CPF: ${d.cpf} | Nome: ${d.nome} | Líquido: R$ ${d.liquido.toFixed(2)}\n`;
+        txt += `CPF: ${d.cpf} | Nome: ${d.nome} | Líquido: R$ ${d.liquido.toFixed(2)}
+`;
       });
     }
     
@@ -252,7 +255,7 @@ export default function IntegracaoContabil() {
                 <Label>Layout do Sistema</Label>
                 <Select 
                   value={config.layout} 
-                  onValueChange={(v: any) => setConfig(prev => ({ ...prev, layout: v }))}
+                  onValueChange={(v: unknown) => setConfig(prev => ({ ...prev, layout: v }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -269,7 +272,7 @@ export default function IntegracaoContabil() {
                 <Label>Formato do Arquivo</Label>
                 <Select 
                   value={config.formato} 
-                  onValueChange={(v: any) => setConfig(prev => ({ ...prev, formato: v }))}
+                  onValueChange={(v: unknown) => setConfig(prev => ({ ...prev, formato: v }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -342,21 +345,21 @@ export default function IntegracaoContabil() {
                   <span className="text-sm">Total Proventos</span>
                   <span className="font-medium text-success">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                      .format(holerites.reduce((sum: number, h: any) => sum + h.total_proventos, 0))}
+                      .format(holerites.reduce((sum: number, h: unknown) => sum + h.total_proventos, 0))}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 rounded-lg bg-destructive/10">
                   <span className="text-sm">Total Descontos</span>
                   <span className="font-medium text-destructive">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                      .format(holerites.reduce((sum: number, h: any) => sum + h.total_descontos, 0))}
+                      .format(holerites.reduce((sum: number, h: unknown) => sum + h.total_descontos, 0))}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10">
                   <span className="text-sm font-medium">Total Líquido</span>
                   <span className="font-bold text-primary">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                      .format(holerites.reduce((sum: number, h: any) => sum + h.liquido, 0))}
+                      .format(holerites.reduce((sum: number, h: unknown) => sum + h.liquido, 0))}
                   </span>
                 </div>
 
@@ -367,21 +370,21 @@ export default function IntegracaoContabil() {
                       <p className="text-xs text-muted-foreground">INSS</p>
                       <p className="text-sm font-medium">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(holerites.reduce((sum: number, h: any) => sum + (h.valor_inss || 0), 0))}
+                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_inss || 0), 0))}
                       </p>
                     </div>
                     <div className="p-2 rounded bg-muted/50">
                       <p className="text-xs text-muted-foreground">IRRF</p>
                       <p className="text-sm font-medium">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(holerites.reduce((sum: number, h: any) => sum + (h.valor_irrf || 0), 0))}
+                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_irrf || 0), 0))}
                       </p>
                     </div>
                     <div className="p-2 rounded bg-muted/50">
                       <p className="text-xs text-muted-foreground">FGTS</p>
                       <p className="text-sm font-medium">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(holerites.reduce((sum: number, h: any) => sum + (h.valor_fgts || 0), 0))}
+                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_fgts || 0), 0))}
                       </p>
                     </div>
                   </div>

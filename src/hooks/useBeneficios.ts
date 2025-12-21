@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 export interface TipoBeneficio {
   id: string;
@@ -135,7 +136,7 @@ export function useBeneficios() {
       queryClient.invalidateQueries({ queryKey: ['beneficios_colaborador'] });
       toast({ title: 'Benefício adicionado com sucesso' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: 'Erro ao adicionar benefício', description: error.message, variant: 'destructive' });
     },
   });
@@ -154,7 +155,7 @@ export function useBeneficios() {
       queryClient.invalidateQueries({ queryKey: ['beneficios_colaborador'] });
       toast({ title: 'Benefício removido' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: 'Erro ao remover benefício', description: error.message, variant: 'destructive' });
     },
   });
@@ -173,7 +174,7 @@ export function useBeneficios() {
       queryClient.invalidateQueries({ queryKey: ['beneficios_colaborador'] });
       toast({ title: 'Benefício atualizado' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: 'Erro ao atualizar benefício', description: error.message, variant: 'destructive' });
     },
   });

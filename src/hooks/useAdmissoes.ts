@@ -107,7 +107,7 @@ export function useAdmissoes() {
 
       if (error) throw error;
       setAdmissoes((data || []) as Admissao[]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
       console.error('Erro ao buscar admissões:', err);
     } finally {
@@ -131,7 +131,7 @@ export function useAdmissoes() {
       setAdmissoes(prev => [newAdmissao as Admissao, ...prev]);
       toast.success('Admissão criada com sucesso!');
       return newAdmissao;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Erro ao criar admissão: ' + err.message);
       throw err;
     }
@@ -149,7 +149,7 @@ export function useAdmissoes() {
       if (error) throw error;
       setAdmissoes(prev => prev.map(a => a.id === id ? updated as Admissao : a));
       return updated;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Erro ao atualizar admissão: ' + err.message);
       throw err;
     }
@@ -165,7 +165,7 @@ export function useAdmissoes() {
       if (error) throw error;
       setAdmissoes(prev => prev.filter(a => a.id !== id));
       toast.success('Admissão removida!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Erro ao remover admissão: ' + err.message);
       throw err;
     }
@@ -220,7 +220,7 @@ export function useAdmissoes() {
       
       toast.success(`${admissao.nome} foi adicionado como colaborador!`);
       return novoColaborador;
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err.message !== 'Dados incompletos para conversão') {
         toast.error('Erro ao converter admissão: ' + err.message);
       }

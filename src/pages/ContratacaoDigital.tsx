@@ -153,7 +153,7 @@ export default function ContratacaoDigital() {
 
       if (docs) {
         const docsMap: Record<string, { url: string; nome: string }> = {};
-        docs.forEach((doc: any) => {
+        docs.forEach((doc: unknown) => {
           docsMap[doc.tipo] = { url: doc.url, nome: doc.nome_arquivo };
         });
         setDocumentosEnviados(docsMap);

@@ -413,19 +413,19 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
       const colabsDept = colaboradores.filter(c => c.departamento === dept && c.status === 'ativo');
       
       // Contar atestados (afastamentos do departamento)
-      const atestadosDept = afastamentos.filter((a: any) => 
+      const atestadosDept = afastamentos.filter((a: unknown) => 
         a.colaboradores?.departamento === dept
       );
       
       let diasAfastados = 0;
-      atestadosDept.forEach((a: any) => {
+      atestadosDept.forEach((a: unknown) => {
         const inicio = parseISO(a.data_inicio);
         const fim = a.data_fim_real ? parseISO(a.data_fim_real) : parseISO(a.data_fim_prevista);
         diasAfastados += Math.min(differenceInDays(fim, inicio) + 1, diasUteisMes);
       });
 
       // Contar faltas do ponto
-      const faltasDept = registrosPonto.filter((r: any) => 
+      const faltasDept = registrosPonto.filter((r: unknown) => 
         r.colaboradores?.departamento === dept && r.horas_falta
       ).length;
 
@@ -471,7 +471,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
       // Usar dados da folha
       const custoByDept = new Map<string, { total: number; count: number }>();
       
-      folhaData.holerites.forEach((h: any) => {
+      folhaData.holerites.forEach((h: unknown) => {
         const current = custoByDept.get(h.colaborador_departamento) || { total: 0, count: 0 };
         custoByDept.set(h.colaborador_departamento, {
           total: current.total + (h.total_proventos || 0),

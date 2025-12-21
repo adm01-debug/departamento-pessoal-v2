@@ -32,7 +32,7 @@ export function useColaboradores() {
       if (fetchError) throw fetchError;
       
       setColaboradores(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar colaboradores:', err);
       setError(err.message);
       toast({
@@ -68,7 +68,7 @@ export function useColaboradores() {
       });
       
       return newColaborador;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao criar colaborador:', err);
       toast({
         title: 'Erro ao cadastrar',
@@ -97,7 +97,7 @@ export function useColaboradores() {
       });
       
       return updated;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao atualizar colaborador:', err);
       toast({
         title: 'Erro ao atualizar',
@@ -124,7 +124,7 @@ export function useColaboradores() {
         title: 'Colaborador excluído',
         description: colaborador ? `${colaborador.nome_completo} foi removido.` : 'Registro removido com sucesso.',
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao excluir colaborador:', err);
       toast({
         title: 'Erro ao excluir',
@@ -145,7 +145,7 @@ export function useColaboradores() {
 
       if (error) throw error;
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar colaborador:', err);
       throw err;
     }
@@ -180,7 +180,7 @@ export function useDependentes(colaboradorId: string) {
 
       if (error) throw error;
       setDependentes(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar dependentes:', err);
     } finally {
       setLoading(false);
@@ -203,7 +203,7 @@ export function useDependentes(colaboradorId: string) {
       setDependentes(prev => [...prev, newDep]);
       toast({ title: 'Dependente adicionado!' });
       return newDep;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -219,7 +219,7 @@ export function useDependentes(colaboradorId: string) {
       if (error) throw error;
       setDependentes(prev => prev.filter(d => d.id !== id));
       toast({ title: 'Dependente removido!' });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -246,7 +246,7 @@ export function useHistoricoCargo(colaboradorId: string) {
 
       if (error) throw error;
       setHistorico(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar histórico:', err);
     } finally {
       setLoading(false);
@@ -269,7 +269,7 @@ export function useHistoricoCargo(colaboradorId: string) {
       setHistorico(prev => [newHist, ...prev]);
       toast({ title: 'Histórico registrado!' });
       return newHist;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }

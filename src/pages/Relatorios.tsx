@@ -32,7 +32,7 @@ interface RelatorioConfig {
 
 interface CategoriaConfig {
   titulo: string;
-  icone: any;
+  icone: React.ComponentType;
   color: string;
   relatorios: RelatorioConfig[];
 }

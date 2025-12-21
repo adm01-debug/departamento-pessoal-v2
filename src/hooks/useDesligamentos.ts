@@ -110,7 +110,7 @@ export function useDesligamentos() {
 
       if (error) throw error;
       setDesligamentos((data || []) as Desligamento[]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
       console.error('Erro ao buscar desligamentos:', err);
     } finally {
@@ -219,7 +219,7 @@ export function useDesligamentos() {
       setDesligamentos(prev => [newDesligamento as Desligamento, ...prev]);
       toast.success('Desligamento iniciado com sucesso!');
       return newDesligamento;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Erro ao criar desligamento: ' + err.message);
       throw err;
     }
@@ -237,7 +237,7 @@ export function useDesligamentos() {
       if (error) throw error;
       setDesligamentos(prev => prev.map(d => d.id === id ? updated as Desligamento : d));
       return updated;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Erro ao atualizar desligamento: ' + err.message);
       throw err;
     }
@@ -253,7 +253,7 @@ export function useDesligamentos() {
       if (error) throw error;
       setDesligamentos(prev => prev.filter(d => d.id !== id));
       toast.success('Desligamento removido!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Erro ao remover desligamento: ' + err.message);
       throw err;
     }

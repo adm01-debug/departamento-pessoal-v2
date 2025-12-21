@@ -458,10 +458,10 @@ function EventosVariaveisTab({
   disabled 
 }: {
   competencia: string;
-  eventos: any[];
-  colaboradores: any[];
-  rubricas: any[];
-  onAdd: (evento: any) => Promise<any>;
+  eventos: unknown[];
+  colaboradores: unknown[];
+  rubricas: unknown[];
+  onAdd: (evento: unknown) => Promise<any>;
   onRemove: (id: string) => Promise<void>;
   disabled: boolean;
 }) {

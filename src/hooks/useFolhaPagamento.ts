@@ -36,7 +36,7 @@ export function useFolhasPagamento() {
 
       if (error) throw error;
       setFolhas((data || []) as FolhaPagamento[]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar folhas:', err);
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
     } finally {
@@ -60,7 +60,7 @@ export function useFolhasPagamento() {
       setFolhas(prev => [data as FolhaPagamento, ...prev]);
       toast({ title: 'Folha criada!', description: `Competência ${competencia}` });
       return data as FolhaPagamento;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -68,7 +68,7 @@ export function useFolhasPagamento() {
 
   const updateFolhaStatus = async (id: string, status: StatusFolha) => {
     try {
-      const updateData: any = { status };
+      const updateData: unknown = { status };
       if (status === 'calculada') updateData.data_calculo = new Date().toISOString();
       if (status === 'fechada') updateData.data_fechamento = new Date().toISOString();
 
@@ -82,7 +82,7 @@ export function useFolhasPagamento() {
       if (error) throw error;
       setFolhas(prev => prev.map(f => f.id === id ? data as FolhaPagamento : f));
       return data as FolhaPagamento;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -98,7 +98,7 @@ export function useFolhasPagamento() {
       if (error) throw error;
       setFolhas(prev => prev.filter(f => f.id !== id));
       toast({ title: 'Folha excluída!' });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -122,7 +122,7 @@ export function useRubricas() {
 
         if (error) throw error;
         setRubricas((data || []) as RubricaFolha[]);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Erro ao buscar rubricas:', err);
       } finally {
         setLoading(false);
@@ -150,7 +150,7 @@ export function useHolerites(folhaId: string) {
 
       if (error) throw error;
       setHolerites((data || []) as Holerite[]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar holerites:', err);
     } finally {
       setLoading(false);
@@ -180,7 +180,7 @@ export function useLancamentos(holeriteId: string) {
 
       if (error) throw error;
       setLancamentos((data || []) as LancamentoFolha[]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar lançamentos:', err);
     } finally {
       setLoading(false);
@@ -210,7 +210,7 @@ export function useEventosVariaveis(competencia: string) {
 
       if (error) throw error;
       setEventos((data || []) as EventoVariavel[]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao buscar eventos:', err);
     } finally {
       setLoading(false);
@@ -233,7 +233,7 @@ export function useEventosVariaveis(competencia: string) {
       setEventos(prev => [...prev, data as EventoVariavel]);
       toast({ title: 'Evento adicionado!' });
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -249,7 +249,7 @@ export function useEventosVariaveis(competencia: string) {
       if (error) throw error;
       setEventos(prev => prev.filter(e => e.id !== id));
       toast({ title: 'Evento removido!' });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
       throw err;
     }
@@ -336,7 +336,7 @@ export function useCalculoFolha() {
         let proventos = salarioBase;
         let descontos = 0;
         
-        const lancamentos: any[] = [];
+        const lancamentos: unknown[] = [];
         
         // Adicionar salário base
         if (rubricaSalario) {
@@ -530,7 +530,7 @@ export function useCalculoFolha() {
 
       toast({ title: 'Folha calculada!', description: `${colaboradores.length} holerites gerados.` });
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erro ao calcular folha:', err);
       toast({ title: 'Erro no cálculo', description: err.message, variant: 'destructive' });
       throw err;
