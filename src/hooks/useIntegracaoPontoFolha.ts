@@ -160,7 +160,7 @@ export const useIntegracaoPontoFolha = () => {
         ].filter(Boolean));
 
       // Preparar eventos variáveis
-      const eventos: any[] = [];
+      const eventos: unknown[] = [];
 
       for (const resumo of resumos) {
         // Horas extras 50%
