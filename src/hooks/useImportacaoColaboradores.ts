@@ -125,7 +125,7 @@ function normalizeColumnName(name: string): string {
   return name.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-function parseDate(value: any): string | null {
+function parseDate(value: unknown): string | null {
   if (!value) return null;
   
   // Se for número (Excel date serial)
@@ -156,7 +156,7 @@ function parseDate(value: any): string | null {
   return null;
 }
 
-function parseCurrency(value: any): number {
+function parseCurrency(value: unknown): number {
   if (typeof value === 'number') return value;
   if (!value) return 0;
   
@@ -422,7 +422,7 @@ export function useImportacaoColaboradores() {
         } else {
           sucesso++;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         detalhesErros.push({ linha: item.linha, erro: err.message || 'Erro desconhecido' });
       }
     }
