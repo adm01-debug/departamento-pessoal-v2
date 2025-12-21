@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 interface ResumoIntegracao {
   colaboradorId: string;
@@ -62,7 +63,7 @@ export const useIntegracaoPontoFolha = () => {
       let totalFalta = 0;
       let diasFalta = 0;
 
-      (registros || []).forEach((reg: any) => {
+      (registros || []).forEach((reg: unknown) => {
         const extras = intervalToMinutes(reg.horas_extras as string);
         const falta = intervalToMinutes(reg.horas_falta as string);
         const horasTrabalhadas = intervalToMinutes(reg.horas_trabalhadas as string);
