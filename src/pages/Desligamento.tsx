@@ -64,7 +64,7 @@ export default function DesligamentoPage() {
     return colaboradores.find(c => c.id === colaboradorId);
   };
 
-  const handleNovoDesligamento = async (data: any) => {
+  const handleNovoDesligamento = async (data: unknown) => {
     const colaborador = colaboradores.find(c => c.id === data.colaboradorId);
     if (!colaborador) return;
 
