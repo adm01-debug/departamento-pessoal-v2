@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Afastamento, AfastamentoComColaborador, ConfigAfastamento, TipoAfastamento, StatusAfastamento } from '@/types/afastamento';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
 import { useEmpresas } from './useEmpresas';
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 export const useAfastamentos = () => {
   const queryClient = useQueryClient();
@@ -62,7 +63,7 @@ export const useAfastamentos = () => {
         const { data, error } = await query;
         if (error) throw error;
         
-        return data.map((a: any) => ({
+        return data.map((a: unknown) => ({
           ...a,
           colaborador_nome: a.colaboradores?.nome_completo,
           colaborador_cargo: a.colaboradores?.cargo,
@@ -310,7 +311,7 @@ export const useAfastamentos = () => {
         
         const { data, error } = await query;
         if (error) throw error;
-        return data.map((a: any) => ({
+        return data.map((a: unknown) => ({
           ...a,
           colaborador_nome: a.colaboradores?.nome_completo
         }));
