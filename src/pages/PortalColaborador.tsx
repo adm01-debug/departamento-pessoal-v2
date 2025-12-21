@@ -300,7 +300,7 @@ export default function PortalColaborador() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {holerites.map((holerite: any) => (
+                  {holerites.map((holerite: unknown) => (
                     <div 
                       key={holerite.id} 
                       className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -371,7 +371,7 @@ export default function PortalColaborador() {
                   </p>
                 ) : (
                   <div className="space-y-3">
-                    {ferias.map((f: any) => (
+                    {ferias.map((f: unknown) => (
                       <div key={f.id} className="p-4 rounded-lg border">
                         <div className="flex items-center justify-between mb-2">
                           <Badge className={statusFeriasColors[f.status] || ''}>
@@ -483,7 +483,7 @@ export default function PortalColaborador() {
                       </tr>
                     </thead>
                     <tbody>
-                      {pontos.map((p: any) => (
+                      {pontos.map((p: unknown) => (
                         <tr key={p.id} className="border-b hover:bg-muted/50">
                           <td className="py-2 px-3">
                             {format(new Date(p.data), 'dd/MM/yyyy')}
