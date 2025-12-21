@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useEffect } from 'react';
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 export interface Notificacao {
   id: string;
