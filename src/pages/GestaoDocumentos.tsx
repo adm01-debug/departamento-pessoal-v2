@@ -51,14 +51,14 @@ export default function GestaoDocumentos() {
   });
 
   // Agrupar templates por categoria
-  const templatesPorCategoria = templates.reduce((acc: any, t: any) => {
+  const templatesPorCategoria = templates.reduce((acc: unknown, t: unknown) => {
     if (!acc[t.categoria]) acc[t.categoria] = [];
     acc[t.categoria].push(t);
     return acc;
   }, {});
 
   // Função para substituir variáveis no template
-  const processarTemplate = (template: any, colaborador: any) => {
+  const processarTemplate = (template: unknown, colaborador: unknown) => {
     let html = template.conteudo_html;
     
     const variaveis: Record<string, string> = {
@@ -125,7 +125,7 @@ export default function GestaoDocumentos() {
   };
 
   // Identificar variáveis customizadas que precisam ser preenchidas
-  const getVariaveisCustomizadas = (template: any) => {
+  const getVariaveisCustomizadas = (template: unknown) => {
     if (!template) return [];
     const variaveis = template.variaveis || [];
     const variavelPadrao = [
@@ -175,7 +175,7 @@ export default function GestaoDocumentos() {
                       {categoria}
                     </h4>
                     <div className="space-y-2">
-                      {items.map((template: any) => (
+                      {items.map((template: unknown) => (
                         <div
                           key={template.id}
                           onClick={() => {
