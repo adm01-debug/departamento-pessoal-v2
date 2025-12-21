@@ -68,7 +68,7 @@ export function useFolhasPagamento() {
 
   const updateFolhaStatus = async (id: string, status: StatusFolha) => {
     try {
-      const updateData: any = { status };
+      const updateData: unknown = { status };
       if (status === 'calculada') updateData.data_calculo = new Date().toISOString();
       if (status === 'fechada') updateData.data_fechamento = new Date().toISOString();
 
@@ -336,7 +336,7 @@ export function useCalculoFolha() {
         let proventos = salarioBase;
         let descontos = 0;
         
-        const lancamentos: any[] = [];
+        const lancamentos: unknown[] = [];
         
         // Adicionar salário base
         if (rubricaSalario) {
