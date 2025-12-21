@@ -59,7 +59,7 @@ export function useRelatorios() {
       let query = supabase.from('colaboradores').select('*');
       
       if (filtro?.departamento) query = query.eq('departamento', filtro.departamento);
-      if (filtro?.status) query = query.eq('status', filtro.status as any);
+      if (filtro?.status) query = query.eq('status', filtro.status as unknown);
       
       const { data, error } = await query.order('nome_completo');
       if (error) throw error;
@@ -725,7 +725,7 @@ export function useRelatorios() {
       const { data: colaboradores, error } = await query;
       if (error) throw error;
 
-      const resultado: any[] = [];
+      const resultado: unknown[] = [];
       
       for (const colab of colaboradores || []) {
         const { data: banco } = await supabase
