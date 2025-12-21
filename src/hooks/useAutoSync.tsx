@@ -43,7 +43,7 @@ export interface SyncStatus {
 
 export function useAutoSync() {
   const queryClient = useQueryClient();
-  const auditoria = useAuditoriaIntegration();
+  const auditoria = useAuditoriaIntegration('bitrix24');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<SyncStatus>({ rodando: false });
 
@@ -178,29 +178,34 @@ export function useAutoSync() {
         await notificarResultadoSync(true, resultado.sucesso, []);
       }
 
-    } catch (error: unknown) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       console.error('[AutoSync] Erro:', error);
       
       setStatus(prev => ({
         ...prev,
         rodando: false,
-        erro: error.message,
+        erro: errorMessage,
       }));
 
       if (config?.notificar_erros) {
-        toast.error(`Erro no sync automático: ${error.message}`);
-        await notificarResultadoSync(false, 0, [error.message]);
+        toast.error(`Erro no sync automático: ${errorMessage}`);
+        await notificarResultadoSync(false, 0, [errorMessage]);
       }
 
       // Registrar erro no log
-      await supabase.from('bitrix24_sync_logs').insert({
-        tipo: 'auto',
-        direcao: 'bidirecional',
-        registros_processados: 0,
-        registros_sucesso: 0,
-        registros_erro: 1,
-        detalhes: [`Erro: ${error.message}`],
-      });
+      try {
+        await supabase.from('bitrix24_sync_logs').insert({
+          tipo: 'auto',
+          direcao: 'bidirecional',
+          registros_processados: 0,
+          registros_sucesso: 0,
+          registros_erro: 1,
+          detalhes: [`Erro: ${errorMessage}`],
+        });
+      } catch (e) {
+        console.error('Erro ao registrar log:', e);
+      }
     }
   }, [config, dentroDoPeriodoPermitido, atualizarConfig]);
 

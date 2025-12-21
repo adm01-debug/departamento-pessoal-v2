@@ -104,8 +104,9 @@ export function ImportacaoPontoModal({ open, onOpenChange, competencia, onSucces
       if (res.sucesso > 0 && res.erros.length === 0) {
         onSuccess?.();
       }
-    } catch (err: unknown) {
-      setResultado({ sucesso: 0, erros: [err.message] });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      setResultado({ sucesso: 0, erros: [errorMessage] });
     } finally {
       setProcessando(false);
     }

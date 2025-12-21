@@ -9,11 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { FeriasComColaborador, StatusFerias, HistoricoFerias } from '@/types/ferias';
 import { useFeriasMelhorado } from '@/hooks/useFeriasMelhorado';
+import { useHistoricoRegistro } from '@/hooks/useAuditoria';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrency } from '@/lib/calculosTrabalhistas';
@@ -35,48 +35,40 @@ const statusConfig: Record<StatusFerias, { label: string; icon: React.ElementTyp
 export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: WorkflowAprovacaoFeriasProps) {
   const { 
     aprovarFerias, 
-    rejeitarFerias, 
-    iniciarGozo, 
-    concluirFerias,
-    useHistoricoFerias 
+    rejeitarFerias,
+    atualizarFerias,
   } = useFeriasMelhorado();
   
-  const { data: historico, isLoading: loadingHistorico } = useHistoricoFerias(ferias.id);
+  const { data: historico, isLoading: loadingHistorico } = useHistoricoRegistro('ferias', ferias.id);
   
   const [motivoRejeicao, setMotivoRejeicao] = useState('');
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [acaoPendente, setAcaoPendente] = useState<'aprovar' | 'rejeitar' | 'iniciar' | 'concluir' | null>(null);
   const [historicoOpen, setHistoricoOpen] = useState(false);
 
-  const config = statusConfig[ferias.status];
+  const config = statusConfig[ferias.status] || statusConfig.programada;
   const StatusIcon = config.icon;
 
   const diasParaInicio = differenceInDays(parseISO(ferias.data_inicio), new Date());
-  const diasFerias = ferias.dias_gozo + (ferias.vender_abono ? ferias.dias_abono : 0);
 
   const handleAcao = (acao: typeof acaoPendente) => {
-    if (acao === 'rejeitar') {
-      setAcaoPendente(acao);
-      setConfirmDialogOpen(true);
-    } else {
-      setAcaoPendente(acao);
-      setConfirmDialogOpen(true);
-    }
+    setAcaoPendente(acao);
+    setConfirmDialogOpen(true);
   };
 
   const executarAcao = () => {
     switch (acaoPendente) {
       case 'aprovar':
-        aprovarFerias({ feriasId: ferias.id });
+        aprovarFerias.mutate({ id: ferias.id, aprovadoPor: 'current-user' });
         break;
       case 'rejeitar':
-        rejeitarFerias({ feriasId: ferias.id, motivo: motivoRejeicao });
+        rejeitarFerias.mutate({ id: ferias.id, motivo: motivoRejeicao });
         break;
       case 'iniciar':
-        iniciarGozo(ferias.id);
+        atualizarFerias.mutate({ id: ferias.id, status: 'em_gozo' as any });
         break;
       case 'concluir':
-        concluirFerias(ferias.id);
+        atualizarFerias.mutate({ id: ferias.id, status: 'concluida' as any });
         break;
     }
     setConfirmDialogOpen(false);
@@ -85,7 +77,6 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
     onOpenChange(false);
   };
 
-  // Determinar ações disponíveis
   const acoesDisponiveis = {
     aprovar: ferias.status === 'programada',
     rejeitar: ferias.status === 'programada',
@@ -114,7 +105,6 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Colaborador */}
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                 <User className="w-5 h-5 text-primary" />
@@ -127,27 +117,21 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
               </div>
             </div>
 
-            {/* Período */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 rounded-lg bg-muted/30">
                 <p className="text-xs text-muted-foreground mb-1">Início</p>
                 <p className="font-semibold">
                   {format(parseISO(ferias.data_inicio), "dd/MM/yyyy", { locale: ptBR })}
                 </p>
-                {diasParaInicio > 0 && (
-                  <p className="text-xs text-muted-foreground">em {diasParaInicio} dias</p>
-                )}
               </div>
               <div className="p-3 rounded-lg bg-muted/30">
                 <p className="text-xs text-muted-foreground mb-1">Término</p>
                 <p className="font-semibold">
                   {format(parseISO(ferias.data_fim), "dd/MM/yyyy", { locale: ptBR })}
                 </p>
-                <p className="text-xs text-muted-foreground">{ferias.dias_gozo} dias</p>
               </div>
             </div>
 
-            {/* Valores */}
             <div className="p-3 rounded-lg bg-muted/30">
               <div className="flex items-center gap-2 mb-3">
                 <DollarSign className="w-4 h-4 text-muted-foreground" />
@@ -162,31 +146,6 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
                   <span className="text-muted-foreground">1/3 Constitucional</span>
                   <span>{formatCurrency(ferias.valor_terco)}</span>
                 </div>
-                {ferias.vender_abono && (
-                  <>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Abono ({ferias.dias_abono}d)</span>
-                      <span>{formatCurrency(ferias.valor_abono)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">1/3 Abono</span>
-                      <span>{formatCurrency(ferias.valor_terco_abono)}</span>
-                    </div>
-                  </>
-                )}
-                <Separator />
-                <div className="flex justify-between font-medium">
-                  <span>Total Bruto</span>
-                  <span>{formatCurrency(ferias.valor_total)}</span>
-                </div>
-                <div className="flex justify-between text-destructive">
-                  <span>INSS</span>
-                  <span>-{formatCurrency(ferias.descontos_inss)}</span>
-                </div>
-                <div className="flex justify-between text-destructive">
-                  <span>IRRF</span>
-                  <span>-{formatCurrency(ferias.descontos_irrf)}</span>
-                </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Líquido</span>
@@ -195,7 +154,6 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
               </div>
             </div>
 
-            {/* Observações */}
             {ferias.observacoes && (
               <div className="p-3 rounded-lg bg-muted/30">
                 <div className="flex items-center gap-2 mb-2">
@@ -205,96 +163,29 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
                 <p className="text-sm text-muted-foreground">{ferias.observacoes}</p>
               </div>
             )}
-
-            {/* Histórico */}
-            <Collapsible open={historicoOpen} onOpenChange={setHistoricoOpen}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between">
-                  <div className="flex items-center gap-2">
-                    <History className="w-4 h-4" />
-                    Histórico
-                  </div>
-                  <ChevronDown className={cn(
-                    "w-4 h-4 transition-transform",
-                    historicoOpen && "rotate-180"
-                  )} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="pt-2 space-y-2">
-                  {loadingHistorico ? (
-                    <div className="text-center py-4">
-                      <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-                    </div>
-                  ) : historico && historico.length > 0 ? (
-                    historico.map((h) => (
-                      <div
-                        key={h.id}
-                        className="flex items-start gap-3 p-2 rounded bg-muted/20"
-                      >
-                        <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-xs">
-                              {h.status_novo.replace('_', ' ')}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {format(parseISO(h.created_at), "dd/MM HH:mm")}
-                            </span>
-                          </div>
-                          {h.observacao && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {h.observacao}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-2">
-                      Nenhum histórico registrado
-                    </p>
-                  )}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
           </div>
 
-          {/* Ações */}
           <DialogFooter className="flex-col sm:flex-row gap-2">
             {acoesDisponiveis.rejeitar && (
-              <Button
-                variant="destructive"
-                onClick={() => handleAcao('rejeitar')}
-                className="gap-2"
-              >
+              <Button variant="destructive" onClick={() => handleAcao('rejeitar')} className="gap-2">
                 <XCircle className="w-4 h-4" />
                 Rejeitar
               </Button>
             )}
             {acoesDisponiveis.aprovar && (
-              <Button
-                onClick={() => handleAcao('aprovar')}
-                className="gap-2 bg-success hover:bg-success/90"
-              >
+              <Button onClick={() => handleAcao('aprovar')} className="gap-2 bg-success hover:bg-success/90">
                 <CheckCircle className="w-4 h-4" />
                 Aprovar
               </Button>
             )}
             {acoesDisponiveis.iniciar && (
-              <Button
-                onClick={() => handleAcao('iniciar')}
-                className="gap-2"
-              >
+              <Button onClick={() => handleAcao('iniciar')} className="gap-2">
                 <Calendar className="w-4 h-4" />
                 Iniciar Gozo
               </Button>
             )}
             {acoesDisponiveis.concluir && (
-              <Button
-                onClick={() => handleAcao('concluir')}
-                className="gap-2"
-              >
+              <Button onClick={() => handleAcao('concluir')} className="gap-2">
                 <CheckCircle className="w-4 h-4" />
                 Concluir
               </Button>
@@ -303,7 +194,6 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo de Confirmação */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -324,26 +214,6 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
                 onChange={(e) => setMotivoRejeicao(e.target.value)}
               />
             </div>
-          )}
-
-          {acaoPendente === 'aprovar' && (
-            <p className="text-sm text-muted-foreground">
-              As férias de <strong>{ferias.colaborador_nome}</strong> serão aprovadas.
-              O pagamento deverá ser realizado até 2 dias antes do início.
-            </p>
-          )}
-
-          {acaoPendente === 'iniciar' && (
-            <p className="text-sm text-muted-foreground">
-              O status será alterado para "Em Gozo". 
-              O colaborador estará oficialmente de férias.
-            </p>
-          )}
-
-          {acaoPendente === 'concluir' && (
-            <p className="text-sm text-muted-foreground">
-              As férias serão marcadas como concluídas e o período aquisitivo será baixado.
-            </p>
           )}
 
           <DialogFooter>

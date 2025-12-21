@@ -4,7 +4,37 @@ import { toast } from 'sonner';
 import { Afastamento, AfastamentoComColaborador, ConfigAfastamento, TipoAfastamento, StatusAfastamento } from '@/types/afastamento';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
 import { useEmpresas } from './useEmpresas';
-import { useAuditoriaIntegration } from './useAuditoriaIntegration';
+
+interface AfastamentoRow {
+  id: string;
+  colaborador_id: string;
+  tipo: TipoAfastamento;
+  status: StatusAfastamento | null;
+  data_inicio: string;
+  data_fim_prevista: string;
+  data_fim_real: string | null;
+  dias_total: number | null;
+  dias_empresa: number | null;
+  dias_inss: number | null;
+  cid: string | null;
+  cid_descricao: string | null;
+  medico_nome: string | null;
+  medico_crm: string | null;
+  atestado_numero: string | null;
+  numero_beneficio: string | null;
+  data_pericia: string | null;
+  observacoes: string | null;
+  empresa_id: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  colaboradores: {
+    nome_completo: string;
+    cargo: string;
+    departamento: string;
+    salario_base?: number;
+  };
+}
 
 export const useAfastamentos = () => {
   const queryClient = useQueryClient();
@@ -63,7 +93,7 @@ export const useAfastamentos = () => {
         const { data, error } = await query;
         if (error) throw error;
         
-        return data.map((a: unknown) => ({
+        return (data as AfastamentoRow[]).map((a) => ({
           ...a,
           colaborador_nome: a.colaboradores?.nome_completo,
           colaborador_cargo: a.colaboradores?.cargo,
@@ -89,12 +119,14 @@ export const useAfastamentos = () => {
           .single();
         
         if (error) throw error;
+        
+        const row = data as AfastamentoRow & { colaboradores: { salario_base?: number } };
         return {
-          ...data,
-          colaborador_nome: data.colaboradores?.nome_completo,
-          colaborador_cargo: data.colaboradores?.cargo,
-          colaborador_departamento: data.colaboradores?.departamento,
-          colaborador_salario: data.colaboradores?.salario_base
+          ...row,
+          colaborador_nome: row.colaboradores?.nome_completo,
+          colaborador_cargo: row.colaboradores?.cargo,
+          colaborador_departamento: row.colaboradores?.departamento,
+          colaborador_salario: row.colaboradores?.salario_base
         };
       },
       enabled: !!id
@@ -148,7 +180,7 @@ export const useAfastamentos = () => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       toast.success('Afastamento registrado com sucesso!');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error('Erro ao registrar afastamento: ' + error.message);
     }
   });
@@ -170,7 +202,7 @@ export const useAfastamentos = () => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       toast.success('Afastamento atualizado!');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error('Erro ao atualizar afastamento: ' + error.message);
     }
   });
@@ -195,7 +227,7 @@ export const useAfastamentos = () => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       toast.success('Afastamento encerrado!');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error('Erro ao encerrar afastamento: ' + error.message);
     }
   });
@@ -264,7 +296,7 @@ export const useAfastamentos = () => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       toast.success('Afastamento prorrogado!');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error('Erro ao prorrogar afastamento: ' + error.message);
     }
   });
@@ -286,7 +318,7 @@ export const useAfastamentos = () => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       toast.success('Afastamento cancelado!');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error('Erro ao cancelar afastamento: ' + error.message);
     }
   });
@@ -311,7 +343,7 @@ export const useAfastamentos = () => {
         
         const { data, error } = await query;
         if (error) throw error;
-        return data.map((a: unknown) => ({
+        return (data as AfastamentoRow[]).map((a) => ({
           ...a,
           colaborador_nome: a.colaboradores?.nome_completo
         }));

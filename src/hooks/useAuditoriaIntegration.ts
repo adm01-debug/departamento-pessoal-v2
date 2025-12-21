@@ -12,7 +12,10 @@ export type EntidadeAuditoria =
   | 'beneficio'
   | 'afastamento'
   | 'esocial'
-  | 'bitrix24';
+  | 'bitrix24'
+  | 'bitrix24_sync'
+  | 'folha_calculo'
+  | 'periodos_aquisitivos';
 
 export type AcaoAuditoria = 
   | 'criar'
@@ -37,19 +40,25 @@ interface LogAuditoria {
 
 /**
  * Hook simplificado para integração de auditoria
- * Uso: const { audit } = useAuditoriaIntegration('colaborador');
- *      await audit.criar(id, 'Criou colaborador João', { nome: 'João' });
+ * Uso: const auditoria = useAuditoriaIntegration('colaborador');
+ *      await auditoria.registrarCriacao(id, dados);
  */
-export function useAuditoriaIntegration(entidade: EntidadeAuditoria) {
+export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
   const { user } = useAuth();
+  const entidadePadrao = entidade || 'colaborador';
 
   const registrarLog = useCallback(async (log: Omit<LogAuditoria, 'entidade'>) => {
     try {
-      await supabase.from('auditoria_logs').insert({
-        acao: log.acao,
-        entidade,
-        entidade_id: log.entidade_id,
-        descricao: log.descricao,
+      // Log no console para debug
+      console.log('[Auditoria]', log.acao, entidadePadrao, log.entidade_id);
+      
+      // Tentar inserir na tabela audit_log (padrão do sistema)
+      await supabase.from('audit_log').insert({
+        acao: log.acao.toUpperCase() === 'CRIAR' ? 'INSERT' : 
+              log.acao.toUpperCase() === 'EDITAR' ? 'UPDATE' : 
+              log.acao.toUpperCase() === 'EXCLUIR' ? 'DELETE' : 'UPDATE',
+        tabela: entidadePadrao,
+        registro_id: log.entidade_id || 'N/A',
         dados_anteriores: log.dados_anteriores,
         dados_novos: log.dados_novos,
         user_id: user?.id,
@@ -58,101 +67,95 @@ export function useAuditoriaIntegration(entidade: EntidadeAuditoria) {
     } catch (error) {
       console.error('Erro ao registrar auditoria:', error);
     }
-  }, [entidade, user]);
+  }, [entidadePadrao, user]);
 
-  const criar = useCallback(async (
+  const registrarCriacao = useCallback(async (
     id: string,
-    descricao: string,
     dados?: Record<string, any>
   ) => {
     await registrarLog({
       acao: 'criar',
       entidade_id: id,
-      descricao,
+      descricao: `Criação de ${entidadePadrao}`,
       dados_novos: dados,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
-  const editar = useCallback(async (
+  const registrarAlteracao = useCallback(async (
     id: string,
-    descricao: string,
     dadosAnteriores?: Record<string, any>,
     dadosNovos?: Record<string, any>
   ) => {
     await registrarLog({
       acao: 'editar',
       entidade_id: id,
-      descricao,
+      descricao: `Alteração de ${entidadePadrao}`,
       dados_anteriores: dadosAnteriores,
       dados_novos: dadosNovos,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
-  const excluir = useCallback(async (
+  const registrarExclusao = useCallback(async (
     id: string,
-    descricao: string,
     dadosAnteriores?: Record<string, any>
   ) => {
     await registrarLog({
       acao: 'excluir',
       entidade_id: id,
-      descricao,
+      descricao: `Exclusão de ${entidadePadrao}`,
       dados_anteriores: dadosAnteriores,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
   const aprovar = useCallback(async (
     id: string,
-    descricao: string
+    descricao?: string
   ) => {
     await registrarLog({
       acao: 'aprovar',
       entidade_id: id,
-      descricao,
+      descricao: descricao || `Aprovação de ${entidadePadrao}`,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
   const rejeitar = useCallback(async (
     id: string,
-    descricao: string,
     motivo?: string
   ) => {
     await registrarLog({
       acao: 'rejeitar',
       entidade_id: id,
-      descricao,
+      descricao: `Rejeição de ${entidadePadrao}`,
       dados_novos: motivo ? { motivo } : undefined,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
   const calcular = useCallback(async (
     id: string,
-    descricao: string,
     resultado?: Record<string, any>
   ) => {
     await registrarLog({
       acao: 'calcular',
       entidade_id: id,
-      descricao,
+      descricao: `Cálculo de ${entidadePadrao}`,
       dados_novos: resultado,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
   const exportar = useCallback(async (
-    descricao: string,
     detalhes?: Record<string, any>
   ) => {
     await registrarLog({
       acao: 'exportar',
-      descricao,
+      descricao: `Exportação de ${entidadePadrao}`,
       dados_novos: detalhes,
     });
-  }, [registrarLog]);
+  }, [registrarLog, entidadePadrao]);
 
   return {
-    criar,
-    editar,
-    excluir,
+    registrarCriacao,
+    registrarAlteracao,
+    registrarExclusao,
     aprovar,
     rejeitar,
     calcular,

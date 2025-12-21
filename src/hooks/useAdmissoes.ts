@@ -103,12 +103,13 @@ export function useAdmissoes() {
         query = query.eq('empresa_id', empresaAtualId);
       }
 
-      const { data, error } = await query;
+      const { data, error: err } = await query;
 
-      if (error) throw error;
+      if (err) throw err;
       setAdmissoes((data || []) as Admissao[]);
-    } catch (err: unknown) {
-      setError(err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      setError(errorMessage);
       console.error('Erro ao buscar admissões:', err);
     } finally {
       setLoading(false);
@@ -121,52 +122,55 @@ export function useAdmissoes() {
 
   const createAdmissao = async (data: AdmissaoInsert) => {
     try {
-      const { data: newAdmissao, error } = await supabase
+      const { data: newAdmissao, error: err } = await supabase
         .from('admissoes')
         .insert({ ...data, empresa_id: empresaAtualId })
         .select()
         .single();
 
-      if (error) throw error;
+      if (err) throw err;
       setAdmissoes(prev => [newAdmissao as Admissao, ...prev]);
       toast.success('Admissão criada com sucesso!');
       return newAdmissao;
-    } catch (err: unknown) {
-      toast.error('Erro ao criar admissão: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao criar admissão: ' + errorMessage);
       throw err;
     }
   };
 
   const updateAdmissao = async (id: string, data: Partial<Admissao>) => {
     try {
-      const { data: updated, error } = await supabase
+      const { data: updated, error: err } = await supabase
         .from('admissoes')
         .update(data)
         .eq('id', id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (err) throw err;
       setAdmissoes(prev => prev.map(a => a.id === id ? updated as Admissao : a));
       return updated;
-    } catch (err: unknown) {
-      toast.error('Erro ao atualizar admissão: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao atualizar admissão: ' + errorMessage);
       throw err;
     }
   };
 
   const deleteAdmissao = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error: err } = await supabase
         .from('admissoes')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (err) throw err;
       setAdmissoes(prev => prev.filter(a => a.id !== id));
       toast.success('Admissão removida!');
-    } catch (err: unknown) {
-      toast.error('Erro ao remover admissão: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao remover admissão: ' + errorMessage);
       throw err;
     }
   };
@@ -220,9 +224,10 @@ export function useAdmissoes() {
       
       toast.success(`${admissao.nome} foi adicionado como colaborador!`);
       return novoColaborador;
-    } catch (err: unknown) {
-      if (err.message !== 'Dados incompletos para conversão') {
-        toast.error('Erro ao converter admissão: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      if (errorMessage !== 'Dados incompletos para conversão') {
+        toast.error('Erro ao converter admissão: ' + errorMessage);
       }
       throw err;
     }
