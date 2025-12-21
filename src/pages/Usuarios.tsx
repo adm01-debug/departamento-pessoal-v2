@@ -24,7 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-const ROLES: { value: AppRole; label: string; icon: any; description: string }[] = [
+const ROLES: { value: AppRole; label: string; icon: React.ComponentType; description: string }[] = [
   { value: 'admin', label: 'Administrador', icon: Crown, description: 'Acesso total ao sistema' },
   { value: 'gestor', label: 'Gestor', icon: UserCog, description: 'Gerencia equipe e aprova solicitações' },
   { value: 'rh', label: 'RH', icon: Building2, description: 'Acesso a módulos de RH' },
@@ -64,7 +64,7 @@ export default function Usuarios() {
   });
 
   // Agrupar roles por usuário
-  const userRolesMap = allUserRoles.reduce((acc, ur: any) => {
+  const userRolesMap = allUserRoles.reduce((acc, ur: unknown) => {
     if (!acc[ur.user_id]) {
       acc[ur.user_id] = {
         user_id: ur.user_id,
@@ -74,19 +74,19 @@ export default function Usuarios() {
     }
     acc[ur.user_id].roles.push(ur.role);
     return acc;
-  }, {} as Record<string, { user_id: string; profile: any; roles: AppRole[] }>);
+  }, {} as Record<string, { user_id: string; profile: Record<string, unknown>; roles: AppRole[] }>);
 
   const usersWithRoles = Object.values(userRolesMap);
 
   // Filtrar por busca
-  const filteredUsers = usersWithRoles.filter((u: any) => 
+  const filteredUsers = usersWithRoles.filter((u: unknown) => 
     u.profile?.nome?.toLowerCase().includes(search.toLowerCase()) ||
     u.roles.some((r: AppRole) => ROLE_LABELS[r]?.toLowerCase().includes(search.toLowerCase()))
   );
 
   // Usuários sem role atribuída
   const usersWithoutRoles = profiles.filter(p => 
-    !usersWithRoles.find((u: any) => u.user_id === p.user_id) &&
+    !usersWithRoles.find((u: unknown) => u.user_id === p.user_id) &&
     p.nome?.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -156,7 +156,7 @@ export default function Usuarios() {
       {/* Estatísticas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {ROLES.map(role => {
-          const count = usersWithRoles.filter((u: any) => u.roles.includes(role.value)).length;
+          const count = usersWithRoles.filter((u: unknown) => u.roles.includes(role.value)).length;
           return (
             <Card key={role.value}>
               <CardContent className="pt-6">
@@ -218,7 +218,7 @@ export default function Usuarios() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {filteredUsers.map((u: any) => (
+                  {filteredUsers.map((u: unknown) => (
                     <div 
                       key={u.user_id}
                       className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -297,7 +297,7 @@ export default function Usuarios() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {usersWithoutRoles.map((profile: any) => (
+                  {usersWithoutRoles.map((profile: unknown) => (
                     <div 
                       key={profile.user_id}
                       className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -375,7 +375,7 @@ export default function Usuarios() {
                   <SelectValue placeholder="Selecione o usuário" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
-                  {profiles.map((p: any) => (
+                  {profiles.map((p: unknown) => (
                     <SelectItem key={p.user_id} value={p.user_id}>
                       {p.nome || 'Sem nome'}
                     </SelectItem>
