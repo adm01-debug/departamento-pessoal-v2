@@ -70,7 +70,7 @@ export default function Onboarding() {
       if (onbError) throw onbError;
 
       // Criar tarefas a partir do template
-      const tarefas = (template as any).onboarding_template_tarefas.map((t: any) => ({
+      const tarefas = (template as any).onboarding_template_tarefas.map((t: unknown) => ({
         onboarding_id: onboarding.id,
         template_tarefa_id: t.id,
         titulo: t.titulo,
@@ -165,7 +165,7 @@ export default function Onboarding() {
         <Card><CardContent className="py-12 text-center text-muted-foreground">Nenhum onboarding em andamento</CardContent></Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {onboardings.map((onb: any) => (
+          {onboardings.map((onb: unknown) => (
             <OnboardingCard 
               key={onb.id} 
               onboarding={onb} 
@@ -179,7 +179,7 @@ export default function Onboarding() {
   );
 }
 
-function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: any) {
+function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
   const { data: tarefas = [] } = useQuery({
     queryKey: ['onboarding-tarefas', onboarding.id],
     queryFn: async () => {
@@ -193,7 +193,7 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: any) {
     }
   });
 
-  const concluidas = tarefas.filter((t: any) => t.concluida).length;
+  const concluidas = tarefas.filter((t: unknown) => t.concluida).length;
   const progresso = tarefas.length > 0 ? (concluidas / tarefas.length) * 100 : 0;
 
   return (
@@ -215,7 +215,7 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: any) {
         </div>
 
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {tarefas.map((tarefa: any) => (
+          {tarefas.map((tarefa: unknown) => (
             <div key={tarefa.id} className="flex items-center gap-2 text-sm">
               <Checkbox 
                 checked={tarefa.concluida} 
