@@ -245,7 +245,7 @@ export function useBackupExport() {
       doc.text('Resumo de Colaboradores', 14, 20);
 
       if (data.colaboradores.length > 0) {
-        const colaboradoresSummary = data.colaboradores.slice(0, 50).map((c: any) => [
+        const colaboradoresSummary = data.colaboradores.slice(0, 50).map((c: unknown) => [
           c.nome_completo || '',
           c.cpf || '',
           c.cargo || '',
