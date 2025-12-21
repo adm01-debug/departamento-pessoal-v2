@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 export interface Empresa {
   id: string;
