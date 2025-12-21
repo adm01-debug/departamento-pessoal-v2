@@ -1,5 +1,29 @@
 import { useCallback } from 'react';
-import { useAuditoria, TipoAcao, Entidade } from './useAuditoria';
+import { useAuditoriaIntegration, EntidadeAuditoria } from './useAuditoriaIntegration';
+
+export type Entidade = 
+  | 'colaborador' 
+  | 'admissao' 
+  | 'desligamento' 
+  | 'ferias' 
+  | 'afastamento' 
+  | 'ponto' 
+  | 'folha' 
+  | 'empresa'
+  | 'beneficio';
+
+export type TipoAcao = 
+  | 'criar' 
+  | 'editar' 
+  | 'excluir' 
+  | 'visualizar' 
+  | 'exportar' 
+  | 'importar' 
+  | 'aprovar' 
+  | 'rejeitar' 
+  | 'login' 
+  | 'logout' 
+  | 'sync';
 
 /**
  * Hook wrapper para facilitar o registro de auditoria
@@ -7,7 +31,7 @@ import { useAuditoria, TipoAcao, Entidade } from './useAuditoria';
  *      registrar('criar', colaboradorId, 'Criou colaborador João');
  */
 export function useAuditoriaWrapper(entidade: Entidade) {
-  const { registrarLog, registrarCriacao, registrarEdicao, registrarExclusao } = useAuditoria();
+  const auditoria = useAuditoriaIntegration(entidade as EntidadeAuditoria);
 
   const registrar = useCallback(async (
     acao: TipoAcao,
@@ -16,23 +40,22 @@ export function useAuditoriaWrapper(entidade: Entidade) {
     dadosAnteriores?: Record<string, any>,
     dadosNovos?: Record<string, any>
   ) => {
-    await registrarLog({
-      acao,
-      entidade,
+    await auditoria.registrarLog({
+      acao: acao as any,
       entidade_id: entidadeId,
       descricao,
       dados_anteriores: dadosAnteriores,
       dados_novos: dadosNovos,
     });
-  }, [entidade, registrarLog]);
+  }, [auditoria]);
 
   const criar = useCallback(async (
     entidadeId: string,
     descricao: string,
     dados?: Record<string, any>
   ) => {
-    await registrarCriacao(entidade, entidadeId, descricao, dados);
-  }, [entidade, registrarCriacao]);
+    await auditoria.registrarCriacao(entidadeId, dados);
+  }, [auditoria]);
 
   const editar = useCallback(async (
     entidadeId: string,
@@ -40,16 +63,16 @@ export function useAuditoriaWrapper(entidade: Entidade) {
     dadosAnteriores?: Record<string, any>,
     dadosNovos?: Record<string, any>
   ) => {
-    await registrarEdicao(entidade, entidadeId, descricao, dadosAnteriores, dadosNovos);
-  }, [entidade, registrarEdicao]);
+    await auditoria.registrarAlteracao(entidadeId, dadosAnteriores, dadosNovos);
+  }, [auditoria]);
 
   const excluir = useCallback(async (
     entidadeId: string,
     descricao: string,
     dadosAnteriores?: Record<string, any>
   ) => {
-    await registrarExclusao(entidade, entidadeId, descricao, dadosAnteriores);
-  }, [entidade, registrarExclusao]);
+    await auditoria.registrarExclusao(entidadeId, dadosAnteriores);
+  }, [auditoria]);
 
   return {
     registrar,

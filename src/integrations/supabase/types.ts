@@ -369,6 +369,48 @@ export type Database = {
         }
         Relationships: []
       }
+      auditoria_logs: {
+        Row: {
+          acao: string
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          descricao: string | null
+          entidade: string
+          entidade_id: string | null
+          id: string
+          ip_address: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          descricao?: string | null
+          entidade: string
+          entidade_id?: string | null
+          id?: string
+          ip_address?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          descricao?: string | null
+          entidade?: string
+          entidade_id?: string | null
+          id?: string
+          ip_address?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       banco_horas: {
         Row: {
           colaborador_id: string
@@ -486,12 +528,117 @@ export type Database = {
           },
         ]
       }
+      bitrix24_config: {
+        Row: {
+          created_at: string | null
+          dias_semana: number[] | null
+          habilitado: boolean | null
+          horario_fim: string | null
+          horario_inicio: string | null
+          id: number
+          intervalo_minutos: number | null
+          max_tentativas: number | null
+          notificar_erros: boolean | null
+          notificar_sucesso: boolean | null
+          proxima_execucao: string | null
+          sync_cargos: boolean | null
+          sync_colaboradores: boolean | null
+          sync_departamentos: boolean | null
+          ultima_execucao: string | null
+          updated_at: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dias_semana?: number[] | null
+          habilitado?: boolean | null
+          horario_fim?: string | null
+          horario_inicio?: string | null
+          id?: number
+          intervalo_minutos?: number | null
+          max_tentativas?: number | null
+          notificar_erros?: boolean | null
+          notificar_sucesso?: boolean | null
+          proxima_execucao?: string | null
+          sync_cargos?: boolean | null
+          sync_colaboradores?: boolean | null
+          sync_departamentos?: boolean | null
+          ultima_execucao?: string | null
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dias_semana?: number[] | null
+          habilitado?: boolean | null
+          horario_fim?: string | null
+          horario_inicio?: string | null
+          id?: number
+          intervalo_minutos?: number | null
+          max_tentativas?: number | null
+          notificar_erros?: boolean | null
+          notificar_sucesso?: boolean | null
+          proxima_execucao?: string | null
+          sync_cargos?: boolean | null
+          sync_colaboradores?: boolean | null
+          sync_departamentos?: boolean | null
+          ultima_execucao?: string | null
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      bitrix24_sync_logs: {
+        Row: {
+          conflitos: number | null
+          created_at: string | null
+          detalhes: Json | null
+          direcao: string
+          erros: number | null
+          id: string
+          registros_erro: number | null
+          registros_processados: number | null
+          registros_sucesso: number | null
+          sucesso: number | null
+          tipo: string
+        }
+        Insert: {
+          conflitos?: number | null
+          created_at?: string | null
+          detalhes?: Json | null
+          direcao: string
+          erros?: number | null
+          id?: string
+          registros_erro?: number | null
+          registros_processados?: number | null
+          registros_sucesso?: number | null
+          sucesso?: number | null
+          tipo: string
+        }
+        Update: {
+          conflitos?: number | null
+          created_at?: string | null
+          detalhes?: Json | null
+          direcao?: string
+          erros?: number | null
+          id?: string
+          registros_erro?: number | null
+          registros_processados?: number | null
+          registros_sucesso?: number | null
+          sucesso?: number | null
+          tipo?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           agencia: string | null
           bairro: string | null
           banco_codigo: string | null
           banco_nome: string | null
+          bitrix_id: string | null
+          bitrix_sync_status: string | null
+          bitrix_ultima_sync: string | null
           cargo: string
           cbo: string | null
           celular: string | null
@@ -564,6 +711,9 @@ export type Database = {
           bairro?: string | null
           banco_codigo?: string | null
           banco_nome?: string | null
+          bitrix_id?: string | null
+          bitrix_sync_status?: string | null
+          bitrix_ultima_sync?: string | null
           cargo: string
           cbo?: string | null
           celular?: string | null
@@ -636,6 +786,9 @@ export type Database = {
           bairro?: string | null
           banco_codigo?: string | null
           banco_nome?: string | null
+          bitrix_id?: string | null
+          bitrix_sync_status?: string | null
+          bitrix_ultima_sync?: string | null
           cargo?: string
           cbo?: string | null
           celular?: string | null
@@ -773,6 +926,30 @@ export type Database = {
           limite_critico?: number
           tipo?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      configuracoes: {
+        Row: {
+          chave: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          valor: Json | null
+        }
+        Insert: {
+          chave: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          valor?: Json | null
+        }
+        Update: {
+          chave?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          valor?: Json | null
         }
         Relationships: []
       }
