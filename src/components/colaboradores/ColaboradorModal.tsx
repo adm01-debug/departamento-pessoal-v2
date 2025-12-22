@@ -3,7 +3,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Colaborador, statusColors } from '@/data/mockData';
+import { Colaborador } from '@/types/colaborador';
+
+const statusColors: Record<string, string> = {
+  ativo: 'bg-green-100 text-green-800',
+  inativo: 'bg-red-100 text-red-800',
+  ferias: 'bg-blue-100 text-blue-800',
+  afastado: 'bg-yellow-100 text-yellow-800',
+  desligado: 'bg-gray-100 text-gray-800',
+};
 import { cn } from '@/lib/utils';
 import { 
   User, 
@@ -298,4 +306,5 @@ function formatCurrency(value: number): string {
     currency: 'BRL' 
   }).format(value);
 }
+
 
