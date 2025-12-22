@@ -166,7 +166,7 @@ function parseCurrency(value: unknown): number {
     .replace(/\./g, '')
     .replace(',', '.');
   
-  return parseFloat(str) || 0;
+  return parseFloat(str) ?? 0;
 }
 
 export function useImportacaoColaboradores() {
@@ -200,7 +200,7 @@ export function useImportacaoColaboradores() {
       }
 
       // Primeira linha são os cabeçalhos
-      const headers = (jsonData[0] as string[]).map(h => String(h || '').trim());
+      const headers = (jsonData[0] as string[]).map(h => String(h ?? '').trim());
       setColunasDetectadas(headers);
 
       // Mapear colunas
@@ -230,7 +230,7 @@ export function useImportacaoColaboradores() {
         .from('colaboradores')
         .select('cpf');
       
-      const cpfsSet = new Set((cpfsExistentes || []).map(c => unmask(c.cpf)));
+      const cpfsSet = new Set((cpfsExistentes ?? []).map(c => unmask(c.cpf)));
 
       // Processar linhas
       const previews: ColaboradorImport[] = [];
@@ -256,7 +256,7 @@ export function useImportacaoColaboradores() {
         }
 
         // CPF
-        const cpfLimpo = unmask(String(dados.cpf || ''));
+        const cpfLimpo = unmask(String(dados.cpf ?? ''));
         if (!cpfLimpo || cpfLimpo.length !== 11) {
           erros.push('CPF inválido (deve ter 11 dígitos)');
         } else if (!validateCPF(cpfLimpo)) {
@@ -281,15 +281,15 @@ export function useImportacaoColaboradores() {
         dados.data_admissao = dataAdm;
 
         // Sexo
-        const sexoNorm = normalizeColumnName(String(dados.sexo || ''));
+        const sexoNorm = normalizeColumnName(String(dados.sexo ?? ''));
         dados.sexo = SEXO_MAP[sexoNorm] || 'masculino';
 
         // Estado civil
-        const estadoCivilNorm = normalizeColumnName(String(dados.estado_civil || ''));
+        const estadoCivilNorm = normalizeColumnName(String(dados.estado_civil ?? ''));
         dados.estado_civil = ESTADO_CIVIL_MAP[estadoCivilNorm] || 'solteiro';
 
         // Tipo contrato
-        const tipoContratoNorm = normalizeColumnName(String(dados.tipo_contrato || ''));
+        const tipoContratoNorm = normalizeColumnName(String(dados.tipo_contrato ?? ''));
         dados.tipo_contrato = TIPO_CONTRATO_MAP[tipoContratoNorm] || 'clt';
 
         // Salário
@@ -477,5 +477,6 @@ export function useImportacaoColaboradores() {
     totalInvalidos: dadosPreview.filter(p => !p.valido).length,
   };
 }
+
 
 
