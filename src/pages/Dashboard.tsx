@@ -30,9 +30,10 @@ import { AbsenteeismChart } from '@/components/dashboard/AbsenteeismChart';
 import { PayrollCostChart } from '@/components/dashboard/PayrollCostChart';
 import { IndicatorAlertsCard } from '@/components/dashboard/IndicatorAlertsCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { mockAlertas, mockCalendarioEventos, mockColaboradores } from '@/data/mockData';
+
 import { useNavigate } from 'react-router-dom';
 import { subMonths, subQuarters, subYears, isAfter } from 'date-fns';
+import { useColaboradores } from '@/hooks/useColaboradores';
 import { useIndicadoresDP } from '@/hooks/useIndicadoresDP';
 
 type PeriodFilter = 'all' | 'month' | 'quarter' | 'year';
@@ -74,7 +75,7 @@ export default function Dashboard() {
 
   // Filtrar colaboradores por período de admissão (para gráficos visuais)
   const filteredColaboradores = useMemo(() => {
-    if (period === 'all') return mockColaboradores;
+    if (period === 'all') return colaboradoresData;
 
     const now = new Date();
     let startDate: Date;
@@ -90,10 +91,10 @@ export default function Dashboard() {
         startDate = subYears(now, 1);
         break;
       default:
-        return mockColaboradores;
+        return colaboradoresData;
     }
 
-    return mockColaboradores.filter(c => 
+    return colaboradoresData.filter(c => 
       isAfter(new Date(c.dataAdmissao), startDate)
     );
   }, [period]);
@@ -335,7 +336,7 @@ export default function Dashboard() {
             Últimos 12 meses
           </span>
         </div>
-        <AdmissionsLineChart colaboradores={mockColaboradores} months={12} />
+        <AdmissionsLineChart colaboradores={colaboradoresData} months={12} />
       </div>
 
       {/* Alertas */}
@@ -345,7 +346,7 @@ export default function Dashboard() {
             <AlertTriangle className="w-4 h-4 text-destructive" />
             Alertas Urgentes
           </h3>
-          <AlertsList alertas={mockAlertas.slice(0, 5)} />
+          <AlertsList alertas={alertasData.slice(0, 5)} />
         </div>
 
         {/* Calendar */}
@@ -353,10 +354,11 @@ export default function Dashboard() {
           <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
             📅 Calendário do Mês
           </h3>
-          <MiniCalendar eventos={mockCalendarioEventos} />
+          <MiniCalendar eventos={eventosCalendario} />
         </div>
       </div>
     </div>
   );
 }
+
 
