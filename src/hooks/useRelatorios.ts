@@ -1,6 +1,26 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { exportToExcel, exportToPDF, exportToCSV, formatters, ExportColumn } from '@/lib/exportUtils';
+
+
+// Validação de parâmetros para prevenir injection
+const validateYear = (year: number | undefined): number => {
+  const currentYear = new Date().getFullYear();
+  if (year === undefined) return currentYear;
+  if (typeof year !== 'number' || isNaN(year)) return currentYear;
+  if (year < 1900 || year > currentYear + 10) return currentYear;
+  return Math.floor(year);
+};
+
+const validateDateString = (dateStr: string): string => {
+  // Aceita apenas formato YYYY-MM-DD
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateStr)) {
+    throw new Error('Invalid date format');
+  }
+  return dateStr;
+};
+
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -333,8 +353,8 @@ export function useRelatorios() {
       const { data, error } = await supabase
         .from('ferias')
         .select('*, colaboradores(nome_completo, cargo, departamento)')
-        .gte('data_inicio', `${ano}-01-01`)
-        .lte('data_inicio', `${ano}-12-31`)
+        .gte('data_inicio', validateDateString(`${validateYear(ano)}-01-01`))
+        .lte('data_inicio', validateDateString(`${validateYear(ano)}-12-31`))
         .order('data_inicio');
       
       if (error) throw error;
@@ -547,19 +567,19 @@ export function useRelatorios() {
   const gerarTurnover = async (formato: FormatoRelatorio, ano?: number) => {
     setGerando(true);
     try {
-      const anoAtual = ano || new Date().getFullYear();
+      const anoAtual = validateYear(ano);
       
       const { data: admissoes } = await supabase
         .from('colaboradores')
         .select('data_admissao')
-        .gte('data_admissao', `${anoAtual}-01-01`)
-        .lte('data_admissao', `${anoAtual}-12-31`);
+        .gte('data_admissao', validateDateString(`${anoAtual}-01-01`))
+        .lte('data_admissao', validateDateString(`${anoAtual}-12-31`));
 
       const { data: desligamentos } = await supabase
         .from('desligamentos')
         .select('data_desligamento, tipo')
-        .gte('data_desligamento', `${anoAtual}-01-01`)
-        .lte('data_desligamento', `${anoAtual}-12-31`);
+        .gte('data_desligamento', validateDateString(`${anoAtual}-01-01`))
+        .lte('data_desligamento', validateDateString(`${anoAtual}-12-31`));
 
       const { data: ativos } = await supabase
         .from('colaboradores')
@@ -780,7 +800,7 @@ export function useRelatorios() {
       ] = await Promise.all([
         supabase.from('colaboradores').select('id, salario_base, status'),
         supabase.from('admissoes').select('id').neq('etapa', 'esocial'),
-        supabase.from('desligamentos').select('id').gte('data_desligamento', `${anoAtual}-01-01`),
+        supabase.from('desligamentos').select('id').gte('data_desligamento', validateDateString(`${anoAtual}-01-01`)),
         supabase.from('afastamentos').select('id').in('status', ['ativo', 'prorrogado']),
         supabase.from('ferias').select('id').eq('status', 'em_gozo')
       ]);
@@ -842,3 +862,4 @@ export function useRelatorios() {
     gerarIndicadoresDP,
   };
 }
+
