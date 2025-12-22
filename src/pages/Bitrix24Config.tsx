@@ -36,6 +36,10 @@ const CAMPOS_DISPONIVEIS = [
 ];
 
 export default function Bitrix24Config() {
+  useEffect(() => {
+    document.title = 'Configuração Bitrix24 | DP System';
+  }, []);
+
   const {
     useConfiguracao,
     salvarConfiguracao,
@@ -487,3 +491,4 @@ export default function Bitrix24Config() {
     </div>
   );
 }
+
