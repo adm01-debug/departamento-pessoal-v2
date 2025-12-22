@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +34,10 @@ interface ExportConfig {
 }
 
 export default function IntegracaoContabil() {
+  useEffect(() => {
+    document.title = 'Integração Contábil | DP System';
+  }, []);
+
   const { empresaAtual } = useEmpresas();
   const [config, setConfig] = useState<ExportConfig>({
     competencia: format(new Date(), 'yyyy-MM'),
@@ -424,4 +428,5 @@ export default function IntegracaoContabil() {
     </div>
   );
 }
+
 
