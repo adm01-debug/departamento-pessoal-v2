@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useState, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
@@ -361,7 +362,7 @@ export function useImportacaoColaboradores() {
       });
 
     } catch (error) {
-      console.error('Erro ao processar arquivo:', error);
+      logger.error('Erro ao processar arquivo:', error);
       toast({
         title: 'Erro ao processar arquivo',
         description: 'Verifique se o arquivo é um Excel ou CSV válido.',
@@ -476,4 +477,5 @@ export function useImportacaoColaboradores() {
     totalInvalidos: dadosPreview.filter(p => !p.valido).length,
   };
 }
+
 
