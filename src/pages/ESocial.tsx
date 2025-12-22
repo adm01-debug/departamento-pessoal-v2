@@ -229,7 +229,7 @@ export default function ESocial() {
                         {tipoEventoLabels[evento.tipo as TipoEvento]}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {(evento as any).colaborador?.nome_completo || 'Colaborador'}
+                        {(evento as unknown).colaborador?.nome_completo || 'Colaborador'}
                       </p>
                     </div>
                   </div>
@@ -331,3 +331,4 @@ export default function ESocial() {
     </div>
   );
 }
+
