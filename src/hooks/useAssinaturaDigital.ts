@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
@@ -110,7 +111,7 @@ export function useAssinaturaDigital() {
         const ipData = await ipResponse.json();
         ipAddress = ipData.ip;
       } catch (err) {
-        console.warn('Não foi possível capturar o IP:', err);
+        logger.warn('Não foi possível capturar o IP:', err);
       }
 
       const { error } = await supabase
@@ -188,3 +189,4 @@ export const TIPOS_DOCUMENTO = [
   { value: 'declaracao', label: 'Declaração' },
   { value: 'outros', label: 'Outros' },
 ];
+
