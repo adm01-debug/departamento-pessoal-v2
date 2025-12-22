@@ -78,17 +78,17 @@ export default memo(function) GestaoDocumentos() {
     let html = template.conteudo_html;
     
     const variaveis: Record<string, string> = {
-      nome_colaborador: colaborador?.nome_completo || '',
-      cpf: colaborador?.cpf || '',
-      rg: colaborador?.rg || '',
-      cargo: colaborador?.cargo || '',
-      departamento: colaborador?.departamento || '',
+      nome_colaborador: colaborador?.nome_completo ?? '',
+      cpf: colaborador?.cpf ?? '',
+      rg: colaborador?.rg ?? '',
+      cargo: colaborador?.cargo ?? '',
+      departamento: colaborador?.departamento ?? '',
       data_admissao: colaborador?.data_admissao ? format(new Date(colaborador.data_admissao), 'dd/MM/yyyy') : '',
       jornada_semanal: colaborador?.jornada_semanal?.toString() || '44',
       salario: colaborador?.salario_base ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(colaborador.salario_base) : '',
-      empresa_razao_social: empresaAtual?.razao_social || '',
-      empresa_cnpj: empresaAtual?.cnpj || '',
-      cidade: empresaAtual?.cidade || '',
+      empresa_razao_social: empresaAtual?.razao_social ?? '',
+      empresa_cnpj: empresaAtual?.cnpj ?? '',
+      cidade: empresaAtual?.cidade ?? '',
       data_atual: format(new Date(), 'dd/MM/yyyy'),
       ...customVariables
     };
@@ -143,7 +143,7 @@ export default memo(function) GestaoDocumentos() {
   // Identificar variáveis customizadas que precisam ser preenchidas
   const getVariaveisCustomizadas = (template: unknown) => {
     if (!template) return [];
-    const variaveis = template.variaveis || [];
+    const variaveis = template.variaveis ?? [];
     const variavelPadrao = [
       'nome_colaborador', 'cpf', 'rg', 'cargo', 'departamento', 
       'data_admissao', 'jornada_semanal', 'salario',
@@ -206,7 +206,7 @@ export default memo(function) GestaoDocumentos() {
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-medium text-sm">{template.nome}</span>
-                            <Badge className={tipoColors[template.tipo] || ''} variant="secondary">
+                            <Badge className={tipoColors[template.tipo] ?? ''} variant="secondary">
                               {template.tipo}
                             </Badge>
                           </div>
@@ -259,7 +259,7 @@ export default memo(function) GestaoDocumentos() {
                           {varName.replace(/_/g, ' ')}
                         </Label>
                         <Input
-                          value={customVariables[varName] || ''}
+                          value={customVariables[varName] ?? ''}
                           onChange={(e) => setCustomVariables(prev => ({
                             ...prev,
                             [varName]: e.target.value
@@ -319,6 +319,7 @@ export default memo(function) GestaoDocumentos() {
     </div>
   );
 }
+
 
 
 
