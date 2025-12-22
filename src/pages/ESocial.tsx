@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { 
   FileText, Upload, Download, AlertTriangle, CheckCircle, 
@@ -39,6 +39,10 @@ const statusColors: Record<StatusEvento, string> = {
 };
 
 export default function ESocial() {
+  useEffect(() => {
+    document.title = 'eSocial | DP System';
+  }, []);
+
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [xmlModalOpen, setXmlModalOpen] = useState(false);
@@ -332,5 +336,6 @@ export default function ESocial() {
     </div>
   );
 }
+
 
 
