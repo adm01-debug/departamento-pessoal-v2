@@ -44,7 +44,7 @@ export default memo(function) DesligamentoPage() {
   const kpis = useMemo(() => {
     const emAndamento = desligamentos.filter(d => d.status === 'em_andamento');
     const concluidos = desligamentos.filter(d => d.status === 'concluido');
-    const totalPago = concluidos.reduce((sum, d) => sum + (d.valor_liquido || 0), 0);
+    const totalPago = concluidos.reduce((sum, d) => sum + (d.valor_liquido ?? 0), 0);
     
     return {
       emAndamento: emAndamento.length,
@@ -351,6 +351,7 @@ export default memo(function) DesligamentoPage() {
     </div>
   );
 }
+
 
 
 
