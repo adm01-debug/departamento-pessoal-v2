@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -110,7 +111,7 @@ export function useDocumentosColaborador(colaboradorId: string) {
 
       queryClient.invalidateQueries({ queryKey: ['documentos-colaborador', colaboradorId] });
     } catch (error) {
-      console.error('Erro ao enviar documento:', error);
+      logger.error('Erro ao enviar documento:', error);
       toast({
         title: 'Erro ao enviar documento',
         description: 'Não foi possível enviar o arquivo. Tente novamente.',
@@ -133,7 +134,7 @@ export function useDocumentosColaborador(colaboradorId: string) {
         .remove([filePath]);
 
       if (storageError) {
-        console.warn('Erro ao deletar do storage:', storageError);
+        logger.warn('Erro ao deletar do storage:', storageError);
       }
 
       // Delete from database
@@ -152,7 +153,7 @@ export function useDocumentosColaborador(colaboradorId: string) {
       queryClient.invalidateQueries({ queryKey: ['documentos-colaborador', colaboradorId] });
     },
     onError: (error) => {
-      console.error('Erro ao excluir documento:', error);
+      logger.error('Erro ao excluir documento:', error);
       toast({
         title: 'Erro ao excluir',
         description: 'Não foi possível excluir o documento.',
@@ -183,7 +184,7 @@ export function useDocumentosColaborador(colaboradorId: string) {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Erro ao baixar documento:', error);
+      logger.error('Erro ao baixar documento:', error);
       toast({
         title: 'Erro ao baixar',
         description: 'Não foi possível baixar o documento.',
@@ -202,3 +203,4 @@ export function useDocumentosColaborador(colaboradorId: string) {
     isDeleting: deleteDocumento.isPending,
   };
 }
+
