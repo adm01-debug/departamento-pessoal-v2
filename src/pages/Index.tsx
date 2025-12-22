@@ -1,4 +1,6 @@
 const Index = () => {
+  useEffect(() => { document.title = 'Início | DP System'; }, []);
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center animate-fade-in">
@@ -20,3 +22,4 @@ const Index = () => {
 };
 
 export default Index;
+
