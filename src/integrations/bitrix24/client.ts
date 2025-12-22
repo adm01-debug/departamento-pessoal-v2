@@ -1,4 +1,5 @@
 // =====================================================
+import { logger } from '@/lib/logger';
 // CLIENTE BITRIX24
 // =====================================================
 
@@ -151,4 +152,5 @@ export const bitrix24 = {
 };
 
 export default Bitrix24Client;
+
 
