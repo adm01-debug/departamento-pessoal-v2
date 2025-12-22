@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,7 +125,7 @@ export function useAutoSync() {
   const executarSync = useCallback(async () => {
     if (!config?.habilitado) return;
     if (!dentroDoPeriodoPermitido()) {
-      console.log('[AutoSync] Fora do período permitido');
+      logger.log('[AutoSync] Fora do período permitido');
       return;
     }
 
@@ -180,7 +181,7 @@ export function useAutoSync() {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-      console.error('[AutoSync] Erro:', error);
+      logger.error('[AutoSync] Erro:', error);
       
       setStatus(prev => ({
         ...prev,
@@ -204,7 +205,7 @@ export function useAutoSync() {
           detalhes: [`Erro: ${errorMessage}`],
         });
       } catch (e) {
-        console.error('Erro ao registrar log:', e);
+        logger.error('Erro ao registrar log:', e);
       }
     }
   }, [config, dentroDoPeriodoPermitido, atualizarConfig]);
@@ -322,3 +323,4 @@ export function AutoSyncStatusBadge(): JSX.Element {
     </span>
   );
 }
+
