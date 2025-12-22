@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, Pencil, Loader2 } from 'lucide-react';
 import { useState, memo, useEffect } from 'react';
-import { Colaborador } from '@/data/mockData';
+import { Colaborador } from '@/types/colaborador';
 import { validateCPF, unmask } from '@/lib/masks';
 
 const colaboradorSchema = z.object({
@@ -389,5 +389,6 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     </Dialog>
   );
 }
+
 
 
