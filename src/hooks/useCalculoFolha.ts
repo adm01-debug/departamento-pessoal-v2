@@ -1,4 +1,5 @@
 import { useAuditoriaIntegration } from './useAuditoriaIntegration';
+import { logger } from '@/lib/logger';
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -386,7 +387,7 @@ export function useCalculoFolha() {
       return resumo;
 
     } catch (error: unknown) {
-      console.error('Erro ao calcular folha:', error);
+      logger.error('Erro ao calcular folha:', error);
       const message = error instanceof Error ? error.message : 'Erro desconhecido';
       toast.error('Erro ao calcular folha: ' + message);
       throw error;
@@ -478,7 +479,7 @@ export function useCalculoFolha() {
       toast.success('Holerite recalculado com sucesso!');
 
     } catch (error: unknown) {
-      console.error('Erro ao recalcular holerite:', error);
+      logger.error('Erro ao recalcular holerite:', error);
       const message = error instanceof Error ? error.message : 'Erro desconhecido';
       toast.error('Erro: ' + message);
       throw error;
@@ -565,7 +566,7 @@ export function useEventosVariaveis(competencia: string) {
       if (error) throw error;
       setEventos(data || []);
     } catch (err) {
-      console.error('Erro ao buscar eventos:', err);
+      logger.error('Erro ao buscar eventos:', err);
     } finally {
       setLoading(false);
     }
@@ -620,3 +621,4 @@ export function useEventosVariaveis(competencia: string) {
 
   return { eventos, loading, fetchEventos, addEvento, removeEvento };
 }
+
