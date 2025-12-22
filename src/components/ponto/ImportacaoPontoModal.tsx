@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, Loader2, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -300,3 +300,4 @@ export function ImportacaoPontoModal({ open, onOpenChange, competencia, onSucces
     </Dialog>
   );
 }
+
