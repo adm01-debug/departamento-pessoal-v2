@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   FolhaPagamento, 
@@ -37,7 +38,7 @@ export function useFolhasPagamento() {
       if (error) throw error;
       setFolhas((data || []) as FolhaPagamento[]);
     } catch (err: unknown) {
-      console.error('Erro ao buscar folhas:', err);
+      logger.error('Erro ao buscar folhas:', err);
       toast({ title: 'Erro', description: err.message, variant: 'destructive' });
     } finally {
       setLoading(false);
@@ -123,7 +124,7 @@ export function useRubricas() {
         if (error) throw error;
         setRubricas((data || []) as RubricaFolha[]);
       } catch (err: unknown) {
-        console.error('Erro ao buscar rubricas:', err);
+        logger.error('Erro ao buscar rubricas:', err);
       } finally {
         setLoading(false);
       }
@@ -151,7 +152,7 @@ export function useHolerites(folhaId: string) {
       if (error) throw error;
       setHolerites((data || []) as Holerite[]);
     } catch (err: unknown) {
-      console.error('Erro ao buscar holerites:', err);
+      logger.error('Erro ao buscar holerites:', err);
     } finally {
       setLoading(false);
     }
@@ -181,7 +182,7 @@ export function useLancamentos(holeriteId: string) {
       if (error) throw error;
       setLancamentos((data || []) as LancamentoFolha[]);
     } catch (err: unknown) {
-      console.error('Erro ao buscar lançamentos:', err);
+      logger.error('Erro ao buscar lançamentos:', err);
     } finally {
       setLoading(false);
     }
@@ -211,7 +212,7 @@ export function useEventosVariaveis(competencia: string) {
       if (error) throw error;
       setEventos((data || []) as EventoVariavel[]);
     } catch (err: unknown) {
-      console.error('Erro ao buscar eventos:', err);
+      logger.error('Erro ao buscar eventos:', err);
     } finally {
       setLoading(false);
     }
@@ -531,7 +532,7 @@ export function useCalculoFolha() {
       toast({ title: 'Folha calculada!', description: `${colaboradores.length} holerites gerados.` });
       return true;
     } catch (err: unknown) {
-      console.error('Erro ao calcular folha:', err);
+      logger.error('Erro ao calcular folha:', err);
       toast({ title: 'Erro no cálculo', description: err.message, variant: 'destructive' });
       throw err;
     } finally {
@@ -541,3 +542,4 @@ export function useCalculoFolha() {
 
   return { calcularFolha, calculating };
 }
+
