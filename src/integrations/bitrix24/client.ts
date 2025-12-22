@@ -59,7 +59,7 @@ export class Bitrix24Client {
 
       return data.result;
     } catch (error) {
-      console.error(`Bitrix24 API error (${method}):`, error);
+      logger.error(`Bitrix24 API error (${method}):`, error);
       throw error;
     }
   }
@@ -152,5 +152,6 @@ export const bitrix24 = {
 };
 
 export default Bitrix24Client;
+
 
 
