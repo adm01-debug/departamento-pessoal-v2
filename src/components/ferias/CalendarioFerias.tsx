@@ -203,3 +203,4 @@ export function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: Calendar
     </div>
   );
 }
+
