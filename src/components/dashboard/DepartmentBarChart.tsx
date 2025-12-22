@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 import { useMemo } from 'react';
@@ -76,4 +77,5 @@ export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartPro
     </div>
   );
 }
+
 
