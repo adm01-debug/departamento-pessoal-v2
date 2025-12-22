@@ -1,3 +1,16 @@
+interface EmpresaCNAB {
+  banco: string;
+  cnpj: string;
+  agencia: string;
+  conta: string;
+  razao_social: string;
+  endereco?: string;
+  cidade?: string;
+  cep?: string;
+  uf?: string;
+  codigo?: string;
+}
+
 // Gerador de arquivos CNAB 240 e 400 para pagamento de folha
 import { format } from 'date-fns';
 
@@ -17,7 +30,7 @@ interface Pagamento {
 }
 
 // CNAB 240 - Layout padrão FEBRABAN
-export function gerarCNAB240(empresa: any, pagamentos: Pagamento[]): string {
+export function gerarCNAB240(empresa: EmpresaCNAB, pagamentos: Pagamento[]): string {
   const dataGeracao = format(new Date(), 'ddMMyyyy');
   const horaGeracao = format(new Date(), 'HHmmss');
   const linhas: string[] = [];
@@ -155,7 +168,7 @@ export function gerarCNAB240(empresa: any, pagamentos: Pagamento[]): string {
 }
 
 // CNAB 400 - Layout legado
-export function gerarCNAB400(empresa: any, pagamentos: Pagamento[]): string {
+export function gerarCNAB400(empresa: EmpresaCNAB, pagamentos: Pagamento[]): string {
   const linhas: string[] = [];
   const dataGeracao = format(new Date(), 'ddMMyy');
   
@@ -233,3 +246,4 @@ export function gerarCNAB400(empresa: any, pagamentos: Pagamento[]): string {
   
   return linhas.join('\r\n');
 }
+
