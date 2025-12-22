@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Users, 
   UserPlus, 
@@ -45,6 +45,10 @@ const periodLabels: Record<PeriodFilter, string> = {
 };
 
 export default function Dashboard() {
+  useEffect(() => {
+    document.title = 'Dashboard | DP System';
+  }, []);
+
   const navigate = useNavigate();
   const [period, setPeriod] = useState<PeriodFilter>('year');
   
@@ -355,3 +359,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
