@@ -58,7 +58,7 @@ export function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: Calendar
       dias.forEach(dia => {
         if (isSameMonth(dia, mesAtual)) {
           const key = format(dia, 'yyyy-MM-dd');
-          const lista = mapa.get(key) || [];
+          const lista = mapa.get(key) ?? [];
           lista.push(f);
           mapa.set(key, lista);
         }
@@ -75,7 +75,7 @@ export function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: Calendar
   // Renderizar célula do dia
   const renderDia = (dia: Date) => {
     const dataStr = format(dia, 'yyyy-MM-dd');
-    const feriasNoDia = feriasPorData.get(dataStr) || [];
+    const feriasNoDia = feriasPorData.get(dataStr) ?? [];
     const ehHoje = isToday(dia);
     const ehFimDeSemana = getDay(dia) === 0 || getDay(dia) === 6;
 
@@ -203,6 +203,7 @@ export function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: Calendar
     </div>
   );
 }
+
 
 
 
