@@ -211,7 +211,7 @@ export const usePonto = () => {
     let totalMinutosExtras = 0;
     let totalMinutosFalta = 0;
 
-    (registros || []).forEach((reg) => {
+    (registros ?? []).forEach((reg) => {
       const registro = reg as RegistroPonto;
       totalMinutosTrabalhados += intervalToMinutes(registro.horas_trabalhadas);
       totalMinutosExtras += intervalToMinutes(registro.horas_extras);
@@ -334,4 +334,5 @@ export const useResumoPonto = (competencia: string) => {
     }
   });
 };
+
 
