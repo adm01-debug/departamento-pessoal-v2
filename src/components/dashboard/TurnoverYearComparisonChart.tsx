@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
@@ -157,3 +158,4 @@ export function TurnoverYearComparisonChart({ data, loading }: TurnoverYearCompa
     </Card>
   );
 }
+
