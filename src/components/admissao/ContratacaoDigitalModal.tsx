@@ -187,10 +187,10 @@ export function ContratacaoDigitalModal({
                     readOnly 
                     className="text-xs"
                   />
-                  <Button variant="outline" size="icon" aria-label="Navegação" onClick={handleCopiarLink}>
+                  <Button variant="outline" size="icon" aria-label="Navegação" aria-label="Navegação" onClick={handleCopiarLink}>
                     <Copy className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="icon" aria-label="Navegação" onClick={handleAbrirLink}>
+                  <Button variant="outline" size="icon" aria-label="Navegação" aria-label="Navegação" onClick={handleAbrirLink}>
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 </div>
@@ -354,6 +354,7 @@ export function ContratacaoDigitalModal({
     </Dialog>
   );
 }
+
 
 
 
