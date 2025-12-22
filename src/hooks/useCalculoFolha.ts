@@ -105,7 +105,7 @@ export function useCalculoFolha() {
       
       if (beneficios) {
         for (const b of beneficios) {
-          const tipoNome = (b.tipos_beneficio as { nome?: string } | null)?.nome?.toLowerCase() || '';
+          const tipoNome = (b.tipos_beneficio as { nome?: string } | null)?.nome?.toLowerCase() ?? '';
           if (!beneficiosMap[b.colaborador_id]) {
             beneficiosMap[b.colaborador_id] = {
               valorVT: 0,
@@ -116,13 +116,13 @@ export function useCalculoFolha() {
           }
           
           if (tipoNome.includes('transporte') || tipoNome.includes('vt')) {
-            beneficiosMap[b.colaborador_id].valorVT = b.valor || 0;
+            beneficiosMap[b.colaborador_id].valorVT = b.valor ?? 0;
           } else if (tipoNome.includes('refeição') || tipoNome.includes('vr') || tipoNome.includes('alimenta')) {
-            beneficiosMap[b.colaborador_id].valorVR = b.valor || 0;
+            beneficiosMap[b.colaborador_id].valorVR = b.valor ?? 0;
           } else if (tipoNome.includes('saúde') || tipoNome.includes('saude') || tipoNome.includes('médico')) {
-            beneficiosMap[b.colaborador_id].valorPlanoSaude = b.desconto || 0;
+            beneficiosMap[b.colaborador_id].valorPlanoSaude = b.desconto ?? 0;
           } else if (tipoNome.includes('odonto') || tipoNome.includes('dental')) {
-            beneficiosMap[b.colaborador_id].valorPlanoOdonto = b.desconto || 0;
+            beneficiosMap[b.colaborador_id].valorPlanoOdonto = b.desconto ?? 0;
           }
         }
       }
@@ -133,7 +133,7 @@ export function useCalculoFolha() {
     // 6. Processar dados por colaborador
     return colaboradores.map((colab) => {
       // Agregar ponto do colaborador
-      const pontoColab = (registrosPonto || []).filter(p => p.colaborador_id === colab.id);
+      const pontoColab = (registrosPonto ?? []).filter(p => p.colaborador_id === colab.id);
       
       let horasExtras50 = 0;
       let horasExtras100 = 0;
@@ -168,7 +168,7 @@ export function useCalculoFolha() {
       }
 
       // Eventos variáveis do colaborador
-      const eventosColab = (eventos || [])
+      const eventosColab = (eventos ?? [])
         .filter(e => e.colaborador_id === colab.id)
         .map(e => {
           const rubrica = e.rubricas_folha as { codigo?: string; descricao?: string; tipo?: string; incide_inss?: boolean; incide_irrf?: boolean; incide_fgts?: boolean } | null;
@@ -305,7 +305,7 @@ export function useCalculoFolha() {
           dadosColab,
           dadosPonto,
           dadosBeneficios,
-          colab.eventosVariaveis || []
+          colab.eventosVariaveis ?? []
         );
 
         // Calcular encargos patronais
@@ -433,15 +433,15 @@ export function useCalculoFolha() {
         departamento: colab.departamento,
         matricula: colab.matricula,
         salarioBase: colab.salario_base,
-        dependentesIRRF: holerite.dependentes_irrf || 0,
+        dependentesIRRF: holerite.dependentes_irrf ?? 0,
         jornadaMensal,
       };
 
       const dadosPonto: DadosPonto = {
-        horasExtras50: holerite.horas_extras_50 || 0,
-        horasExtras100: holerite.horas_extras_100 || 0,
+        horasExtras50: holerite.horas_extras_50 ?? 0,
+        horasExtras100: holerite.horas_extras_100 ?? 0,
         horasNoturnas: 0,
-        diasFalta: holerite.faltas_dias || 0,
+        diasFalta: holerite.faltas_dias ?? 0,
         horasAtraso: 0,
         diasUteis: 22,
         domingosFeriados: 8,
@@ -564,7 +564,7 @@ export function useEventosVariaveis(competencia: string) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setEventos(data || []);
+      setEventos(data ?? []);
     } catch (err) {
       logger.error('Erro ao buscar eventos:', err);
     } finally {
@@ -621,4 +621,5 @@ export function useEventosVariaveis(competencia: string) {
 
   return { eventos, loading, fetchEventos, addEvento, removeEvento };
 }
+
 
