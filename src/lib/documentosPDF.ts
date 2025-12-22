@@ -1,5 +1,15 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+// Extensão de tipo para jspdf-autotable
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable: {
+      finalY: number;
+    };
+  }
+}
+
+
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -115,7 +125,7 @@ export function gerarFichaRegistro(colaborador: ColaboradorData): void {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
   
   // Section: Contato
   doc.setFillColor(240, 240, 240);
@@ -140,7 +150,7 @@ export function gerarFichaRegistro(colaborador: ColaboradorData): void {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
   
   // Section: Endereço
   doc.setFillColor(240, 240, 240);
@@ -167,7 +177,7 @@ export function gerarFichaRegistro(colaborador: ColaboradorData): void {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
   
   // Section: Documentos
   doc.setFillColor(240, 240, 240);
@@ -191,7 +201,7 @@ export function gerarFichaRegistro(colaborador: ColaboradorData): void {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
   
   // Section: Dados Profissionais
   doc.setFillColor(240, 240, 240);
@@ -227,7 +237,7 @@ export function gerarFichaRegistro(colaborador: ColaboradorData): void {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
   
   // Section: Dados Bancários
   doc.setFillColor(240, 240, 240);
@@ -351,7 +361,7 @@ export function gerarReciboFerias(dados: {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
   
   // Valores
   doc.setFillColor(240, 240, 240);
@@ -380,7 +390,7 @@ export function gerarReciboFerias(dados: {
     },
   });
   
-  yPos = (doc as any).lastAutoTable.finalY + 5;
+  yPos = doc.lastAutoTable.finalY + 5;
   
   // Total
   doc.setFillColor(34, 197, 94);
@@ -707,7 +717,7 @@ export function gerarHoleritePDF(dados: HoleriteData): void {
     margin: { left: 10 },
   });
   
-  const proventosEndY = (doc as any).lastAutoTable.finalY;
+  const proventosEndY = doc.lastAutoTable.finalY;
   
   // Tabela Descontos
   autoTable(doc, {
@@ -726,7 +736,7 @@ export function gerarHoleritePDF(dados: HoleriteData): void {
     margin: { left: 10 + (pageWidth - 25) / 2 + 5 },
   });
   
-  const descontosEndY = (doc as any).lastAutoTable.finalY;
+  const descontosEndY = doc.lastAutoTable.finalY;
   yPos = Math.max(proventosEndY, descontosEndY) + 10;
   
   // Totais
@@ -788,3 +798,4 @@ export function gerarHoleritePDF(dados: HoleriteData): void {
   const competenciaNome = dados.competencia.replace('/', '-');
   doc.save(`holerite_${competenciaNome}_${dados.colaborador_nome.replace(/\s+/g, '_')}.pdf`);
 }
+
