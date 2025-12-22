@@ -3,6 +3,8 @@ import { logger } from '@/lib/logger';
 import { useEffect } from "react";
 
 const NotFound = () => {
+  useEffect(() => { document.title = 'Página não encontrada | DP System'; }, []);
+
   const location = useLocation();
 
   useEffect(() => {
@@ -23,4 +25,5 @@ const NotFound = () => {
 };
 
 export default NotFound;
+
 
