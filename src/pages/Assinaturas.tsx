@@ -1,4 +1,4 @@
-import { useState, useEffect, useEffect } from 'react';
+import { useState, memo, useEffect, useEffect } from 'react';
 import { 
   PenTool, FileSignature, Clock, CheckCircle2, XCircle, Plus,
   Search, MoreHorizontal, Eye, Download, Trash2, RefreshCw
@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export default function Assinaturas() {
+export default memo(function) Assinaturas() {
   useEffect(() => {
     document.title = 'Assinaturas Digitais | DP System';
   }, []);
@@ -428,6 +428,7 @@ export default function Assinaturas() {
     </div>
   );
 }
+
 
 
 
