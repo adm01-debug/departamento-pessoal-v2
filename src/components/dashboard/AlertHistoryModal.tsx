@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -106,7 +107,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
       if (error) throw error;
       setHistory(data || []);
     } catch (error) {
-      console.error('Erro ao carregar histórico:', error);
+      logger.error('Erro ao carregar histórico:', error);
     } finally {
       setLoading(false);
     }
@@ -481,3 +482,4 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
     </Dialog>
   );
 }
+
