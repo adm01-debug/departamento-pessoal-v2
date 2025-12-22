@@ -157,7 +157,7 @@ export default memo(function) Folha() {
               </SelectContent>
             </Select>
           )}
-          <Button onClick={() => setNewFolhaOpen(true)} className="gap-2">
+          <Button aria-label="Ação" onClick={() => setNewFolhaOpen(true)} className="gap-2">
             <Plus className="w-4 h-4" />
             Nova Folha
           </Button>
@@ -169,7 +169,7 @@ export default memo(function) Folha() {
           <Wallet className="w-16 h-16 text-muted-foreground/50 mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma folha encontrada</h3>
           <p className="text-sm text-muted-foreground mb-4">Crie uma nova folha para começar o processamento</p>
-          <Button onClick={() => setNewFolhaOpen(true)} className="gap-2">
+          <Button aria-label="Ação" onClick={() => setNewFolhaOpen(true)} className="gap-2">
             <Plus className="w-4 h-4" />
             Criar Primeira Folha
           </Button>
@@ -315,7 +315,7 @@ export default memo(function) Folha() {
                           <TableCell className="text-right font-mono text-destructive">{formatCurrency(holerite.total_descontos)}</TableCell>
                           <TableCell className="text-right font-mono font-semibold">{formatCurrency(holerite.liquido)}</TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button aria-label="Ação" variant="ghost" size="icon" className="h-8 w-8">
                               <Eye className="w-4 h-4" />
                             </Button>
                           </TableCell>
@@ -373,17 +373,17 @@ export default memo(function) Folha() {
             )}
             {selectedFolha.status === 'calculada' && (
               <>
-                <Button onClick={handleCalcular} variant="outline" disabled={calculating} className="gap-2">
+                <Button aria-label="Ação" onClick={handleCalcular} variant="outline" disabled={calculating} className="gap-2">
                   {calculating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calculator className="w-4 h-4" />}
                   Recalcular
                 </Button>
-                <Button onClick={handleFechar} className="gap-2">
+                <Button aria-label="Ação" onClick={handleFechar} className="gap-2">
                   <Lock className="w-4 h-4" />
                   Fechar Folha
                 </Button>
               </>
             )}
-            <Button variant="outline" className="gap-2 ml-auto">
+            <Button aria-label="Ação" variant="outline" className="gap-2 ml-auto">
               <Download className="w-4 h-4" />
               Exportar
             </Button>
@@ -416,8 +416,8 @@ export default memo(function) Folha() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setNewFolhaOpen(false)}>Cancelar</Button>
-            <Button onClick={handleCreateFolha}>Criar Folha</Button>
+            <Button aria-label="Ação" variant="outline" onClick={() => setNewFolhaOpen(false)}>Cancelar</Button>
+            <Button aria-label="Ação" onClick={handleCreateFolha}>Criar Folha</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -504,7 +504,7 @@ function EventosVariaveisTab({
     <div className="space-y-4">
       {!disabled && (
         <div className="flex justify-end">
-          <Button onClick={() => setAddModalOpen(true)} className="gap-2">
+          <Button aria-label="Ação" onClick={() => setAddModalOpen(true)} className="gap-2">
             <Plus className="w-4 h-4" />
             Adicionar Evento
           </Button>
@@ -632,8 +632,8 @@ function EventosVariaveisTab({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAdd}>Adicionar</Button>
+            <Button aria-label="Ação" variant="outline" onClick={() => setAddModalOpen(false)}>Cancelar</Button>
+            <Button aria-label="Ação" onClick={handleAdd}>Adicionar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -780,6 +780,7 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
 
 
 
