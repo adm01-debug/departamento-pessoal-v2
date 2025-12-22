@@ -122,7 +122,7 @@ export const useFerias = () => {
         const { data, error } = await query;
         if (error) throw error;
         
-        return (data || []).map((f: { colaborador_id: string }) => ({
+        return (data ?? []).map((f: { colaborador_id: string }) => ({
           ...f,
           colaborador_nome: f.colaboradores?.nome_completo,
           colaborador_cargo: f.colaboradores?.cargo,
@@ -292,5 +292,6 @@ export const useFerias = () => {
     isAprovando: aprovarFeriasMutation.isPending
   };
 };
+
 
 
