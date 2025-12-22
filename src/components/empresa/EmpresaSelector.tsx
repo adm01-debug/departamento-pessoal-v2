@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { EmpresaModal } from "./EmpresaModal";
 
 export function EmpresaSelector() {
@@ -83,3 +83,4 @@ export function EmpresaSelector() {
     </>
   );
 }
+
