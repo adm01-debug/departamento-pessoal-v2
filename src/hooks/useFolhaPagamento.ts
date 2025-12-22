@@ -382,7 +382,14 @@ export function useCalculoFolha() {
         descontos += inss.valorINSS;
 
         // Calcular IRRF
-        const irrf = calcularIRRF(baseIRRF, inss.valorINSS, 0); // TODO: dependentes
+        // Buscar quantidade de dependentes do colaborador
+      const { data: dependentes } = await supabase
+        .from('dependentes')
+        .select('id')
+        .eq('colaborador_id', colaborador.id);
+      
+      const qtdDependentes = dependentes?.length || 0;
+      const irrf = calcularIRRF(baseIRRF, inss.valorINSS, qtdDependentes);
         descontos += irrf.valorIRRF;
 
         // Calcular FGTS
@@ -542,4 +549,5 @@ export function useCalculoFolha() {
 
   return { calcularFolha, calculating };
 }
+
 
