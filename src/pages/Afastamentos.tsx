@@ -65,7 +65,7 @@ export default memo(function) Afastamentos() {
     isProrrogando
   } = useAfastamentos();
 
-  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') || [];
+  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') ?? [];
   
   const { data: config } = useConfigAfastamentos();
   const { data: afastamentos, isLoading } = useAfastamentosQuery({ 
@@ -80,18 +80,18 @@ export default memo(function) Afastamentos() {
     return afastamentosAtivos?.filter(a => {
       const dias = differenceInDays(parseISO(a.data_fim_prevista), parseISO(a.data_inicio)) + 1;
       return dias > 15 && ['doenca', 'acidente_trabalho', 'acidente_trajeto'].includes(a.tipo);
-    }) || [];
+    }) ?? [];
   }, [afastamentosAtivos]);
 
   // Estatísticas
   const stats = useMemo(() => {
-    const ativos = afastamentosAtivos?.length || 0;
+    const ativos = afastamentosAtivos?.length ?? 0;
     const esteMes = afastamentos?.filter(a => {
       const data = parseISO(a.data_inicio);
       return data.getMonth() === new Date().getMonth() && data.getFullYear() === new Date().getFullYear();
-    }).length || 0;
-    const maternidade = afastamentosAtivos?.filter(a => a.tipo === 'licenca_maternidade').length || 0;
-    const inss = afastamentosAtivos?.filter(a => (a.dias_inss || 0) > 0).length || 0;
+    }).length ?? 0;
+    const maternidade = afastamentosAtivos?.filter(a => a.tipo === 'licenca_maternidade').length ?? 0;
+    const inss = afastamentosAtivos?.filter(a => (a.dias_inss ?? 0) > 0).length ?? 0;
     
     return { ativos, esteMes, maternidade, inss };
   }, [afastamentos, afastamentosAtivos]);
@@ -538,5 +538,6 @@ export default memo(function) Afastamentos() {
     </div>
   );
 }
+
 
 
