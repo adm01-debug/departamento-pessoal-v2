@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -91,3 +92,4 @@ export function AbsenteeismChart({ data }: AbsenteeismChartProps) {
     </div>
   );
 }
+
