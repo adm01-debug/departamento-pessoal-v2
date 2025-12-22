@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -50,7 +51,7 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
   const registrarLog = useCallback(async (log: Omit<LogAuditoria, 'entidade'>) => {
     try {
       // Log no console para debug
-      console.log('[Auditoria]', log.acao, entidadePadrao, log.entidade_id);
+      logger.log('[Auditoria]', log.acao, entidadePadrao, log.entidade_id);
       
       // Tentar inserir na tabela audit_log (padrão do sistema)
       await supabase.from('audit_log').insert({
@@ -65,7 +66,7 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
         user_email: user?.email,
       });
     } catch (error) {
-      console.error('Erro ao registrar auditoria:', error);
+      logger.error('Erro ao registrar auditoria:', error);
     }
   }, [entidadePadrao, user]);
 
@@ -175,4 +176,5 @@ export const useAuditoriaBeneficios = () => useAuditoriaIntegration('beneficio')
 export const useAuditoriaAfastamentos = () => useAuditoriaIntegration('afastamento');
 
 export default useAuditoriaIntegration;
+
 
