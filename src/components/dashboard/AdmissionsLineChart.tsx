@@ -1,15 +1,15 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { mockColaboradores } from '@/data/mockData';
+
 import { useMemo } from 'react';
 import { format, parseISO, startOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface AdmissionsLineChartProps {
-  colaboradores?: typeof mockColaboradores;
+  colaboradores?: typeof [];
   months?: number;
 }
 
-export function AdmissionsLineChart({ colaboradores = mockColaboradores, months = 12 }: AdmissionsLineChartProps) {
+export function AdmissionsLineChart({ colaboradores = [], months = 12 }: AdmissionsLineChartProps) {
   const data = useMemo(() => {
     const now = new Date();
     const startDate = startOfMonth(subMonths(now, months - 1));
@@ -128,3 +128,4 @@ export function AdmissionsLineChart({ colaboradores = mockColaboradores, months 
     </div>
   );
 }
+
