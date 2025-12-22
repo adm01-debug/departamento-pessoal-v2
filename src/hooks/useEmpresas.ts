@@ -247,3 +247,4 @@ export function useEmpresas() {
     temMultiplasEmpresas: (userEmpresas?.length || 0) > 1,
   };
 }
+
