@@ -389,3 +389,4 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     </Dialog>
   );
 }
+
