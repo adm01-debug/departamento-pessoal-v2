@@ -7,7 +7,7 @@ import { parse, isValid, format } from 'date-fns';
 
 export interface ColaboradorImport {
   linha: number;
-  dados: Record<string, any>;
+  dados: Record<string, unknown>;
   erros: string[];
   valido: boolean;
 }
@@ -186,7 +186,7 @@ export function useImportacaoColaboradores() {
       const workbook = XLSX.read(data, { type: 'array', cellDates: true });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
 
       if (jsonData.length < 2) {
         toast({
@@ -239,7 +239,7 @@ export function useImportacaoColaboradores() {
         if (!row || row.every(cell => cell === null || cell === undefined || cell === '')) continue;
 
         const erros: string[] = [];
-        const dados: Record<string, any> = {};
+        const dados: Record<string, unknown> = {};
 
         // Extrair dados mapeados
         Object.entries(columnIndexMap).forEach(([field, index]) => {
@@ -476,3 +476,4 @@ export function useImportacaoColaboradores() {
     totalInvalidos: dadosPreview.filter(p => !p.valido).length,
   };
 }
+
