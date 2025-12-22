@@ -190,3 +190,4 @@ export const TIPOS_DOCUMENTO = [
   { value: 'outros', label: 'Outros' },
 ];
 
+
