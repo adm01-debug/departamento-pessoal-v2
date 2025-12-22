@@ -60,7 +60,9 @@ export function useAuditoria(filtros?: FiltrosAuditoria) {
       let query = supabase
         .from('audit_log')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false ,
+    staleTime: 5 * 60 * 1000,
+    retry: 3})
         .limit(500);
 
       if (filtros?.tabela && filtros.tabela !== 'todas') {
@@ -131,4 +133,5 @@ export function useHistoricoRegistro(tabela: string, registroId: string) {
     enabled: !!tabela && !!registroId,
   });
 }
+
 
