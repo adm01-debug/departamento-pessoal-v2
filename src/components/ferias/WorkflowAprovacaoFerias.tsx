@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { 
   CheckCircle, XCircle, Clock, AlertTriangle, History, 
   User, Calendar, DollarSign, FileText, Loader2, ChevronDown
@@ -233,4 +233,5 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
     </>
   );
 }
+
 
