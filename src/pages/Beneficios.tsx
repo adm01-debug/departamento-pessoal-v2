@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { Gift, Plus, Loader2, Search, X, Pencil, Trash2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,10 @@ import { formatters, ExportColumn } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 
 export default function Beneficios() {
+  useEffect(() => {
+    document.title = 'Benefícios | DP System';
+  }, []);
+
   const { 
     tiposBeneficio, 
     beneficiosColaboradores, 
@@ -361,3 +365,4 @@ export default function Beneficios() {
     </div>
   );
 }
+
