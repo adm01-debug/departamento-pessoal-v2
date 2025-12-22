@@ -29,7 +29,7 @@ export default function Assinaturas() {
   const [search, setSearch] = useState('');
   const [novoDocumentoOpen, setNovoDocumentoOpen] = useState(false);
   const [assinarModalOpen, setAssinarModalOpen] = useState(false);
-  const [documentoSelecionado, setDocumentoSelecionado] = useState<any>(null);
+  const [documentoSelecionado, setDocumentoSelecionado] = useState<unknown>(null);
   const [visualizarAssinaturaOpen, setVisualizarAssinaturaOpen] = useState(false);
   const [assinaturaVisualizada, setAssinaturaVisualizada] = useState<string | null>(null);
 
@@ -424,3 +424,4 @@ export default function Assinaturas() {
     </div>
   );
 }
+
