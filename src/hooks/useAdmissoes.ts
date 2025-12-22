@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useColaboradores } from './useColaboradores';
@@ -110,7 +111,7 @@ export function useAdmissoes() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
-      console.error('Erro ao buscar admissões:', err);
+      logger.error('Erro ao buscar admissões:', err);
     } finally {
       setLoading(false);
     }
@@ -259,4 +260,5 @@ export function useAdmissoes() {
     ETAPA_CONCLUIDA,
   };
 }
+
 
