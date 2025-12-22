@@ -528,7 +528,9 @@ export function useDesligamentoMelhorado() {
             *,
             colaboradores!inner(nome_completo, cargo, departamento, data_admissao)
           `)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false ,
+    staleTime: 5 * 60 * 1000,
+    retry: 3});
 
         if (filtros?.status) {
           query = query.eq('status', filtros.status);
@@ -806,3 +808,4 @@ export function useDesligamentoMelhorado() {
     direitosPorTipo,
   };
 }
+
