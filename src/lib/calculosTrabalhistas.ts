@@ -285,3 +285,4 @@ export function calcularFolhaColaborador(
     inssPatronal,
   };
 }
+
