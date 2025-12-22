@@ -9,7 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { mockColaboradores, statusColors } from '@/data/mockData';
+import { [], statusColors } from '@/data/mockData';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -32,10 +32,10 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
   // Filtrar colaboradores
   const filteredColaboradores = useMemo(() => {
-    if (!search) return mockColaboradores.slice(0, 8);
+    if (!search) return [].slice(0, 8);
     
     const query = search.toLowerCase();
-    return mockColaboradores.filter(c => 
+    return [].filter(c => 
       c.nome.toLowerCase().includes(query) ||
       c.matricula.toLowerCase().includes(query) ||
       c.cargo.toLowerCase().includes(query) ||
@@ -113,3 +113,4 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     </CommandDialog>
   );
 }
+
