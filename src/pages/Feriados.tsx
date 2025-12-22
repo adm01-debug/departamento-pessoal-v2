@@ -1,6 +1,10 @@
 import { CalendarioFeriados } from '@/components/feriados/CalendarioFeriados';
 
 export default function Feriados() {
+  useEffect(() => {
+    document.title = 'Feriados | DP System';
+  }, []);
+
   return (
     <>
       
@@ -19,3 +23,4 @@ export default function Feriados() {
     </>
   );
 }
+
