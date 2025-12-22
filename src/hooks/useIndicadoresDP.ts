@@ -91,7 +91,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .select('id, status, departamento, data_admissao, data_desligamento, salario_base');
       
       if (error) throw error;
-      return data || [];
+      return data ?? [];
     }
   });
 
@@ -127,8 +127,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
       if (errTotal) throw errTotal;
 
       return {
-        admissoes: admissoes?.length || 0,
-        desligamentos: desligamentos?.length || 0,
+        admissoes: admissoes?.length ?? 0,
+        desligamentos: desligamentos?.length ?? 0,
         total: total || 1
       };
     }
@@ -159,13 +159,13 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         const admissoes = colaboradores?.filter(c => {
           const admDate = c.data_admissao;
           return admDate >= monthStart && admDate <= monthEnd;
-        }).length || 0;
+        }).length ?? 0;
         
         // Contar desligamentos no mês
         const desligamentos = colaboradores?.filter(c => {
           const deslDate = c.data_desligamento;
           return deslDate && deslDate >= monthStart && deslDate <= monthEnd;
-        }).length || 0;
+        }).length ?? 0;
         
         // Estimar total de colaboradores ativos no final do mês
         const totalAtivos = colaboradores?.filter(c => {
@@ -219,13 +219,13 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         const admissoes = colaboradores?.filter(c => {
           const admDate = c.data_admissao;
           return admDate >= yearStart && admDate <= yearEnd;
-        }).length || 0;
+        }).length ?? 0;
         
         // Contar desligamentos no ano
         const desligamentos = colaboradores?.filter(c => {
           const deslDate = c.data_desligamento;
           return deslDate && deslDate >= yearStart && deslDate <= yearEnd;
-        }).length || 0;
+        }).length ?? 0;
         
         // Estimar total de colaboradores ativos no final do ano
         const totalAtivos = colaboradores?.filter(c => {
@@ -274,7 +274,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .in('status', ['ativo', 'prorrogado', 'encerrado']);
       
       if (error) throw error;
-      return afastamentos || [];
+      return afastamentos ?? [];
     }
   });
 
@@ -298,7 +298,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .lte('data', mesFim);
       
       if (error) throw error;
-      return registros || [];
+      return registros ?? [];
     }
   });
 
@@ -330,7 +330,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
       
       if (errHol) throw errHol;
 
-      return { holerites: holerites || [], usarSalarioBase: false };
+      return { holerites: holerites ?? [], usarSalarioBase: false };
     }
   });
 
@@ -348,7 +348,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .in('status', ['aprovada', 'em_gozo']);
       
       if (error) throw error;
-      return count || 0;
+      return count ?? 0;
     }
   });
 
@@ -362,7 +362,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .eq('aprovado', false);
       
       if (error) throw error;
-      return count || 0;
+      return count ?? 0;
     }
   });
 
@@ -380,7 +380,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .in('status', ['ativo', 'prorrogado']);
       
       if (error) throw error;
-      return count || 0;
+      return count ?? 0;
     }
   });
 
@@ -394,12 +394,12 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
                     pontoQuery.isLoading ||
                     folhaQuery.isLoading;
 
-    const colaboradores = colaboradoresQuery.data || [];
+    const colaboradores = colaboradoresQuery.data ?? [];
     const turnoverData = turnoverQuery.data || { admissoes: 0, desligamentos: 0, total: 1 };
-    const turnoverEvolution = turnoverEvolutionQuery.data || [];
-    const turnoverYearComparison = turnoverYearQuery.data || [];
-    const afastamentos = afastamentosQuery.data || [];
-    const registrosPonto = pontoQuery.data || [];
+    const turnoverEvolution = turnoverEvolutionQuery.data ?? [];
+    const turnoverYearComparison = turnoverYearQuery.data ?? [];
+    const afastamentos = afastamentosQuery.data ?? [];
+    const registrosPonto = pontoQuery.data ?? [];
     const folhaData = folhaQuery.data || { holerites: [], usarSalarioBase: true };
 
     // Calcular turnover
@@ -456,7 +456,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
         .forEach(c => {
           const current = custoByDept.get(c.departamento) || { total: 0, count: 0 };
           custoByDept.set(c.departamento, {
-            total: current.total + (c.salario_base || 0),
+            total: current.total + (c.salario_base ?? 0),
             count: current.count + 1
           });
         });
@@ -474,7 +474,7 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
       folhaData.holerites.forEach((h: unknown) => {
         const current = custoByDept.get(h.colaborador_departamento) || { total: 0, count: 0 };
         custoByDept.set(h.colaborador_departamento, {
-          total: current.total + (h.total_proventos || 0),
+          total: current.total + (h.total_proventos ?? 0),
           count: current.count + 1
         });
       });
@@ -506,12 +506,12 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
       kpis: {
         colaboradoresAtivos: ativos,
         admissoesEmCurso: pendentes,
-        feriasEsteMes: feriasQuery.data || 0,
-        afastadosHoje: afastadosHojeQuery.data || 0,
-        pontosPendentes: pontosPendentesQuery.data || 0,
+        feriasEsteMes: feriasQuery.data ?? 0,
+        afastadosHoje: afastadosHojeQuery.data ?? 0,
+        pontosPendentes: pontosPendentesQuery.data ?? 0,
         folhaProjetada: folhaTotal,
         desligamentosEmCurso: turnoverData.desligamentos,
-        alertasUrgentes: Math.min((afastadosHojeQuery.data || 0) + (pontosPendentesQuery.data || 0), 10)
+        alertasUrgentes: Math.min((afastadosHojeQuery.data ?? 0) + (pontosPendentesQuery.data ?? 0), 10)
       },
       loading
     };
@@ -519,4 +519,5 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
 
   return processData();
 }
+
 
