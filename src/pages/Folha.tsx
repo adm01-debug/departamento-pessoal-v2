@@ -461,7 +461,7 @@ function EventosVariaveisTab({
   eventos: unknown[];
   colaboradores: unknown[];
   rubricas: unknown[];
-  onAdd: (evento: unknown) => Promise<any>;
+  onAdd: (evento: unknown) => Promise<unknown>;
   onRemove: (id: string) => Promise<void>;
   disabled: boolean;
 }) {
@@ -776,3 +776,4 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
