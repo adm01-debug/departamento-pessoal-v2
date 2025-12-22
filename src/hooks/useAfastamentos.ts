@@ -71,7 +71,9 @@ export const useAfastamentos = () => {
             *,
             colaboradores!inner(nome_completo, cargo, departamento)
           `)
-          .order('data_inicio', { ascending: false });
+          .order('data_inicio', { ascending: false ,
+    staleTime: 5 * 60 * 1000,
+    retry: 3});
         
         if (empresaAtualId) {
           query = query.eq('empresa_id', empresaAtualId);
@@ -335,7 +337,9 @@ export const useAfastamentos = () => {
             colaboradores!inner(nome_completo, cargo, departamento)
           `)
           .in('status', ['ativo', 'prorrogado'])
-          .order('data_fim_prevista', { ascending: true });
+          .order('data_fim_prevista', { ascending: true ,
+    staleTime: 5 * 60 * 1000,
+    retry: 3});
         
         if (empresaAtualId) {
           query = query.eq('empresa_id', empresaAtualId);
@@ -367,3 +371,4 @@ export const useAfastamentos = () => {
     isProrrogando: prorrogarAfastamentoMutation.isPending
   };
 };
+
