@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, AlertTriangle, Calendar, FileText, CheckCircle, XCircle, Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,10 @@ import {
 } from '@/types/afastamento';
 
 export default function Afastamentos() {
+  useEffect(() => {
+    document.title = 'Afastamentos | DP System';
+  }, []);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [prorrogaDialogOpen, setProrrogaDialogOpen] = useState(false);
   const [selectedAfastamentoId, setSelectedAfastamentoId] = useState<string | null>(null);
@@ -534,3 +538,4 @@ export default function Afastamentos() {
     </div>
   );
 }
+
