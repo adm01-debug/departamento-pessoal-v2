@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,7 +64,7 @@ export function ExportDropdown({ options, defaultFilename, disabled }: ExportDro
           break;
       }
     } catch (error) {
-      console.error('Erro ao exportar:', error);
+      logger.error('Erro ao exportar:', error);
       toast({
         title: 'Erro na exportação',
         description: 'Não foi possível gerar o arquivo.',
@@ -103,3 +104,4 @@ export function ExportDropdown({ options, defaultFilename, disabled }: ExportDro
     </DropdownMenu>
   );
 }
+
