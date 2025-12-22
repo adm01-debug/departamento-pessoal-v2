@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useRef, useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -234,3 +235,4 @@ export function AssinaturaDigitalModal({
     </Dialog>
   );
 }
+
