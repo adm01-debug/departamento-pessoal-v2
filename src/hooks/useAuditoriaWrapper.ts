@@ -37,11 +37,11 @@ export function useAuditoriaWrapper(entidade: Entidade) {
     acao: TipoAcao,
     entidadeId: string,
     descricao: string,
-    dadosAnteriores?: Record<string, any>,
-    dadosNovos?: Record<string, any>
+    dadosAnteriores?: Record<string, unknown>,
+    dadosNovos?: Record<string, unknown>
   ) => {
     await auditoria.registrarLog({
-      acao: acao as any,
+      acao: acao as TipoAcao,
       entidade_id: entidadeId,
       descricao,
       dados_anteriores: dadosAnteriores,
@@ -52,7 +52,7 @@ export function useAuditoriaWrapper(entidade: Entidade) {
   const criar = useCallback(async (
     entidadeId: string,
     descricao: string,
-    dados?: Record<string, any>
+    dados?: Record<string, unknown>
   ) => {
     await auditoria.registrarCriacao(entidadeId, dados);
   }, [auditoria]);
@@ -60,8 +60,8 @@ export function useAuditoriaWrapper(entidade: Entidade) {
   const editar = useCallback(async (
     entidadeId: string,
     descricao: string,
-    dadosAnteriores?: Record<string, any>,
-    dadosNovos?: Record<string, any>
+    dadosAnteriores?: Record<string, unknown>,
+    dadosNovos?: Record<string, unknown>
   ) => {
     await auditoria.registrarAlteracao(entidadeId, dadosAnteriores, dadosNovos);
   }, [auditoria]);
@@ -69,7 +69,7 @@ export function useAuditoriaWrapper(entidade: Entidade) {
   const excluir = useCallback(async (
     entidadeId: string,
     descricao: string,
-    dadosAnteriores?: Record<string, any>
+    dadosAnteriores?: Record<string, unknown>
   ) => {
     await auditoria.registrarExclusao(entidadeId, dadosAnteriores);
   }, [auditoria]);
@@ -94,3 +94,4 @@ export const useAuditoriaBeneficio = () => useAuditoriaWrapper('beneficio');
 export const useAuditoriaAfastamento = () => useAuditoriaWrapper('afastamento');
 
 export default useAuditoriaWrapper;
+
