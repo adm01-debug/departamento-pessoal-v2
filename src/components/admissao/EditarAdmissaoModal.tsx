@@ -110,7 +110,7 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
         cargo: admissao.cargo || "",
         departamento: admissao.departamento || "",
         data_prevista: admissao.data_prevista || "",
-        salario_proposto: admissao.salario_proposto || 0,
+        salario_proposto: admissao.salario_proposto ?? 0,
         cpf: admissao.cpf || "",
         data_nascimento: admissao.data_nascimento || "",
         sexo: admissao.sexo || "",
@@ -204,7 +204,7 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
                   type="number"
                   step="0.01"
                   value={formData.salario_proposto}
-                  onChange={(e) => setFormData({ ...formData, salario_proposto: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => setFormData({ ...formData, salario_proposto: parseFloat(e.target.value) ?? 0 })}
                   required
                 />
               </div>
@@ -362,4 +362,5 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
     </Dialog>
   );
 }
+
 
