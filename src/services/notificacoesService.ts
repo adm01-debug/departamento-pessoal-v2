@@ -1,4 +1,5 @@
 /**
+import { logger } from '@/lib/logger';
  * Serviço para envio de notificações
  */
 
@@ -34,7 +35,7 @@ export const notificarResultadoSync = async (
       lida: false,
     });
   } catch (error) {
-    console.error('Erro ao criar notificação:', error);
+    logger.error('Erro ao criar notificação:', error);
   }
 };
 
@@ -54,6 +55,7 @@ export const criarNotificacao = async (
       lida: false,
     });
   } catch (error) {
-    console.error('Erro ao criar notificação:', error);
+    logger.error('Erro ao criar notificação:', error);
   }
 };
+
