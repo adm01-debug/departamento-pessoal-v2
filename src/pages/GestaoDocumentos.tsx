@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DOMPurify from 'dompurify';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,10 @@ import { useEmpresas } from '@/hooks/useEmpresas';
 import { format } from 'date-fns';
 
 export default function GestaoDocumentos() {
+  useEffect(() => {
+    document.title = 'Gestão de Documentos | DP System';
+  }, []);
+
   const queryClient = useQueryClient();
   const { colaboradores } = useColaboradores();
   const { empresaAtual } = useEmpresas();
@@ -315,4 +319,5 @@ export default function GestaoDocumentos() {
     </div>
   );
 }
+
 
