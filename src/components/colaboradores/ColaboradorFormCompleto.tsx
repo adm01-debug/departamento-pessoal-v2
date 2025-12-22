@@ -252,58 +252,58 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
     if (colaborador && open) {
       form.reset({
         ...colaborador,
-        salario_base: colaborador.salario_base?.toString() || '',
+        salario_base: colaborador.salario_base?.toString() ?? '',
         jornada_semanal: colaborador.jornada_semanal?.toString() || '44',
         intervalo_minutos: colaborador.intervalo_minutos?.toString() || '60',
-        nome_social: colaborador.nome_social || '',
-        rg: colaborador.rg || '',
-        rg_orgao_emissor: colaborador.rg_orgao_emissor || '',
-        rg_uf: colaborador.rg_uf || '',
-        rg_data_emissao: colaborador.rg_data_emissao || '',
-        nome_pai: colaborador.nome_pai || '',
+        nome_social: colaborador.nome_social ?? '',
+        rg: colaborador.rg ?? '',
+        rg_orgao_emissor: colaborador.rg_orgao_emissor ?? '',
+        rg_uf: colaborador.rg_uf ?? '',
+        rg_data_emissao: colaborador.rg_data_emissao ?? '',
+        nome_pai: colaborador.nome_pai ?? '',
         nacionalidade: colaborador.nacionalidade || 'Brasileira',
-        naturalidade_cidade: colaborador.naturalidade_cidade || '',
-        naturalidade_uf: colaborador.naturalidade_uf || '',
-        pis_pasep: colaborador.pis_pasep || '',
-        ctps_numero: colaborador.ctps_numero || '',
-        ctps_serie: colaborador.ctps_serie || '',
-        ctps_uf: colaborador.ctps_uf || '',
-        ctps_data_emissao: colaborador.ctps_data_emissao || '',
-        titulo_eleitor: colaborador.titulo_eleitor || '',
-        titulo_zona: colaborador.titulo_zona || '',
-        titulo_secao: colaborador.titulo_secao || '',
-        certificado_reservista: colaborador.certificado_reservista || '',
-        cnh_numero: colaborador.cnh_numero || '',
-        cnh_categoria: colaborador.cnh_categoria || '',
-        cnh_validade: colaborador.cnh_validade || '',
-        email: colaborador.email || '',
-        telefone: colaborador.telefone || '',
-        celular: colaborador.celular || '',
-        cep: colaborador.cep || '',
-        logradouro: colaborador.logradouro || '',
-        numero: colaborador.numero || '',
-        complemento: colaborador.complemento || '',
-        bairro: colaborador.bairro || '',
-        cidade: colaborador.cidade || '',
-        uf: colaborador.uf || '',
-        banco_codigo: colaborador.banco_codigo || '',
-        banco_nome: colaborador.banco_nome || '',
-        agencia: colaborador.agencia || '',
-        conta: colaborador.conta || '',
+        naturalidade_cidade: colaborador.naturalidade_cidade ?? '',
+        naturalidade_uf: colaborador.naturalidade_uf ?? '',
+        pis_pasep: colaborador.pis_pasep ?? '',
+        ctps_numero: colaborador.ctps_numero ?? '',
+        ctps_serie: colaborador.ctps_serie ?? '',
+        ctps_uf: colaborador.ctps_uf ?? '',
+        ctps_data_emissao: colaborador.ctps_data_emissao ?? '',
+        titulo_eleitor: colaborador.titulo_eleitor ?? '',
+        titulo_zona: colaborador.titulo_zona ?? '',
+        titulo_secao: colaborador.titulo_secao ?? '',
+        certificado_reservista: colaborador.certificado_reservista ?? '',
+        cnh_numero: colaborador.cnh_numero ?? '',
+        cnh_categoria: colaborador.cnh_categoria ?? '',
+        cnh_validade: colaborador.cnh_validade ?? '',
+        email: colaborador.email ?? '',
+        telefone: colaborador.telefone ?? '',
+        celular: colaborador.celular ?? '',
+        cep: colaborador.cep ?? '',
+        logradouro: colaborador.logradouro ?? '',
+        numero: colaborador.numero ?? '',
+        complemento: colaborador.complemento ?? '',
+        bairro: colaborador.bairro ?? '',
+        cidade: colaborador.cidade ?? '',
+        uf: colaborador.uf ?? '',
+        banco_codigo: colaborador.banco_codigo ?? '',
+        banco_nome: colaborador.banco_nome ?? '',
+        agencia: colaborador.agencia ?? '',
+        conta: colaborador.conta ?? '',
         tipo_conta: colaborador.tipo_conta || 'corrente',
-        pix_tipo: colaborador.pix_tipo || '',
-        pix_chave: colaborador.pix_chave || '',
-        matricula: colaborador.matricula || '',
-        data_desligamento: colaborador.data_desligamento || '',
-        centro_custo: colaborador.centro_custo || '',
-        local_trabalho: colaborador.local_trabalho || '',
-        cbo: colaborador.cbo || '',
+        pix_tipo: colaborador.pix_tipo ?? '',
+        pix_chave: colaborador.pix_chave ?? '',
+        matricula: colaborador.matricula ?? '',
+        data_desligamento: colaborador.data_desligamento ?? '',
+        centro_custo: colaborador.centro_custo ?? '',
+        local_trabalho: colaborador.local_trabalho ?? '',
+        cbo: colaborador.cbo ?? '',
         tipo_salario: colaborador.tipo_salario || 'mensal',
-        horario_entrada: colaborador.horario_entrada || '',
-        horario_saida: colaborador.horario_saida || '',
-        formacao: colaborador.formacao || '',
-        cursos_certificacoes: colaborador.cursos_certificacoes || '',
-        observacoes: colaborador.observacoes || '',
+        horario_entrada: colaborador.horario_entrada ?? '',
+        horario_saida: colaborador.horario_saida ?? '',
+        formacao: colaborador.formacao ?? '',
+        cursos_certificacoes: colaborador.cursos_certificacoes ?? '',
+        observacoes: colaborador.observacoes ?? '',
       } as ColaboradorFormData);
       setActiveTab('pessoal');
     } else if (!open) {
@@ -343,10 +343,10 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
             variant: 'destructive',
           });
         } else {
-          form.setValue('logradouro', data.logradouro || '');
-          form.setValue('bairro', data.bairro || '');
-          form.setValue('cidade', data.localidade || '');
-          form.setValue('uf', data.uf || '');
+          form.setValue('logradouro', data.logradouro ?? '');
+          form.setValue('bairro', data.bairro ?? '');
+          form.setValue('cidade', data.localidade ?? '');
+          form.setValue('uf', data.uf ?? '');
           toast({
             title: 'Endereço encontrado',
             description: `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`,
@@ -369,7 +369,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
   const handleBancoChange = (codigo: string) => {
     const banco = bancosComuns.find(b => b.codigo === codigo);
     form.setValue('banco_codigo', codigo);
-    form.setValue('banco_nome', banco?.nome || '');
+    form.setValue('banco_nome', banco?.nome ?? '');
   };
 
   const tabItems = [
@@ -530,7 +530,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                           <FormControl>
                             <MaskedInput 
                               mask="rg" 
-                              value={field.value || ''} 
+                              value={field.value ?? ''} 
                               onValueChange={(_, masked) => field.onChange(masked)} 
                               className="bg-background font-mono" 
                               placeholder="00.000.000-0"
@@ -584,7 +584,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                       <FormItem>
                         <FormLabel>Telefone</FormLabel>
                         <FormControl>
-                          <MaskedInput mask="phone" value={field.value || ''} onValueChange={(_, masked) => field.onChange(masked)} className="bg-background" />
+                          <MaskedInput mask="phone" value={field.value ?? ''} onValueChange={(_, masked) => field.onChange(masked)} className="bg-background" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -594,7 +594,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                       <FormItem>
                         <FormLabel>Celular</FormLabel>
                         <FormControl>
-                          <MaskedInput mask="phone" value={field.value || ''} onValueChange={(_, masked) => field.onChange(masked)} className="bg-background" />
+                          <MaskedInput mask="phone" value={field.value ?? ''} onValueChange={(_, masked) => field.onChange(masked)} className="bg-background" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -656,7 +656,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                           <MaskedInput 
                             mask="tituloEleitor" 
                             placeholder="0000 0000 0000" 
-                            value={field.value || ''} 
+                            value={field.value ?? ''} 
                             onValueChange={(_, masked) => field.onChange(masked)} 
                             className="bg-background font-mono" 
                           />
@@ -696,7 +696,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                           <MaskedInput 
                             mask="cnh" 
                             placeholder="00000000000" 
-                            value={field.value || ''} 
+                            value={field.value ?? ''} 
                             onValueChange={(_, masked) => field.onChange(masked)} 
                             className="bg-background font-mono" 
                           />
@@ -738,9 +738,9 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                             <div className="relative flex-1">
                               <MaskedInput 
                                 mask="cep" 
-                                value={field.value || ''} 
+                                value={field.value ?? ''} 
                                 onValueChange={(_, masked) => field.onChange(masked)} 
-                                onBlur={() => handleCepBlur(field.value || '')}
+                                onBlur={() => handleCepBlur(field.value ?? '')}
                                 className="bg-background font-mono" 
                                 disabled={isFetchingCep}
                               />
@@ -754,8 +754,8 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
                               type="button" 
                               variant="outline" 
                               size="icon"
-                              onClick={() => handleCepBlur(field.value || '')}
-                              disabled={isFetchingCep || unmask(field.value || '').length !== 8}
+                              onClick={() => handleCepBlur(field.value ?? '')}
+                              disabled={isFetchingCep || unmask(field.value ?? '').length !== 8}
                               title="Buscar endereço"
                             >
                               <Search className="h-4 w-4" />
@@ -1116,6 +1116,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
     </Dialog>
   );
 }
+
 
 
 
