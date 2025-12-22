@@ -34,8 +34,8 @@ interface LogAuditoria {
   entidade: EntidadeAuditoria;
   entidade_id?: string;
   descricao: string;
-  dados_anteriores?: Record<string, any>;
-  dados_novos?: Record<string, any>;
+  dados_anteriores?: Record<string, unknown>;
+  dados_novos?: Record<string, unknown>;
 }
 
 /**
@@ -71,7 +71,7 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
 
   const registrarCriacao = useCallback(async (
     id: string,
-    dados?: Record<string, any>
+    dados?: Record<string, unknown>
   ) => {
     await registrarLog({
       acao: 'criar',
@@ -83,8 +83,8 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
 
   const registrarAlteracao = useCallback(async (
     id: string,
-    dadosAnteriores?: Record<string, any>,
-    dadosNovos?: Record<string, any>
+    dadosAnteriores?: Record<string, unknown>,
+    dadosNovos?: Record<string, unknown>
   ) => {
     await registrarLog({
       acao: 'editar',
@@ -97,7 +97,7 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
 
   const registrarExclusao = useCallback(async (
     id: string,
-    dadosAnteriores?: Record<string, any>
+    dadosAnteriores?: Record<string, unknown>
   ) => {
     await registrarLog({
       acao: 'excluir',
@@ -132,7 +132,7 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
 
   const calcular = useCallback(async (
     id: string,
-    resultado?: Record<string, any>
+    resultado?: Record<string, unknown>
   ) => {
     await registrarLog({
       acao: 'calcular',
@@ -143,7 +143,7 @@ export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
   }, [registrarLog, entidadePadrao]);
 
   const exportar = useCallback(async (
-    detalhes?: Record<string, any>
+    detalhes?: Record<string, unknown>
   ) => {
     await registrarLog({
       acao: 'exportar',
@@ -175,3 +175,4 @@ export const useAuditoriaBeneficios = () => useAuditoriaIntegration('beneficio')
 export const useAuditoriaAfastamentos = () => useAuditoriaIntegration('afastamento');
 
 export default useAuditoriaIntegration;
+
