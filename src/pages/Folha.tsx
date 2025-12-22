@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { 
   Wallet, CheckCircle, Clock, FileText, Plus, Calculator, 
   Users, Banknote, TrendingUp, ChevronRight, Loader2, 
@@ -41,7 +41,7 @@ import {
 import { formatCurrency } from '@/lib/calculosTrabalhistas';
 import { toast } from '@/hooks/use-toast';
 
-export default function Folha() {
+export default memo(function) Folha() {
   useEffect(() => {
     document.title = 'Folha de Pagamento | DP System';
   }, []);
@@ -780,5 +780,6 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
 
 
