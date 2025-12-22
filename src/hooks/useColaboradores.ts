@@ -34,10 +34,11 @@ export function useColaboradores() {
       setColaboradores(data || []);
     } catch (err: unknown) {
       console.error('Erro ao buscar colaboradores:', err);
-      setError(err.message);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      setError(message);
       toast({
         title: 'Erro ao carregar colaboradores',
-        description: err.message,
+        description: message,
         variant: 'destructive',
       });
     } finally {
@@ -70,9 +71,10 @@ export function useColaboradores() {
       return newColaborador;
     } catch (err: unknown) {
       console.error('Erro ao criar colaborador:', err);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
       toast({
         title: 'Erro ao cadastrar',
-        description: err.message,
+        description: message,
         variant: 'destructive',
       });
       throw err;
@@ -99,9 +101,10 @@ export function useColaboradores() {
       return updated;
     } catch (err: unknown) {
       console.error('Erro ao atualizar colaborador:', err);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
       toast({
         title: 'Erro ao atualizar',
-        description: err.message,
+        description: message,
         variant: 'destructive',
       });
       throw err;
@@ -126,9 +129,10 @@ export function useColaboradores() {
       });
     } catch (err: unknown) {
       console.error('Erro ao excluir colaborador:', err);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
       toast({
         title: 'Erro ao excluir',
-        description: err.message,
+        description: message,
         variant: 'destructive',
       });
       throw err;
@@ -204,7 +208,8 @@ export function useDependentes(colaboradorId: string) {
       toast({ title: 'Dependente adicionado!' });
       return newDep;
     } catch (err: unknown) {
-      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
       throw err;
     }
   };
@@ -220,7 +225,8 @@ export function useDependentes(colaboradorId: string) {
       setDependentes(prev => prev.filter(d => d.id !== id));
       toast({ title: 'Dependente removido!' });
     } catch (err: unknown) {
-      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
       throw err;
     }
   };
@@ -270,7 +276,8 @@ export function useHistoricoCargo(colaboradorId: string) {
       toast({ title: 'Histórico registrado!' });
       return newHist;
     } catch (err: unknown) {
-      toast({ title: 'Erro', description: err.message, variant: 'destructive' });
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
       throw err;
     }
   };

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Bitrix24Client, Bitrix24User, Bitrix24Department, bitrix24 } from '@/integrations/bitrix24/client';
 import { ColaboradorDB } from '@/types/colaborador';
 import { useAuditoriaIntegration } from './useAuditoriaIntegration';
+import type { Json } from '@/integrations/supabase/types';
 
 // =====================================================
 // TIPOS
@@ -63,7 +64,14 @@ export function useBitrix24Sync() {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      return data?.valor as ConfiguracaoSync | null;
+      if (!data?.valor) return null;
+      
+      // Cast safely through unknown
+      const valor = data.valor as unknown;
+      if (typeof valor === 'object' && valor !== null && 'webhook_url' in valor) {
+        return valor as ConfiguracaoSync;
+      }
+      return null;
     },
   });
 
@@ -73,9 +81,9 @@ export function useBitrix24Sync() {
         .from('configuracoes')
         .upsert({
           chave: 'bitrix24_sync',
-          valor: config,
+          valor: config as unknown as Json,
           updated_at: new Date().toISOString(),
-        });
+        }, { onConflict: 'chave' });
 
       if (error) throw error;
 
@@ -85,7 +93,8 @@ export function useBitrix24Sync() {
       toast.success('Configuração salva com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['bitrix24-config'] });
     } catch (err: unknown) {
-      toast.error('Erro ao salvar configuração: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao salvar configuração: ' + message);
       throw err;
     }
   };
@@ -161,10 +170,10 @@ export function useBitrix24Sync() {
             nome_completo: `${user.NAME} ${user.LAST_NAME}`.trim(),
             email: user.EMAIL,
             telefone: user.PERSONAL_PHONE || user.WORK_PHONE,
-            cargo: user.WORK_POSITION,
-            departamento: user.UF_DEPARTMENT?.[0]?.toString(),
+            cargo: user.WORK_POSITION || 'Não definido',
+            departamento: user.UF_DEPARTMENT?.[0]?.toString() || 'Geral',
             bitrix_id: user.ID.toString(),
-            bitrix_sync_status: 'sincronizado' as StatusSync,
+            bitrix_sync_status: 'sincronizado',
             bitrix_ultima_sync: new Date().toISOString(),
           };
 
@@ -178,20 +187,28 @@ export function useBitrix24Sync() {
               .eq('id', existente.id);
             resultado.detalhes.push(`Atualizado: ${dadosColaborador.nome_completo}`);
           } else {
+            // Para novo colaborador, precisamos dos campos obrigatórios
             await supabase
               .from('colaboradores')
               .insert({
                 ...dadosColaborador,
-                cpf: '',
+                cpf: '000.000.000-00', // Placeholder - precisa ser atualizado
                 data_admissao: new Date().toISOString().split('T')[0],
-                status: 'ativo',
+                data_nascimento: '1990-01-01', // Placeholder
+                sexo: 'masculino' as const,
+                estado_civil: 'solteiro' as const,
+                nome_mae: 'Não informado',
+                salario_base: 0,
+                status: 'ativo' as const,
+                tipo_contrato: 'clt' as const,
               });
             resultado.detalhes.push(`Importado: ${dadosColaborador.nome_completo}`);
           }
           resultado.sucesso++;
         } catch (err: unknown) {
           resultado.erros++;
-          resultado.detalhes.push(`Erro em ${user.NAME}: ${err.message}`);
+          const message = err instanceof Error ? err.message : 'Erro desconhecido';
+          resultado.detalhes.push(`Erro em ${user.NAME}: ${message}`);
         }
       }
 
@@ -208,7 +225,8 @@ export function useBitrix24Sync() {
       
       return resultado;
     } catch (err: unknown) {
-      toast.error('Erro na importação: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro na importação: ' + message);
       throw err;
     } finally {
       setSincronizando(false);
@@ -278,7 +296,8 @@ export function useBitrix24Sync() {
           resultado.sucesso++;
         } catch (err: unknown) {
           resultado.erros++;
-          resultado.detalhes.push(`Erro em ${colab.nome_completo}: ${err.message}`);
+          const message = err instanceof Error ? err.message : 'Erro desconhecido';
+          resultado.detalhes.push(`Erro em ${colab.nome_completo}: ${message}`);
           
           await supabase
             .from('colaboradores')
@@ -301,7 +320,8 @@ export function useBitrix24Sync() {
       
       return resultado;
     } catch (err: unknown) {
-      toast.error('Erro na exportação: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro na exportação: ' + message);
       throw err;
     } finally {
       setSincronizando(false);

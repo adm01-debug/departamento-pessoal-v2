@@ -15,6 +15,14 @@ export interface BackupProgress {
   error?: string;
 }
 
+interface ColaboradorBackup {
+  nome_completo?: string;
+  cpf?: string;
+  cargo?: string;
+  departamento?: string;
+  status?: string;
+}
+
 export type BackupData = {
   [key: string]: unknown[];
   colaboradores: unknown[];
@@ -245,13 +253,16 @@ export function useBackupExport() {
       doc.text('Resumo de Colaboradores', 14, 20);
 
       if (data.colaboradores.length > 0) {
-        const colaboradoresSummary = data.colaboradores.slice(0, 50).map((c: unknown) => [
-          c.nome_completo || '',
-          c.cpf || '',
-          c.cargo || '',
-          c.departamento || '',
-          c.status || '',
-        ]);
+        const colaboradoresSummary = data.colaboradores.slice(0, 50).map((item: unknown) => {
+          const c = item as ColaboradorBackup;
+          return [
+            c.nome_completo || '',
+            c.cpf || '',
+            c.cargo || '',
+            c.departamento || '',
+            c.status || '',
+          ];
+        });
 
         autoTable(doc, {
           startY: 30,

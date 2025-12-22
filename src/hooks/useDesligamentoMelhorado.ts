@@ -475,6 +475,46 @@ export function calcularRescisaoCompleta(
 
 export function useDesligamentoMelhorado() {
   const queryClient = useQueryClient();
+  const auditoria = useAuditoriaIntegration('colaborador');
+
+  // Tipo para o resultado do join
+  interface DesligamentoRow {
+    id: string;
+    colaborador_id: string;
+    tipo: string;
+    data_desligamento: string;
+    data_aviso?: string;
+    motivo?: string;
+    status: string;
+    salario_base: number;
+    saldo_salario?: number;
+    aviso_previo?: number;
+    ferias_vencidas?: number;
+    ferias_proporcionais?: number;
+    terco_constitucional?: number;
+    decimo_terceiro?: number;
+    multa_fgts?: number;
+    total_proventos?: number;
+    total_descontos?: number;
+    valor_liquido?: number;
+    checklist_comunicacao?: boolean;
+    checklist_documentacao?: boolean;
+    checklist_calculo_rescisao?: boolean;
+    checklist_homologacao?: boolean;
+    checklist_revogacao_acessos?: boolean;
+    checklist_devolucao_equipamentos?: boolean;
+    checklist_esocial?: boolean;
+    checklist_pagamento?: boolean;
+    created_at: string;
+    created_by?: string;
+    updated_at: string;
+    colaboradores?: {
+      nome_completo?: string;
+      cargo?: string;
+      departamento?: string;
+      data_admissao?: string;
+    };
+  }
 
   // ===== QUERIES =====
 
@@ -501,7 +541,7 @@ export function useDesligamentoMelhorado() {
         const { data, error } = await query;
         if (error) throw error;
 
-        return data.map((d: Record<string, unknown>) => ({
+        return (data || []).map((d: DesligamentoRow) => ({
           ...d,
           colaborador_nome: d.colaboradores?.nome_completo,
           colaborador_cargo: d.colaboradores?.cargo,
@@ -521,18 +561,20 @@ export function useDesligamentoMelhorado() {
           .from('desligamentos')
           .select(`
             *,
-            colaboradores!inner(nome_completo, cargo, departamento, data_admissao, cpf, pis)
+            colaboradores!inner(nome_completo, cargo, departamento, data_admissao)
           `)
           .eq('id', id)
           .single();
 
         if (error) throw error;
+        
+        const row = data as DesligamentoRow;
         return {
-          ...data,
-          colaborador_nome: data.colaboradores?.nome_completo,
-          colaborador_cargo: data.colaboradores?.cargo,
-          colaborador_departamento: data.colaboradores?.departamento,
-          colaborador_data_admissao: data.colaboradores?.data_admissao,
+          ...row,
+          colaborador_nome: row.colaboradores?.nome_completo,
+          colaborador_cargo: row.colaboradores?.cargo,
+          colaborador_departamento: row.colaboradores?.departamento,
+          colaborador_data_admissao: row.colaboradores?.data_admissao,
         } as DesligamentoComColaborador;
       },
       enabled: !!id,
@@ -604,33 +646,21 @@ export function useDesligamentoMelhorado() {
           tipo: dados.tipo,
           data_desligamento: dados.dataDesligamento,
           data_aviso: dados.dataAviso,
-          aviso_previo_trabalhado: dados.avisoPrevioTrabalhado,
-          aviso_previo_indenizado: !dados.avisoPrevioTrabalhado,
           motivo: dados.motivo,
           status: 'em_andamento',
           
           salario_base: dados.calculo.salarioBase,
-          media_variaveis: dados.calculo.mediaVariaveis,
           
           saldo_salario: dados.calculo.saldoSalario.valor,
           aviso_previo: dados.calculo.avisoPrevio.valor,
-          aviso_previo_dias: dados.calculo.avisoPrevio.dias,
           ferias_vencidas: dados.calculo.feriasVencidas.valor,
           ferias_proporcionais: dados.calculo.feriasProporcionais.valor,
-          ferias_proporcionais_meses: dados.calculo.feriasProporcionais.meses,
-          terco_ferias_vencidas: dados.calculo.feriasVencidas.terco,
-          terco_ferias_proporcionais: dados.calculo.feriasProporcionais.terco,
+          terco_constitucional: dados.calculo.feriasVencidas.terco + dados.calculo.feriasProporcionais.terco,
           decimo_terceiro: dados.calculo.decimoTerceiro.valor,
-          decimo_terceiro_meses: dados.calculo.decimoTerceiro.meses,
           
-          saldo_fgts: dados.calculo.fgts.saldoEstimado,
           multa_fgts: dados.calculo.fgts.multaValor,
-          multa_fgts_percentual: dados.calculo.fgts.multaPercentual,
           
           total_proventos: dados.calculo.totalProventos,
-          desconto_inss: dados.calculo.descontos.inss,
-          desconto_irrf: dados.calculo.descontos.irrf,
-          desconto_aviso_previo: dados.calculo.descontos.avisoPrevioNaoCumprido,
           total_descontos: dados.calculo.descontos.total,
           valor_liquido: dados.calculo.valorLiquido,
         })
@@ -639,17 +669,17 @@ export function useDesligamentoMelhorado() {
 
       if (error) throw error;
 
-      // Atualizar status do colaborador
+      // Atualizar status do colaborador para afastado (em processo de desligamento)
       await supabase
         .from('colaboradores')
         .update({ 
-          status: 'em_desligamento',
+          status: 'afastado',
           data_desligamento: dados.dataDesligamento,
         })
         .eq('id', dados.colaboradorId);
 
       // ✅ AUDITORIA
-      await auditoria.registrarCriacao('desligamentos', data.id, { colaborador_id: dados.colaboradorId, tipo: dados.tipo });
+      await auditoria.registrarCriacao(data.id, { colaborador_id: dados.colaboradorId, tipo: dados.tipo });
       return data;
     },
     onSuccess: () => {
@@ -690,18 +720,17 @@ export function useDesligamentoMelhorado() {
         .from('desligamentos')
         .update({
           status: 'concluido',
-          concluido_em: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', id);
 
       if (error) throw error;
 
-      // Atualizar colaborador para inativo
+      // Atualizar colaborador para desligado
       if (desligamento?.colaborador_id) {
         await supabase
           .from('colaboradores')
-          .update({ status: 'inativo' })
+          .update({ status: 'desligado' })
           .eq('id', desligamento.colaborador_id);
       }
     },
