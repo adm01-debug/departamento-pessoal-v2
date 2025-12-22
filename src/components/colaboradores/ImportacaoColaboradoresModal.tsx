@@ -1,4 +1,4 @@
-import { useState, useRef, memo } from 'react';
+import { useState, memo, useRef, memo } from 'react';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X, Loader2, Download, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
@@ -447,4 +447,5 @@ export function ImportacaoColaboradoresModal({
     </Dialog>
   );
 }
+
 
