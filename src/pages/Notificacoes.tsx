@@ -88,7 +88,7 @@ export default function Notificacoes() {
           </p>
         </div>
         {contadorNaoLidas > 0 && (
-          <Button variant="outline" onClick={() => marcarTodasLidas()}>
+          <Button aria-label="Ação" variant="outline" onClick={() => marcarTodasLidas()}>
             <CheckCheck className="w-4 h-4 mr-2" />
             Marcar Todas como Lidas
           </Button>
@@ -211,5 +211,6 @@ export default function Notificacoes() {
     </div>
   );
 }
+
 
 
