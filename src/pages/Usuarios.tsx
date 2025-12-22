@@ -372,7 +372,7 @@ export default function Usuarios() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Usuário</label>
-              <Select value={selectedUserId || ''} onValueChange={setSelectedUserId}>
+              <Select value={selectedUserId ?? ''} onValueChange={setSelectedUserId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o usuário" />
                 </SelectTrigger>
@@ -417,5 +417,6 @@ export default function Usuarios() {
     </div>
   );
 }
+
 
 
