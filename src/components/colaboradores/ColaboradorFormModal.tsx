@@ -100,13 +100,13 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     if (colaborador && open) {
       form.reset({
         nome: colaborador.nome,
-        cpf: (colaborador as any).cpf || '',
+        cpf: (colaborador as any).cpf ?? '',
         matricula: colaborador.matricula,
         cargo: colaborador.cargo,
         departamento: colaborador.departamento,
         dataAdmissao: colaborador.dataAdmissao,
         salario: colaborador.salario.toString(),
-        gestor: colaborador.gestor || '',
+        gestor: colaborador.gestor ?? '',
         status: colaborador.status,
       });
     } else if (!open) {
@@ -389,6 +389,7 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     </Dialog>
   );
 }
+
 
 
 
