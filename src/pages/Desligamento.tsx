@@ -190,7 +190,7 @@ export default function DesligamentoPage() {
       </div>
 
       {/* Tabs e Lista */}
-      <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as unknown)}>
         <TabsList>
           <TabsTrigger value="em_andamento" className="gap-2">
             <Clock className="w-4 h-4" />
@@ -347,3 +347,4 @@ export default function DesligamentoPage() {
     </div>
   );
 }
+
