@@ -26,6 +26,10 @@ const signupSchema = z.object({
 });
 
 export default function Auth() {
+  useEffect(() => {
+    document.title = 'Login | DP System';
+  }, []);
+
   const navigate = useNavigate();
   const { user, loading, signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -265,3 +269,4 @@ export default function Auth() {
     </div>
   );
 }
+
