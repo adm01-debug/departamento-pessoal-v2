@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Calendar, List, AlertTriangle, CheckCircle, XCircle, Eye, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +44,10 @@ const statusPeriodoLabels: Record<string, string> = {
 };
 
 export default function Ferias() {
+  useEffect(() => {
+    document.title = 'Férias | DP System';
+  }, []);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [colaboradorId, setColaboradorId] = useState<string>('');
@@ -538,3 +542,4 @@ export default function Ferias() {
     </div>
   );
 }
+
