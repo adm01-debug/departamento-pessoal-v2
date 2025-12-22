@@ -958,3 +958,131 @@ interface ASOData {
   tipo?: string;
   resultado?: string;
 }
+
+
+// S-1010: Tabela de Rubricas
+export function gerarXML_S1010(empresa: EmpresaData, rubrica: RubricaData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtTabRubrica/v_S_01_02_00">
+  <evtTabRubrica Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoRubrica>
+      <inclusao>
+        <ideRubrica>
+          <codRubr>${rubrica.codigo}</codRubr>
+          <ideTabRubr>1</ideTabRubr>
+          <iniValid>${dataAtual.slice(0, 7).replace('-', '')}</iniValid>
+        </ideRubrica>
+        <dadosRubrica>
+          <dscRubr>${rubrica.descricao}</dscRubr>
+          <natRubr>${rubrica.natureza || '1000'}</natRubr>
+          <tpRubr>${rubrica.tipo || '1'}</tpRubr>
+          <codIncCP>${rubrica.incidencia_cp || '11'}</codIncCP>
+          <codIncIRRF>${rubrica.incidencia_irrf || '11'}</codIncIRRF>
+          <codIncFGTS>${rubrica.incidencia_fgts || '11'}</codIncFGTS>
+        </dadosRubrica>
+      </inclusao>
+    </infoRubrica>
+  </evtTabRubrica>
+</eSocial>`;
+}
+
+// S-1020: Tabela de Lotações Tributárias
+export function gerarXML_S1020(empresa: EmpresaData, lotacao: LotacaoData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtTabLotacao/v_S_01_02_00">
+  <evtTabLotacao Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoLotacao>
+      <inclusao>
+        <ideLotacao>
+          <codLotacao>${lotacao.codigo}</codLotacao>
+          <iniValid>${dataAtual.slice(0, 7).replace('-', '')}</iniValid>
+        </ideLotacao>
+        <dadosLotacao>
+          <tpLotacao>${lotacao.tipo || '01'}</tpLotacao>
+          <fpasLotacao>
+            <fpas>${lotacao.fpas || '515'}</fpas>
+            <codTercs>${lotacao.cod_tercs || '0000'}</codTercs>
+          </fpasLotacao>
+        </dadosLotacao>
+      </inclusao>
+    </infoLotacao>
+  </evtTabLotacao>
+</eSocial>`;
+}
+
+// S-2240: Condições Ambientais do Trabalho - Agentes Nocivos
+export function gerarXML_S2240(colaborador: ColaboradorData, empresa: EmpresaData, condicao: CondicaoAmbientalData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtExpRisco/v_S_01_02_00">
+  <evtExpRisco Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <ideVinculo>
+      <cpfTrab>${colaborador.cpf.replace(/\D/g, '')}</cpfTrab>
+      <matricula>${colaborador.matricula || ''}</matricula>
+    </ideVinculo>
+    <infoExpRisco>
+      <dtIniCondicao>${condicao.data_inicio}</dtIniCondicao>
+      <infoAmb>
+        <codAmb>${condicao.codigo_ambiente}</codAmb>
+      </infoAmb>
+      <infoAtiv>
+        <dscAtivDes>${condicao.descricao_atividade}</dscAtivDes>
+      </infoAtiv>
+    </infoExpRisco>
+  </evtExpRisco>
+</eSocial>`;
+}
+
+// Tipos auxiliares adicionais
+interface RubricaData {
+  codigo: string;
+  descricao: string;
+  natureza?: string;
+  tipo?: string;
+  incidencia_cp?: string;
+  incidencia_irrf?: string;
+  incidencia_fgts?: string;
+}
+
+interface LotacaoData {
+  codigo: string;
+  tipo?: string;
+  fpas?: string;
+  cod_tercs?: string;
+}
+
+interface CondicaoAmbientalData {
+  data_inicio: string;
+  codigo_ambiente: string;
+  descricao_atividade: string;
+}
