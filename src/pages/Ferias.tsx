@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, memo, useEffect, useMemo } from 'react';
 import { Plus, Calendar, List, AlertTriangle, CheckCircle, XCircle, Eye, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,7 @@ const statusPeriodoLabels: Record<string, string> = {
   pago: 'Pago',
 };
 
-export default function Ferias() {
+export default memo(function) Ferias() {
   useEffect(() => {
     document.title = 'Férias | DP System';
   }, []);
@@ -542,4 +542,5 @@ export default function Ferias() {
     </div>
   );
 }
+
 
