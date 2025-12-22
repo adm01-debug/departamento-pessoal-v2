@@ -41,7 +41,7 @@ export default memo(function) Ponto() {
   const { useRegistrosPonto, useFeriados, calcularResumoMensal, registrarPonto, isRegistrando } = usePonto();
   const { exportarParaFolha, isExportando } = useIntegracaoPontoFolha();
 
-  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') || [];
+  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') ?? [];
   const colaboradorSelecionado = colaboradoresAtivos.find(c => c.id === colaboradorId);
 
   const [ano, mes] = competencia.split('-').map(Number);
@@ -126,13 +126,13 @@ export default memo(function) Ponto() {
     setRegistroEditando({
       colaborador_id: colaboradorId,
       data: dataStr,
-      entrada_1: registroExistente?.entrada_1 || '',
-      saida_1: registroExistente?.saida_1 || '',
-      entrada_2: registroExistente?.entrada_2 || '',
-      saida_2: registroExistente?.saida_2 || '',
+      entrada_1: registroExistente?.entrada_1 ?? '',
+      saida_1: registroExistente?.saida_1 ?? '',
+      entrada_2: registroExistente?.entrada_2 ?? '',
+      saida_2: registroExistente?.saida_2 ?? '',
       tipo_dia: registroExistente?.tipo_dia || 'normal',
-      justificativa: registroExistente?.justificativa || '',
-      observacoes: registroExistente?.observacoes || ''
+      justificativa: registroExistente?.justificativa ?? '',
+      observacoes: registroExistente?.observacoes ?? ''
     });
     setDialogOpen(true);
   };
@@ -267,7 +267,7 @@ export default memo(function) Ponto() {
         <div className="p-4 rounded-xl bg-card border border-border">
           <p className="text-xs text-muted-foreground uppercase">Dias Trabalhados</p>
           <p className="text-2xl font-bold text-foreground mt-1">
-            {resumo?.dias_trabalhados || 0}/{resumo?.dias_uteis || 0}
+            {resumo?.dias_trabalhados ?? 0}/{resumo?.dias_uteis ?? 0}
           </p>
           <p className="text-xs text-muted-foreground">este mês</p>
         </div>
@@ -376,7 +376,7 @@ export default memo(function) Ponto() {
                 <Label>Entrada</Label>
                 <Input
                   type="time"
-                  value={registroEditando?.entrada_1 || ''}
+                  value={registroEditando?.entrada_1 ?? ''}
                   onChange={e => setRegistroEditando(prev => prev ? { ...prev, entrada_1: e.target.value } : null)}
                 />
               </div>
@@ -384,7 +384,7 @@ export default memo(function) Ponto() {
                 <Label>Almoço</Label>
                 <Input
                   type="time"
-                  value={registroEditando?.saida_1 || ''}
+                  value={registroEditando?.saida_1 ?? ''}
                   onChange={e => setRegistroEditando(prev => prev ? { ...prev, saida_1: e.target.value } : null)}
                 />
               </div>
@@ -392,7 +392,7 @@ export default memo(function) Ponto() {
                 <Label>Retorno</Label>
                 <Input
                   type="time"
-                  value={registroEditando?.entrada_2 || ''}
+                  value={registroEditando?.entrada_2 ?? ''}
                   onChange={e => setRegistroEditando(prev => prev ? { ...prev, entrada_2: e.target.value } : null)}
                 />
               </div>
@@ -400,7 +400,7 @@ export default memo(function) Ponto() {
                 <Label>Saída</Label>
                 <Input
                   type="time"
-                  value={registroEditando?.saida_2 || ''}
+                  value={registroEditando?.saida_2 ?? ''}
                   onChange={e => setRegistroEditando(prev => prev ? { ...prev, saida_2: e.target.value } : null)}
                 />
               </div>
@@ -431,7 +431,7 @@ export default memo(function) Ponto() {
             <div>
               <Label>Observações</Label>
               <Textarea
-                value={registroEditando?.observacoes || ''}
+                value={registroEditando?.observacoes ?? ''}
                 onChange={e => setRegistroEditando(prev => prev ? { ...prev, observacoes: e.target.value } : null)}
                 placeholder="Observações opcionais..."
               />
@@ -463,6 +463,7 @@ export default memo(function) Ponto() {
     </div>
   );
 }
+
 
 
 
