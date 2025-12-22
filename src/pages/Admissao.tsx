@@ -80,7 +80,7 @@ export default memo(function) AdmissaoPage() {
       nome: data.candidatoNome,
       cargo: data.cargo,
       departamento: data.departamento,
-      salario_proposto: data.salarioProposto || 0,
+      salario_proposto: data.salarioProposto ?? 0,
       data_prevista: data.dataPrevisao.toISOString().split('T')[0],
       observacoes: data.observacoes,
       cpf: data.cpf,
@@ -434,6 +434,7 @@ export default memo(function) AdmissaoPage() {
     </div>
   );
 }
+
 
 
 
