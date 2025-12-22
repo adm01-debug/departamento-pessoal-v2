@@ -136,7 +136,7 @@ export function useFeriados(ano?: number) {
         .gte('data', `${anoSync}-01-01`)
         .lte('data', `${anoSync}-12-31`);
       
-      const datasExistentes = new Set(existentes?.map(f => f.data) || []);
+      const datasExistentes = new Set(existentes?.map(f => f.data) ?? []);
       
       // Filtrar apenas novos
       const novos = feriadosGerados.filter(f => !datasExistentes.has(f.data));
@@ -229,4 +229,5 @@ export function useFeriados(ano?: number) {
     gerarFeriadosAno,
   };
 }
+
 
