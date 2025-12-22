@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { 
   Link2, Copy, Send, Mail, MessageCircle, CheckCircle2, 
   Clock, FileText, Upload, PenTool, RefreshCw, ExternalLink,
@@ -73,7 +74,7 @@ export function ContratacaoDigitalModal({
         setDocumentos(docs || []);
       }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      logger.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
     }
@@ -353,4 +354,5 @@ export function ContratacaoDigitalModal({
     </Dialog>
   );
 }
+
 
