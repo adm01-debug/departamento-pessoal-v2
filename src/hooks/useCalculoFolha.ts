@@ -95,21 +95,34 @@ export function useCalculoFolha() {
       .select('*, rubricas_folha(*)')
       .eq('competencia', competencia);
 
-    // 5. Buscar benefícios dos colaboradores (se existir a tabela)
+    // 5. Buscar benefícios dos colaboradores
     let beneficiosMap: Record<string, DadosBeneficios> = {};
     try {
       const { data: beneficios } = await supabase
         .from('beneficios_colaborador')
-        .select('*');
+        .select('*, tipos_beneficio(*)');
       
       if (beneficios) {
         for (const b of beneficios) {
-          beneficiosMap[b.colaborador_id] = {
-            valorVT: b.valor_vt || 0,
-            valorVR: b.valor_vr || 0,
-            valorPlanoSaude: b.valor_plano_saude || 0,
-            valorPlanoOdonto: b.valor_plano_odonto || 0,
-          };
+          const tipoNome = (b.tipos_beneficio as { nome?: string } | null)?.nome?.toLowerCase() || '';
+          if (!beneficiosMap[b.colaborador_id]) {
+            beneficiosMap[b.colaborador_id] = {
+              valorVT: 0,
+              valorVR: 0,
+              valorPlanoSaude: 0,
+              valorPlanoOdonto: 0,
+            };
+          }
+          
+          if (tipoNome.includes('transporte') || tipoNome.includes('vt')) {
+            beneficiosMap[b.colaborador_id].valorVT = b.valor || 0;
+          } else if (tipoNome.includes('refeição') || tipoNome.includes('vr') || tipoNome.includes('alimenta')) {
+            beneficiosMap[b.colaborador_id].valorVR = b.valor || 0;
+          } else if (tipoNome.includes('saúde') || tipoNome.includes('saude') || tipoNome.includes('médico')) {
+            beneficiosMap[b.colaborador_id].valorPlanoSaude = b.desconto || 0;
+          } else if (tipoNome.includes('odonto') || tipoNome.includes('dental')) {
+            beneficiosMap[b.colaborador_id].valorPlanoOdonto = b.desconto || 0;
+          }
         }
       }
     } catch {
@@ -117,7 +130,7 @@ export function useCalculoFolha() {
     }
 
     // 6. Processar dados por colaborador
-    return colaboradores.map((colab: ColaboradorDB) => {
+    return colaboradores.map((colab) => {
       // Agregar ponto do colaborador
       const pontoColab = (registrosPonto || []).filter(p => p.colaborador_id === colab.id);
       
@@ -131,8 +144,8 @@ export function useCalculoFolha() {
 
       for (const reg of pontoColab) {
         // Converter interval para horas
-        const parseInterval = (interval: string | null): number => {
-          if (!interval) return 0;
+        const parseInterval = (interval: unknown): number => {
+          if (!interval || typeof interval !== 'string') return 0;
           const match = interval.match(/(\d+):(\d+):(\d+)/);
           if (match) {
             return parseInt(match[1]) + parseInt(match[2]) / 60;
@@ -156,16 +169,19 @@ export function useCalculoFolha() {
       // Eventos variáveis do colaborador
       const eventosColab = (eventos || [])
         .filter(e => e.colaborador_id === colab.id)
-        .map(e => ({
-          codigo: e.rubricas_folha?.codigo || '999',
-          descricao: e.rubricas_folha?.descricao || 'Evento',
-          tipo: (e.rubricas_folha?.tipo || 'provento') as 'provento' | 'desconto',
-          referencia: e.referencia,
-          valor: e.valor,
-          incideINSS: e.rubricas_folha?.incide_inss || false,
-          incideIRRF: e.rubricas_folha?.incide_irrf || false,
-          incideFGTS: e.rubricas_folha?.incide_fgts || false,
-        }));
+        .map(e => {
+          const rubrica = e.rubricas_folha as { codigo?: string; descricao?: string; tipo?: string; incide_inss?: boolean; incide_irrf?: boolean; incide_fgts?: boolean } | null;
+          return {
+            codigo: rubrica?.codigo || '999',
+            descricao: rubrica?.descricao || 'Evento',
+            tipo: (rubrica?.tipo || 'provento') as 'provento' | 'desconto',
+            referencia: e.referencia,
+            valor: e.valor,
+            incideINSS: rubrica?.incide_inss || false,
+            incideIRRF: rubrica?.incide_irrf || false,
+            incideFGTS: rubrica?.incide_fgts || false,
+          };
+        });
 
       return {
         ...colab,
@@ -204,14 +220,33 @@ export function useCalculoFolha() {
 
       // 2. Limpar holerites anteriores
       await supabase.from('holerites').delete().eq('folha_id', folhaId);
-      await supabase.from('lancamentos_folha').delete().match({ 
-        holerite_id: supabase.rpc('get_holerites_by_folha', { folha_id_param: folhaId }) 
-      });
       setProgress(20);
 
       // 3. Calcular cada colaborador
-      const holerites: Omit<Holerite, 'id'>[] = [];
-      const lancamentos: Omit<LancamentoFolha, 'id'>[] = [];
+      const holeritesParaInserir: {
+        folha_id: string;
+        colaborador_id: string;
+        colaborador_nome: string;
+        colaborador_cpf: string;
+        colaborador_cargo: string;
+        colaborador_departamento: string;
+        colaborador_matricula: string | null;
+        salario_base: number;
+        total_proventos: number;
+        total_descontos: number;
+        liquido: number;
+        base_inss: number;
+        base_irrf: number;
+        base_fgts: number;
+        valor_inss: number;
+        valor_irrf: number;
+        valor_fgts: number;
+        dependentes_irrf: number;
+        faltas_dias: number;
+        horas_extras_50: number;
+        horas_extras_100: number;
+      }[] = [];
+
       let resumo: ResumoFolha = {
         totalColaboradores: 0,
         totalProventos: 0,
@@ -223,6 +258,10 @@ export function useCalculoFolha() {
       };
 
       const totalColabs = colaboradores.length;
+      const jornadaMensalPadrao = (colab: ColaboradorComPonto) => {
+        // Calcular jornada mensal a partir da jornada semanal
+        return colab.jornada_semanal ? (colab.jornada_semanal / 6) * 30 : JORNADA_MENSAL_PADRAO;
+      };
       
       for (let i = 0; i < totalColabs; i++) {
         const colab = colaboradores[i];
@@ -236,8 +275,8 @@ export function useCalculoFolha() {
           departamento: colab.departamento,
           matricula: colab.matricula,
           salarioBase: colab.salario_base,
-          dependentesIRRF: colab.dependentes_irrf || 0,
-          jornadaMensal: colab.jornada_mensal || JORNADA_MENSAL_PADRAO,
+          dependentesIRRF: 0, // Buscar da tabela de dependentes se necessário
+          jornadaMensal: jornadaMensalPadrao(colab),
         };
 
         const dadosPonto: DadosPonto = colab.ponto || {
@@ -272,14 +311,14 @@ export function useCalculoFolha() {
         const encargos = calcularEncargosPatronais(resultado.baseFGTS);
 
         // Montar holerite
-        holerites.push({
+        holeritesParaInserir.push({
           folha_id: folhaId,
           colaborador_id: colab.id,
           colaborador_nome: colab.nome_completo,
           colaborador_cpf: colab.cpf,
           colaborador_cargo: colab.cargo,
           colaborador_departamento: colab.departamento,
-          colaborador_matricula: colab.matricula,
+          colaborador_matricula: colab.matricula || null,
           salario_base: colab.salario_base,
           total_proventos: resultado.totalProventos,
           total_descontos: resultado.totalDescontos,
@@ -313,15 +352,15 @@ export function useCalculoFolha() {
 
       // 4. Inserir holerites
       toast.info('Salvando holerites...');
-      const { data: holeritesInseridos, error: errHolerites } = await supabase
+      const { error: errHolerites } = await supabase
         .from('holerites')
-        .insert(holerites)
-        .select();
+        .insert(holeritesParaInserir);
 
       if (errHolerites) throw errHolerites;
       setProgress(90);
+      
       // ✅ AUDITORIA
-      await auditoria.registrarCriacao(folhaId, { tipo: 'calculo_holerites', quantidade: holerites.length, competencia });
+      await auditoria.registrarCriacao(folhaId, { tipo: 'calculo_holerites', quantidade: holeritesParaInserir.length, competencia });
 
       // 5. Atualizar folha com totais
       const { error: errFolha } = await supabase
@@ -348,7 +387,8 @@ export function useCalculoFolha() {
 
     } catch (error: unknown) {
       console.error('Erro ao calcular folha:', error);
-      toast.error('Erro ao calcular folha: ' + error.message);
+      const message = error instanceof Error ? error.message : 'Erro desconhecido';
+      toast.error('Erro ao calcular folha: ' + message);
       throw error;
     } finally {
       setCalculating(false);
@@ -381,6 +421,8 @@ export function useCalculoFolha() {
 
       if (errColab || !colab) throw new Error('Colaborador não encontrado');
 
+      const jornadaMensal = colab.jornada_semanal ? (colab.jornada_semanal / 6) * 30 : JORNADA_MENSAL_PADRAO;
+
       // Preparar dados
       const dadosColab: DadosColaborador = {
         id: colab.id,
@@ -391,7 +433,7 @@ export function useCalculoFolha() {
         matricula: colab.matricula,
         salarioBase: colab.salario_base,
         dependentesIRRF: holerite.dependentes_irrf || 0,
-        jornadaMensal: colab.jornada_mensal || JORNADA_MENSAL_PADRAO,
+        jornadaMensal,
       };
 
       const dadosPonto: DadosPonto = {
@@ -437,7 +479,8 @@ export function useCalculoFolha() {
 
     } catch (error: unknown) {
       console.error('Erro ao recalcular holerite:', error);
-      toast.error('Erro: ' + error.message);
+      const message = error instanceof Error ? error.message : 'Erro desconhecido';
+      toast.error('Erro: ' + message);
       throw error;
     } finally {
       setCalculating(false);
@@ -504,7 +547,9 @@ export function useCalculoFolha() {
  */
 export function useEventosVariaveis(competencia: string) {
   const [eventos, setEventos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const auditoria = useAuditoriaIntegration('folha_calculo');
 
   const fetchEventos = useCallback(async () => {
     if (!competencia) return;
@@ -549,7 +594,8 @@ export function useEventosVariaveis(competencia: string) {
       toast.success('Evento adicionado!');
       return data;
     } catch (err: unknown) {
-      toast.error('Erro: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro: ' + message);
       throw err;
     }
   };
@@ -564,9 +610,10 @@ export function useEventosVariaveis(competencia: string) {
       if (error) throw error;
       setEventos(prev => prev.filter(e => e.id !== eventoId));
       toast.success('Evento removido!');
-      auditoria.registrarExclusao('registro', '', {});
+      await auditoria.registrarExclusao('registro', {});
     } catch (err: unknown) {
-      toast.error('Erro: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro: ' + message);
       throw err;
     }
   };
