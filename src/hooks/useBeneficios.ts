@@ -193,7 +193,7 @@ export function useBeneficios() {
     }).filter(t => t.quantidade > 0);
 
     const totalMensal = beneficiosColaboradores.reduce((acc, b) => acc + Number(b.valor), 0);
-    const totalDescontos = beneficiosColaboradores.reduce((acc, b) => acc + Number(b.desconto || 0), 0);
+    const totalDescontos = beneficiosColaboradores.reduce((acc, b) => acc + Number(b.desconto ?? 0), 0);
     const custoEmpresa = totalMensal - totalDescontos;
 
     return {
@@ -218,4 +218,5 @@ export function useBeneficios() {
     isAdding: adicionarBeneficio.isPending,
   };
 }
+
 
