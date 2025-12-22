@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { useSearchParams } from 'react-router-dom';
 import { 
@@ -54,7 +54,7 @@ const DOCUMENTOS_NECESSARIOS = [
   { tipo: 'certidao_nascimento_filhos', label: 'Certidão de Nascimento dos Filhos', obrigatorio: false },
 ];
 
-export default function ContratacaoDigital() {
+export default memo(function) ContratacaoDigital() {
   useEffect(() => { document.title = 'Contratação Digital | DP System'; }, []);
 
   const [searchParams] = useSearchParams();
@@ -855,6 +855,7 @@ export default function ContratacaoDigital() {
     </div>
   );
 }
+
 
 
 
