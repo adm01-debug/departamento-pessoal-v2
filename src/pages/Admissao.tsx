@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, AlertTriangle, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +25,10 @@ const etapaColors: Record<string, string> = {
 };
 
 export default function AdmissaoPage() {
+  useEffect(() => {
+    document.title = 'Admissões | DP System';
+  }, []);
+
   const { 
     admissoes, 
     loading, 
@@ -430,4 +434,5 @@ export default function AdmissaoPage() {
     </div>
   );
 }
+
 
