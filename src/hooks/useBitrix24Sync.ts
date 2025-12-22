@@ -253,11 +253,11 @@ export function useBitrix24Sync() {
       const { data: colaboradores, error } = await query;
       if (error) throw error;
 
-      for (const colab of colaboradores || []) {
+      for (const colab of colaboradores ?? []) {
         try {
           const dadosBitrix = {
-            NAME: colab.nome_completo?.split(' ')[0] || '',
-            LAST_NAME: colab.nome_completo?.split(' ').slice(1).join(' ') || '',
+            NAME: colab.nome_completo?.split(' ')[0] ?? '',
+            LAST_NAME: colab.nome_completo?.split(' ').slice(1).join(' ') ?? '',
             EMAIL: colab.email,
             PERSONAL_PHONE: colab.telefone,
             WORK_POSITION: colab.cargo,
@@ -404,4 +404,5 @@ export function useBitrix24Sync() {
     logsSync,
   };
 }
+
 
