@@ -277,7 +277,7 @@ export const useAfastamentos = () => {
       if (errProrroga) throw errProrroga;
       
       // Atualizar afastamento
-      const novosDiasINSS = (afastamento.dias_inss || 0) + diasAdicionais;
+      const novosDiasINSS = (afastamento.dias_inss ?? 0) + diasAdicionais;
       
       const { data, error } = await supabase
         .from('afastamentos')
@@ -371,4 +371,5 @@ export const useAfastamentos = () => {
     isProrrogando: prorrogarAfastamentoMutation.isPending
   };
 };
+
 
