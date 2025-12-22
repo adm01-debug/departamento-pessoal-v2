@@ -244,7 +244,8 @@ export function useEmpresas() {
     associarUsuario,
     definirEmpresaPadrao,
     trocarEmpresa,
-    temMultiplasEmpresas: (userEmpresas?.length || 0) > 1,
+    temMultiplasEmpresas: (userEmpresas?.length ?? 0) > 1,
   };
 }
+
 
