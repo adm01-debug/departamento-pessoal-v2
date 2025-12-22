@@ -218,10 +218,10 @@ export default memo(function) Perfil() {
             <DialogDescription>{confirmDialog.description}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
               Cancelar
             </Button>
-            <Button onClick={confirmDialog.onConfirm}>
+            <Button aria-label="Ação" onClick={confirmDialog.onConfirm}>
               Confirmar
             </Button>
           </DialogFooter>
@@ -453,7 +453,7 @@ export default memo(function) Perfil() {
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button onClick={handleSaveNotifications} className="gap-2">
+                <Button aria-label="Ação" onClick={handleSaveNotifications} className="gap-2">
                   <Save className="w-4 h-4" />
                   Salvar Preferências
                 </Button>
@@ -513,7 +513,7 @@ export default memo(function) Perfil() {
                 </div>
               </div>
               <div className="flex justify-end pt-4">
-                <Button onClick={handleSavePreferences} className="gap-2">
+                <Button aria-label="Ação" onClick={handleSavePreferences} className="gap-2">
                   <Save className="w-4 h-4" />
                   Salvar Preferências
                 </Button>
@@ -622,6 +622,7 @@ export default memo(function) Perfil() {
     </div>
   );
 }
+
 
 
 
