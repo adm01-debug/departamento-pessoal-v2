@@ -226,3 +226,4 @@ export const DIAS_SEMANA = [
   { value: 5, label: "Sexta-feira" },
   { value: 6, label: "Sábado" },
 ];
+
