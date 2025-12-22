@@ -62,7 +62,7 @@ export default memo(function) ESocial() {
   
   const { colaboradores } = useColaboradores();
 
-  const eventosFiltrados = (eventosPendentes || []).filter(e => {
+  const eventosFiltrados = (eventosPendentes ?? []).filter(e => {
     if (filtroStatus !== 'todos' && e.status !== filtroStatus) return false;
     if (filtroTipo !== 'todos' && e.tipo !== filtroTipo) return false;
     return true;
@@ -93,11 +93,11 @@ export default memo(function) ESocial() {
 
   // KPIs
   const kpis = {
-    pendentes: eventosPendentes?.filter(e => e.status === 'pendente').length || 0,
-    gerados: eventosPendentes?.filter(e => e.status === 'gerado').length || 0,
-    enviados: eventosPendentes?.filter(e => e.status === 'enviado').length || 0,
-    processados: eventosPendentes?.filter(e => e.status === 'processado').length || 0,
-    rejeitados: eventosPendentes?.filter(e => e.status === 'rejeitado' || e.status === 'erro').length || 0,
+    pendentes: eventosPendentes?.filter(e => e.status === 'pendente').length ?? 0,
+    gerados: eventosPendentes?.filter(e => e.status === 'gerado').length ?? 0,
+    enviados: eventosPendentes?.filter(e => e.status === 'enviado').length ?? 0,
+    processados: eventosPendentes?.filter(e => e.status === 'processado').length ?? 0,
+    rejeitados: eventosPendentes?.filter(e => e.status === 'rejeitado' || e.status === 'erro').length ?? 0,
   };
 
   return (
@@ -336,6 +336,7 @@ export default memo(function) ESocial() {
     </div>
   );
 }
+
 
 
 
