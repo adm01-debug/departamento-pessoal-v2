@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -86,7 +87,7 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
 
       setMovimentacoes(movs);
     } catch (error) {
-      console.error('Erro ao buscar movimentações:', error);
+      logger.error('Erro ao buscar movimentações:', error);
     } finally {
       setLoading(false);
     }
@@ -233,3 +234,4 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
     </Dialog>
   );
 }
+
