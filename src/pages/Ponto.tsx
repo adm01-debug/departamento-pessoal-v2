@@ -30,6 +30,8 @@ const statusConfig: Record<string, { label: string; bg: string; text: string; ic
 const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 export default function Ponto() {
+  useEffect(() => { document.title = 'Ponto Eletrônico | DP System'; }, []);
+
   const [colaboradorId, setColaboradorId] = useState<string>('');
   const [competencia, setCompetencia] = useState(format(new Date(), 'yyyy-MM'));
   const [registroEditando, setRegistroEditando] = useState<Partial<RegistroPonto> | null>(null);
@@ -461,3 +463,4 @@ export default function Ponto() {
     </div>
   );
 }
+
