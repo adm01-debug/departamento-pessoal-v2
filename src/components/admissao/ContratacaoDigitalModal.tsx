@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { 
   Link2, Copy, Send, Mail, MessageCircle, CheckCircle2, 
@@ -354,6 +354,7 @@ export function ContratacaoDigitalModal({
     </Dialog>
   );
 }
+
 
 
 
