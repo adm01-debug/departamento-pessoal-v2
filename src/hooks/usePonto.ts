@@ -334,3 +334,4 @@ export const useResumoPonto = (competencia: string) => {
     }
   });
 };
+
