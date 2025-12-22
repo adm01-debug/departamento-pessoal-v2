@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -88,3 +89,4 @@ export function TurnoverGauge({ admissoes, desligamentos, totalColaboradores }: 
     </div>
   );
 }
+
