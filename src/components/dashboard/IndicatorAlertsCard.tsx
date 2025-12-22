@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,7 +93,7 @@ export function IndicatorAlertsCard({
           setEditingLimits(loadedLimits);
         }
       } catch (error) {
-        console.error('Erro ao carregar limites:', error);
+        logger.error('Erro ao carregar limites:', error);
       } finally {
         setLoading(false);
       }
@@ -127,7 +128,7 @@ export function IndicatorAlertsCard({
         // Mark as logged
         loggedAlertsRef.current.add(alertKey);
       } catch (error) {
-        console.error('Erro ao registrar alerta:', error);
+        logger.error('Erro ao registrar alerta:', error);
       }
     };
 
@@ -172,7 +173,7 @@ export function IndicatorAlertsCard({
       setSettingsOpen(false);
       toast.success('Limites salvos com sucesso!');
     } catch (error) {
-      console.error('Erro ao salvar limites:', error);
+      logger.error('Erro ao salvar limites:', error);
       toast.error('Erro ao salvar limites');
     } finally {
       setSaving(false);
@@ -453,3 +454,4 @@ export function IndicatorAlertsCard({
     </>
   );
 }
+
