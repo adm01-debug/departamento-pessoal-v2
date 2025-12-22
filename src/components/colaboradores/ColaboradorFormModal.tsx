@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, Pencil, Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { Colaborador } from '@/data/mockData';
 import { validateCPF, unmask } from '@/lib/masks';
 
@@ -389,4 +389,5 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
     </Dialog>
   );
 }
+
 
