@@ -110,8 +110,9 @@ export function useDesligamentos() {
 
       if (error) throw error;
       setDesligamentos((data || []) as Desligamento[]);
-    } catch (err: unknown) {
-      setError(err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      setError(errorMessage);
       console.error('Erro ao buscar desligamentos:', err);
     } finally {
       setLoading(false);
@@ -219,8 +220,9 @@ export function useDesligamentos() {
       setDesligamentos(prev => [newDesligamento as Desligamento, ...prev]);
       toast.success('Desligamento iniciado com sucesso!');
       return newDesligamento;
-    } catch (err: unknown) {
-      toast.error('Erro ao criar desligamento: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao criar desligamento: ' + errorMessage);
       throw err;
     }
   };
@@ -237,8 +239,9 @@ export function useDesligamentos() {
       if (error) throw error;
       setDesligamentos(prev => prev.map(d => d.id === id ? updated as Desligamento : d));
       return updated;
-    } catch (err: unknown) {
-      toast.error('Erro ao atualizar desligamento: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao atualizar desligamento: ' + errorMessage);
       throw err;
     }
   };
@@ -253,8 +256,9 @@ export function useDesligamentos() {
       if (error) throw error;
       setDesligamentos(prev => prev.filter(d => d.id !== id));
       toast.success('Desligamento removido!');
-    } catch (err: unknown) {
-      toast.error('Erro ao remover desligamento: ' + err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast.error('Erro ao remover desligamento: ' + errorMessage);
       throw err;
     }
   };

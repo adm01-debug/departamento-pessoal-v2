@@ -120,7 +120,7 @@ export const useFerias = () => {
         const { data, error } = await query;
         if (error) throw error;
         
-        return data.map((f: unknown) => ({
+        return (data || []).map((f: any) => ({
           ...f,
           colaborador_nome: f.colaboradores?.nome_completo,
           colaborador_cargo: f.colaboradores?.cargo,
