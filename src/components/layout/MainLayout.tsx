@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppSidebar } from './AppSidebar';
 import { GlobalSearch } from '@/components/GlobalSearch';
@@ -16,3 +16,4 @@ export function MainLayout() {
     </div>
   );
 }
+
