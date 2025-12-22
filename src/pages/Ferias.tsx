@@ -74,7 +74,7 @@ export default memo(function) Ferias() {
     isProgramando 
   } = useFerias();
 
-  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') || [];
+  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') ?? [];
   const colaboradorSelecionado = colaboradoresAtivos.find(c => c.id === formColaboradorId);
 
   const { data: ferias, isLoading: loadingFerias } = useFeriasQuery({ ano: anoFiltro });
@@ -183,7 +183,7 @@ export default memo(function) Ferias() {
             defaultFilename={`ferias_${anoFiltro}`}
             options={{
               title: `Relatório de Férias - ${anoFiltro}`,
-              subtitle: `Total: ${ferias?.length || 0} registros`,
+              subtitle: `Total: ${ferias?.length ?? 0} registros`,
               columns: [
                 { key: 'colaborador_nome', header: 'Colaborador', width: 30 },
                 { key: 'data_inicio', header: 'Início', width: 12, format: formatters.date },
@@ -194,7 +194,7 @@ export default memo(function) Ferias() {
                 { key: 'valor_liquido', header: 'Valor Líquido', width: 15, format: formatters.currency },
                 { key: 'status', header: 'Status', width: 12 },
               ] as ExportColumn[],
-              data: (ferias || []).map(f => ({
+              data: (ferias ?? []).map(f => ({
                 ...f,
                 colaborador_nome: colaboradoresAtivos.find(c => c.id === f.colaborador_id)?.nome_completo || '-',
               })) as unknown as Record<string, unknown>[],
@@ -272,25 +272,25 @@ export default memo(function) Ferias() {
         <div className="p-4 rounded-xl bg-card border border-border">
           <p className="text-xs text-muted-foreground uppercase">Programadas</p>
           <p className="text-2xl font-bold text-warning mt-1">
-            {ferias?.filter(f => f.status === 'programada').length || 0}
+            {ferias?.filter(f => f.status === 'programada').length ?? 0}
           </p>
         </div>
         <div className="p-4 rounded-xl bg-card border border-border">
           <p className="text-xs text-muted-foreground uppercase">Aprovadas</p>
           <p className="text-2xl font-bold text-success mt-1">
-            {ferias?.filter(f => f.status === 'aprovada').length || 0}
+            {ferias?.filter(f => f.status === 'aprovada').length ?? 0}
           </p>
         </div>
         <div className="p-4 rounded-xl bg-card border border-border">
           <p className="text-xs text-muted-foreground uppercase">Em Gozo</p>
           <p className="text-2xl font-bold text-info mt-1">
-            {ferias?.filter(f => f.status === 'em_gozo').length || 0}
+            {ferias?.filter(f => f.status === 'em_gozo').length ?? 0}
           </p>
         </div>
         <div className="p-4 rounded-xl bg-card border border-border">
           <p className="text-xs text-muted-foreground uppercase">Concluídas</p>
           <p className="text-2xl font-bold text-muted-foreground mt-1">
-            {ferias?.filter(f => f.status === 'concluida').length || 0}
+            {ferias?.filter(f => f.status === 'concluida').length ?? 0}
           </p>
         </div>
       </div>
@@ -542,5 +542,6 @@ export default memo(function) Ferias() {
     </div>
   );
 }
+
 
 
