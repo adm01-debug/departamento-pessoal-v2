@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, memo, useMemo } from 'react';
 import { Clock, Calendar, Download, CheckCircle, AlertTriangle, User, Plus, Save, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -29,7 +29,7 @@ const statusConfig: Record<string, { label: string; bg: string; text: string; ic
 
 const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-export default function Ponto() {
+export default memo(function) Ponto() {
   useEffect(() => { document.title = 'Ponto Eletrônico | DP System'; }, []);
 
   const [colaboradorId, setColaboradorId] = useState<string>('');
@@ -463,5 +463,6 @@ export default function Ponto() {
     </div>
   );
 }
+
 
 
