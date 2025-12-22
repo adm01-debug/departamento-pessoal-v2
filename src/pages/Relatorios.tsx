@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   FileText, Download, Calendar, Users, Wallet, Clock, Umbrella, Heart, 
   UserMinus, BarChart3, Plus, Loader2, FileSpreadsheet, File, ChevronDown,
@@ -97,6 +97,8 @@ const categorias: CategoriaConfig[] = [
 ];
 
 export default function Relatorios() {
+  useEffect(() => { document.title = 'Relatórios | DP System'; }, []);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [agendamentoModalOpen, setAgendamentoModalOpen] = useState(false);
   const [selectedRelatorio, setSelectedRelatorio] = useState<RelatorioConfig | null>(null);
@@ -537,3 +539,4 @@ export default function Relatorios() {
     </div>
   );
 }
+
