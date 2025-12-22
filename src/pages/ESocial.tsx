@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { 
   FileText, Upload, Download, AlertTriangle, CheckCircle, 
   Clock, RefreshCw, Loader2, Eye, Filter, Calendar
@@ -77,7 +78,7 @@ export default function ESocial() {
       setGerarModalOpen(false);
       setColaboradorSelecionado('');
     } catch (error) {
-      console.error(error);
+      logger.error('Error', error);
     }
   };
 
@@ -331,4 +332,5 @@ export default function ESocial() {
     </div>
   );
 }
+
 
