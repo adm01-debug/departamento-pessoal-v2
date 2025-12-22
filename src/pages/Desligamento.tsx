@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, UserMinus, FileText, Calculator, CheckCircle, Loader2, DollarSign, Clock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,10 @@ import { DesligamentoChecklist } from '@/components/desligamento/DesligamentoChe
 import { toast } from 'sonner';
 
 export default function DesligamentoPage() {
+  useEffect(() => {
+    document.title = 'Desligamentos | DP System';
+  }, []);
+
   const { 
     desligamentos, 
     loading, 
@@ -347,4 +351,5 @@ export default function DesligamentoPage() {
     </div>
   );
 }
+
 
