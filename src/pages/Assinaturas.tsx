@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { 
   PenTool, FileSignature, Clock, CheckCircle2, XCircle, Plus,
   Search, MoreHorizontal, Eye, Download, Trash2, RefreshCw
@@ -26,6 +26,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function Assinaturas() {
+  useEffect(() => {
+    document.title = 'Assinaturas Digitais | DP System';
+  }, []);
+
   const [search, setSearch] = useState('');
   const [novoDocumentoOpen, setNovoDocumentoOpen] = useState(false);
   const [assinarModalOpen, setAssinarModalOpen] = useState(false);
@@ -424,4 +428,5 @@ export default function Assinaturas() {
     </div>
   );
 }
+
 
