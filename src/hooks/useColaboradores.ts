@@ -32,7 +32,7 @@ export function useColaboradores() {
 
       if (fetchError) throw fetchError;
       
-      setColaboradores(data || []);
+      setColaboradores(data ?? []);
     } catch (err: unknown) {
       logger.error('Erro ao buscar colaboradores:', err);
       const message = err instanceof Error ? err.message : 'Erro desconhecido';
@@ -184,7 +184,7 @@ export function useDependentes(colaboradorId: string) {
         .order('nome', { ascending: true });
 
       if (error) throw error;
-      setDependentes(data || []);
+      setDependentes(data ?? []);
     } catch (err: unknown) {
       logger.error('Erro ao buscar dependentes:', err);
     } finally {
@@ -252,7 +252,7 @@ export function useHistoricoCargo(colaboradorId: string) {
         .order('data_alteracao', { ascending: false });
 
       if (error) throw error;
-      setHistorico(data || []);
+      setHistorico(data ?? []);
     } catch (err: unknown) {
       logger.error('Erro ao buscar histórico:', err);
     } finally {
@@ -285,4 +285,5 @@ export function useHistoricoCargo(colaboradorId: string) {
 
   return { historico, loading, fetchHistorico, addHistorico };
 }
+
 
