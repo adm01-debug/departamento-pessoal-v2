@@ -34,7 +34,7 @@ export default function Organograma() {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'hierarchy' | 'grid'>('hierarchy');
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
-  const [selectedColaborador, setSelectedColaborador] = useState<any>(null);
+  const [selectedColaborador, setSelectedColaborador] = useState<unknown>(null);
   const [zoom, setZoom] = useState(100);
 
   // Agrupar colaboradores por departamento
@@ -375,3 +375,4 @@ export default function Organograma() {
     </div>
   );
 }
+
