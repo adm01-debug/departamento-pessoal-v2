@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { mockColaboradores } from '@/data/mockData';
+
 import { useMemo } from 'react';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -11,10 +11,10 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 interface StatusPieChartProps {
-  colaboradores?: typeof mockColaboradores;
+  colaboradores?: typeof [];
 }
 
-export function StatusPieChart({ colaboradores = mockColaboradores }: StatusPieChartProps) {
+export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
   const data = useMemo(() => {
     const statusCount: Record<string, number> = {};
     
@@ -74,3 +74,4 @@ export function StatusPieChart({ colaboradores = mockColaboradores }: StatusPieC
     </div>
   );
 }
+
