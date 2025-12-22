@@ -55,6 +55,8 @@ const DOCUMENTOS_NECESSARIOS = [
 ];
 
 export default function ContratacaoDigital() {
+  useEffect(() => { document.title = 'Contratação Digital | DP System'; }, []);
+
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   
@@ -853,4 +855,5 @@ export default function ContratacaoDigital() {
     </div>
   );
 }
+
 
