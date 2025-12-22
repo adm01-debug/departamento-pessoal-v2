@@ -108,7 +108,7 @@ export default memo(function) ESocial() {
           <h1 className="text-3xl font-bold">eSocial</h1>
           <p className="text-muted-foreground">Gestão de eventos eSocial</p>
         </div>
-        <Button onClick={() => setGerarModalOpen(true)}>
+        <Button aria-label="Ação" onClick={() => setGerarModalOpen(true)}>
           <FileText className="w-4 h-4 mr-2" />
           Gerar Evento
         </Button>
@@ -309,10 +309,10 @@ export default memo(function) ESocial() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setGerarModalOpen(false)}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setGerarModalOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleGerarEvento} disabled={isGenerating}>
+            <Button aria-label="Ação" onClick={handleGerarEvento} disabled={isGenerating}>
               {isGenerating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Gerar
             </Button>
@@ -336,6 +336,7 @@ export default memo(function) ESocial() {
     </div>
   );
 }
+
 
 
 
