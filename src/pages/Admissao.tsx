@@ -147,7 +147,7 @@ export default function AdmissaoPage() {
       </div>
 
       {/* View Toggle */}
-      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
+      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as unknown)}>
         <TabsList>
           <TabsTrigger value="kanban" className="gap-2">
             <LayoutGrid className="w-4 h-4" />
@@ -430,3 +430,4 @@ export default function AdmissaoPage() {
     </div>
   );
 }
+
