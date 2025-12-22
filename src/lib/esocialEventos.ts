@@ -546,3 +546,197 @@ export function gerarXML_S3000(dados: DadosExclusao): string {
   </evtExclusao>
 </eSocial>`;
 }
+
+
+// S-1010 - Tabela de Rubricas
+export interface DadosRubrica {
+  codRubr: string;
+  ideTabRubr: string;
+  dscRubr: string;
+  natRubr: string;
+  tpRubr: string;
+  codIncCP: string;
+  codIncIRRF: string;
+  codIncFGTS: string;
+  cnpjEmpregador: string;
+}
+
+export function gerarXML_S1010(dados: DadosRubrica): string {
+  const id = gerarIdEvento('S1010', dados.cnpjEmpregador);
+  
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtTabRubrica/v_S_01_02_00">
+  <evtTabRubrica Id="${id}">
+    <ideEvento>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${dados.cnpjEmpregador.substring(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoRubrica>
+      <inclusao>
+        <ideRubrica>
+          <codRubr>${dados.codRubr}</codRubr>
+          <ideTabRubr>${dados.ideTabRubr}</ideTabRubr>
+          <iniValid>${new Date().toISOString().substring(0, 7).replace('-', '')}</iniValid>
+        </ideRubrica>
+        <dadosRubrica>
+          <dscRubr>${dados.dscRubr}</dscRubr>
+          <natRubr>${dados.natRubr}</natRubr>
+          <tpRubr>${dados.tpRubr}</tpRubr>
+          <codIncCP>${dados.codIncCP}</codIncCP>
+          <codIncIRRF>${dados.codIncIRRF}</codIncIRRF>
+          <codIncFGTS>${dados.codIncFGTS}</codIncFGTS>
+        </dadosRubrica>
+      </inclusao>
+    </infoRubrica>
+  </evtTabRubrica>
+</eSocial>`;
+}
+
+// S-1020 - Tabela de Lotações Tributárias
+export interface DadosLotacao {
+  codLotacao: string;
+  tpLotacao: string;
+  tpInsc?: string;
+  nrInsc?: string;
+  fpas: string;
+  codTercs: string;
+  codTercsSusp?: string;
+  cnpjEmpregador: string;
+}
+
+export function gerarXML_S1020(dados: DadosLotacao): string {
+  const id = gerarIdEvento('S1020', dados.cnpjEmpregador);
+  
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtTabLotacao/v_S_01_02_00">
+  <evtTabLotacao Id="${id}">
+    <ideEvento>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${dados.cnpjEmpregador.substring(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoLotacao>
+      <inclusao>
+        <ideLotacao>
+          <codLotacao>${dados.codLotacao}</codLotacao>
+          <iniValid>${new Date().toISOString().substring(0, 7).replace('-', '')}</iniValid>
+        </ideLotacao>
+        <dadosLotacao>
+          <tpLotacao>${dados.tpLotacao}</tpLotacao>
+          <fpasLotacao>
+            <fpas>${dados.fpas}</fpas>
+            <codTercs>${dados.codTercs}</codTercs>
+          </fpasLotacao>
+        </dadosLotacao>
+      </inclusao>
+    </infoLotacao>
+  </evtTabLotacao>
+</eSocial>`;
+}
+
+// S-2220 - Monitoramento da Saúde do Trabalhador
+export interface DadosASO {
+  cpfTrabalhador: string;
+  matricula: string;
+  dtAso: string;
+  tpAso: string;
+  resAso: string;
+  exames: Array<{
+    dtExm: string;
+    procRealizado: string;
+    obsProc?: string;
+    ordExame: string;
+    indResult?: string;
+  }>;
+  medico: {
+    cpfMed?: string;
+    nisMed?: string;
+    nmMed: string;
+    nrCRM: string;
+    ufCRM: string;
+  };
+  cnpjEmpregador: string;
+}
+
+export function gerarXML_S2220(dados: DadosASO): string {
+  const id = gerarIdEvento('S2220', dados.cnpjEmpregador);
+  
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_02_00">
+  <evtMonit Id="${id}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${dados.cnpjEmpregador.substring(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <ideVinculo>
+      <cpfTrab>${dados.cpfTrabalhador}</cpfTrab>
+      <matricula>${dados.matricula}</matricula>
+    </ideVinculo>
+    <aso>
+      <dtAso>${dados.dtAso}</dtAso>
+      <tpAso>${dados.tpAso}</tpAso>
+      <resAso>${dados.resAso}</resAso>
+      ${dados.exames.map(ex => `
+      <exame>
+        <dtExm>${ex.dtExm}</dtExm>
+        <procRealizado>${ex.procRealizado}</procRealizado>
+        <ordExame>${ex.ordExame}</ordExame>
+        ${ex.indResult ? `<indResult>${ex.indResult}</indResult>` : ''}
+      </exame>`).join('')}
+      <medico>
+        <nmMed>${dados.medico.nmMed}</nmMed>
+        <nrCRM>${dados.medico.nrCRM}</nrCRM>
+        <ufCRM>${dados.medico.ufCRM}</ufCRM>
+      </medico>
+    </aso>
+  </evtMonit>
+</eSocial>`;
+}
+
+// S-2190 - Registro Preliminar de Admissão
+export interface DadosAdmPreliminar {
+  cpfTrab: string;
+  dtNascto: string;
+  dtAdm: string;
+  cnpjEmpregador: string;
+}
+
+export function gerarXML_S2190(dados: DadosAdmPreliminar): string {
+  const id = gerarIdEvento('S2190', dados.cnpjEmpregador);
+  
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtAdmPrelim/v_S_01_02_00">
+  <evtAdmPrelim Id="${id}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${dados.cnpjEmpregador.substring(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoRegPrelim>
+      <cpfTrab>${dados.cpfTrab}</cpfTrab>
+      <dtNascto>${dados.dtNascto}</dtNascto>
+      <dtAdm>${dados.dtAdm}</dtAdm>
+    </infoRegPrelim>
+  </evtAdmPrelim>
+</eSocial>`;
+}
