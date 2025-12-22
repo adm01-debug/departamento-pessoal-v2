@@ -83,10 +83,10 @@ export default memo(function) Perfil() {
   useEffect(() => {
     if (profile) {
       const data = {
-        nome: profile.nome || '',
-        telefone: profile.telefone || '',
+        nome: profile.nome ?? '',
+        telefone: profile.telefone ?? '',
         cargo: profile.cargo || 'Usuário',
-        departamento: profile.departamento || '',
+        departamento: profile.departamento ?? '',
       };
       setProfileData(data);
       setOriginalProfileData(data);
@@ -240,7 +240,7 @@ export default memo(function) Perfil() {
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
               <Avatar className="w-24 h-24 border-4 border-primary/20">
-                <AvatarImage src={profile?.avatar_url || ''} />
+                <AvatarImage src={profile?.avatar_url ?? ''} />
                 <AvatarFallback className="text-2xl font-bold bg-primary/20 text-primary">
                   {profileData.nome ? getInitials(profileData.nome) : '??'}
                 </AvatarFallback>
@@ -321,7 +321,7 @@ export default memo(function) Perfil() {
                   <Input 
                     id="email" 
                     type="email"
-                    value={user?.email || ''}
+                    value={user?.email ?? ''}
                     disabled
                     className="bg-muted"
                   />
@@ -622,6 +622,7 @@ export default memo(function) Perfil() {
     </div>
   );
 }
+
 
 
 
