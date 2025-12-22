@@ -223,7 +223,7 @@ export default memo(function) Beneficios() {
           </SelectContent>
         </Select>
         {(busca || filtroTipo !== 'todos') && (
-          <Button variant="ghost" size="sm" onClick={() => { setBusca(''); setFiltroTipo('todos'); }}>
+          <Button aria-label="Ação" variant="ghost" size="sm" onClick={() => { setBusca(''); setFiltroTipo('todos'); }}>
             <X className="w-4 h-4 mr-1" />
             Limpar
           </Button>
@@ -354,8 +354,8 @@ export default memo(function) Beneficios() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAdicionarBeneficio} disabled={isAdding || !colaboradorId || !tipoBeneficioId}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
+            <Button aria-label="Ação" onClick={handleAdicionarBeneficio} disabled={isAdding || !colaboradorId || !tipoBeneficioId}>
               {isAdding && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Adicionar
             </Button>
@@ -365,6 +365,7 @@ export default memo(function) Beneficios() {
     </div>
   );
 }
+
 
 
 
