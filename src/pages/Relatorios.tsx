@@ -306,7 +306,7 @@ export default memo(function) Relatorios() {
           <h1 className="text-2xl font-display font-bold text-foreground">Relatórios</h1>
           <p className="text-muted-foreground text-sm">Central de relatórios do Departamento Pessoal</p>
         </div>
-        <Button onClick={() => {
+        <Button aria-label="Ação" onClick={() => {
           setSelectedRelatorio({ nome: 'Indicadores DP', formatos: ['PDF', 'Excel'], action: 'indicadoresDP' });
           setFormato('PDF');
           executarRelatorio('indicadoresDP', 'PDF');
@@ -339,7 +339,7 @@ export default memo(function) Relatorios() {
                   </span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button aria-label="Ação" variant="ghost" size="sm" className="h-7 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Download className="w-3 h-3 mr-1" />
                         <ChevronDown className="w-3 h-3" />
                       </Button>
@@ -478,7 +478,7 @@ export default memo(function) Relatorios() {
             </div>
           )}
           {agendamentos && agendamentos.length > 3 && (
-            <Button variant="ghost" size="sm" className="w-full" onClick={() => setAgendamentoModalOpen(true)}>
+            <Button aria-label="Ação" variant="ghost" size="sm" className="w-full" onClick={() => setAgendamentoModalOpen(true)}>
               Ver todos ({agendamentos.length})
             </Button>
           )}
@@ -517,10 +517,10 @@ export default memo(function) Relatorios() {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setModalOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleGerar} disabled={relatorios.gerando}>
+            <Button aria-label="Ação" onClick={handleGerar} disabled={relatorios.gerando}>
               {relatorios.gerando ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -539,6 +539,7 @@ export default memo(function) Relatorios() {
     </div>
   );
 }
+
 
 
 
