@@ -29,6 +29,8 @@ interface DepartmentNode {
 }
 
 export default function Organograma() {
+  useEffect(() => { document.title = 'Organograma | DP System'; }, []);
+
   const { empresaAtual } = useEmpresas();
   const { colaboradores, loading } = useColaboradores();
   const [search, setSearch] = useState('');
@@ -375,4 +377,5 @@ export default function Organograma() {
     </div>
   );
 }
+
 
