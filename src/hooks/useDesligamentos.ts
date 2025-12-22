@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { differenceInDays, differenceInMonths } from 'date-fns';
@@ -113,7 +114,7 @@ export function useDesligamentos() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
-      console.error('Erro ao buscar desligamentos:', err);
+      logger.error('Erro ao buscar desligamentos:', err);
     } finally {
       setLoading(false);
     }
@@ -286,3 +287,4 @@ export function useDesligamentos() {
     tipoLabels,
   };
 }
+
