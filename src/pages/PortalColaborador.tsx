@@ -38,7 +38,7 @@ export default memo(function) PortalColaborador() {
   const queryClient = useQueryClient();
   const [editingDados, setEditingDados] = useState(false);
   const [dadosPessoais, setDadosPessoais] = useState({
-    telefone: profile?.telefone || '',
+    telefone: profile?.telefone ?? '',
   });
 
   // Buscar colaborador vinculado ao usuário (por email)
@@ -376,7 +376,7 @@ export default memo(function) PortalColaborador() {
                     {ferias.map((f: unknown) => (
                       <div key={f.id} className="p-4 rounded-lg border">
                         <div className="flex items-center justify-between mb-2">
-                          <Badge className={statusFeriasColors[f.status] || ''}>
+                          <Badge className={statusFeriasColors[f.status] ?? ''}>
                             {f.status?.replace('_', ' ').toUpperCase()}
                           </Badge>
                           <span className="text-sm text-muted-foreground">
@@ -651,6 +651,7 @@ export default memo(function) PortalColaborador() {
     </div>
   );
 }
+
 
 
 
