@@ -42,6 +42,10 @@ import { formatCurrency } from '@/lib/calculosTrabalhistas';
 import { toast } from '@/hooks/use-toast';
 
 export default function Folha() {
+  useEffect(() => {
+    document.title = 'Folha de Pagamento | DP System';
+  }, []);
+
   const { folhas, loading, createFolha, updateFolhaStatus, deleteFolha, fetchFolhas } = useFolhasPagamento();
   const { colaboradores } = useColaboradores();
   const { rubricas } = useRubricas();
@@ -776,4 +780,5 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
 
