@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Shield, Users, Search, Plus, Crown, UserCog, Building2, User,
   MoreHorizontal, Trash2, RefreshCw, Check
@@ -32,6 +32,8 @@ const ROLES: { value: AppRole; label: string; icon: React.ComponentType; descrip
 ];
 
 export default function Usuarios() {
+  useEffect(() => { document.title = 'Usuários | DP System'; }, []);
+
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -415,3 +417,4 @@ export default function Usuarios() {
     </div>
   );
 }
+
