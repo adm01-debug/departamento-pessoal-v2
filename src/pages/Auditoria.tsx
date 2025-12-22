@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { History, Search, Filter, RefreshCw, ChevronDown, ChevronRight, Eye, Calendar, User, Database, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,10 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 export default function Auditoria() {
+  useEffect(() => {
+    document.title = 'Auditoria | DP System';
+  }, []);
+
   const [filtroTabela, setFiltroTabela] = useState('todas');
   const [filtroAcao, setFiltroAcao] = useState('todas');
   const [filtroDataInicio, setFiltroDataInicio] = useState('');
@@ -347,3 +351,4 @@ export default function Auditoria() {
     </div>
   );
 }
+
