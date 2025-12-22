@@ -4,6 +4,23 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
+
+// Função para sanitizar CSS e prevenir XSS
+const sanitizeCSS = (css: string): string => {
+  // Remove caracteres potencialmente perigosos
+  return css
+    .replace(/<[^>]*>/g, '') // Remove tags HTML
+    .replace(/javascript:/gi, '') // Remove javascript:
+    .replace(/expression\s*\(/gi, '') // Remove expression()
+    .replace(/url\s*\([^)]*\)/gi, (match) => {
+      // Permite apenas URLs seguras (data: para cores, https:)
+      if (match.includes('data:') || match.includes('https:')) {
+        return match;
+      }
+      return '';
+    });
+};
+
 const THEMES = { light: "", dark: ".dark" } as const;
 
 export type ChartConfig = {
@@ -68,7 +85,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
+        __html: sanitizeCSS(Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
@@ -81,7 +98,7 @@ ${colorConfig
 }
 `,
           )
-          .join("\n"),
+          .join("\n")),
       }}
     />
   );
@@ -301,3 +318,4 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
 }
 
 export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle };
+
