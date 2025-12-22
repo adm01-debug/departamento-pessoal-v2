@@ -197,7 +197,7 @@ export default memo(function) Ponto() {
             {isExportando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             {isExportando ? 'Exportando...' : 'Exportar p/ Folha'}
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button aria-label="Ação" variant="outline" className="gap-2">
             <Download className="w-4 h-4" />
             Exportar PDF
           </Button>
@@ -463,6 +463,7 @@ export default memo(function) Ponto() {
     </div>
   );
 }
+
 
 
 
