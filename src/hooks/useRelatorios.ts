@@ -98,10 +98,10 @@ export function useRelatorios() {
       await gerarRelatorio(
         'lista_colaboradores',
         columns,
-        data || [],
+        data ?? [],
         formato,
         'Lista de Colaboradores',
-        `Total: ${data?.length || 0} colaboradores`
+        `Total: ${data?.length ?? 0} colaboradores`
       );
     } finally {
       setGerando(false);
@@ -120,7 +120,7 @@ export function useRelatorios() {
       if (error) throw error;
 
       // Filtrar por mês de aniversário
-      const aniversariantes = (data || []).filter(c => {
+      const aniversariantes = (data ?? []).filter(c => {
         if (!c.data_nascimento) return false;
         const mesNasc = new Date(c.data_nascimento).getMonth() + 1;
         return mesNasc === mesAtual;
@@ -164,7 +164,7 @@ export function useRelatorios() {
       if (error) throw error;
 
       // Agrupar por departamento
-      const agrupado = (data || []).reduce((acc, c) => {
+      const agrupado = (data ?? []).reduce((acc, c) => {
         if (!acc[c.departamento]) {
           acc[c.departamento] = { total: 0, salarioTotal: 0 };
         }
@@ -220,7 +220,7 @@ export function useRelatorios() {
         { campo: 'Estado Civil', valor: data.estado_civil },
         { campo: 'Nome da Mãe', valor: data.nome_mae },
         { campo: 'Nome do Pai', valor: data.nome_pai || '-' },
-        { campo: 'Endereço', valor: `${data.logradouro || ''}, ${data.numero || ''} - ${data.bairro || ''}, ${data.cidade || ''}/${data.uf || ''}` },
+        { campo: 'Endereço', valor: `${data.logradouro ?? ''}, ${data.numero ?? ''} - ${data.bairro ?? ''}, ${data.cidade ?? ''}/${data.uf ?? ''}` },
         { campo: 'CEP', valor: data.cep || '-' },
         { campo: 'Telefone', valor: data.telefone || '-' },
         { campo: 'Celular', valor: data.celular || '-' },
@@ -294,7 +294,7 @@ export function useRelatorios() {
       await gerarRelatorio(
         `resumo_folha_${competencia}`,
         columns,
-        holerites || [],
+        holerites ?? [],
         formato,
         `Resumo da Folha - ${competencia}`,
         `Total Líquido: ${formatters.currency(folha.total_liquido)}`
@@ -324,7 +324,7 @@ export function useRelatorios() {
         { descricao: 'INSS Colaborador', valor: folha.total_descontos * 0.3 },
         { descricao: 'INSS Patronal', valor: folha.total_inss_patronal },
         { descricao: 'FGTS', valor: folha.total_fgts },
-        { descricao: 'Total Encargos', valor: (folha.total_inss_patronal || 0) + (folha.total_fgts || 0) },
+        { descricao: 'Total Encargos', valor: (folha.total_inss_patronal ?? 0) + (folha.total_fgts ?? 0) },
       ];
 
       const columns: ExportColumn[] = [
@@ -359,7 +359,7 @@ export function useRelatorios() {
       
       if (error) throw error;
 
-      const resultado = (data || []).map((f: unknown) => ({
+      const resultado = (data ?? []).map((f: unknown) => ({
         colaborador: f.colaboradores?.nome_completo,
         departamento: f.colaboradores?.departamento,
         data_inicio: f.data_inicio,
@@ -406,7 +406,7 @@ export function useRelatorios() {
       if (error) throw error;
 
       const hoje = new Date();
-      const resultado = (data || []).map((p: unknown) => {
+      const resultado = (data ?? []).map((p: unknown) => {
         const dataLimite = new Date(p.data_fim);
         dataLimite.setFullYear(dataLimite.getFullYear() + 1);
         const diasRestantes = differenceInDays(dataLimite, hoje);
@@ -463,7 +463,7 @@ export function useRelatorios() {
       const { data, error } = await query.order('tipo');
       if (error) throw error;
 
-      const resultado = (data || []).map((a: unknown) => ({
+      const resultado = (data ?? []).map((a: unknown) => ({
         colaborador: a.colaboradores?.nome_completo,
         departamento: a.colaboradores?.departamento,
         tipo: a.tipo.replace(/_/g, ' ').toUpperCase(),
@@ -518,15 +518,15 @@ export function useRelatorios() {
         .lte('data_inicio', dataFim);
 
       // Calcular absenteísmo por departamento
-      const porDept = (colaboradores || []).reduce((acc, c) => {
+      const porDept = (colaboradores ?? []).reduce((acc, c) => {
         if (!acc[c.departamento]) {
           acc[c.departamento] = { total: 0, diasPerdidos: 0 };
         }
         acc[c.departamento].total++;
         
-        const afastColab = (afastamentos || []).filter((a: unknown) => a.colaborador_id === c.id);
+        const afastColab = (afastamentos ?? []).filter((a: unknown) => a.colaborador_id === c.id);
         afastColab.forEach((a: unknown) => {
-          acc[c.departamento].diasPerdidos += a.dias_total || 0;
+          acc[c.departamento].diasPerdidos += a.dias_total ?? 0;
         });
         
         return acc;
@@ -587,8 +587,8 @@ export function useRelatorios() {
         .eq('status', 'ativo');
 
       const totalAtivos = ativos?.length || 1;
-      const totalAdmissoes = admissoes?.length || 0;
-      const totalDesligamentos = desligamentos?.length || 0;
+      const totalAdmissoes = admissoes?.length ?? 0;
+      const totalDesligamentos = desligamentos?.length ?? 0;
       const turnover = ((totalAdmissoes + totalDesligamentos) / 2 / totalAtivos * 100);
 
       const resultado = [
@@ -638,7 +638,7 @@ export function useRelatorios() {
         falecimento: 'Falecimento',
       };
 
-      const resultado = (data || []).map((d: unknown) => ({
+      const resultado = (data ?? []).map((d: unknown) => ({
         colaborador: d.colaboradores?.nome_completo,
         departamento: d.colaboradores?.departamento,
         cargo: d.colaboradores?.cargo,
@@ -695,7 +695,7 @@ export function useRelatorios() {
       
       if (error) throw error;
 
-      const resultado = (data || []).map((r: unknown) => ({
+      const resultado = (data ?? []).map((r: unknown) => ({
         data: r.data,
         tipo: r.tipo_dia,
         entrada_1: r.entrada_1 || '-',
@@ -747,7 +747,7 @@ export function useRelatorios() {
 
       const resultado: unknown[] = [];
       
-      for (const colab of colaboradores || []) {
+      for (const colab of colaboradores ?? []) {
         const { data: banco } = await supabase
           .from('banco_horas')
           .select('saldo_atual')
@@ -805,15 +805,15 @@ export function useRelatorios() {
         supabase.from('ferias').select('id').eq('status', 'em_gozo')
       ]);
 
-      const ativos = colaboradores?.filter(c => c.status === 'ativo') || [];
-      const custoFolha = ativos.reduce((sum, c) => sum + (c.salario_base || 0), 0);
+      const ativos = colaboradores?.filter(c => c.status === 'ativo') ?? [];
+      const custoFolha = ativos.reduce((sum, c) => sum + (c.salario_base ?? 0), 0);
 
       const indicadores = [
         { indicador: 'Colaboradores Ativos', valor: ativos.length.toString() },
-        { indicador: 'Admissões em Andamento', valor: (admissoes?.length || 0).toString() },
-        { indicador: 'Desligamentos no Ano', valor: (desligamentos?.length || 0).toString() },
-        { indicador: 'Afastamentos Ativos', valor: (afastamentos?.length || 0).toString() },
-        { indicador: 'Colaboradores em Férias', valor: (ferias?.length || 0).toString() },
+        { indicador: 'Admissões em Andamento', valor: (admissoes?.length ?? 0).toString() },
+        { indicador: 'Desligamentos no Ano', valor: (desligamentos?.length ?? 0).toString() },
+        { indicador: 'Afastamentos Ativos', valor: (afastamentos?.length ?? 0).toString() },
+        { indicador: 'Colaboradores em Férias', valor: (ferias?.length ?? 0).toString() },
         { indicador: 'Custo Folha Projetado', valor: formatters.currency(custoFolha) },
         { indicador: 'Custo Médio por Colaborador', valor: formatters.currency(custoFolha / (ativos.length || 1)) },
       ];
@@ -862,4 +862,5 @@ export function useRelatorios() {
     gerarIndicadoresDP,
   };
 }
+
 
