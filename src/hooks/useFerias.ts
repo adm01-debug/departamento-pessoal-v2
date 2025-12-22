@@ -101,7 +101,9 @@ export const useFerias = () => {
             *,
             colaboradores!inner(nome_completo, cargo, departamento)
           `)
-          .order('data_inicio', { ascending: true });
+          .order('data_inicio', { ascending: true ,
+    staleTime: 5 * 60 * 1000,
+    retry: 3});
         
         if (empresaAtualId) {
           query = query.eq('empresa_id', empresaAtualId);
@@ -290,4 +292,5 @@ export const useFerias = () => {
     isAprovando: aprovarFeriasMutation.isPending
   };
 };
+
 
