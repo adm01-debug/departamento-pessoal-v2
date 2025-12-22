@@ -139,7 +139,7 @@ export default memo(function) Assinaturas() {
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{documentosPendentes?.length || 0}</p>
+                <p className="text-2xl font-bold">{documentosPendentes?.length ?? 0}</p>
                 <p className="text-xs text-muted-foreground">Pendentes</p>
               </div>
             </div>
@@ -152,7 +152,7 @@ export default memo(function) Assinaturas() {
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{documentosAssinados?.length || 0}</p>
+                <p className="text-2xl font-bold">{documentosAssinados?.length ?? 0}</p>
                 <p className="text-xs text-muted-foreground">Assinados</p>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default memo(function) Assinaturas() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {(documentosPendentes?.length || 0) + (documentosAssinados?.length || 0)}
+                  {(documentosPendentes?.length ?? 0) + (documentosAssinados?.length ?? 0)}
                 </p>
                 <p className="text-xs text-muted-foreground">Total</p>
               </div>
@@ -191,11 +191,11 @@ export default memo(function) Assinaturas() {
         <TabsList>
           <TabsTrigger value="pendentes" className="gap-2">
             <Clock className="w-4 h-4" />
-            Pendentes ({documentosPendentes?.length || 0})
+            Pendentes ({documentosPendentes?.length ?? 0})
           </TabsTrigger>
           <TabsTrigger value="assinados" className="gap-2">
             <CheckCircle2 className="w-4 h-4" />
-            Assinados ({documentosAssinados?.length || 0})
+            Assinados ({documentosAssinados?.length ?? 0})
           </TabsTrigger>
         </TabsList>
 
@@ -428,6 +428,7 @@ export default memo(function) Assinaturas() {
     </div>
   );
 }
+
 
 
 
