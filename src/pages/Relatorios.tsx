@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { 
   FileText, Download, Calendar, Users, Wallet, Clock, Umbrella, Heart, 
   UserMinus, BarChart3, Plus, Loader2, FileSpreadsheet, File, ChevronDown,
@@ -96,7 +96,7 @@ const categorias: CategoriaConfig[] = [
   },
 ];
 
-export default function Relatorios() {
+export default memo(function) Relatorios() {
   useEffect(() => { document.title = 'Relatórios | DP System'; }, []);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -539,5 +539,6 @@ export default function Relatorios() {
     </div>
   );
 }
+
 
 
