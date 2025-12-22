@@ -138,7 +138,7 @@ export default function Colaboradores() {
       if (isEdit && editingColaborador) {
         await updateColaborador(editingColaborador.id, colaboradorData);
       } else {
-        await createColaborador(colaboradorData as any);
+        await createColaborador(colaboradorData as unknown);
       }
       setEditingColaborador(null);
     } catch (err) {
@@ -711,3 +711,4 @@ export default function Colaboradores() {
     </div>
   );
 }
+
