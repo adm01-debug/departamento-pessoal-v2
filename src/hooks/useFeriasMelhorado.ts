@@ -5,52 +5,61 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 import { addDays, differenceInDays, parseISO, isAfter, isBefore, format, addYears, startOfDay } from 'date-fns';
 
-export type StatusFerias = 'agendada' | 'em_andamento' | 'concluida' | 'cancelada' | 'aguardando_aprovacao' | 'aprovada' | 'rejeitada';
+export type StatusFeriasMelhorado = 'agendada' | 'em_andamento' | 'concluida' | 'cancelada' | 'aguardando_aprovacao' | 'aprovada' | 'rejeitada';
 export type TipoFerias = 'integral' | 'parcial_20' | 'parcial_15' | 'parcial_10' | 'abono';
 
-export interface PeriodoAquisitivo {
+export interface PeriodoAquisitivoMelhorado {
   id: string;
   colaborador_id: string;
   data_inicio: string;
   data_fim: string;
   dias_direito: number;
-  dias_gozados: number;
-  dias_vendidos: number;
-  dias_restantes: number;
-  status: 'em_aquisicao' | 'disponivel' | 'vencido' | 'gozado';
+  dias_descontados?: number;
+  faltas_periodo?: number;
+  numero_periodo?: number;
+  status: string;
 }
 
-export interface Ferias {
+export interface FeriasMelhorado {
   id: string;
   colaborador_id: string;
-  periodo_aquisitivo_id?: string;
+  periodo_aquisitivo_id?: string | null;
   data_inicio: string;
   data_fim: string;
-  dias_gozados: number;
-  dias_abono: number;
-  tipo: TipoFerias;
-  status: StatusFerias;
-  valor_ferias?: number;
-  valor_abono?: number;
-  valor_adiantamento_13?: number;
-  observacoes?: string;
-  aprovado_por?: string;
-  data_aprovacao?: string;
+  dias_gozo: number;
+  dias_abono?: number | null;
+  vender_abono?: boolean | null;
+  salario_base: number;
+  valor_ferias: number;
+  valor_terco: number;
+  valor_abono?: number | null;
+  valor_terco_abono?: number | null;
+  valor_total: number;
+  valor_liquido: number;
+  descontos_inss?: number | null;
+  descontos_irrf?: number | null;
+  status: string;
+  observacoes?: string | null;
+  aprovado_por?: string | null;
+  aprovado_em?: string | null;
+  data_pagamento?: string | null;
   created_at?: string;
+  created_by?: string | null;
   updated_at?: string;
+  empresa_id?: string | null;
 }
 
-export interface FeriasComColaborador extends Ferias {
+export interface FeriasComColaboradorMelhorado extends FeriasMelhorado {
   colaborador?: {
     id: string;
     nome_completo: string;
     cargo?: string;
     departamento?: string;
     salario_base?: number;
-  };
+  } | null;
 }
 
-export interface CalculoFerias {
+export interface CalculoFeriasMelhorado {
   salario_base: number;
   dias_ferias: number;
   dias_abono: number;
@@ -65,14 +74,16 @@ export interface CalculoFerias {
   total_liquido: number;
 }
 
-const statusLabels: Record<StatusFerias, string> = {
+const statusLabels: Record<string, string> = {
   agendada: 'Agendada',
   em_andamento: 'Em Andamento',
   concluida: 'Concluída',
   cancelada: 'Cancelada',
   aguardando_aprovacao: 'Aguardando Aprovação',
   aprovada: 'Aprovada',
-  rejeitada: 'Rejeitada'
+  rejeitada: 'Rejeitada',
+  programada: 'Programada',
+  em_gozo: 'Em Gozo'
 };
 
 const tipoLabels: Record<TipoFerias, string> = {
@@ -86,7 +97,7 @@ const tipoLabels: Record<TipoFerias, string> = {
 export function useFeriasMelhorado() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const auditoria = useAuditoriaIntegration();
+  const auditoria = useAuditoriaIntegration('ferias');
 
   // Query para buscar todas as férias
   const feriasQuery = useQuery({
@@ -101,7 +112,7 @@ export function useFeriasMelhorado() {
         .order('data_inicio', { ascending: false });
 
       if (error) throw error;
-      return data as FeriasComColaborador[];
+      return (data || []) as FeriasComColaboradorMelhorado[];
     }
   });
 
@@ -115,28 +126,46 @@ export function useFeriasMelhorado() {
         .order('data_inicio', { ascending: false });
 
       if (error) throw error;
-      return data as PeriodoAquisitivo[];
+      return (data || []) as PeriodoAquisitivoMelhorado[];
     }
   });
 
   // Mutation para criar férias
   const criarFerias = useMutation({
-    mutationFn: async (ferias: Omit<Ferias, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (ferias: Omit<FeriasMelhorado, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('ferias')
-        .insert(ferias)
+        .insert({
+          colaborador_id: ferias.colaborador_id,
+          periodo_aquisitivo_id: ferias.periodo_aquisitivo_id,
+          data_inicio: ferias.data_inicio,
+          data_fim: ferias.data_fim,
+          dias_gozo: ferias.dias_gozo,
+          dias_abono: ferias.dias_abono || 0,
+          vender_abono: ferias.vender_abono || false,
+          salario_base: ferias.salario_base,
+          valor_ferias: ferias.valor_ferias,
+          valor_terco: ferias.valor_terco,
+          valor_abono: ferias.valor_abono || 0,
+          valor_terco_abono: ferias.valor_terco_abono || 0,
+          valor_total: ferias.valor_total,
+          valor_liquido: ferias.valor_liquido,
+          descontos_inss: ferias.descontos_inss || 0,
+          descontos_irrf: ferias.descontos_irrf || 0,
+          status: ferias.status || 'programada',
+          observacoes: ferias.observacoes,
+        })
         .select()
         .single();
 
       if (error) throw error;
       
       // ✅ AUDITORIA
-      await auditoria.registrarCriacao('ferias', data.id, {
+      await auditoria.registrarCriacao(data.id, {
         colaborador_id: ferias.colaborador_id,
         data_inicio: ferias.data_inicio,
         data_fim: ferias.data_fim,
-        dias_gozados: ferias.dias_gozados,
-        tipo: ferias.tipo
+        dias_gozo: ferias.dias_gozo
       });
       
       return data;
@@ -153,7 +182,7 @@ export function useFeriasMelhorado() {
 
   // Mutation para atualizar férias
   const atualizarFerias = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Ferias> & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: Partial<FeriasMelhorado> & { id: string }) => {
       const { data, error } = await supabase
         .from('ferias')
         .update(updates)
@@ -164,7 +193,7 @@ export function useFeriasMelhorado() {
       if (error) throw error;
       
       // ✅ AUDITORIA
-      await auditoria.registrarAlteracao('ferias', id, updates);
+      await auditoria.registrarAlteracao(id, undefined, updates);
       
       return data;
     },
@@ -185,7 +214,7 @@ export function useFeriasMelhorado() {
         .update({
           status: 'aprovada',
           aprovado_por: aprovadoPor,
-          data_aprovacao: new Date().toISOString()
+          aprovado_em: new Date().toISOString()
         })
         .eq('id', id)
         .select()
@@ -194,7 +223,7 @@ export function useFeriasMelhorado() {
       if (error) throw error;
       
       // ✅ AUDITORIA
-      await auditoria.registrarAlteracao('ferias', id, {
+      await auditoria.registrarAlteracao(id, undefined, {
         acao: 'aprovacao',
         aprovado_por: aprovadoPor,
         status: 'aprovada'
@@ -217,7 +246,7 @@ export function useFeriasMelhorado() {
       const { data, error } = await supabase
         .from('ferias')
         .update({
-          status: 'rejeitada',
+          status: 'cancelada',
           observacoes: motivo
         })
         .eq('id', id)
@@ -227,7 +256,7 @@ export function useFeriasMelhorado() {
       if (error) throw error;
       
       // ✅ AUDITORIA
-      await auditoria.registrarAlteracao('ferias', id, {
+      await auditoria.registrarAlteracao(id, undefined, {
         acao: 'rejeicao',
         motivo: motivo,
         status: 'rejeitada'
@@ -260,7 +289,7 @@ export function useFeriasMelhorado() {
       if (error) throw error;
       
       // ✅ AUDITORIA
-      await auditoria.registrarAlteracao('ferias', id, {
+      await auditoria.registrarAlteracao(id, undefined, {
         acao: 'cancelamento',
         motivo: motivo,
         status: 'cancelada'
@@ -280,17 +309,26 @@ export function useFeriasMelhorado() {
 
   // Mutation para criar período aquisitivo
   const criarPeriodoAquisitivo = useMutation({
-    mutationFn: async (periodo: Omit<PeriodoAquisitivo, 'id'>) => {
+    mutationFn: async (periodo: Omit<PeriodoAquisitivoMelhorado, 'id'>) => {
       const { data, error } = await supabase
         .from('periodos_aquisitivos')
-        .insert(periodo)
+        .insert({
+          colaborador_id: periodo.colaborador_id,
+          data_inicio: periodo.data_inicio,
+          data_fim: periodo.data_fim,
+          dias_direito: periodo.dias_direito,
+          dias_descontados: periodo.dias_descontados || 0,
+          faltas_periodo: periodo.faltas_periodo || 0,
+          numero_periodo: periodo.numero_periodo || 1,
+          status: periodo.status || 'em_aquisicao',
+        })
         .select()
         .single();
 
       if (error) throw error;
       
       // ✅ AUDITORIA
-      await auditoria.registrarCriacao('periodos_aquisitivos', data.id, {
+      await auditoria.registrarCriacao(data.id, {
         colaborador_id: periodo.colaborador_id,
         data_inicio: periodo.data_inicio,
         data_fim: periodo.data_fim,
@@ -314,7 +352,7 @@ export function useFeriasMelhorado() {
     diasFerias: number,
     diasAbono: number = 0,
     adiantamento13: boolean = false
-  ): CalculoFerias => {
+  ): CalculoFeriasMelhorado => {
     const salarioDia = salarioBase / 30;
     
     // Valor das férias

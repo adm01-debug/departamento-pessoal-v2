@@ -641,7 +641,7 @@ export function useDesligamentoMelhorado() {
     }) => {
       const { data, error } = await supabase
         .from('desligamentos')
-        .insert({
+        .insert([{
           colaborador_id: dados.colaboradorId,
           tipo: dados.tipo,
           data_desligamento: dados.dataDesligamento,
@@ -663,7 +663,7 @@ export function useDesligamentoMelhorado() {
           total_proventos: dados.calculo.totalProventos,
           total_descontos: dados.calculo.descontos.total,
           valor_liquido: dados.calculo.valorLiquido,
-        })
+        }])
         .select()
         .single();
 
