@@ -30,7 +30,7 @@ export default memo(function) Beneficios() {
   } = useBeneficios();
   
   const { colaboradores } = useColaboradores();
-  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') || [];
+  const colaboradoresAtivos = colaboradores?.filter(c => c.status === 'ativo') ?? [];
 
   const [modalOpen, setModalOpen] = useState(false);
   const [filtroTipo, setFiltroTipo] = useState('todos');
@@ -56,7 +56,7 @@ export default memo(function) Beneficios() {
   const beneficiosPorColaborador = colaboradoresAtivos.map(colab => {
     const beneficios = beneficiosColaboradores.filter(b => b.colaborador_id === colab.id);
     const totalBeneficios = beneficios.reduce((acc, b) => acc + Number(b.valor), 0);
-    const totalDescontos = beneficios.reduce((acc, b) => acc + Number(b.desconto || 0), 0);
+    const totalDescontos = beneficios.reduce((acc, b) => acc + Number(b.desconto ?? 0), 0);
     
     return {
       colaborador: colab,
@@ -116,11 +116,11 @@ export default memo(function) Beneficios() {
 
   // Dados para exportação
   const dadosExport = beneficiosColaboradores.map(b => ({
-    colaborador: b.colaborador?.nome_completo || '',
-    departamento: b.colaborador?.departamento || '',
-    beneficio: b.tipo_beneficio?.nome || '',
+    colaborador: b.colaborador?.nome_completo ?? '',
+    departamento: b.colaborador?.departamento ?? '',
+    beneficio: b.tipo_beneficio?.nome ?? '',
     valor: b.valor,
-    desconto: b.desconto || 0,
+    desconto: b.desconto ?? 0,
     data_inicio: b.data_inicio,
   }));
 
@@ -365,5 +365,6 @@ export default memo(function) Beneficios() {
     </div>
   );
 }
+
 
 
