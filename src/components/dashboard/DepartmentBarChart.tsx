@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { mockColaboradores } from '@/data/mockData';
+
 import { useMemo } from 'react';
 
 const colors = [
@@ -13,10 +13,10 @@ const colors = [
 ];
 
 interface DepartmentBarChartProps {
-  colaboradores?: typeof mockColaboradores;
+  colaboradores?: typeof [];
 }
 
-export function DepartmentBarChart({ colaboradores = mockColaboradores }: DepartmentBarChartProps) {
+export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartProps) {
   const data = useMemo(() => {
     const deptCount: Record<string, number> = {};
     
@@ -76,3 +76,4 @@ export function DepartmentBarChart({ colaboradores = mockColaboradores }: Depart
     </div>
   );
 }
+
