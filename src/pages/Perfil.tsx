@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,7 +35,7 @@ const passwordSchema = z.object({
 type ProfileErrors = { nome?: string; telefone?: string };
 type PasswordErrors = { senhaAtual?: string; novaSenha?: string; confirmarSenha?: string };
 
-export default function Perfil() {
+export default memo(function) Perfil() {
   useEffect(() => { document.title = 'Perfil | DP System'; }, []);
 
   const { user, profile, updateProfile } = useAuth();
@@ -622,5 +622,6 @@ export default function Perfil() {
     </div>
   );
 }
+
 
 
