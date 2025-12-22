@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ const signupSchema = z.object({
   path: ['confirmPassword'],
 });
 
-export default function Auth() {
+export default memo(function) Auth() {
   useEffect(() => {
     document.title = 'Login | DP System';
   }, []);
@@ -269,4 +269,5 @@ export default function Auth() {
     </div>
   );
 }
+
 
