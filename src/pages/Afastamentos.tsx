@@ -476,8 +476,8 @@ export default memo(function) Afastamentos() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleCriar} disabled={isCriando}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button aria-label="Ação" onClick={handleCriar} disabled={isCriando}>
               {isCriando ? 'Salvando...' : 'Registrar Afastamento'}
             </Button>
           </DialogFooter>
@@ -528,8 +528,8 @@ export default memo(function) Afastamentos() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setProrrogaDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleProrrogar} disabled={isProrrogando}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setProrrogaDialogOpen(false)}>Cancelar</Button>
+            <Button aria-label="Ação" onClick={handleProrrogar} disabled={isProrrogando}>
               {isProrrogando ? 'Salvando...' : 'Prorrogar'}
             </Button>
           </DialogFooter>
@@ -538,6 +538,7 @@ export default memo(function) Afastamentos() {
     </div>
   );
 }
+
 
 
 
