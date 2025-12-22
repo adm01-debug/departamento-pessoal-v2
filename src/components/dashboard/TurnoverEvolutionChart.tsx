@@ -185,3 +185,4 @@ export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChart
     </>
   );
 }
+
