@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface WidgetConfig {
   id: string;
@@ -37,7 +38,7 @@ export function useDashboardConfig() {
         return [...parsed, ...newWidgets].sort((a, b) => a.order - b.order);
       }
     } catch (e) {
-      console.error('Error loading dashboard config:', e);
+      logger.error('Error loading dashboard config:', e);
     }
     return DEFAULT_WIDGETS;
   });
@@ -49,7 +50,7 @@ export function useDashboardConfig() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets));
     } catch (e) {
-      console.error('Error saving dashboard config:', e);
+      logger.error('Error saving dashboard config:', e);
     }
   }, [widgets]);
 
@@ -100,3 +101,4 @@ export function useDashboardConfig() {
     getVisibleWidgets,
   };
 }
+
