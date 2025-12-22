@@ -70,7 +70,7 @@ export default function Onboarding() {
       if (onbError) throw onbError;
 
       // Criar tarefas a partir do template
-      const tarefas = (template as any).onboarding_template_tarefas.map((t: unknown) => ({
+      const tarefas = (template as unknown).onboarding_template_tarefas.map((t: unknown) => ({
         onboarding_id: onboarding.id,
         template_tarefa_id: t.id,
         titulo: t.titulo,
@@ -235,3 +235,4 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
     </Card>
   );
 }
+
