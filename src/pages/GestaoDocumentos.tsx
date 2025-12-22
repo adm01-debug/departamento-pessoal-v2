@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,17 @@ export default function GestaoDocumentos() {
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [selectedColaborador, setSelectedColaborador] = useState('');
   const [previewHtml, setPreviewHtml] = useState('');
+  
+  // Sanitizar HTML para prevenir XSS
+  const sanitizedPreviewHtml = useMemo(() => {
+    return DOMPurify.sanitize(previewHtml, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+                     'ul', 'ol', 'li', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 
+                     'div', 'span', 'a', 'img'],
+      ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'style', 'target'],
+      ALLOW_DATA_ATTR: false
+    });
+  }, [previewHtml]);
   const [showPreview, setShowPreview] = useState(false);
   const [customVariables, setCustomVariables] = useState<Record<string, string>>({});
 
@@ -111,7 +123,7 @@ export default function GestaoDocumentos() {
             @media print { body { padding: 20px; } }
           </style>
         </head>
-        <body>${previewHtml}</body>
+        <body>${sanitizedPreviewHtml}</body>
         </html>
       `);
       printWindow.document.close();
@@ -283,7 +295,7 @@ export default function GestaoDocumentos() {
           </DialogHeader>
           <div 
             className="prose prose-sm max-w-none p-6 border rounded-lg bg-white text-black"
-            dangerouslySetInnerHTML={{ __html: previewHtml }}
+            dangerouslySetInnerHTML={{ __html: sanitizedPreviewHtml }}
           />
           <div className="flex justify-end gap-2 mt-4">
             <Button variant="outline" onClick={() => setShowPreview(false)}>
@@ -303,3 +315,4 @@ export default function GestaoDocumentos() {
     </div>
   );
 }
+
