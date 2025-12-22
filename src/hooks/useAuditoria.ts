@@ -10,8 +10,8 @@ export interface AuditLog {
   tabela: string;
   registro_id: string;
   acao: 'INSERT' | 'UPDATE' | 'DELETE';
-  dados_anteriores: Record<string, any> | null;
-  dados_novos: Record<string, any> | null;
+  dados_anteriores: Record<string, unknown> | null;
+  dados_novos: Record<string, unknown> | null;
   campos_alterados: string[] | null;
   user_id: string | null;
   user_email: string | null;
@@ -131,3 +131,4 @@ export function useHistoricoRegistro(tabela: string, registroId: string) {
     enabled: !!tabela && !!registroId,
   });
 }
+
