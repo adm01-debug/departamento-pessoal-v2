@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,10 @@ import { useColaboradores } from '@/hooks/useColaboradores';
 import { format } from 'date-fns';
 
 export default function Onboarding() {
+  useEffect(() => {
+    document.title = 'Onboarding | DP System';
+  }, []);
+
   const queryClient = useQueryClient();
   const { colaboradores } = useColaboradores();
   const [selectedColaborador, setSelectedColaborador] = useState('');
@@ -235,4 +239,5 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
     </Card>
   );
 }
+
 
