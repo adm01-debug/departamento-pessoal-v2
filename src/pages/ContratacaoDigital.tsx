@@ -129,13 +129,13 @@ export default memo(function) ContratacaoDigital() {
       if (data.admissoes) {
         setFormData(prev => ({
           ...prev,
-          cpf: data.admissoes.cpf || '',
-          data_nascimento: data.admissoes.data_nascimento || '',
-          sexo: data.admissoes.sexo || '',
-          email: data.admissoes.email || '',
-          telefone: data.admissoes.telefone || '',
-          nome_mae: data.admissoes.nome_mae || '',
-          estado_civil: data.admissoes.estado_civil || '',
+          cpf: data.admissoes.cpf ?? '',
+          data_nascimento: data.admissoes.data_nascimento ?? '',
+          sexo: data.admissoes.sexo ?? '',
+          email: data.admissoes.email ?? '',
+          telefone: data.admissoes.telefone ?? '',
+          nome_mae: data.admissoes.nome_mae ?? '',
+          estado_civil: data.admissoes.estado_civil ?? '',
         }));
       }
 
@@ -855,6 +855,7 @@ export default memo(function) ContratacaoDigital() {
     </div>
   );
 }
+
 
 
 
