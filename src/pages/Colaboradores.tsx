@@ -328,7 +328,7 @@ export default memo(function) Colaboradores() {
             }}
             disabled={filteredColaboradores.length === 0}
           />
-          <Button variant="outline" className="gap-2" onClick={() => setImportModalOpen(true)}>
+          <Button aria-label="Ação" variant="outline" className="gap-2" onClick={() => setImportModalOpen(true)}>
             <Upload className="w-4 h-4" />
             Importar
           </Button>
@@ -405,7 +405,7 @@ export default memo(function) Colaboradores() {
 
           {/* Clear Filters */}
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="gap-1 text-muted-foreground hover:text-foreground">
+            <Button aria-label="Ação" variant="ghost" size="sm" onClick={clearAllFilters} className="gap-1 text-muted-foreground hover:text-foreground">
               <X className="w-3 h-3" />
               Limpar
             </Button>
@@ -507,7 +507,7 @@ export default memo(function) Colaboradores() {
                       <p className="font-medium text-foreground">Nenhum colaborador cadastrado</p>
                       <p className="text-sm text-muted-foreground mt-1">Comece adicionando o primeiro colaborador</p>
                     </div>
-                    <Button onClick={handleOpenNewModal} className="mt-2 gap-2">
+                    <Button aria-label="Ação" onClick={handleOpenNewModal} className="mt-2 gap-2">
                       <Plus className="w-4 h-4" />
                       Novo Colaborador
                     </Button>
@@ -521,7 +521,7 @@ export default memo(function) Colaboradores() {
                     <Search className="w-8 h-8 text-muted-foreground/50" />
                     <p className="text-sm text-muted-foreground">Nenhum colaborador encontrado</p>
                     {hasActiveFilters && (
-                      <Button variant="link" size="sm" onClick={clearAllFilters}>
+                      <Button aria-label="Ação" variant="link" size="sm" onClick={clearAllFilters}>
                         Limpar filtros
                       </Button>
                     )}
@@ -715,6 +715,7 @@ export default memo(function) Colaboradores() {
     </div>
   );
 }
+
 
 
 
