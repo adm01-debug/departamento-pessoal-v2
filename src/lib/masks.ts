@@ -407,3 +407,56 @@ export const validateCNH = (cnh: string): { valid: boolean; message?: string } =
   
   return { valid: true };
 };
+
+
+// Função helper para aplicar máscara em input
+export function applyMask(value: string, mask: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'currency'): string {
+  const digits = value.replace(/\D/g, '');
+  
+  switch (mask) {
+    case 'cpf':
+      return digits
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+        .slice(0, 14);
+    
+    case 'cnpj':
+      return digits
+        .replace(/(\d{2})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1/$2')
+        .replace(/(\d{4})(\d{1,2})/, '$1-$2')
+        .slice(0, 18);
+    
+    case 'phone':
+      if (digits.length <= 10) {
+        return digits
+          .replace(/(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{4})(\d)/, '$1-$2');
+      }
+      return digits
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d)/, '$1-$2')
+        .slice(0, 15);
+    
+    case 'cep':
+      return digits.replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9);
+    
+    case 'currency':
+      const number = parseFloat(digits) / 100;
+      return number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    
+    default:
+      return value;
+  }
+}
+
+// Hook para máscara de input
+export function useMaskedInput(mask: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'currency') {
+  return (e: React.ChangeEvent<HTMLInputElement>) => {
+    const masked = applyMask(e.target.value, mask);
+    e.target.value = masked;
+    return masked;
+  };
+}
