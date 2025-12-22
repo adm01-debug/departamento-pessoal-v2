@@ -144,11 +144,11 @@ export default function Usuarios() {
           <p className="text-muted-foreground text-sm">Gerencie acessos e permissões do sistema</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => refetchAllRoles()}>
+          <Button aria-label="Ação" variant="outline" onClick={() => refetchAllRoles()}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
           </Button>
-          <Button onClick={() => setModalOpen(true)}>
+          <Button aria-label="Ação" onClick={() => setModalOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Atribuir Permissão
           </Button>
@@ -247,7 +247,7 @@ export default function Usuarios() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button aria-label="Ação" variant="ghost" size="icon" className="h-8 w-8">
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -405,10 +405,10 @@ export default function Usuarios() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
+            <Button aria-label="Ação" variant="outline" onClick={() => setModalOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleAddRole} disabled={!selectedUserId}>
+            <Button aria-label="Ação" onClick={handleAddRole} disabled={!selectedUserId}>
               Atribuir
             </Button>
           </DialogFooter>
@@ -417,6 +417,7 @@ export default function Usuarios() {
     </div>
   );
 }
+
 
 
 
