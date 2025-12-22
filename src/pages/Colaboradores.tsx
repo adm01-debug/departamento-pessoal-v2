@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, memo, useMemo, useEffect } from 'react';
 import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight, Loader2, Database, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ const statusColors: Record<string, { bg: string; text: string; dot: string }> = 
 type SortColumn = 'nome' | 'dataAdmissao' | 'departamento' | null;
 type SortDirection = 'asc' | 'desc';
 
-export default function Colaboradores() {
+export default memo(function) Colaboradores() {
   useEffect(() => {
     document.title = 'Colaboradores | DP System';
   }, []);
@@ -715,5 +715,6 @@ export default function Colaboradores() {
     </div>
   );
 }
+
 
 
