@@ -268,3 +268,4 @@ export function GerenciamentoPeriodos({ open, onOpenChange, competenciaAtual }: 
   );
 }
 
+
