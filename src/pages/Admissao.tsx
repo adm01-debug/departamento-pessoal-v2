@@ -1,4 +1,4 @@
-import { useState, useEffect, useEffect } from 'react';
+import { useState, memo, useEffect, useEffect } from 'react';
 import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, AlertTriangle, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +24,7 @@ const etapaColors: Record<string, string> = {
   'eSocial': 'bg-primary/20 border-primary',
 };
 
-export default function AdmissaoPage() {
+export default memo(function) AdmissaoPage() {
   useEffect(() => {
     document.title = 'Admissões | DP System';
   }, []);
@@ -434,5 +434,6 @@ export default function AdmissaoPage() {
     </div>
   );
 }
+
 
 
