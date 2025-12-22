@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -352,7 +353,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
           });
         }
       } catch (err) {
-        console.error('Erro ao buscar CEP:', err);
+        logger.error('Erro ao buscar CEP:', err);
         toast({
           title: 'Erro ao buscar CEP',
           description: 'Não foi possível consultar o CEP. Tente novamente.',
@@ -1115,3 +1116,4 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
     </Dialog>
   );
 }
+
