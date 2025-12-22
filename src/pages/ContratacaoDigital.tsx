@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Upload, FileText, PenTool, CheckCircle2, User, 
@@ -159,7 +160,7 @@ export default function ContratacaoDigital() {
         setDocumentosEnviados(docsMap);
       }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      logger.error('Erro ao carregar dados:', error);
       setExpired(true);
     } finally {
       setLoading(false);
@@ -199,7 +200,7 @@ export default function ContratacaoDigital() {
       setTokenData(prev => prev ? { ...prev, dados_preenchidos: true } : null);
       setCurrentStep(2);
     } catch (error) {
-      console.error('Erro ao salvar:', error);
+      logger.error('Erro ao salvar:', error);
       toast.error('Erro ao salvar dados');
     } finally {
       setSaving(false);
@@ -243,7 +244,7 @@ export default function ContratacaoDigital() {
 
       toast.success('Documento enviado!');
     } catch (error) {
-      console.error('Erro no upload:', error);
+      logger.error('Erro no upload:', error);
       toast.error('Erro ao enviar documento');
     } finally {
       setUploading(null);
@@ -278,7 +279,7 @@ export default function ContratacaoDigital() {
       setTokenData(prev => prev ? { ...prev, documentos_enviados: true, contrato_gerado: true } : null);
       setCurrentStep(3);
     } catch (error) {
-      console.error('Erro:', error);
+      logger.error('Erro:', error);
       toast.error('Erro ao finalizar');
     } finally {
       setSaving(false);
@@ -296,7 +297,7 @@ export default function ContratacaoDigital() {
         const ipData = await ipResponse.json();
         ipAddress = ipData.ip;
       } catch (err) {
-        console.warn('Não foi possível capturar o IP:', err);
+        logger.warn('Não foi possível capturar o IP:', err);
       }
 
       // Converter base64 para blob e fazer upload no Storage
@@ -316,7 +317,7 @@ export default function ContratacaoDigital() {
         .upload(fileName, blob, { contentType: 'image/png' });
 
       if (uploadError) {
-        console.error('Erro no upload da assinatura:', uploadError);
+        logger.error('Erro no upload da assinatura:', uploadError);
         throw uploadError;
       }
 
@@ -326,7 +327,7 @@ export default function ContratacaoDigital() {
         .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 ano de validade
 
       if (signedUrlError) {
-        console.error('Erro ao gerar signed URL:', signedUrlError);
+        logger.error('Erro ao gerar signed URL:', signedUrlError);
       }
 
       const assinaturaUrl = signedUrlData?.signedUrl || fileName;
@@ -356,7 +357,7 @@ export default function ContratacaoDigital() {
       setTokenData(prev => prev ? { ...prev, contrato_assinado: true } : null);
       setCurrentStep(4);
     } catch (error) {
-      console.error('Erro ao assinar:', error);
+      logger.error('Erro ao assinar:', error);
       toast.error('Erro ao salvar assinatura');
     }
     
@@ -852,3 +853,4 @@ export default function ContratacaoDigital() {
     </div>
   );
 }
+
