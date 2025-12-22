@@ -145,7 +145,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
       candidatoNome: formData.candidatoNome,
       cargo: formData.cargo,
       departamento: formData.departamento,
-      salarioProposto: formData.salarioProposto || 0,
+      salarioProposto: formData.salarioProposto ?? 0,
       dataPrevisao: formData.dataPrevisao,
       observacoes: formData.observacoes,
       cpf: formData.cpf,
@@ -188,7 +188,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                 <Input
                   id="candidatoNome"
                   placeholder="Nome do candidato"
-                  value={formData.candidatoNome || ''}
+                  value={formData.candidatoNome ?? ''}
                   onChange={(e) => setFormData({ ...formData, candidatoNome: e.target.value })}
                 />
               </div>
@@ -199,7 +199,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                   id="cpf"
                   mask="cpf"
                   placeholder="000.000.000-00"
-                  value={formData.cpf || ''}
+                  value={formData.cpf ?? ''}
                   onChange={(e) => {
                     setFormData({ ...formData, cpf: e.target.value });
                     if (cpfError) setCpfError(null);
@@ -287,7 +287,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                 <Input
                   id="nomeMae"
                   placeholder="Nome completo da mãe"
-                  value={formData.nomeMae || ''}
+                  value={formData.nomeMae ?? ''}
                   onChange={(e) => setFormData({ ...formData, nomeMae: e.target.value })}
                 />
               </div>
@@ -298,7 +298,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                   id="email"
                   type="email"
                   placeholder="email@exemplo.com"
-                  value={formData.email || ''}
+                  value={formData.email ?? ''}
                   onChange={(e) => {
                     setFormData({ ...formData, email: e.target.value });
                     if (emailError) setEmailError(null);
@@ -317,7 +317,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                   id="telefone"
                   mask="phone"
                   placeholder="(00) 00000-0000"
-                  value={formData.telefone || ''}
+                  value={formData.telefone ?? ''}
                   onChange={(e) => {
                     setFormData({ ...formData, telefone: e.target.value });
                     if (telefoneError) setTelefoneError(null);
@@ -347,7 +347,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                 <Input
                   id="cargo"
                   placeholder="Ex: Analista de RH"
-                  value={formData.cargo || ''}
+                  value={formData.cargo ?? ''}
                   onChange={(e) => setFormData({ ...formData, cargo: e.target.value })}
                 />
               </div>
@@ -382,7 +382,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
                     type="number"
                     placeholder="0,00"
                     className="pl-9"
-                    value={formData.salarioProposto || ''}
+                    value={formData.salarioProposto ?? ''}
                     onChange={(e) => setFormData({ ...formData, salarioProposto: parseFloat(e.target.value) })}
                   />
                 </div>
@@ -431,7 +431,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
               id="observacoes"
               placeholder="Informações adicionais sobre a admissão..."
               rows={3}
-              value={formData.observacoes || ''}
+              value={formData.observacoes ?? ''}
               onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
             />
           </div>
@@ -448,6 +448,7 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
     </Dialog>
   );
 }
+
 
 
 
