@@ -740,3 +740,221 @@ export function gerarXML_S2190(dados: DadosAdmPreliminar): string {
   </evtAdmPrelim>
 </eSocial>`;
 }
+
+
+// S-2200: Cadastramento Inicial do Vínculo e Admissão/Ingresso de Trabalhador
+export function gerarXML_S2200(colaborador: ColaboradorData, empresa: EmpresaData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtAdmissao/v_S_01_02_00">
+  <evtAdmissao Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <trabalhador>
+      <cpfTrab>${colaborador.cpf.replace(/\D/g, '')}</cpfTrab>
+      <nmTrab>${colaborador.nome_completo}</nmTrab>
+      <sexo>${colaborador.sexo === 'masculino' ? 'M' : 'F'}</sexo>
+      <racaCor>1</racaCor>
+      <estCiv>${colaborador.estado_civil === 'solteiro' ? '1' : colaborador.estado_civil === 'casado' ? '2' : '5'}</estCiv>
+      <grauInstr>09</grauInstr>
+      <nmSoc>${colaborador.nome_completo}</nmSoc>
+      <nascimento>
+        <dtNascto>${colaborador.data_nascimento}</dtNascto>
+        <paisNascto>105</paisNascto>
+      </nascimento>
+    </trabalhador>
+    <vinculo>
+      <matricula>${colaborador.matricula || ''}</matricula>
+      <tpRegTrab>1</tpRegTrab>
+      <tpRegPrev>1</tpRegPrev>
+      <cadIni>S</cadIni>
+      <infoContrato>
+        <dtAdm>${colaborador.data_admissao}</dtAdm>
+        <tpContr>1</tpContr>
+      </infoContrato>
+    </vinculo>
+  </evtAdmissao>
+</eSocial>`;
+}
+
+// S-2299: Desligamento
+export function gerarXML_S2299(colaborador: ColaboradorData, empresa: EmpresaData, desligamento: DesligamentoData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtDeslig/v_S_01_02_00">
+  <evtDeslig Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <ideVinculo>
+      <cpfTrab>${colaborador.cpf.replace(/\D/g, '')}</cpfTrab>
+      <matricula>${colaborador.matricula || ''}</matricula>
+    </ideVinculo>
+    <infoDeslig>
+      <mtvDeslig>${desligamento.motivo_codigo || '01'}</mtvDeslig>
+      <dtDeslig>${desligamento.data_desligamento}</dtDeslig>
+      <indPagtoAPI>S</indPagtoAPI>
+      <dtProjFimAPI>${desligamento.data_desligamento}</dtProjFimAPI>
+    </infoDeslig>
+  </evtDeslig>
+</eSocial>`;
+}
+
+// S-2210: Comunicação de Acidente de Trabalho (CAT)
+export function gerarXML_S2210(colaborador: ColaboradorData, empresa: EmpresaData, acidente: AcidenteData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtCAT/v_S_01_02_00">
+  <evtCAT Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <ideVinculo>
+      <cpfTrab>${colaborador.cpf.replace(/\D/g, '')}</cpfTrab>
+      <matricula>${colaborador.matricula || ''}</matricula>
+    </ideVinculo>
+    <cat>
+      <dtAcid>${acidente.data_acidente}</dtAcid>
+      <tpAcid>${acidente.tipo || '1'}</tpAcid>
+      <hrAcid>${acidente.hora || '0800'}</hrAcid>
+      <hrsTrabAntesAcid>0400</hrsTrabAntesAcid>
+      <tpCat>1</tpCat>
+      <indCatObito>N</indCatObito>
+      <dtObito></dtObito>
+      <indComunPolworkscia>N</indComunPolicia>
+      <codSitGeradora>200004300</codSitGeradora>
+      <iniciatCAT>1</iniciatCAT>
+    </cat>
+  </evtCAT>
+</eSocial>`;
+}
+
+// S-2220: Monitoramento da Saúde do Trabalhador (ASO)
+export function gerarXML_S2220(colaborador: ColaboradorData, empresa: EmpresaData, aso: ASOData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_02_00">
+  <evtMonit Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <indRetif>1</indRetif>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <ideVinculo>
+      <cpfTrab>${colaborador.cpf.replace(/\D/g, '')}</cpfTrab>
+      <matricula>${colaborador.matricula || ''}</matricula>
+    </ideVinculo>
+    <exMedOcup>
+      <tpExameOcup>${aso.tipo || '0'}</tpExameOcup>
+      <aso>
+        <dtAso>${aso.data}</dtAso>
+        <resAso>${aso.resultado || '1'}</resAso>
+      </aso>
+    </exMedOcup>
+  </evtMonit>
+</eSocial>`;
+}
+
+// S-1000: Informações do Empregador
+export function gerarXML_S1000(empresa: EmpresaData): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtInfoEmpregador/v_S_01_02_00">
+  <evtInfoEmpregador Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoEmpregador>
+      <inclusao>
+        <idePeriodo>
+          <iniValid>${dataAtual.slice(0, 7).replace('-', '')}</iniValid>
+        </idePeriodo>
+        <infoCadastro>
+          <nmRazao>${empresa.razao_social}</nmRazao>
+          <classTrib>01</classTrib>
+          <natJurid>2062</natJurid>
+          <indCoop>0</indCoop>
+          <indConstr>0</indConstr>
+          <indDesFolha>0</indDesFolha>
+          <indOpcCP>0</indOpcCP>
+          <indOptRegEletron>0</indOptRegEletron>
+        </infoCadastro>
+      </inclusao>
+    </infoEmpregador>
+  </evtInfoEmpregador>
+</eSocial>`;
+}
+
+// S-3000: Exclusão de Eventos
+export function gerarXML_S3000(empresa: EmpresaData, eventoId: string, tipoEvento: string): string {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtExclusao/v_S_01_02_00">
+  <evtExclusao Id="ID${empresa.cnpj}${dataAtual.replace(/-/g, '')}${Math.random().toString().slice(2, 8)}">
+    <ideEvento>
+      <tpAmb>2</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>1.0</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj.replace(/\D/g, '').slice(0, 8)}</nrInsc>
+    </ideEmpregador>
+    <infoExclusao>
+      <tpEvento>${tipoEvento}</tpEvento>
+      <nrRecEvt>${eventoId}</nrRecEvt>
+    </infoExclusao>
+  </evtExclusao>
+</eSocial>`;
+}
+
+// Tipos auxiliares
+interface DesligamentoData {
+  data_desligamento: string;
+  motivo_codigo?: string;
+}
+
+interface AcidenteData {
+  data_acidente: string;
+  tipo?: string;
+  hora?: string;
+}
+
+interface ASOData {
+  data: string;
+  tipo?: string;
+  resultado?: string;
+}
