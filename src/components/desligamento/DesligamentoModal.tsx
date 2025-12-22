@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -476,3 +476,4 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
     </Dialog>
   );
 }
+
