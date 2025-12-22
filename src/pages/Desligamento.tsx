@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, memo, useEffect, useMemo } from 'react';
 import { Plus, UserMinus, FileText, Calculator, CheckCircle, Loader2, DollarSign, Clock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ import { DesligamentoModal } from '@/components/desligamento/DesligamentoModal';
 import { DesligamentoChecklist } from '@/components/desligamento/DesligamentoChecklist';
 import { toast } from 'sonner';
 
-export default function DesligamentoPage() {
+export default memo(function) DesligamentoPage() {
   useEffect(() => {
     document.title = 'Desligamentos | DP System';
   }, []);
@@ -351,5 +351,6 @@ export default function DesligamentoPage() {
     </div>
   );
 }
+
 
 
