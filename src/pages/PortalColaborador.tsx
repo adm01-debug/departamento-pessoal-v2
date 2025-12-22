@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { gerarHoleritePDF } from '@/lib/documentosPDF';
 
-export default function PortalColaborador() {
+export default memo(function) PortalColaborador() {
   useEffect(() => { document.title = 'Portal do Colaborador | DP System'; }, []);
 
   const { user, profile, updateProfile } = useAuth();
@@ -651,5 +651,6 @@ export default function PortalColaborador() {
     </div>
   );
 }
+
 
 
