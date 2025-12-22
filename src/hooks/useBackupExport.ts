@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { exportToExcel, exportToPDF, exportToCSV, formatters } from '@/lib/exportUtils';
 import { format } from 'date-fns';
@@ -157,7 +158,7 @@ export function useBackupExport() {
       toast.success('Backup exportado com sucesso!');
     } catch (error) {
       toast.error('Erro ao exportar backup');
-      console.error(error);
+      logger.error('Error', error);
     } finally {
       setIsExporting(false);
     }
@@ -196,7 +197,7 @@ export function useBackupExport() {
       toast.success('Backup Excel exportado com sucesso!');
     } catch (error) {
       toast.error('Erro ao exportar backup Excel');
-      console.error(error);
+      logger.error('Error', error);
     } finally {
       setIsExporting(false);
     }
@@ -292,7 +293,7 @@ export function useBackupExport() {
       toast.success('Relatório PDF exportado com sucesso!');
     } catch (error) {
       toast.error('Erro ao exportar PDF');
-      console.error(error);
+      logger.error('Error', error);
     } finally {
       setIsExporting(false);
     }
@@ -326,7 +327,7 @@ export function useBackupExport() {
       toast.success(`${TABLE_LABELS[table]} exportado com sucesso!`);
     } catch (error) {
       toast.error(`Erro ao exportar ${TABLE_LABELS[table]}`);
-      console.error(error);
+      logger.error('Error', error);
     }
   };
 
@@ -341,3 +342,4 @@ export function useBackupExport() {
     TABLES_TO_BACKUP,
   };
 }
+
