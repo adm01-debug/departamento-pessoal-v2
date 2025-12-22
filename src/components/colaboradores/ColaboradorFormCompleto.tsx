@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, memo, useEffect, memo } from 'react';
 import { logger } from '@/lib/logger';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -1116,6 +1116,7 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
     </Dialog>
   );
 }
+
 
 
 
