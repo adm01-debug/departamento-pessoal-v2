@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, memo, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +28,7 @@ interface DepartmentNode {
   expanded: boolean;
 }
 
-export default function Organograma() {
+export default memo(function) Organograma() {
   useEffect(() => { document.title = 'Organograma | DP System'; }, []);
 
   const { empresaAtual } = useEmpresas();
@@ -377,6 +377,7 @@ export default function Organograma() {
     </div>
   );
 }
+
 
 
 
