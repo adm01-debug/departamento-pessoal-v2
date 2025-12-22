@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, memo, useEffect, useMemo } from 'react';
 import { Plus, AlertTriangle, Calendar, FileText, CheckCircle, XCircle, Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ import {
   statusAfastamentoColors
 } from '@/types/afastamento';
 
-export default function Afastamentos() {
+export default memo(function) Afastamentos() {
   useEffect(() => {
     document.title = 'Afastamentos | DP System';
   }, []);
@@ -538,4 +538,5 @@ export default function Afastamentos() {
     </div>
   );
 }
+
 
