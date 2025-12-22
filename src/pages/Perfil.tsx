@@ -36,6 +36,8 @@ type ProfileErrors = { nome?: string; telefone?: string };
 type PasswordErrors = { senhaAtual?: string; novaSenha?: string; confirmarSenha?: string };
 
 export default function Perfil() {
+  useEffect(() => { document.title = 'Perfil | DP System'; }, []);
+
   const { user, profile, updateProfile } = useAuth();
   
   const [profileData, setProfileData] = useState({
@@ -620,3 +622,4 @@ export default function Perfil() {
     </div>
   );
 }
+
