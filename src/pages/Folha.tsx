@@ -61,8 +61,8 @@ export default memo(function) Folha() {
   const [eventoModalOpen, setEventoModalOpen] = useState(false);
   
   const selectedFolha = folhas.find(f => f.id === selectedFolhaId);
-  const { holerites, loading: loadingHolerites, fetchHolerites } = useHolerites(selectedFolhaId || '');
-  const { eventos, addEvento, removeEvento } = useEventosVariaveis(selectedFolha?.competencia || '');
+  const { holerites, loading: loadingHolerites, fetchHolerites } = useHolerites(selectedFolhaId ?? '');
+  const { eventos, addEvento, removeEvento } = useEventosVariaveis(selectedFolha?.competencia ?? '');
   
   // Auto-select first folha or latest
   useEffect(() => {
@@ -144,7 +144,7 @@ export default memo(function) Folha() {
         </div>
         <div className="flex items-center gap-2">
           {folhas.length > 0 && (
-            <Select value={selectedFolhaId || ''} onValueChange={setSelectedFolhaId}>
+            <Select value={selectedFolhaId ?? ''} onValueChange={setSelectedFolhaId}>
               <SelectTrigger className="w-52">
                 <SelectValue placeholder="Selecione a competência" />
               </SelectTrigger>
@@ -643,7 +643,7 @@ function EventosVariaveisTab({
 
 // Componente Detalhe do Holerite
 function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holerite | null; open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { lancamentos, loading } = useLancamentos(holerite?.id || '');
+  const { lancamentos, loading } = useLancamentos(holerite?.id ?? '');
 
   if (!holerite) return null;
 
@@ -780,6 +780,7 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
 
 
 
