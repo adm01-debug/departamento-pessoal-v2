@@ -1,4 +1,4 @@
-import { useState, useEffect, useEffect } from 'react';
+import { useState, memo, useEffect, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { 
   FileText, Upload, Download, AlertTriangle, CheckCircle, 
@@ -38,7 +38,7 @@ const statusColors: Record<StatusEvento, string> = {
   erro: 'bg-destructive/20 text-destructive',
 };
 
-export default function ESocial() {
+export default memo(function) ESocial() {
   useEffect(() => {
     document.title = 'eSocial | DP System';
   }, []);
@@ -336,6 +336,7 @@ export default function ESocial() {
     </div>
   );
 }
+
 
 
 
