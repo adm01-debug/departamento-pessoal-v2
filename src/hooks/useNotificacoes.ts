@@ -5,6 +5,16 @@ import { ptBR } from 'date-fns/locale';
 import { useEffect } from 'react';
 import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
+
+// Tipo para colaborador vindo de relacionamento
+interface ColaboradorRelation {
+  id: string;
+  nome_completo: string;
+  status: string;
+  email?: string;
+}
+
+
 export interface Notificacao {
   id: string;
   user_id: string | null;
@@ -129,7 +139,7 @@ export function useNotificacoes() {
 
       if (periodos) {
         for (const periodo of periodos) {
-          const colaborador = periodo.colaboradores as any;
+          const colaborador = periodo.colaboradores as ColaboradorRelation;
           if (!colaborador || colaborador.status !== 'ativo') continue;
 
           const dataFimConcessivo = addDays(parseISO(periodo.data_fim), 365);
@@ -248,7 +258,7 @@ export function useNotificacoes() {
 
       if (feriasProgramadas) {
         for (const ferias of feriasProgramadas) {
-          const colaborador = ferias.colaboradores as any;
+          const colaborador = ferias.colaboradores as ColaboradorRelation;
           if (!colaborador) continue;
 
           const dataInicio = parseISO(ferias.data_inicio);
@@ -317,3 +327,4 @@ export function useNotificacoes() {
     isGerando: gerarNotificacoesAutomaticas.isPending,
   };
 }
+
