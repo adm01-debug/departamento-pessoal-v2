@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffect } from 'react';
 import { 
   Bell, Check, CheckCheck, Trash2, Filter, 
   RefreshCw, Loader2, Info, AlertTriangle, 
@@ -44,6 +44,10 @@ const tipoColors: Record<TipoNotificacao, string> = {
 };
 
 export default function Notificacoes() {
+  useEffect(() => {
+    document.title = 'Notificações | DP System';
+  }, []);
+
   const [tab, setTab] = useState<'todas' | 'nao_lidas'>('nao_lidas');
   const [pagina, setPagina] = useState(1);
 
@@ -207,3 +211,4 @@ export default function Notificacoes() {
     </div>
   );
 }
+
