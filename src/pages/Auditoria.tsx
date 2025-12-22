@@ -1,4 +1,4 @@
-import { useState, useEffect, useEffect } from 'react';
+import { useState, memo, useEffect, useEffect } from 'react';
 import { History, Search, Filter, RefreshCw, ChevronDown, ChevronRight, Eye, Calendar, User, Database, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
-export default function Auditoria() {
+export default memo(function) Auditoria() {
   useEffect(() => {
     document.title = 'Auditoria | DP System';
   }, []);
@@ -351,4 +351,5 @@ export default function Auditoria() {
     </div>
   );
 }
+
 
