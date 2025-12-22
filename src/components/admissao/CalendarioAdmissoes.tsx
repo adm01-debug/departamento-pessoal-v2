@@ -66,14 +66,14 @@ export function CalendarioAdmissoes({ admissoes, etapaLabels, onSelectAdmissao }
     <div className="rounded-lg border bg-card">
       {/* Header do Calendário */}
       <div className="flex items-center justify-between p-4 border-b">
-        <Button variant="outline" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-          <ChevronLeft className="h-4 w-4" />
+        <Button variant="outline" size="icon" aria-label="Mês anterior" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+          <ChevronLeft aria-hidden="true" className="h-4 w-4" />
         </Button>
         <h3 className="text-lg font-semibold capitalize">
           {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
         </h3>
-        <Button variant="outline" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-          <ChevronRight className="h-4 w-4" />
+        <Button variant="outline" size="icon" aria-label="Mês anterior" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+          <ChevronRight aria-hidden="true" className="h-4 w-4" />
         </Button>
       </div>
 
@@ -164,3 +164,4 @@ export function CalendarioAdmissoes({ admissoes, etapaLabels, onSelectAdmissao }
     </div>
   );
 }
+
