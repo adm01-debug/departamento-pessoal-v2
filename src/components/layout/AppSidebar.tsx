@@ -27,7 +27,7 @@ import {
 import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
@@ -215,3 +215,4 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
     </aside>
   );
 }
+
