@@ -29,6 +29,10 @@ type SortColumn = 'nome' | 'dataAdmissao' | 'departamento' | null;
 type SortDirection = 'asc' | 'desc';
 
 export default function Colaboradores() {
+  useEffect(() => {
+    document.title = 'Colaboradores | DP System';
+  }, []);
+
   const { colaboradores, loading, error, createColaborador, updateColaborador, deleteColaborador, fetchColaboradores } = useColaboradores();
   
   const [search, setSearch] = useState('');
@@ -711,4 +715,5 @@ export default function Colaboradores() {
     </div>
   );
 }
+
 
