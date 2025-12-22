@@ -47,7 +47,7 @@ export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChart
     return 'hsl(var(--destructive))';
   };
 
-  const handleChartClick = (data: any) => {
+  const handleChartClick = (data: { activePayload?: Array<{ payload: { month: string; rate: number } }> }) => {
     if (data && data.activePayload && data.activePayload.length > 0) {
       const item = data.activePayload[0].payload as TurnoverMonthData;
       setSelectedMonth({ mes: item.mes, mesLabel: item.mesLabel });
@@ -185,4 +185,5 @@ export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChart
     </>
   );
 }
+
 
