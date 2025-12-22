@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
@@ -133,11 +134,11 @@ export const useIntegracaoPontoFolha = () => {
   // Exportar para eventos variáveis
   const exportarParaFolhaMutation = useMutation({
     mutationFn: async (competencia: string) => {
-      console.log('Iniciando integração Ponto x Folha para', competencia);
+      logger.log('Iniciando integração Ponto x Folha para', competencia);
       
       // Processar registros de ponto
       const resumos = await processarPonto(competencia);
-      console.log('Resumos processados:', resumos.length);
+      logger.log('Resumos processados:', resumos.length);
 
       if (resumos.length === 0) {
         throw new Error('Nenhum registro de ponto encontrado para integração');
@@ -145,7 +146,7 @@ export const useIntegracaoPontoFolha = () => {
 
       // Buscar rubricas
       const rubricas = await buscarRubricas();
-      console.log('Rubricas encontradas:', rubricas);
+      logger.log('Rubricas encontradas:', rubricas);
 
       // Remover eventos variáveis existentes da competência (para não duplicar)
       await supabase
@@ -200,7 +201,7 @@ export const useIntegracaoPontoFolha = () => {
         }
       }
 
-      console.log('Eventos a inserir:', eventos.length);
+      logger.log('Eventos a inserir:', eventos.length);
 
       // Inserir eventos
       if (eventos.length > 0) {
@@ -223,7 +224,7 @@ export const useIntegracaoPontoFolha = () => {
       toast.success(`Integração concluída! ${data.colaboradoresProcessados} colaboradores, ${data.eventosGerados} eventos gerados.`);
     },
     onError: (error) => {
-      console.error('Erro na integração:', error);
+      logger.error('Erro na integração:', error);
       toast.error('Erro na integração: ' + error.message);
     }
   });
@@ -242,3 +243,4 @@ export const formatarMinutos = (minutos: number): string => {
   const mins = minutos % 60;
   return `${horas}h${mins > 0 ? ` ${mins}min` : ''}`;
 };
+
