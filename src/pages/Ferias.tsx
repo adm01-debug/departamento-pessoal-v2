@@ -460,7 +460,7 @@ export default memo(function) Ferias() {
                 />
               </div>
               
-              <Button variant="outline" className="w-full gap-2" onClick={handleCalcular}>
+              <Button aria-label="Ação" variant="outline" className="w-full gap-2" onClick={handleCalcular}>
                 <Calculator className="w-4 h-4" />
                 Calcular Valores
               </Button>
@@ -542,6 +542,7 @@ export default memo(function) Ferias() {
     </div>
   );
 }
+
 
 
 
