@@ -244,3 +244,4 @@ export const formatarMinutos = (minutos: number): string => {
   return `${horas}h${mins > 0 ? ` ${mins}min` : ''}`;
 };
 
+
