@@ -82,7 +82,7 @@ export default memo(function) Auditoria() {
           </h1>
           <p className="text-muted-foreground text-sm">Histórico completo de alterações no sistema</p>
         </div>
-        <Button variant="outline" onClick={() => refetch()} className="gap-2">
+        <Button aria-label="Ação" variant="outline" onClick={() => refetch()} className="gap-2">
           <RefreshCw className="w-4 h-4" />
           Atualizar
         </Button>
@@ -199,7 +199,7 @@ export default memo(function) Auditoria() {
         </div>
 
         {hasFilters && (
-          <Button variant="ghost" size="sm" onClick={limparFiltros} className="gap-1">
+          <Button aria-label="Ação" variant="ghost" size="sm" onClick={limparFiltros} className="gap-1">
             <X className="w-3 h-3" />
             Limpar
           </Button>
@@ -351,6 +351,7 @@ export default memo(function) Auditoria() {
     </div>
   );
 }
+
 
 
 
