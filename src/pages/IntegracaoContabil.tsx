@@ -126,7 +126,7 @@ export default function IntegracaoContabil() {
       // Linha do colaborador
       const linhaBase = {
         competencia: config.competencia,
-        matricula: holerite.colaborador_matricula || '',
+        matricula: holerite.colaborador_matricula ?? '',
         cpf: holerite.colaborador_cpf,
         nome: holerite.colaborador_nome,
         cargo: holerite.colaborador_cargo,
@@ -135,9 +135,9 @@ export default function IntegracaoContabil() {
         total_proventos: holerite.total_proventos,
         total_descontos: holerite.total_descontos,
         liquido: holerite.liquido,
-        valor_inss: holerite.valor_inss || 0,
-        valor_irrf: holerite.valor_irrf || 0,
-        valor_fgts: holerite.valor_fgts || 0
+        valor_inss: holerite.valor_inss ?? 0,
+        valor_irrf: holerite.valor_irrf ?? 0,
+        valor_fgts: holerite.valor_fgts ?? 0
       };
       
       linhas.push(linhaBase);
@@ -371,21 +371,21 @@ export default function IntegracaoContabil() {
                       <p className="text-xs text-muted-foreground">INSS</p>
                       <p className="text-sm font-medium">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_inss || 0), 0))}
+                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_inss ?? 0), 0))}
                       </p>
                     </div>
                     <div className="p-2 rounded bg-muted/50">
                       <p className="text-xs text-muted-foreground">IRRF</p>
                       <p className="text-sm font-medium">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_irrf || 0), 0))}
+                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_irrf ?? 0), 0))}
                       </p>
                     </div>
                     <div className="p-2 rounded bg-muted/50">
                       <p className="text-xs text-muted-foreground">FGTS</p>
                       <p className="text-sm font-medium">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_fgts || 0), 0))}
+                          .format(holerites.reduce((sum: number, h: unknown) => sum + (h.valor_fgts ?? 0), 0))}
                       </p>
                     </div>
                   </div>
@@ -428,5 +428,6 @@ export default function IntegracaoContabil() {
     </div>
   );
 }
+
 
 
