@@ -234,3 +234,4 @@ export const bancosComuns = [
   { codigo: '756', nome: 'Sicoob' },
   { codigo: '748', nome: 'Sicredi' },
 ];
+
