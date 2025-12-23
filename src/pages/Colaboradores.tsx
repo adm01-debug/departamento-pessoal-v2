@@ -1,4 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useMemo, useEffect } from 'react';
 import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight, Loader2, Database, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -293,6 +294,8 @@ export default memo(function) Colaboradores() {
     return (
     <>
       <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
+    <>
+      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
       <div className="p-6 flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -303,6 +306,8 @@ export default memo(function) Colaboradores() {
   }
 
   return (
+    <>
+      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -535,6 +540,8 @@ export default memo(function) Colaboradores() {
               paginatedColaboradores.map((colab) => {
                 const colors = statusColors[colab.status] || statusColors.pendente;
                 return (
+    <>
+      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
                   <tr 
                     key={colab.id} 
                     className="hover:bg-muted/30 transition-colors cursor-pointer"
@@ -651,6 +658,8 @@ export default memo(function) Colaboradores() {
                   pageNum = currentPage - 2 + i;
                 }
                 return (
+    <>
+      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
                   <Button
                     key={pageNum}
                     variant={currentPage === pageNum ? "default" : "outline"}
@@ -717,8 +726,10 @@ export default memo(function) Colaboradores() {
       />
     </div>
     </>
+    </>
   );
 }
+
 
 
 
