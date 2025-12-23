@@ -44,7 +44,18 @@ interface LogAuditoria {
  * Uso: const auditoria = useAuditoriaIntegration('colaborador');
  *      await auditoria.registrarCriacao(id, dados);
  */
-export function useAuditoriaIntegration(entidade?: EntidadeAuditoria) {
+export interface UseAuditoriaIntegrationReturn {
+  registrarCriacao: (entidadeId: string, dados: Record<string, unknown>) => Promise<void>;
+  registrarAlteracao: (entidadeId: string, dadosAnteriores: Record<string, unknown>, dadosNovos: Record<string, unknown>) => Promise<void>;
+  registrarExclusao: (entidadeId: string, dados: Record<string, unknown>) => Promise<void>;
+  aprovar: (entidadeId: string, detalhes?: Record<string, unknown>) => Promise<void>;
+  rejeitar: (entidadeId: string, detalhes?: Record<string, unknown>) => Promise<void>;
+  calcular: (entidadeId: string, detalhes?: Record<string, unknown>) => Promise<void>;
+  exportar: (entidadeId: string, detalhes?: Record<string, unknown>) => Promise<void>;
+  registrarLog: (log: LogAuditoria) => Promise<void>;
+}
+
+export function useAuditoriaIntegration(entidade?: EntidadeAuditoria): UseAuditoriaIntegrationReturn {
   const { user } = useAuth();
   const entidadePadrao = entidade || 'colaborador';
 
@@ -176,5 +187,6 @@ export const useAuditoriaBeneficios = () => useAuditoriaIntegration('beneficio')
 export const useAuditoriaAfastamentos = () => useAuditoriaIntegration('afastamento');
 
 export default useAuditoriaIntegration;
+
 
 
