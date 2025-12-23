@@ -22,7 +22,7 @@ export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartPro
     const deptCount: Record<string, number> = {};
     
     colaboradores.forEach(c => {
-      deptCount[c.departamento] = (deptCount[c.departamento] || 0) + 1;
+      deptCount[c.departamento] = (deptCount[c.departamento] ?? 0) + 1;
     });
 
     return Object.entries(deptCount)
@@ -77,5 +77,6 @@ export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartPro
     </div>
   );
 }
+
 
 
