@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useMemo } from 'react';
 import { Plus, Calendar, List, AlertTriangle, CheckCircle, XCircle, Eye, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -171,6 +172,8 @@ export default memo(function) Ferias() {
   };
 
   return (
+    <>
+      <SEOHead title="Férias | DP System" description="Gestão de férias" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -312,6 +315,8 @@ export default memo(function) Ferias() {
             {ferias.map((f) => {
               const colors = statusColors[f.status] || statusColors.programada;
               return (
+    <>
+      <SEOHead title="Férias | DP System" description="Gestão de férias" />
                 <div key={f.id} className="p-4 hover:bg-muted/30 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -540,8 +545,10 @@ export default memo(function) Ferias() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
+
 
 
 
