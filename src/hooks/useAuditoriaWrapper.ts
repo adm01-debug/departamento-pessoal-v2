@@ -30,7 +30,15 @@ export type TipoAcao =
  * Uso: const { registrar } = useAuditoriaWrapper('colaborador');
  *      registrar('criar', colaboradorId, 'Criou colaborador João');
  */
-export function useAuditoriaWrapper(entidade: Entidade) {
+export interface UseAuditoriaWrapperReturn {
+  registrar: (acao: Acao, entidadeId: string, descricao: string, dados?: Record<string, unknown>) => Promise<void>;
+  criar: (entidadeId: string, descricao: string, dados?: Record<string, unknown>) => Promise<void>;
+  editar: (entidadeId: string, descricao: string, dadosAnteriores?: Record<string, unknown>, dadosNovos?: Record<string, unknown>) => Promise<void>;
+  excluir: (entidadeId: string, descricao: string, dadosAnteriores?: Record<string, unknown>) => Promise<void>;
+  entidade: Entidade;
+}
+
+export function useAuditoriaWrapper(entidade: Entidade): UseAuditoriaWrapperReturn {
   const auditoria = useAuditoriaIntegration(entidade as EntidadeAuditoria);
 
   const registrar = useCallback(async (
@@ -94,4 +102,5 @@ export const useAuditoriaBeneficio = () => useAuditoriaWrapper('beneficio');
 export const useAuditoriaAfastamento = () => useAuditoriaWrapper('afastamento');
 
 export default useAuditoriaWrapper;
+
 
