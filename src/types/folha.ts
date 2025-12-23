@@ -198,3 +198,4 @@ export function getProximaCompetencia(competencia: string): string {
   }
   return `${ano}-${String(mes + 1).padStart(2, '0')}`;
 }
+
