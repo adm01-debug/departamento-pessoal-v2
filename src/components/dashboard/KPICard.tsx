@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +45,7 @@ export function KPICard({ icon: Icon, label, value, subtitle, trend, colorClass 
     </div>
   );
 }
+
 
 
 
