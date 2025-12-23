@@ -346,7 +346,7 @@ export default memo(function) Colaboradores() {
           <div className="relative flex-1 min-w-[280px] max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Buscar por nome, matrícula, cargo, CPF..."
+              placeholder="Buscar por nome, matrícula, cargo, CPF..." aria-label="Buscar por nome, matrícula, cargo, CPF..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-10"
@@ -715,6 +715,7 @@ export default memo(function) Colaboradores() {
     </div>
   );
 }
+
 
 
 
