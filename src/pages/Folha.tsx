@@ -633,7 +633,7 @@ function EventosVariaveisTab({
           </div>
           <DialogFooter>
             <Button aria-label="Ação" variant="outline" onClick={() => setAddModalOpen(false)}>Cancelar</Button>
-            <Button aria-label="Ação" onClick={handleAdd}>Adicionar</Button>
+            <Button aria-label="Adicionar" aria-label="Ação" onClick={handleAdd}>Adicionar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -780,6 +780,7 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
 
 
 
