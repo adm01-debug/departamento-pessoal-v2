@@ -48,6 +48,8 @@ export function useDocumentosColaborador(colaboradorId: string) {
 
   const { data: documentos = [], isLoading } = useQuery({
     queryKey: ['documentos-colaborador', colaboradorId],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       if (!colaboradorId) return [];
       
@@ -203,5 +205,6 @@ export function useDocumentosColaborador(colaboradorId: string) {
     isDeleting: deleteDocumento.isPending,
   };
 }
+
 
 
