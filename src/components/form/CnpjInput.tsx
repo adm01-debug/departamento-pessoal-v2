@@ -27,3 +27,4 @@ export const CnpjInput = memo(forwardRef<HTMLInputElement, CnpjInputProps>(
 ));
 
 export default CnpjInput;
+
