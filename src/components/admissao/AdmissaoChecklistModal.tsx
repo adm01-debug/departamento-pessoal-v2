@@ -1,4 +1,4 @@
-import { useState, memo, memo } from 'react';
+import { useState, memo, memo, memo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -371,6 +371,7 @@ export function AdmissaoChecklistModal({
     </Dialog>
   );
 }
+
 
 
 
