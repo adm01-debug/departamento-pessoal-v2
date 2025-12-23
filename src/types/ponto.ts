@@ -105,3 +105,4 @@ export interface ResumoMensal {
   banco_horas_debito: string;
   saldo_banco_horas: string;
 }
+
