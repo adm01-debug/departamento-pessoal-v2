@@ -56,6 +56,8 @@ export function useBeneficios() {
   // Buscar tipos de benefício
   const { data: tiposBeneficio = [], isLoading: loadingTipos } = useQuery({
     queryKey: ['tipos_beneficio'],
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tipos_beneficio')
@@ -71,6 +73,8 @@ export function useBeneficios() {
   // Buscar benefícios de todos os colaboradores
   const { data: beneficiosColaboradores = [], isLoading: loadingBeneficios, refetch } = useQuery({
     queryKey: ['beneficios_colaborador'],
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
     queryFn: async () => {
       const { data, error } = await supabase
         .from('beneficios_colaborador')
@@ -91,7 +95,9 @@ export function useBeneficios() {
   const useBeneficiosColaborador = (colaboradorId: string | null) => {
     return useQuery({
       queryKey: ['beneficios_colaborador', colaboradorId],
-      queryFn: async () => {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
+    queryFn: async () => {
         if (!colaboradorId) return [];
         
         const { data, error } = await supabase
@@ -218,6 +224,7 @@ export function useBeneficios() {
     isAdding: adicionarBeneficio.isPending,
   };
 }
+
 
 
 
