@@ -56,6 +56,9 @@ const ACAO_COLORS: Record<string, { bg: string; text: string }> = {
 export function useAuditoria(filtros?: FiltrosAuditoria) {
   const { data: logs = [], isLoading, refetch } = useQuery({
     queryKey: ['audit_log', filtros],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    meta: { onError: (error: Error) => console.error('Erro ao carregar auditoria:', error) },
     queryFn: async () => {
       let query = supabase
         .from('audit_log')
@@ -133,6 +136,7 @@ export function useHistoricoRegistro(tabela: string, registroId: string) {
     enabled: !!tabela && !!registroId,
   });
 }
+
 
 
 
