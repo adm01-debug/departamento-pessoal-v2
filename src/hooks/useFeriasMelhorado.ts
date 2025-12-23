@@ -106,6 +106,8 @@ export function useFeriasMelhorado() {
     gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ferias')
@@ -123,6 +125,8 @@ export function useFeriasMelhorado() {
   // Query para períodos aquisitivos
   const periodosQuery = useQuery({
     queryKey: ['periodos-aquisitivos'],
+    staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
@@ -497,6 +501,7 @@ export function useFeriasMelhorado() {
     }
   };
 }
+
 
 
 
