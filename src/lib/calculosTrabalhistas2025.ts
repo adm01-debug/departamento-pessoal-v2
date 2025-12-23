@@ -101,6 +101,11 @@ export interface EncargosPatronais {
 /**
  * Calcula o INSS (progressivo)
  */
+/**
+ * Calcula o INSS 2025 usando tabela progressiva
+ * @param salarioBruto - Salário bruto do colaborador
+ * @returns Valor do INSS a descontar
+ */
 export function calcularINSS(salarioBruto: number): number {
   let inss = 0;
   let salarioRestante = Math.min(salarioBruto, TETO_INSS_2025);
@@ -120,6 +125,12 @@ export function calcularINSS(salarioBruto: number): number {
 
 /**
  * Calcula o IRRF
+ */
+/**
+ * Calcula o IRRF 2025
+ * @param baseCalculo - Base de cálculo (salário - INSS - pensões)
+ * @param dependentes - Número de dependentes
+ * @returns Valor do IRRF a descontar
  */
 export function calcularIRRF(baseCalculo: number, dependentes: number = 0): number {
   // Deduzir dependentes
@@ -145,12 +156,22 @@ export function calcularIRRF(baseCalculo: number, dependentes: number = 0): numb
 /**
  * Calcula o FGTS
  */
+/**
+ * Calcula o FGTS (8% da base)
+ * @param baseFGTS - Base de cálculo do FGTS
+ * @returns Valor do FGTS
+ */
 export function calcularFGTS(baseFGTS: number): number {
   return Math.round(baseFGTS * 0.08 * 100) / 100;
 }
 
 /**
  * Calcula encargos patronais
+ */
+/**
+ * Calcula encargos patronais (INSS patronal, RAT, terceiros, FGTS)
+ * @param baseSalarial - Base salarial para cálculo
+ * @returns Objeto com todos os encargos patronais
  */
 export function calcularEncargosPatronais(baseSalarial: number): EncargosPatronais {
   const inssPatronal = baseSalarial * 0.20; // 20% INSS patronal
@@ -169,6 +190,11 @@ export function calcularEncargosPatronais(baseSalarial: number): EncargosPatrona
 
 /**
  * Calcula holerite completo
+ */
+/**
+ * Calcula o holerite completo do colaborador
+ * @param dados - Dados do colaborador e folha
+ * @returns Holerite calculado com todos os proventos e descontos
  */
 export function calcularHolerite(
   colaborador: DadosColaborador,
@@ -394,3 +420,4 @@ export function formatPercent(value: number): string {
     maximumFractionDigits: 2,
   }).format(value / 100);
 }
+
