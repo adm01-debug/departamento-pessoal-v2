@@ -216,3 +216,4 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   );
 }
 
+
