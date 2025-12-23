@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface Afastamento {
   id: string;
@@ -15,29 +16,49 @@ export interface Afastamento {
 
 export const afastamentosService = {
   async listar(colaborador_id?: string): Promise<Afastamento[]> {
-    let query = supabase.from('afastamentos').select('id, colaborador_id, tipo, data_inicio, data_fim, status, motivo');
-    if (colaborador_id) query = query.eq('colaborador_id', colaborador_id);
-    const { data, error } = await query.order('data_inicio', { ascending: false });
-    if (error) throw error;
-    return data ?? [];
+    try {
+      let query = supabase.from('afastamentos').select('id, colaborador_id, tipo, data_inicio, data_fim, status, motivo');
+      if (colaborador_id) query = query.eq('colaborador_id', colaborador_id);
+      const { data, error } = await query.order('data_inicio', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    } catch (error) {
+      logger.error('Erro ao listar afastamentos:', error);
+      throw error;
+    }
   },
 
   async criar(dados: Omit<Afastamento, 'id' | 'created_at'>): Promise<Afastamento> {
-    const { data, error } = await supabase.from('afastamentos').insert(dados).select().single();
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.from('afastamentos').insert(dados).select().single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Erro ao criar afastamento:', error);
+      throw error;
+    }
   },
 
   async encerrar(id: string, data_fim: string): Promise<Afastamento> {
-    const { data, error } = await supabase.from('afastamentos').update({ status: 'encerrado', data_fim }).eq('id', id).select().single();
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.from('afastamentos').update({ status: 'encerrado', data_fim }).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Erro ao encerrar afastamento:', error);
+      throw error;
+    }
   },
 
   async ativos(): Promise<Afastamento[]> {
-    const { data, error } = await supabase.from('afastamentos').select('*').eq('status', 'ativo');
-    if (error) throw error;
-    return data ?? [];
+    try {
+      const { data, error } = await supabase.from('afastamentos').select('id, colaborador_id, tipo, data_inicio, data_fim, status, motivo, cid, observacoes').eq('status', 'ativo');
+      if (error) throw error;
+      return data ?? [];
+    } catch (error) {
+      logger.error('Erro ao listar afastamentos ativos:', error);
+      throw error;
+    }
   },
 };
 
