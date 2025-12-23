@@ -111,6 +111,8 @@ export function useFeriados(ano?: number) {
   // Buscar feriados do banco
   const { data: feriados = [], isLoading, refetch } = useQuery({
     queryKey: ['feriados', anoAtual],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('feriados')
@@ -229,6 +231,7 @@ export function useFeriados(ano?: number) {
     gerarFeriadosAno,
   };
 }
+
 
 
 
