@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { AlertTriangle, Calendar, Clock, FileText, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alerta } from '@/data/mockData';
@@ -52,6 +52,7 @@ export function AlertsList({ alertas }: AlertsListProps) {
     </div>
   );
 }
+
 
 
 
