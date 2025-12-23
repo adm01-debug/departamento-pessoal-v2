@@ -56,3 +56,4 @@ export const PageSkeleton = memo(function PageSkeleton({ type = 'table' }: PageS
 
 export default PageSkeleton;
 
+
