@@ -93,3 +93,4 @@ export function AbsenteeismChart({ data }: AbsenteeismChartProps) {
   );
 }
 
+
