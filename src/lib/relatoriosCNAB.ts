@@ -247,3 +247,4 @@ export function gerarCNAB400(empresa: EmpresaCNAB, pagamentos: Pagamento[]): str
   return linhas.join('\r\n');
 }
 
+
