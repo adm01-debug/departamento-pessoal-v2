@@ -90,3 +90,4 @@ export function TurnoverGauge({ admissoes, desligamentos, totalColaboradores }: 
   );
 }
 
+
