@@ -112,3 +112,4 @@ export const statusAfastamentoColors: Record<StatusAfastamento, { bg: string; te
   cancelado: { bg: 'bg-destructive/10', text: 'text-destructive' },
   prorrogado: { bg: 'bg-info/10', text: 'text-info' }
 };
+
