@@ -100,7 +100,7 @@ export function useDesligamentos() {
       setLoading(true);
       let query = supabase
         .from('desligamentos')
-        .select('*')
+        .select('id, colaborador_id, data_desligamento, motivo, tipo, status')
         .order('created_at', { ascending: false });
 
       if (empresaAtualId) {
@@ -287,5 +287,6 @@ export function useDesligamentos() {
     tipoLabels,
   };
 }
+
 
 
