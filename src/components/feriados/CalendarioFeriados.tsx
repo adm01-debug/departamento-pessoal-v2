@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, memo } from 'react';
 import { format, startOfYear, endOfYear, eachMonthOfInterval, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useFeriados, Feriado } from '@/hooks/useFeriados';
@@ -360,6 +360,7 @@ export function CalendarioFeriados() {
     </div>
   );
 }
+
 
 
 
