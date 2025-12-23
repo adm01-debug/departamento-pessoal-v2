@@ -132,3 +132,4 @@ export function AdmissionsLineChart({ colaboradores = [], months = 12 }: Admissi
 
 
 
+
