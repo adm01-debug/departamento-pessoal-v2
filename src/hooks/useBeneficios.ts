@@ -59,7 +59,7 @@ export function useBeneficios() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tipos_beneficio')
-        .select('*')
+        .select('id, colaborador_id, tipo, valor, data_inicio, status')
         .eq('ativo', true)
         .order('nome');
 
@@ -218,5 +218,6 @@ export function useBeneficios() {
     isAdding: adicionarBeneficio.isPending,
   };
 }
+
 
 
