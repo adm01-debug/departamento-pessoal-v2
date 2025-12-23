@@ -61,6 +61,8 @@ export function useEmpresas() {
   // Buscar empresas do usuário
   const { data: userEmpresas, isLoading: loadingEmpresas } = useQuery({
     queryKey: ["user-empresas"],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) return [];
@@ -90,6 +92,8 @@ export function useEmpresas() {
   // Listar todas as empresas (para admin)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
     queryKey: ["todas-empresas"],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("empresas")
@@ -247,6 +251,7 @@ export function useEmpresas() {
     temMultiplasEmpresas: (userEmpresas?.length ?? 0) > 1,
   };
 }
+
 
 
 
