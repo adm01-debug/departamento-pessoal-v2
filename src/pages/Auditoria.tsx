@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useEffect } from 'react';
 import { History, Search, Filter, RefreshCw, ChevronDown, ChevronRight, Eye, Calendar, User, Database, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,8 @@ export default memo(function) Auditoria() {
   const hasFilters = filtroTabela !== 'todas' || filtroAcao !== 'todas' || filtroDataInicio || filtroDataFim || busca;
 
   return (
+    <>
+      <SEOHead title="Auditoria | DP System" description="Trilha de auditoria do sistema" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -349,8 +352,10 @@ export default memo(function) Auditoria() {
         </DialogContent>
       </Dialog>
     </div>
+  </>
   );
 }
+
 
 
 
