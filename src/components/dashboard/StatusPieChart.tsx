@@ -78,3 +78,4 @@ export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
 
 
 
+
