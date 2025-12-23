@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useMemo } from 'react';
 import { Plus, AlertTriangle, Calendar, FileText, CheckCircle, XCircle, Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -169,6 +170,8 @@ export default memo(function) Afastamentos() {
   };
 
   return (
+    <>
+      <SEOHead title="Afastamentos | DP System" description="Gestão de afastamentos" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -298,6 +301,8 @@ export default memo(function) Afastamentos() {
               {afastamentos.map((item) => {
                 const statusColors = statusAfastamentoColors[item.status];
                 return (
+    <>
+      <SEOHead title="Afastamentos | DP System" description="Gestão de afastamentos" />
                   <tr key={item.id} className="hover:bg-muted/20 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -536,8 +541,10 @@ export default memo(function) Afastamentos() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
+
 
 
 
