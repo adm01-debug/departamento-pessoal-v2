@@ -25,7 +25,7 @@ export function AdmissionsLineChart({ colaboradores = [], months = 12 }: Admissi
     colaboradores.forEach(c => {
       const admDate = parseISO(c.dataAdmissao);
       const monthKey = format(startOfMonth(admDate), 'yyyy-MM');
-      admissionsByMonth[monthKey] = (admissionsByMonth[monthKey] || 0) + 1;
+      admissionsByMonth[monthKey] = (admissionsByMonth[monthKey] ?? 0) + 1;
     });
 
     // Criar dados com acumulado
@@ -41,7 +41,7 @@ export function AdmissionsLineChart({ colaboradores = [], months = 12 }: Admissi
 
     return monthsInterval.map(month => {
       const monthKey = format(month, 'yyyy-MM');
-      const admissionsInMonth = admissionsByMonth[monthKey] || 0;
+      const admissionsInMonth = admissionsByMonth[monthKey] ?? 0;
       accumulated += admissionsInMonth;
       
       return {
@@ -129,5 +129,6 @@ export function AdmissionsLineChart({ colaboradores = [], months = 12 }: Admissi
     </div>
   );
 }
+
 
 
