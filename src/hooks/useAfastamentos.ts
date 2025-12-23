@@ -47,7 +47,7 @@ export const useAfastamentos = () => {
       queryFn: async () => {
         const { data, error } = await supabase
           .from('config_afastamentos')
-          .select('*');
+          .select('id, colaborador_id, tipo, data_inicio, data_fim, status, motivo');
         
         if (error) throw error;
         return data as ConfigAfastamento[];
@@ -252,7 +252,7 @@ export const useAfastamentos = () => {
       // Buscar afastamento atual
       const { data: afastamento, error: errFetch } = await supabase
         .from('afastamentos')
-        .select('*')
+        .select('id, colaborador_id, tipo, data_inicio, data_fim, status, motivo')
         .eq('id', afastamentoId)
         .single();
       
@@ -371,5 +371,6 @@ export const useAfastamentos = () => {
     isProrrogando: prorrogarAfastamentoMutation.isPending
   };
 };
+
 
 
