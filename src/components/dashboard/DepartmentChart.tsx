@@ -49,3 +49,4 @@ export function DepartmentChart({ departamentos }: DepartmentChartProps) {
 }
 
 
+
