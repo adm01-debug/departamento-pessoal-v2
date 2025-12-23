@@ -118,3 +118,4 @@ function InformeRendimentos({ dados }: { dados: RendimentosData }) {
 }
 
 export default memo(InformeRendimentos);
+
