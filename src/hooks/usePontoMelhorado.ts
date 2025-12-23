@@ -61,7 +61,27 @@ const calcularHorasTrabalhadas = (registro: Partial<RegistroPonto>): number => {
 // HOOK PRINCIPAL
 // =====================================================
 
-export const usePontoMelhorado = () => {
+export interface UsePontoMelhoradoReturn {
+  useRegistrosPonto: (colaboradorId: string | null, dataInicio: string, dataFim: string) => ReturnType<typeof useQuery>;
+  useFeriados: (ano: number) => ReturnType<typeof useQuery>;
+  usePeriodos: () => ReturnType<typeof useQuery>;
+  useAjustesPendentes: () => ReturnType<typeof useQuery>;
+  useBancoHoras: (colaboradorId: string | null) => ReturnType<typeof useQuery>;
+  registrarPonto: (registro: RegistroPontoInput) => void;
+  registrarPontoAsync: (registro: RegistroPontoInput) => Promise<unknown>;
+  isRegistrando: boolean;
+  importarArquivo: (arquivo: File, empresaId: string, competencia: string) => Promise<void>;
+  importProgress: number;
+  fecharPeriodo: (periodoId: string) => void;
+  reabrirPeriodo: (periodoId: string) => void;
+  isFechandoPeriodo: boolean;
+  solicitarAjuste: (ajuste: AjusteInput) => void;
+  aprovarAjuste: (params: { ajusteId: string; aprovado: boolean; motivo?: string }) => void;
+  isProcessandoAjuste: boolean;
+  calcularResumoMensal: (colaboradorId: string, competencia: string) => Promise<ResumoMensal>;
+}
+
+export const usePontoMelhorado = (): UsePontoMelhoradoReturn => {
   const queryClient = useQueryClient();
   const [importProgress, setImportProgress] = useState(0);
 
@@ -677,4 +697,5 @@ export const usePontoMelhorado = () => {
     calcularResumoMensal,
   };
 };
+
 
