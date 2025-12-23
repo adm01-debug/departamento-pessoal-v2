@@ -34,3 +34,4 @@ function CartaDesligamento({ colaborador, empresa, data_desligamento, motivo }: 
 }
 export default memo(CartaDesligamento);
 
+
