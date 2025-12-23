@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface Departamento {
   id: string;
@@ -10,28 +11,48 @@ export interface Departamento {
 
 export const departamentosService = {
   async listar(empresa_id?: string): Promise<Departamento[]> {
-    let query = supabase.from('departamentos').select('id, nome, gestor_id');
-    if (empresa_id) query = query.eq('empresa_id', empresa_id);
-    const { data, error } = await query.order('nome');
-    if (error) throw error;
-    return data ?? [];
+    try {
+      let query = supabase.from('departamentos').select('id, nome, gestor_id, empresa_id');
+      if (empresa_id) query = query.eq('empresa_id', empresa_id);
+      const { data, error } = await query.order('nome');
+      if (error) throw error;
+      return data ?? [];
+    } catch (error) {
+      logger.error('Erro ao listar departamentos:', error);
+      throw error;
+    }
   },
 
   async criar(dados: Omit<Departamento, 'id' | 'created_at'>): Promise<Departamento> {
-    const { data, error } = await supabase.from('departamentos').insert(dados).select().single();
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.from('departamentos').insert(dados).select().single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Erro ao criar departamento:', error);
+      throw error;
+    }
   },
 
   async atualizar(id: string, dados: Partial<Departamento>): Promise<Departamento> {
-    const { data, error } = await supabase.from('departamentos').update(dados).eq('id', id).select().single();
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.from('departamentos').update(dados).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Erro ao atualizar departamento:', error);
+      throw error;
+    }
   },
 
   async excluir(id: string): Promise<void> {
-    const { error } = await supabase.from('departamentos').delete().eq('id', id);
-    if (error) throw error;
+    try {
+      const { error } = await supabase.from('departamentos').delete().eq('id', id);
+      if (error) throw error;
+    } catch (error) {
+      logger.error('Erro ao excluir departamento:', error);
+      throw error;
+    }
   },
 };
 
