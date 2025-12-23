@@ -7,3 +7,8 @@ export * from './empresa';
 export * from './usuario';
 export * from './auditoria';
 export * from './esocial';
+export * from './beneficio';
+export * from './departamento';
+export * from './cargo';
+export * from './feriado';
+export * from './notificacao';
