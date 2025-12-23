@@ -51,7 +51,7 @@ export function useNotificacoes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('notificacoes')
-        .select('*')
+        .select('id, titulo, mensagem, lida, created_at, tipo')
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -173,7 +173,7 @@ export function useNotificacoes() {
       // 2. Verificar contratos temporários vencendo
       const { data: colaboradores } = await supabase
         .from('colaboradores')
-        .select('*')
+        .select('id, titulo, mensagem, lida, created_at, tipo')
         .in('tipo_contrato', ['temporario', 'estagiario', 'aprendiz'])
         .eq('status', 'ativo');
 
@@ -327,6 +327,7 @@ export function useNotificacoes() {
     isGerando: gerarNotificacoesAutomaticas.isPending,
   };
 }
+
 
 
 
