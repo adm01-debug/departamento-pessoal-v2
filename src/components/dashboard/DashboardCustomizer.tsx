@@ -1,4 +1,4 @@
-import { useState, memo, memo } from 'react';
+import { useState, memo, memo, memo } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -278,6 +278,7 @@ export function DashboardCustomizer({ children }: DashboardCustomizerProps) {
     </div>
   );
 }
+
 
 
 
