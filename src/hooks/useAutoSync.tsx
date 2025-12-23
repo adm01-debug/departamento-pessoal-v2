@@ -51,6 +51,8 @@ export function useAutoSync() {
   // Buscar configuração
   const { data: config, isLoading: loadingConfig } = useQuery({
     queryKey: ['auto-sync-config'],
+    staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
@@ -327,6 +329,7 @@ export function AutoSyncStatusBadge(): JSX.Element {
     </span>
   );
 }
+
 
 
 
