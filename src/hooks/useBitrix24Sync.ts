@@ -61,7 +61,7 @@ export function useBitrix24Sync() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('configuracoes')
-        .select('*')
+        .select('id, entidade, status, ultima_sync')
         .eq('chave', 'bitrix24_sync')
         .single();
 
@@ -251,7 +251,7 @@ export function useBitrix24Sync() {
     try {
       const client = new Bitrix24Client(configuracao.webhook_url);
       
-      let query = supabase.from('colaboradores').select('*');
+      let query = supabase.from('colaboradores').select('id, entidade, status, ultima_sync');
       if (colaboradorIds?.length) {
         query = query.in('id', colaboradorIds);
       }
@@ -387,7 +387,7 @@ export function useBitrix24Sync() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bitrix24_sync_logs')
-        .select('*')
+        .select('id, entidade, status, ultima_sync')
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -412,6 +412,7 @@ export function useBitrix24Sync() {
     logsSync,
   };
 }
+
 
 
 
