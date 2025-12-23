@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Bell, Check, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +51,7 @@ export function NotificationBell() {
   // Filtrar não lidas para exibição
   const notificacoesNaoLidas = notificacoes.filter((n: Notificacao) => !n.lida);
 
-  const handleNotificationClick = async (notif: Notificacao) => {
+  const handleNotificationClick = useCallback(async (notif: Notificacao) => {
     if (marcarComoLida) {
       marcarComoLida(notif.id);
     }
@@ -63,12 +63,12 @@ export function NotificationBell() {
       navigate('/ferias');
       setOpen(false);
     }
-  };
+  }, [marcarComoLida, navigate]);
 
-  const handleVerTodas = () => {
+  const handleVerTodas = useCallback(() => {
     setOpen(false);
     navigate('/notificacoes');
-  };
+  }, [navigate]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -150,3 +150,4 @@ export function NotificationBell() {
     </DropdownMenu>
   );
 }
+
