@@ -53,6 +53,8 @@ export function useAutoSync() {
     queryKey: ['auto-sync-config'],
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bitrix24_config')
@@ -325,6 +327,7 @@ export function AutoSyncStatusBadge(): JSX.Element {
     </span>
   );
 }
+
 
 
 
