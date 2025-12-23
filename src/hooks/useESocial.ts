@@ -249,6 +249,8 @@ export function useESocial() {
   // Buscar eventos pendentes (simulado - tabela esocial_eventos não existe ainda)
   const { data: eventosPendentes, isLoading: loadingPendentes } = useQuery({
     queryKey: ['esocial-pendentes'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       // Simulando retorno vazio enquanto a tabela não existe
       return [] as EventoESocial[];
@@ -259,7 +261,9 @@ export function useESocial() {
   const useHistoricoEventos = (colaboradorId?: string, limite = 50) => {
     return useQuery({
       queryKey: ['esocial-historico', colaboradorId],
-      queryFn: async () => {
+      staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
         // Simulando retorno vazio
         return [] as EventoESocial[];
       },
@@ -470,4 +474,5 @@ export function useESocial() {
     marcarEnviado,
   };
 }
+
 
