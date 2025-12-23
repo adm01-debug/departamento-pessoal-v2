@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useEffect } from 'react';
 import { Plus, FileText, Clock, List, Calendar, LayoutGrid, Loader2, Pencil, AlertTriangle, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -130,6 +131,8 @@ export default memo(function) AdmissaoPage() {
 
   if (loading) {
     return (
+    <>
+      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
@@ -137,6 +140,8 @@ export default memo(function) AdmissaoPage() {
   }
 
   return (
+    <>
+      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -189,6 +194,8 @@ export default memo(function) AdmissaoPage() {
                     const progress = getProgress(adm);
                     const dadosIncompletos = isDadosIncompletos(adm);
                     return (
+    <>
+      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
                       <div 
                         key={adm.id}
                         onClick={() => handleOpenChecklist(adm)}
@@ -294,6 +301,8 @@ export default memo(function) AdmissaoPage() {
                   const progress = getProgress(adm);
                   const dadosIncompletos = isDadosIncompletos(adm);
                   return (
+    <>
+      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
                     <tr key={adm.id} className="border-t hover:bg-muted/30">
                       <td className="p-3">
                         <div className="flex items-center gap-2">
@@ -432,8 +441,10 @@ export default memo(function) AdmissaoPage() {
         admissao={selectedAdmissao}
       />
     </div>
+    </>
   );
 }
+
 
 
 
