@@ -59,7 +59,7 @@ export function useAuditoria(filtros?: FiltrosAuditoria) {
     queryFn: async () => {
       let query = supabase
         .from('audit_log')
-        .select('*')
+        .select('id, acao, usuario_id, tabela, registro_id, dados_antigos, dados_novos, created_at')
         .order('created_at', { ascending: false ,
     staleTime: 5 * 60 * 1000,
     retry: 3})
@@ -122,7 +122,7 @@ export function useHistoricoRegistro(tabela: string, registroId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('audit_log')
-        .select('*')
+        .select('id, acao, usuario_id, tabela, registro_id, dados_antigos, dados_novos, created_at')
         .eq('tabela', tabela)
         .eq('registro_id', registroId)
         .order('created_at', { ascending: false });
@@ -133,6 +133,7 @@ export function useHistoricoRegistro(tabela: string, registroId: string) {
     enabled: !!tabela && !!registroId,
   });
 }
+
 
 
 
