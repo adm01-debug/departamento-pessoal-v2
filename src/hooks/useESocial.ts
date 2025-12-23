@@ -277,7 +277,7 @@ export function useESocial() {
       // Buscar dados do colaborador
       const { data: colab, error } = await supabase
         .from('colaboradores')
-        .select('*')
+        .select('id, tipo, status, xml, recibo, created_at')
         .eq('id', colaboradorId)
         .single();
       
@@ -474,5 +474,6 @@ export function useESocial() {
     marcarEnviado,
   };
 }
+
 
 
