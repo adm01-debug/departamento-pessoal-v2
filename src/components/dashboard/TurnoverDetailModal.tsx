@@ -1,4 +1,4 @@
-import { useState, memo, useEffect, useMemo } from 'react';
+import { useState, memo, memo, useEffect, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -234,6 +234,7 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
     </Dialog>
   );
 }
+
 
 
 
