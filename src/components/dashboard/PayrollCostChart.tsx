@@ -125,3 +125,4 @@ export function PayrollCostChart({ data }: PayrollCostChartProps) {
   );
 }
 
+
