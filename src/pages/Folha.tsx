@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect } from 'react';
 import { 
   Wallet, CheckCircle, Clock, FileText, Plus, Calculator, 
@@ -128,6 +129,8 @@ export default memo(function) Folha() {
 
   if (loading) {
     return (
+    <>
+      <SEOHead title="Folha | DP System" description="Folha de pagamento" />
       <div className="p-6 flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
@@ -448,6 +451,7 @@ export default memo(function) Folha() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </>
   );
 }
 
@@ -780,6 +784,7 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
+
 
 
 
