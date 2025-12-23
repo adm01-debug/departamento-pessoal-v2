@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Clock, Zap, Play, Pause, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,18 +27,18 @@ export function AutoSyncConfigComponent({ onConfigChange, showCard = true }: Aut
     isUpdating 
   } = useAutoSync();
 
-  const handleToggle = async (enabled: boolean) => {
+  const handleToggle = useCallback(async (enabled: boolean) => {
     await toggleAutoSync(enabled);
     onConfigChange?.({ ...config!, habilitado: enabled });
-  };
+  }, [toggleAutoSync, onConfigChange, config]);
 
-  const handleIntervalChange = async (minutos: string) => {
+  const handleIntervalChange = useCallback(async (minutos: string) => {
     const novoConfig = { ...config!, intervalo_minutos: parseInt(minutos) };
     await atualizarConfig(novoConfig);
     onConfigChange?.(novoConfig);
-  };
+  }, [config, atualizarConfig, onConfigChange]);
 
-  const handleDiasSemanaChange = async (dia: number, checked: boolean) => {
+  const handleDiasSemanaChange = useCallback(async (dia: number, checked: boolean) => {
     const diasAtuais = config?.dias_semana || [1, 2, 3, 4, 5];
     const novosDias = checked 
       ? [...diasAtuais, dia].sort()
@@ -47,7 +47,7 @@ export function AutoSyncConfigComponent({ onConfigChange, showCard = true }: Aut
     const novoConfig = { ...config!, dias_semana: novosDias };
     await atualizarConfig(novoConfig);
     onConfigChange?.(novoConfig);
-  };
+  }, [config, atualizarConfig, onConfigChange]);
 
   const diasSemana = [
     { value: 0, label: 'Dom' },
@@ -233,3 +233,4 @@ export function AutoSyncConfigComponent({ onConfigChange, showCard = true }: Aut
 }
 
 export default AutoSyncConfigComponent;
+
