@@ -180,12 +180,13 @@ export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChart
       <TurnoverDetailModal
         open={!!selectedMonth}
         onOpenChange={(open) => !open && setSelectedMonth(null)}
-        mes={selectedMonth?.mes || ''}
-        mesLabel={selectedMonth?.mesLabel || ''}
+        mes={selectedMonth?.mes ?? ''}
+        mesLabel={selectedMonth?.mesLabel ?? ''}
       />
     </>
   );
 }
+
 
 
 
