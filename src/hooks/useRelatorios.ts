@@ -76,7 +76,7 @@ export function useRelatorios() {
   const gerarListaColaboradores = async (formato: FormatoRelatorio, filtro?: FiltroRelatorio) => {
     setGerando(true);
     try {
-      let query = supabase.from('colaboradores').select('*');
+      let query = supabase.from('colaboradores').select('id, tipo, nome, parametros, created_at');
       
       if (filtro?.departamento) query = query.eq('departamento', filtro.departamento);
       if (filtro?.status) query = query.eq('status', filtro.status as unknown);
@@ -114,7 +114,7 @@ export function useRelatorios() {
       const mesAtual = mes || new Date().getMonth() + 1;
       const { data, error } = await supabase
         .from('colaboradores')
-        .select('*')
+        .select('id, tipo, nome, parametros, created_at')
         .eq('status', 'ativo');
       
       if (error) throw error;
@@ -205,7 +205,7 @@ export function useRelatorios() {
     try {
       const { data, error } = await supabase
         .from('colaboradores')
-        .select('*')
+        .select('id, tipo, nome, parametros, created_at')
         .eq('id', colaboradorId)
         .single();
       
@@ -261,7 +261,7 @@ export function useRelatorios() {
     try {
       const { data: folha, error: folhaError } = await supabase
         .from('folhas_pagamento')
-        .select('*')
+        .select('id, tipo, nome, parametros, created_at')
         .eq('competencia', competencia)
         .single();
       
@@ -274,7 +274,7 @@ export function useRelatorios() {
 
       const { data: holerites, error: holError } = await supabase
         .from('holerites')
-        .select('*')
+        .select('id, tipo, nome, parametros, created_at')
         .eq('folha_id', folha.id);
       
       if (holError) throw holError;
@@ -309,7 +309,7 @@ export function useRelatorios() {
     try {
       const { data: folha, error } = await supabase
         .from('folhas_pagamento')
-        .select('*')
+        .select('id, tipo, nome, parametros, created_at')
         .eq('competencia', competencia)
         .single();
       
@@ -687,7 +687,7 @@ export function useRelatorios() {
 
       const { data, error } = await supabase
         .from('registros_ponto')
-        .select('*')
+        .select('id, tipo, nome, parametros, created_at')
         .eq('colaborador_id', colaboradorId)
         .gte('data', dataInicio)
         .lte('data', dataFim)
@@ -862,6 +862,7 @@ export function useRelatorios() {
     gerarIndicadoresDP,
   };
 }
+
 
 
 
