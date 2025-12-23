@@ -32,5 +32,4 @@ export const MoneyInput = memo(forwardRef<HTMLInputElement, MoneyInputProps>(
 
 export default MoneyInput;
 
-
-
+MoneyInput.displayName = 'MoneyInput';
