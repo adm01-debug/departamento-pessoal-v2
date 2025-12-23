@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, memo } from 'react';
 import { Lock, Unlock, Calendar, CheckCircle, AlertCircle, Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -267,6 +267,7 @@ export function GerenciamentoPeriodos({ open, onOpenChange, competenciaAtual }: 
     </>
   );
 }
+
 
 
 
