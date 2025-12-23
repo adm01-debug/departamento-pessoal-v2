@@ -105,7 +105,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
       const { data, error } = await query;
 
       if (error) throw error;
-      setHistory(data || []);
+      setHistory(data ?? []);
     } catch (error) {
       logger.error('Erro ao carregar histórico:', error);
     } finally {
@@ -482,6 +482,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
     </Dialog>
   );
 }
+
 
 
 
