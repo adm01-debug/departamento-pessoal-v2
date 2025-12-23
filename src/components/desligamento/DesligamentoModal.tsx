@@ -314,14 +314,13 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
               </Label>
               <Popover open={dateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger asChild>
-                  <Button
+                  <Button aria-label="Ação"
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !dataDesligamento && "text-muted-foreground"
                     )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                  ><CalendarIcon className="mr-2 h-4 w-4" />
                     {dataDesligamento
                       ? format(dataDesligamento, "dd/MM/yyyy", { locale: ptBR })
                       : "Selecione"}
@@ -476,6 +475,7 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
     </Dialog>
   );
 }
+
 
 
 
