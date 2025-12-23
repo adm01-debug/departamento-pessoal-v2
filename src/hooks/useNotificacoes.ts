@@ -48,6 +48,8 @@ export function useNotificacoes() {
   // Buscar notificações
   const { data: notificacoes = [], isLoading, refetch } = useQuery({
     queryKey: ['notificacoes'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('notificacoes')
@@ -327,6 +329,7 @@ export function useNotificacoes() {
     isGerando: gerarNotificacoesAutomaticas.isPending,
   };
 }
+
 
 
 
