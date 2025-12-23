@@ -71,7 +71,7 @@ export function ContratacaoDigitalModal({
       
       if (token) {
         const docs = await getDocumentosAdmissao(admissao.id);
-        setDocumentos(docs || []);
+        setDocumentos(docs ?? []);
       }
     } catch (error) {
       logger.error('Erro ao carregar dados:', error);
@@ -354,6 +354,7 @@ export function ContratacaoDigitalModal({
     </Dialog>
   );
 }
+
 
 
 
