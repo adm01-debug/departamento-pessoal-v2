@@ -51,6 +51,8 @@ export function useAgendamentoRelatorios() {
 
   const { data: agendamentos, isLoading } = useQuery({
     queryKey: ["relatorios-agendados"],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("relatorios_agendados")
@@ -64,6 +66,8 @@ export function useAgendamentoRelatorios() {
 
   const { data: logs } = useQuery({
     queryKey: ["logs-envio-relatorios"],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("log_envio_relatorios")
@@ -226,4 +230,5 @@ export const DIAS_SEMANA = [
   { value: 5, label: "Sexta-feira" },
   { value: 6, label: "Sábado" },
 ];
+
 
