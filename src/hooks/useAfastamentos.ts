@@ -36,7 +36,23 @@ interface AfastamentoRow {
   };
 }
 
-export const useAfastamentos = () => {
+export interface UseAfastamentosReturn {
+  useConfigAfastamentos: () => ReturnType<typeof useQuery>;
+  useAfastamentosQuery: (filtros?: { colaboradorId?: string; status?: StatusAfastamento; tipo?: TipoAfastamento; ano?: number }) => ReturnType<typeof useQuery>;
+  useAfastamento: (id: string) => ReturnType<typeof useQuery>;
+  useAfastamentosAtivos: () => ReturnType<typeof useQuery>;
+  calcularDias: (dataInicio: string, dataFim: string) => number;
+  criarAfastamento: (afastamento: Partial<Afastamento>) => void;
+  atualizarAfastamento: (params: { id: string; dados: Partial<Afastamento> }) => void;
+  encerrarAfastamento: (params: { id: string; dataFimReal: string; observacoes?: string }) => void;
+  prorrogarAfastamento: (params: { afastamentoId: string; novaDataFim: string; diasAdicionais: number; numeroBeneficio?: string }) => void;
+  cancelarAfastamento: (id: string) => void;
+  isCriando: boolean;
+  isAtualizando: boolean;
+  isProrrogando: boolean;
+}
+
+export const useAfastamentos = (): UseAfastamentosReturn => {
   const queryClient = useQueryClient();
   const { empresaAtualId } = useEmpresas();
 
@@ -371,6 +387,7 @@ export const useAfastamentos = () => {
     isProrrogando: prorrogarAfastamentoMutation.isPending
   };
 };
+
 
 
 
