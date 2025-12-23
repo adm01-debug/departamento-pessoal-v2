@@ -52,7 +52,7 @@ export const useIntegracaoPontoFolha = () => {
       // Buscar registros de ponto do colaborador
       const { data: registros, error: errReg } = await supabase
         .from('registros_ponto')
-        .select('*')
+        .select('id, colaborador_id, mes, ano, horas')
         .eq('colaborador_id', colab.id)
         .gte('data', dataInicio)
         .lte('data', dataFim);
@@ -117,7 +117,7 @@ export const useIntegracaoPontoFolha = () => {
   const buscarRubricas = async () => {
     const { data, error } = await supabase
       .from('rubricas_folha')
-      .select('*')
+      .select('id, colaborador_id, mes, ano, horas')
       .in('codigo', ['1003', '1004', '2001', '2002'])
       .eq('ativo', true);
 
@@ -243,6 +243,7 @@ export const formatarMinutos = (minutos: number): string => {
   const mins = minutos % 60;
   return `${horas}h${mins > 0 ? ` ${mins}min` : ''}`;
 };
+
 
 
 
