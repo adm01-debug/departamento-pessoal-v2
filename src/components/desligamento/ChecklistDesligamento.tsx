@@ -42,3 +42,4 @@ function ChecklistDesligamento({ colaboradorId }: { colaboradorId: string }) {
 }
 export default memo(ChecklistDesligamento);
 
+
