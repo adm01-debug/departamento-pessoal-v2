@@ -52,3 +52,4 @@ export function AlertsList({ alertas }: AlertsListProps) {
   );
 }
 
+
