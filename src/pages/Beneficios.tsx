@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useEffect } from 'react';
 import { Gift, Plus, Loader2, Search, X, Pencil, Trash2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -126,6 +127,8 @@ export default memo(function) Beneficios() {
 
   if (loadingBeneficios) {
     return (
+    <>
+      <SEOHead title="Benefícios | DP System" description="Gestão de benefícios" />
       <div className="p-6 flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -136,6 +139,8 @@ export default memo(function) Beneficios() {
   }
 
   return (
+    <>
+      <SEOHead title="Benefícios | DP System" description="Gestão de benefícios" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -266,6 +271,8 @@ export default memo(function) Beneficios() {
                     {tiposBeneficio.slice(0, 5).map(tipo => {
                       const beneficio = item.beneficios.find(b => b.tipo_beneficio_id === tipo.id);
                       return (
+    <>
+      <SEOHead title="Benefícios | DP System" description="Gestão de benefícios" />
                         <td key={tipo.id} className="p-4 text-sm text-center">
                           {beneficio ? (
                             <Badge className="bg-success/10 text-success border-0">
@@ -363,8 +370,10 @@ export default memo(function) Beneficios() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
+
 
 
 
