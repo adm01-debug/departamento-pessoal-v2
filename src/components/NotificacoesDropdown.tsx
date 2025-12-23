@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Bell, Check, CheckCheck, Trash2, RefreshCw, Calendar, FileText, Users, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -165,3 +165,4 @@ export function NotificacoesDropdown() {
     </DropdownMenu>
   );
 }
+
