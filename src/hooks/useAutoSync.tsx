@@ -51,6 +51,8 @@ export function useAutoSync() {
   // Buscar configuração
   const { data: config, isLoading: loadingConfig } = useQuery({
     queryKey: ['auto-sync-config'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bitrix24_config')
@@ -323,5 +325,6 @@ export function AutoSyncStatusBadge(): JSX.Element {
     </span>
   );
 }
+
 
 
