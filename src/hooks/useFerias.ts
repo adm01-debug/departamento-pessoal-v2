@@ -79,7 +79,7 @@ export const useFerias = () => {
         if (!colaboradorId) return [];
         const { data, error } = await supabase
           .from('periodos_aquisitivos')
-          .select('*')
+          .select('id, colaborador_id, data_inicio, data_fim, dias_gozo, status, observacoes')
           .eq('colaborador_id', colaboradorId)
           .order('numero_periodo', { ascending: true });
         
@@ -292,6 +292,7 @@ export const useFerias = () => {
     isAprovando: aprovarFeriasMutation.isPending
   };
 };
+
 
 
 
