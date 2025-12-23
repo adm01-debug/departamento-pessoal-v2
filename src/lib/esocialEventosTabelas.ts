@@ -116,3 +116,4 @@ export default {
   gerarEventoS1060,
   gerarEventoS1070,
 };
+
