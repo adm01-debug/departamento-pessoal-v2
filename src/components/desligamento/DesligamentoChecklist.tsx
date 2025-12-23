@@ -227,3 +227,4 @@ export function DesligamentoChecklist({ desligamento, onChecklistChange, onConcl
   );
 }
 
+
