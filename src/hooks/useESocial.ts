@@ -251,6 +251,8 @@ export function useESocial() {
     queryKey: ['esocial-pendentes'],
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       // Simulando retorno vazio enquanto a tabela não existe
       return [] as EventoESocial[];
@@ -261,6 +263,8 @@ export function useESocial() {
   const useHistoricoEventos = (colaboradorId?: string, limite = 50) => {
     return useQuery({
       queryKey: ['esocial-historico', colaboradorId],
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
       staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -474,6 +478,7 @@ export function useESocial() {
     marcarEnviado,
   };
 }
+
 
 
 
