@@ -97,7 +97,7 @@ export function useAdmissoes() {
       setLoading(true);
       let query = supabase
         .from('admissoes')
-        .select('*')
+        .select('id, nome, cpf, cargo, departamento, data_admissao, status')
         .order('created_at', { ascending: false });
 
       if (empresaAtualId) {
@@ -260,6 +260,7 @@ export function useAdmissoes() {
     ETAPA_CONCLUIDA,
   };
 }
+
 
 
 
