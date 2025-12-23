@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useMemo, useEffect } from 'react';
 import { Search, Plus, MoreVertical, X, SlidersHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Pencil, ChevronLeft, ChevronRight, Loader2, Database, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -290,6 +291,8 @@ export default memo(function) Colaboradores() {
 
   if (loading) {
     return (
+    <>
+      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
       <div className="p-6 flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -713,8 +716,10 @@ export default memo(function) Colaboradores() {
         onSuccess={() => fetchColaboradores()}
       />
     </div>
+    </>
   );
 }
+
 
 
 
