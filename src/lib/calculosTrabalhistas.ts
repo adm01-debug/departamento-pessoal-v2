@@ -27,7 +27,12 @@ export const ALIQUOTA_FGTS = 0.08;
 export const ALIQUOTA_INSS_PATRONAL = 0.20;
 
 /**
- * Calcula o INSS usando a tabela progressiva
+ * Calcula o INSS usando a tabela progressiva 2024
+ * @param salarioBruto - Salário bruto do colaborador
+ * @returns Objeto com valor do INSS, alíquota efetiva e detalhamento por faixa
+ * @example
+ * const resultado = calcularINSS(5000);
+ * // resultado.valorINSS = 636.13
  * O cálculo progressivo aplica cada alíquota apenas sobre a parcela correspondente
  */
 export function calcularINSS(salarioBruto: number): ResultadoCalculoINSS {
@@ -116,6 +121,13 @@ export function calcularINSS(salarioBruto: number): ResultadoCalculoINSS {
 /**
  * Calcula o IRRF
  */
+/**
+ * Calcula o IRRF (Imposto de Renda Retido na Fonte)
+ * @param baseCalculo - Base de cálculo após deduções
+ * @param dependentes - Número de dependentes
+ * @param outrasDeducoes - Outras deduções permitidas
+ * @returns Objeto com valor do IRRF, alíquota e faixa
+ */
 export function calcularIRRF(
   baseCalculo: number, 
   valorINSS: number, 
@@ -153,6 +165,11 @@ export function calcularIRRF(
 
 /**
  * Calcula o FGTS
+ */
+/**
+ * Calcula o FGTS do colaborador
+ * @param baseFGTS - Base de cálculo do FGTS
+ * @returns Valor do FGTS (8% da base)
  */
 export function calcularFGTS(baseFGTS: number): number {
   return Math.round(baseFGTS * ALIQUOTA_FGTS * 100) / 100;
@@ -285,6 +302,7 @@ export function calcularFolhaColaborador(
     inssPatronal,
   };
 }
+
 
 
 
