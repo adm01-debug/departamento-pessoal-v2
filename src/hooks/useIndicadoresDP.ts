@@ -85,6 +85,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para colaboradores
   const colaboradoresQuery = useQuery({
     queryKey: ['indicadores-colaboradores'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('colaboradores')
@@ -98,6 +100,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para turnover (admissões e desligamentos no período)
   const turnoverQuery = useQuery({
     queryKey: ['indicadores-turnover', dataInicioStr, dataFimStr],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       // Admissões no período
       const { data: admissoes, error: errAdm } = await supabase
@@ -137,6 +141,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para evolução do turnover (últimos 12 meses)
   const turnoverEvolutionQuery = useQuery({
     queryKey: ['indicadores-turnover-evolution'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const months: TurnoverMonthData[] = [];
       
@@ -198,6 +204,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para comparativo anual de turnover (últimos 5 anos)
   const turnoverYearQuery = useQuery({
     queryKey: ['indicadores-turnover-year-comparison'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const currentYear = now.getFullYear();
       const years: TurnoverYearData[] = [];
@@ -255,6 +263,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
 
   const afastamentosQuery = useQuery({
     queryKey: ['indicadores-afastamentos', competenciaAtual],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const mesInicio = format(startOfMonth(now), 'yyyy-MM-dd');
       const mesFim = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -281,6 +291,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para registros de ponto (faltas)
   const pontoQuery = useQuery({
     queryKey: ['indicadores-ponto', competenciaAtual],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const mesInicio = format(startOfMonth(now), 'yyyy-MM-dd');
       const mesFim = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -305,6 +317,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para folha de pagamento (custo por departamento)
   const folhaQuery = useQuery({
     queryKey: ['indicadores-folha', competenciaAtual],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       // Buscar última folha calculada
       const { data: folha, error: errFolha } = await supabase
@@ -337,6 +351,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para férias do mês
   const feriasQuery = useQuery({
     queryKey: ['indicadores-ferias', competenciaAtual],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const mesInicio = format(startOfMonth(now), 'yyyy-MM-dd');
       const mesFim = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -355,6 +371,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para pontos pendentes
   const pontosPendentesQuery = useQuery({
     queryKey: ['indicadores-pontos-pendentes'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { count, error } = await supabase
         .from('registros_ponto')
@@ -369,6 +387,8 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para afastados hoje
   const afastadosHojeQuery = useQuery({
     queryKey: ['indicadores-afastados-hoje'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const hoje = format(now, 'yyyy-MM-dd');
 
@@ -519,5 +539,6 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
 
   return processData();
 }
+
 
 
