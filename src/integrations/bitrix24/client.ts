@@ -132,7 +132,7 @@ export class Bitrix24Client {
    */
   async getDepartments(): Promise<Bitrix24Department[]> {
     const departments = await this.request<Bitrix24Department[]>('department.get', {});
-    return departments || [];
+    return departments ?? [];
   }
 
   /**
@@ -152,6 +152,7 @@ export const bitrix24 = {
 };
 
 export default Bitrix24Client;
+
 
 
 
