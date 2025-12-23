@@ -55,3 +55,4 @@ export const folhaService = {
 };
 
 export default folhaService;
+
