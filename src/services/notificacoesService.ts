@@ -1,9 +1,9 @@
 /**
-import { logger } from '@/lib/logger';
  * Serviço para envio de notificações
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface ResultadoSync {
   sucesso: boolean;
@@ -35,7 +35,7 @@ export const notificarResultadoSync = async (
       lida: false,
     });
   } catch (error) {
-    logger.error('Erro ao criar notificação:', error);
+    logger.error('Erro ao criar notificação de sync:', error);
   }
 };
 
@@ -59,3 +59,4 @@ export const criarNotificacao = async (
   }
 };
 
+export default { notificarResultadoSync, criarNotificacao };
