@@ -55,7 +55,7 @@ export function useDocumentosColaborador(colaboradorId: string) {
       
       const { data, error } = await supabase
         .from('documentos_colaborador')
-        .select('*')
+        .select('id, colaborador_id, tipo, nome, url, created_at')
         .eq('colaborador_id', colaboradorId)
         .order('created_at', { ascending: false });
 
@@ -205,6 +205,7 @@ export function useDocumentosColaborador(colaboradorId: string) {
     isDeleting: deleteDocumento.isPending,
   };
 }
+
 
 
 
