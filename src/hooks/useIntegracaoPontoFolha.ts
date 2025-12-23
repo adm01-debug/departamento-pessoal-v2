@@ -48,7 +48,7 @@ export const useIntegracaoPontoFolha = () => {
 
     const resumos: ResumoIntegracao[] = [];
 
-    for (const colab of colaboradores || []) {
+    for (const colab of colaboradores ?? []) {
       // Buscar registros de ponto do colaborador
       const { data: registros, error: errReg } = await supabase
         .from('registros_ponto')
@@ -64,7 +64,7 @@ export const useIntegracaoPontoFolha = () => {
       let totalFalta = 0;
       let diasFalta = 0;
 
-      (registros || []).forEach((reg: unknown) => {
+      (registros ?? []).forEach((reg: unknown) => {
         const extras = intervalToMinutes(reg.horas_extras as string);
         const falta = intervalToMinutes(reg.horas_falta as string);
         const horasTrabalhadas = intervalToMinutes(reg.horas_trabalhadas as string);
@@ -243,6 +243,7 @@ export const formatarMinutos = (minutos: number): string => {
   const mins = minutos % 60;
   return `${horas}h${mins > 0 ? ` ${mins}min` : ''}`;
 };
+
 
 
 
