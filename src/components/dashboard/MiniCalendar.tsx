@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface CalendarEvent {
@@ -102,6 +102,7 @@ export function MiniCalendar({ eventos, mes = 11, ano = 2025 }: MiniCalendarProp
     </div>
   );
 }
+
 
 
 
