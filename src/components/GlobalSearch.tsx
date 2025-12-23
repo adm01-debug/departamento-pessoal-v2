@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, X } from 'lucide-react';
 import {
@@ -43,11 +43,11 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     ).slice(0, 10);
   }, [search]);
 
-  const handleSelect = (colaboradorId: string) => {
+  const handleSelect = useCallback((colaboradorId: string) => {
     navigate(`/colaboradores?highlight=${colaboradorId}`);
     onOpenChange(false);
     setSearch('');
-  };
+  }, [navigate, onOpenChange]);
 
   // Keyboard shortcut
   useEffect(() => {
@@ -113,4 +113,5 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     </CommandDialog>
   );
 }
+
 
