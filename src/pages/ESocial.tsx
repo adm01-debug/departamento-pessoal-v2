@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { 
@@ -101,6 +102,8 @@ export default memo(function) ESocial() {
   };
 
   return (
+    <>
+      <SEOHead title="eSocial | DP System" description="Integração eSocial" />
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -334,8 +337,10 @@ export default memo(function) ESocial() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
+
 
 
 
