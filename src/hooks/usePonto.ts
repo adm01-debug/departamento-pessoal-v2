@@ -49,7 +49,9 @@ export const usePonto = () => {
   const useRegistrosPonto = (colaboradorId: string | null, dataInicio: string, dataFim: string) => {
     return useQuery({
       queryKey: ['registros-ponto', colaboradorId, dataInicio, dataFim],
-      queryFn: async () => {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
+    queryFn: async () => {
         if (!colaboradorId) return [];
         const { data, error } = await supabase
           .from('registros_ponto')
@@ -70,7 +72,9 @@ export const usePonto = () => {
   const useFeriados = (ano: number) => {
     return useQuery({
       queryKey: ['feriados', ano, empresaAtualId],
-      queryFn: async () => {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
+    queryFn: async () => {
         let query = supabase
           .from('feriados')
           .select('id, colaborador_id, data, entrada, saida, observacoes')
@@ -92,7 +96,9 @@ export const usePonto = () => {
   const useBancoHoras = (colaboradorId: string | null) => {
     return useQuery({
       queryKey: ['banco-horas', colaboradorId],
-      queryFn: async () => {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
+    queryFn: async () => {
         if (!colaboradorId) return [];
         const { data, error } = await supabase
           .from('banco_horas')
@@ -309,6 +315,8 @@ export const useResumoPonto = (competencia: string) => {
   
   return useQuery({
     queryKey: ['resumo-ponto', competencia, empresaAtualId],
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
     queryFn: async () => {
       const [ano, mes] = competencia.split('-').map(Number);
       const dataInicio = `${competencia}-01`;
@@ -334,6 +342,7 @@ export const useResumoPonto = (competencia: string) => {
     }
   });
 };
+
 
 
 
