@@ -233,8 +233,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
               <>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-2">
-                      <CalendarIcon className="w-3.5 h-3.5" />
+                    <Button aria-label="Ação" variant="outline" size="sm" className="h-8 gap-2"><CalendarIcon className="w-3.5 h-3.5" />
                       {startDate ? format(startDate, 'dd/MM/yy', { locale: ptBR }) : 'Início'}
                     </Button>
                   </PopoverTrigger>
@@ -251,8 +250,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
                 <span className="text-muted-foreground text-sm">até</span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-2">
-                      <CalendarIcon className="w-3.5 h-3.5" />
+                    <Button aria-label="Ação" variant="outline" size="sm" className="h-8 gap-2"><CalendarIcon className="w-3.5 h-3.5" />
                       {endDate ? format(endDate, 'dd/MM/yy', { locale: ptBR }) : 'Fim'}
                     </Button>
                   </PopoverTrigger>
@@ -482,6 +480,7 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
     </Dialog>
   );
 }
+
 
 
 
