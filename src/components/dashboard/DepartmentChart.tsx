@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface DepartmentData {
@@ -47,6 +48,7 @@ export function DepartmentChart({ departamentos }: DepartmentChartProps) {
     </div>
   );
 }
+
 
 
 
