@@ -114,7 +114,7 @@ export function useFeriados(ano?: number) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('feriados')
-        .select('*')
+        .select('id, data, nome, tipo, uf')
         .gte('data', `${anoAtual}-01-01`)
         .lte('data', `${anoAtual}-12-31`)
         .order('data', { ascending: true });
@@ -229,5 +229,6 @@ export function useFeriados(ano?: number) {
     gerarFeriadosAno,
   };
 }
+
 
 
