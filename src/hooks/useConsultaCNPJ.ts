@@ -60,26 +60,26 @@ export function useConsultaCNPJ() {
 
       const dadosFormatados: DadosCNPJ = {
         cnpj: data.cnpj || cnpjLimpo,
-        razao_social: data.nome || '',
-        nome_fantasia: data.fantasia || '',
-        situacao: data.situacao || '',
-        data_situacao: data.data_situacao || '',
-        tipo: data.tipo || '',
-        porte: data.porte || '',
-        natureza_juridica: data.natureza_juridica || '',
+        razao_social: data.nome ?? '',
+        nome_fantasia: data.fantasia ?? '',
+        situacao: data.situacao ?? '',
+        data_situacao: data.data_situacao ?? '',
+        tipo: data.tipo ?? '',
+        porte: data.porte ?? '',
+        natureza_juridica: data.natureza_juridica ?? '',
         atividade_principal: data.atividade_principal?.[0] || { code: '', text: '' },
-        logradouro: data.logradouro || '',
-        numero: data.numero || '',
-        complemento: data.complemento || '',
-        bairro: data.bairro || '',
-        municipio: data.municipio || '',
-        cidade: data.municipio || '',
-        uf: data.uf || '',
-        cep: data.cep || '',
-        telefone: data.telefone || '',
-        email: data.email || '',
-        capital_social: parseFloat(data.capital_social) || 0,
-        data_abertura: data.abertura || '',
+        logradouro: data.logradouro ?? '',
+        numero: data.numero ?? '',
+        complemento: data.complemento ?? '',
+        bairro: data.bairro ?? '',
+        municipio: data.municipio ?? '',
+        cidade: data.municipio ?? '',
+        uf: data.uf ?? '',
+        cep: data.cep ?? '',
+        telefone: data.telefone ?? '',
+        email: data.email ?? '',
+        capital_social: parseFloat(data.capital_social) ?? 0,
+        data_abertura: data.abertura ?? '',
       };
 
       setDados(dadosFormatados);
@@ -108,4 +108,5 @@ export function useConsultaCNPJ() {
     limpar,
   };
 }
+
 
