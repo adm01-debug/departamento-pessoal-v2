@@ -28,6 +28,8 @@ export function useAssinaturaDigital() {
   // Buscar documentos pendentes de assinatura
   const { data: documentosPendentes = [], isLoading: loadingPendentes } = useQuery({
     queryKey: ['assinaturas-pendentes'],
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -48,6 +50,8 @@ export function useAssinaturaDigital() {
   // Buscar documentos assinados
   const { data: documentosAssinados = [], isLoading: loadingAssinados } = useQuery({
     queryKey: ['assinaturas-concluidas'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -193,6 +197,7 @@ export const TIPOS_DOCUMENTO = [
   { value: 'declaracao', label: 'Declaração' },
   { value: 'outros', label: 'Outros' },
 ];
+
 
 
 
