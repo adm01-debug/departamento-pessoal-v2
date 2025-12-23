@@ -80,3 +80,4 @@ export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartPro
 
 
 
+
