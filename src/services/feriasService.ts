@@ -64,3 +64,4 @@ export const feriasService = {
 };
 
 export default feriasService;
+
