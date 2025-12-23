@@ -41,7 +41,18 @@ const calcularHorasTrabalhadas = (registro: Partial<RegistroPonto>): number => {
   return total;
 };
 
-export const usePonto = () => {
+export interface UsePontoReturn {
+  useRegistrosPonto: (colaboradorId: string | null, dataInicio: string, dataFim: string) => ReturnType<typeof useQuery>;
+  useFeriados: (ano: number) => ReturnType<typeof useQuery>;
+  useBancoHoras: (colaboradorId: string | null) => ReturnType<typeof useQuery>;
+  registrarPonto: (registro: Omit<RegistroPonto, "id" | "created_at" | "updated_at">) => void;
+  registrarBancoHoras: (movimento: Omit<BancoHoras, "id" | "created_at">) => void;
+  gerarEspelhoPonto: (colaboradorId: string, colaboradorNome: string, colaboradorCargo: string, colaboradorDepartamento: string, competencia: string) => Promise<EspelhoPonto>;
+  calcularResumoMensal: (colaboradorId: string, competencia: string) => Promise<ResumoMensal>;
+  isRegistrando: boolean;
+}
+
+export const usePonto = (): UsePontoReturn => {
   const queryClient = useQueryClient();
   const { empresaAtualId } = useEmpresas();
 
@@ -342,6 +353,7 @@ export const useResumoPonto = (competencia: string) => {
     }
   });
 };
+
 
 
 
