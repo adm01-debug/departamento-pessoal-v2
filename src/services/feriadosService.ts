@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface Feriado {
   id: string;
@@ -11,30 +12,50 @@ export interface Feriado {
 
 export const feriadosService = {
   async listar(ano?: number, uf?: string): Promise<Feriado[]> {
-    let query = supabase.from('feriados').select('id, data, nome, tipo, uf');
-    if (ano) {
-      query = query.gte('data', `${ano}-01-01`).lte('data', `${ano}-12-31`);
+    try {
+      let query = supabase.from('feriados').select('id, data, nome, tipo, uf, cidade');
+      if (ano) {
+        query = query.gte('data', `${ano}-01-01`).lte('data', `${ano}-12-31`);
+      }
+      if (uf) query = query.or(`uf.is.null,uf.eq.${uf}`);
+      const { data, error } = await query.order('data');
+      if (error) throw error;
+      return data ?? [];
+    } catch (error) {
+      logger.error('Erro ao listar feriados:', error);
+      throw error;
     }
-    if (uf) query = query.or(`uf.is.null,uf.eq.${uf}`);
-    const { data, error } = await query.order('data');
-    if (error) throw error;
-    return data ?? [];
   },
 
   async criar(dados: Omit<Feriado, 'id'>): Promise<Feriado> {
-    const { data, error } = await supabase.from('feriados').insert(dados).select().single();
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.from('feriados').insert(dados).select().single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Erro ao criar feriado:', error);
+      throw error;
+    }
   },
 
   async excluir(id: string): Promise<void> {
-    const { error } = await supabase.from('feriados').delete().eq('id', id);
-    if (error) throw error;
+    try {
+      const { error } = await supabase.from('feriados').delete().eq('id', id);
+      if (error) throw error;
+    } catch (error) {
+      logger.error('Erro ao excluir feriado:', error);
+      throw error;
+    }
   },
 
   async isFeriado(data: string, uf?: string): Promise<boolean> {
-    const feriados = await this.listar(undefined, uf);
-    return feriados.some(f => f.data === data);
+    try {
+      const feriados = await this.listar(undefined, uf);
+      return feriados.some(f => f.data === data);
+    } catch (error) {
+      logger.error('Erro ao verificar feriado:', error);
+      throw error;
+    }
   },
 };
 
