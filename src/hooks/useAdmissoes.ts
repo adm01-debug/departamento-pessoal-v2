@@ -107,7 +107,7 @@ export function useAdmissoes() {
       const { data, error: err } = await query;
 
       if (err) throw err;
-      setAdmissoes((data || []) as Admissao[]);
+      setAdmissoes((data ?? []) as Admissao[]);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
@@ -260,6 +260,7 @@ export function useAdmissoes() {
     ETAPA_CONCLUIDA,
   };
 }
+
 
 
 
