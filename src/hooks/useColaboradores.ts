@@ -20,7 +20,7 @@ export function useColaboradores() {
       
       let query = supabase
         .from('colaboradores')
-        .select('*')
+        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
         .order('nome_completo', { ascending: true });
 
       // Filtrar por empresa se houver uma selecionada
@@ -144,7 +144,7 @@ export function useColaboradores() {
     try {
       const { data, error } = await supabase
         .from('colaboradores')
-        .select('*')
+        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
         .eq('id', id)
         .maybeSingle();
 
@@ -179,7 +179,7 @@ export function useDependentes(colaboradorId: string) {
       setLoading(true);
       const { data, error } = await supabase
         .from('dependentes')
-        .select('*')
+        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
         .eq('colaborador_id', colaboradorId)
         .order('nome', { ascending: true });
 
@@ -247,7 +247,7 @@ export function useHistoricoCargo(colaboradorId: string) {
       setLoading(true);
       const { data, error } = await supabase
         .from('historico_cargo')
-        .select('*')
+        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
         .eq('colaborador_id', colaboradorId)
         .order('data_alteracao', { ascending: false });
 
@@ -285,5 +285,6 @@ export function useHistoricoCargo(colaboradorId: string) {
 
   return { historico, loading, fetchHistorico, addHistorico };
 }
+
 
 
