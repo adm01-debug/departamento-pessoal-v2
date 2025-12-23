@@ -68,7 +68,7 @@ export function ImportacaoPontoModal({ open, onOpenChange, competencia, onSucces
   const handleFile = (file: File) => {
     // Validar extensão
     const ext = file.name.split('.').pop()?.toLowerCase();
-    if (!['csv', 'txt'].includes(ext || '')) {
+    if (!['csv', 'txt'].includes(ext ?? '')) {
       alert('Formato inválido. Use arquivos .csv ou .txt');
       return;
     }
@@ -300,6 +300,7 @@ export function ImportacaoPontoModal({ open, onOpenChange, competencia, onSucces
     </Dialog>
   );
 }
+
 
 
 
