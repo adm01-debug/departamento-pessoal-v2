@@ -71,3 +71,4 @@ export interface FeriasComColaborador extends Ferias {
   colaborador_cargo?: string;
   colaborador_departamento?: string;
 }
+
