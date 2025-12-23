@@ -13,6 +13,31 @@ declare module 'jspdf' {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+
+// ==========================================
+// CONSTANTES DE LAYOUT PDF
+// ==========================================
+const PDF_COLORS = {
+  HEADER_BG: { r: 59, g: 130, b: 246 },
+  SECTION_BG: { r: 240, g: 240, b: 240 },
+  WHITE: { r: 255, g: 255, b: 255 },
+  BLACK: { r: 0, g: 0, b: 0 },
+};
+
+const PDF_LAYOUT = {
+  HEADER_HEIGHT: 30,
+  SECTION_HEIGHT: 8,
+  MARGIN: 10,
+  MARGIN_HORIZONTAL: 14,
+  FONT_SIZE_TITLE: 16,
+  FONT_SIZE_SUBTITLE: 10,
+  FONT_SIZE_BODY: 9,
+  CELL_PADDING: 2,
+  LABEL_WIDTH: 45,
+  INITIAL_Y: 40,
+  SPACING: 12,
+};
+
 interface ColaboradorData {
   nome_completo: string;
   cpf: string;
@@ -798,4 +823,5 @@ export function gerarHoleritePDF(dados: HoleriteData): void {
   const competenciaNome = dados.competencia.replace('/', '-');
   doc.save(`holerite_${competenciaNome}_${dados.colaborador_nome.replace(/\s+/g, '_')}.pdf`);
 }
+
 
