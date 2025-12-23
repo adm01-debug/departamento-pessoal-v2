@@ -286,9 +286,9 @@ export function useESocial() {
       // Montar dados para o XML
       const dadosS2200: DadosS2200 = {
         colaborador_id: colab.id,
-        cpf: colab.cpf || '',
+        cpf: colab.cpf ?? '',
         nome: colab.nome_completo,
-        data_nascimento: colab.data_nascimento || '',
+        data_nascimento: colab.data_nascimento ?? '',
         sexo: (colab.sexo as 'M' | 'F') || 'M',
         raca_cor: 1,
         estado_civil: 1,
@@ -306,22 +306,22 @@ export function useESocial() {
           municipio: '3550308',
         },
         ctps: {
-          numero: colab.ctps_numero || '',
-          serie: colab.ctps_serie || '',
+          numero: colab.ctps_numero ?? '',
+          serie: colab.ctps_serie ?? '',
           uf: colab.ctps_uf || 'SP',
         },
         rg: {
-          numero: colab.rg || '',
+          numero: colab.rg ?? '',
           orgao: 'SSP',
           uf: colab.uf || 'SP',
         },
-        pis: colab.pis_pasep || '',
-        data_admissao: colab.data_admissao || '',
+        pis: colab.pis_pasep ?? '',
+        data_admissao: colab.data_admissao ?? '',
         tipo_admissao: 1,
         matricula: colab.matricula || colab.id.slice(0, 8),
         cargo_cbo: colab.cbo || '411010',
         cargo_descricao: colab.cargo || 'AUXILIAR',
-        salario: colab.salario_base || 0,
+        salario: colab.salario_base ?? 0,
         unidade_salario: 5,
         tipo_contrato: 1,
         natureza_atividade: 1,
@@ -385,19 +385,19 @@ export function useESocial() {
 
       const dadosS2299: DadosS2299 = {
         colaborador_id: deslig.colaborador_id,
-        cpf: colab.cpf || '',
+        cpf: colab.cpf ?? '',
         matricula: colab.matricula || colab.id.slice(0, 8),
         data_desligamento: deslig.data_desligamento,
         motivo_desligamento: motivoMap[deslig.tipo] || '99',
         data_aviso: deslig.data_aviso,
         tipo_aviso: 'indenizado',
         verbas: {
-          saldo_salario: deslig.saldo_salario || 0,
-          decimo_terceiro: deslig.decimo_terceiro || 0,
-          ferias_proporcionais: (deslig.ferias_proporcionais || 0) + (deslig.terco_constitucional || 0),
-          ferias_vencidas: deslig.ferias_vencidas || 0,
-          aviso_previo: deslig.aviso_previo || 0,
-          multa_fgts: deslig.multa_fgts || 0,
+          saldo_salario: deslig.saldo_salario ?? 0,
+          decimo_terceiro: deslig.decimo_terceiro ?? 0,
+          ferias_proporcionais: (deslig.ferias_proporcionais ?? 0) + (deslig.terco_constitucional ?? 0),
+          ferias_vencidas: deslig.ferias_vencidas ?? 0,
+          aviso_previo: deslig.aviso_previo ?? 0,
+          multa_fgts: deslig.multa_fgts ?? 0,
           desconto_inss: 0,
           desconto_irrf: 0,
         },
@@ -474,6 +474,7 @@ export function useESocial() {
     marcarEnviado,
   };
 }
+
 
 
 
