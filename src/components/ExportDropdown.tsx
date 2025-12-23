@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   DropdownMenu,
@@ -22,7 +22,7 @@ type ExportFormat = 'excel' | 'pdf' | 'csv';
 export function ExportDropdown({ options, defaultFilename, disabled }: ExportDropdownProps) {
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = async (format: ExportFormat) => {
+  const handleExport = useCallback(async (format: ExportFormat) => {
     if (options.data.length === 0) {
       toast({
         title: 'Sem dados para exportar',
@@ -73,7 +73,7 @@ export function ExportDropdown({ options, defaultFilename, disabled }: ExportDro
     } finally {
       setIsExporting(false);
     }
-  };
+  }, [options, defaultFilename, toast]);
 
   return (
     <DropdownMenu>
@@ -104,4 +104,5 @@ export function ExportDropdown({ options, defaultFilename, disabled }: ExportDro
     </DropdownMenu>
   );
 }
+
 
