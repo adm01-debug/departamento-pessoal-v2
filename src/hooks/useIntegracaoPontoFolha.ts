@@ -29,7 +29,14 @@ const intervalToMinutes = (interval: string | null): number => {
   return 0;
 };
 
-export const useIntegracaoPontoFolha = () => {
+export interface UseIntegracaoPontoFolhaReturn {
+  processarPonto: (colaboradorId: string, mes: number, ano: number) => Promise<ProcessamentoPonto>;
+  exportarParaFolha: (params: { colaboradorId: string; mes: number; ano: number; processamento: ProcessamentoPonto }) => void;
+  exportarParaFolhaAsync: (params: { colaboradorId: string; mes: number; ano: number; processamento: ProcessamentoPonto }) => Promise<unknown>;
+  isExportando: boolean;
+}
+
+export const useIntegracaoPontoFolha = (): UseIntegracaoPontoFolhaReturn => {
   const queryClient = useQueryClient();
 
   // Processar registros de ponto e gerar resumo
@@ -243,6 +250,7 @@ export const formatarMinutos = (minutos: number): string => {
   const mins = minutos % 60;
   return `${horas}h${mins > 0 ? ` ${mins}min` : ''}`;
 };
+
 
 
 
