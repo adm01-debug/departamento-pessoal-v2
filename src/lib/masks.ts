@@ -460,3 +460,4 @@ export function useMaskedInput(mask: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'currenc
     return masked;
   };
 }
+
