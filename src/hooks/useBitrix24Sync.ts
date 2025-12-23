@@ -56,6 +56,8 @@ export function useBitrix24Sync() {
   // Configuração
   const { data: configuracao, isLoading: loadingConfig } = useQuery({
     queryKey: ['bitrix24-config'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('configuracoes')
@@ -125,6 +127,8 @@ export function useBitrix24Sync() {
   // Buscar usuários do Bitrix
   const { data: usuariosBitrix, refetch: refetchUsuarios } = useQuery({
     queryKey: ['bitrix24-users'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       if (!configuracao?.webhook_url) return [];
       const client = new Bitrix24Client(configuracao.webhook_url);
@@ -136,6 +140,8 @@ export function useBitrix24Sync() {
   // Buscar departamentos do Bitrix
   const { data: departamentosBitrix } = useQuery({
     queryKey: ['bitrix24-departments'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       if (!configuracao?.webhook_url) return [];
       const client = new Bitrix24Client(configuracao.webhook_url);
@@ -376,6 +382,8 @@ export function useBitrix24Sync() {
   // Buscar logs de sync
   const { data: logsSync } = useQuery({
     queryKey: ['bitrix24-logs'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bitrix24_sync_logs')
@@ -404,5 +412,6 @@ export function useBitrix24Sync() {
     logsSync,
   };
 }
+
 
 
