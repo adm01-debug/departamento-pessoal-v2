@@ -53,7 +53,7 @@ export const usePonto = () => {
         if (!colaboradorId) return [];
         const { data, error } = await supabase
           .from('registros_ponto')
-          .select('*')
+          .select('id, colaborador_id, data, entrada, saida, observacoes')
           .eq('colaborador_id', colaboradorId)
           .gte('data', dataInicio)
           .lte('data', dataFim)
@@ -73,7 +73,7 @@ export const usePonto = () => {
       queryFn: async () => {
         let query = supabase
           .from('feriados')
-          .select('*')
+          .select('id, colaborador_id, data, entrada, saida, observacoes')
           .gte('data', `${ano}-01-01`)
           .lte('data', `${ano}-12-31`);
         
@@ -96,7 +96,7 @@ export const usePonto = () => {
         if (!colaboradorId) return [];
         const { data, error } = await supabase
           .from('banco_horas')
-          .select('*')
+          .select('id, colaborador_id, data, entrada, saida, observacoes')
           .eq('colaborador_id', colaboradorId)
           .order('data', { ascending: false })
           .limit(50);
@@ -198,7 +198,7 @@ export const usePonto = () => {
 
     const { data: registros, error } = await supabase
       .from('registros_ponto')
-      .select('*')
+      .select('id, colaborador_id, data, entrada, saida, observacoes')
       .eq('colaborador_id', colaboradorId)
       .gte('data', dataInicio)
       .lte('data', dataFim)
@@ -221,7 +221,7 @@ export const usePonto = () => {
     // Buscar saldo do banco de horas
     const { data: bancoHoras } = await supabase
       .from('banco_horas')
-      .select('*')
+      .select('id, colaborador_id, data, entrada, saida, observacoes')
       .eq('colaborador_id', colaboradorId)
       .order('data', { ascending: false })
       .limit(1);
@@ -334,5 +334,6 @@ export const useResumoPonto = (competencia: string) => {
     }
   });
 };
+
 
 
