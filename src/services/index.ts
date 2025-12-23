@@ -10,3 +10,6 @@ export { cargosService } from './cargosService';
 export { feriadosService } from './feriadosService';
 export { afastamentosService } from './afastamentosService';
 export { beneficiosService } from './beneficiosService';
+export { relatoriosService } from './relatoriosService';
+export { usuariosService } from './usuariosService';
+export { documentosService } from './documentosService';
