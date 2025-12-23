@@ -20,7 +20,7 @@ export const MoneyInput = memo(forwardRef<HTMLInputElement, MoneyInputProps>(
     return (
       <Input
         ref={ref}
-        value={formatMoney(Number(value) || 0)}
+        value={formatMoney(Number(value) ?? 0)}
         onChange={handleChange}
         placeholder="R$ 0,00"
         aria-label="Valor"
@@ -31,5 +31,6 @@ export const MoneyInput = memo(forwardRef<HTMLInputElement, MoneyInputProps>(
 ));
 
 export default MoneyInput;
+
 
 
