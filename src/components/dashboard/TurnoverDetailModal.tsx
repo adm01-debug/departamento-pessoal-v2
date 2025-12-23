@@ -67,7 +67,7 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
       if (errDesl) throw errDesl;
 
       const movs: MovimentacaoColaborador[] = [
-        ...(admissoes || []).map(a => ({
+        ...(admissoes ?? []).map(a => ({
           id: a.id,
           nome: a.nome_completo,
           cargo: a.cargo,
@@ -75,7 +75,7 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
           data: a.data_admissao,
           tipo: 'admissao' as const
         })),
-        ...(desligamentos || []).map(d => ({
+        ...(desligamentos ?? []).map(d => ({
           id: d.id,
           nome: d.nome_completo,
           cargo: d.cargo,
@@ -234,5 +234,6 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
     </Dialog>
   );
 }
+
 
 
