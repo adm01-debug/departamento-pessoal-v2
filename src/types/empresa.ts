@@ -42,3 +42,4 @@ export interface EmpresaFilters {
   ativa?: boolean;
   regime_tributario?: Empresa['regime_tributario'];
 }
+
