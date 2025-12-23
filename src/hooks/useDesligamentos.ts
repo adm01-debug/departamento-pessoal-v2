@@ -110,7 +110,7 @@ export function useDesligamentos() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setDesligamentos((data || []) as Desligamento[]);
+      setDesligamentos((data ?? []) as Desligamento[]);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
@@ -287,6 +287,7 @@ export function useDesligamentos() {
     tipoLabels,
   };
 }
+
 
 
 
