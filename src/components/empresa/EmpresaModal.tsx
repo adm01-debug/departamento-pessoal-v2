@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, memo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -390,6 +390,7 @@ export function EmpresaModal({ open, onOpenChange }: Props) {
     </Dialog>
   );
 }
+
 
 
 
