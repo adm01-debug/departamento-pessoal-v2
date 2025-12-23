@@ -67,7 +67,22 @@ export const calcularFerias = (
   };
 };
 
-export const useFerias = () => {
+export interface UseFeriasReturn {
+  usePeriodosAquisitivos: (colaboradorId?: string) => ReturnType<typeof useQuery>;
+  useFeriasQuery: (filtros?: { colaboradorId?: string; status?: StatusFerias; ano?: number }) => ReturnType<typeof useQuery>;
+  criarPeriodoAquisitivo: (periodo: Partial<PeriodoAquisitivo>) => void;
+  gerarPeriodosAquisitivos: (colaboradorId: string, dataAdmissao: string) => void;
+  programarFerias: (ferias: Partial<Ferias>) => void;
+  aprovarFerias: (id: string) => void;
+  cancelarFerias: (id: string) => void;
+  calcularPeriodoConcessivo: (periodoAquisitivo: PeriodoAquisitivo) => { inicio: string; fim: string; diasRestantes: number };
+  calcularFerias: typeof calcularFerias;
+  calcularDiasDireito: typeof calcularDiasDireito;
+  isProgramando: boolean;
+  isAprovando: boolean;
+}
+
+export const useFerias = (): UseFeriasReturn => {
   const queryClient = useQueryClient();
   const { empresaAtualId } = useEmpresas();
 
@@ -292,6 +307,7 @@ export const useFerias = () => {
     isAprovando: aprovarFeriasMutation.isPending
   };
 };
+
 
 
 
