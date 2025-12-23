@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { memo } from 'react';
 import { useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts';
 import { TurnoverDetailModal } from './TurnoverDetailModal';
@@ -186,6 +187,7 @@ export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChart
     </>
   );
 }
+
 
 
 
