@@ -75,3 +75,4 @@ export const EVENTOS_ESOCIAL_DESCRICAO: Record<EventoESocialTipo, string> = {
   'S-2410': 'Cessação de Benefício',
   'S-3000': 'Exclusão de Eventos',
 };
+
