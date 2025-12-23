@@ -29,3 +29,4 @@ export interface AuditStats {
   por_usuario: Record<string, number>;
   por_entidade: Record<string, number>;
 }
+
