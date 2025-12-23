@@ -20,7 +20,7 @@ export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
     const statusCount: Record<string, number> = {};
     
     colaboradores.forEach(c => {
-      statusCount[c.status] = (statusCount[c.status] || 0) + 1;
+      statusCount[c.status] = (statusCount[c.status] ?? 0) + 1;
     });
 
     return Object.entries(statusCount).map(([status, count]) => ({
@@ -75,5 +75,6 @@ export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
     </div>
   );
 }
+
 
 
