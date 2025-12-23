@@ -54,7 +54,22 @@ export const useEmpresaStore = create<EmpresaStore>()(
   )
 );
 
-export function useEmpresas() {
+export interface UseEmpresasReturn {
+  userEmpresas: UserEmpresa[] | undefined;
+  todasEmpresas: Empresa[] | undefined;
+  empresaAtual: Empresa | null;
+  empresaAtualId: string | null;
+  loadingEmpresas: boolean;
+  loadingTodas: boolean;
+  criarEmpresa: (empresa: Omit<Empresa, "id" | "created_at" | "updated_at">) => void;
+  atualizarEmpresa: (params: { id: string; dados: Partial<Empresa> }) => void;
+  associarUsuario: (params: { userId: string; empresaId: string }) => void;
+  definirEmpresaPadrao: (params: { userEmpresaId: string; empresaId: string }) => void;
+  trocarEmpresa: (empresaId: string) => void;
+  temMultiplasEmpresas: boolean;
+}
+
+export function useEmpresas(): UseEmpresasReturn {
   const queryClient = useQueryClient();
   const { empresaAtualId, setEmpresaAtual } = useEmpresaStore();
 
@@ -251,6 +266,7 @@ export function useEmpresas() {
     temMultiplasEmpresas: (userEmpresas?.length ?? 0) > 1,
   };
 }
+
 
 
 
