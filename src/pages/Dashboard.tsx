@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useMemo } from 'react';
 import { 
   Users, 
@@ -96,10 +97,13 @@ export default memo(function) Dashboard() {
 
     return colaboradoresData.filter(c => 
       isAfter(new Date(c.dataAdmissao), startDate)
-    );
+      </>
+  );
   }, [period]);
 
   return (
+    <>
+      <SEOHead title="Dashboard | DP System" description="Painel de controle do Departamento Pessoal" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -358,8 +362,10 @@ export default memo(function) Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
+
 
 
 
