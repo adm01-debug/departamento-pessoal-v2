@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { memo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 import { useMemo } from 'react';
@@ -75,6 +76,7 @@ export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
     </div>
   );
 }
+
 
 
 
