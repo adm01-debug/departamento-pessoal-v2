@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 import { useMemo } from 'react';
@@ -129,6 +130,7 @@ export function AdmissionsLineChart({ colaboradores = [], months = 12 }: Admissi
     </div>
   );
 }
+
 
 
 
