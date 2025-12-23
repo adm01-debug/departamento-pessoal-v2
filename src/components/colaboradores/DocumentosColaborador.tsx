@@ -22,13 +22,13 @@ const formatBytes = (bytes: number | null): string => {
 
 const getFileIcon = (filename: string) => {
   const ext = filename.split('.').pop()?.toLowerCase();
-  if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext || '')) {
+  if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext ?? '')) {
     return <Image className="w-5 h-5 text-blue-500" />;
   }
-  if (['pdf'].includes(ext || '')) {
+  if (['pdf'].includes(ext ?? '')) {
     return <FileText className="w-5 h-5 text-red-500" />;
   }
-  if (['doc', 'docx'].includes(ext || '')) {
+  if (['doc', 'docx'].includes(ext ?? '')) {
     return <FileSpreadsheet className="w-5 h-5 text-blue-600" />;
   }
   return <File className="w-5 h-5 text-muted-foreground" />;
@@ -211,4 +211,5 @@ export function DocumentosColaborador({ colaboradorId, colaboradorNome }: Docume
     </div>
   );
 }
+
 
