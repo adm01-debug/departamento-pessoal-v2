@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -22,7 +23,7 @@ interface CalendarioAdmissoesProps {
   onSelectAdmissao: (admissao: Admissao) => void;
 }
 
-export function CalendarioAdmissoes({ admissoes, etapaLabels, onSelectAdmissao }: CalendarioAdmissoesProps) {
+export const CalendarioAdmissoes = memo(function CalendarioAdmissoes({ admissoes, etapaLabels, onSelectAdmissao }: CalendarioAdmissoesProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const monthStart = startOfMonth(currentMonth);
@@ -163,10 +164,4 @@ export function CalendarioAdmissoes({ admissoes, etapaLabels, onSelectAdmissao }
       </div>
     </div>
   );
-}
-
-
-
-
-
-
+});
