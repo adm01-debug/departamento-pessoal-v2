@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { 
@@ -36,7 +37,7 @@ interface ContratacaoDigitalModalProps {
   } | null;
 }
 
-export function ContratacaoDigitalModal({ 
+export const ContratacaoDigitalModal = memo(function ContratacaoDigitalModal({ 
   open, 
   onOpenChange, 
   admissao 
@@ -353,12 +354,4 @@ export function ContratacaoDigitalModal({
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
-
-
+});
