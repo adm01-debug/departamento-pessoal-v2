@@ -87,8 +87,6 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
     queryKey: ['indicadores-colaboradores'],
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('colaboradores')
@@ -102,8 +100,6 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para turnover (admissões e desligamentos no período)
   const turnoverQuery = useQuery({
     queryKey: ['indicadores-turnover', dataInicioStr, dataFimStr],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -145,8 +141,6 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para evolução do turnover (últimos 12 meses)
   const turnoverEvolutionQuery = useQuery({
     queryKey: ['indicadores-turnover-evolution'],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -210,8 +204,6 @@ export function useIndicadoresDP(periodo: 'month' | 'quarter' | 'year' = 'year')
   // Query para comparativo anual de turnover (últimos 5 anos)
   const turnoverYearQuery = useQuery({
     queryKey: ['indicadores-turnover-year-comparison'],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
