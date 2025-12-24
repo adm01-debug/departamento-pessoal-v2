@@ -6,7 +6,19 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
 import { useEmpresas } from './useEmpresas';
 
-export function useColaboradores() {
+
+export interface UseColaboradoresReturn {
+  colaboradores: ColaboradorDB[];
+  loading: boolean;
+  error: string | null;
+  fetchColaboradores: () => Promise<void>;
+  createColaborador: (data: Partial<ColaboradorDB>) => Promise<ColaboradorDB | null>;
+  updateColaborador: (id: string, data: Partial<ColaboradorDB>) => Promise<boolean>;
+  deleteColaborador: (id: string) => Promise<boolean>;
+  getColaboradorById: (id: string) => ColaboradorDB | undefined;
+}
+
+export function useColaboradores(): UseColaboradoresReturn {
   const [colaboradores, setColaboradores] = useState<ColaboradorDB[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -285,6 +297,7 @@ export function useHistoricoCargo(colaboradorId: string) {
 
   return { historico, loading, fetchHistorico, addHistorico };
 }
+
 
 
 
