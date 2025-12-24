@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de afastamentos
+ * @module types/afastamento
+ */
+
 export interface Afastamento {
   id: string;
   colaborador_id: string;
@@ -34,3 +39,4 @@ export const TIPOS_AFASTAMENTO: Record<Afastamento['tipo'], string> = {
   servico_militar: 'Serviço Militar',
   outro: 'Outro',
 };
+
