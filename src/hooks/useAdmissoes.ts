@@ -85,7 +85,25 @@ const etapaOrder: EtapaAdmissao[] = [
   'esocial',
 ];
 
-export function useAdmissoes() {
+
+export interface UseAdmissoesReturn {
+  admissoes: Admissao[];
+  loading: boolean;
+  error: string | null;
+  fetchAdmissoes: () => Promise<void>;
+  createAdmissao: (data: AdmissaoInsert) => Promise<Admissao | null>;
+  updateAdmissao: (id: string, data: AdmissaoUpdate) => Promise<boolean>;
+  deleteAdmissao: (id: string) => Promise<boolean>;
+  advanceStage: (id: string) => Promise<boolean>;
+  updateChecklist: (id: string, field: string, value: boolean) => Promise<boolean>;
+  getProgress: (admissao: Admissao) => number;
+  converterParaColaborador: (admissao: Admissao) => Promise<boolean>;
+  etapaLabels: Record<EtapaAdmissao, string>;
+  etapaOrder: EtapaAdmissao[];
+  ETAPA_CONCLUIDA: string;
+}
+
+export function useAdmissoes(): UseAdmissoesReturn {
   const [admissoes, setAdmissoes] = useState<Admissao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -260,6 +278,7 @@ export function useAdmissoes() {
     ETAPA_CONCLUIDA,
   };
 }
+
 
 
 
