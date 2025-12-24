@@ -21,7 +21,20 @@ export interface DocumentoAssinatura {
   created_by?: string;
 }
 
-export function useAssinaturaDigital() {
+
+export interface UseAssinaturaDigitalReturn {
+  documentosPendentes: DocumentoAssinatura[];
+  documentosAssinados: DocumentoAssinatura[];
+  loadingPendentes: boolean;
+  loadingAssinados: boolean;
+  criarDocumento: (data: { colaborador_id: string; tipo_documento: string; titulo: string; conteudo_url?: string }) => void;
+  assinarDocumento: (data: { id: string; assinatura_base64: string }) => void;
+  cancelarDocumento: (id: string) => void;
+  isCriando: boolean;
+  isAssinando: boolean;
+}
+
+export function useAssinaturaDigital(): UseAssinaturaDigitalReturn {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -197,6 +210,7 @@ export const TIPOS_DOCUMENTO = [
   { value: 'declaracao', label: 'Declaração' },
   { value: 'outros', label: 'Outros' },
 ];
+
 
 
 
