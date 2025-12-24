@@ -169,7 +169,21 @@ function parseCurrency(value: unknown): number {
   return parseFloat(str) ?? 0;
 }
 
-export function useImportacaoColaboradores() {
+
+export interface UseImportacaoColaboradoresReturn {
+  dadosPreview: Array<{ dados: ColaboradorImport; valido: boolean; erros: string[] }>;
+  colunasDetectadas: string[];
+  processando: boolean;
+  importando: boolean;
+  resultado: ImportResult | null;
+  processarArquivo: (file: File, mapeamento: Record<string, string>) => Promise<void>;
+  importarColaboradores: () => Promise<void>;
+  limpar: () => void;
+  totalValidos: number;
+  totalInvalidos: number;
+}
+
+export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [dadosPreview, setDadosPreview] = useState<ColaboradorImport[]>([]);
   const [colunasDetectadas, setColunasDetectadas] = useState<string[]>([]);
@@ -477,6 +491,7 @@ export function useImportacaoColaboradores() {
     totalInvalidos: dadosPreview.filter(p => !p.valido).length,
   };
 }
+
 
 
 
