@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useCallback, memo } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, Loader2, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ const formatoDescricao: Record<FormatoArquivo, { label: string; descricao: strin
   },
 };
 
-export function ImportacaoPontoModal({ open, onOpenChange, competencia, onSuccess }: ImportacaoPontoModalProps) {
+export const ImportacaoPontoModal = memo(function ImportacaoPontoModal({ open, onOpenChange, competencia, onSuccess }: ImportacaoPontoModalProps) {
   const { importarArquivo, importProgress } = usePontoMelhorado();
   
   const [arquivo, setArquivo] = useState<File | null>(null);
@@ -299,10 +300,4 @@ export function ImportacaoPontoModal({ open, onOpenChange, competencia, onSucces
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
+});
