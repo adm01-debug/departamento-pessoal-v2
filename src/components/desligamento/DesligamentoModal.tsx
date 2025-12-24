@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useMemo, memo } from 'react';
 import {
   Dialog,
@@ -89,7 +90,7 @@ const tiposDesligamentoInfo: Record<TipoDesligamento, { label: string; descripti
   },
 };
 
-export function DesligamentoModal({ open, onOpenChange, onSubmit }: DesligamentoModalProps) {
+export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenChange, onSubmit }: DesligamentoModalProps) {
   const [colaboradorId, setColaboradorId] = useState<string>('');
   const [tipoDesligamento, setTipoDesligamento] = useState<TipoDesligamento | ''>('');
   const [dataDesligamento, setDataDesligamento] = useState<Date>();
@@ -474,10 +475,4 @@ export function DesligamentoModal({ open, onOpenChange, onSubmit }: Desligamento
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
+});
