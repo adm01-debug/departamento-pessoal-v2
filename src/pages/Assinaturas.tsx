@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useEffect } from 'react';
 import { 
   PenTool, FileSignature, Clock, CheckCircle2, XCircle, Plus,
@@ -117,7 +118,9 @@ export default memo(function) Assinaturas() {
   };
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
+      <>
+        <SEOHead title="Assinaturas Digitais" description="Gestão de assinaturas digitais" />
+        <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -426,8 +429,10 @@ export default memo(function) Assinaturas() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  
+      </>);
 }
+
 
 
 
