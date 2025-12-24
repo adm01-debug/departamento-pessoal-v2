@@ -22,7 +22,7 @@ interface AlertsListProps {
   alertas: Alerta[];
 }
 
-export function AlertsList({ alertas }: AlertsListProps) {
+export const AlertsList = memo(function AlertsList({ alertas }: AlertsListProps) {
   return (
     <div className="space-y-2">
       {alertas.map((alerta) => {
@@ -51,9 +51,4 @@ export function AlertsList({ alertas }: AlertsListProps) {
       })}
     </div>
   );
-}
-
-
-
-
-
+});
