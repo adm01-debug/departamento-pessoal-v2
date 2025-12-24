@@ -1,56 +1,93 @@
 /**
- * @fileoverview Botão com estado de carregamento
- * @module components/button/ButtonLoading
+ * @file ButtonLoading.tsx
+ * @description Indicador de loading para botões
+ * @category Components/Button
  */
-import { memo, forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 
-/** Props do ButtonLoading */
-interface ButtonLoadingProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Se está carregando */
-  loading?: boolean;
-  /** Texto durante carregamento */
-  loadingText?: string;
-  /** Conteúdo do botão */
-  children: ReactNode;
-  /** Variante do botão */
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  /** Tamanho do botão */
-  size?: 'default' | 'sm' | 'lg' | 'icon';
-}
+import React, { memo } from 'react';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 /**
- * Botão que exibe spinner durante carregamento
- * @param props - Propriedades do componente
- * @returns Elemento JSX do botão
+ * Props do ButtonLoading
  */
-export const ButtonLoading = memo(forwardRef<HTMLButtonElement, ButtonLoadingProps>(
-  function ButtonLoading({
-    loading = false,
-    loadingText,
-    children,
-    variant = 'default',
-    size = 'default',
-    disabled,
-    className,
-    ...props
-  }, ref) {
+export interface ButtonLoadingProps {
+  /** Tamanho do spinner */
+  size?: 'sm' | 'md' | 'lg';
+  /** Texto de loading */
+  text?: string;
+  /** Classe adicional */
+  className?: string;
+  /** Posição do spinner em relação ao texto */
+  spinnerPosition?: 'left' | 'right';
+  /** Cor do spinner */
+  color?: string;
+}
+
+const sizeClasses = {
+  sm: 'h-3 w-3',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5',
+};
+
+const textSizeClasses = {
+  sm: 'text-xs',
+  md: 'text-sm',
+  lg: 'text-base',
+};
+
+/**
+ * Indicador de loading para botões
+ * 
+ * @example
+ * ```tsx
+ * <Button disabled>
+ *   <ButtonLoading text="Salvando..." />
+ * </Button>
+ * ```
+ */
+export const ButtonLoading = memo(function ButtonLoading({
+  size = 'md',
+  text,
+  className,
+  spinnerPosition = 'left',
+  color,
+}: ButtonLoadingProps) {
+  const spinner = (
+    <Loader2
+      className={cn(
+        sizeClasses[size],
+        'animate-spin',
+        text && (spinnerPosition === 'left' ? 'mr-2' : 'ml-2')
+      )}
+      style={color ? { color } : undefined}
+      aria-hidden="true"
+    />
+  );
+
+  if (!text) {
     return (
-      <Button
-        ref={ref}
-        variant={variant}
-        size={size}
-        disabled={loading || disabled}
-        className={cn('relative', className)}
-        {...props}
-      >
-        {loading && (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        )}
-        {loading ? (loadingText || children) : children}
-      </Button>
+      <span className={cn('inline-flex items-center justify-center', className)}>
+        {spinner}
+      </span>
     );
   }
-));
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center justify-center',
+        textSizeClasses[size],
+        className
+      )}
+    >
+      {spinnerPosition === 'left' && spinner}
+      <span>{text}</span>
+      {spinnerPosition === 'right' && spinner}
+    </span>
+  );
+});
+
+ButtonLoading.displayName = 'ButtonLoading';
+
+export default ButtonLoading;
