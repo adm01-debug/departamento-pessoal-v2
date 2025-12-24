@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -54,7 +55,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-export function AgendamentoRelatoriosModal({ open, onOpenChange }: Props) {
+export const AgendamentoRelatoriosModal = memo(function AgendamentoRelatoriosModal({ open, onOpenChange }: Props) {
   const {
     agendamentos,
     logs,
@@ -442,8 +443,4 @@ export function AgendamentoRelatoriosModal({ open, onOpenChange }: Props) {
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
+});
