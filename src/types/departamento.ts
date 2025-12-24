@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de departamentos
+ * @module types/departamento
+ */
+
 export interface Departamento {
   id: string;
   nome: string;
@@ -26,3 +31,4 @@ export interface DepartamentoStats {
   colaboradores_ativos: number;
   colaboradores_afastados: number;
 }
+
