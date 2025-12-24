@@ -12,7 +12,7 @@ interface DepartmentChartProps {
   departamentos: DepartmentData[];
 }
 
-export function DepartmentChart({ departamentos }: DepartmentChartProps) {
+const DepartmentChartComponent({ departamentos }: DepartmentChartProps) {
   const maxValue = Math.max(...departamentos.map(d => d.colaboradores));
   
   const colors = [
@@ -49,6 +49,4 @@ export function DepartmentChart({ departamentos }: DepartmentChartProps) {
   );
 }
 
-
-
-
+export const DepartmentChart = memo(DepartmentChartComponent);
