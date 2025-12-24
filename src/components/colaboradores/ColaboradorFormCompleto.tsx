@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useEffect, memo } from 'react';
 import { logger } from '@/lib/logger';
 import { useForm } from 'react-hook-form';
@@ -172,7 +173,7 @@ interface ColaboradorFormCompletoProps {
   onSuccess?: (data: ColaboradorFormData, isEdit: boolean) => void;
 }
 
-export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuccess }: ColaboradorFormCompletoProps) {
+export const ColaboradorFormCompleto = memo(function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuccess }: ColaboradorFormCompletoProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetchingCep, setIsFetchingCep] = useState(false);
   const [activeTab, setActiveTab] = useState('pessoal');
@@ -1115,12 +1116,4 @@ export function ColaboradorFormCompleto({ open, onOpenChange, colaborador, onSuc
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
-
-
+});
