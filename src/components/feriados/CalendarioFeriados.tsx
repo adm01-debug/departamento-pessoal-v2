@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from 'react';
 import { format, startOfYear, endOfYear, eachMonthOfInterval, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -28,7 +29,7 @@ const ESTADOS_BR = [
   'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
 ];
 
-export function CalendarioFeriados() {
+export const CalendarioFeriados = memo(function CalendarioFeriados() {
   const [ano, setAno] = useState(new Date().getFullYear());
   const [mesSelecionado, setMesSelecionado] = useState(new Date().getMonth());
   const [novoFeriadoOpen, setNovoFeriadoOpen] = useState(false);
@@ -359,9 +360,4 @@ export function CalendarioFeriados() {
       </div>
     </div>
   );
-}
-
-
-
-
-
+});
