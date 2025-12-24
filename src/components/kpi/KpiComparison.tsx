@@ -1,24 +1,16 @@
-/**
- * @fileoverview Comparação de KPI
- * @module components/kpi/KpiComparison
- */
 import { memo } from 'react';
-import { cn } from '@/lib/utils';
-
-interface KpiComparisonProps { atual: number; anterior: number; label?: string; formato?: (v: number) => string; }
-
-export const KpiComparison = memo(function KpiComparison({ atual, anterior, label, formato = v => v.toString() }: KpiComparisonProps) {
-  const diff = atual - anterior;
-  const percent = anterior !== 0 ? ((diff / anterior) * 100).toFixed(1) : '0';
-  const isPositive = diff >= 0;
+import { ArrowRight } from 'lucide-react';
+interface KpiComparisonProps { label: string; valorAnterior: number; valorAtual: number; formato?: (v: number) => string; }
+export const KpiComparison = memo(function KpiComparison({ label, valorAnterior, valorAtual, formato = v => String(v) }: KpiComparisonProps) {
+  const diff = valorAtual - valorAnterior;
   return (
-    <div className="space-y-1">
-      {label && <p className="text-sm text-muted-foreground">{label}</p>}
-      <div className="flex items-baseline gap-2">
-        <span className="text-xl font-bold">{formato(atual)}</span>
-        <span className={cn('text-sm', isPositive ? 'text-green-600' : 'text-red-600')}>{isPositive ? '+' : ''}{percent}%</span>
+    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+      <span className="text-sm font-medium">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-muted-foreground">{formato(valorAnterior)}</span>
+        <ArrowRight className="h-4 w-4" />
+        <span className={diff >= 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>{formato(valorAtual)}</span>
       </div>
-      <p className="text-xs text-muted-foreground">vs {formato(anterior)} anterior</p>
     </div>
   );
 });
