@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { CalendarioFeriados } from '@/components/feriados/CalendarioFeriados';
 
 export default function Feriados() {
@@ -6,7 +7,9 @@ export default function Feriados() {
   }, []);
 
   return (
-    <>
+      <>
+        <SEOHead title="Feriados" description="Calendário de feriados" />
+        <>
       
       <div className="p-6 space-y-6 animate-fade-in">
         <div>
@@ -23,6 +26,7 @@ export default function Feriados() {
     </>
   );
 }
+
 
 
 
