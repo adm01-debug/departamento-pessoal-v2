@@ -1,114 +1,61 @@
 /**
- * @file CardHeader.tsx
- * @description Cabeçalho do card
- * @category Components/Card
+ * @fileoverview Cabeçalho do card
+ * @module components/card/CardHeader
  */
-
-import React, { memo } from 'react';
-import { CardHeader as ShadcnCardHeader } from '@/components/ui/card';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import type { LucideIcon } from 'lucide-react';
 
-/**
- * Props do CardHeader
- */
-export interface CardHeaderProps {
-  /** Conteúdo do header */
-  children: React.ReactNode;
-  /** Classe adicional */
+/** Props do CardHeader */
+interface CardHeaderProps {
+  /** Conteúdo do cabeçalho */
+  children?: ReactNode;
+  /** Título do card */
+  title?: string;
+  /** Subtítulo opcional */
+  subtitle?: string;
+  /** Ícone opcional */
+  icon?: LucideIcon;
+  /** Ações do cabeçalho (botões, menus) */
+  actions?: ReactNode;
+  /** Classes CSS adicionais */
   className?: string;
-  /** Padding interno */
-  padding?: 'none' | 'sm' | 'md' | 'lg';
-  /** Se deve ter borda inferior */
+  /** Se exibe borda inferior */
   bordered?: boolean;
-  /** Ações à direita */
-  actions?: React.ReactNode;
-  /** Ícone à esquerda */
-  icon?: React.ReactNode;
-  /** Variante de fundo */
-  variant?: 'default' | 'muted' | 'primary';
 }
 
-const paddingClasses = {
-  none: 'p-0',
-  sm: 'p-3',
-  md: 'p-6',
-  lg: 'p-8',
-};
-
-const variantClasses = {
-  default: '',
-  muted: 'bg-muted/50',
-  primary: 'bg-primary/5',
-};
-
 /**
- * Cabeçalho do card
- * 
- * @example
- * ```tsx
- * <CardHeader 
- *   icon={<User />} 
- *   actions={<Button size="sm">Editar</Button>}
- *   bordered
- * >
- *   <CardTitle>Perfil</CardTitle>
- *   <CardDescription>Informações do usuário</CardDescription>
- * </CardHeader>
- * ```
+ * Cabeçalho do card com título, ícone e ações
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX do cabeçalho
  */
 export const CardHeader = memo(function CardHeader({
   children,
-  className,
-  padding = 'md',
-  bordered = false,
+  title,
+  subtitle,
+  icon: Icon,
   actions,
-  icon,
-  variant = 'default',
+  className,
+  bordered = false,
 }: CardHeaderProps) {
-  const hasExtras = icon || actions;
-
-  if (!hasExtras) {
+  if (children) {
     return (
-      <ShadcnCardHeader
-        className={cn(
-          paddingClasses[padding],
-          variantClasses[variant],
-          bordered && 'border-b',
-          className
-        )}
-      >
+      <div className={cn('p-4', bordered && 'border-b', className)}>
         {children}
-      </ShadcnCardHeader>
+      </div>
     );
   }
 
   return (
-    <ShadcnCardHeader
-      className={cn(
-        'flex flex-row items-start gap-4',
-        paddingClasses[padding],
-        variantClasses[variant],
-        bordered && 'border-b',
-        className
-      )}
-    >
-      {icon && (
-        <div className="shrink-0 mt-1">
-          {icon}
+    <div className={cn('flex items-center justify-between p-4', bordered && 'border-b', className)}>
+      <div className="flex items-center gap-3">
+        {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
+        <div>
+          {title && <h3 className="font-semibold">{title}</h3>}
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         </div>
-      )}
-      <div className="flex-1 space-y-1.5">
-        {children}
       </div>
-      {actions && (
-        <div className="shrink-0">
-          {actions}
-        </div>
-      )}
-    </ShadcnCardHeader>
+      {actions && <div className="flex items-center gap-2">{actions}</div>}
+    </div>
   );
 });
-
-CardHeader.displayName = 'CardHeader';
-
-export default CardHeader;
