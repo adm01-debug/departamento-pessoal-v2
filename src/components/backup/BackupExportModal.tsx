@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from 'react';
 import {
   Dialog,
@@ -28,7 +29,7 @@ interface BackupExportModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function BackupExportModal({ open, onOpenChange }: BackupExportModalProps) {
+export const BackupExportModal = memo(function BackupExportModal({ open, onOpenChange }: BackupExportModalProps) {
   const {
     isExporting,
     progress,
@@ -162,10 +163,4 @@ export function BackupExportModal({ open, onOpenChange }: BackupExportModalProps
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
+});
