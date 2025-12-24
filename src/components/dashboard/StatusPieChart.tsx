@@ -16,7 +16,7 @@ interface StatusPieChartProps {
   colaboradores?: typeof [];
 }
 
-export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
+export const StatusPieChart = memo(function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
   const data = useMemo(() => {
     const statusCount: Record<string, number> = {};
     
@@ -75,9 +75,4 @@ export function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {
       </div>
     </div>
   );
-}
-
-
-
-
-
+});
