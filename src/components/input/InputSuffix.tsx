@@ -1,5 +1,35 @@
-import { memo } from "react";
-interface InputSuffixProps { children: React.ReactNode; }
-export const InputSuffix = memo(function InputSuffix({ children }: InputSuffixProps) {
-  return <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{children}</span>;
+/**
+ * @fileoverview Sufixo para inputs
+ * @module components/input/InputSuffix
+ */
+import { memo, type ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+
+/** Props do InputSuffix */
+interface InputSuffixProps {
+  /** Conteúdo do sufixo (texto ou ícone) */
+  children: ReactNode;
+  /** Classes CSS adicionais */
+  className?: string;
+}
+
+/**
+ * Sufixo visual para campos de input
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX
+ */
+export const InputSuffix = memo(function InputSuffix({
+  children,
+  className,
+}: InputSuffixProps) {
+  return (
+    <span
+      className={cn(
+        'flex items-center justify-center px-3 text-muted-foreground bg-muted border border-l-0 rounded-r-md',
+        className
+      )}
+    >
+      {children}
+    </span>
+  );
 });
