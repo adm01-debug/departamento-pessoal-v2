@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
@@ -52,5 +52,6 @@ function ChecklistAdmissao({ colaboradorId }: { colaboradorId: string }) {
 }
 
 export default memo(ChecklistAdmissao);
+
 
 
