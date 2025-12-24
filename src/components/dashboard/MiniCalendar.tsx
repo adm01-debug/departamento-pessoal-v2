@@ -30,7 +30,7 @@ const eventEmojis: Record<string, string> = {
   afastamento: '🏥',
 };
 
-export function MiniCalendar({ eventos, mes = 11, ano = 2025 }: MiniCalendarProps) {
+export const MiniCalendar = memo(function MiniCalendar({ eventos, mes = 11, ano = 2025 }: MiniCalendarProps) {
   const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
   const primeiroDia = new Date(ano, mes, 1).getDay();
   const ultimoDia = new Date(ano, mes + 1, 0).getDate();
@@ -101,9 +101,4 @@ export function MiniCalendar({ eventos, mes = 11, ano = 2025 }: MiniCalendarProp
       </div>
     </div>
   );
-}
-
-
-
-
-
+});
