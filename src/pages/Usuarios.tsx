@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { SEOHead } from '@/components/SEOHead';
 import { 
   Shield, Users, Search, Plus, Crown, UserCog, Building2, User,
   MoreHorizontal, Trash2, RefreshCw, Check
@@ -121,7 +122,9 @@ export default function Usuarios() {
 
   if (!isAdmin()) {
     return (
-      <div className="p-6 flex items-center justify-center h-[calc(100vh-100px)]">
+      <>
+        <SEOHead title="Acesso Restrito | DP System" description="Acesso restrito a administradores" />
+        <div className="p-6 flex items-center justify-center h-[calc(100vh-100px)]">
         <Card className="max-w-md">
           <CardHeader className="text-center">
             <Shield className="w-12 h-12 mx-auto text-destructive mb-4" />
@@ -131,12 +134,15 @@ export default function Usuarios() {
             </CardDescription>
           </CardHeader>
         </Card>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
+    <>
+      <SEOHead title="Usuários | DP System" description="Gestão de usuários e permissões" />
+      <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -414,7 +420,8 @@ export default function Usuarios() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </>
   );
 }
 
