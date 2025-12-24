@@ -15,7 +15,17 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
 import { useEmpresas } from './useEmpresas';
 
-export function useFolhasPagamento() {
+
+export interface UseFolhasPagamentoReturn {
+  folhas: FolhaPagamento[];
+  loading: boolean;
+  fetchFolhas: () => Promise<void>;
+  createFolha: (competencia: string) => Promise<FolhaPagamento | null>;
+  updateFolhaStatus: (id: string, status: StatusFolha) => Promise<boolean>;
+  deleteFolha: (id: string) => Promise<boolean>;
+}
+
+export function useFolhasPagamento(): UseFolhasPagamentoReturn {
   const [folhas, setFolhas] = useState<FolhaPagamento[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -549,6 +559,7 @@ export function useCalculoFolha() {
 
   return { calcularFolha, calculating };
 }
+
 
 
 
