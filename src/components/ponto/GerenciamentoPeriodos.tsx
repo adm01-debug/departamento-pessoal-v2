@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from 'react';
 import { Lock, Unlock, Calendar, CheckCircle, AlertCircle, Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ interface GerenciamentoPeriodosProps {
   competenciaAtual: string;
 }
 
-export function GerenciamentoPeriodos({ open, onOpenChange, competenciaAtual }: GerenciamentoPeriodosProps) {
+export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open, onOpenChange, competenciaAtual }: GerenciamentoPeriodosProps) {
   const { usePeriodos, useAjustesPendentes, fecharPeriodo, reabrirPeriodo, isFechandoPeriodo } = usePontoMelhorado();
   const { exportarParaFolha, isExportando } = useIntegracaoPontoFolha();
   
@@ -266,9 +267,4 @@ export function GerenciamentoPeriodos({ open, onOpenChange, competenciaAtual }: 
       </AlertDialog>
     </>
   );
-}
-
-
-
-
-
+});
