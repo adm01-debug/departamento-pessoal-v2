@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Calendar } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -51,3 +51,4 @@ function AvisoFerias({ dados }: { dados: FeriasData }) {
 }
 
 export default memo(AvisoFerias);
+
