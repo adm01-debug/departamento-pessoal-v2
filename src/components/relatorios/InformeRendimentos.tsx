@@ -117,4 +117,6 @@ function InformeRendimentos({ dados }: { dados: RendimentosData }) {
   );
 }
 
+InformeRendimentos.displayName = 'InformeRendimentos';
+
 export default memo(InformeRendimentos);
