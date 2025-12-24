@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { Bell, Check, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,7 @@ const tipoColors: Record<string, string> = {
   periodo_aquisitivo: 'bg-warning',
 };
 
-export function NotificationBell() {
+export const NotificationBell = memo(function NotificationBell() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   
@@ -149,5 +149,4 @@ export function NotificationBell() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
+});
