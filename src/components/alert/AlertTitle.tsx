@@ -1,48 +1,75 @@
 /**
- * @fileoverview Título para componente de alerta
- * @module components/alert/AlertTitle
+ * @file AlertTitle.tsx
+ * @description Título do alerta
+ * @category Components/Alert
  */
-import { memo, type ReactNode } from 'react';
+
+import React, { memo } from 'react';
+import { AlertTitle as ShadcnAlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
-/** Props do AlertTitle */
-interface AlertTitleProps {
-  /** Conteúdo do título */
-  children: ReactNode;
-  /** Classes CSS adicionais */
+/**
+ * Props do AlertTitle
+ */
+export interface AlertTitleProps {
+  /** Texto do título */
+  children: React.ReactNode;
+  /** Classe adicional */
   className?: string;
-  /** Variante do alerta para estilização */
-  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  /** Tamanho do título */
+  size?: 'sm' | 'md' | 'lg';
+  /** Peso da fonte */
+  weight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  /** Elemento HTML */
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
 }
 
-/** Mapeamento de variantes para estilos */
-const variantStyles: Record<string, string> = {
-  default: 'text-foreground',
-  destructive: 'text-destructive',
-  success: 'text-green-700 dark:text-green-400',
-  warning: 'text-yellow-700 dark:text-yellow-400',
-  info: 'text-blue-700 dark:text-blue-400',
+const sizeClasses = {
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-lg',
+};
+
+const weightClasses = {
+  normal: 'font-normal',
+  medium: 'font-medium',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
 };
 
 /**
- * Componente de título para alertas
- * @param props - Propriedades do componente
- * @returns Elemento JSX do título
+ * Título do alerta
+ * 
+ * @example
+ * ```tsx
+ * <AlertTitle size="lg" weight="bold">
+ *   Atenção!
+ * </AlertTitle>
+ * ```
  */
 export const AlertTitle = memo(function AlertTitle({
   children,
   className,
-  variant = 'default',
+  size = 'md',
+  weight = 'medium',
+  as: Component = 'h5',
 }: AlertTitleProps) {
   return (
-    <h5
-      className={cn(
-        'mb-1 font-semibold leading-none tracking-tight',
-        variantStyles[variant],
-        className
-      )}
-    >
-      {children}
-    </h5>
+    <ShadcnAlertTitle asChild>
+      <Component
+        className={cn(
+          sizeClasses[size],
+          weightClasses[weight],
+          'mb-1 leading-none tracking-tight',
+          className
+        )}
+      >
+        {children}
+      </Component>
+    </ShadcnAlertTitle>
   );
 });
+
+AlertTitle.displayName = 'AlertTitle';
+
+export default AlertTitle;
