@@ -36,7 +36,27 @@ export interface FiltroRelatorio {
   competencia?: string;
 }
 
-export function useRelatorios() {
+
+export interface UseRelatoriosReturn {
+  gerando: boolean;
+  gerarListaColaboradores: (filtros?: { departamento?: string; status?: string }) => Promise<void>;
+  gerarAniversariantes: (mes?: number) => Promise<void>;
+  gerarPorDepartamento: () => Promise<void>;
+  gerarFichaRegistro: (colaboradorId: string) => Promise<void>;
+  gerarResumoFolha: (competencia: string) => Promise<void>;
+  gerarEncargos: (competencia: string) => Promise<void>;
+  gerarProgramacaoFerias: (ano?: number) => Promise<void>;
+  gerarFeriasVencer: () => Promise<void>;
+  gerarAfastamentosPorTipo: (periodo?: { inicio: string; fim: string }) => Promise<void>;
+  gerarAbsenteismo: (periodo?: { inicio: string; fim: string }) => Promise<void>;
+  gerarTurnover: (ano?: number) => Promise<void>;
+  gerarDesligamentosPorMotivo: (periodo?: { inicio: string; fim: string }) => Promise<void>;
+  gerarEspelhoPonto: (colaboradorId: string, mes: string) => Promise<void>;
+  gerarBancoHoras: () => Promise<void>;
+  gerarIndicadoresDP: () => Promise<void>;
+}
+
+export function useRelatorios(): UseRelatoriosReturn {
   const [gerando, setGerando] = useState(false);
 
   // Helper para gerar relatórios
@@ -862,6 +882,7 @@ export function useRelatorios() {
     gerarIndicadoresDP,
   };
 }
+
 
 
 
