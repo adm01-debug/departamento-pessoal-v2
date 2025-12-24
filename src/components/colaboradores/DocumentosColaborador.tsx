@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useRef } from 'react';
 import { FileText, Upload, Trash2, Download, Loader2, File, Image, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ const getFileIcon = (filename: string) => {
   return <File className="w-5 h-5 text-muted-foreground" />;
 };
 
-export function DocumentosColaborador({ colaboradorId, colaboradorNome }: DocumentosColaboradorProps) {
+export const DocumentosColaborador = memo(function DocumentosColaborador({ colaboradorId, colaboradorNome }: DocumentosColaboradorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedTipo, setSelectedTipo] = useState<string>('');
   const [deleteConfirm, setDeleteConfirm] = useState<DocumentoColaborador | null>(null);
@@ -210,8 +211,4 @@ export function DocumentosColaborador({ colaboradorId, colaboradorNome }: Docume
       </AlertDialog>
     </div>
   );
-}
-
-
-
-
+});
