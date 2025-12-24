@@ -51,4 +51,3 @@ function AvisoFerias({ dados }: { dados: FeriasData }) {
 }
 
 export default memo(AvisoFerias);
-
