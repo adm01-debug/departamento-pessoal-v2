@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -46,3 +46,4 @@ function ReciboValeTransporte({ dados }: { dados: VTData }) {
 }
 
 export default memo(ReciboValeTransporte);
+
