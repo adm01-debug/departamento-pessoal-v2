@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from "react";
 import {
   Dialog,
@@ -21,7 +22,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-export function EmpresaModal({ open, onOpenChange }: Props) {
+export const EmpresaModal = memo(function EmpresaModal({ open, onOpenChange }: Props) {
   const {
     userEmpresas,
     todasEmpresas,
@@ -389,10 +390,4 @@ export function EmpresaModal({ open, onOpenChange }: Props) {
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
+});
