@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Building2, Check, ChevronDown, Plus, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState, memo, memo } from "react";
 import { EmpresaModal } from "./EmpresaModal";
 
-export function EmpresaSelector() {
+export const EmpresaSelector = memo(function EmpresaSelector() {
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -82,7 +83,4 @@ export function EmpresaSelector() {
       <EmpresaModal open={modalOpen} onOpenChange={setModalOpen} />
     </>
   );
-}
-
-
-
+});
