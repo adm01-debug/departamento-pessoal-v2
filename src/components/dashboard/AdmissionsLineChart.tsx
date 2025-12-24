@@ -11,7 +11,7 @@ interface AdmissionsLineChartProps {
   months?: number;
 }
 
-export function AdmissionsLineChart({ colaboradores = [], months = 12 }: AdmissionsLineChartProps) {
+export const AdmissionsLineChart = memo(function AdmissionsLineChart({ colaboradores = [], months = 12 }: AdmissionsLineChartProps) {
   const data = useMemo(() => {
     const now = new Date();
     const startDate = startOfMonth(subMonths(now, months - 1));
@@ -129,9 +129,4 @@ export function AdmissionsLineChart({ colaboradores = [], months = 12 }: Admissi
       </div>
     </div>
   );
-}
-
-
-
-
-
+});
