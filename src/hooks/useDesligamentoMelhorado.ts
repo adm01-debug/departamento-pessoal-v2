@@ -473,7 +473,24 @@ export function calcularRescisaoCompleta(
 // HOOK PRINCIPAL
 // =====================================================
 
-export function useDesligamentoMelhorado() {
+
+export interface UseDesligamentoMelhoradoReturn {
+  useDesligamentos: (filtros?: { status?: StatusDesligamento; colaboradorId?: string }) => { data: Desligamento[] | undefined; isLoading: boolean; error: Error | null };
+  useDesligamentoById: (id: string) => { data: Desligamento | undefined; isLoading: boolean };
+  useResumoDesligamentos: () => { data: { emAndamento: Desligamento[]; concluidos: number; totalPago: number; porTipo: Record<string, number> } | undefined; isLoading: boolean };
+  criarDesligamento: (dados: { colaboradorId: string; tipo: TipoDesligamento; dataDesligamento: string; dataAviso?: string; avisoPrevioTrabalhado: boolean; motivo?: string; calculo: CalculoRescisaoCompleto }) => void;
+  criarDesligamentoAsync: (dados: { colaboradorId: string; tipo: TipoDesligamento; dataDesligamento: string; dataAviso?: string; avisoPrevioTrabalhado: boolean; motivo?: string; calculo: CalculoRescisaoCompleto }) => Promise<Desligamento>;
+  isCriando: boolean;
+  atualizarChecklist: (data: { id: string; campo: string; valor: boolean }) => void;
+  concluirDesligamento: (id: string) => void;
+  cancelarDesligamento: (id: string) => void;
+  calcularRescisao: typeof calcularRescisaoCompleta;
+  tipoLabels: Record<TipoDesligamento, string>;
+  statusLabels: Record<StatusDesligamento, string>;
+  direitosPorTipo: Record<TipoDesligamento, { avisoPrevio: boolean; multa40: boolean; seguroDesemprego: boolean; sacarFGTS: boolean }>;
+}
+
+export function useDesligamentoMelhorado(): UseDesligamentoMelhoradoReturn {
   const queryClient = useQueryClient();
   const auditoria = useAuditoriaIntegration('colaborador');
 
@@ -808,4 +825,5 @@ export function useDesligamentoMelhorado() {
     direitosPorTipo,
   };
 }
+
 
