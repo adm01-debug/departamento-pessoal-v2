@@ -1,9 +1,13 @@
-import { memo, useMemo } from 'react';
-import { memo, useMemo } from 'react';
+/**
+ * @fileoverview Lista de alertas do dashboard com indicadores visuais de urgência
+ * @module components/dashboard/AlertsList
+ */
+import { memo } from 'react';
 import { AlertTriangle, Calendar, Clock, FileText, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alerta } from '@/data/mockData';
 
+/** Mapeamento de tipos de alerta para ícones */
 const alertIcons: Record<string, typeof AlertTriangle> = {
   ferias: Calendar,
   admissao: FileText,
@@ -12,6 +16,7 @@ const alertIcons: Record<string, typeof AlertTriangle> = {
   documento: FileText,
 };
 
+/** Cores de urgência para feedback visual */
 const urgencyColors: Record<string, string> = {
   alta: 'border-l-destructive bg-destructive/5',
   media: 'border-l-warning bg-warning/5',
@@ -19,9 +24,15 @@ const urgencyColors: Record<string, string> = {
 };
 
 interface AlertsListProps {
+  /** Lista de alertas a serem exibidos */
   alertas: Alerta[];
 }
 
+/**
+ * Componente que exibe lista de alertas com cores de urgência
+ * @param props - Propriedades do componente
+ * @returns Lista de alertas formatada
+ */
 export const AlertsList = memo(function AlertsList({ alertas }: AlertsListProps) {
   return (
     <div className="space-y-2">
@@ -52,3 +63,4 @@ export const AlertsList = memo(function AlertsList({ alertas }: AlertsListProps)
     </div>
   );
 });
+
