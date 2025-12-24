@@ -16,7 +16,7 @@ interface TurnoverYearComparisonChartProps {
   loading?: boolean;
 }
 
-export function TurnoverYearComparisonChart({ data, loading }: TurnoverYearComparisonChartProps) {
+export const TurnoverYearComparisonChart = memo(function TurnoverYearComparisonChart({ data, loading }: TurnoverYearComparisonChartProps) {
   if (loading) {
     return (
       <Card>
@@ -158,8 +158,4 @@ export function TurnoverYearComparisonChart({ data, loading }: TurnoverYearCompa
       </CardContent>
     </Card>
   );
-}
-
-
-
-
+});
