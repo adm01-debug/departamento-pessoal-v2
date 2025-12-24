@@ -89,7 +89,22 @@ const tipoLabels: Record<TipoDesligamento, string> = {
   falecimento: 'Falecimento',
 };
 
-export function useDesligamentos() {
+
+export interface UseDesligamentosReturn {
+  desligamentos: Desligamento[];
+  loading: boolean;
+  error: string | null;
+  fetchDesligamentos: () => Promise<void>;
+  createDesligamento: (data: DesligamentoInsert) => Promise<Desligamento | null>;
+  updateDesligamento: (id: string, data: Partial<DesligamentoInsert>) => Promise<boolean>;
+  deleteDesligamento: (id: string) => Promise<boolean>;
+  updateChecklist: (id: string, field: string, value: boolean) => Promise<boolean>;
+  concluirDesligamento: (id: string) => Promise<boolean>;
+  calcularRescisao: (desligamento: Desligamento) => CalculoRescisao;
+  tipoLabels: Record<TipoDesligamento, string>;
+}
+
+export function useDesligamentos(): UseDesligamentosReturn {
   const [desligamentos, setDesligamentos] = useState<Desligamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -287,6 +302,7 @@ export function useDesligamentos() {
     tipoLabels,
   };
 }
+
 
 
 
