@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect } from 'react';
 import { 
   FileText, Download, Calendar, Users, Wallet, Clock, Umbrella, Heart, 
@@ -198,6 +199,8 @@ export default memo(function) Relatorios() {
     switch (selectedRelatorio.paramType) {
       case 'colaborador':
         return (
+    <>
+      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
           <div className="space-y-2">
             <Label>Colaborador</Label>
             <Select value={colaboradorId} onValueChange={setColaboradorId}>
@@ -224,6 +227,8 @@ export default memo(function) Relatorios() {
         );
       case 'competencia':
         return (
+    <>
+      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
           <div className="space-y-2">
             <Label>Competência</Label>
             <Input 
@@ -235,6 +240,8 @@ export default memo(function) Relatorios() {
         );
       case 'ano':
         return (
+    <>
+      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
           <div className="space-y-2">
             <Label>Ano</Label>
             <Select value={ano} onValueChange={setAno}>
@@ -251,6 +258,8 @@ export default memo(function) Relatorios() {
         );
       case 'mes':
         return (
+    <>
+      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
           <div className="space-y-2">
             <Label>Mês</Label>
             <Select value={mes} onValueChange={setMes}>
@@ -268,6 +277,8 @@ export default memo(function) Relatorios() {
         );
       case 'periodo':
         return (
+    <>
+      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Data Início</Label>
@@ -299,6 +310,8 @@ export default memo(function) Relatorios() {
   };
 
   return (
+    <>
+      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -537,8 +550,10 @@ export default memo(function) Relatorios() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
+
 
 
 
