@@ -94,7 +94,29 @@ const tipoLabels: Record<TipoFerias, string> = {
   abono: 'Abono pecuniário'
 };
 
-export function useFeriasMelhorado() {
+
+export interface UseFeriasMelhoradoReturn {
+  ferias: FeriasComColaboradorMelhorado[];
+  periodos: PeriodoAquisitivoMelhorado[];
+  estatisticas: { total: number; aguardandoAprovacao: number; aprovadas: number; emAndamento: number; agendadas: number; proximoMes: number };
+  isLoading: boolean;
+  error: Error | null;
+  criarFerias: (data: Omit<FeriasMelhorado, 'id' | 'created_at' | 'updated_at'>) => Promise<FeriasMelhorado | null>;
+  atualizarFerias: (id: string, data: Partial<FeriasMelhorado>) => Promise<boolean>;
+  aprovarFerias: (id: string, aprovadorId: string) => Promise<boolean>;
+  rejeitarFerias: (id: string, motivo: string) => Promise<boolean>;
+  cancelarFerias: (id: string, motivo?: string) => Promise<boolean>;
+  criarPeriodoAquisitivo: (data: Omit<PeriodoAquisitivoMelhorado, 'id'>) => Promise<PeriodoAquisitivoMelhorado | null>;
+  calcularFerias: (colaboradorId: string, dataInicio: string, dataFim: string, tipo: TipoFerias, abonoP: boolean) => Promise<CalculoFeriasMelhorado>;
+  getFeriasColaborador: (colaboradorId: string) => FeriasComColaboradorMelhorado[];
+  getPeriodosColaborador: (colaboradorId: string) => PeriodoAquisitivoMelhorado[];
+  verificarConflitoFerias: (colaboradorId: string, dataInicio: string, dataFim: string, excluirId?: string) => boolean;
+  statusLabels: Record<StatusFeriasMelhorado, string>;
+  tipoLabels: Record<TipoFerias, string>;
+  refetch: () => void;
+}
+
+export function useFeriasMelhorado(): UseFeriasMelhoradoReturn {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const auditoria = useAuditoriaIntegration('ferias');
@@ -501,6 +523,7 @@ export function useFeriasMelhorado() {
     }
   };
 }
+
 
 
 
