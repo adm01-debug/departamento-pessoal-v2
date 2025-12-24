@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de empresas
+ * @module types/empresa
+ */
+
 export interface Empresa {
   id: string;
   razao_social: string;
@@ -42,4 +47,5 @@ export interface EmpresaFilters {
   ativa?: boolean;
   regime_tributario?: Empresa['regime_tributario'];
 }
+
 
