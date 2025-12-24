@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useMemo } from 'react';
 import { Clock, Calendar, Download, CheckCircle, AlertTriangle, User, Plus, Save, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -180,6 +181,8 @@ export default memo(function) Ponto() {
   }, []);
 
   return (
+    <>
+      <SEOHead title="Ponto | DP System" description="Gestão de ponto e jornada de trabalho" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -317,6 +320,8 @@ export default memo(function) Ponto() {
                 const feriado = feriadosPorData.get(dataStr);
                 
                 return (
+    <>
+      <SEOHead title="Ponto | DP System" description="Gestão de ponto e jornada de trabalho" />
                   <tr key={dataStr} className="hover:bg-muted/20 transition-colors">
                     <td className="p-3 text-sm font-medium text-foreground">
                       {format(data, 'dd/MM')}
@@ -461,8 +466,10 @@ export default memo(function) Ponto() {
         ))}
       </div>
     </div>
+    </>
   );
 }
+
 
 
 
