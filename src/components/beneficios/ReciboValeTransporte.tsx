@@ -46,4 +46,3 @@ function ReciboValeTransporte({ dados }: { dados: VTData }) {
 }
 
 export default memo(ReciboValeTransporte);
-
