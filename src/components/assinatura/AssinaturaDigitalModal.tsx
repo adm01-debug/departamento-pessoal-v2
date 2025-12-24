@@ -13,7 +13,7 @@ interface AssinaturaDigitalModalProps {
   onAssinaturaSalva: (assinaturaBase64: string, dataAssinatura: string) => void;
 }
 
-export function AssinaturaDigitalModal({
+export const AssinaturaDigitalModal = memo(function AssinaturaDigitalModal({
   open,
   onOpenChange,
   documento,
@@ -235,9 +235,4 @@ export function AssinaturaDigitalModal({
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
+});
