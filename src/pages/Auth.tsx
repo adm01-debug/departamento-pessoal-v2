@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,7 +108,9 @@ export default memo(function) Auth() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <>
+        <SEOHead title="Autenticação" description="Sistema de autenticação" />
+        <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -267,7 +270,9 @@ export default memo(function) Auth() {
         </CardContent>
       </Card>
     </div>
-  );
+  
+      </>);
 }
+
 
 
