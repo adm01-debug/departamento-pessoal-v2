@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -34,7 +35,7 @@ interface ChecklistStage {
   items: ChecklistItem[];
 }
 
-export function DesligamentoChecklist({ desligamento, onChecklistChange, onConcluir }: DesligamentoChecklistProps) {
+export const DesligamentoChecklist = memo(function DesligamentoChecklist({ desligamento, onChecklistChange, onConcluir }: DesligamentoChecklistProps) {
   const checklist: ChecklistStage[] = [
     {
       id: 'comunicacao',
@@ -225,7 +226,4 @@ export function DesligamentoChecklist({ desligamento, onChecklistChange, onConcl
       </CardContent>
     </Card>
   );
-}
-
-
-
+});
