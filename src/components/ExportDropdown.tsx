@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { logger } from '@/lib/logger';
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ interface ExportDropdownProps {
 
 type ExportFormat = 'excel' | 'pdf' | 'csv';
 
-export function ExportDropdown({ options, defaultFilename, disabled }: ExportDropdownProps) {
+export const ExportDropdown = memo(function ExportDropdown({ options, defaultFilename, disabled }: ExportDropdownProps) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = useCallback(async (format: ExportFormat) => {
@@ -103,6 +103,4 @@ export function ExportDropdown({ options, defaultFilename, disabled }: ExportDro
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
-
+});
