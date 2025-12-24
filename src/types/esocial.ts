@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de eSocial
+ * @module types/esocial
+ */
+
 export type EventoESocialTipo = 
   | 'S-1000' | 'S-1005' | 'S-1010' | 'S-1020' | 'S-1030' | 'S-1035'
   | 'S-1040' | 'S-1050' | 'S-1060' | 'S-1070' | 'S-1080'
@@ -75,4 +80,5 @@ export const EVENTOS_ESOCIAL_DESCRICAO: Record<EventoESocialTipo, string> = {
   'S-2410': 'Cessação de Benefício',
   'S-3000': 'Exclusão de Eventos',
 };
+
 
