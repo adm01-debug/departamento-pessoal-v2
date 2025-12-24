@@ -46,7 +46,19 @@ export interface NovoAgendamento {
   hora_envio?: string;
 }
 
-export function useAgendamentoRelatorios() {
+
+export interface UseAgendamentoRelatoriosReturn {
+  agendamentos: RelatorioAgendado[];
+  logs: LogEnvioRelatorio[];
+  isLoading: boolean;
+  criarAgendamento: (data: NovoAgendamento) => Promise<RelatorioAgendado | null>;
+  atualizarAgendamento: (id: string, data: Partial<NovoAgendamento>) => Promise<boolean>;
+  excluirAgendamento: (id: string) => Promise<boolean>;
+  alternarAtivo: (id: string, ativo: boolean) => Promise<boolean>;
+  executarAgora: (id: string) => Promise<boolean>;
+}
+
+export function useAgendamentoRelatorios(): UseAgendamentoRelatoriosReturn {
   const queryClient = useQueryClient();
 
   const { data: agendamentos, isLoading } = useQuery({
@@ -234,6 +246,7 @@ export const DIAS_SEMANA = [
   { value: 5, label: "Sexta-feira" },
   { value: 6, label: "Sábado" },
 ];
+
 
 
 
