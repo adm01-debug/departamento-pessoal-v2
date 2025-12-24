@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -76,7 +77,7 @@ interface ColaboradorFormModalProps {
   onSuccess?: (data: ColaboradorFormData, isEdit: boolean) => void;
 }
 
-export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSuccess }: ColaboradorFormModalProps) {
+export const ColaboradorFormModal = memo(function ColaboradorFormModal({ open, onOpenChange, colaborador, onSuccess }: ColaboradorFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!colaborador;
 
@@ -388,10 +389,4 @@ export function ColaboradorFormModal({ open, onOpenChange, colaborador, onSucces
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
+});
