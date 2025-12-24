@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useEffect, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -25,7 +26,7 @@ interface MovimentacaoColaborador {
   tipo: 'admissao' | 'desligamento';
 }
 
-export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: TurnoverDetailModalProps) {
+export const TurnoverDetailModal = memo(function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: TurnoverDetailModalProps) {
   const [loading, setLoading] = useState(false);
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoColaborador[]>([]);
   const [filtroTipo, setFiltroTipo] = useState<'todos' | 'admissao' | 'desligamento'>('todos');
@@ -233,9 +234,4 @@ export function TurnoverDetailModal({ open, onOpenChange, mes, mesLabel }: Turno
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
+});
