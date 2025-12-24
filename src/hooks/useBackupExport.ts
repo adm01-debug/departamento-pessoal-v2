@@ -73,7 +73,19 @@ const TABLE_LABELS: Record<string, string> = {
   audit_log: 'Log de Auditoria',
 };
 
-export function useBackupExport() {
+
+export interface UseBackupExportReturn {
+  isExporting: boolean;
+  progress: number;
+  exportToJSON: (selectedTables: string[]) => Promise<void>;
+  exportToExcelWorkbook: (selectedTables: string[]) => Promise<void>;
+  exportToPDFReport: (selectedTables: string[]) => Promise<void>;
+  exportTableToCSV: (tableName: string) => Promise<void>;
+  TABLE_LABELS: Record<string, string>;
+  TABLES_TO_BACKUP: string[];
+}
+
+export function useBackupExport(): UseBackupExportReturn {
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState<BackupProgress[]>([]);
 
@@ -342,4 +354,5 @@ export function useBackupExport() {
     TABLES_TO_BACKUP,
   };
 }
+
 
