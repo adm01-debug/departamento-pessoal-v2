@@ -2,7 +2,7 @@
  * @fileoverview Título do card
  * @module components/card/CardTitle
  */
-import { memo, type ReactNode, type ElementType } from 'react';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 
@@ -14,12 +14,19 @@ interface CardTitleProps {
   className?: string;
   /** Ícone opcional */
   icon?: LucideIcon;
-  /** Elemento HTML do título */
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /** Tamanho do título */
+  size?: 'sm' | 'md' | 'lg';
 }
 
+/** Mapeamento de tamanhos */
+const sizeStyles: Record<string, { text: string; icon: string }> = {
+  sm: { text: 'text-base font-medium', icon: 'h-4 w-4' },
+  md: { text: 'text-lg font-semibold', icon: 'h-5 w-5' },
+  lg: { text: 'text-xl font-bold', icon: 'h-6 w-6' },
+};
+
 /**
- * Título para cards com suporte a ícone
+ * Título principal do card
  * @param props - Propriedades do componente
  * @returns Elemento JSX do título
  */
@@ -27,19 +34,14 @@ export const CardTitle = memo(function CardTitle({
   children,
   className,
   icon: Icon,
-  as: Component = 'h3',
+  size = 'md',
 }: CardTitleProps) {
-  const Tag = Component as ElementType;
-  
+  const styles = sizeStyles[size];
+
   return (
-    <Tag
-      className={cn(
-        'flex items-center gap-2 font-semibold leading-none tracking-tight',
-        className
-      )}
-    >
-      {Icon && <Icon className="h-5 w-5" />}
+    <h3 className={cn('flex items-center gap-2', styles.text, className)}>
+      {Icon && <Icon className={styles.icon} />}
       {children}
-    </Tag>
+    </h3>
   );
 });
