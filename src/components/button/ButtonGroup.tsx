@@ -1,96 +1,64 @@
 /**
- * @file ButtonGroup.tsx
- * @description Grupo de botões com espaçamento e layout
- * @category Components/Button
+ * @fileoverview Grupo de botões com espaçamento consistente
+ * @module components/button/ButtonGroup
  */
-
-import React, { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Props do ButtonGroup
- */
-export interface ButtonGroupProps {
+/** Props do ButtonGroup */
+interface ButtonGroupProps {
   /** Botões filhos */
-  children: React.ReactNode;
+  children: ReactNode;
   /** Orientação do grupo */
   orientation?: 'horizontal' | 'vertical';
-  /** Espaçamento entre botões */
-  spacing?: 'none' | 'sm' | 'md' | 'lg';
-  /** Alinhamento */
-  align?: 'start' | 'center' | 'end' | 'stretch';
-  /** Se os botões devem ser unidos (attached) */
-  attached?: boolean;
-  /** Se deve ocupar largura total */
-  fullWidth?: boolean;
-  /** Classe adicional */
+  /** Tamanho do espaçamento */
+  gap?: 'none' | 'sm' | 'md' | 'lg';
+  /** Classes CSS adicionais */
   className?: string;
+  /** Alinhamento dos botões */
+  align?: 'start' | 'center' | 'end' | 'stretch';
 }
 
-const spacingClasses = {
+/** Mapeamento de gaps */
+const gapStyles: Record<string, string> = {
   none: 'gap-0',
   sm: 'gap-1',
   md: 'gap-2',
   lg: 'gap-4',
 };
 
-const alignClasses = {
-  start: 'justify-start',
-  center: 'justify-center',
-  end: 'justify-end',
-  stretch: 'justify-stretch',
+/** Mapeamento de alinhamentos */
+const alignStyles: Record<string, string> = {
+  start: 'items-start justify-start',
+  center: 'items-center justify-center',
+  end: 'items-end justify-end',
+  stretch: 'items-stretch',
 };
 
 /**
- * Grupo de botões com espaçamento e layout
- * 
- * @example
- * ```tsx
- * <ButtonGroup spacing="md" align="end">
- *   <Button variant="outline">Cancelar</Button>
- *   <Button>Salvar</Button>
- * </ButtonGroup>
- * ```
+ * Agrupa botões com espaçamento e orientação consistentes
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX do grupo de botões
  */
 export const ButtonGroup = memo(function ButtonGroup({
   children,
   orientation = 'horizontal',
-  spacing = 'md',
-  align = 'start',
-  attached = false,
-  fullWidth = false,
+  gap = 'md',
   className,
+  align = 'start',
 }: ButtonGroupProps) {
   return (
     <div
-      role="group"
       className={cn(
         'inline-flex',
-        orientation === 'horizontal' ? 'flex-row' : 'flex-col',
-        !attached && spacingClasses[spacing],
-        alignClasses[align],
-        fullWidth && 'w-full',
-        attached && [
-          '[&>*]:rounded-none',
-          orientation === 'horizontal' && [
-            '[&>*:first-child]:rounded-l-md',
-            '[&>*:last-child]:rounded-r-md',
-            '[&>*:not(:first-child)]:-ml-px',
-          ],
-          orientation === 'vertical' && [
-            '[&>*:first-child]:rounded-t-md',
-            '[&>*:last-child]:rounded-b-md',
-            '[&>*:not(:first-child)]:-mt-px',
-          ],
-        ],
+        orientation === 'vertical' ? 'flex-col' : 'flex-row',
+        gapStyles[gap],
+        alignStyles[align],
         className
       )}
+      role="group"
     >
       {children}
     </div>
   );
 });
-
-ButtonGroup.displayName = 'ButtonGroup';
-
-export default ButtonGroup;
