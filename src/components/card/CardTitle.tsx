@@ -4,46 +4,22 @@
  */
 import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import type { LucideIcon } from 'lucide-react';
 
-/** Props do CardTitle */
 interface CardTitleProps {
-  /** Conteúdo do título */
   children: ReactNode;
-  /** Classes CSS adicionais */
   className?: string;
-  /** Tamanho do título */
-  size?: 'sm' | 'md' | 'lg';
-  /** Elemento HTML a usar */
+  icon?: LucideIcon;
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
-/** Mapeamento de tamanhos */
-const sizeStyles: Record<string, string> = {
-  sm: 'text-base font-medium',
-  md: 'text-lg font-semibold',
-  lg: 'text-xl font-bold',
-};
-
-/**
- * Título para cards com estilos consistentes
- * @param props - Propriedades do componente
- * @returns Elemento JSX do título
- */
 export const CardTitle = memo(function CardTitle({
-  children,
-  className,
-  size = 'md',
-  as: Component = 'h3',
+  children, className, icon: Icon, as: Tag = 'h3',
 }: CardTitleProps) {
   return (
-    <Component
-      className={cn(
-        'leading-none tracking-tight',
-        sizeStyles[size],
-        className
-      )}
-    >
+    <Tag className={cn('flex items-center gap-2 font-semibold leading-none tracking-tight', className)}>
+      {Icon && <Icon className="h-5 w-5" />}
       {children}
-    </Component>
+    </Tag>
   );
 });
