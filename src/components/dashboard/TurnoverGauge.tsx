@@ -9,7 +9,7 @@ interface TurnoverGaugeProps {
   totalColaboradores: number;
 }
 
-export function TurnoverGauge({ admissoes, desligamentos, totalColaboradores }: TurnoverGaugeProps) {
+export const TurnoverGauge = memo(function TurnoverGauge({ admissoes, desligamentos, totalColaboradores }: TurnoverGaugeProps) {
   const { turnoverRate, data } = useMemo(() => {
     // Fórmula turnover: ((Admissões + Desligamentos) / 2) / Total * 100
     const rate = totalColaboradores > 0 
@@ -89,8 +89,4 @@ export function TurnoverGauge({ admissoes, desligamentos, totalColaboradores }: 
       </div>
     </div>
   );
-}
-
-
-
-
+});
