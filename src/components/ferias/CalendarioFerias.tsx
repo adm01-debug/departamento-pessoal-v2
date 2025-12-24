@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,7 @@ const statusCores: Record<StatusFerias, { bg: string; text: string; border: stri
   cancelada: { bg: 'bg-destructive/20', text: 'text-destructive', border: 'border-destructive/50' },
 };
 
-export function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: CalendarioFeriasProps) {
+export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: CalendarioFeriasProps) {
   const [mesAtual, setMesAtual] = useState(new Date());
 
   // Dias do mês
@@ -202,9 +203,4 @@ export function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: Calendar
       </div>
     </div>
   );
-}
-
-
-
-
-
+});
