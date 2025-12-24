@@ -17,7 +17,22 @@ export interface AdmissaoToken {
   created_at: string;
 }
 
-export function useContratacaoDigital() {
+
+export interface UseContratacaoDigitalReturn {
+  tokens: AdmissaoToken[];
+  isLoading: boolean;
+  criarToken: (admissaoId: string) => void;
+  reenviarToken: (tokenId: string) => void;
+  getTokenByAdmissao: (admissaoId: string) => AdmissaoToken | null;
+  getDocumentosAdmissao: (admissaoId: string) => Promise<Array<{ tipo: string; url: string; status: string }>>;
+  validarDocumento: (data: { tokenId: string; tipo: string }) => void;
+  gerarLinkContratacao: (token: string) => string;
+  copiarLink: (token: string) => void;
+  isCriando: boolean;
+  isReenviando: boolean;
+}
+
+export function useContratacaoDigital(): UseContratacaoDigitalReturn {
   const queryClient = useQueryClient();
 
   // Buscar todos os tokens de admissão
@@ -189,6 +204,7 @@ export function useContratacaoDigital() {
     isReenviando: reenviarToken.isPending,
   };
 }
+
 
 
 
