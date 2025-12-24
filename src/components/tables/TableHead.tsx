@@ -4,63 +4,31 @@
  */
 import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { TableHeader as UITableHeader, TableRow, TableHead as UITableHead } from '@/components/ui/table';
+import { TableHead as UITableHead } from '@/components/ui/table';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-/** Props do TableHead */
 interface TableHeadProps {
-  /** Células do cabeçalho */
   children: ReactNode;
-  /** Classes CSS adicionais */
   className?: string;
-  /** Se é sticky */
-  sticky?: boolean;
+  sortable?: boolean;
+  sortDirection?: 'asc' | 'desc' | null;
+  onSort?: () => void;
 }
 
-/**
- * Cabeçalho da tabela
- * @param props - Propriedades do componente
- * @returns Elemento JSX
- */
 export const TableHead = memo(function TableHead({
-  children,
-  className,
-  sticky = false,
+  children, className, sortable, sortDirection, onSort,
 }: TableHeadProps) {
+  const SortIcon = sortDirection === 'asc' ? ArrowUp : sortDirection === 'desc' ? ArrowDown : ArrowUpDown;
+  
   return (
-    <UITableHeader
-      className={cn(
-        'bg-muted/50',
-        sticky && 'sticky top-0 z-10',
-        className
-      )}
+    <UITableHead 
+      className={cn(sortable && 'cursor-pointer select-none', className)}
+      onClick={sortable ? onSort : undefined}
     >
-      <TableRow>
+      <div className="flex items-center gap-1">
         {children}
-      </TableRow>
-    </UITableHeader>
-  );
-});
-
-/** Props do HeaderCell */
-interface HeaderCellProps {
-  /** Conteúdo */
-  children: ReactNode;
-  /** Classes CSS */
-  className?: string;
-  /** Alinhamento */
-  align?: 'left' | 'center' | 'right';
-}
-
-/** Célula de cabeçalho */
-export const HeaderCell = memo(function HeaderCell({
-  children,
-  className,
-  align = 'left',
-}: HeaderCellProps) {
-  const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left';
-  return (
-    <UITableHead className={cn('h-12 px-4 font-medium', alignClass, className)}>
-      {children}
+        {sortable && <SortIcon className="h-4 w-4 text-muted-foreground" />}
+      </div>
     </UITableHead>
   );
 });
