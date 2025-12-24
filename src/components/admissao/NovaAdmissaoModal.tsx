@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from 'react';
 import {
   Dialog,
@@ -58,7 +59,7 @@ const estadosCivis = [
   { value: 'uniao_estavel', label: 'União Estável' },
 ];
 
-export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissaoModalProps) {
+export const NovaAdmissaoModal = memo(function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissaoModalProps) {
   const [formData, setFormData] = useState<Partial<NovaAdmissaoData>>({});
   const [dateOpen, setDateOpen] = useState(false);
   const [birthDateOpen, setBirthDateOpen] = useState(false);
@@ -447,10 +448,4 @@ export function NovaAdmissaoModal({ open, onOpenChange, onSubmit }: NovaAdmissao
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
-
+});
