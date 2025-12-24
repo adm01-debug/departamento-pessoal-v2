@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { useSearchParams } from 'react-router-dom';
@@ -376,7 +377,9 @@ export default memo(function) ContratacaoDigital() {
   // Tela de carregamento
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+      <>
+        <SEOHead title="Contratação Digital" description="Processo de contratação digital" />
+        <div className="min-h-screen flex items-center justify-center bg-muted/30">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -853,8 +856,10 @@ export default memo(function) ContratacaoDigital() {
         onAssinaturaSalva={handleAssinaturaSalva}
       />
     </div>
-  );
+  
+      </>);
 }
+
 
 
 
