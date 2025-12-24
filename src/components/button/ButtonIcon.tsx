@@ -1,60 +1,81 @@
 /**
- * @fileoverview Botão apenas com ícone
- * @module components/button/ButtonIcon
+ * @file ButtonIcon.tsx
+ * @description Wrapper para ícones dentro de botões
+ * @category Components/Button
  */
-import { memo, forwardRef, type ButtonHTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import type { LucideIcon } from 'lucide-react';
 
-/** Props do ButtonIcon */
-interface ButtonIconProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Ícone a exibir */
-  icon: LucideIcon;
-  /** Texto do tooltip (acessibilidade) */
-  label: string;
-  /** Variante do botão */
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  /** Tamanho do botão */
+import React, { memo } from 'react';
+import { cn } from '@/lib/utils';
+
+/**
+ * Props do ButtonIcon
+ */
+export interface ButtonIconProps {
+  /** Ícone a ser renderizado */
+  children: React.ReactNode;
+  /** Posição do ícone */
+  position?: 'left' | 'right' | 'only';
+  /** Tamanho do ícone */
   size?: 'sm' | 'md' | 'lg';
+  /** Se está em loading */
+  loading?: boolean;
+  /** Classe adicional */
+  className?: string;
 }
 
-/** Mapeamento de tamanhos */
-const sizeStyles = {
-  sm: { button: 'h-8 w-8', icon: 'h-4 w-4' },
-  md: { button: 'h-9 w-9', icon: 'h-4 w-4' },
-  lg: { button: 'h-10 w-10', icon: 'h-5 w-5' },
+const sizeClasses = {
+  sm: 'h-3 w-3',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5',
+};
+
+const positionClasses = {
+  left: 'mr-2',
+  right: 'ml-2',
+  only: '',
 };
 
 /**
- * Botão quadrado contendo apenas um ícone com tooltip
- * @param props - Propriedades do componente
- * @returns Elemento JSX do botão
+ * Wrapper para ícones dentro de botões
+ * 
+ * @example
+ * ```tsx
+ * <Button>
+ *   <ButtonIcon position="left"><Plus /></ButtonIcon>
+ *   Adicionar
+ * </Button>
+ * ```
  */
-export const ButtonIcon = memo(forwardRef<HTMLButtonElement, ButtonIconProps>(
-  function ButtonIcon({ icon: Icon, label, variant = 'ghost', size = 'md', className, ...props }, ref) {
-    const styles = sizeStyles[size];
+export const ButtonIcon = memo(function ButtonIcon({
+  children,
+  position = 'left',
+  size = 'md',
+  loading = false,
+  className,
+}: ButtonIconProps) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center justify-center shrink-0',
+        sizeClasses[size],
+        positionClasses[position],
+        loading && 'animate-spin',
+        className
+      )}
+      aria-hidden="true"
+    >
+      {React.isValidElement(children)
+        ? React.cloneElement(children as React.ReactElement<{ className?: string }>, {
+            className: cn(
+              sizeClasses[size],
+              (children as React.ReactElement<{ className?: string }>).props.className
+            ),
+          })
+        : children}
+    </span>
+  );
+});
 
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              ref={ref}
-              variant={variant}
-              className={cn('p-0', styles.button, className)}
-              aria-label={label}
-              {...props}
-            >
-              <Icon className={styles.icon} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{label}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-));
+ButtonIcon.displayName = 'ButtonIcon';
+
+export default ButtonIcon;
