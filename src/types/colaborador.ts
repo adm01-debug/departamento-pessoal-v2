@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de colaboradores
+ * @module types/colaborador
+ */
+
 // Tipos baseados na tabela do banco de dados para colaboradores
 
 export type EstadoCivil = 'solteiro' | 'casado' | 'divorciado' | 'viuvo' | 'separado' | 'uniao_estavel';
@@ -234,4 +239,5 @@ export const bancosComuns = [
   { codigo: '756', nome: 'Sicoob' },
   { codigo: '748', nome: 'Sicredi' },
 ];
+
 
