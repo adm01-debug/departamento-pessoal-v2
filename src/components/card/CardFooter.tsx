@@ -1,86 +1,51 @@
 /**
- * @file CardFooter.tsx
- * @description Rodapé do card com ações
- * @category Components/Card
+ * @fileoverview Rodapé do card
+ * @module components/card/CardFooter
  */
-
-import React, { memo } from 'react';
-import { CardFooter as ShadcnCardFooter } from '@/components/ui/card';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Props do CardFooter
- */
-export interface CardFooterProps {
-  /** Conteúdo do footer (normalmente botões) */
-  children: React.ReactNode;
-  /** Classe adicional */
+/** Props do CardFooter */
+interface CardFooterProps {
+  /** Conteúdo do rodapé */
+  children: ReactNode;
+  /** Classes CSS adicionais */
   className?: string;
   /** Alinhamento dos itens */
-  align?: 'left' | 'center' | 'right' | 'between' | 'around';
-  /** Padding interno */
-  padding?: 'none' | 'sm' | 'md' | 'lg';
-  /** Se deve ter borda superior */
+  align?: 'start' | 'center' | 'end' | 'between';
+  /** Se exibe borda superior */
   bordered?: boolean;
-  /** Cor de fundo */
-  variant?: 'default' | 'muted';
 }
 
-const alignClasses = {
-  left: 'justify-start',
+/** Mapeamento de alinhamentos */
+const alignStyles: Record<string, string> = {
+  start: 'justify-start',
   center: 'justify-center',
-  right: 'justify-end',
+  end: 'justify-end',
   between: 'justify-between',
-  around: 'justify-around',
-};
-
-const paddingClasses = {
-  none: 'p-0',
-  sm: 'p-3',
-  md: 'p-6',
-  lg: 'p-8',
-};
-
-const variantClasses = {
-  default: '',
-  muted: 'bg-muted/50',
 };
 
 /**
- * Rodapé do card com ações
- * 
- * @example
- * ```tsx
- * <CardFooter align="right" bordered>
- *   <Button variant="outline">Cancelar</Button>
- *   <Button>Salvar</Button>
- * </CardFooter>
- * ```
+ * Rodapé do card para ações e informações secundárias
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX do rodapé
  */
 export const CardFooter = memo(function CardFooter({
   children,
   className,
-  align = 'right',
-  padding = 'md',
-  bordered = false,
-  variant = 'default',
+  align = 'end',
+  bordered = true,
 }: CardFooterProps) {
   return (
-    <ShadcnCardFooter
+    <div
       className={cn(
-        'flex items-center gap-2',
-        alignClasses[align],
-        paddingClasses[padding],
-        variantClasses[variant],
+        'flex items-center gap-2 p-4',
         bordered && 'border-t',
+        alignStyles[align],
         className
       )}
     >
       {children}
-    </ShadcnCardFooter>
+    </div>
   );
 });
-
-CardFooter.displayName = 'CardFooter';
-
-export default CardFooter;
