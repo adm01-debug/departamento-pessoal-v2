@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, FileText } from 'lucide-react';
@@ -118,4 +118,5 @@ function InformeRendimentos({ dados }: { dados: RendimentosData }) {
 }
 
 export default memo(InformeRendimentos);
+
 
