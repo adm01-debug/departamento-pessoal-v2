@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { useState, memo, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
