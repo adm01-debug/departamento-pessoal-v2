@@ -48,7 +48,24 @@ export interface LogSync {
 // HOOK PRINCIPAL
 // =====================================================
 
-export function useBitrix24Sync() {
+
+export interface UseBitrix24SyncReturn {
+  configuracao: ConfiguracaoSync | null;
+  loadingConfig: boolean;
+  salvarConfiguracao: (config: ConfiguracaoSync) => Promise<boolean>;
+  testarConexao: () => void;
+  testandoConexao: boolean;
+  usuariosBitrix: Array<{ ID: string; NAME: string; LAST_NAME: string; EMAIL: string }>;
+  departamentosBitrix: Array<{ ID: string; NAME: string }>;
+  refetchUsuarios: () => void;
+  importarDoBitrix: () => Promise<ResultadoSync>;
+  exportarParaBitrix: () => Promise<ResultadoSync>;
+  sincronizarBidirecional: () => Promise<ResultadoSync>;
+  sincronizando: boolean;
+  logsSync: LogSync[];
+}
+
+export function useBitrix24Sync(): UseBitrix24SyncReturn {
   const queryClient = useQueryClient();
   const [sincronizando, setSincronizando] = useState(false);
   const auditoria = useAuditoriaIntegration('bitrix24_sync');
@@ -412,6 +429,7 @@ export function useBitrix24Sync() {
     logsSync,
   };
 }
+
 
 
 
