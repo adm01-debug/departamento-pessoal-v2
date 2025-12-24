@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, useRef, memo } from 'react';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X, Loader2, Download, AlertTriangle } from 'lucide-react';
 import {
@@ -34,7 +35,7 @@ interface ImportacaoColaboradoresModalProps {
   onSuccess?: () => void;
 }
 
-export function ImportacaoColaboradoresModal({
+export const ImportacaoColaboradoresModal = memo(function ImportacaoColaboradoresModal({
   open,
   onOpenChange,
   onSuccess,
@@ -446,8 +447,4 @@ export function ImportacaoColaboradoresModal({
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
+});
