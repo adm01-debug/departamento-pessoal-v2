@@ -26,7 +26,19 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
 
 const STORAGE_KEY = 'dashboard_widgets_config';
 
-export function useDashboardConfig() {
+
+export interface UseDashboardConfigReturn {
+  widgets: WidgetConfig[];
+  isEditing: boolean;
+  setIsEditing: (editing: boolean) => void;
+  reorderWidgets: (startIndex: number, endIndex: number) => void;
+  toggleVisibility: (id: string) => void;
+  updateSize: (id: string, size: 'small' | 'medium' | 'large') => void;
+  resetToDefaults: () => void;
+  getVisibleWidgets: () => WidgetConfig[];
+}
+
+export function useDashboardConfig(): UseDashboardConfigReturn {
   const [widgets, setWidgets] = useState<WidgetConfig[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -101,4 +113,5 @@ export function useDashboardConfig() {
     getVisibleWidgets,
   };
 }
+
 
