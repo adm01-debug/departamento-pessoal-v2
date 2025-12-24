@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, X } from 'lucide-react';
 import {
@@ -26,7 +26,7 @@ interface GlobalSearchProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
+export const GlobalSearch = memo(function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
@@ -112,6 +112,4 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       </CommandList>
     </CommandDialog>
   );
-}
-
-
+});
