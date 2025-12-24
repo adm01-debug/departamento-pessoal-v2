@@ -23,7 +23,7 @@ const COLORS = [
   'hsl(var(--sales))',
 ];
 
-export function PayrollCostChart({ data }: PayrollCostChartProps) {
+export const PayrollCostChart = memo(function PayrollCostChart({ data }: PayrollCostChartProps) {
   const { chartData, totalCost } = useMemo(() => {
     const sorted = [...data].sort((a, b) => b.custoTotal - a.custoTotal);
     const total = data.reduce((acc, item) => acc + item.custoTotal, 0);
@@ -124,8 +124,4 @@ export function PayrollCostChart({ data }: PayrollCostChartProps) {
       </div>
     </div>
   );
-}
-
-
-
-
+});
