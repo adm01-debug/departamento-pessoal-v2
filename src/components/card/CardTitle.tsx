@@ -1,80 +1,49 @@
 /**
- * @file CardTitle.tsx
- * @description Título do card
- * @category Components/Card
+ * @fileoverview Título do card
+ * @module components/card/CardTitle
  */
-
-import React, { memo } from 'react';
-import { CardTitle as ShadcnCardTitle } from '@/components/ui/card';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Props do CardTitle
- */
-export interface CardTitleProps {
-  /** Texto do título */
-  children: React.ReactNode;
-  /** Classe adicional */
+/** Props do CardTitle */
+interface CardTitleProps {
+  /** Conteúdo do título */
+  children: ReactNode;
+  /** Classes CSS adicionais */
   className?: string;
   /** Tamanho do título */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  /** Peso da fonte */
-  weight?: 'normal' | 'medium' | 'semibold' | 'bold';
-  /** Truncar texto longo */
-  truncate?: boolean;
-  /** Elemento HTML */
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
+  size?: 'sm' | 'md' | 'lg';
+  /** Elemento HTML a usar */
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
-const sizeClasses = {
-  sm: 'text-base',
-  md: 'text-lg',
-  lg: 'text-xl',
-  xl: 'text-2xl',
-};
-
-const weightClasses = {
-  normal: 'font-normal',
-  medium: 'font-medium',
-  semibold: 'font-semibold',
-  bold: 'font-bold',
+/** Mapeamento de tamanhos */
+const sizeStyles: Record<string, string> = {
+  sm: 'text-base font-medium',
+  md: 'text-lg font-semibold',
+  lg: 'text-xl font-bold',
 };
 
 /**
- * Título do card
- * 
- * @example
- * ```tsx
- * <CardTitle size="lg" weight="bold">
- *   Dashboard
- * </CardTitle>
- * ```
+ * Título para cards com estilos consistentes
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX do título
  */
 export const CardTitle = memo(function CardTitle({
   children,
   className,
   size = 'md',
-  weight = 'semibold',
-  truncate = false,
   as: Component = 'h3',
 }: CardTitleProps) {
   return (
-    <ShadcnCardTitle asChild>
-      <Component
-        className={cn(
-          sizeClasses[size],
-          weightClasses[weight],
-          'leading-none tracking-tight',
-          truncate && 'truncate',
-          className
-        )}
-      >
-        {children}
-      </Component>
-    </ShadcnCardTitle>
+    <Component
+      className={cn(
+        'leading-none tracking-tight',
+        sizeStyles[size],
+        className
+      )}
+    >
+      {children}
+    </Component>
   );
 });
-
-CardTitle.displayName = 'CardTitle';
-
-export default CardTitle;
