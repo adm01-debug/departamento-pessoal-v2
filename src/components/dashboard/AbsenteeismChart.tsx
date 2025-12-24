@@ -14,7 +14,7 @@ interface AbsenteeismChartProps {
   data: AbsenteeismData[];
 }
 
-export function AbsenteeismChart({ data }: AbsenteeismChartProps) {
+export const AbsenteeismChart = memo(function AbsenteeismChart({ data }: AbsenteeismChartProps) {
   const chartData = useMemo(() => {
     return data.map(item => ({
       ...item,
@@ -92,8 +92,4 @@ export function AbsenteeismChart({ data }: AbsenteeismChartProps) {
       </div>
     </div>
   );
-}
-
-
-
-
+});
