@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -8,29 +9,37 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
-import Dashboard from "./pages/Dashboard";
-import Colaboradores from "./pages/Colaboradores";
-import Admissao from "./pages/Admissao";
-import Ponto from "./pages/Ponto";
-import Ferias from "./pages/Ferias";
-import Afastamentos from "./pages/Afastamentos";
-import Folha from "./pages/Folha";
-import Beneficios from "./pages/Beneficios";
-import Desligamento from "./pages/Desligamento";
-import Relatorios from "./pages/Relatorios";
-import Auditoria from "./pages/Auditoria";
-import FeriadosPage from "./pages/Feriados";
-import Perfil from "./pages/Perfil";
-import Usuarios from "./pages/Usuarios";
-import Assinaturas from "./pages/Assinaturas";
-import PortalColaborador from "./pages/PortalColaborador";
-import Organograma from "./pages/Organograma";
-import Onboarding from "./pages/Onboarding";
-import GestaoDocumentos from "./pages/GestaoDocumentos";
-import IntegracaoContabil from "./pages/IntegracaoContabil";
-import ContratacaoDigital from "./pages/ContratacaoDigital";
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Colaboradores = lazy(() => import("./pages/Colaboradores"));
+const Admissao = lazy(() => import("./pages/Admissao"));
+const Ponto = lazy(() => import("./pages/Ponto"));
+const Ferias = lazy(() => import("./pages/Ferias"));
+const Afastamentos = lazy(() => import("./pages/Afastamentos"));
+const Folha = lazy(() => import("./pages/Folha"));
+const Beneficios = lazy(() => import("./pages/Beneficios"));
+const Desligamento = lazy(() => import("./pages/Desligamento"));
+const Relatorios = lazy(() => import("./pages/Relatorios"));
+const Auditoria = lazy(() => import("./pages/Auditoria"));
+const FeriadosPage = lazy(() => import("./pages/Feriados"));
+const Perfil = lazy(() => import("./pages/Perfil"));
+const Usuarios = lazy(() => import("./pages/Usuarios"));
+const Assinaturas = lazy(() => import("./pages/Assinaturas"));
+const PortalColaborador = lazy(() => import("./pages/PortalColaborador"));
+const Organograma = lazy(() => import("./pages/Organograma"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const GestaoDocumentos = lazy(() => import("./pages/GestaoDocumentos"));
+const IntegracaoContabil = lazy(() => import("./pages/IntegracaoContabil"));
+const ContratacaoDigital = lazy(() => import("./pages/ContratacaoDigital"));
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
+
 
 const queryClient = new QueryClient();
 
@@ -43,6 +52,7 @@ const App = () => (
           <AuthProvider>
             <Toaster />
             <Sonner />
+            <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/contratacao" element={<ContratacaoDigital />} />
@@ -74,6 +84,7 @@ const App = () => (
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
@@ -83,5 +94,6 @@ const App = () => (
 );
 
 export default App;
+
 
 
