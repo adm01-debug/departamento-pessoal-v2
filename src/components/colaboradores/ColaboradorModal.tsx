@@ -46,7 +46,7 @@ interface ColaboradorModalProps {
   onDelete?: (colaborador: Colaborador) => void;
 }
 
-export function ColaboradorModal({ colaborador, open, onOpenChange, onEdit, onDelete }: ColaboradorModalProps) {
+export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, open, onOpenChange, onEdit, onDelete }: ColaboradorModalProps) {
   if (!colaborador) return null;
 
   const colors = statusColors[colaborador.status];
@@ -305,8 +305,4 @@ function formatCurrency(value: number): string {
     style: 'currency', 
     currency: 'BRL' 
   }).format(value);
-}
-
-
-
-
+});
