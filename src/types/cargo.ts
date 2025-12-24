@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de cargos
+ * @module types/cargo
+ */
+
 export interface Cargo {
   id: string;
   nome: string;
@@ -30,3 +35,4 @@ export const NIVEIS_CARGO: Record<NonNullable<Cargo['nivel']>, string> = {
   gerente: 'Gerente',
   diretor: 'Diretor',
 };
+
