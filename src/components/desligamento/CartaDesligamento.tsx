@@ -33,5 +33,3 @@ function CartaDesligamento({ colaborador, empresa, data_desligamento, motivo }: 
   return <Button onClick={gerar} variant="outline" size="sm"><Download className="mr-2 h-4 w-4" />Carta</Button>;
 }
 export default memo(CartaDesligamento);
-
-
