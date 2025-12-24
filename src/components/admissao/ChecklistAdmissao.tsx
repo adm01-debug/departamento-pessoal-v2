@@ -52,6 +52,3 @@ function ChecklistAdmissao({ colaboradorId }: { colaboradorId: string }) {
 }
 
 export default memo(ChecklistAdmissao);
-
-
-
