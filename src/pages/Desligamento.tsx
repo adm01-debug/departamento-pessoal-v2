@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useMemo } from 'react';
 import { Plus, UserMinus, FileText, Calculator, CheckCircle, Loader2, DollarSign, Clock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -114,7 +115,9 @@ export default memo(function) DesligamentoPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <>
+        <SEOHead title="Desligamento" description="Processo de desligamento" />
+        <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -349,8 +352,10 @@ export default memo(function) DesligamentoPage() {
         onSubmit={handleNovoDesligamento}
       />
     </div>
-  );
+  
+      </>);
 }
+
 
 
 
