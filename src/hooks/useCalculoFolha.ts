@@ -56,7 +56,16 @@ interface ResumoFolha {
 // HOOK PRINCIPAL
 // =====================================================
 
-export function useCalculoFolha() {
+
+export interface UseCalculoFolhaReturn {
+  calcularFolha: (competencia: string, empresaId?: string) => Promise<FolhaPagamento | null>;
+  recalcularHolerite: (holeriteId: string, dados: Partial<Holerite>) => Promise<Holerite | null>;
+  simularCalculo: (colaborador: ColaboradorDB, competencia: string) => Promise<Holerite | null>;
+  calculating: boolean;
+  progress: number;
+}
+
+export function useCalculoFolha(): UseCalculoFolhaReturn {
   const [calculating, setCalculating] = useState(false);
   const [progress, setProgress] = useState(0);
   const { user } = useAuth();
@@ -621,6 +630,7 @@ export function useEventosVariaveis(competencia: string) {
 
   return { eventos, loading, fetchEventos, addEvento, removeEvento };
 }
+
 
 
 
