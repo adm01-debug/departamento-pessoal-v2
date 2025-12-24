@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Activity, User, Clock, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -48,7 +49,7 @@ const acaoColors: Record<string, string> = {
   sync: 'bg-info/20 text-info',
 };
 
-export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: AuditTrailProps) {
+export const AuditTrail = memo(function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: AuditTrailProps) {
   const { data: logs = [], isLoading } = useHistoricoRegistro(entidade, entidadeId);
 
   if (isLoading) {
@@ -141,6 +142,6 @@ export function AuditTrail({ entidade, entidadeId, maxItems = 10, className }: A
       </div>
     </ScrollArea>
   );
-}
+});
 
 export default AuditTrail;
