@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ interface EditarAdmissaoModalProps {
   onSave: (id: string, data: Partial<Admissao>) => void;
 }
 
-export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: EditarAdmissaoModalProps) {
+export const EditarAdmissaoModal = memo(function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: EditarAdmissaoModalProps) {
   const [formData, setFormData] = useState({
     nome: "",
     cargo: "",
@@ -361,8 +362,4 @@ export function EditarAdmissaoModal({ open, onOpenChange, admissao, onSave }: Ed
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
+});
