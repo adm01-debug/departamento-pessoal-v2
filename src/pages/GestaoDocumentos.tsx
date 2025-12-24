@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, memo, useEffect, useMemo } from 'react';
 import DOMPurify from 'dompurify';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -160,7 +161,9 @@ export default memo(function) GestaoDocumentos() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+      <>
+        <SEOHead title="Gestão de Documentos" description="Gerenciamento de documentos" />
+        <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -317,8 +320,10 @@ export default memo(function) GestaoDocumentos() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  
+      </>);
 }
+
 
 
 
