@@ -1,4 +1,8 @@
-import { useState, memo, memo, memo } from 'react';
+/**
+ * @fileoverview Customizador de widgets do dashboard com drag-and-drop
+ * @module components/dashboard/DashboardCustomizer
+ */
+import { useState, memo } from 'react';
 import {
   DndContext,
   DragEndEvent,
