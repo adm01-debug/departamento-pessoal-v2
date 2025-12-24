@@ -113,8 +113,6 @@ export function useFeriados(ano?: number) {
     queryKey: ['feriados', anoAtual],
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('feriados')
