@@ -1,4 +1,7 @@
-import { memo } from 'react';
+/**
+ * @fileoverview Gráfico de distribuição por departamento
+ * @module components/dashboard/DepartmentChart
+ */
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
 
