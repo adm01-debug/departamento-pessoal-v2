@@ -1,77 +1,41 @@
 /**
- * @file CardDescription.tsx
- * @description Descrição/subtítulo do card
- * @category Components/Card
+ * @fileoverview Descrição do card
+ * @module components/card/CardDescription
  */
-
-import React, { memo } from 'react';
-import { CardDescription as ShadcnCardDescription } from '@/components/ui/card';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Props do CardDescription
- */
-export interface CardDescriptionProps {
-  /** Texto da descrição */
-  children: React.ReactNode;
-  /** Classe adicional */
+/** Props do CardDescription */
+interface CardDescriptionProps {
+  /** Conteúdo da descrição */
+  children: ReactNode;
+  /** Classes CSS adicionais */
   className?: string;
-  /** Tamanho do texto */
-  size?: 'sm' | 'md' | 'lg';
-  /** Truncar texto */
-  truncate?: boolean;
-  /** Máximo de linhas */
+  /** Número máximo de linhas antes de truncar */
   maxLines?: number;
-  /** Alinhamento */
-  align?: 'left' | 'center' | 'right';
 }
 
-const sizeClasses = {
-  sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-base',
-};
-
-const alignClasses = {
-  left: 'text-left',
-  center: 'text-center',
-  right: 'text-right',
-};
-
 /**
- * Descrição/subtítulo do card
- * 
- * @example
- * ```tsx
- * <CardDescription size="md" maxLines={2}>
- *   Uma breve descrição do conteúdo...
- * </CardDescription>
- * ```
+ * Texto descritivo secundário para cards
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX da descrição
  */
 export const CardDescription = memo(function CardDescription({
   children,
   className,
-  size = 'md',
-  truncate = false,
   maxLines,
-  align = 'left',
 }: CardDescriptionProps) {
+  const lineClampClass = maxLines ? `line-clamp-${maxLines}` : '';
+
   return (
-    <ShadcnCardDescription
+    <p
       className={cn(
-        sizeClasses[size],
-        alignClasses[align],
-        'text-muted-foreground',
-        truncate && 'truncate',
-        maxLines && `line-clamp-${maxLines}`,
+        'text-sm text-muted-foreground',
+        lineClampClass,
         className
       )}
     >
       {children}
-    </ShadcnCardDescription>
+    </p>
   );
 });
-
-CardDescription.displayName = 'CardDescription';
-
-export default CardDescription;
