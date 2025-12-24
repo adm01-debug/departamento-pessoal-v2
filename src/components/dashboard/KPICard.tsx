@@ -1,5 +1,4 @@
 import { memo, useMemo } from 'react';
-import { memo, useMemo } from 'react';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +12,7 @@ interface KPICardProps {
   onClick?: () => void;
 }
 
-export function KPICard({ icon: Icon, label, value, subtitle, trend, colorClass = 'text-primary', onClick }: KPICardProps) {
+export const KPICard = memo(function KPICard({ icon: Icon, label, value, subtitle, trend, colorClass = 'text-primary', onClick }: KPICardProps) {
   return (
     <div 
       className={cn(
@@ -44,9 +43,4 @@ export function KPICard({ icon: Icon, label, value, subtitle, trend, colorClass 
       </div>
     </div>
   );
-}
-
-
-
-
-
+});
