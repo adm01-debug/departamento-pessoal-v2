@@ -28,7 +28,16 @@ export interface DadosCNPJ {
   data_abertura: string;
 }
 
-export function useConsultaCNPJ() {
+
+export interface UseConsultaCNPJReturn {
+  consultar: (cnpj: string) => Promise<DadosCNPJ | null>;
+  loading: boolean;
+  dados: DadosCNPJ | null;
+  error: string | null;
+  limpar: () => void;
+}
+
+export function useConsultaCNPJ(): UseConsultaCNPJReturn {
   const [loading, setLoading] = useState(false);
   const [dados, setDados] = useState<DadosCNPJ | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +117,7 @@ export function useConsultaCNPJ() {
     limpar,
   };
 }
+
 
 
 
