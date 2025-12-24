@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, useEffect, useRef, memo } from 'react';
 import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,7 +55,7 @@ interface Alert {
   icon: React.ElementType;
 }
 
-export function IndicatorAlertsCard({ 
+export const IndicatorAlertsCard = memo(function IndicatorAlertsCard({ 
   turnoverRate, 
   absenteeismRate
 }: IndicatorAlertsCardProps) {
@@ -453,11 +454,4 @@ export function IndicatorAlertsCard({
       <AlertHistoryModal open={historyOpen} onOpenChange={setHistoryOpen} />
     </>
   );
-}
-
-
-
-
-
-
-
+});
