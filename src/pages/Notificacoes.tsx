@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect, useEffect } from 'react';
 import { 
   Bell, Check, CheckCheck, Trash2, Filter, 
@@ -75,7 +76,9 @@ export default function Notificacoes() {
   };
 
   return (
-    <div className="space-y-6">
+      <>
+        <SEOHead title="Notificações" description="Central de notificações" />
+        <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -209,8 +212,10 @@ export default function Notificacoes() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  
+      </>);
 }
+
 
 
 
