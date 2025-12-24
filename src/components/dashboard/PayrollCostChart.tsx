@@ -1,4 +1,7 @@
-import { memo } from 'react';
+/**
+ * @fileoverview Gráfico de custos da folha de pagamento
+ * @module components/dashboard/PayrollCostChart
+ */
 import { memo } from 'react';
 import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
