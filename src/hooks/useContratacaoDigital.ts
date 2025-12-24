@@ -166,6 +166,7 @@ export function useContratacaoDigital(): UseContratacaoDigitalReturn {
     },
     onSuccess: () => {
       toast.success('Documento atualizado!');
+      queryClient.invalidateQueries({ queryKey: ['admissao-tokens'] });
     },
     onError: () => {
       toast.error('Erro ao atualizar documento');
