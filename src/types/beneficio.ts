@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Tipos para gestão de benefícios
+ * @module types/beneficio
+ */
+
 export interface Beneficio {
   id: string;
   colaborador_id: string;
@@ -31,3 +36,4 @@ export const TIPOS_BENEFICIO: Record<Beneficio['tipo'], string> = {
   gym: 'Academia/Gympass',
   outro: 'Outro',
 };
+
