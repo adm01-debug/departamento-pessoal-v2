@@ -1,69 +1,94 @@
 /**
- * @fileoverview Badge de contagem
- * @module components/badges/CountBadge
+ * @file CountBadge.tsx
+ * @description Badge numérico com contador
+ * @category Components/Badges
  */
-import { memo } from 'react';
+
+import React, { memo, useMemo } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-/** Props do CountBadge */
-interface CountBadgeProps {
-  /** Valor numérico a exibir */
+/**
+ * Props do CountBadge
+ */
+export interface CountBadgeProps {
+  /** Valor do contador */
   count: number;
-  /** Valor máximo antes de exibir "+" */
+  /** Valor máximo antes de mostrar "+" */
   max?: number;
-  /** Variante de cor */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success';
-  /** Tamanho do badge */
+  /** Variante visual */
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline';
+  /** Tamanho */
   size?: 'sm' | 'md' | 'lg';
-  /** Classes CSS adicionais */
-  className?: string;
   /** Se deve mostrar zero */
   showZero?: boolean;
+  /** Classe adicional */
+  className?: string;
+  /** Formatação customizada */
+  formatValue?: (count: number) => string;
+  /** Se deve pulsar quando > 0 */
+  pulse?: boolean;
+  /** Cor de fundo customizada */
+  color?: string;
 }
 
-/** Mapeamento de variantes para estilos */
-const variantStyles: Record<string, string> = {
-  default: 'bg-muted text-muted-foreground',
-  primary: 'bg-primary text-primary-foreground',
-  secondary: 'bg-secondary text-secondary-foreground',
-  destructive: 'bg-destructive text-destructive-foreground',
-  success: 'bg-green-500 text-white',
-};
-
-/** Mapeamento de tamanhos */
-const sizeStyles: Record<string, string> = {
+const sizeClasses = {
   sm: 'h-4 min-w-4 text-[10px] px-1',
   md: 'h-5 min-w-5 text-xs px-1.5',
   lg: 'h-6 min-w-6 text-sm px-2',
 };
 
 /**
- * Badge que exibe um contador numérico
- * @param props - Propriedades do componente
- * @returns Elemento JSX do badge ou null
+ * Badge numérico com contador
+ * 
+ * @example
+ * ```tsx
+ * <CountBadge count={5} max={99} variant="destructive" />
+ * <CountBadge count={150} max={99} /> // Exibe "99+"
+ * ```
  */
 export const CountBadge = memo(function CountBadge({
   count,
   max = 99,
   variant = 'default',
   size = 'md',
-  className,
   showZero = false,
+  className,
+  formatValue,
+  pulse = false,
+  color,
 }: CountBadgeProps) {
-  if (count === 0 && !showZero) return null;
+  const displayValue = useMemo(() => {
+    if (formatValue) {
+      return formatValue(count);
+    }
+    if (count > max) {
+      return `${max}+`;
+    }
+    return count.toString();
+  }, [count, max, formatValue]);
 
-  const displayValue = count > max ? `${max}+` : count.toString();
+  // Não renderiza se count é 0 e showZero é false
+  if (count === 0 && !showZero) {
+    return null;
+  }
 
   return (
-    <span
+    <Badge
+      variant={variant}
       className={cn(
         'inline-flex items-center justify-center rounded-full font-medium',
-        variantStyles[variant],
-        sizeStyles[size],
+        sizeClasses[size],
+        pulse && count > 0 && 'animate-pulse',
         className
       )}
+      style={color ? { backgroundColor: color } : undefined}
     >
       {displayValue}
-    </span>
+    </Badge>
   );
 });
+
+CountBadge.displayName = 'CountBadge';
+
+export default CountBadge;
