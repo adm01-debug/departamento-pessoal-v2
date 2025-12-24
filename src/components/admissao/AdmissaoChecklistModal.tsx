@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo, memo } from 'react';
 import {
   Dialog,
@@ -129,7 +130,7 @@ const initialChecklist: ChecklistStage[] = [
   },
 ];
 
-export function AdmissaoChecklistModal({
+export const AdmissaoChecklistModal = memo(function AdmissaoChecklistModal({
   open,
   onOpenChange,
   admissao,
@@ -370,9 +371,4 @@ export function AdmissaoChecklistModal({
       </DialogContent>
     </Dialog>
   );
-}
-
-
-
-
-
+});
