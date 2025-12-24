@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useState, memo, memo } from 'react';
 import { 
   CheckCircle, XCircle, Clock, AlertTriangle, History, 
@@ -32,7 +33,7 @@ const statusConfig: Record<StatusFerias, { label: string; icon: React.ElementTyp
   cancelada: { label: 'Cancelada', icon: XCircle, color: 'text-destructive' },
 };
 
-export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: WorkflowAprovacaoFeriasProps) {
+export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: WorkflowAprovacaoFeriasProps) {
   const { 
     aprovarFerias, 
     rejeitarFerias,
@@ -232,9 +233,4 @@ export function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: Workflow
       </Dialog>
     </>
   );
-}
-
-
-
-
-
+});
