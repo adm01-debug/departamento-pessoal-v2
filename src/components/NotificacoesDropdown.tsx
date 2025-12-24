@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, memo } from 'react';
 import { Bell, Check, CheckCheck, Trash2, RefreshCw, Calendar, FileText, Users, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +23,7 @@ const tipoConfig: Record<string, { icon: typeof Bell; color: string; label: stri
   periodo_aquisitivo: { icon: Calendar, color: 'text-purple-500', label: 'Período Aquisitivo' },
 };
 
-export function NotificacoesDropdown() {
+export const NotificacoesDropdown = memo(function NotificacoesDropdown() {
   const {
     notificacoes,
     isLoading,
@@ -164,5 +164,4 @@ export function NotificacoesDropdown() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
+});
