@@ -19,7 +19,7 @@ interface TurnoverEvolutionChartProps {
   loading?: boolean;
 }
 
-export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChartProps) {
+export const TurnoverEvolutionChart = memo(function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChartProps) {
   const [selectedMonth, setSelectedMonth] = useState<{ mes: string; mesLabel: string } | null>(null);
   
   const { chartData, avgRate, trend } = useMemo(() => {
@@ -186,10 +186,4 @@ export function TurnoverEvolutionChart({ data, loading }: TurnoverEvolutionChart
       />
     </>
   );
-}
-
-
-
-
-
-
+});
