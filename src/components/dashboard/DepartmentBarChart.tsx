@@ -18,7 +18,7 @@ interface DepartmentBarChartProps {
   colaboradores?: typeof [];
 }
 
-export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartProps) {
+export const DepartmentBarChart = memo(function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartProps) {
   const data = useMemo(() => {
     const deptCount: Record<string, number> = {};
     
@@ -77,9 +77,4 @@ export function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartPro
       </ResponsiveContainer>
     </div>
   );
-}
-
-
-
-
-
+});
