@@ -2,7 +2,9 @@ const Index = () => {
   useEffect(() => { document.title = 'Início | DP System'; }, []);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+      <>
+        <SEOHead title="Início" description="Página inicial do sistema" />
+        <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center animate-fade-in">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
           <span className="status-dot status-dot-success" />
@@ -18,9 +20,11 @@ const Index = () => {
         </p>
       </div>
     </div>
-  );
+  
+      </>);
 };
 
 export default Index;
+
 
 
