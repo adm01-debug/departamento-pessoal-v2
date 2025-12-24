@@ -1,71 +1,41 @@
 /**
- * @file CardBody.tsx
- * @description Corpo/conteúdo principal do card
- * @category Components/Card
+ * @fileoverview Corpo do card
+ * @module components/card/CardBody
  */
-
-import React, { memo } from 'react';
-import { CardContent } from '@/components/ui/card';
+import { memo, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Props do CardBody
- */
-export interface CardBodyProps {
-  /** Conteúdo do card */
-  children: React.ReactNode;
-  /** Classe adicional */
+/** Props do CardBody */
+interface CardBodyProps {
+  /** Conteúdo do corpo */
+  children: ReactNode;
+  /** Classes CSS adicionais */
   className?: string;
   /** Padding interno */
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  /** Se o conteúdo deve ter scroll */
-  scrollable?: boolean;
-  /** Altura máxima (quando scrollable) */
-  maxHeight?: string | number;
 }
 
-const paddingClasses = {
+/** Mapeamento de paddings */
+const paddingStyles: Record<string, string> = {
   none: 'p-0',
   sm: 'p-3',
-  md: 'p-6',
-  lg: 'p-8',
+  md: 'p-4',
+  lg: 'p-6',
 };
 
 /**
- * Corpo/conteúdo principal do card
- * 
- * @example
- * ```tsx
- * <CardBody padding="md">
- *   <p>Conteúdo do card...</p>
- * </CardBody>
- * ```
+ * Corpo do card para conteúdo principal
+ * @param props - Propriedades do componente
+ * @returns Elemento JSX do corpo
  */
 export const CardBody = memo(function CardBody({
   children,
   className,
   padding = 'md',
-  scrollable = false,
-  maxHeight,
 }: CardBodyProps) {
-  const heightStyle = maxHeight
-    ? { maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight }
-    : undefined;
-
   return (
-    <CardContent
-      className={cn(
-        paddingClasses[padding],
-        scrollable && 'overflow-y-auto',
-        className
-      )}
-      style={heightStyle}
-    >
+    <div className={cn(paddingStyles[padding], className)}>
       {children}
-    </CardContent>
+    </div>
   );
 });
-
-CardBody.displayName = 'CardBody';
-
-export default CardBody;
