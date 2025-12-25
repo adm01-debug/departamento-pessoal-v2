@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para documentos
+ * @module lib/schemasDocumento
+ */
 import { z } from 'zod';
 
 export const documentoSchema = z.object({
