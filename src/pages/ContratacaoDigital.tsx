@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect } from 'react';
+import { useState, memo, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { useSearchParams } from 'react-router-dom';
 import { 
