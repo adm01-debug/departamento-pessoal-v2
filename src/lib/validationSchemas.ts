@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schemas de validação de formulários
+ * @module lib/validationSchemas
+ */
 import { z } from 'zod';
 
 // ============================================
