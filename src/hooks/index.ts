@@ -9,3 +9,6 @@ export { usePrevious } from './usePrevious';
 export { useToggle } from './useToggle';
 export { useMediaQuery, useBreakpoint, useIsMobile, useIsTablet, useIsDesktop } from './useMediaQuery';
 export { useVirtualList } from './useVirtualList';
+
+export * from './useTheme';
+export * from './useLazyComponent';
