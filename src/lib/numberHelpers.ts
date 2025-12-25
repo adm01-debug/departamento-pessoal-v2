@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Funções auxiliares numéricas
+ * @module lib/numberHelpers
+ */
+/**
  * Formata número como moeda brasileira
  */
 export function formatarMoeda(valor: number): string {
