@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useEffect } from 'react';
+import { useState, memo, useEffect, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { 
   FileText, Upload, Download, AlertTriangle, CheckCircle, 
