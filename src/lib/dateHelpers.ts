@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Funções auxiliares de data
+ * @module lib/dateHelpers
+ */
 import { format, parseISO, differenceInDays, differenceInMonths, differenceInYears, addDays, addMonths, startOfMonth, endOfMonth, isWeekend, isSameDay, isAfter, isBefore } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
