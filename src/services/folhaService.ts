@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de folha de pagamento
+ * @module services/folhaService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { Holerite, FolhaPagamento } from '@/types/folha';
 import { logger } from '@/lib/logger';
