@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para consulta de CNPJ
+ * @module hooks/useConsultaCNPJ
+ */
 import { useState } from 'react';
 import { toast } from 'sonner';
 
