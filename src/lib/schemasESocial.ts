@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para eSocial
+ * @module lib/schemasESocial
+ */
 import { z } from 'zod';
 
 export const eventoESocialSchema = z.object({
