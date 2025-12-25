@@ -11,7 +11,7 @@ export default function Feriados() {
         <SEOHead title="Feriados" description="Calendário de feriados" />
         <>
       
-      <div className="p-6 space-y-6 animate-fade-in">
+      <div id="main-content" className="p-6 space-y-6 animate-fade-in">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">
             Calendário de Feriados
