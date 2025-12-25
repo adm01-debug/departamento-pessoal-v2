@@ -124,7 +124,7 @@ export default function Usuarios() {
     return (
       <>
         <SEOHead title="Acesso Restrito | DP System" description="Acesso restrito a administradores" />
-        <div className="p-6 flex items-center justify-center h-[calc(100vh-100px)]">
+        <div id="main-content" className="p-6 flex items-center justify-center h-[calc(100vh-100px)]">
         <Card className="max-w-md">
           <CardHeader className="text-center">
             <Shield className="w-12 h-12 mx-auto text-destructive mb-4" />
