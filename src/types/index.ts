@@ -15,3 +15,8 @@ export * from './notificacao';
 
 export * from './pagination';
 export * from './api';
+
+export * from './entities';
+export * from './forms';
+export * from './routes';
+export * from './permissions';
