@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Sistema de logging
+ * @module lib/logger
+ */
 // Logger centralizado para o sistema
 // Em desenvolvimento: console.log
 // Em produção: pode ser integrado com serviço de monitoramento
