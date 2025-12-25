@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SEOHead } from '@/components/SEOHead';
 import { 
   Shield, Users, Search, Plus, Crown, UserCog, Building2, User,
