@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Cálculos trabalhistas (INSS, IRRF, FGTS)
+ * @module lib/calculosTrabalhistas
+ */
 // Funções de cálculo trabalhista - INSS, IRRF, FGTS
 
 import { TabelaINSS, TabelaIRRF, ResultadoCalculoINSS, ResultadoCalculoIRRF } from '@/types/folha';
