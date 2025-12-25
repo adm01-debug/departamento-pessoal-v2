@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para integração eSocial
+ * @module hooks/useESocial
+ */
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
