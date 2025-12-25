@@ -23,3 +23,9 @@ export { Select } from './Select';
 export { SortableTable } from './SortableTable';
 export { StatusBadge } from './StatusBadge';
 export { TableActions } from './TableActions';
+
+export { ThemeToggle } from './ThemeToggle';
+export { SkipLink } from './SkipLink';
+export { VisuallyHidden } from './VisuallyHidden';
+export { FocusTrap } from './FocusTrap';
+export { LiveRegion, AlertRegion } from './LiveRegion';
