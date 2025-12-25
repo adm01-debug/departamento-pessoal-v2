@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Eventos eSocial principais
+ * @module lib/esocialEventos
+ */
+/**
  * Geradores de XML para eventos eSocial adicionais
  * S-2205: Alteração de Dados Cadastrais
  * S-2206: Alteração Contratual
