@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para empresas
+ * @module lib/schemasEmpresa
+ */
 import { z } from 'zod';
 import { validarCNPJ } from './validators';
 
