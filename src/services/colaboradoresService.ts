@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de colaboradores
+ * @module services/colaboradoresService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { Colaborador, ColaboradorFormData, ColaboradorFilters } from '@/types/colaborador';
 import { logger } from '@/lib/logger';
