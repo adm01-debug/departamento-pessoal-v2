@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para usuários
+ * @module types/usuario
+ */
 export interface Usuario {
   id: string;
   email: string;
