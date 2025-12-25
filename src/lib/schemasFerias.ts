@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para férias
+ * @module lib/schemasFerias
+ */
 import { z } from 'zod';
 
 export const feriasSchema = z.object({
