@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para desligamentos
+ * @module lib/schemasDesligamento
+ */
 import { z } from 'zod';
 
 export const desligamentoSchema = z.object({
