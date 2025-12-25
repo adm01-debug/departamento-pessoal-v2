@@ -142,7 +142,7 @@ export default memo(function) AdmissaoPage() {
   return (
     <>
       <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
-    <div className="p-6 space-y-6 animate-fade-in">
+    <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
