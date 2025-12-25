@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações eSocial
+ * @module services/esocialService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { EventoESocial, EventoESocialFilters, LoteESocial, EventoESocialTipo } from '@/types/esocial';
 import { logger } from '@/lib/logger';
