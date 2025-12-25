@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Eventos eSocial TSV
+ * @module lib/esocialEventosTSV
+ */
 // S-2300 - TSV Início
 export function gerarEventoS2300(tsv: { cpf: string; nome: string; codCateg: number; dtInicio: string }): string {
   return `<?xml version="1.0"?>
