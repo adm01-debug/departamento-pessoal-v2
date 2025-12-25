@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para geração de relatórios
+ * @module services/relatoriosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
