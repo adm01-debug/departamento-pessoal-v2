@@ -12,3 +12,6 @@ export * from './departamento';
 export * from './cargo';
 export * from './feriado';
 export * from './notificacao';
+
+export * from './pagination';
+export * from './api';
