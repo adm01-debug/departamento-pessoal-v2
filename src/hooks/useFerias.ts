@@ -122,6 +122,7 @@ export const useFerias = (): UseFeriasReturn => {
           `)
           .order('data_inicio', { ascending: true ,
     staleTime: 5 * 60 * 1000,
+    gcTime: 1000 * 60 * 30, // 30 minutos
     retry: 3});
         
         if (empresaAtualId) {
