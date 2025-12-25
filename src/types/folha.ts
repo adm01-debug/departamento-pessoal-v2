@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para folha de pagamento
+ * @module types/folha
+ */
 export interface Holerite {
   id: string;
   colaborador_id: string;
