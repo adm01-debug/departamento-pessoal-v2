@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useMemo } from 'react';
+import { useState, memo, useEffect, useMemo, useCallback } from 'react';
 import { 
   Users, 
   UserPlus, 
