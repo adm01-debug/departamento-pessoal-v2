@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Geração de documentos PDF
+ * @module lib/documentosPDF
+ */
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 // Extensão de tipo para jspdf-autotable
