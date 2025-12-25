@@ -29,3 +29,7 @@ export { SkipLink } from './SkipLink';
 export { VisuallyHidden } from './VisuallyHidden';
 export { FocusTrap } from './FocusTrap';
 export { LiveRegion, AlertRegion } from './LiveRegion';
+export { ConfirmationDialog } from './ConfirmationDialog';
+export { DataTable } from './DataTable';
+export { EmptyState } from './EmptyState';
+export { LoadingSpinner } from './LoadingSpinner';
