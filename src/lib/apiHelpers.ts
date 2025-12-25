@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Funções auxiliares de API
+ * @module lib/apiHelpers
+ */
+/**
  * Helper para tratamento de erros de API
  */
 export function handleApiError(error: unknown): string {
