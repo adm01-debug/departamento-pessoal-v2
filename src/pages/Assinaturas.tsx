@@ -120,7 +120,7 @@ export default memo(function) Assinaturas() {
   return (
       <>
         <SEOHead title="Assinaturas Digitais" description="Gestão de assinaturas digitais" />
-        <div className="p-6 space-y-6 animate-fade-in">
+        <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
