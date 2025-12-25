@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para ponto
+ * @module types/ponto
+ */
 export interface RegistroPonto {
   id: string;
   colaborador_id: string;
