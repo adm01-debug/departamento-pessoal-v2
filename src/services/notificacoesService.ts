@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Service para operações de notificações
+ * @module services/notificacoesService
+ */
+/**
  * Serviço para envio de notificações
  */
 
