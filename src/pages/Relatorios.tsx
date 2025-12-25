@@ -312,7 +312,7 @@ export default memo(function) Relatorios() {
   return (
     <>
       <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
-    <div className="p-6 space-y-6 animate-fade-in">
+    <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
