@@ -183,7 +183,7 @@ export default memo(function) Ponto() {
   return (
     <>
       <SEOHead title="Ponto | DP System" description="Gestão de ponto e jornada de trabalho" />
-    <div className="p-6 space-y-6 animate-fade-in">
+    <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
