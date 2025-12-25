@@ -31,3 +31,5 @@ export * from './useFetch';
 export * from './useEventListener';
 export * from './useIsOnline';
 export * from './useClickAway';
+export * from './useTableSort';
+export * from './useTableFilter';
