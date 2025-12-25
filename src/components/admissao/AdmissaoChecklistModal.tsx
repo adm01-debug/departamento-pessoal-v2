@@ -1,4 +1,4 @@
-import { useState, memo, memo } from 'react';
+import { useState, memo } from 'react';
 import {
   Dialog,
   DialogContent,
