@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para documentos de colaborador
+ * @module hooks/useDocumentosColaborador
+ */
 import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
