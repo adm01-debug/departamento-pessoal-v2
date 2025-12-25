@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schemas Zod centralizados
+ * @module lib/zodSchemas
+ */
 import { z } from 'zod';
 
 const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
