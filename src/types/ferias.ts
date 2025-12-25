@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para férias
+ * @module types/ferias
+ */
 export interface Ferias {
   id: string;
   colaborador_id: string;
