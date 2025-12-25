@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para integração de auditoria
+ * @module hooks/useAuditoriaIntegration
+ */
 import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
