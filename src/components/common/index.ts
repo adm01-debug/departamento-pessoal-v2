@@ -45,3 +45,6 @@ export { ActionButton } from './ActionButton';
 export { IconButton } from './IconButton';
 export { AlertBanner } from './AlertBanner';
 export { Chip } from './Chip';
+export { SortableColumn } from './SortableColumn';
+export { NoData } from './NoData';
+export { ErrorMessage } from './ErrorMessage';
