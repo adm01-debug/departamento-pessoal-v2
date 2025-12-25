@@ -766,7 +766,7 @@ export default memo(function) ContratacaoDigital() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="p-6 rounded-lg border bg-muted/30">
+              <div id="main-content" className="p-6 rounded-lg border bg-muted/30">
                 <h3 className="font-semibold mb-4">Resumo do Contrato</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
