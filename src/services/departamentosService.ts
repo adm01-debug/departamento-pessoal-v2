@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de departamentos
+ * @module services/departamentosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
