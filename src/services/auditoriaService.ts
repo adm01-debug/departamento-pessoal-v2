@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de auditoria
+ * @module services/auditoriaService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { AuditLog, AuditFilters, AuditStats } from '@/types/auditoria';
 import { logger } from '@/lib/logger';
