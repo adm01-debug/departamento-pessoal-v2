@@ -48,3 +48,6 @@ export { Chip } from './Chip';
 export { SortableColumn } from './SortableColumn';
 export { NoData } from './NoData';
 export { ErrorMessage } from './ErrorMessage';
+export { Grid } from './Grid';
+export { Flex } from './Flex';
+export { Container } from './Container';
