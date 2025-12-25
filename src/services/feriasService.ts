@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de férias
+ * @module services/feriasService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { Ferias, FeriasFormData, FeriasFilters } from '@/types/ferias';
 import { logger } from '@/lib/logger';
