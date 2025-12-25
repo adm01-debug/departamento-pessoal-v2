@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para feriados
+ * @module types/feriado
+ */
 export interface Feriado {
   id: string;
   data: string;
