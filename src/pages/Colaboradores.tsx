@@ -293,7 +293,7 @@ export default memo(function) Colaboradores() {
     return (
     <>
       <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
-      <div className="p-6 flex items-center justify-center min-h-[400px]">
+      <div id="main-content" className="p-6 flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Carregando colaboradores...</p>
