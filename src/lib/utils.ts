@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Utilitários gerais
+ * @module lib/utils
+ */
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
