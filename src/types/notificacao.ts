@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para notificações
+ * @module types/notificacao
+ */
 export interface Notificacao {
   id: string;
   titulo: string;
