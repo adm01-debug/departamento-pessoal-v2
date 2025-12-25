@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para folha de pagamento
+ * @module lib/schemasFolha
+ */
 import { z } from 'zod';
 
 export const holeriteSchema = z.object({
