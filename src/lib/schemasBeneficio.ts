@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para benefícios
+ * @module lib/schemasBeneficio
+ */
 import { z } from 'zod';
 
 export const beneficioSchema = z.object({
