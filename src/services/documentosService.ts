@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de documentos
+ * @module services/documentosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
