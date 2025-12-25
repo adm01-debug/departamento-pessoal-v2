@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de cargos
+ * @module services/cargosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
