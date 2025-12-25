@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de ponto
+ * @module services/pontoService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { RegistroPonto, PontoFilters } from '@/types/ponto';
 import { logger } from '@/lib/logger';
