@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useMemo } from 'react';
+import { useState, memo, useEffect, useMemo, useCallback } from 'react';
 import { Plus, AlertTriangle, Calendar, FileText, CheckCircle, XCircle, Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
