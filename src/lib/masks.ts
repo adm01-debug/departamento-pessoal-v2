@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Máscaras de input
+ * @module lib/masks
+ */
 // Mask utility functions for Brazilian document formats
 
 export type MaskType = 'cpf' | 'cnpj' | 'cpfCnpj' | 'phone' | 'cep' | 'date' | 'currency' | 'rg' | 'pis' | 'tituloEleitor' | 'cnh';
