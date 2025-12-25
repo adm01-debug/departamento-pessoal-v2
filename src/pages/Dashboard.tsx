@@ -104,7 +104,7 @@ export default memo(function) Dashboard() {
   return (
     <>
       <SEOHead title="Dashboard | DP System" description="Painel de controle do Departamento Pessoal" />
-    <div className="p-6 space-y-6 animate-fade-in">
+    <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
