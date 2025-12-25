@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Tipos para auditoria
+ * @module types/auditoria
+ */
 export interface AuditLog {
   id: string;
   usuario_id: string;
