@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para departamentos
+ * @module lib/schemasDepartamento
+ */
 import { z } from 'zod';
 
 export const departamentoSchema = z.object({
