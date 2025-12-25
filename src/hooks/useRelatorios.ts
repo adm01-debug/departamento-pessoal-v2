@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para geração de relatórios
+ * @module hooks/useRelatorios
+ */
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { exportToExcel, exportToPDF, exportToCSV, formatters, ExportColumn } from '@/lib/exportUtils';
