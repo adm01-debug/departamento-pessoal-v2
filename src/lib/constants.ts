@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Constantes do sistema
+ * @module lib/constants
+ */
 // Status do Colaborador
 export const StatusColaborador = {
   ATIVO: 'ativo',
