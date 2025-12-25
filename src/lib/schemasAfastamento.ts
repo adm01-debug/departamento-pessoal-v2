@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para afastamentos
+ * @module lib/schemasAfastamento
+ */
 import { z } from 'zod';
 
 export const afastamentoSchema = z.object({
