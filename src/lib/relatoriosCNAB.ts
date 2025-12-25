@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Geração de relatórios CNAB
+ * @module lib/relatoriosCNAB
+ */
 interface EmpresaCNAB {
   banco: string;
   cnpj: string;
