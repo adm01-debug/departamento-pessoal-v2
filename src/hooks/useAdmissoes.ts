@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para gerenciamento de admissões
+ * @module hooks/useAdmissoes
+ */
 import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
