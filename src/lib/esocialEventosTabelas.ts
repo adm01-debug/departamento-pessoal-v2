@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Eventos eSocial tabelas
+ * @module lib/esocialEventosTabelas
+ */
 import { Colaborador } from '@/types/colaborador';
 import { Empresa } from '@/types/empresa';
 
