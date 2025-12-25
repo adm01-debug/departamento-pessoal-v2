@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schemas de validação gerais
+ * @module lib/schemasValidacao
+ */
 import { z } from 'zod';
 
 // Schemas de validação reutilizáveis
