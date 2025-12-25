@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Configuração do React Query
+ * @module lib/queryClient
+ */
 import { QueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 
