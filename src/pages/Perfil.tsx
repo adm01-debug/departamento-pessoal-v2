@@ -206,7 +206,7 @@ export default memo(function) Perfil() {
   };
 
   return (
-    <div className="space-y-6">
+    <div id="main-content" className="space-y-6">
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}>
         <DialogContent className="sm:max-w-md">
