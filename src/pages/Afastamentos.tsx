@@ -172,7 +172,7 @@ export default memo(function) Afastamentos() {
   return (
     <>
       <SEOHead title="Afastamentos | DP System" description="Gestão de afastamentos" />
-    <div className="p-6 space-y-6 animate-fade-in">
+    <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
