@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de benefícios
+ * @module services/beneficiosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
