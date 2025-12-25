@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Funções auxiliares de string
+ * @module lib/stringHelpers
+ */
+/**
  * Capitaliza primeira letra
  */
 export function capitalizar(str: string): string {
