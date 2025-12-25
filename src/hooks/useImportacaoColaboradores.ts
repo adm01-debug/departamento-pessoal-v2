@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para importação de colaboradores
+ * @module hooks/useImportacaoColaboradores
+ */
 import { logger } from '@/lib/logger';
 import { useState, useCallback } from 'react';
 import * as XLSX from 'xlsx';
