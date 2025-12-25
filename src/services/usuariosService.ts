@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de usuários
+ * @module services/usuariosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
