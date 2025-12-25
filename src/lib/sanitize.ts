@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Funções de sanitização
+ * @module lib/sanitize
+ */
+/**
  * Utilitários para sanitização de inputs
  * Previne XSS e injection attacks
  */
