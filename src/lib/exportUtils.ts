@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Utilitários de exportação
+ * @module lib/exportUtils
+ */
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
