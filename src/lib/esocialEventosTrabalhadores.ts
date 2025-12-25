@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Eventos eSocial trabalhadores
+ * @module lib/esocialEventosTrabalhadores
+ */
 import { Colaborador } from '@/types/colaborador';
 
 // S-2190 - Registro Preliminar de Trabalhador
