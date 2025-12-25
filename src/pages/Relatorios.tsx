@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect } from 'react';
+import { useState, memo, useEffect, useCallback } from 'react';
 import { 
   FileText, Download, Calendar, Users, Wallet, Clock, Umbrella, Heart, 
   UserMinus, BarChart3, Plus, Loader2, FileSpreadsheet, File, ChevronDown,
