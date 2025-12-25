@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de afastamentos
+ * @module services/afastamentosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
