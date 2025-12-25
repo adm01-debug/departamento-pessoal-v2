@@ -51,7 +51,7 @@ export const MiniCalendar = memo(function MiniCalendar({ eventos, mes = 11, ano 
       <h4 className="text-sm font-semibold text-foreground capitalize">{nomeMes}</h4>
       
       {/* Header */}
-      <div className="grid grid-cols-7 gap-1">
+      <div role="grid" aria-label="Calendário" className="grid grid-cols-7 gap-1">
         {diasSemana.map(dia => (
           <div key={dia} className="text-center text-xs text-muted-foreground font-medium py-1">
             {dia}
@@ -60,7 +60,7 @@ export const MiniCalendar = memo(function MiniCalendar({ eventos, mes = 11, ano 
       </div>
 
       {/* Days */}
-      <div className="grid grid-cols-7 gap-1">
+      <div role="grid" aria-label="Calendário" className="grid grid-cols-7 gap-1">
         {dias.map((dia, index) => {
           if (dia === null) {
             return <div key={`empty-${index}`} className="h-8" />;
