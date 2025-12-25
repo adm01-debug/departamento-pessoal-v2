@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para gerenciamento de colaboradores
+ * @module hooks/useColaboradores
+ */
 import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
