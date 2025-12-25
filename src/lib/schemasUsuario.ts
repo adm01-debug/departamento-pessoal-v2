@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schema Zod para usuários
+ * @module lib/schemasUsuario
+ */
 import { z } from 'zod';
 
 export const usuarioSchema = z.object({
