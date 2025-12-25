@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Schemas de validação Zod
+ * @module lib/schemas
+ */
 import { z } from 'zod';
 
 // Validadores base
