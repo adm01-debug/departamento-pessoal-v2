@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Eventos eSocial periódicos
+ * @module lib/esocialEventosPeriodicos
+ */
+/**
  * Eventos Periódicos do eSocial
  * S-1200 a S-1299
  */
