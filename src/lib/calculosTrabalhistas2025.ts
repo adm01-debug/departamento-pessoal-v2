@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Cálculos trabalhistas atualizados 2025
+ * @module lib/calculosTrabalhistas2025
+ */
 // =====================================================
 // CÁLCULOS TRABALHISTAS 2025
 // =====================================================
