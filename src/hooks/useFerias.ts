@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hook para gerenciamento de férias
+ * @module hooks/useFerias
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
