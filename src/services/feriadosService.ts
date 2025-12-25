@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Service para operações de feriados
+ * @module services/feriadosService
+ */
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
