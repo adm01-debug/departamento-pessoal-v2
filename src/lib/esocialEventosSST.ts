@@ -1,4 +1,8 @@
 /**
+ * @fileoverview Eventos eSocial SST
+ * @module lib/esocialEventosSST
+ */
+/**
  * Eventos SST do eSocial
  * S-2210 a S-2240
  */
