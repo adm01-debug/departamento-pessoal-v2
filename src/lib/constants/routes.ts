@@ -1,0 +1,1 @@
+export const ROUTES = { HOME: '/', DASHBOARD: '/dashboard', COLABORADORES: '/colaboradores', CARGOS: '/cargos', DEPARTAMENTOS: '/departamentos', FOLHA: '/folha', FERIAS: '/ferias', BENEFICIOS: '/beneficios', ADMISSOES: '/admissoes', DESLIGAMENTOS: '/desligamentos', RELATORIOS: '/relatorios', CONFIGURACOES: '/configuracoes', LOGIN: '/login', FORGOT_PASSWORD: '/forgot-password' };
