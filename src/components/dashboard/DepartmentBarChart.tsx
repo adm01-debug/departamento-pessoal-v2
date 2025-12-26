@@ -1,8 +1,5 @@
-import { memo } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-
-import { useMemo } from 'react';
 
 const colors = [
   'hsl(var(--primary))',
@@ -14,8 +11,13 @@ const colors = [
   'hsl(var(--loggi))',
 ];
 
+interface Colaborador {
+  departamento: string;
+  [key: string]: any;
+}
+
 interface DepartmentBarChartProps {
-  colaboradores?: typeof [];
+  colaboradores?: Colaborador[];
 }
 
 export const DepartmentBarChart = memo(function DepartmentBarChart({ colaboradores = [] }: DepartmentBarChartProps) {

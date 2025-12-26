@@ -25,7 +25,7 @@ const etapaColors: Record<string, string> = {
   'eSocial': 'bg-primary/20 border-primary',
 };
 
-export default memo(function) AdmissaoPage() {
+const AdmissaoPage = memo(function AdmissaoPage() {
   useEffect(() => {
     document.title = 'Admissões | DP System';
   }, []);

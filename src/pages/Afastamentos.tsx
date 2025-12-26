@@ -22,7 +22,7 @@ import {
   statusAfastamentoColors
 } from '@/types/afastamento';
 
-export default memo(function) Afastamentos() {
+const Afastamentos = memo(function Afastamentos() {
   useEffect(() => {
     document.title = 'Afastamentos | DP System';
   }, []);

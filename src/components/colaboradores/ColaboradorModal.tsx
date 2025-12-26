@@ -220,7 +220,7 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
       </DialogContent>
     </Dialog>
   );
-}
+});
 
 // Componentes auxiliares
 function Section({ title, icon: Icon, children }: { title: string; icon: typeof User; children: React.ReactNode }) {
@@ -305,4 +305,4 @@ function formatCurrency(value: number): string {
     style: 'currency', 
     currency: 'BRL' 
   }).format(value);
-});
+}

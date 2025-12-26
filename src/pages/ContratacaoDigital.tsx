@@ -55,7 +55,7 @@ const DOCUMENTOS_NECESSARIOS = [
   { tipo: 'certidao_nascimento_filhos', label: 'Certidão de Nascimento dos Filhos', obrigatorio: false },
 ];
 
-export default memo(function) ContratacaoDigital() {
+const ContratacaoDigital = memo(function ContratacaoDigital() {
   useEffect(() => { document.title = 'Contratação Digital | DP System'; }, []);
 
   const [searchParams] = useSearchParams();

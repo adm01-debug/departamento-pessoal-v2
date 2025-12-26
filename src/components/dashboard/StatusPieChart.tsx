@@ -1,8 +1,5 @@
-import { memo } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-import { useMemo } from 'react';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   ativo: { label: 'Ativos', color: 'hsl(var(--success))' },
@@ -12,8 +9,13 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   admissao: { label: 'Em Admissão', color: 'hsl(var(--info))' },
 };
 
+interface Colaborador {
+  status: string;
+  [key: string]: any;
+}
+
 interface StatusPieChartProps {
-  colaboradores?: typeof [];
+  colaboradores?: Colaborador[];
 }
 
 export const StatusPieChart = memo(function StatusPieChart({ colaboradores = [] }: StatusPieChartProps) {

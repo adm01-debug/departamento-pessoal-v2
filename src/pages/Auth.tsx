@@ -26,7 +26,7 @@ const signupSchema = z.object({
   path: ['confirmPassword'],
 });
 
-export default memo(function) Auth() {
+const Auth = memo(function Auth() {
   useEffect(() => {
     document.title = 'Login | DP System';
   }, []);
@@ -111,8 +111,9 @@ export default memo(function) Auth() {
       <>
         <SEOHead title="Autenticação" description="Sistema de autenticação" />
         <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </>
     );
   }
 
@@ -270,9 +271,8 @@ export default memo(function) Auth() {
         </CardContent>
       </Card>
     </div>
-  
-      </>);
-}
+  </>
+  );
+});
 
-
-
+export default Auth;
