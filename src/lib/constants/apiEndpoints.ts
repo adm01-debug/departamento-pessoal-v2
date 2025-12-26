@@ -1,0 +1,1 @@
+export const API_ENDPOINTS = { COLABORADORES: '/api/colaboradores', CARGOS: '/api/cargos', DEPARTAMENTOS: '/api/departamentos', FOLHA: '/api/folha', FERIAS: '/api/ferias', BENEFICIOS: '/api/beneficios', ADMISSOES: '/api/admissoes', DESLIGAMENTOS: '/api/desligamentos', RELATORIOS: '/api/relatorios', BACKUP: '/api/backup', INTEGRACOES: '/api/integracoes', AUTH: '/api/auth' };
