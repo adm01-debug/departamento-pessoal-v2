@@ -15,7 +15,7 @@ import { ExportDropdown } from '@/components/ExportDropdown';
 import { formatters, ExportColumn } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 
-export default memo(function) Beneficios() {
+const Beneficios = memo(function Beneficios() {
   useEffect(() => {
     document.title = 'Benefícios | DP System';
   }, []);

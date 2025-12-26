@@ -46,7 +46,7 @@ const periodLabels: Record<PeriodFilter, string> = {
   year: 'Último ano',
 };
 
-export default memo(function) Dashboard() {
+const Dashboard = memo(function Dashboard() {
   useEffect(() => {
     document.title = 'Dashboard | DP System';
   }, []);
@@ -97,8 +97,7 @@ export default memo(function) Dashboard() {
 
     return colaboradoresData.filter(c => 
       isAfter(new Date(c.dataAdmissao), startDate)
-      </>
-  );
+    );
   }, [period]);
 
   return (
@@ -364,12 +363,9 @@ export default memo(function) Dashboard() {
     </div>
     </>
   );
-}
+});
 
-
-
-
-
+export default Dashboard;
 
 
 

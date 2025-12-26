@@ -13,7 +13,7 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
-export default memo(function) Auditoria() {
+const Auditoria = memo(function Auditoria() {
   useEffect(() => {
     document.title = 'Auditoria | DP System';
   }, []);

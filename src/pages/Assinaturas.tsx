@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export default memo(function) Assinaturas() {
+const Assinaturas = memo(function Assinaturas() {
   useEffect(() => {
     document.title = 'Assinaturas Digitais | DP System';
   }, []);

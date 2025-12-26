@@ -12,7 +12,7 @@ import { DesligamentoModal } from '@/components/desligamento/DesligamentoModal';
 import { DesligamentoChecklist } from '@/components/desligamento/DesligamentoChecklist';
 import { toast } from 'sonner';
 
-export default memo(function) DesligamentoPage() {
+const DesligamentoPage = memo(function DesligamentoPage() {
   useEffect(() => {
     document.title = 'Desligamentos | DP System';
   }, []);

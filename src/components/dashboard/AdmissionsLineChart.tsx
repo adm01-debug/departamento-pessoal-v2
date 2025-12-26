@@ -1,13 +1,15 @@
-import { memo } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-
-import { useMemo } from 'react';
 import { format, parseISO, startOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+interface Colaborador {
+  dataAdmissao: string;
+  [key: string]: any;
+}
+
 interface AdmissionsLineChartProps {
-  colaboradores?: typeof [];
+  colaboradores?: Colaborador[];
   months?: number;
 }
 

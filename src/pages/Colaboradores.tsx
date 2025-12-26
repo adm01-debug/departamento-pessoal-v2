@@ -29,7 +29,7 @@ const statusColors: Record<string, { bg: string; text: string; dot: string }> = 
 type SortColumn = 'nome' | 'dataAdmissao' | 'departamento' | null;
 type SortDirection = 'asc' | 'desc';
 
-export default memo(function) Colaboradores() {
+const Colaboradores = memo(function Colaboradores() {
   useEffect(() => {
     document.title = 'Colaboradores | DP System';
   }, []);
