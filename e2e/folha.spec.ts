@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Folha', () => { test('deve exibir resumo da folha', async ({ page }) => { await page.goto('/folha'); await expect(page.locator('[data-testid="folha-resumo"]')).toBeVisible(); }); test('deve gerar folha', async ({ page }) => { await page.goto('/folha'); await page.click('button:has-text("Gerar")'); await expect(page.locator('[data-testid="loading"]')).toBeVisible(); }); });
