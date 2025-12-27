@@ -1,0 +1,1 @@
+export const TIPOS_CONTRATO = [{ codigo: 1, descricao: 'Indeterminado' }, { codigo: 2, descricao: 'Determinado' }, { codigo: 3, descricao: 'Experiência' }, { codigo: 4, descricao: 'Temporário' }, { codigo: 5, descricao: 'Intermitente' }, { codigo: 6, descricao: 'Teletrabalho' }];
