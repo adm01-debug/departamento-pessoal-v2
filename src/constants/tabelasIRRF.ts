@@ -1,0 +1,2 @@
+export const TABELAS_IRRF_2025 = [{ faixa: 1, de: 0, ate: 2259.20, aliquota: 0, deducao: 0 }, { faixa: 2, de: 2259.21, ate: 2826.65, aliquota: 7.5, deducao: 169.44 }, { faixa: 3, de: 2826.66, ate: 3751.05, aliquota: 15, deducao: 381.44 }, { faixa: 4, de: 3751.06, ate: 4664.68, aliquota: 22.5, deducao: 662.77 }, { faixa: 5, de: 4664.69, ate: Infinity, aliquota: 27.5, deducao: 896.00 }];
+export const DEDUCAO_DEPENDENTE_IRRF = 189.59;
