@@ -1,0 +1,1 @@
+export const NATUREZAS_JURIDICAS = [{ codigo: '2062', descricao: 'Sociedade Empresária Limitada' }, { codigo: '2240', descricao: 'Sociedade Simples Limitada' }, { codigo: '2135', descricao: 'Empresário Individual' }];
