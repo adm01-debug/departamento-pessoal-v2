@@ -1,0 +1,1 @@
+export const hashUtils = { simpleHash: (str: string): number => { let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; } return Math.abs(hash); }, generateId: (): string => { return Date.now().toString(36) + Math.random().toString(36).substring(2); } };
