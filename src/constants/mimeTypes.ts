@@ -1,0 +1,1 @@
+export const MIME_TYPES = { PDF: 'application/pdf', XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', DOCX: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', CSV: 'text/csv', JSON: 'application/json', PNG: 'image/png', JPEG: 'image/jpeg' };
