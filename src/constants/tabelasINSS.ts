@@ -1,0 +1,1 @@
+export const TABELAS_INSS_2025 = [{ faixa: 1, de: 0, ate: 1518.00, aliquota: 7.5 }, { faixa: 2, de: 1518.01, ate: 2793.88, aliquota: 9 }, { faixa: 3, de: 2793.89, ate: 4190.83, aliquota: 12 }, { faixa: 4, de: 4190.84, ate: 8157.41, aliquota: 14 }];
