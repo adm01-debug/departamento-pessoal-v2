@@ -1,0 +1,1 @@
+export const CNAES = [{ codigo: '6201-5/00', descricao: 'Desenvolvimento de programas de computador sob encomenda' }, { codigo: '6202-3/00', descricao: 'Desenvolvimento e licenciamento de programas de computador customizáveis' }];
