@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Navigation', () => { test('deve navegar pelo menu', async ({ page }) => { await page.goto('/'); await page.click('[data-testid="menu-colaboradores"]'); await expect(page).toHaveURL(/colaboradores/); }); test('deve exibir breadcrumb', async ({ page }) => { await page.goto('/colaboradores/1'); await expect(page.locator('[data-testid="breadcrumb"]')).toBeVisible(); }); });
