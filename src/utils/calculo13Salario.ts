@@ -1,0 +1,1 @@
+export const calcular13Salario = (salario: number, mesesTrabalhados: number): { primeira: number; segunda: number; total: number } => { const proporcional = (salario / 12) * mesesTrabalhados; return { primeira: proporcional / 2, segunda: proporcional / 2, total: proporcional }; };
