@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Ponto', () => { test('deve exibir registros de ponto', async ({ page }) => { await page.goto('/ponto'); await expect(page.locator('table')).toBeVisible(); }); test('deve registrar ponto', async ({ page }) => { await page.goto('/ponto'); await page.click('button:has-text("Registrar")'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
