@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Cargos', () => { test('deve listar cargos', async ({ page }) => { await page.goto('/cargos'); await expect(page.locator('table')).toBeVisible(); }); test('deve criar novo cargo', async ({ page }) => { await page.goto('/cargos'); await page.click('button:has-text("Novo")'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
