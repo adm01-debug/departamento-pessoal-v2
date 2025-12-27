@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Admissão', () => { test('deve listar admissões', async ({ page }) => { await page.goto('/admissao'); await expect(page.locator('table')).toBeVisible(); }); test('deve abrir modal de nova admissão', async ({ page }) => { await page.goto('/admissao'); await page.click('button:has-text("Nova")'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
