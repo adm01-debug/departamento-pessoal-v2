@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Backup', () => { test('deve exibir histórico de backups', async ({ page }) => { await page.goto('/backup'); await expect(page.locator('[data-testid="backup-history"]')).toBeVisible(); }); test('deve criar backup', async ({ page }) => { await page.goto('/backup'); await page.click('button:has-text("Criar Backup")'); await expect(page.locator('[data-testid="loading"]')).toBeVisible(); }); });
