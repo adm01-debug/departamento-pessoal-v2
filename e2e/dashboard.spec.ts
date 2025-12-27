@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Dashboard', () => { test('deve exibir cards de KPI', async ({ page }) => { await page.goto('/dashboard'); await expect(page.locator('[data-testid="kpi-card"]').first()).toBeVisible(); }); test('deve exibir gráficos', async ({ page }) => { await page.goto('/dashboard'); await expect(page.locator('[data-testid="chart"]').first()).toBeVisible(); }); });
