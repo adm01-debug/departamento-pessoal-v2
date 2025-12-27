@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Onboarding', () => { test('deve exibir wizard de onboarding', async ({ page }) => { await page.goto('/onboarding'); await expect(page.locator('[data-testid="onboarding-step"]')).toBeVisible(); }); test('deve navegar entre steps', async ({ page }) => { await page.goto('/onboarding'); await page.click('button:has-text("Próximo")'); await expect(page.locator('[data-testid="step-2"]')).toBeVisible(); }); });
