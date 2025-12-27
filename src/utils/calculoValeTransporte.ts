@@ -1,0 +1,1 @@
+export const calcularValeTransporte = (salario: number, valorDiario: number, diasUteis: number = 22): { valorTotal: number; descontoMax: number; desconto: number } => { const valorTotal = valorDiario * diasUteis; const descontoMax = salario * 0.06; const desconto = Math.min(valorTotal, descontoMax); return { valorTotal, descontoMax, desconto }; };
