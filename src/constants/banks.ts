@@ -1,0 +1,1 @@
+export const BANKS_BR = [{ code: '001', name: 'Banco do Brasil' }, { code: '033', name: 'Santander' }, { code: '104', name: 'Caixa Econômica Federal' }, { code: '237', name: 'Bradesco' }, { code: '341', name: 'Itaú Unibanco' }, { code: '756', name: 'Sicoob' }, { code: '260', name: 'Nubank' }, { code: '077', name: 'Inter' }];
