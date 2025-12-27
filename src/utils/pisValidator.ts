@@ -1,0 +1,1 @@
+export const validatePIS = (pis: string): boolean => { const cleaned = pis.replace(/\D/g, ''); if (cleaned.length !== 11) return false; const weights = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2]; let sum = 0; for (let i = 0; i < 10; i++) sum += parseInt(cleaned[i]) * weights[i]; const rest = sum % 11; const digit = rest < 2 ? 0 : 11 - rest; return digit === parseInt(cleaned[10]); };
