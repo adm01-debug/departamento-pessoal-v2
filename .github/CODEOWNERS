@@ -1,0 +1,19 @@
+# Code Owners
+* @adm01-debug
+
+# Frontend
+/src/components/ @adm01-debug
+/src/pages/ @adm01-debug
+/src/hooks/ @adm01-debug
+
+# Backend
+/src/services/ @adm01-debug
+/supabase/ @adm01-debug
+
+# Tests
+/src/test/ @adm01-debug
+/e2e/ @adm01-debug
+
+# Documentation
+/docs/ @adm01-debug
+*.md @adm01-debug
