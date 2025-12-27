@@ -4,6 +4,9 @@
 > **Repositório:** adm01-debug/departamento-pessoal  
 > **Total de Melhorias Identificadas:** 935
 
+
+> **NOTA:** Sistema exclusivamente em Português do Brasil (PT-BR). Não há necessidade de i18n/internacionalização.
+
 ---
 
 ## 📊 RESUMO EXECUTIVO
@@ -297,7 +300,6 @@
 | 7 | file.ts | Manipulação arquivos |
 | 8 | format.ts | Formatação geral |
 | 9 | http.ts | HTTP client |
-| 10 | i18n.ts | Internacionalização |
 | 11 | mask.ts | Máscaras de input |
 | 12 | number.ts | Formatação números |
 | 13 | object.ts | Object helpers |
