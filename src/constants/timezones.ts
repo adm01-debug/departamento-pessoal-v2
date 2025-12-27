@@ -1,0 +1,1 @@
+export const TIMEZONES_BR = ['America/Sao_Paulo', 'America/Manaus', 'America/Belem', 'America/Fortaleza', 'America/Recife', 'America/Cuiaba', 'America/Porto_Velho', 'America/Rio_Branco', 'America/Boa_Vista', 'America/Noronha'];
