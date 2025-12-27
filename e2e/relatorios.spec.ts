@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Relatórios', () => { test('deve exibir lista de relatórios', async ({ page }) => { await page.goto('/relatorios'); await expect(page.locator('[data-testid="relatorio-card"]').first()).toBeVisible(); }); test('deve gerar relatório PDF', async ({ page }) => { await page.goto('/relatorios'); await page.click('button:has-text("Gerar PDF")'); await expect(page.locator('[data-testid="loading"]')).toBeVisible(); }); });
