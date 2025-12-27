@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Férias', () => { test('deve exibir calendário de férias', async ({ page }) => { await page.goto('/ferias'); await expect(page.locator('[data-testid="calendar"]')).toBeVisible(); }); test('deve solicitar férias', async ({ page }) => { await page.goto('/ferias'); await page.click('button:has-text("Solicitar")'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
