@@ -1,0 +1,1 @@
+export const TIPOS_AFASTAMENTO = [{ codigo: 'D', descricao: 'Doença' }, { codigo: 'A', descricao: 'Acidente de trabalho' }, { codigo: 'M', descricao: 'Licença maternidade' }, { codigo: 'P', descricao: 'Licença paternidade' }, { codigo: 'F', descricao: 'Férias' }, { codigo: 'S', descricao: 'Serviço militar' }];
