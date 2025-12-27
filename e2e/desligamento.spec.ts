@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Desligamento', () => { test('deve exibir lista de desligamentos', async ({ page }) => { await page.goto('/desligamento'); await expect(page.locator('table')).toBeVisible(); }); test('deve filtrar por período', async ({ page }) => { await page.goto('/desligamento'); await page.click('[data-testid="filter-date"]'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
