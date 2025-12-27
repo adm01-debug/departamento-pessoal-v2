@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Auditoria', () => { test('deve exibir logs de auditoria', async ({ page }) => { await page.goto('/auditoria'); await expect(page.locator('table')).toBeVisible(); }); test('deve filtrar logs', async ({ page }) => { await page.goto('/auditoria'); await page.click('[data-testid="filter-button"]'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
