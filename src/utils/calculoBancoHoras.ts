@@ -1,0 +1,1 @@
+export const calcularBancoHoras = (saldoAtual: number, horasAdicionais: number, tipo: 'credito' | 'debito'): number => { return tipo === 'credito' ? saldoAtual + horasAdicionais : saldoAtual - horasAdicionais; };
