@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test.describe('Documentos', () => { test('deve listar documentos', async ({ page }) => { await page.goto('/documentos'); await expect(page.locator('[data-testid="documento-card"]').first()).toBeVisible(); }); test('deve fazer upload', async ({ page }) => { await page.goto('/documentos'); await page.click('button:has-text("Upload")'); await expect(page.locator('[role="dialog"]')).toBeVisible(); }); });
