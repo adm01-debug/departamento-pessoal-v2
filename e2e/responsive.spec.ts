@@ -1,0 +1,2 @@
+import { test, expect, devices } from '@playwright/test';
+test.describe('Responsive', () => { test('deve funcionar em mobile', async ({ page }) => { await page.setViewportSize(devices['iPhone 12'].viewport); await page.goto('/dashboard'); await expect(page.locator('[data-testid="mobile-menu"]')).toBeVisible(); }); test('deve funcionar em tablet', async ({ page }) => { await page.setViewportSize(devices['iPad'].viewport); await page.goto('/dashboard'); await expect(page.locator('[data-testid="sidebar"]')).toBeVisible(); }); });
