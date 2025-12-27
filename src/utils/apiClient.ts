@@ -1,0 +1,2 @@
+import { httpClient } from './httpClient';
+export const apiClient = { colaboradores: { list: () => httpClient.get('/colaboradores'), get: (id: string) => httpClient.get(`/colaboradores/${id}`), create: (data: any) => httpClient.post('/colaboradores', data), update: (id: string, data: any) => httpClient.put(`/colaboradores/${id}`, data), delete: (id: string) => httpClient.delete(`/colaboradores/${id}`) } };
