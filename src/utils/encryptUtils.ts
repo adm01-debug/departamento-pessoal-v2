@@ -1,0 +1,1 @@
+export const encryptUtils = { base64Encode: (str: string): string => btoa(unescape(encodeURIComponent(str))), base64Decode: (str: string): string => decodeURIComponent(escape(atob(str))), simpleEncrypt: (text: string, key: string): string => { return text.split('').map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join(''); } };
