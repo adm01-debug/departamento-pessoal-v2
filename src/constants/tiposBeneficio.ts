@@ -1,0 +1,1 @@
+export const TIPOS_BENEFICIO = [{ codigo: 'VT', descricao: 'Vale Transporte' }, { codigo: 'VA', descricao: 'Vale Alimentação' }, { codigo: 'VR', descricao: 'Vale Refeição' }, { codigo: 'PS', descricao: 'Plano de Saúde' }, { codigo: 'PO', descricao: 'Plano Odontológico' }, { codigo: 'SV', descricao: 'Seguro de Vida' }, { codigo: 'PL', descricao: 'PLR' }];
