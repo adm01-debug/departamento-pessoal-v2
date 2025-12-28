@@ -33,9 +33,9 @@
 | Security Modules | 8 | 🔴 CRÍTICO |
 | CI/CD Workflows | 7 | 🟠 ALTO |
 | Storybook Stories | 53 | 🟢 BAIXO |
-| i18n/PWA | 5 | 🟡 MÉDIO |
+| PWA | 2 | 🟡 MÉDIO |
 | Documentação | 1 | 🟢 BAIXO |
-| **TOTAL** | **~750+** | - |
+| **TOTAL** | **~747** | - |
 
 ---
 
@@ -637,22 +637,14 @@ Todos os 53 componentes em `src/components/ui/` precisam de stories:
 
 ---
 
-## 🟡 FASE 15: i18n E PWA (5 itens)
+## 🟡 FASE 15: PWA (2 itens)
 
-### 15.1 Internacionalização (3 itens)
-
-| # | Arquivo | Path |
-|---|---------|------|
-| 403 | i18n Config | `src/i18n/index.ts` |
-| 404 | pt-BR | `src/locales/pt-BR.json` |
-| 405 | en-US | `src/locales/en-US.json` |
-
-### 15.2 PWA (2 itens)
+### 15.1 PWA (2 itens)
 
 | # | Arquivo | Path |
 |---|---------|------|
-| 406 | Manifest | `public/manifest.webmanifest` |
-| 407 | Offline Page | `src/pages/Offline.tsx` |
+| 403 | Manifest | `public/manifest.webmanifest` |
+| 404 | Offline Page | `src/pages/Offline.tsx` |
 
 ---
 
@@ -662,13 +654,13 @@ Todos os 53 componentes em `src/components/ui/` precisam de stories:
 
 | # | Constant | Teste |
 |---|----------|-------|
-| 408-448 | 41 Constants | `src/test/constants/*.test.ts` |
+| 405-445 | 41 Constants | `src/test/constants/*.test.ts` |
 
 ### 16.2 Testes de Types (38 itens)
 
 | # | Type | Teste |
 |---|------|-------|
-| 449-486 | 38 Types | `src/test/types/*.test.ts` |
+| 446-483 | 38 Types | `src/test/types/*.test.ts` |
 
 ---
 
@@ -676,7 +668,7 @@ Todos os 53 componentes em `src/components/ui/` precisam de stories:
 
 | # | Documento | Path |
 |---|-----------|------|
-| 487 | DEPLOYMENT.md | `docs/DEPLOYMENT.md` |
+| 484 | DEPLOYMENT.md | `docs/DEPLOYMENT.md` |
 
 ---
 
@@ -689,8 +681,8 @@ Todos os 53 componentes em `src/components/ui/` precisam de stories:
 | 7-8 | Fases 4-5 (Relatórios + Dashboards) | 38 | 4 semanas |
 | 9-10 | Fases 6-9 (Features) | 59 | 4 semanas |
 | 11-12 | Fases 10-13 (Security + CI/CD) | 31 | 4 semanas |
-| 13-14 | Fases 14-17 (UI + i18n + Docs) | 138 | 4 semanas |
-| **TOTAL** | **17 Fases** | **~750** | **28 semanas** |
+| 13-14 | Fases 14-17 (UI + PWA + Docs) | 135 | 4 semanas |
+| **TOTAL** | **17 Fases** | **~747** | **28 semanas** |
 
 ---
 
@@ -705,7 +697,6 @@ Todos os 53 componentes em `src/components/ui/` precisam de stories:
 | Integrações Completas | 30% | 100% |
 | Componentes DP | ~70% | 100% |
 | Storybook Coverage | 0% | 100% |
-| i18n | 0% | 100% |
 | PWA Score | ~50% | 100% |
 | Security Score | ~70% | 100% |
 
