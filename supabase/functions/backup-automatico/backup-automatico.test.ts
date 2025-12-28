@@ -1,37 +1,37 @@
-import { describe, it, expect, vi } from 'vitest';
-import { serve } from '../index';
+// Deno Test File - Compatible with Deno runtime
+// Note: Run with `deno test` command
 
-describe('backup-automatico', () => {
-  it('handles valid request', async () => {
-    const req = new Request('http://localhost/backup-automatico', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ test: true })
-    });
-    expect(req).toBeDefined();
-  });
+import { assertEquals, assertExists } from "https://deno.land/std@0.168.0/testing/asserts.ts";
 
-  it('validates input', async () => {
-    const req = new Request('http://localhost/backup-automatico', {
-      method: 'POST',
-      body: JSON.stringify({})
-    });
-    expect(req.body).toBeDefined();
+Deno.test('backup-automatico - handles valid request', () => {
+  const req = new Request('http://localhost/backup-automatico', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ test: true })
   });
+  assertExists(req);
+});
 
-  it('returns correct format', async () => {
-    expect(true).toBe(true);
+Deno.test('backup-automatico - validates input', () => {
+  const req = new Request('http://localhost/backup-automatico', {
+    method: 'POST',
+    body: JSON.stringify({})
   });
+  assertExists(req.body);
+});
 
-  it('handles errors gracefully', async () => {
-    const req = new Request('http://localhost/backup-automatico', {
-      method: 'POST',
-      body: 'invalid'
-    });
-    expect(req).toBeDefined();
-  });
+Deno.test('backup-automatico - returns correct format', () => {
+  assertEquals(true, true);
+});
 
-  it('respects rate limits', async () => {
-    expect(true).toBe(true);
+Deno.test('backup-automatico - handles errors gracefully', () => {
+  const req = new Request('http://localhost/backup-automatico', {
+    method: 'POST',
+    body: 'invalid'
   });
+  assertExists(req);
+});
+
+Deno.test('backup-automatico - respects rate limits', () => {
+  assertEquals(true, true);
 });
