@@ -1,0 +1,42 @@
+-- Migration: beneficios_elegibilidade
+-- Description: Elegibilidade de benefícios
+-- Created at: 2025-12-28T19:25:49+00:00
+
+-- Up Migration
+CREATE TABLE IF NOT EXISTS beneficios_elegibilidade (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Add RLS Policies
+ALTER TABLE beneficios_elegibilidade ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "beneficios_elegibilidade_select" ON beneficios_elegibilidade
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "beneficios_elegibilidade_insert" ON beneficios_elegibilidade
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "beneficios_elegibilidade_update" ON beneficios_elegibilidade
+  FOR UPDATE USING (auth.role() = 'authenticated');
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_beneficios_elegibilidade_created_at ON beneficios_elegibilidade(created_at);
+
+-- Add trigger for updated_at
+CREATE OR REPLACE FUNCTION update_beneficios_elegibilidade_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_beneficios_elegibilidade_updated_at
+  BEFORE UPDATE ON beneficios_elegibilidade
+  FOR EACH ROW
+  EXECUTE FUNCTION update_beneficios_elegibilidade_updated_at();
+
+-- Down Migration (rollback)
+-- DROP TABLE IF EXISTS beneficios_elegibilidade CASCADE;
