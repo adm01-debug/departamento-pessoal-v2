@@ -1,37 +1,37 @@
-import { describe, it, expect, vi } from 'vitest';
-import { serve } from '../index';
+// Deno Test File - Compatible with Deno runtime
+// Note: Run with `deno test` command
 
-describe('sincronizar-bitrix', () => {
-  it('handles valid request', async () => {
-    const req = new Request('http://localhost/sincronizar-bitrix', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ test: true })
-    });
-    expect(req).toBeDefined();
-  });
+import { assertEquals, assertExists } from "https://deno.land/std@0.168.0/testing/asserts.ts";
 
-  it('validates input', async () => {
-    const req = new Request('http://localhost/sincronizar-bitrix', {
-      method: 'POST',
-      body: JSON.stringify({})
-    });
-    expect(req.body).toBeDefined();
+Deno.test('sincronizar-bitrix - handles valid request', () => {
+  const req = new Request('http://localhost/sincronizar-bitrix', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ test: true })
   });
+  assertExists(req);
+});
 
-  it('returns correct format', async () => {
-    expect(true).toBe(true);
+Deno.test('sincronizar-bitrix - validates input', () => {
+  const req = new Request('http://localhost/sincronizar-bitrix', {
+    method: 'POST',
+    body: JSON.stringify({})
   });
+  assertExists(req.body);
+});
 
-  it('handles errors gracefully', async () => {
-    const req = new Request('http://localhost/sincronizar-bitrix', {
-      method: 'POST',
-      body: 'invalid'
-    });
-    expect(req).toBeDefined();
-  });
+Deno.test('sincronizar-bitrix - returns correct format', () => {
+  assertEquals(true, true);
+});
 
-  it('respects rate limits', async () => {
-    expect(true).toBe(true);
+Deno.test('sincronizar-bitrix - handles errors gracefully', () => {
+  const req = new Request('http://localhost/sincronizar-bitrix', {
+    method: 'POST',
+    body: 'invalid'
   });
+  assertExists(req);
+});
+
+Deno.test('sincronizar-bitrix - respects rate limits', () => {
+  assertEquals(true, true);
 });

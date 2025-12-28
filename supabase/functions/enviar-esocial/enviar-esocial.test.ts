@@ -1,37 +1,37 @@
-import { describe, it, expect, vi } from 'vitest';
-import { serve } from '../index';
+// Deno Test File - Compatible with Deno runtime
+// Note: Run with `deno test` command
 
-describe('enviar-esocial', () => {
-  it('handles valid request', async () => {
-    const req = new Request('http://localhost/enviar-esocial', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ test: true })
-    });
-    expect(req).toBeDefined();
-  });
+import { assertEquals, assertExists } from "https://deno.land/std@0.168.0/testing/asserts.ts";
 
-  it('validates input', async () => {
-    const req = new Request('http://localhost/enviar-esocial', {
-      method: 'POST',
-      body: JSON.stringify({})
-    });
-    expect(req.body).toBeDefined();
+Deno.test('enviar-esocial - handles valid request', () => {
+  const req = new Request('http://localhost/enviar-esocial', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ test: true })
   });
+  assertExists(req);
+});
 
-  it('returns correct format', async () => {
-    expect(true).toBe(true);
+Deno.test('enviar-esocial - validates input', () => {
+  const req = new Request('http://localhost/enviar-esocial', {
+    method: 'POST',
+    body: JSON.stringify({})
   });
+  assertExists(req.body);
+});
 
-  it('handles errors gracefully', async () => {
-    const req = new Request('http://localhost/enviar-esocial', {
-      method: 'POST',
-      body: 'invalid'
-    });
-    expect(req).toBeDefined();
-  });
+Deno.test('enviar-esocial - returns correct format', () => {
+  assertEquals(true, true);
+});
 
-  it('respects rate limits', async () => {
-    expect(true).toBe(true);
+Deno.test('enviar-esocial - handles errors gracefully', () => {
+  const req = new Request('http://localhost/enviar-esocial', {
+    method: 'POST',
+    body: 'invalid'
   });
+  assertExists(req);
+});
+
+Deno.test('enviar-esocial - respects rate limits', () => {
+  assertEquals(true, true);
 });
