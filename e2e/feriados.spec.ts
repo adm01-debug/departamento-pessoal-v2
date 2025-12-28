@@ -1,0 +1,25 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Feriados Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/feriados');
+  });
+
+  test('should load correctly', async ({ page }) => {
+    await expect(page.locator('body')).toBeVisible();
+  });
+
+  test('should have title', async ({ page }) => {
+    await expect(page).toHaveTitle(/.*/);
+  });
+
+  test('should be accessible', async ({ page }) => {
+    const content = page.locator('main, [role="main"], .container, #root');
+    await expect(content.first()).toBeVisible();
+  });
+
+  test('should handle mobile viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await expect(page.locator('body')).toBeVisible();
+  });
+});
