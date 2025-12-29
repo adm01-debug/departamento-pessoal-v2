@@ -26,7 +26,7 @@ import { useColaboradores } from '@/hooks/useColaboradores';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { format } from 'date-fns';
 
-export default memo(function) GestaoDocumentos() {
+export default memo(function GestaoDocumentos() {
   useEffect(() => {
     document.title = 'Gestão de Documentos | DP System';
   }, []);
@@ -323,11 +323,3 @@ export default memo(function) GestaoDocumentos() {
   
       </>);
 }
-
-
-
-
-
-
-
-
