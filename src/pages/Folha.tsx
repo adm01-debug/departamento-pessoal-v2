@@ -129,11 +129,12 @@ export default memo(function Folha() {
 
   if (loading) {
     return (
-    <>
-      <SEOHead title="Folha | DP System" description="Folha de pagamento" />
-      <div id="main-content" className="p-6 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <>
+        <SEOHead title="Folha | DP System" description="Folha de pagamento" />
+        <div id="main-content" className="p-6 flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </>
     );
   }
 
@@ -637,7 +638,7 @@ function EventosVariaveisTab({
           </div>
           <DialogFooter>
             <Button aria-label="Ação" variant="outline" onClick={() => setAddModalOpen(false)}>Cancelar</Button>
-            <Button aria-label="Adicionar" aria-label="Ação" onClick={handleAdd}>Adicionar</Button>
+            <Button aria-label="Adicionar" onClick={handleAdd}>Adicionar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
