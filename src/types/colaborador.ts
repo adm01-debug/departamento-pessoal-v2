@@ -1,22 +1,33 @@
 /**
  * @fileoverview Tipos para gestão de colaboradores
  * @module types/colaborador
+ * @version V8.1 - Corrigido por análise QA
  */
 
-// Tipos baseados na tabela do banco de dados para colaboradores
+// ============================================
+// ENUMS E TIPOS BASE
+// ============================================
 
 export type EstadoCivil = 'solteiro' | 'casado' | 'divorciado' | 'viuvo' | 'separado' | 'uniao_estavel';
 export type Sexo = 'masculino' | 'feminino';
-export type TipoContrato = 'clt' | 'pj' | 'estagiario' | 'temporario' | 'intermitente' | 'aprendiz';
-export type StatusColaborador = 'ativo' | 'ferias' | 'afastado' | 'desligado' | 'pendente';
+export type TipoContrato = 'clt' | 'pj' | 'estagiario' | 'temporario' | 'intermitente' | 'aprendiz' | 'autonomo';
+export type StatusColaborador = 'ativo' | 'inativo' | 'ferias' | 'afastado' | 'desligado' | 'pendente';
 export type Escolaridade = 'fundamental_incompleto' | 'fundamental_completo' | 'medio_incompleto' | 'medio_completo' | 'superior_incompleto' | 'superior_completo' | 'pos_graduacao' | 'mestrado' | 'doutorado';
 export type TipoConta = 'corrente' | 'poupanca' | 'salario';
 
+// ============================================
+// INTERFACE PRINCIPAL - COLABORADOR
+// ============================================
+
+/**
+ * Interface completa do colaborador (banco de dados)
+ */
 export interface ColaboradorDB {
   id: string;
   created_at: string;
   updated_at: string;
   created_by?: string;
+  empresa_id: string;
   
   // Dados Pessoais
   nome_completo: string;
@@ -78,17 +89,21 @@ export interface ColaboradorDB {
   data_desligamento?: string;
   tipo_contrato: TipoContrato;
   cargo: string;
+  cargo_id?: string;
   departamento: string;
+  departamento_id?: string;
   centro_custo?: string;
   local_trabalho?: string;
   cbo?: string;
   
   // Remuneração
   salario_base: number;
+  salario?: number; // Alias
   tipo_salario?: string;
   
   // Jornada
   jornada_semanal?: number;
+  jornada_trabalho?: string;
   horario_entrada?: string;
   horario_saida?: string;
   intervalo_minutos?: number;
@@ -105,6 +120,105 @@ export interface ColaboradorDB {
   observacoes?: string;
   foto_url?: string;
 }
+
+/**
+ * Interface simplificada para compatibilidade (alias)
+ */
+export interface Colaborador {
+  id: string;
+  nome: string;
+  cpf: string;
+  rg?: string;
+  data_nascimento?: string;
+  sexo?: string;
+  estado_civil?: string;
+  email?: string;
+  telefone?: string;
+  celular?: string;
+  endereco?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  cep?: string;
+  cargo_id?: string;
+  departamento_id?: string;
+  data_admissao?: string;
+  data_demissao?: string;
+  salario?: number;
+  tipo_contrato?: string;
+  jornada_trabalho?: string;
+  banco?: string;
+  agencia?: string;
+  conta?: string;
+  tipo_conta?: string;
+  pix?: string;
+  status: StatusColaborador;
+  foto_url?: string;
+  empresa_id: string;
+  created_at?: string;
+  updated_at?: string;
+  // Relations
+  cargo?: { id: string; nome: string; cbo?: string };
+  departamento?: { id: string; nome: string };
+}
+
+/**
+ * Dados para criação/edição de colaborador
+ */
+export interface ColaboradorFormData {
+  nome: string;
+  cpf: string;
+  rg?: string;
+  data_nascimento?: string;
+  sexo?: Sexo;
+  estado_civil?: EstadoCivil;
+  email?: string;
+  telefone?: string;
+  celular?: string;
+  endereco?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  cep?: string;
+  cargo_id?: string;
+  departamento_id?: string;
+  data_admissao?: string;
+  salario?: number;
+  tipo_contrato?: TipoContrato;
+  jornada_trabalho?: string;
+  banco?: string;
+  agencia?: string;
+  conta?: string;
+  tipo_conta?: TipoConta;
+  pix?: string;
+  status?: StatusColaborador;
+  foto_url?: string;
+  empresa_id?: string;
+}
+
+/**
+ * Filtros para listagem de colaboradores
+ */
+export interface ColaboradorFilters {
+  empresa_id?: string;
+  departamento_id?: string;
+  cargo_id?: string;
+  status?: StatusColaborador;
+  tipo_contrato?: TipoContrato;
+  search?: string;
+  orderBy?: string;
+  orderDirection?: 'asc' | 'desc';
+  limit?: number;
+  offset?: number;
+}
+
+// ============================================
+// INTERFACES RELACIONADAS
+// ============================================
 
 export interface Dependente {
   id: string;
@@ -144,7 +258,20 @@ export interface DocumentoColaborador {
   created_by?: string;
 }
 
-// Labels para exibição
+export interface ContatoEmergencia {
+  id: string;
+  colaborador_id: string;
+  nome: string;
+  parentesco?: string;
+  telefone: string;
+  celular?: string;
+  created_at: string;
+}
+
+// ============================================
+// LABELS PARA EXIBIÇÃO
+// ============================================
+
 export const estadoCivilLabels: Record<EstadoCivil, string> = {
   solteiro: 'Solteiro(a)',
   casado: 'Casado(a)',
@@ -166,10 +293,12 @@ export const tipoContratoLabels: Record<TipoContrato, string> = {
   temporario: 'Temporário',
   intermitente: 'Intermitente',
   aprendiz: 'Jovem Aprendiz',
+  autonomo: 'Autônomo',
 };
 
 export const statusColaboradorLabels: Record<StatusColaborador, string> = {
   ativo: 'Ativo',
+  inativo: 'Inativo',
   ferias: 'Férias',
   afastado: 'Afastado',
   desligado: 'Desligado',
@@ -194,10 +323,14 @@ export const tipoContaLabels: Record<TipoConta, string> = {
   salario: 'Conta Salário',
 };
 
+// ============================================
+// CONSTANTES
+// ============================================
+
 export const ufOptions = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG',
   'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
-];
+] as const;
 
 export const parentescoOptions = [
   'Filho(a)',
@@ -210,9 +343,9 @@ export const parentescoOptions = [
   'Irmão(ã)',
   'Avô/Avó',
   'Outro',
-];
+] as const;
 
-export const cnhCategorias = ['A', 'B', 'AB', 'C', 'D', 'E', 'ACC'];
+export const cnhCategorias = ['A', 'B', 'AB', 'C', 'D', 'E', 'ACC'] as const;
 
 export const departamentosDefault = [
   'Gravação',
@@ -224,7 +357,7 @@ export const departamentosDefault = [
   'Produção',
   'RH',
   'TI',
-];
+] as const;
 
 export const bancosComuns = [
   { codigo: '001', nome: 'Banco do Brasil' },
@@ -238,6 +371,54 @@ export const bancosComuns = [
   { codigo: '212', nome: 'Banco Original' },
   { codigo: '756', nome: 'Sicoob' },
   { codigo: '748', nome: 'Sicredi' },
-];
+  { codigo: '422', nome: 'Safra' },
+  { codigo: '070', nome: 'BRB' },
+  { codigo: '197', nome: 'Stone' },
+  { codigo: '380', nome: 'PicPay' },
+] as const;
 
+// ============================================
+// FUNÇÕES UTILITÁRIAS DE TIPO
+// ============================================
 
+/**
+ * Converte ColaboradorDB para Colaborador simplificado
+ */
+export function toColaboradorSimplificado(db: ColaboradorDB): Colaborador {
+  return {
+    id: db.id,
+    nome: db.nome_completo,
+    cpf: db.cpf,
+    rg: db.rg,
+    data_nascimento: db.data_nascimento,
+    sexo: db.sexo,
+    estado_civil: db.estado_civil,
+    email: db.email,
+    telefone: db.telefone,
+    celular: db.celular,
+    endereco: db.logradouro,
+    numero: db.numero,
+    complemento: db.complemento,
+    bairro: db.bairro,
+    cidade: db.cidade,
+    estado: db.uf,
+    cep: db.cep,
+    cargo_id: db.cargo_id,
+    departamento_id: db.departamento_id,
+    data_admissao: db.data_admissao,
+    data_demissao: db.data_desligamento,
+    salario: db.salario_base,
+    tipo_contrato: db.tipo_contrato,
+    jornada_trabalho: db.jornada_trabalho,
+    banco: db.banco_codigo,
+    agencia: db.agencia,
+    conta: db.conta,
+    tipo_conta: db.tipo_conta,
+    pix: db.pix_chave,
+    status: db.status,
+    foto_url: db.foto_url,
+    empresa_id: db.empresa_id,
+    created_at: db.created_at,
+    updated_at: db.updated_at,
+  };
+}
