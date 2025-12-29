@@ -1,10 +1,31 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 /**
  * Edge Function: Cálculo Completo de Rescisão Trabalhista
- * @version V8.0 - Implementação REAL
+ * @version V8.1 - Corrigido por análise QA - Tabelas 2025
  */
+
+// ============================================
+// CONSTANTES 2025
+// ============================================
+
+const TABELA_INSS = [
+  { limite: 1518.00, aliquota: 0.075 },
+  { limite: 2793.88, aliquota: 0.09 },
+  { limite: 4190.83, aliquota: 0.12 },
+  { limite: 8157.41, aliquota: 0.14 },
+];
+
+const TABELA_IRRF = [
+  { limite: 2259.20, aliquota: 0, deducao: 0 },
+  { limite: 2826.65, aliquota: 0.075, deducao: 169.44 },
+  { limite: 3751.05, aliquota: 0.15, deducao: 381.44 },
+  { limite: 4664.68, aliquota: 0.225, deducao: 662.77 },
+  { limite: Infinity, aliquota: 0.275, deducao: 896.00 },
+];
+
+const TETO_INSS = 8157.41;
+const DEDUCAO_DEPENDENTE = 189.59;
 
 type TipoRescisao = 
   | 'semJustaCausa'
@@ -30,57 +51,24 @@ interface DadosRescisao {
   pensaoAlimenticia: number;
 }
 
-interface ResultadoRescisao {
-  colaboradorId: string;
-  tipoRescisao: TipoRescisao;
-  diasTrabalhados: number;
-  anosCompletos: number;
-  
-  proventos: {
-    saldoSalario: number;
-    avisoPrevioIndenizado: number;
-    diasAvisoPrevio: number;
-    feriasVencidas: number;
-    tercoFeriasVencidas: number;
-    feriasProporcionais: number;
-    tercoFeriasProporcionais: number;
-    decimoTerceiroProporcional: number;
-    totalProventos: number;
-  };
-  
-  descontos: {
-    inss: number;
-    irrf: number;
-    avisoPrevioDesconto: number;
-    pensaoAlimenticia: number;
-    totalDescontos: number;
-  };
-  
-  fgts: {
-    saldo: number;
-    multaRescisoria: number;
-    percentualMulta: number;
-    saqueLiberado: number;
-    depositoRescisorio: number;
-  };
-  
-  liquido: number;
-  totalGeral: number;
+// ============================================
+// FUNÇÕES AUXILIARES
+// ============================================
+
+function arredondar(valor: number): number {
+  return Math.round((valor + Number.EPSILON) * 100) / 100;
 }
 
-// Calcular diferença em meses
 function calcularMeses(dataInicio: Date, dataFim: Date): number {
   const anos = dataFim.getFullYear() - dataInicio.getFullYear();
   const meses = dataFim.getMonth() - dataInicio.getMonth();
   return anos * 12 + meses;
 }
 
-// Calcular diferença em dias
 function calcularDias(dataInicio: Date, dataFim: Date): number {
   return Math.floor((dataFim.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-// Calcular aviso prévio proporcional
 function calcularAvisoPrevio(
   dataAdmissao: Date, 
   dataDemissao: Date, 
@@ -108,10 +96,9 @@ function calcularAvisoPrevio(
   }
   
   const valorDia = salarioMedio / 30;
-  return { dias, valor: Number((valorDia * dias).toFixed(2)) };
+  return { dias, valor: arredondar(valorDia * dias) };
 }
 
-// Calcular férias na rescisão
 function calcularFerias(
   salario: number,
   dataAdmissao: Date,
@@ -124,67 +111,50 @@ function calcularFerias(
   proporcionais: number;
   tercoProporcionais: number;
 } {
-  // Férias vencidas
-  const valorFeriasVencidas = salario * feriasVencidas;
-  const tercoVencidas = Number((valorFeriasVencidas / 3).toFixed(2));
+  const valorFeriasVencidas = arredondar(salario * feriasVencidas);
+  const tercoVencidas = arredondar(valorFeriasVencidas / 3);
   
-  // Férias proporcionais
   const meses = calcularMeses(dataAdmissao, dataDemissao);
   let mesesProporcional = meses % 12;
   
-  // Adicionar meses da projeção do aviso prévio
   mesesProporcional += Math.floor(diasProjecao / 30);
   mesesProporcional = Math.min(mesesProporcional, 12);
   
-  // Se trabalhou mais de 14 dias no mês, conta como mês cheio
   const diasNoMes = dataDemissao.getDate();
   if (diasNoMes >= 15 && mesesProporcional < 12) {
     mesesProporcional++;
   }
   
-  const proporcionais = Number(((salario / 12) * mesesProporcional).toFixed(2));
-  const tercoProporcionais = Number((proporcionais / 3).toFixed(2));
+  const proporcionais = arredondar((salario / 12) * mesesProporcional);
+  const tercoProporcionais = arredondar(proporcionais / 3);
   
-  return {
-    vencidas: valorFeriasVencidas,
-    tercoVencidas,
-    proporcionais,
-    tercoProporcionais,
-  };
+  return { vencidas: valorFeriasVencidas, tercoVencidas, proporcionais, tercoProporcionais };
 }
 
-// Calcular 13º proporcional
-function calcular13Proporcional(
-  salario: number,
-  dataDemissao: Date,
-  diasProjecao: number = 0
-): number {
+function calcular13Proporcional(salario: number, dataDemissao: Date, diasProjecao: number = 0): number {
   let meses = dataDemissao.getMonth() + 1;
-  
-  // Adicionar meses da projeção
   meses += Math.floor(diasProjecao / 30);
   meses = Math.min(meses, 12);
   
-  // Se trabalhou mais de 14 dias no mês, conta
   if (dataDemissao.getDate() >= 15 && meses < 12) {
     meses++;
   }
   
-  return Number(((salario / 12) * meses).toFixed(2));
+  return arredondar((salario / 12) * meses);
 }
 
-// Calcular multa FGTS
-function calcularMultaFGTS(
-  saldoFGTS: number,
-  tipoRescisao: TipoRescisao
-): { multa: number; percentual: number; saqueLiberado: number } {
+function calcularMultaFGTS(saldoFGTS: number, tipoRescisao: TipoRescisao): { 
+  multa: number; 
+  percentual: number; 
+  saqueLiberado: number;
+} {
   switch (tipoRescisao) {
     case 'semJustaCausa':
-      return { multa: saldoFGTS * 0.40, percentual: 40, saqueLiberado: saldoFGTS };
+      return { multa: arredondar(saldoFGTS * 0.40), percentual: 40, saqueLiberado: saldoFGTS };
     case 'acordoMutuo':
-      return { multa: saldoFGTS * 0.20, percentual: 20, saqueLiberado: saldoFGTS * 0.80 };
+      return { multa: arredondar(saldoFGTS * 0.20), percentual: 20, saqueLiberado: arredondar(saldoFGTS * 0.80) };
     case 'culpaReciproca':
-      return { multa: saldoFGTS * 0.20, percentual: 20, saqueLiberado: saldoFGTS };
+      return { multa: arredondar(saldoFGTS * 0.20), percentual: 20, saqueLiberado: saldoFGTS };
     case 'fimContrato':
       return { multa: 0, percentual: 0, saqueLiberado: saldoFGTS };
     default:
@@ -192,35 +162,41 @@ function calcularMultaFGTS(
   }
 }
 
-// Cálculo INSS (simplificado para rescisão)
 function calcularINSSRescisao(base: number): number {
-  const teto = 7786.02;
-  const baseCalculo = Math.min(base, teto);
+  if (base <= 0) return 0;
+  const baseCalculo = Math.min(base, TETO_INSS);
   
-  // Tabela progressiva simplificada
   let inss = 0;
-  if (baseCalculo <= 1412) inss = baseCalculo * 0.075;
-  else if (baseCalculo <= 2666.68) inss = 105.90 + (baseCalculo - 1412) * 0.09;
-  else if (baseCalculo <= 4000.03) inss = 218.82 + (baseCalculo - 2666.68) * 0.12;
-  else inss = 378.82 + (baseCalculo - 4000.03) * 0.14;
+  let valorAnterior = 0;
   
-  return Number(Math.min(inss, 908.85).toFixed(2));
+  for (const faixa of TABELA_INSS) {
+    if (baseCalculo > valorAnterior) {
+      const baseNaFaixa = Math.min(baseCalculo, faixa.limite) - valorAnterior;
+      inss += baseNaFaixa * faixa.aliquota;
+    }
+    valorAnterior = faixa.limite;
+  }
+  
+  return arredondar(inss);
 }
 
-// Cálculo IRRF
 function calcularIRRFRescisao(base: number, dependentes: number): number {
-  const deducao = dependentes * 189.59;
+  const deducao = Math.max(0, dependentes) * DEDUCAO_DEPENDENTE;
   const baseCalculo = base - deducao;
   
-  if (baseCalculo <= 2259.20) return 0;
-  if (baseCalculo <= 2826.65) return Number(((baseCalculo * 0.075) - 169.44).toFixed(2));
-  if (baseCalculo <= 3751.05) return Number(((baseCalculo * 0.15) - 381.44).toFixed(2));
-  if (baseCalculo <= 4664.68) return Number(((baseCalculo * 0.225) - 662.77).toFixed(2));
-  return Number(((baseCalculo * 0.275) - 896.00).toFixed(2));
+  if (baseCalculo <= TABELA_IRRF[0].limite) return 0;
+  
+  for (const faixa of TABELA_IRRF) {
+    if (baseCalculo <= faixa.limite) {
+      return arredondar(Math.max(0, (baseCalculo * faixa.aliquota) - faixa.deducao));
+    }
+  }
+  
+  const ultima = TABELA_IRRF[TABELA_IRRF.length - 1];
+  return arredondar((baseCalculo * ultima.aliquota) - ultima.deducao);
 }
 
-// Função principal
-function processarRescisao(dados: DadosRescisao): ResultadoRescisao {
+function processarRescisao(dados: DadosRescisao) {
   const dataAdmissao = new Date(dados.dataAdmissao);
   const dataDemissao = new Date(dados.dataDemissao);
   const salarioMedio = dados.salario + (dados.mediaVariaveis || 0);
@@ -230,7 +206,7 @@ function processarRescisao(dados: DadosRescisao): ResultadoRescisao {
   
   // Saldo de salário
   const diasNoMes = dataDemissao.getDate();
-  const saldoSalario = Number(((salarioMedio / 30) * diasNoMes).toFixed(2));
+  const saldoSalario = arredondar((salarioMedio / 30) * diasNoMes);
   
   // Aviso prévio
   const avisoPrevio = calcularAvisoPrevio(
@@ -243,13 +219,7 @@ function processarRescisao(dados: DadosRescisao): ResultadoRescisao {
   
   // Férias
   const diasProjecao = dados.avisoPrevioTrabalhado ? 0 : avisoPrevio.dias;
-  const ferias = calcularFerias(
-    salarioMedio, 
-    dataAdmissao, 
-    dataDemissao, 
-    dados.feriasVencidas,
-    diasProjecao
-  );
+  const ferias = calcularFerias(salarioMedio, dataAdmissao, dataDemissao, dados.feriasVencidas, diasProjecao);
   
   // 13º
   let decimo = 0;
@@ -259,30 +229,30 @@ function processarRescisao(dados: DadosRescisao): ResultadoRescisao {
   
   // FGTS
   const fgtsCalculo = calcularMultaFGTS(dados.saldoFGTS, dados.tipoRescisao);
-  const depositoRescisorio = Number((saldoSalario * 0.08).toFixed(2));
+  const depositoRescisorio = arredondar(saldoSalario * 0.08);
   
   // Total de proventos
-  const totalProventos = saldoSalario + avisoPrevio.valor + 
+  const totalProventos = arredondar(
+    saldoSalario + avisoPrevio.valor + 
     ferias.vencidas + ferias.tercoVencidas + 
-    ferias.proporcionais + ferias.tercoProporcionais + decimo;
+    ferias.proporcionais + ferias.tercoProporcionais + decimo
+  );
   
-  // Descontos
-  // Verbas tributáveis: saldo + aviso (não indenizado)
-  const verbasTriputaveis = saldoSalario + (dados.avisoPrevioTrabalhado ? 0 : 0);
+  // Descontos (verbas tributáveis)
+  const verbasTriputaveis = saldoSalario;
   const inss = calcularINSSRescisao(verbasTriputaveis);
   const irrf = calcularIRRFRescisao(verbasTriputaveis - inss, dados.dependentesIRRF);
   
-  // Aviso prévio a descontar (pedido de demissão sem trabalhar)
   let avisoPrevioDesconto = 0;
   if (dados.tipoRescisao === 'pedidoDemissao' && !dados.avisoPrevioTrabalhado) {
     avisoPrevioDesconto = avisoPrevio.valor;
   }
   
   const pensao = dados.pensaoAlimenticia || 0;
-  const totalDescontos = inss + irrf + avisoPrevioDesconto + pensao;
+  const totalDescontos = arredondar(inss + irrf + avisoPrevioDesconto + pensao);
   
-  const liquido = Number((totalProventos - totalDescontos).toFixed(2));
-  const totalGeral = Number((liquido + fgtsCalculo.saqueLiberado + fgtsCalculo.multa).toFixed(2));
+  const liquido = arredondar(totalProventos - totalDescontos);
+  const totalGeral = arredondar(liquido + fgtsCalculo.saqueLiberado + fgtsCalculo.multa);
   
   return {
     colaboradorId: dados.colaboradorId,
@@ -298,26 +268,30 @@ function processarRescisao(dados: DadosRescisao): ResultadoRescisao {
       feriasProporcionais: ferias.proporcionais,
       tercoFeriasProporcionais: ferias.tercoProporcionais,
       decimoTerceiroProporcional: decimo,
-      totalProventos: Number(totalProventos.toFixed(2)),
+      totalProventos,
     },
     descontos: {
       inss,
       irrf,
       avisoPrevioDesconto,
       pensaoAlimenticia: pensao,
-      totalDescontos: Number(totalDescontos.toFixed(2)),
+      totalDescontos,
     },
     fgts: {
       saldo: dados.saldoFGTS,
-      multaRescisoria: Number(fgtsCalculo.multa.toFixed(2)),
+      multaRescisoria: fgtsCalculo.multa,
       percentualMulta: fgtsCalculo.percentual,
-      saqueLiberado: Number(fgtsCalculo.saqueLiberado.toFixed(2)),
+      saqueLiberado: fgtsCalculo.saqueLiberado,
       depositoRescisorio,
     },
     liquido,
     totalGeral,
   };
 }
+
+// ============================================
+// HANDLER
+// ============================================
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -336,11 +310,16 @@ serve(async (req: Request): Promise<Response> => {
       throw new Error('Dados obrigatórios: colaboradorId, dataAdmissao, dataDemissao');
     }
 
+    if (!dados.tipoRescisao) {
+      throw new Error('Tipo de rescisão é obrigatório');
+    }
+
     const resultado = processarRescisao(dados);
 
     return new Response(
       JSON.stringify({
         success: true,
+        versaoTabelas: '2025-01',
         processadoEm: new Date().toISOString(),
         resultado,
       }),
@@ -348,7 +327,10 @@ serve(async (req: Request): Promise<Response> => {
     );
   } catch (error) {
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro desconhecido' 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     );
   }
