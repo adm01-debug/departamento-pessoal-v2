@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, Pencil, Loader2 } from 'lucide-react';
-import { useState, memo, useEffect } from 'react';
 import { Colaborador } from '@/types/colaborador';
 import { validateCPF, unmask } from '@/lib/masks';
 
