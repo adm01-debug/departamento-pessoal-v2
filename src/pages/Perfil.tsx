@@ -35,7 +35,7 @@ const passwordSchema = z.object({
 type ProfileErrors = { nome?: string; telefone?: string };
 type PasswordErrors = { senhaAtual?: string; novaSenha?: string; confirmarSenha?: string };
 
-export default memo(function) Perfil() {
+export default memo(function Perfil() {
   useEffect(() => { document.title = 'Perfil | DP System'; }, []);
 
   const { user, profile, updateProfile } = useAuth();
@@ -622,11 +622,3 @@ export default memo(function) Perfil() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
