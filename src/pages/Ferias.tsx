@@ -44,7 +44,7 @@ const statusPeriodoLabels: Record<string, string> = {
   pago: 'Pago',
 };
 
-export default memo(function) Ferias() {
+export default memo(function Ferias() {
   useEffect(() => {
     document.title = 'Férias | DP System';
   }, []);
@@ -548,16 +548,3 @@ export default memo(function) Ferias() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
