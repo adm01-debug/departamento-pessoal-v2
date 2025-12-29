@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useMemo, useCallback } from 'react';
+import { useState, memo, useEffect, useMemo } from 'react';
 import { 
   Users, 
   UserPlus, 
@@ -33,7 +33,7 @@ import { IndicatorAlertsCard } from '@/components/dashboard/IndicatorAlertsCard'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { useNavigate } from 'react-router-dom';
-import { subMonths, subQuarters, subYears, isAfter } from 'date-fns';
+import { subMonths, subQuarters, subYears, isAfter, parseISO, differenceInDays, addDays, format } from 'date-fns';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { useIndicadoresDP } from '@/hooks/useIndicadoresDP';
 
@@ -46,6 +46,22 @@ const periodLabels: Record<PeriodFilter, string> = {
   year: 'Último ano',
 };
 
+// Tipos para alertas e eventos
+interface Alerta {
+  id: string;
+  tipo: 'warning' | 'error' | 'info';
+  titulo: string;
+  descricao: string;
+  data?: string;
+}
+
+interface EventoCalendario {
+  id: string;
+  titulo: string;
+  data: Date;
+  tipo: 'ferias' | 'admissao' | 'desligamento' | 'aniversario' | 'feriado';
+}
+
 const Dashboard = memo(function Dashboard() {
   useEffect(() => {
     document.title = 'Dashboard | DP System';
@@ -54,9 +70,108 @@ const Dashboard = memo(function Dashboard() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<PeriodFilter>('year');
   
+  // ✅ FIX: Chamar useColaboradores corretamente
+  const { colaboradores, loading: loadingColaboradores } = useColaboradores();
+  
   // Hook para indicadores de DP com dados reais
   const indicadoresPeriodo = period === 'all' ? 'year' : period;
   const indicadores = useIndicadoresDP(indicadoresPeriodo as 'month' | 'quarter' | 'year');
+
+  // ✅ FIX: Gerar alertas baseados em dados reais
+  const alertasData = useMemo<Alerta[]>(() => {
+    const alertas: Alerta[] = [];
+    const hoje = new Date();
+    
+    // Alertas de documentos vencendo
+    colaboradores.forEach(c => {
+      if (c.cnh_validade) {
+        const vencimento = parseISO(c.cnh_validade);
+        const diasParaVencer = differenceInDays(vencimento, hoje);
+        if (diasParaVencer > 0 && diasParaVencer <= 30) {
+          alertas.push({
+            id: `cnh-${c.id}`,
+            tipo: 'warning',
+            titulo: 'CNH Vencendo',
+            descricao: `CNH de ${c.nome_completo} vence em ${diasParaVencer} dias`,
+            data: c.cnh_validade,
+          });
+        } else if (diasParaVencer <= 0) {
+          alertas.push({
+            id: `cnh-vencida-${c.id}`,
+            tipo: 'error',
+            titulo: 'CNH Vencida',
+            descricao: `CNH de ${c.nome_completo} está vencida`,
+            data: c.cnh_validade,
+          });
+        }
+      }
+      
+      // Alertas de férias vencendo (> 11 meses sem férias)
+      if (c.data_admissao && c.status === 'ativo') {
+        const admissao = parseISO(c.data_admissao);
+        const mesesDesdeAdmissao = differenceInDays(hoje, admissao) / 30;
+        if (mesesDesdeAdmissao > 22) { // 22 meses = período concessivo vencendo
+          alertas.push({
+            id: `ferias-${c.id}`,
+            tipo: 'error',
+            titulo: 'Férias Vencendo',
+            descricao: `${c.nome_completo} precisa tirar férias urgente`,
+          });
+        } else if (mesesDesdeAdmissao > 11 && mesesDesdeAdmissao <= 22) {
+          alertas.push({
+            id: `ferias-prox-${c.id}`,
+            tipo: 'warning',
+            titulo: 'Férias Disponíveis',
+            descricao: `${c.nome_completo} tem férias a programar`,
+          });
+        }
+      }
+    });
+    
+    // Limitar e ordenar por prioridade
+    return alertas
+      .sort((a, b) => (a.tipo === 'error' ? -1 : 1) - (b.tipo === 'error' ? -1 : 1))
+      .slice(0, 10);
+  }, [colaboradores]);
+
+  // ✅ FIX: Gerar eventos do calendário baseados em dados reais
+  const eventosCalendario = useMemo<EventoCalendario[]>(() => {
+    const eventos: EventoCalendario[] = [];
+    const hoje = new Date();
+    const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+    
+    colaboradores.forEach(c => {
+      // Aniversários no mês
+      if (c.data_nascimento) {
+        const nascimento = parseISO(c.data_nascimento);
+        const aniversarioEsteMes = new Date(hoje.getFullYear(), nascimento.getMonth(), nascimento.getDate());
+        if (aniversarioEsteMes >= inicioMes && aniversarioEsteMes <= fimMes) {
+          eventos.push({
+            id: `aniv-${c.id}`,
+            titulo: `🎂 ${c.nome_completo.split(' ')[0]}`,
+            data: aniversarioEsteMes,
+            tipo: 'aniversario',
+          });
+        }
+      }
+      
+      // Admissões recentes (últimos 30 dias)
+      if (c.data_admissao) {
+        const admissao = parseISO(c.data_admissao);
+        if (differenceInDays(hoje, admissao) <= 30 && differenceInDays(hoje, admissao) >= 0) {
+          eventos.push({
+            id: `adm-${c.id}`,
+            titulo: `✨ Admissão: ${c.nome_completo.split(' ')[0]}`,
+            data: admissao,
+            tipo: 'admissao',
+          });
+        }
+      }
+    });
+    
+    return eventos.sort((a, b) => a.data.getTime() - b.data.getTime());
+  }, [colaboradores]);
 
   // Calcular taxa média de absenteísmo
   const avgAbsenteeismRate = useMemo(() => {
@@ -74,9 +189,9 @@ const Dashboard = memo(function Dashboard() {
     }).format(value);
   };
 
-  // Filtrar colaboradores por período de admissão (para gráficos visuais)
+  // ✅ FIX: Usar colaboradores do hook ao invés de colaboradoresData
   const filteredColaboradores = useMemo(() => {
-    if (period === 'all') return colaboradoresData;
+    if (period === 'all') return colaboradores;
 
     const now = new Date();
     let startDate: Date;
@@ -92,13 +207,16 @@ const Dashboard = memo(function Dashboard() {
         startDate = subYears(now, 1);
         break;
       default:
-        return colaboradoresData;
+        return colaboradores;
     }
 
-    return colaboradoresData.filter(c => 
-      isAfter(new Date(c.dataAdmissao), startDate)
+    return colaboradores.filter(c => 
+      c.data_admissao && isAfter(new Date(c.data_admissao), startDate)
     );
-  }, [period]);
+  }, [colaboradores, period]);
+
+  // Loading state
+  const isLoading = loadingColaboradores || indicadores.loading;
 
   return (
     <>
@@ -111,7 +229,7 @@ const Dashboard = memo(function Dashboard() {
           <p className="text-muted-foreground text-sm">Visão geral do Departamento Pessoal</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass">
-          {indicadores.loading ? (
+          {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Carregando...</span>
@@ -186,7 +304,7 @@ const Dashboard = memo(function Dashboard() {
         <KPICard 
           icon={AlertTriangle} 
           label="Alertas Urgentes" 
-          value={indicadores.kpis.alertasUrgentes}
+          value={alertasData.filter(a => a.tipo === 'error').length}
           subtitle="requerem ação"
           colorClass="text-destructive"
         />
@@ -339,10 +457,10 @@ const Dashboard = memo(function Dashboard() {
             Últimos 12 meses
           </span>
         </div>
-        <AdmissionsLineChart colaboradores={colaboradoresData} months={12} />
+        <AdmissionsLineChart colaboradores={colaboradores} months={12} />
       </div>
 
-      {/* Alertas */}
+      {/* Alertas e Calendário */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="p-5 rounded-xl bg-card border border-border">
           <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -366,11 +484,3 @@ const Dashboard = memo(function Dashboard() {
 });
 
 export default Dashboard;
-
-
-
-
-
-
-
-
