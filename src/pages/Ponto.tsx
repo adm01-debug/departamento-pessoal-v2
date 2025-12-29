@@ -30,7 +30,7 @@ const statusConfig: Record<string, { label: string; bg: string; text: string; ic
 
 const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-export default memo(function) Ponto() {
+export default memo(function Ponto() {
   useEffect(() => { document.title = 'Ponto Eletrônico | DP System'; }, []);
 
   const [colaboradorId, setColaboradorId] = useState<string>('');
@@ -469,16 +469,3 @@ export default memo(function) Ponto() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
