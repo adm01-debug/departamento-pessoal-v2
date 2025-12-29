@@ -1,7 +1,10 @@
-import { memo } from 'react';
-import { memo } from 'react';
-import { useMemo } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+/**
+ * @fileoverview Gauge de turnover para dashboard
+ * @module components/dashboard/TurnoverGauge
+ * @version V8.2 - Import duplicado corrigido
+ */
+import { memo, useMemo } from 'react';
+import { cn } from '@/lib/utils';
 
 interface TurnoverGaugeProps {
   admissoes: number;
@@ -10,81 +13,82 @@ interface TurnoverGaugeProps {
 }
 
 export const TurnoverGauge = memo(function TurnoverGauge({ admissoes, desligamentos, totalColaboradores }: TurnoverGaugeProps) {
-  const { turnoverRate, data } = useMemo(() => {
-    // Fórmula turnover: ((Admissões + Desligamentos) / 2) / Total * 100
-    const rate = totalColaboradores > 0 
-      ? (((admissoes + desligamentos) / 2) / totalColaboradores) * 100 
-      : 0;
-    
-    const clampedRate = Math.min(rate, 100);
-    
-    return {
-      turnoverRate: rate,
-      data: [
-        { name: 'Turnover', value: clampedRate },
-        { name: 'Restante', value: 100 - clampedRate },
-      ],
-    };
+  // Calcular taxa de turnover: ((Admissões + Desligamentos) / 2) / Total * 100
+  const turnoverRate = useMemo(() => {
+    if (totalColaboradores <= 0) return 0;
+    return (((admissoes + desligamentos) / 2) / totalColaboradores) * 100;
   }, [admissoes, desligamentos, totalColaboradores]);
 
+  // Determinar cor baseada na taxa
   const getColor = (rate: number) => {
-    if (rate <= 5) return 'hsl(var(--success))';
-    if (rate <= 10) return 'hsl(var(--warning))';
-    return 'hsl(var(--destructive))';
+    if (rate <= 5) return { stroke: 'stroke-success', text: 'text-success', label: 'Excelente' };
+    if (rate <= 10) return { stroke: 'stroke-info', text: 'text-info', label: 'Bom' };
+    if (rate <= 15) return { stroke: 'stroke-warning', text: 'text-warning', label: 'Atenção' };
+    return { stroke: 'stroke-destructive', text: 'text-destructive', label: 'Crítico' };
   };
 
-  const getLabel = (rate: number) => {
-    if (rate <= 5) return 'Excelente';
-    if (rate <= 10) return 'Atenção';
-    return 'Crítico';
-  };
+  const { stroke, text, label } = getColor(turnoverRate);
+  
+  // Calcular ângulo do gauge (0-180 graus = 0-30% turnover)
+  const angle = Math.min(180, (turnoverRate / 30) * 180);
+  
+  // Calcular coordenadas do arco
+  const radius = 70;
+  const centerX = 100;
+  const centerY = 90;
+  
+  const startAngle = -180;
+  const endAngle = startAngle + angle;
+  
+  const startX = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
+  const startY = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
+  const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
+  const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
+  
+  const largeArcFlag = angle > 180 ? 1 : 0;
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-32 h-20">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="100%"
-              startAngle={180}
-              endAngle={0}
-              innerRadius={50}
-              outerRadius={65}
-              paddingAngle={0}
-              dataKey="value"
-            >
-              <Cell fill={getColor(turnoverRate)} />
-              <Cell fill="hsl(var(--muted))" />
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-1">
-          <span className="text-2xl font-bold text-foreground">
-            {turnoverRate.toFixed(1)}%
-          </span>
+      <svg width="200" height="110" viewBox="0 0 200 110" className="mb-2">
+        {/* Background arc */}
+        <path
+          d="M 30 90 A 70 70 0 0 1 170 90"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="12"
+          strokeLinecap="round"
+          className="text-muted/30"
+        />
+        
+        {/* Value arc */}
+        {turnoverRate > 0 && (
+          <path
+            d={`M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`}
+            fill="none"
+            strokeWidth="12"
+            strokeLinecap="round"
+            className={stroke}
+          />
+        )}
+        
+        {/* Center text */}
+        <text x={centerX} y={centerY - 10} textAnchor="middle" className="fill-foreground font-bold text-2xl">
+          {turnoverRate.toFixed(1)}%
+        </text>
+        <text x={centerX} y={centerY + 10} textAnchor="middle" className={cn("text-xs font-medium", text)}>
+          {label}
+        </text>
+      </svg>
+      
+      {/* Legend */}
+      <div className="flex gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-success" />
+          <span>Admissões: {admissoes}</span>
         </div>
-      </div>
-      <div className="mt-2 text-center">
-        <span 
-          className="text-xs font-medium px-2 py-0.5 rounded-full"
-          style={{ 
-            backgroundColor: `${getColor(turnoverRate)}20`,
-            color: getColor(turnoverRate)
-          }}
-        >
-          {getLabel(turnoverRate)}
-        </span>
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-4 text-center w-full">
-        <div>
-          <p className="text-lg font-semibold text-success">{admissoes}</p>
-          <p className="text-xs text-muted-foreground">Admissões</p>
-        </div>
-        <div>
-          <p className="text-lg font-semibold text-destructive">{desligamentos}</p>
-          <p className="text-xs text-muted-foreground">Desligamentos</p>
+        <div className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-destructive" />
+          <span>Desligamentos: {desligamentos}</span>
         </div>
       </div>
     </div>
