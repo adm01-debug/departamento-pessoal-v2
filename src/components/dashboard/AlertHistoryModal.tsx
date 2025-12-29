@@ -1,4 +1,3 @@
-import { useState, memo, memo, useEffect, useMemo, memo } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Dialog,
@@ -480,11 +479,3 @@ export function AlertHistoryModal({ open, onOpenChange }: AlertHistoryModalProps
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-
