@@ -73,7 +73,7 @@ export const DIAS_UTEIS_PADRAO = 22;
  * Arredondamento monetário preciso (2 casas decimais)
  * Evita problemas de floating point
  */
-function arredondarMonetario(valor: number): number {
+export function arredondarMonetario(valor: number): number {
   return Math.round((valor + Number.EPSILON) * 100) / 100;
 }
 
