@@ -28,7 +28,7 @@ interface DepartmentNode {
   expanded: boolean;
 }
 
-export default memo(function) Organograma() {
+export default memo(function Organograma() {
   useEffect(() => { document.title = 'Organograma | DP System'; }, []);
 
   const { empresaAtual } = useEmpresas();
@@ -377,10 +377,3 @@ export default memo(function) Organograma() {
     </div>
   );
 }
-
-
-
-
-
-
-
