@@ -97,7 +97,7 @@ const categorias: CategoriaConfig[] = [
   },
 ];
 
-export default memo(function) Relatorios() {
+export default memo(function Relatorios() {
   useEffect(() => { document.title = 'Relatórios | DP System'; }, []);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -553,16 +553,3 @@ export default memo(function) Relatorios() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
