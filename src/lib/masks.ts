@@ -118,7 +118,7 @@ export const validateCPF = (cpf: string): boolean => {
   if (digits.length !== 11) return false;
   
   // Check for known invalid patterns (all same digits)
-  if (/^(\d)\1{10}$/.test(digits)) return false;
+  if (/^(\d){10}$/.test(digits)) return false;
   
   // Validate first check digit
   let sum = 0;
@@ -148,7 +148,7 @@ export const validateCNPJ = (cnpj: string): boolean => {
   if (digits.length !== 14) return false;
   
   // Check for known invalid patterns (all same digits)
-  if (/^(\d)\1{13}$/.test(digits)) return false;
+  if (/^(\d){13}$/.test(digits)) return false;
   
   // Validate first check digit
   const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -180,7 +180,7 @@ export const validatePIS = (pis: string): boolean => {
   if (digits.length !== 11) return false;
   
   // Check for known invalid patterns (all same digits)
-  if (/^(\d)\1{10}$/.test(digits)) return false;
+  if (/^(\d){10}$/.test(digits)) return false;
   
   // PIS/PASEP validation weights
   const weights = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -301,7 +301,7 @@ export const validateTituloEleitor = (titulo: string): { valid: boolean; message
   }
   
   // Check for all same digits (invalid)
-  if (/^(\d)\1{11}$/.test(digits)) {
+  if (/^(\d){11}$/.test(digits)) {
     return { valid: false, message: 'Título de eleitor inválido' };
   }
   
@@ -373,7 +373,7 @@ export const validateCNH = (cnh: string): { valid: boolean; message?: string } =
   }
   
   // Check for all same digits (invalid)
-  if (/^(\d)\1{10}$/.test(digits)) {
+  if (/^(\d){10}$/.test(digits)) {
     return { valid: false, message: 'CNH inválida' };
   }
   
@@ -464,3 +464,19 @@ export function useMaskedInput(mask: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'currenc
     return masked;
   };
 }
+
+// ============================================
+// FUNÇÕES DE FORMATAÇÃO (ALIASES)
+// ============================================
+
+export const formatarCPF = (value: string): string => masks.cpf(value);
+export const formatarCNPJ = (value: string): string => masks.cnpj(value);
+export const formatarCPFCNPJ = (value: string): string => masks.cpfCnpj(value);
+export const formatarTelefone = (value: string): string => masks.phone(value);
+export const formatarCEP = (value: string): string => masks.cep(value);
+export const formatarData = (value: string): string => masks.date(value);
+export const formatarMoeda = (value: string): string => masks.currency(value);
+export const formatarRG = (value: string): string => masks.rg(value);
+export const formatarPIS = (value: string): string => masks.pis(value);
+export const formatarTituloEleitor = (value: string): string => masks.tituloEleitor(value);
+export const formatarCNH = (value: string): string => masks.cnh(value);
