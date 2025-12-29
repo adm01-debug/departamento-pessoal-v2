@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import { useState, memo, memo, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import { FileText, Upload, Trash2, Download, Loader2, File, Image, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
