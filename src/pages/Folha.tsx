@@ -42,7 +42,7 @@ import {
 import { formatCurrency } from '@/lib/calculosTrabalhistas';
 import { toast } from '@/hooks/use-toast';
 
-export default memo(function) Folha() {
+export default memo(function Folha() {
   useEffect(() => {
     document.title = 'Folha de Pagamento | DP System';
   }, []);
@@ -784,16 +784,3 @@ function HoleriteDetailModal({ holerite, open, onOpenChange }: { holerite: Holer
     </Dialog>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
