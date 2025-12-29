@@ -1,7 +1,7 @@
 /**
  * @fileoverview Utilitários gerais do sistema
  * @module lib/utils
- * @version V8.1 - Expandido por análise QA
+ * @version V8.2 - QA Fix - Regex corrigido
  */
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -129,6 +129,16 @@ export function formatCompetencia(competencia: string | null | undefined): strin
   return `${mes}/${ano}`;
 }
 
+/**
+ * Formata horas (HH:MM)
+ */
+export function formatHoras(minutos: number): string {
+  const horas = Math.floor(Math.abs(minutos) / 60);
+  const mins = Math.abs(minutos) % 60;
+  const sinal = minutos < 0 ? '-' : '';
+  return `${sinal}${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+}
+
 // ============================================
 // VALIDAÇÃO
 // ============================================
@@ -140,6 +150,7 @@ export function isValidCPF(cpf: string | null | undefined): boolean {
   if (!cpf) return false;
   const cleaned = cpf.replace(/\D/g, '');
   if (cleaned.length !== 11) return false;
+  // Rejeita CPFs com todos os dígitos iguais
   if (/^(\d)\1+$/.test(cleaned)) return false;
   
   let soma = 0;
@@ -166,6 +177,7 @@ export function isValidCNPJ(cnpj: string | null | undefined): boolean {
   if (!cnpj) return false;
   const cleaned = cnpj.replace(/\D/g, '');
   if (cleaned.length !== 14) return false;
+  // Rejeita CNPJs com todos os dígitos iguais
   if (/^(\d)\1+$/.test(cleaned)) return false;
   
   const pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -204,6 +216,8 @@ export function isValidPIS(pis: string | null | undefined): boolean {
   if (!pis) return false;
   const cleaned = pis.replace(/\D/g, '');
   if (cleaned.length !== 11) return false;
+  // Rejeita PIS com todos os dígitos iguais
+  if (/^(\d)\1+$/.test(cleaned)) return false;
   
   const pesos = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
   let soma = 0;
@@ -270,6 +284,15 @@ export function getPreviousCompetencia(competencia?: string): string {
 }
 
 /**
+ * Retorna próxima competência
+ */
+export function getNextCompetencia(competencia?: string): string {
+  const [ano, mes] = (competencia || getCurrentCompetencia()).split('-').map(Number);
+  const date = new Date(ano, mes, 1);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
  * Calcula idade
  */
 export function calculateAge(birthDate: string | Date): number {
@@ -293,6 +316,38 @@ export function daysBetween(start: string | Date, end: string | Date): number {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Calcula meses entre datas
+ */
+export function monthsBetween(start: string | Date, end: string | Date): number {
+  const startDate = typeof start === 'string' ? new Date(start) : start;
+  const endDate = typeof end === 'string' ? new Date(end) : end;
+  return (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+         (endDate.getMonth() - startDate.getMonth());
+}
+
+/**
+ * Verifica se é dia útil (segunda a sexta)
+ */
+export function isBusinessDay(date: Date): boolean {
+  const day = date.getDay();
+  return day !== 0 && day !== 6;
+}
+
+/**
+ * Retorna primeiro dia do mês
+ */
+export function firstDayOfMonth(date: Date = new Date()): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+/**
+ * Retorna último dia do mês
+ */
+export function lastDayOfMonth(date: Date = new Date()): Date {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
 // ============================================
 // MISC
 // ============================================
@@ -300,11 +355,11 @@ export function daysBetween(start: string | Date, end: string | Date): number {
 /**
  * Debounce function
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -314,7 +369,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * Throttle function
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -339,13 +394,27 @@ export function sleep(ms: number): Promise<void> {
  * Gera ID único
  */
 export function generateId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 11)}`;
+}
+
+/**
+ * Gera UUID v4
+ */
+export function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 /**
  * Deep clone de objeto
  */
 export function deepClone<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj instanceof Date) return new Date(obj.getTime()) as T;
+  if (Array.isArray(obj)) return obj.map(item => deepClone(item)) as T;
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -357,9 +426,17 @@ export function isDev(): boolean {
 }
 
 /**
+ * Verifica se está no ambiente de produção
+ */
+export function isProd(): boolean {
+  return import.meta.env?.PROD ?? process.env.NODE_ENV === 'production';
+}
+
+/**
  * Trunca texto
  */
 export function truncate(str: string, length: number, suffix: string = '...'): string {
+  if (!str) return '';
   if (str.length <= length) return str;
   return str.substring(0, length - suffix.length) + suffix;
 }
@@ -368,6 +445,7 @@ export function truncate(str: string, length: number, suffix: string = '...'): s
  * Capitaliza primeira letra
  */
 export function capitalize(str: string): string {
+  if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
@@ -375,5 +453,81 @@ export function capitalize(str: string): string {
  * Capitaliza cada palavra
  */
 export function capitalizeWords(str: string): string {
+  if (!str) return '';
   return str.split(' ').map(capitalize).join(' ');
+}
+
+/**
+ * Verifica se objeto está vazio
+ */
+export function isEmpty(obj: unknown): boolean {
+  if (obj === null || obj === undefined) return true;
+  if (typeof obj === 'string') return obj.trim().length === 0;
+  if (Array.isArray(obj)) return obj.length === 0;
+  if (typeof obj === 'object') return Object.keys(obj).length === 0;
+  return false;
+}
+
+/**
+ * Agrupa array por chave
+ */
+export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
+  return array.reduce((result, item) => {
+    const groupKey = String(item[key]);
+    if (!result[groupKey]) {
+      result[groupKey] = [];
+    }
+    result[groupKey].push(item);
+    return result;
+  }, {} as Record<string, T[]>);
+}
+
+/**
+ * Remove duplicatas de array
+ */
+export function unique<T>(array: T[]): T[] {
+  return [...new Set(array)];
+}
+
+/**
+ * Remove duplicatas por chave
+ */
+export function uniqueBy<T>(array: T[], key: keyof T): T[] {
+  const seen = new Set();
+  return array.filter(item => {
+    const value = item[key];
+    if (seen.has(value)) return false;
+    seen.add(value);
+    return true;
+  });
+}
+
+/**
+ * Ordena array por chave
+ */
+export function sortBy<T>(array: T[], key: keyof T, order: 'asc' | 'desc' = 'asc'): T[] {
+  return [...array].sort((a, b) => {
+    const aVal = a[key];
+    const bVal = b[key];
+    if (aVal < bVal) return order === 'asc' ? -1 : 1;
+    if (aVal > bVal) return order === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+/**
+ * Arredonda valor monetário
+ */
+export function roundMoney(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Compara dois objetos (shallow)
+ */
+export function shallowEqual(obj1: Record<string, unknown>, obj2: Record<string, unknown>): boolean {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) return false;
+  return keys1.every(key => obj1[key] === obj2[key]);
 }
