@@ -39,7 +39,7 @@ const statusColors: Record<StatusEvento, string> = {
   erro: 'bg-destructive/20 text-destructive',
 };
 
-export default memo(function) ESocial() {
+export default memo(function ESocial() {
   useEffect(() => {
     document.title = 'eSocial | DP System';
   }, []);
@@ -340,17 +340,3 @@ export default memo(function) ESocial() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
