@@ -3,18 +3,22 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 /**
  * Edge Function: Cálculo Completo de Folha de Pagamento
- * @version V8.0 - Implementação REAL com cálculos trabalhistas
+ * @version V8.1 - Corrigido por análise QA - Tabelas 2025
  */
 
-// Tabela INSS Progressiva 2024
+// ============================================
+// TABELAS 2025
+// ============================================
+
+// Tabela INSS Progressiva 2025
 const TABELA_INSS = [
-  { limite: 1412.00, aliquota: 0.075 },
-  { limite: 2666.68, aliquota: 0.09 },
-  { limite: 4000.03, aliquota: 0.12 },
-  { limite: 7786.02, aliquota: 0.14 },
+  { limite: 1518.00, aliquota: 0.075 },
+  { limite: 2793.88, aliquota: 0.09 },
+  { limite: 4190.83, aliquota: 0.12 },
+  { limite: 8157.41, aliquota: 0.14 },
 ];
 
-// Tabela IRRF 2024
+// Tabela IRRF 2025
 const TABELA_IRRF = [
   { limite: 2259.20, aliquota: 0, deducao: 0 },
   { limite: 2826.65, aliquota: 0.075, deducao: 169.44 },
@@ -23,9 +27,17 @@ const TABELA_IRRF = [
   { limite: Infinity, aliquota: 0.275, deducao: 896.00 },
 ];
 
-const TETO_INSS = 7786.02;
+// Constantes 2025
+const TETO_INSS = 8157.41;
+const SALARIO_MINIMO = 1518.00;
 const ALIQUOTA_FGTS = 0.08;
+const ALIQUOTA_INSS_PATRONAL = 0.20;
 const DEDUCAO_DEPENDENTE = 189.59;
+const JORNADA_MENSAL = 220;
+
+// ============================================
+// TIPOS
+// ============================================
 
 interface Colaborador {
   id: string;
@@ -76,8 +88,17 @@ interface ResultadoFolha {
   faixaIRRF: number;
 }
 
-// Cálculo INSS Progressivo
+// ============================================
+// FUNÇÕES DE CÁLCULO
+// ============================================
+
+function arredondar(valor: number): number {
+  return Math.round((valor + Number.EPSILON) * 100) / 100;
+}
+
 function calcularINSS(remuneracao: number): { valor: number; detalhamento: any[] } {
+  if (remuneracao <= 0) return { valor: 0, detalhamento: [] };
+  
   const base = Math.min(remuneracao, TETO_INSS);
   let valorINSS = 0;
   let valorAnterior = 0;
@@ -87,12 +108,12 @@ function calcularINSS(remuneracao: number): { valor: number; detalhamento: any[]
     const faixa = TABELA_INSS[i];
     if (base > valorAnterior) {
       const baseNaFaixa = Math.min(base, faixa.limite) - valorAnterior;
-      const valorFaixa = baseNaFaixa * faixa.aliquota;
+      const valorFaixa = arredondar(baseNaFaixa * faixa.aliquota);
       valorINSS += valorFaixa;
       
       detalhamento.push({
         faixa: i + 1,
-        base: baseNaFaixa,
+        base: arredondar(baseNaFaixa),
         aliquota: faixa.aliquota * 100,
         valor: valorFaixa,
       });
@@ -100,12 +121,11 @@ function calcularINSS(remuneracao: number): { valor: number; detalhamento: any[]
     valorAnterior = faixa.limite;
   }
 
-  return { valor: Number(valorINSS.toFixed(2)), detalhamento };
+  return { valor: arredondar(valorINSS), detalhamento };
 }
 
-// Cálculo IRRF
 function calcularIRRF(baseCalculo: number, dependentes: number): { valor: number; faixa: number } {
-  const deducaoDependentes = dependentes * DEDUCAO_DEPENDENTE;
+  const deducaoDependentes = Math.max(0, dependentes) * DEDUCAO_DEPENDENTE;
   const base = baseCalculo - deducaoDependentes;
   
   if (base <= 0) return { valor: 0, faixa: 0 };
@@ -114,80 +134,84 @@ function calcularIRRF(baseCalculo: number, dependentes: number): { valor: number
     const faixa = TABELA_IRRF[i];
     if (base <= faixa.limite) {
       const irrf = (base * faixa.aliquota) - faixa.deducao;
-      return { valor: Math.max(0, Number(irrf.toFixed(2))), faixa: i + 1 };
+      return { valor: Math.max(0, arredondar(irrf)), faixa: i + 1 };
     }
   }
 
   const ultimaFaixa = TABELA_IRRF[TABELA_IRRF.length - 1];
   return { 
-    valor: Number(((base * ultimaFaixa.aliquota) - ultimaFaixa.deducao).toFixed(2)), 
+    valor: arredondar((base * ultimaFaixa.aliquota) - ultimaFaixa.deducao), 
     faixa: 5 
   };
 }
 
-// Cálculo de Horas Extras
 function calcularHorasExtras(salario: number, he50: number, he100: number): { valorHE50: number; valorHE100: number } {
-  const salarioHora = salario / 220;
+  const salarioHora = salario / JORNADA_MENSAL;
   return {
-    valorHE50: Number((salarioHora * 1.5 * he50).toFixed(2)),
-    valorHE100: Number((salarioHora * 2 * he100).toFixed(2)),
+    valorHE50: arredondar(salarioHora * 1.5 * he50),
+    valorHE100: arredondar(salarioHora * 2 * he100),
   };
 }
 
-// Cálculo de Adicional Noturno
 function calcularAdicionalNoturno(salario: number, horasNoturnas: number): number {
-  const salarioHora = salario / 220;
-  return Number((salarioHora * 0.2 * horasNoturnas).toFixed(2));
+  const salarioHora = salario / JORNADA_MENSAL;
+  return arredondar(salarioHora * 0.2 * horasNoturnas);
 }
 
-// Cálculo de DSR sobre Comissões
 function calcularDSR(comissoes: number, diasUteis: number = 22, domingos: number = 4): number {
-  if (diasUteis === 0) return 0;
-  return Number(((comissoes / diasUteis) * domingos).toFixed(2));
+  if (diasUteis === 0 || comissoes <= 0) return 0;
+  return arredondar((comissoes / diasUteis) * domingos);
 }
 
-// Função principal de cálculo
 function processarFolha(colaborador: Colaborador, competencia: string): ResultadoFolha {
   // PROVENTOS
   const { valorHE50, valorHE100 } = calcularHorasExtras(
     colaborador.salario, 
-    colaborador.horasExtras50, 
-    colaborador.horasExtras100
+    colaborador.horasExtras50 || 0, 
+    colaborador.horasExtras100 || 0
   );
   
-  const adicionalNoturno = calcularAdicionalNoturno(colaborador.salario, colaborador.adicionalNoturno);
-  const dsrComissoes = calcularDSR(colaborador.comissoes);
+  const adicionalNoturno = calcularAdicionalNoturno(
+    colaborador.salario, 
+    colaborador.adicionalNoturno || 0
+  );
   
-  const totalProventos = 
+  const dsrComissoes = calcularDSR(colaborador.comissoes || 0);
+  
+  const totalProventos = arredondar(
     colaborador.salario + 
     valorHE50 + 
     valorHE100 + 
     adicionalNoturno + 
-    colaborador.comissoes + 
+    (colaborador.comissoes || 0) + 
     dsrComissoes + 
-    colaborador.gratificacoes;
+    (colaborador.gratificacoes || 0)
+  );
 
   // DESCONTOS
   const inssCalculo = calcularINSS(totalProventos);
   const baseIRRF = totalProventos - inssCalculo.valor;
-  const irrfCalculo = calcularIRRF(baseIRRF, colaborador.dependentes);
+  const irrfCalculo = calcularIRRF(baseIRRF, colaborador.dependentes || 0);
   
-  const valeTransporte = Math.min(colaborador.salario * 0.06, colaborador.valeTransporte);
+  const valeTransporte = arredondar(
+    Math.min(colaborador.salario * 0.06, colaborador.valeTransporte || 0)
+  );
   
-  const totalDescontos = 
+  const totalDescontos = arredondar(
     inssCalculo.valor + 
     irrfCalculo.valor + 
     valeTransporte + 
-    colaborador.planoSaude + 
-    colaborador.pensaoAlimenticia + 
-    colaborador.outrosDescontos;
+    (colaborador.planoSaude || 0) + 
+    (colaborador.pensaoAlimenticia || 0) + 
+    (colaborador.outrosDescontos || 0)
+  );
 
   // ENCARGOS
-  const fgts = Number((totalProventos * ALIQUOTA_FGTS).toFixed(2));
-  const inssPatronal = Number((totalProventos * 0.20).toFixed(2));
+  const fgts = arredondar(totalProventos * ALIQUOTA_FGTS);
+  const inssPatronal = arredondar(totalProventos * ALIQUOTA_INSS_PATRONAL);
 
   // LÍQUIDO
-  const liquido = Number((totalProventos - totalDescontos).toFixed(2));
+  const liquido = arredondar(totalProventos - totalDescontos);
 
   return {
     colaboradorId: colaborador.id,
@@ -197,19 +221,19 @@ function processarFolha(colaborador: Colaborador, competencia: string): Resultad
       horasExtras50: valorHE50,
       horasExtras100: valorHE100,
       adicionalNoturno,
-      comissoes: colaborador.comissoes,
+      comissoes: colaborador.comissoes || 0,
       dsrComissoes,
-      gratificacoes: colaborador.gratificacoes,
-      totalProventos: Number(totalProventos.toFixed(2)),
+      gratificacoes: colaborador.gratificacoes || 0,
+      totalProventos,
     },
     descontos: {
       inss: inssCalculo.valor,
       irrf: irrfCalculo.valor,
       valeTransporte,
-      planoSaude: colaborador.planoSaude,
-      pensaoAlimenticia: colaborador.pensaoAlimenticia,
-      outrosDescontos: colaborador.outrosDescontos,
-      totalDescontos: Number(totalDescontos.toFixed(2)),
+      planoSaude: colaborador.planoSaude || 0,
+      pensaoAlimenticia: colaborador.pensaoAlimenticia || 0,
+      outrosDescontos: colaborador.outrosDescontos || 0,
+      totalDescontos,
     },
     encargos: {
       fgts,
@@ -220,6 +244,10 @@ function processarFolha(colaborador: Colaborador, competencia: string): Resultad
     faixaIRRF: irrfCalculo.faixa,
   };
 }
+
+// ============================================
+// HANDLER
+// ============================================
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -232,18 +260,13 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
     const { colaboradores, competencia } = await req.json();
 
     if (!colaboradores || !Array.isArray(colaboradores)) {
       throw new Error('Lista de colaboradores é obrigatória');
     }
 
-    if (!competencia) {
+    if (!competencia || !/^\d{4}-\d{2}$/.test(competencia)) {
       throw new Error('Competência é obrigatória (formato: YYYY-MM)');
     }
 
@@ -254,11 +277,14 @@ serve(async (req: Request): Promise<Response> => {
 
     // Totalizadores
     const totais = {
-      totalProventos: resultados.reduce((acc, r) => acc + r.proventos.totalProventos, 0),
-      totalDescontos: resultados.reduce((acc, r) => acc + r.descontos.totalDescontos, 0),
-      totalLiquido: resultados.reduce((acc, r) => acc + r.liquido, 0),
-      totalFGTS: resultados.reduce((acc, r) => acc + r.encargos.fgts, 0),
-      totalINSSPatronal: resultados.reduce((acc, r) => acc + r.encargos.inssPatronal, 0),
+      totalProventos: arredondar(resultados.reduce((acc, r) => acc + r.proventos.totalProventos, 0)),
+      totalDescontos: arredondar(resultados.reduce((acc, r) => acc + r.descontos.totalDescontos, 0)),
+      totalLiquido: arredondar(resultados.reduce((acc, r) => acc + r.liquido, 0)),
+      totalFGTS: arredondar(resultados.reduce((acc, r) => acc + r.encargos.fgts, 0)),
+      totalINSSPatronal: arredondar(resultados.reduce((acc, r) => acc + r.encargos.inssPatronal, 0)),
+      custoTotal: arredondar(resultados.reduce((acc, r) => 
+        acc + r.proventos.totalProventos + r.encargos.fgts + r.encargos.inssPatronal, 0
+      )),
       quantidadeColaboradores: resultados.length,
     };
 
@@ -266,6 +292,7 @@ serve(async (req: Request): Promise<Response> => {
       JSON.stringify({
         success: true,
         competencia,
+        versaoTabelas: '2025-01',
         processadoEm: new Date().toISOString(),
         resultados,
         totais,
@@ -274,7 +301,10 @@ serve(async (req: Request): Promise<Response> => {
     );
   } catch (error) {
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Erro desconhecido' 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     );
   }
