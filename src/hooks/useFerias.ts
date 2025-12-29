@@ -120,10 +120,7 @@ export const useFerias = (): UseFeriasReturn => {
             *,
             colaboradores!inner(nome_completo, cargo, departamento)
           `)
-          .order('data_inicio', { ascending: true ,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 1000 * 60 * 30, // 30 minutos
-    retry: 3});
+          .order('data_inicio', { ascending: true });
         
         if (empresaAtualId) {
           query = query.eq('empresa_id', empresaAtualId);
@@ -142,13 +139,16 @@ export const useFerias = (): UseFeriasReturn => {
         const { data, error } = await query;
         if (error) throw error;
         
-        return (data ?? []).map((f: { colaborador_id: string }) => ({
+        return (data ?? []).map((f: Record<string, unknown> & { colaboradores?: { nome_completo?: string; cargo?: string; departamento?: string } }) => ({
           ...f,
           colaborador_nome: f.colaboradores?.nome_completo,
           colaborador_cargo: f.colaboradores?.cargo,
           colaborador_departamento: f.colaboradores?.departamento
         }));
-      }
+      },
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      retry: 3
     });
   };
 
@@ -312,10 +312,3 @@ export const useFerias = (): UseFeriasReturn => {
     isAprovando: aprovarFeriasMutation.isPending
   };
 };
-
-
-
-
-
-
-
