@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { useState, memo, useRef, memo } from 'react';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X, Loader2, Download, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
@@ -162,7 +161,8 @@ export const ImportacaoColaboradoresModal = memo(function ImportacaoColaboradore
     const csvContent = [
       headers.join(';'),
       exemplo.join(';'),
-    ].join('\n');
+    ].join('
+');
 
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
