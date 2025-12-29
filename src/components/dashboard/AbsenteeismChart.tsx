@@ -1,7 +1,10 @@
+/**
+ * @fileoverview Gráfico de absenteísmo por departamento
+ * @module components/dashboard/AbsenteeismChart
+ * @version V8.2 - Import duplicado corrigido
+ */
 import { memo } from 'react';
-import { memo } from 'react';
-import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface AbsenteeismData {
   departamento: string;
@@ -14,82 +17,76 @@ interface AbsenteeismChartProps {
   data: AbsenteeismData[];
 }
 
+const COLORS = {
+  faltas: 'hsl(var(--destructive))',
+  atestados: 'hsl(var(--warning))',
+};
+
 export const AbsenteeismChart = memo(function AbsenteeismChart({ data }: AbsenteeismChartProps) {
-  const chartData = useMemo(() => {
-    return data.map(item => ({
-      ...item,
-      name: item.departamento.length > 10 
-        ? item.departamento.substring(0, 10) + '...' 
-        : item.departamento,
-    }));
-  }, [data]);
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[180px] text-muted-foreground text-sm">
+        Sem dados de absenteísmo
+      </div>
+    );
+  }
 
-  const getColor = (rate: number) => {
-    if (rate <= 2) return 'hsl(var(--success))';
-    if (rate <= 5) return 'hsl(var(--warning))';
-    return 'hsl(var(--destructive))';
-  };
-
-  const avgRate = useMemo(() => {
-    if (data.length === 0) return 0;
-    return data.reduce((acc, item) => acc + item.taxaAbsenteismo, 0) / data.length;
-  }, [data]);
+  // Preparar dados para o gráfico
+  const chartData = data.map(d => ({
+    departamento: d.departamento.length > 10 ? d.departamento.substring(0, 10) + '...' : d.departamento,
+    departamentoFull: d.departamento,
+    faltas: d.faltas,
+    atestados: d.atestados,
+    total: d.faltas + d.atestados,
+    taxa: d.taxaAbsenteismo,
+  }));
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-foreground">{avgRate.toFixed(1)}%</p>
-          <p className="text-xs text-muted-foreground">Taxa média de absenteísmo</p>
-        </div>
-        <div 
-          className="text-xs font-medium px-2 py-1 rounded-full"
-          style={{ 
-            backgroundColor: `${getColor(avgRate)}20`,
-            color: getColor(avgRate)
+    <ResponsiveContainer width="100%" height={180}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+        <XAxis type="number" tick={{ fontSize: 10 }} className="text-muted-foreground" />
+        <YAxis 
+          type="category" 
+          dataKey="departamento" 
+          tick={{ fontSize: 10 }} 
+          width={80}
+          className="text-muted-foreground"
+        />
+        <Tooltip 
+          contentStyle={{ 
+            backgroundColor: 'hsl(var(--card))', 
+            border: '1px solid hsl(var(--border))',
+            borderRadius: '8px',
+            fontSize: '12px'
           }}
-        >
-          {avgRate <= 2 ? 'Saudável' : avgRate <= 5 ? 'Atenção' : 'Crítico'}
-        </div>
-      </div>
-      
-      <div className="h-[180px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 10 }}>
-            <XAxis type="number" domain={[0, 'auto']} tickFormatter={(v) => `${v}%`} />
-            <YAxis 
-              type="category" 
-              dataKey="name" 
-              width={80} 
-              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-            />
-            <Tooltip 
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const item = payload[0].payload as AbsenteeismData;
-                  return (
-                    <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
-                      <p className="font-medium text-foreground">{item.departamento}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Taxa: <span className="font-semibold">{item.taxaAbsenteismo.toFixed(1)}%</span>
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Faltas: {item.faltas} | Atestados: {item.atestados}
-                      </p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Bar dataKey="taxaAbsenteismo" radius={[0, 4, 4, 0]}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getColor(entry.taxaAbsenteismo)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+          formatter={(value: number, name: string) => {
+            const label = name === 'faltas' ? 'Faltas' : 'Atestados';
+            return [`${value} dias`, label];
+          }}
+          labelFormatter={(label: string, payload: unknown[]) => {
+            if (payload?.[0]) {
+              const item = payload[0] as { payload: { departamentoFull: string; taxa: number } };
+              return `${item.payload.departamentoFull} (${item.payload.taxa.toFixed(1)}%)`;
+            }
+            return label;
+          }}
+        />
+        <Bar 
+          dataKey="faltas" 
+          stackId="a"
+          fill={COLORS.faltas}
+          radius={[0, 0, 0, 0]}
+          name="faltas"
+        />
+        <Bar 
+          dataKey="atestados" 
+          stackId="a"
+          fill={COLORS.atestados}
+          radius={[0, 4, 4, 0]}
+          name="atestados"
+        />
+      </BarChart>
+    </ResponsiveContainer>
   );
 });
