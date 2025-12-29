@@ -104,7 +104,7 @@ export interface UseDesligamentosReturn {
   deleteDesligamento: (id: string) => Promise<boolean>;
   updateChecklist: (id: string, field: string, value: boolean) => Promise<boolean>;
   concluirDesligamento: (id: string) => Promise<boolean>;
-  calcularRescisao: (desligamento: Desligamento) => CalculoRescisao;
+  calcularRescisao: (salario: number, dataAdmissao: Date, dataDesligamento: Date, tipo: TipoDesligamento, avisoPrevioTrabalhado: boolean) => CalculoRescisao;
   tipoLabels: Record<TipoDesligamento, string>;
 }
 
@@ -306,11 +306,3 @@ export function useDesligamentos(): UseDesligamentosReturn {
     tipoLabels,
   };
 }
-
-
-
-
-
-
-
-
