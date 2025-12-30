@@ -442,6 +442,6 @@ const Assinaturas = memo(function Assinaturas() {
         </DialogContent>
       </Dialog>
     </div>
-  
-      </>);
-}
+    </>
+  );
+});
