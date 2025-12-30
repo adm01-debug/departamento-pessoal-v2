@@ -315,8 +315,6 @@ export default memo(function Ferias() {
             {ferias.map((f) => {
               const colors = statusColors[f.status] || statusColors.programada;
               return (
-    <>
-      <SEOHead title="Férias | DP System" description="Gestão de férias" />
                 <div key={f.id} className="p-4 hover:bg-muted/30 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
