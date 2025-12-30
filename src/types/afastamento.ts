@@ -40,3 +40,14 @@ export const TIPOS_AFASTAMENTO: Record<Afastamento['tipo'], string> = {
   outro: 'Outro',
 };
 
+export const statusAfastamentoColors: Record<Afastamento['status'], string> = {
+  ativo: 'bg-red-500',
+  encerrado: 'bg-green-500',
+  pendente: 'bg-yellow-500',
+};
+
+export const STATUS_AFASTAMENTO: Record<Afastamento['status'], string> = {
+  ativo: 'Ativo',
+  encerrado: 'Encerrado',
+  pendente: 'Pendente',
+};
