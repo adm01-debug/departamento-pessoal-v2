@@ -272,8 +272,6 @@ const Beneficios = memo(function Beneficios() {
                     {tiposBeneficio.slice(0, 5).map(tipo => {
                       const beneficio = item.beneficios.find(b => b.tipo_beneficio_id === tipo.id);
                       return (
-    <>
-      <SEOHead title="Benefícios | DP System" description="Gestão de benefícios" />
                         <td key={tipo.id} className="p-4 text-sm text-center">
                           {beneficio ? (
                             <Badge className="bg-success/10 text-success border-0">
@@ -374,15 +372,3 @@ const Beneficios = memo(function Beneficios() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
