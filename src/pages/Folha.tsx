@@ -453,7 +453,7 @@ export default memo(function Folha() {
       </AlertDialog>
     </div>
   );
-}
+});
 
 // Componente de Eventos Variáveis
 function EventosVariaveisTab({ 
