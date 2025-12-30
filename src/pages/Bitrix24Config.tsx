@@ -495,5 +495,6 @@ export default function Bitrix24Config() {
         </TabsContent>
       </Tabs>
     </div>
+    </>
   );
 }
