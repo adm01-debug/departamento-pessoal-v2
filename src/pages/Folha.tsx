@@ -139,8 +139,6 @@ export default memo(function Folha() {
   }
 
   return (
-    <>
-      <SEOHead title="Folha de Pagamento | DP System" description="Sistema de Departamento Pessoal" />
       <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -454,7 +452,6 @@ export default memo(function Folha() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-    </>
   );
 }
 
@@ -645,7 +642,6 @@ function EventosVariaveisTab({
         </DialogContent>
       </Dialog>
     </div>
-    </>
   );
 }
 
