@@ -541,4 +541,4 @@ const Afastamentos = memo(function Afastamentos() {
     </div>
     </>
   );
-}
+});
