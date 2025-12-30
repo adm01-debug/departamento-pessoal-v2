@@ -650,4 +650,4 @@ export default memo(function PortalColaborador() {
       </Tabs>
     </div>
   );
-}
+});
