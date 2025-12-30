@@ -171,8 +171,6 @@ export default function Bitrix24Config() {
 
   if (loadingConfig) {
     return (
-    <>
-      <SEOHead title="Bitrix24 | DP System" description="Configuração Bitrix24" />
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
@@ -180,8 +178,6 @@ export default function Bitrix24Config() {
   }
 
   return (
-    <>
-      <SEOHead title="Configuração Bitrix24 | DP System" description="Sistema de Departamento Pessoal" />
       <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -494,6 +490,5 @@ export default function Bitrix24Config() {
         </TabsContent>
       </Tabs>
     </div>
-    </>
   );
 }
