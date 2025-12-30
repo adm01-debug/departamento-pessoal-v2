@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, useEffect, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,29 @@ import { supabase } from '@/integrations/supabase/client';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { format } from 'date-fns';
 
+interface OnboardingData {
+  id: string;
+  status: string;
+  created_at: string;
+  colaboradores?: {
+    nome_completo: string;
+    cargo: string;
+    departamento: string;
+  };
+}
+
+interface TarefaData {
+  id: string;
+  titulo: string;
+  concluida: boolean;
+}
+
+interface OnboardingCardProps {
+  onboarding: OnboardingData;
+  statusColors: Record<string, string>;
+  onToggleTarefa: (id: string, concluida: boolean) => void;
+}
+
 export default function Onboarding() {
   useEffect(() => {
     document.title = 'Onboarding | DP System';
@@ -34,7 +57,6 @@ export default function Onboarding() {
 
   const colaboradoresAtivos = colaboradores.filter(c => c.status === 'ativo');
 
-  // Buscar onboardings ativos
   const { data: onboardings = [], isLoading } = useQuery({
     queryKey: ['onboardings'],
     queryFn: async () => {
@@ -43,11 +65,10 @@ export default function Onboarding() {
         .select(`*, colaboradores(nome_completo, cargo, departamento)`)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+      return data as OnboardingData[];
     }
   });
 
-  // Buscar tarefas de um onboarding
   const { data: templates = [] } = useQuery({
     queryKey: ['onboarding-templates'],
     queryFn: async () => {
@@ -60,13 +81,11 @@ export default function Onboarding() {
     }
   });
 
-  // Iniciar onboarding
   const iniciarMutation = useMutation({
     mutationFn: async (colaboradorId: string) => {
-      const template = templates[0];
+      const template = templates[0] as any;
       if (!template) throw new Error('Nenhum template encontrado');
 
-      // Criar onboarding
       const { data: onboarding, error: onbError } = await supabase
         .from('onboarding_colaborador')
         .insert({ colaborador_id: colaboradorId, template_id: template.id })
@@ -74,8 +93,7 @@ export default function Onboarding() {
         .single();
       if (onbError) throw onbError;
 
-      // Criar tarefas a partir do template
-      const tarefas = (template as unknown).onboarding_template_tarefas.map((t: unknown) => ({
+      const tarefas = template.onboarding_template_tarefas.map((t: any) => ({
         onboarding_id: onboarding.id,
         template_tarefa_id: t.id,
         titulo: t.titulo,
@@ -100,7 +118,6 @@ export default function Onboarding() {
     onError: () => toast.error('Erro ao iniciar onboarding')
   });
 
-  // Concluir tarefa
   const concluirTarefaMutation = useMutation({
     mutationFn: async ({ tarefaId, concluida }: { tarefaId: string; concluida: boolean }) => {
       const { error } = await supabase
@@ -122,71 +139,72 @@ export default function Onboarding() {
   };
 
   return (
-      <>
-        <SEOHead title="Onboarding" description="Processo de integração" />
-        <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-primary" />
-            Onboarding
-          </h1>
-          <p className="text-muted-foreground">Acompanhe a integração de novos colaboradores</p>
+    <>
+      <SEOHead title="Onboarding" description="Processo de integração" />
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <ClipboardList className="h-6 w-6 text-primary" />
+              Onboarding
+            </h1>
+            <p className="text-muted-foreground">Acompanhe a integração de novos colaboradores</p>
+          </div>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" />Iniciar Onboarding</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Iniciar Onboarding</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <Select value={selectedColaborador} onValueChange={setSelectedColaborador}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o colaborador" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colaboradoresAtivos.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button 
+                  className="w-full" 
+                  disabled={!selectedColaborador || iniciarMutation.isPending}
+                  onClick={() => iniciarMutation.mutate(selectedColaborador)}
+                >
+                  {iniciarMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
+                  Iniciar
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />Iniciar Onboarding</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Iniciar Onboarding</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <Select value={selectedColaborador} onValueChange={setSelectedColaborador}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o colaborador" />
-                </SelectTrigger>
-                <SelectContent>
-                  {colaboradoresAtivos.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button 
-                className="w-full" 
-                disabled={!selectedColaborador || iniciarMutation.isPending}
-                onClick={() => iniciarMutation.mutate(selectedColaborador)}
-              >
-                {iniciarMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
-                Iniciar
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {isLoading ? (
+          <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin" /></div>
+        ) : onboardings.length === 0 ? (
+          <Card><CardContent className="py-12 text-center text-muted-foreground">Nenhum onboarding em andamento</CardContent></Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {onboardings.map((onb) => (
+              <OnboardingCard 
+                key={onb.id} 
+                onboarding={onb} 
+                statusColors={statusColors}
+                onToggleTarefa={(id, concluida) => concluirTarefaMutation.mutate({ tarefaId: id, concluida })}
+              />
+            ))}
+          </div>
+        )}
       </div>
-
-      {isLoading ? (
-        <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin" /></div>
-      ) : onboardings.length === 0 ? (
-        <Card><CardContent className="py-12 text-center text-muted-foreground">Nenhum onboarding em andamento</CardContent></Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {onboardings.map((onb: unknown) => (
-            <OnboardingCard 
-              key={onb.id} 
-              onboarding={onb} 
-              statusColors={statusColors}
-              onToggleTarefa={(id, concluida) => concluirTarefaMutation.mutate({ tarefaId: id, concluida })}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
-function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
+function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: OnboardingCardProps) {
   const { data: tarefas = [] } = useQuery({
     queryKey: ['onboarding-tarefas', onboarding.id],
     queryFn: async () => {
@@ -196,11 +214,11 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
         .eq('onboarding_id', onboarding.id)
         .order('ordem');
       if (error) throw error;
-      return data;
+      return data as TarefaData[];
     }
   });
 
-  const concluidas = tarefas.filter((t: unknown) => t.concluida).length;
+  const concluidas = tarefas.filter((t) => t.concluida).length;
   const progresso = tarefas.length > 0 ? (concluidas / tarefas.length) * 100 : 0;
 
   return (
@@ -222,11 +240,11 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
         </div>
 
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {tarefas.map((tarefa: unknown) => (
+          {tarefas.map((tarefa) => (
             <div key={tarefa.id} className="flex items-center gap-2 text-sm">
               <Checkbox 
                 checked={tarefa.concluida} 
-                onCheckedChange={(checked) => onToggleTarefa(tarefa.id, checked)}
+                onCheckedChange={(checked) => onToggleTarefa(tarefa.id, checked as boolean)}
               />
               <span className={tarefa.concluida ? 'line-through text-muted-foreground' : ''}>
                 {tarefa.titulo}
@@ -240,12 +258,5 @@ function OnboardingCard({ onboarding, statusColors, onToggleTarefa }: unknown) {
         </p>
       </CardContent>
     </Card>
-  
-      </>);
+  );
 }
-
-
-
-
-
-

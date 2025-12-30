@@ -161,8 +161,7 @@ export const ImportacaoColaboradoresModal = memo(function ImportacaoColaboradore
     const csvContent = [
       headers.join(';'),
       exemplo.join(';'),
-    ].join('
-');
+    ].join('\n');
 
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
