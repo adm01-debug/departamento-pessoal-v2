@@ -193,7 +193,7 @@ export const EmpresaModal = memo(function EmpresaModal({ open, onOpenChange }: P
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => definirEmpresaPadrao.mutate(ue.empresa_id)}
+                          onClick={() => definirEmpresaPadrao({ userEmpresaId: ue.id, empresaId: ue.empresa_id })}
                           title={ue.is_default ? "Empresa padrão" : "Definir como padrão"}
                         >
                           {ue.is_default ? (
@@ -370,7 +370,7 @@ export const EmpresaModal = memo(function EmpresaModal({ open, onOpenChange }: P
                 <Button type="button" variant="outline" onClick={() => { resetForm(); setTab("minhas"); }}>
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={criarEmpresa.isPending || atualizarEmpresa.isPending}>
+                <Button type="submit">
                   {editando ? "Salvar Alterações" : "Criar Empresa"}
                 </Button>
               </div>

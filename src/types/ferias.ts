@@ -241,3 +241,27 @@ export const statusFeriasColors: Record<StatusFerias, string> = {
   concluida: 'bg-gray-100 text-gray-800',
   cancelada: 'bg-red-100 text-red-800',
 };
+
+// ============================================
+// TIPOS COMPOSTOS
+// ============================================
+
+export interface FeriasComColaborador extends Ferias {
+  colaborador: {
+    id: string;
+    nome: string;
+    cpf?: string;
+    salario?: number;
+    data_admissao?: string;
+  };
+}
+
+export interface HistoricoFerias {
+  id: string;
+  ferias_id: string;
+  acao: 'criada' | 'aprovada' | 'rejeitada' | 'cancelada' | 'editada';
+  usuario_id: string;
+  usuario_nome?: string;
+  observacao?: string;
+  created_at: string;
+}
