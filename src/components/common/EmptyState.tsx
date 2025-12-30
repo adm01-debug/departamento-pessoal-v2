@@ -83,4 +83,7 @@ export const EmptyState = memo(function EmptyState({
   );
 });
 
+// Alias for NoResults
+export const NoResults = EmptyState;
+
 export { defaultIcons };

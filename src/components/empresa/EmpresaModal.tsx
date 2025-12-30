@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import { useState, memo, memo } from "react";
+import { memo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -103,18 +102,9 @@ export const EmpresaModal = memo(function EmpresaModal({ open, onOpenChange }: P
     }
 
     if (editando) {
-      await atualizarEmpresa.mutateAsync({ id: editando.id, ...form });
+      atualizarEmpresa({ id: editando.id, dados: { ...form, logo_url: null, ativa: true } });
     } else {
-      const empresa = await criarEmpresa.mutateAsync(form);
-      // Associar automaticamente o usuário à nova empresa
-      const { data: userData } = await (await import("@/integrations/supabase/client")).supabase.auth.getUser();
-      if (userData.user && empresa) {
-        await associarUsuario.mutateAsync({
-          userId: userData.user.id,
-          empresaId: empresa.id,
-          isDefault: !userEmpresas || userEmpresas.length === 0,
-        });
-      }
+      criarEmpresa({ ...form, logo_url: null, ativa: true });
     }
     
     resetForm();

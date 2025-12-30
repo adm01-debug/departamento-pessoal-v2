@@ -141,7 +141,7 @@ export function DashboardCustomizer({ children }: DashboardCustomizerProps) {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
-      reorderWidgets(active.id as string, over.id as string);
+      reorderWidgets(String(active.id), String(over.id));
     }
     
     setActiveId(null);
