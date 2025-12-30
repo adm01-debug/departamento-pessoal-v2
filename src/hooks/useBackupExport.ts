@@ -76,10 +76,10 @@ const TABLE_LABELS: Record<string, string> = {
 
 export interface UseBackupExportReturn {
   isExporting: boolean;
-  progress: number;
-  exportToJSON: (selectedTables: string[]) => Promise<void>;
-  exportToExcelWorkbook: (selectedTables: string[]) => Promise<void>;
-  exportToPDFReport: (selectedTables: string[]) => Promise<void>;
+  progress: BackupProgress[];
+  exportToJSON: () => Promise<void>;
+  exportToExcelWorkbook: () => Promise<void>;
+  exportToPDFReport: () => Promise<void>;
   exportTableToCSV: (tableName: string) => Promise<void>;
   TABLE_LABELS: Record<string, string>;
   TABLES_TO_BACKUP: string[];

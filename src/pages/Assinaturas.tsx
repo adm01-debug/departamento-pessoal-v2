@@ -445,3 +445,6 @@ const Assinaturas = memo(function Assinaturas() {
     </>
   );
 });
+
+export default Assinaturas;
+

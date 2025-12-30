@@ -54,9 +54,11 @@ export const AccordionContent = memo(function AccordionContent({
   padding = 'md',
   variant = 'default',
 }: AccordionContentProps) {
+  const resolvedForceMount = forceMount ? true : undefined;
+
   return (
     <ShadcnAccordionContent
-      forceMount={forceMount}
+      forceMount={resolvedForceMount}
       className={cn(
         'overflow-hidden',
         'data-[state=closed]:animate-accordion-up',

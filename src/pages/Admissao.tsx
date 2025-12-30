@@ -441,3 +441,6 @@ const AdmissaoPage = memo(function AdmissaoPage() {
     </>
   );
 });
+
+export default AdmissaoPage;
+

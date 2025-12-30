@@ -21,13 +21,28 @@ export interface AdmissaoToken {
 export interface UseContratacaoDigitalReturn {
   tokens: AdmissaoToken[];
   isLoading: boolean;
-  criarToken: (admissaoId: string) => void;
-  reenviarToken: (tokenId: string) => void;
-  getTokenByAdmissao: (admissaoId: string) => AdmissaoToken | null;
+
+  criarToken: (
+    vars: { admissaoId: string; email?: string; telefone?: string },
+    options?: { onSuccess?: () => void; onError?: () => void }
+  ) => void;
+
+  reenviarToken: (
+    admissaoId: string,
+    options?: { onSuccess?: () => void; onError?: () => void }
+  ) => void;
+
+  getTokenByAdmissao: (admissaoId: string) => Promise<AdmissaoToken | null>;
   getDocumentosAdmissao: (admissaoId: string) => Promise<Array<{ tipo: string; url: string; status: string }>>;
-  validarDocumento: (data: { tokenId: string; tipo: string }) => void;
+
+  validarDocumento: (
+    vars: { documentoId: string; validado: boolean; observacoes?: string },
+    options?: { onSuccess?: () => void; onError?: () => void }
+  ) => void;
+
   gerarLinkContratacao: (token: string) => string;
-  copiarLink: (token: string) => void;
+  copiarLink: (token: string) => Promise<string>;
+
   isCriando: boolean;
   isReenviando: boolean;
 }

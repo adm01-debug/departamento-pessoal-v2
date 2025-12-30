@@ -357,3 +357,6 @@ const DesligamentoPage = memo(function DesligamentoPage() {
     </>
   );
 });
+
+export default DesligamentoPage;
+

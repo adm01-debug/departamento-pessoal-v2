@@ -355,3 +355,6 @@ const Auditoria = memo(function Auditoria() {
     </>
   );
 });
+
+export default Auditoria;
+

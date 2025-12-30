@@ -542,3 +542,6 @@ const Afastamentos = memo(function Afastamentos() {
     </>
   );
 });
+
+export default Afastamentos;
+
