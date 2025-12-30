@@ -26,6 +26,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+
+
+interface DocumentoAssinatura {
+  id: string;
+  titulo: string;
+  tipo: string;
+  colaborador_nome?: string;
+  colaborador_id?: string;
+  data_criacao: string;
+  data_assinatura?: string;
+  status: 'pendente' | 'assinado' | 'rejeitado' | 'expirado';
+  url_documento?: string;
+  assinatura_url?: string;
+}
+
 const Assinaturas = memo(function Assinaturas() {
   useEffect(() => {
     document.title = 'Assinaturas Digitais | DP System';
@@ -34,7 +49,7 @@ const Assinaturas = memo(function Assinaturas() {
   const [search, setSearch] = useState('');
   const [novoDocumentoOpen, setNovoDocumentoOpen] = useState(false);
   const [assinarModalOpen, setAssinarModalOpen] = useState(false);
-  const [documentoSelecionado, setDocumentoSelecionado] = useState<unknown>(null);
+  const [documentoSelecionado, setDocumentoSelecionado] = useState<DocumentoAssinatura | null>(null);
   const [visualizarAssinaturaOpen, setVisualizarAssinaturaOpen] = useState(false);
   const [assinaturaVisualizada, setAssinaturaVisualizada] = useState<string | null>(null);
 
@@ -75,7 +90,7 @@ const Assinaturas = memo(function Assinaturas() {
     setTitulo('');
   };
 
-  const handleAssinar = (doc: unknown) => {
+  const handleAssinar = (doc: DocumentoAssinatura) => {
     setDocumentoSelecionado(doc);
     setAssinarModalOpen(true);
   };
@@ -109,7 +124,7 @@ const Assinaturas = memo(function Assinaturas() {
     }
   };
 
-  const filtrarDocumentos = (docs: unknown[]) => {
+  const filtrarDocumentos = (docs: DocumentoAssinatura[]) => {
     return docs.filter(d => 
       d.titulo?.toLowerCase().includes(search.toLowerCase()) ||
       d.colaboradores?.nome_completo?.toLowerCase().includes(search.toLowerCase()) ||
@@ -221,7 +236,7 @@ const Assinaturas = memo(function Assinaturas() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {filtrarDocumentos(documentosPendentes).map((doc: unknown) => (
+                    {filtrarDocumentos(documentosPendentes).map((doc: DocumentoAssinatura) => (
                       <div 
                         key={doc.id}
                         className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
@@ -289,7 +304,7 @@ const Assinaturas = memo(function Assinaturas() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {filtrarDocumentos(documentosAssinados).map((doc: unknown) => (
+                    {filtrarDocumentos(documentosAssinados).map((doc: DocumentoAssinatura) => (
                       <div 
                         key={doc.id}
                         className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
