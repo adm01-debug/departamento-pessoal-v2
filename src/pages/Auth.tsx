@@ -271,7 +271,6 @@ const Auth = memo(function Auth() {
         </CardContent>
       </Card>
     </div>
-  </>
   );
 });
 

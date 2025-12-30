@@ -131,11 +131,12 @@ const AdmissaoPage = memo(function AdmissaoPage() {
 
   if (loading) {
     return (
-    <>
-      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <>
+        <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </>
     );
   }
 
