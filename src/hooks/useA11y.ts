@@ -1,6 +1,44 @@
-import { useEffect } from 'react';
+/**
+ * @fileoverview Hook para acessibilidade
+ * @module hooks/useA11y
+ */
+import { useCallback } from 'react';
+
 export function useA11y() {
-  useEffect(() => { const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Tab') document.body.classList.add('keyboard-nav'); }; const handleMouseDown = () => document.body.classList.remove('keyboard-nav'); document.addEventListener('keydown', handleKeyDown); document.addEventListener('mousedown', handleMouseDown); return () => { document.removeEventListener('keydown', handleKeyDown); document.removeEventListener('mousedown', handleMouseDown); }; }, []);
-  const announceToScreenReader = (message: string) => { const el = document.createElement('div'); el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); el.textContent = message; document.body.appendChild(el); setTimeout(() => el.remove(), 1000); };
-  return { announceToScreenReader };
+  const announceToScreenReader = useCallback((message: string) => {
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.setAttribute('aria-atomic', 'true');
+    el.className = 'sr-only';
+    el.textContent = message;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }, []);
+
+  const trapFocus = useCallback((container: HTMLElement) => {
+    const focusables = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    };
+    
+    container.addEventListener('keydown', handleTab);
+    return () => container.removeEventListener('keydown', handleTab);
+  }, []);
+
+  return { announceToScreenReader, trapFocus };
 }
+
+export default useA11y;
