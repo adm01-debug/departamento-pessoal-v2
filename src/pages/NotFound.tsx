@@ -1,36 +1,31 @@
-import { SEOHead } from '@/components/SEOHead';
-import { useLocation } from "react-router-dom";
-import { logger } from '@/lib/logger';
-import { useEffect } from "react";
+/**
+ * @fileoverview Página 404 - Não encontrada
+ */
+import { memo } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Home, ArrowLeft, Search } from 'lucide-react';
 
-const NotFound = () => {
-  useEffect(() => { document.title = 'Página não encontrada | DP System'; }, []);
-
-  const location = useLocation();
-
-  useEffect(() => {
-    logger.error('Error', "404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
-
+const NotFoundPage = memo(function NotFoundPage() {
   return (
-      <>
-        <SEOHead title="Página não encontrada" description="Erro 404" />
-        <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center space-y-6 p-8">
+        <div className="text-9xl font-bold text-muted-foreground/20">404</div>
+        <h1 className="text-3xl font-bold">Página não encontrada</h1>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          A página que você está procurando não existe ou foi movida.
+        </p>
+        <div className="flex justify-center gap-4">
+          <Button asChild>
+            <Link to="/"><Home className="h-4 w-4 mr-2" />Início</Link>
+          </Button>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />Voltar
+          </Button>
+        </div>
       </div>
     </div>
-  
-      </>);
-};
+  );
+});
 
-export default NotFound;
-
-
-
-
-
+export default NotFoundPage;
