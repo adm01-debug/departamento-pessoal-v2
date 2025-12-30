@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useEffect, useCallback } from 'react';
+import { useState, memo, useEffect, useCallback } from 'react';
 import { History, Search, Filter, RefreshCw, ChevronDown, ChevronRight, Eye, Calendar, User, Database, Plus, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
