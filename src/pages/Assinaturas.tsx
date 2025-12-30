@@ -432,12 +432,3 @@ const Assinaturas = memo(function Assinaturas() {
   
       </>);
 }
-
-
-
-
-
-
-
-
-
