@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef, useState } from 'react';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X, Loader2, Download, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
