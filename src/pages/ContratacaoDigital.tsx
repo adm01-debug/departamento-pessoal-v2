@@ -857,5 +857,5 @@ const ContratacaoDigital = memo(function ContratacaoDigital() {
       />
     </div>
   
-      </>);
+    </>);
 }
