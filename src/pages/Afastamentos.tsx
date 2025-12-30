@@ -172,7 +172,7 @@ const Afastamentos = memo(function Afastamentos() {
   return (
     <>
       <SEOHead title="Afastamentos | DP System" description="Gestão de afastamentos" />
-    <div id="main-content" className="p-6 space-y-6 animate-fade-in">
+      <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -301,8 +301,6 @@ const Afastamentos = memo(function Afastamentos() {
               {afastamentos.map((item) => {
                 const statusColors = statusAfastamentoColors[item.status];
                 return (
-    <>
-      <SEOHead title="Afastamentos | DP System" description="Gestão de afastamentos" />
                   <tr key={item.id} className="hover:bg-muted/20 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -544,14 +542,4 @@ const Afastamentos = memo(function Afastamentos() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
 
