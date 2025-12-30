@@ -352,6 +352,6 @@ const DesligamentoPage = memo(function DesligamentoPage() {
         onSubmit={handleNovoDesligamento}
       />
     </div>
-  
-    </>);
-}
+    </>
+  );
+});
