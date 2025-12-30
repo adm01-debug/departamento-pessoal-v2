@@ -140,8 +140,6 @@ export default function Usuarios() {
   }
 
   return (
-    <>
-      <SEOHead title="Usuários | DP System" description="Gestão de usuários e permissões" />
       <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -424,9 +422,3 @@ export default function Usuarios() {
     </>
   );
 }
-
-
-
-
-
-
