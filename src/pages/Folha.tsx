@@ -139,7 +139,9 @@ export default memo(function Folha() {
   }
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
+    <>
+      <SEOHead title="Folha de Pagamento | DP System" description="Sistema de Departamento Pessoal" />
+      <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -506,7 +508,7 @@ function EventosVariaveisTab({
   };
 
   return (
-    <div className="space-y-4">
+      <div className="space-y-4">
       {!disabled && (
         <div className="flex justify-end">
           <Button aria-label="Ação" onClick={() => setAddModalOpen(true)} className="gap-2">
@@ -643,6 +645,7 @@ function EventosVariaveisTab({
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
 
