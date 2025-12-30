@@ -31,9 +31,9 @@ export interface UseDashboardConfigReturn {
   widgets: WidgetConfig[];
   isEditing: boolean;
   setIsEditing: (editing: boolean) => void;
-  reorderWidgets: (startIndex: number, endIndex: number) => void;
+  reorderWidgets: (activeId: string, overId: string) => void;
   toggleVisibility: (id: string) => void;
-  updateSize: (id: string, size: 'small' | 'medium' | 'large') => void;
+  updateSize: (id: string, size: WidgetConfig['size']) => void;
   resetToDefaults: () => void;
   getVisibleWidgets: () => WidgetConfig[];
 }

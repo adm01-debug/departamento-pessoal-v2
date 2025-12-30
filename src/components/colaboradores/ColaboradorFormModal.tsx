@@ -101,10 +101,10 @@ export const ColaboradorFormModal = memo(function ColaboradorFormModal({ open, o
       // Map from Colaborador type (which uses data_admissao, cargo object, etc.)
       const cargoNome = typeof colaborador.cargo === 'object' && colaborador.cargo 
         ? (colaborador.cargo as { nome?: string }).nome ?? '' 
-        : (colaborador.cargo ?? '');
+        : String(colaborador.cargo ?? '');
       const deptNome = typeof colaborador.departamento === 'object' && colaborador.departamento 
         ? (colaborador.departamento as { nome?: string }).nome ?? '' 
-        : (colaborador.departamento ?? '');
+        : String(colaborador.departamento ?? '');
       
       // Map status to valid form status
       const statusMap: Record<string, 'ativo' | 'admissao' | 'ferias' | 'afastado' | 'desligado'> = {
@@ -120,12 +120,12 @@ export const ColaboradorFormModal = memo(function ColaboradorFormModal({ open, o
       form.reset({
         nome: colaborador.nome ?? '',
         cpf: colaborador.cpf ?? '',
-        matricula: (colaborador as any).matricula ?? '',
+        matricula: (colaborador as unknown as Record<string, unknown>).matricula as string ?? '',
         cargo: cargoNome,
         departamento: deptNome,
         dataAdmissao: colaborador.data_admissao ?? '',
-        salario: (colaborador.salario ?? 0).toString(),
-        gestor: (colaborador as any).gestor ?? '',
+        salario: String(colaborador.salario ?? 0),
+        gestor: (colaborador as unknown as Record<string, unknown>).gestor as string ?? '',
         status: statusMap[colaborador.status] ?? 'admissao',
       });
     } else if (!open) {

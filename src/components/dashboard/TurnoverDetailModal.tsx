@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import { useState, memo, memo, useEffect, useMemo } from 'react';
+import { memo, useState, useEffect, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -110,7 +109,7 @@ export const TurnoverDetailModal = memo(function TurnoverDetailModal({ open, onO
   }, [movimentacoes, filtroTipo, filtroDepartamento]);
 
   const admissoes = movimentacoesFiltradas.filter(m => m.tipo === 'admissao');
-  const desligamentos = movimentacoesFiltradas.filter(m => m.tipo === 'desligamento');
+  const desligamentosFiltered = movimentacoesFiltradas.filter(m => m.tipo === 'desligamento');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -168,7 +167,7 @@ export const TurnoverDetailModal = memo(function TurnoverDetailModal({ open, onO
                   <UserMinus className="w-4 h-4 text-destructive" />
                   <span className="text-sm font-medium text-destructive">Desligamentos</span>
                 </div>
-                <p className="text-2xl font-bold text-foreground">{desligamentos.length}</p>
+                <p className="text-2xl font-bold text-foreground">{desligamentosFiltered.length}</p>
               </div>
             </div>
 

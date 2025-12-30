@@ -46,7 +46,7 @@ function DataTableComponent<T extends Record<string, unknown>>({
   }
 
   if (data.length === 0) {
-    return <NoResults query={emptyMessage} />;
+    return <NoResults title={emptyMessage || 'Nenhum resultado encontrado'} description="Tente ajustar os filtros ou adicionar novos itens." />;
   }
 
   return (

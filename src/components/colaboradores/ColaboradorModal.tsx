@@ -48,11 +48,11 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
   
   // Get cargo/departamento names
   const cargoNome = typeof colaborador.cargo === 'object' && colaborador.cargo 
-    ? (colaborador.cargo as { nome?: string }).nome ?? '-' 
-    : (colaborador.cargo ?? '-');
+    ? String((colaborador.cargo as { nome?: string }).nome ?? '-')
+    : String(colaborador.cargo ?? '-');
   const deptNome = typeof colaborador.departamento === 'object' && colaborador.departamento 
-    ? (colaborador.departamento as { nome?: string }).nome ?? '-' 
-    : (colaborador.departamento ?? '-');
+    ? String((colaborador.departamento as { nome?: string }).nome ?? '-')
+    : String(colaborador.departamento ?? '-');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
