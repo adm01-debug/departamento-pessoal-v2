@@ -26,8 +26,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-
-
 interface DocumentoAssinatura {
   id: string;
   titulo: string;
