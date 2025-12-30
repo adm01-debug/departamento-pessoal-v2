@@ -320,8 +320,6 @@ export default memo(function Ponto() {
                 const feriado = feriadosPorData.get(dataStr);
                 
                 return (
-    <>
-      <SEOHead title="Ponto | DP System" description="Gestão de ponto e jornada de trabalho" />
                   <tr key={dataStr} className="hover:bg-muted/20 transition-colors">
                     <td className="p-3 text-sm font-medium text-foreground">
                       {format(data, 'dd/MM')}
