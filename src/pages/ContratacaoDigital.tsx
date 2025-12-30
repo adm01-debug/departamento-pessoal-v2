@@ -410,6 +410,8 @@ const ContratacaoDigital = memo(function ContratacaoDigital() {
   }
 
   return (
+    <>
+      <SEOHead title="Contratação Digital | DP System" description="Processo de contratação digital" />
       <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
       {/* Header */}
       <div className="bg-card border-b">

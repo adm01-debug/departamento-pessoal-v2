@@ -124,6 +124,8 @@ const DesligamentoPage = memo(function DesligamentoPage() {
   }
 
   return (
+    <>
+      <SEOHead title="Desligamentos | DP System" description="Gestão de desligamentos" />
       <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
