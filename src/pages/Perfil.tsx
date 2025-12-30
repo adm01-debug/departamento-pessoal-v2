@@ -621,4 +621,4 @@ export default memo(function Perfil() {
       </Tabs>
     </div>
   );
-}
+});
