@@ -719,4 +719,4 @@ const Colaboradores = memo(function Colaboradores() {
     </div>
     </>
   );
-}
+});
