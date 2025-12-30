@@ -124,8 +124,6 @@ const DesligamentoPage = memo(function DesligamentoPage() {
   }
 
   return (
-    <>
-      <SEOHead title="Desligamento | DP System" description="Sistema de Departamento Pessoal" />
       <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
