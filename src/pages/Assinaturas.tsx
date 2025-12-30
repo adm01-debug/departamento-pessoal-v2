@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useEffect, useCallback } from 'react';
+import { useState, memo, useEffect, useCallback } from 'react';
 import { 
   PenTool, FileSignature, Clock, CheckCircle2, XCircle, Plus,
   Search, MoreHorizontal, Eye, Download, Trash2, RefreshCw
