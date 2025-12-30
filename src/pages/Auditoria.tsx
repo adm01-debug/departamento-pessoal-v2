@@ -352,6 +352,6 @@ const Auditoria = memo(function Auditoria() {
         </DialogContent>
       </Dialog>
     </div>
-  </>
+    </>
   );
 }
