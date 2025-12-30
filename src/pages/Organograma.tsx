@@ -376,4 +376,4 @@ export default memo(function Organograma() {
       )}
     </div>
   );
-}
+});
