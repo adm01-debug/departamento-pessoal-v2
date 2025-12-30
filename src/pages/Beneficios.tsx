@@ -140,8 +140,6 @@ const Beneficios = memo(function Beneficios() {
   }
 
   return (
-    <>
-      <SEOHead title="Benefícios | DP System" description="Gestão de benefícios" />
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -369,6 +367,5 @@ const Beneficios = memo(function Beneficios() {
         </DialogContent>
       </Dialog>
     </div>
-    </>
   );
 }
