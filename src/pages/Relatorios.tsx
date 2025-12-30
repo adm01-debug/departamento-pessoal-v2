@@ -199,8 +199,6 @@ export default memo(function Relatorios() {
     switch (selectedRelatorio.paramType) {
       case 'colaborador':
         return (
-    <>
-      <SEOHead title="Relatórios | DP System" description="Relatórios e analytics de RH" />
           <div className="space-y-2">
             <Label>Colaborador</Label>
             <Select value={colaboradorId} onValueChange={setColaboradorId}>
