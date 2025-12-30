@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, Pencil, Loader2 } from 'lucide-react';
 import { Colaborador } from '@/types/colaborador';
-import { validateCPF, unmask } from '@/lib/masks';
+import { validateCPF } from '@/lib/masks';
 
 const colaboradorSchema = z.object({
   nome: z.string()
@@ -98,16 +98,35 @@ export const ColaboradorFormModal = memo(function ColaboradorFormModal({ open, o
   // Preencher form quando editar
   useEffect(() => {
     if (colaborador && open) {
+      // Map from Colaborador type (which uses data_admissao, cargo object, etc.)
+      const cargoNome = typeof colaborador.cargo === 'object' && colaborador.cargo 
+        ? (colaborador.cargo as { nome?: string }).nome ?? '' 
+        : (colaborador.cargo ?? '');
+      const deptNome = typeof colaborador.departamento === 'object' && colaborador.departamento 
+        ? (colaborador.departamento as { nome?: string }).nome ?? '' 
+        : (colaborador.departamento ?? '');
+      
+      // Map status to valid form status
+      const statusMap: Record<string, 'ativo' | 'admissao' | 'ferias' | 'afastado' | 'desligado'> = {
+        'ativo': 'ativo',
+        'inativo': 'desligado',
+        'ferias': 'ferias',
+        'afastado': 'afastado',
+        'desligado': 'desligado',
+        'pendente': 'admissao',
+        'admissao': 'admissao',
+      };
+
       form.reset({
-        nome: colaborador.nome,
-        cpf: (colaborador as any).cpf ?? '',
-        matricula: colaborador.matricula,
-        cargo: colaborador.cargo,
-        departamento: colaborador.departamento,
-        dataAdmissao: colaborador.dataAdmissao,
-        salario: colaborador.salario.toString(),
-        gestor: colaborador.gestor ?? '',
-        status: colaborador.status,
+        nome: colaborador.nome ?? '',
+        cpf: colaborador.cpf ?? '',
+        matricula: (colaborador as any).matricula ?? '',
+        cargo: cargoNome,
+        departamento: deptNome,
+        dataAdmissao: colaborador.data_admissao ?? '',
+        salario: (colaborador.salario ?? 0).toString(),
+        gestor: (colaborador as any).gestor ?? '',
+        status: statusMap[colaborador.status] ?? 'admissao',
       });
     } else if (!open) {
       form.reset({

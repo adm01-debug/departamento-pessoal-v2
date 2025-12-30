@@ -11,8 +11,17 @@ import { validateCPF, validatePIS, unmask } from '@/lib/masks';
 import { parse, isValid, format } from 'date-fns';
 
 export interface ColaboradorImport {
+  nome_completo?: string;
+  cpf?: string;
+  cargo?: string;
+  departamento?: string;
+  data_admissao?: string;
+  [key: string]: unknown;
+}
+
+export interface ColaboradorImportRow {
   linha: number;
-  dados: Record<string, unknown>;
+  dados: ColaboradorImport;
   erros: string[];
   valido: boolean;
 }
@@ -170,18 +179,18 @@ function parseCurrency(value: unknown): number {
     .replace(/\./g, '')
     .replace(',', '.');
   
-  return parseFloat(str) ?? 0;
+  return parseFloat(str) || 0;
 }
 
-
 export interface UseImportacaoColaboradoresReturn {
-  dadosPreview: Array<{ dados: ColaboradorImport; valido: boolean; erros: string[] }>;
+  arquivo: File | null;
+  dadosPreview: ColaboradorImportRow[];
   colunasDetectadas: string[];
   processando: boolean;
   importando: boolean;
   resultado: ImportResult | null;
-  processarArquivo: (file: File, mapeamento: Record<string, string>) => Promise<void>;
-  importarColaboradores: () => Promise<void>;
+  processarArquivo: (file: File) => Promise<void>;
+  importarColaboradores: () => Promise<ImportResult | undefined>;
   limpar: () => void;
   totalValidos: number;
   totalInvalidos: number;
@@ -189,7 +198,7 @@ export interface UseImportacaoColaboradoresReturn {
 
 export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
   const [arquivo, setArquivo] = useState<File | null>(null);
-  const [dadosPreview, setDadosPreview] = useState<ColaboradorImport[]>([]);
+  const [dadosPreview, setDadosPreview] = useState<ColaboradorImportRow[]>([]);
   const [colunasDetectadas, setColunasDetectadas] = useState<string[]>([]);
   const [processando, setProcessando] = useState(false);
   const [importando, setImportando] = useState(false);
@@ -251,14 +260,14 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
       const cpfsSet = new Set((cpfsExistentes ?? []).map(c => unmask(c.cpf)));
 
       // Processar linhas
-      const previews: ColaboradorImport[] = [];
+      const previews: ColaboradorImportRow[] = [];
       
       for (let i = 1; i < jsonData.length; i++) {
         const row = jsonData[i];
         if (!row || row.every(cell => cell === null || cell === undefined || cell === '')) continue;
 
         const erros: string[] = [];
-        const dados: Record<string, unknown> = {};
+        const dados: ColaboradorImport = {};
 
         // Extrair dados mapeados
         Object.entries(columnIndexMap).forEach(([field, index]) => {
@@ -289,14 +298,14 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
         if (!dataNasc) {
           erros.push('Data de nascimento inválida');
         }
-        dados.data_nascimento = dataNasc;
+        dados.data_nascimento = dataNasc ?? undefined;
 
         // Data de admissão
         const dataAdm = parseDate(dados.data_admissao);
         if (!dataAdm) {
           erros.push('Data de admissão é obrigatória');
         }
-        dados.data_admissao = dataAdm;
+        dados.data_admissao = dataAdm ?? undefined;
 
         // Sexo
         const sexoNorm = normalizeColumnName(String(dados.sexo ?? ''));
@@ -312,7 +321,7 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
 
         // Salário
         dados.salario_base = parseCurrency(dados.salario_base);
-        if (dados.salario_base <= 0) {
+        if ((dados.salario_base as number) <= 0) {
           erros.push('Salário deve ser maior que zero');
         }
 
@@ -343,7 +352,7 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
           if (pisLimpo.length > 0 && !validatePIS(pisLimpo)) {
             erros.push('PIS/PASEP inválido');
           }
-          dados.pis_pasep = pisLimpo || null;
+          dados.pis_pasep = pisLimpo || undefined;
         }
 
         // Campos de texto opcionais
@@ -352,7 +361,7 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
             if (dados[field]) {
               dados[field] = String(dados[field]).trim();
             } else {
-              dados[field] = null;
+              dados[field] = undefined;
             }
           });
 
@@ -391,7 +400,7 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
     }
   }, []);
 
-  const importarColaboradores = useCallback(async () => {
+  const importarColaboradores = useCallback(async (): Promise<ImportResult | undefined> => {
     const validos = dadosPreview.filter(p => p.valido);
     
     if (validos.length === 0) {
@@ -442,7 +451,8 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
           sucesso++;
         }
       } catch (err: unknown) {
-        detalhesErros.push({ linha: item.linha, erro: err.message || 'Erro desconhecido' });
+        const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+        detalhesErros.push({ linha: item.linha, erro: errorMessage });
       }
     }
 
@@ -495,12 +505,3 @@ export function useImportacaoColaboradores(): UseImportacaoColaboradoresReturn {
     totalInvalidos: dadosPreview.filter(p => !p.valido).length,
   };
 }
-
-
-
-
-
-
-
-
-

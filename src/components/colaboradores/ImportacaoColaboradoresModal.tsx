@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
 import {
   Table,
   TableBody,
@@ -25,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useImportacaoColaboradores, ColaboradorImport } from '@/hooks/useImportacaoColaboradores';
+import { useImportacaoColaboradores } from '@/hooks/useImportacaoColaboradores';
 import { cn } from '@/lib/utils';
 
 interface ImportacaoColaboradoresModalProps {

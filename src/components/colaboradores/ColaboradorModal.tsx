@@ -3,15 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Colaborador } from '@/types/colaborador';
-
-const statusColors: Record<string, string> = {
-  ativo: 'bg-green-100 text-green-800',
-  inativo: 'bg-red-100 text-red-800',
-  ferias: 'bg-blue-100 text-blue-800',
-  afastado: 'bg-yellow-100 text-yellow-800',
-  desligado: 'bg-gray-100 text-gray-800',
-};
+import { Colaborador, statusColaboradorLabels } from '@/types/colaborador';
 import { cn } from '@/lib/utils';
 import { 
   User, 
@@ -30,12 +22,13 @@ import {
   Trash2
 } from 'lucide-react';
 
-const statusLabels: Record<string, string> = {
-  ativo: 'Ativo',
-  ferias: 'Férias',
-  afastado: 'Afastado',
-  desligado: 'Desligado',
-  admissao: 'Em Admissão',
+const statusColors: Record<string, { bg: string; text: string; dot: string }> = {
+  ativo: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-500' },
+  inativo: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-500' },
+  ferias: { bg: 'bg-blue-100', text: 'text-blue-800', dot: 'bg-blue-500' },
+  afastado: { bg: 'bg-yellow-100', text: 'text-yellow-800', dot: 'bg-yellow-500' },
+  desligado: { bg: 'bg-gray-100', text: 'text-gray-800', dot: 'bg-gray-500' },
+  pendente: { bg: 'bg-orange-100', text: 'text-orange-800', dot: 'bg-orange-500' },
 };
 
 interface ColaboradorModalProps {
@@ -49,8 +42,17 @@ interface ColaboradorModalProps {
 export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, open, onOpenChange, onEdit, onDelete }: ColaboradorModalProps) {
   if (!colaborador) return null;
 
-  const colors = statusColors[colaborador.status];
-  const tempoEmpresa = calcularTempoEmpresa(colaborador.dataAdmissao);
+  const colors = statusColors[colaborador.status] ?? statusColors.ativo;
+  const dataAdmissao = colaborador.data_admissao ?? '';
+  const tempoEmpresa = calcularTempoEmpresa(dataAdmissao);
+  
+  // Get cargo/departamento names
+  const cargoNome = typeof colaborador.cargo === 'object' && colaborador.cargo 
+    ? (colaborador.cargo as { nome?: string }).nome ?? '-' 
+    : (colaborador.cargo ?? '-');
+  const deptNome = typeof colaborador.departamento === 'object' && colaborador.departamento 
+    ? (colaborador.departamento as { nome?: string }).nome ?? '-' 
+    : (colaborador.departamento ?? '-');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,15 +71,17 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
               <DialogTitle className="text-xl font-display font-bold text-foreground">
                 {colaborador.nome}
               </DialogTitle>
-              <p className="text-sm text-muted-foreground mt-0.5">{colaborador.cargo}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{cargoNome}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Badge className={cn("gap-1.5", colors.bg, colors.text, "border-0")}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", colors.dot)} />
-                  {statusLabels[colaborador.status]}
+                  {statusColaboradorLabels[colaborador.status] ?? colaborador.status}
                 </Badge>
-                <Badge variant="outline" className="font-mono text-xs">
-                  MAT: {colaborador.matricula}
-                </Badge>
+                {(colaborador as any).matricula && (
+                  <Badge variant="outline" className="font-mono text-xs">
+                    MAT: {(colaborador as any).matricula}
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -87,13 +91,13 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
           {/* Dados Contratuais */}
           <Section title="Dados Contratuais" icon={Briefcase}>
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem label="Cargo" value={colaborador.cargo} />
-              <InfoItem label="Departamento" value={colaborador.departamento} />
-              <InfoItem label="Gestor" value={colaborador.gestor || 'Não informado'} />
-              <InfoItem label="Salário Base" value={formatCurrency(colaborador.salario)} highlight />
+              <InfoItem label="Cargo" value={cargoNome} />
+              <InfoItem label="Departamento" value={deptNome} />
+              <InfoItem label="Gestor" value={(colaborador as any).gestor || 'Não informado'} />
+              <InfoItem label="Salário Base" value={formatCurrency(colaborador.salario ?? 0)} highlight />
               <InfoItem 
                 label="Data Admissão" 
-                value={new Date(colaborador.dataAdmissao).toLocaleDateString('pt-BR')} 
+                value={dataAdmissao ? new Date(dataAdmissao).toLocaleDateString('pt-BR') : '-'} 
               />
               <InfoItem label="Tempo de Empresa" value={tempoEmpresa} />
             </div>
@@ -101,13 +105,13 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
 
           <Separator />
 
-          {/* Dados Pessoais (mockados para demonstração) */}
+          {/* Dados Pessoais */}
           <Section title="Dados Pessoais" icon={User}>
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem label="CPF" value="***.***.***-00" />
-              <InfoItem label="RG" value="**.***.***-*" />
-              <InfoItem label="Data Nascimento" value="15/03/1990" />
-              <InfoItem label="Estado Civil" value="Casado(a)" />
+              <InfoItem label="CPF" value={colaborador.cpf ? `***.***.***-${colaborador.cpf.slice(-2)}` : '-'} />
+              <InfoItem label="RG" value={colaborador.rg || '-'} />
+              <InfoItem label="Data Nascimento" value={colaborador.data_nascimento ? new Date(colaborador.data_nascimento).toLocaleDateString('pt-BR') : '-'} />
+              <InfoItem label="Estado Civil" value={colaborador.estado_civil || '-'} />
             </div>
           </Section>
 
@@ -118,17 +122,17 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
             <div className="grid grid-cols-2 gap-4">
               <InfoItem 
                 label="Telefone" 
-                value="(11) 98765-4321" 
+                value={colaborador.telefone || colaborador.celular || '-'} 
                 icon={Phone}
               />
               <InfoItem 
                 label="E-mail" 
-                value={`${colaborador.nome.split(' ')[0].toLowerCase()}@empresa.com`}
+                value={colaborador.email || '-'}
                 icon={Mail}
               />
               <InfoItem 
                 label="Endereço" 
-                value="São Paulo, SP"
+                value={colaborador.cidade && colaborador.estado ? `${colaborador.cidade}, ${colaborador.estado}` : '-'}
                 icon={MapPin}
                 colSpan={2}
               />
@@ -140,10 +144,10 @@ export const ColaboradorModal = memo(function ColaboradorModal({ colaborador, op
           {/* Dados Bancários */}
           <Section title="Dados Bancários" icon={CreditCard}>
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem label="Banco" value="Banco Inter" />
-              <InfoItem label="Agência" value="0001" />
-              <InfoItem label="Conta" value="******-*" />
-              <InfoItem label="PIX" value="CPF" />
+              <InfoItem label="Banco" value={colaborador.banco || '-'} />
+              <InfoItem label="Agência" value={colaborador.agencia || '-'} />
+              <InfoItem label="Conta" value={colaborador.conta ? `******-${colaborador.conta.slice(-1)}` : '-'} />
+              <InfoItem label="PIX" value={colaborador.pix || '-'} />
             </div>
           </Section>
 
@@ -286,6 +290,7 @@ function QuickStat({
 
 // Funções auxiliares
 function calcularTempoEmpresa(dataAdmissao: string): string {
+  if (!dataAdmissao) return '-';
   const admissao = new Date(dataAdmissao);
   const hoje = new Date();
   const diffTime = Math.abs(hoje.getTime() - admissao.getTime());
