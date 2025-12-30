@@ -1,14 +1,28 @@
-import React from 'react';
-import { WifiOff } from 'lucide-react';
+/**
+ * @fileoverview Página Offline
+ */
+import { memo } from 'react';
 import { Button } from '@/components/ui/button';
-export const Offline: React.FC = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="text-center space-y-4">
-      <WifiOff className="h-16 w-16 mx-auto text-muted-foreground" />
-      <h1 className="text-2xl font-bold">Você está offline</h1>
-      <p className="text-muted-foreground">Verifique sua conexão com a internet</p>
-      <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
+import { WifiOff, RefreshCw } from 'lucide-react';
+
+const OfflinePage = memo(function OfflinePage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center space-y-6 p-8">
+        <div className="p-6 bg-muted rounded-full inline-block">
+          <WifiOff className="h-16 w-16 text-muted-foreground" />
+        </div>
+        <h1 className="text-3xl font-bold">Você está offline</h1>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          Verifique sua conexão com a internet e tente novamente.
+        </p>
+        <Button onClick={() => window.location.reload()}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Tentar novamente
+        </Button>
+      </div>
     </div>
-  </div>
-);
-export default Offline;
+  );
+});
+
+export default OfflinePage;
