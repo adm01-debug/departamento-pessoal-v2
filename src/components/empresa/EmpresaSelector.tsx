@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { Building2, Check, ChevronDown, Plus, Settings } from "lucide-react";
+import { memo, useState } from 'react';
+import { Building2, Check, ChevronDown, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { Badge } from "@/components/ui/badge";
-import { useState, memo, memo } from "react";
 import { EmpresaModal } from "./EmpresaModal";
 
 export const EmpresaSelector = memo(function EmpresaSelector() {
