@@ -131,8 +131,6 @@ const AdmissaoPage = memo(function AdmissaoPage() {
 
   if (loading) {
     return (
-    <>
-      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
       <>
         <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
         <div className="flex items-center justify-center h-64">
@@ -197,8 +195,6 @@ const AdmissaoPage = memo(function AdmissaoPage() {
                     const progress = getProgress(adm);
                     const dadosIncompletos = isDadosIncompletos(adm);
                     return (
-    <>
-      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
                       <div 
                         key={adm.id}
                         onClick={() => handleOpenChecklist(adm)}
@@ -304,8 +300,6 @@ const AdmissaoPage = memo(function AdmissaoPage() {
                   const progress = getProgress(adm);
                   const dadosIncompletos = isDadosIncompletos(adm);
                   return (
-    <>
-      <SEOHead title="Admissões | DP System" description="Gestão de admissões de colaboradores" />
                     <tr key={adm.id} className="border-t hover:bg-muted/30">
                       <td className="p-3">
                         <div className="flex items-center gap-2">
