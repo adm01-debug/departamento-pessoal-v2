@@ -320,6 +320,6 @@ export default memo(function GestaoDocumentos() {
         </DialogContent>
       </Dialog>
     </div>
-  
-      </>);
-}
+    </>
+  );
+});
