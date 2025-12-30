@@ -339,4 +339,4 @@ export default memo(function ESocial() {
     </div>
     </>
   );
-}
+});
