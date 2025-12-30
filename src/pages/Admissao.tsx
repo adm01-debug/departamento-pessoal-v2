@@ -157,7 +157,7 @@ const AdmissaoPage = memo(function AdmissaoPage() {
       </div>
 
       {/* View Toggle */}
-      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as unknown)}>
+      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'kanban' | 'lista')}>
         <TabsList>
           <TabsTrigger value="kanban" className="gap-2">
             <LayoutGrid className="w-4 h-4" />
