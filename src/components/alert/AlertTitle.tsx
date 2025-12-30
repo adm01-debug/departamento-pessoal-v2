@@ -20,8 +20,6 @@ export interface AlertTitleProps {
   size?: 'sm' | 'md' | 'lg';
   /** Peso da fonte */
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
-  /** Elemento HTML */
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
 }
 
 const sizeClasses = {
@@ -39,7 +37,7 @@ const weightClasses = {
 
 /**
  * Título do alerta
- * 
+ *
  * @example
  * ```tsx
  * <AlertTitle size="lg" weight="bold">
@@ -52,20 +50,17 @@ export const AlertTitle = memo(function AlertTitle({
   className,
   size = 'md',
   weight = 'medium',
-  as: Component = 'h5',
 }: AlertTitleProps) {
   return (
-    <ShadcnAlertTitle asChild>
-      <Component
-        className={cn(
-          sizeClasses[size],
-          weightClasses[weight],
-          'mb-1 leading-none tracking-tight',
-          className
-        )}
-      >
-        {children}
-      </Component>
+    <ShadcnAlertTitle
+      className={cn(
+        sizeClasses[size],
+        weightClasses[weight],
+        'mb-1 leading-none tracking-tight',
+        className
+      )}
+    >
+      {children}
     </ShadcnAlertTitle>
   );
 });

@@ -861,3 +861,6 @@ const ContratacaoDigital = memo(function ContratacaoDigital() {
     </>
   );
 });
+
+export default ContratacaoDigital;
+

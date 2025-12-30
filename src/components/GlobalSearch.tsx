@@ -9,7 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { colaboradoresData, statusColors } from '@/data/mockData';
+import { mockColaboradores, statusColors } from '@/data/mockData';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -32,15 +32,17 @@ export const GlobalSearch = memo(function GlobalSearch({ open, onOpenChange }: G
 
   // Filtrar colaboradores
   const filteredColaboradores = useMemo(() => {
-    if (!search) return [].slice(0, 8);
-    
+    if (!search) return mockColaboradores.slice(0, 8);
+
     const query = search.toLowerCase();
-    return [].filter(c => 
-      c.nome.toLowerCase().includes(query) ||
-      c.matricula.toLowerCase().includes(query) ||
-      c.cargo.toLowerCase().includes(query) ||
-      c.departamento.toLowerCase().includes(query)
-    ).slice(0, 10);
+    return mockColaboradores
+      .filter((c) =>
+        c.nome.toLowerCase().includes(query) ||
+        c.matricula.toLowerCase().includes(query) ||
+        c.cargo.toLowerCase().includes(query) ||
+        c.departamento.toLowerCase().includes(query)
+      )
+      .slice(0, 10);
   }, [search]);
 
   const handleSelect = useCallback((colaboradorId: string) => {

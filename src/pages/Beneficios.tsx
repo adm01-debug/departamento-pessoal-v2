@@ -372,3 +372,6 @@ const Beneficios = memo(function Beneficios() {
     </>
   );
 });
+
+export default Beneficios;
+

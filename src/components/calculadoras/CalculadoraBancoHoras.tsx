@@ -57,13 +57,18 @@ export const CalculadoraBancoHoras: React.FC<CalculadoraBancoHorasProps> = ({
     const valorHora = salario > 0 ? salario / 220 : 0;
     const valorMonetario = Math.abs(novoSaldo) * valorHora;
     
+    const status = (novoSaldo > 0 ? 'positivo' : novoSaldo < 0 ? 'negativo' : 'zerado') as
+      | 'positivo'
+      | 'negativo'
+      | 'zerado';
+
     const res = {
       jornadaEsperada,
       horasTrabalhadas: horas,
       diferenca,
       novoSaldo,
       valorMonetario,
-      status: novoSaldo > 0 ? 'positivo' : novoSaldo < 0 ? 'negativo' : 'zerado',
+      status,
     };
     
     setResultado(res);
