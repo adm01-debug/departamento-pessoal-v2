@@ -856,6 +856,6 @@ const ContratacaoDigital = memo(function ContratacaoDigital() {
         onAssinaturaSalva={handleAssinaturaSalva}
       />
     </div>
-  
-    </>);
-}
+    </>
+  );
+});
