@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/SEOHead';
-import { useState, memo, useEffect, useEffect, useCallback } from 'react';
+import { useState, memo, useEffect, useCallback } from 'react';
 import { Gift, Plus, Loader2, Search, X, Pencil, Trash2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
