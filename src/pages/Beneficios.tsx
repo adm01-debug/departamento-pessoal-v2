@@ -369,5 +369,6 @@ const Beneficios = memo(function Beneficios() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
