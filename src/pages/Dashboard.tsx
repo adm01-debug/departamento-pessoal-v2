@@ -219,6 +219,8 @@ const Dashboard = memo(function Dashboard() {
   const isLoading = loadingColaboradores || indicadores.loading;
 
   return (
+    <>
+    <SEOHead title="Dashboard | DP System" description="Visão geral do Departamento Pessoal" />
     <div id="main-content" className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
