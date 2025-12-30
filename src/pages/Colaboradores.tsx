@@ -538,8 +538,6 @@ const Colaboradores = memo(function Colaboradores() {
               paginatedColaboradores.map((colab) => {
                 const colors = statusColors[colab.status] || statusColors.pendente;
                 return (
-    <>
-      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
                   <tr 
                     key={colab.id} 
                     className="hover:bg-muted/30 transition-colors cursor-pointer"
@@ -656,8 +654,6 @@ const Colaboradores = memo(function Colaboradores() {
                   pageNum = currentPage - 2 + i;
                 }
                 return (
-    <>
-      <SEOHead title="Colaboradores | DP System" description="Gestão de colaboradores" />
                   <Button
                     key={pageNum}
                     variant={currentPage === pageNum ? "default" : "outline"}
@@ -727,18 +723,3 @@ const Colaboradores = memo(function Colaboradores() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
