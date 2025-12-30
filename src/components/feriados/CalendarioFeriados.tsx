@@ -1,6 +1,5 @@
-import { memo } from 'react';
-import { useState, memo, memo } from 'react';
-import { format, startOfYear, endOfYear, eachMonthOfInterval, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns';
+import { useState, memo } from 'react';
+import { format, startOfYear, endOfYear, eachMonthOfInterval, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useFeriados, Feriado } from '@/hooks/useFeriados';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -102,32 +101,19 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setAno(ano - 1)}
-          >
+          <Button variant="outline" size="icon" onClick={() => setAno(ano - 1)}>
             <ChevronLeft className="w-4 h-4" />
           </Button>
           <h2 className="text-2xl font-bold">{ano}</h2>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setAno(ano + 1)}
-          >
+          <Button variant="outline" size="icon" onClick={() => setAno(ano + 1)}>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => sincronizarFeriados(ano)}
-            disabled={isSincronizando}
-          >
+          <Button variant="outline" onClick={() => sincronizarFeriados(ano)} disabled={isSincronizando}>
             <RefreshCw className={cn("w-4 h-4 mr-2", isSincronizando && "animate-spin")} />
             Sincronizar {ano}
           </Button>
@@ -146,29 +132,16 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Data</Label>
-                  <Input
-                    type="date"
-                    value={novoFeriado.data}
-                    onChange={(e) => setNovoFeriado({ ...novoFeriado, data: e.target.value })}
-                  />
+                  <Input type="date" value={novoFeriado.data} onChange={(e) => setNovoFeriado({ ...novoFeriado, data: e.target.value })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Descrição</Label>
-                  <Input
-                    value={novoFeriado.descricao}
-                    onChange={(e) => setNovoFeriado({ ...novoFeriado, descricao: e.target.value })}
-                    placeholder="Nome do feriado"
-                  />
+                  <Input value={novoFeriado.descricao} onChange={(e) => setNovoFeriado({ ...novoFeriado, descricao: e.target.value })} placeholder="Nome do feriado" />
                 </div>
                 <div className="space-y-2">
                   <Label>Tipo</Label>
-                  <Select
-                    value={novoFeriado.tipo}
-                    onValueChange={(v) => setNovoFeriado({ ...novoFeriado, tipo: v as any })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                  <Select value={novoFeriado.tipo} onValueChange={(v) => setNovoFeriado({ ...novoFeriado, tipo: v as 'nacional' | 'estadual' | 'municipal' })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="nacional">Nacional</SelectItem>
                       <SelectItem value="estadual">Estadual</SelectItem>
@@ -179,17 +152,10 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
                 {(novoFeriado.tipo === 'estadual' || novoFeriado.tipo === 'municipal') && (
                   <div className="space-y-2">
                     <Label>Estado (UF)</Label>
-                    <Select
-                      value={novoFeriado.uf}
-                      onValueChange={(v) => setNovoFeriado({ ...novoFeriado, uf: v })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o estado" />
-                      </SelectTrigger>
+                    <Select value={novoFeriado.uf} onValueChange={(v) => setNovoFeriado({ ...novoFeriado, uf: v })}>
+                      <SelectTrigger><SelectValue placeholder="Selecione o estado" /></SelectTrigger>
                       <SelectContent>
-                        {ESTADOS_BR.map(uf => (
-                          <SelectItem key={uf} value={uf}>{uf}</SelectItem>
-                        ))}
+                        {ESTADOS_BR.map(uf => (<SelectItem key={uf} value={uf}>{uf}</SelectItem>))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -197,16 +163,10 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
                 {novoFeriado.tipo === 'municipal' && (
                   <div className="space-y-2">
                     <Label>Cidade</Label>
-                    <Input
-                      value={novoFeriado.cidade}
-                      onChange={(e) => setNovoFeriado({ ...novoFeriado, cidade: e.target.value })}
-                      placeholder="Nome da cidade"
-                    />
+                    <Input value={novoFeriado.cidade} onChange={(e) => setNovoFeriado({ ...novoFeriado, cidade: e.target.value })} placeholder="Nome da cidade" />
                   </div>
                 )}
-                <Button onClick={handleAdicionarFeriado} className="w-full">
-                  Adicionar
-                </Button>
+                <Button onClick={handleAdicionarFeriado} className="w-full">Adicionar</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -214,70 +174,33 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Calendário */}
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                {format(new Date(ano, mesSelecionado), 'MMMM yyyy', { locale: ptBR })}
-              </CardTitle>
-            </div>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              {format(new Date(ano, mesSelecionado), 'MMMM yyyy', { locale: ptBR })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Seletor de Meses */}
             <div className="grid grid-cols-6 gap-2 mb-4">
               {meses.map((mes, idx) => (
-                <Button
-                  key={idx}
-                  variant={mesSelecionado === idx ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setMesSelecionado(idx)}
-                  className="text-xs"
-                >
+                <Button key={idx} variant={mesSelecionado === idx ? 'default' : 'outline'} size="sm" onClick={() => setMesSelecionado(idx)} className="text-xs">
                   {format(mes, 'MMM', { locale: ptBR })}
                 </Button>
               ))}
             </div>
-
-            {/* Grid do Calendário */}
             <div className="grid grid-cols-7 gap-1">
               {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(dia => (
-                <div key={dia} className="text-center text-xs font-medium text-muted-foreground py-2">
-                  {dia}
-                </div>
+                <div key={dia} className="text-center text-xs font-medium text-muted-foreground py-2">{dia}</div>
               ))}
-              
-              {/* Espaços vazios antes do primeiro dia */}
-              {Array.from({ length: diasDoMes[0].getDay() }).map((_, i) => (
-                <div key={`empty-${i}`} />
-              ))}
-              
-              {/* Dias do mês */}
+              {Array.from({ length: diasDoMes[0].getDay() }).map((_, i) => (<div key={`empty-${i}`} />))}
               {diasDoMes.map(dia => {
                 const feriado = getFeriadoDia(dia);
                 const ehHoje = isToday(dia);
-                
                 return (
-                  <div
-                    key={dia.toISOString()}
-                    className={cn(
-                      "p-2 text-center rounded-lg relative group cursor-pointer transition-all",
-                      ehHoje && "ring-2 ring-primary",
-                      feriado && "bg-destructive/10",
-                      !feriado && "hover:bg-muted"
-                    )}
-                    title={feriado?.descricao}
-                  >
-                    <span className={cn(
-                      "text-sm",
-                      feriado && "text-destructive font-medium"
-                    )}>
-                      {format(dia, 'd')}
-                    </span>
-                    {feriado && (
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-destructive" />
-                    )}
+                  <div key={dia.toISOString()} className={cn("p-2 text-center rounded-lg relative", ehHoje && "ring-2 ring-primary", feriado && "bg-destructive/10", !feriado && "hover:bg-muted")} title={feriado?.descricao}>
+                    <span className={cn("text-sm", feriado && "text-destructive font-medium")}>{format(dia, 'd')}</span>
+                    {feriado && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-destructive" />}
                   </div>
                 );
               })}
@@ -285,7 +208,6 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
           </CardContent>
         </Card>
 
-        {/* Lista de Feriados do Mês */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -303,34 +225,17 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
               ) : (
                 <div className="space-y-3">
                   {feriadosDoMes.map(feriado => (
-                    <div
-                      key={feriado.id}
-                      className="p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
-                    >
+                    <div key={feriado.id} className="p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <p className="font-medium text-sm">{feriado.descricao}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {format(new Date(feriado.data + 'T00:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{format(new Date(feriado.data + 'T00:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <Badge variant={getBadgeVariant(feriado.tipo)}>
-                              {feriado.tipo}
-                            </Badge>
-                            {feriado.uf && (
-                              <Badge variant="outline" className="text-xs">
-                                <MapPin className="w-3 h-3 mr-1" />
-                                {feriado.cidade ? `${feriado.cidade}/${feriado.uf}` : feriado.uf}
-                              </Badge>
-                            )}
+                            <Badge variant={getBadgeVariant(feriado.tipo)}>{feriado.tipo}</Badge>
+                            {feriado.uf && (<Badge variant="outline" className="text-xs"><MapPin className="w-3 h-3 mr-1" />{feriado.cidade ? `${feriado.cidade}/${feriado.uf}` : feriado.uf}</Badge>)}
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => removerFeriado(feriado.id)}
-                        >
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removerFeriado(feriado.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -343,20 +248,10 @@ export const CalendarioFeriados = memo(function CalendarioFeriados() {
         </Card>
       </div>
 
-      {/* Legenda */}
       <div className="flex items-center gap-6 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <Badge variant="default">Nacional</Badge>
-          <span>Feriado nacional</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary">Estadual</Badge>
-          <span>Feriado estadual</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline">Municipal</Badge>
-          <span>Feriado municipal</span>
-        </div>
+        <div className="flex items-center gap-2"><Badge variant="default">Nacional</Badge><span>Feriado nacional</span></div>
+        <div className="flex items-center gap-2"><Badge variant="secondary">Estadual</Badge><span>Feriado estadual</span></div>
+        <div className="flex items-center gap-2"><Badge variant="outline">Municipal</Badge><span>Feriado municipal</span></div>
       </div>
     </div>
   );
