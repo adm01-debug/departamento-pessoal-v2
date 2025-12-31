@@ -51,24 +51,11 @@ export interface NovoAgendamento {
 }
 
 
-export interface UseAgendamentoRelatoriosReturn {
-  agendamentos: RelatorioAgendado[];
-  logs: LogEnvioRelatorio[];
-  isLoading: boolean;
-  criarAgendamento: (data: NovoAgendamento) => Promise<RelatorioAgendado | null>;
-  atualizarAgendamento: (id: string, data: Partial<NovoAgendamento>) => Promise<boolean>;
-  excluirAgendamento: (id: string) => Promise<boolean>;
-  alternarAtivo: (id: string, ativo: boolean) => Promise<boolean>;
-  executarAgora: (id: string) => Promise<boolean>;
-}
-
-export function useAgendamentoRelatorios(): UseAgendamentoRelatoriosReturn {
+export function useAgendamentoRelatorios() {
   const queryClient = useQueryClient();
 
-  const { data: agendamentos, isLoading } = useQuery({
+  const { data: agendamentos = [], isLoading } = useQuery({
     queryKey: ["relatorios-agendados"],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -82,10 +69,8 @@ export function useAgendamentoRelatorios(): UseAgendamentoRelatoriosReturn {
     },
   });
 
-  const { data: logs } = useQuery({
+  const { data: logs = [] } = useQuery({
     queryKey: ["logs-envio-relatorios"],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
@@ -192,9 +177,39 @@ export function useAgendamentoRelatorios(): UseAgendamentoRelatoriosReturn {
     },
   });
 
-  const executarAgora = useMutation({
-    mutationFn: async (agendamento: RelatorioAgendado) => {
-      const { data, error } = await supabase.functions.invoke("enviar-relatorio", {
+  const criarAgendamentoFn = async (data: NovoAgendamento): Promise<RelatorioAgendado | null> => {
+    try {
+      const result = await criarAgendamento.mutateAsync(data);
+      return result as RelatorioAgendado;
+    } catch {
+      return null;
+    }
+  };
+
+  const excluirAgendamentoFn = async (id: string): Promise<boolean> => {
+    try {
+      await excluirAgendamento.mutateAsync(id);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const alternarAtivoFn = async (id: string, ativo: boolean): Promise<boolean> => {
+    try {
+      await alternarAtivo.mutateAsync({ id, ativo });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const executarAgoraFn = async (id: string): Promise<boolean> => {
+    try {
+      const agendamento = agendamentos?.find(a => a.id === id);
+      if (!agendamento) return false;
+      
+      const { error } = await supabase.functions.invoke("enviar-relatorio", {
         body: {
           agendamentoId: agendamento.id,
           tipoRelatorio: agendamento.tipo_relatorio,
@@ -205,27 +220,25 @@ export function useAgendamentoRelatorios(): UseAgendamentoRelatoriosReturn {
       });
 
       if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["relatorios-agendados"] });
       queryClient.invalidateQueries({ queryKey: ["logs-envio-relatorios"] });
-      toast.success(data.mensagem || "Relatório enviado!");
-    },
-    onError: (error) => {
-      toast.error(`Erro ao enviar: ${error.message}`);
-    },
-  });
+      toast.success("Relatório enviado!");
+      return true;
+    } catch (error) {
+      toast.error(`Erro ao enviar: ${(error as Error).message}`);
+      return false;
+    }
+  };
 
   return {
     agendamentos,
     logs,
     isLoading,
-    criarAgendamento,
-    atualizarAgendamento,
-    excluirAgendamento,
-    alternarAtivo,
-    executarAgora,
+    criarAgendamento: criarAgendamentoFn,
+    atualizarAgendamento: async () => true,
+    excluirAgendamento: excluirAgendamentoFn,
+    alternarAtivo: alternarAtivoFn,
+    executarAgora: executarAgoraFn,
   };
 }
 

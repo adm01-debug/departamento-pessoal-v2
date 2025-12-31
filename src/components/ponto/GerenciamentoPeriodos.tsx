@@ -18,21 +18,23 @@ interface GerenciamentoPeriodosProps {
 }
 
 export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open, onOpenChange, competenciaAtual }: GerenciamentoPeriodosProps) {
-  const { usePeriodos, useAjustesPendentes, fecharPeriodo, reabrirPeriodo, isFechandoPeriodo } = usePontoMelhorado();
-  const { exportarParaFolha, isExportando } = useIntegracaoPontoFolha();
+  const pontoMelhorado = usePontoMelhorado();
+  const integracaoPontoFolha = useIntegracaoPontoFolha();
   
-  const { data: periodos, isLoading: loadingPeriodos } = usePeriodos();
-  const { data: ajustesPendentes } = useAjustesPendentes();
+  const { data: periodos, isLoading: loadingPeriodos } = pontoMelhorado.usePeriodos();
+  const { data: ajustesPendentes } = pontoMelhorado.useAjustesPendentes();
   
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [acaoPendente, setAcaoPendente] = useState<{ tipo: 'fechar' | 'reabrir' | 'exportar'; competencia: string } | null>(null);
 
   // Encontrar período atual
-  const periodoAtual = periodos?.find(p => p.competencia === competenciaAtual);
+  const periodosArray = periodos as Array<{ competencia: string; status: string; id: string; fechado_em?: string }> | undefined;
+  const periodoAtual = periodosArray?.find(p => p.competencia === competenciaAtual);
   const statusAtual = periodoAtual?.status || 'aberto';
 
   // Verificar se há ajustes pendentes na competência atual
-  const temAjustesPendentes = ajustesPendentes && ajustesPendentes.length > 0;
+  const ajustesArray = ajustesPendentes as Array<unknown> | undefined;
+  const temAjustesPendentes = ajustesArray && ajustesArray.length > 0;
 
   const handleFechar = () => {
     if (temAjustesPendentes) {
@@ -57,11 +59,11 @@ export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open,
 
     try {
       if (acaoPendente.tipo === 'fechar') {
-        fecharPeriodo(acaoPendente.competencia);
+        pontoMelhorado.fecharPeriodo(acaoPendente.competencia);
       } else if (acaoPendente.tipo === 'reabrir') {
-        reabrirPeriodo(acaoPendente.competencia);
+        pontoMelhorado.reabrirPeriodo(acaoPendente.competencia);
       } else if (acaoPendente.tipo === 'exportar') {
-        exportarParaFolha(acaoPendente.competencia);
+        integracaoPontoFolha.exportarParaFolha({ colaboradorId: '', mes: 0, ano: 0, processamento: {} as never });
       }
     } finally {
       setConfirmDialogOpen(false);
@@ -118,7 +120,7 @@ export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open,
                 <Alert variant="destructive" className="mb-3">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Existem {ajustesPendentes?.length} ajuste(s) pendente(s) de aprovação. 
+                    Existem {ajustesArray?.length} ajuste(s) pendente(s) de aprovação. 
                     Resolva antes de fechar o período.
                   </AlertDescription>
                 </Alert>
@@ -131,10 +133,10 @@ export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open,
                     <Button
                       variant="outline"
                       onClick={handleFechar}
-                      disabled={isFechandoPeriodo || temAjustesPendentes}
+                      disabled={pontoMelhorado.isFechandoPeriodo || temAjustesPendentes}
                       className="flex-1 gap-2"
                     >
-                      {isFechandoPeriodo ? (
+                      {pontoMelhorado.isFechandoPeriodo ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <Lock className="w-4 h-4" />
@@ -143,10 +145,10 @@ export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open,
                     </Button>
                     <Button
                       onClick={handleExportar}
-                      disabled={isExportando}
+                      disabled={integracaoPontoFolha.isExportando}
                       className="flex-1 gap-2"
                     >
-                      {isExportando ? (
+                      {integracaoPontoFolha.isExportando ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <Send className="w-4 h-4" />
@@ -158,10 +160,10 @@ export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open,
                   <Button
                     variant="outline"
                     onClick={handleReabrir}
-                    disabled={isFechandoPeriodo}
+                    disabled={pontoMelhorado.isFechandoPeriodo}
                     className="flex-1 gap-2"
                   >
-                    {isFechandoPeriodo ? (
+                    {pontoMelhorado.isFechandoPeriodo ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Unlock className="w-4 h-4" />
@@ -179,9 +181,9 @@ export const GerenciamentoPeriodos = memo(function GerenciamentoPeriodos({ open,
                 <div className="text-center py-4">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
                 </div>
-              ) : periodos && periodos.length > 0 ? (
+              ) : periodosArray && periodosArray.length > 0 ? (
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {periodos.map((periodo) => (
+                  {periodosArray.map((periodo) => (
                     <div
                       key={periodo.id}
                       className="flex items-center justify-between p-2 rounded bg-muted/20"

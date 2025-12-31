@@ -80,28 +80,32 @@ export const AgendamentoRelatoriosModal = memo(function AgendamentoRelatoriosMod
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    await criarAgendamento.mutateAsync({
-      nome: form.nome,
-      tipo_relatorio: form.tipo_relatorio,
-      formato: form.formato,
-      email_destinatario: form.email_destinatario,
-      frequencia: form.frequencia,
-      dia_semana: form.frequencia === "semanal" ? form.dia_semana : undefined,
-      dia_mes: form.frequencia === "mensal" ? form.dia_mes : undefined,
-      hora_envio: form.hora_envio,
-    });
+    try {
+      await criarAgendamento({
+        nome: form.nome,
+        tipo_relatorio: form.tipo_relatorio,
+        formato: form.formato,
+        email_destinatario: form.email_destinatario,
+        frequencia: form.frequencia,
+        dia_semana: form.frequencia === "semanal" ? form.dia_semana : undefined,
+        dia_mes: form.frequencia === "mensal" ? form.dia_mes : undefined,
+        hora_envio: form.hora_envio,
+      });
 
-    setMostrarFormulario(false);
-    setForm({
-      nome: "",
-      tipo_relatorio: "",
-      formato: "PDF",
-      email_destinatario: "",
-      frequencia: "diario",
-      dia_semana: 1,
-      dia_mes: 1,
-      hora_envio: "08:00",
-    });
+      setMostrarFormulario(false);
+      setForm({
+        nome: "",
+        tipo_relatorio: "",
+        formato: "PDF",
+        email_destinatario: "",
+        frequencia: "diario",
+        dia_semana: 1,
+        dia_mes: 1,
+        hora_envio: "08:00",
+      });
+    } catch (error) {
+      console.error('Error creating schedule:', error);
+    }
   };
 
   const getFrequenciaLabel = (agendamento: RelatorioAgendado) => {
@@ -208,7 +212,7 @@ export const AgendamentoRelatoriosModal = memo(function AgendamentoRelatoriosMod
                                 <Switch
                                   checked={agendamento.ativo}
                                   onCheckedChange={(checked) =>
-                                    alternarAtivo.mutate({ id: agendamento.id, ativo: checked })
+                                    alternarAtivo(agendamento.id, checked)
                                   }
                                 />
                                 <Badge variant={agendamento.ativo ? "default" : "secondary"}>
@@ -221,8 +225,7 @@ export const AgendamentoRelatoriosModal = memo(function AgendamentoRelatoriosMod
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => executarAgora.mutate(agendamento)}
-                                  disabled={executarAgora.isPending}
+                                  onClick={() => executarAgora(agendamento.id)}
                                   title="Executar agora"
                                 >
                                   <Play className="h-4 w-4" />
@@ -230,7 +233,7 @@ export const AgendamentoRelatoriosModal = memo(function AgendamentoRelatoriosMod
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => excluirAgendamento.mutate(agendamento.id)}
+                                  onClick={() => excluirAgendamento(agendamento.id)}
                                   className="text-destructive"
                                   title="Excluir"
                                 >
@@ -383,7 +386,7 @@ export const AgendamentoRelatoriosModal = memo(function AgendamentoRelatoriosMod
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={criarAgendamento.isPending}>
+                  <Button type="submit">
                     Salvar Agendamento
                   </Button>
                 </div>
