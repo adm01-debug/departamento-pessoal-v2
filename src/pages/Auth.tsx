@@ -183,6 +183,15 @@ const Auth = memo(function Auth() {
                   {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   Entrar
                 </Button>
+                
+                <div className="text-center">
+                  <a 
+                    href="/forgot-password" 
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Esqueci minha senha
+                  </a>
+                </div>
               </form>
             </TabsContent>
             

@@ -10,6 +10,11 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const TwoFactorSetup = lazy(() => import("./pages/TwoFactorSetup"));
+const RateLimitDashboard = lazy(() => import("./pages/RateLimitDashboard"));
 const Colaboradores = lazy(() => import("./pages/Colaboradores"));
 const Admissao = lazy(() => import("./pages/Admissao"));
 const Ponto = lazy(() => import("./pages/Ponto"));
@@ -55,6 +60,9 @@ const App = () => (
             <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/contratacao" element={<ContratacaoDigital />} />
               <Route element={
                 <ProtectedRoute>
@@ -81,6 +89,8 @@ const App = () => (
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/documentos" element={<GestaoDocumentos />} />
                 <Route path="/contabil" element={<IntegracaoContabil />} />
+                <Route path="/2fa-setup" element={<TwoFactorSetup />} />
+                <Route path="/seguranca" element={<RateLimitDashboard />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
