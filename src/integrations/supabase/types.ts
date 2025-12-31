@@ -1730,6 +1730,84 @@ export type Database = {
           },
         ]
       }
+      geo_allowed_countries: {
+        Row: {
+          added_by: string | null
+          country_code: string
+          country_name: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          added_by?: string | null
+          country_code: string
+          country_name: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          added_by?: string | null
+          country_code?: string
+          country_name?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      geo_blocked_attempts: {
+        Row: {
+          country_code: string | null
+          country_name: string | null
+          created_at: string | null
+          id: string
+          ip_address: string
+          user_agent: string | null
+        }
+        Insert: {
+          country_code?: string | null
+          country_name?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address: string
+          user_agent?: string | null
+        }
+        Update: {
+          country_code?: string | null
+          country_name?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      geo_blocking_config: {
+        Row: {
+          block_unknown_countries: boolean | null
+          enabled: boolean | null
+          id: string
+          log_blocked_attempts: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          block_unknown_countries?: boolean | null
+          enabled?: boolean | null
+          id?: string
+          log_blocked_attempts?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          block_unknown_countries?: boolean | null
+          enabled?: boolean | null
+          id?: string
+          log_blocked_attempts?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       historico_alertas: {
         Row: {
           created_at: string
@@ -3324,6 +3402,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_country_allowed: {
+        Args: { check_country_code: string }
+        Returns: boolean
+      }
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
       user_belongs_to_empresa: {
