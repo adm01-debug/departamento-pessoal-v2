@@ -17,9 +17,9 @@ import {
 
 const ROLES: { value: Role; label: string; icon: typeof Shield; description: string }[] = [
   { value: 'admin', label: 'Administrador', icon: Shield, description: 'Acesso total ao sistema' },
-  { value: 'manager', label: 'Gerente', icon: UserCog, description: 'Acesso intermediário' },
-  { value: 'analyst', label: 'Analista', icon: User, description: 'Acesso de análise' },
-  { value: 'viewer', label: 'Visualizador', icon: Eye, description: 'Apenas visualização' }
+  { value: 'gestor', label: 'Gestor', icon: UserCog, description: 'Acesso intermediário' },
+  { value: 'rh', label: 'RH', icon: User, description: 'Gestão de pessoas' },
+  { value: 'user', label: 'Usuário', icon: Eye, description: 'Apenas visualização' }
 ];
 
 export function RolePermissionsManager() {

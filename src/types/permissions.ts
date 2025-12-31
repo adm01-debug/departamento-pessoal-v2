@@ -25,8 +25,8 @@ export type Permission =
   // Segurança
   | 'seguranca:read' | 'seguranca:manage';
 
-/** Roles do sistema */
-export type Role = 'admin' | 'manager' | 'analyst' | 'viewer';
+/** Roles do sistema (compatível com user_roles no banco) */
+export type Role = 'admin' | 'gestor' | 'rh' | 'user';
 
 /** Detalhes de uma permissão */
 export interface PermissionDetails {
@@ -104,7 +104,7 @@ export const ALL_PERMISSIONS: PermissionDetails[] = [
 /** Mapeamento role -> permissions */
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: ALL_PERMISSIONS.map(p => p.code),
-  manager: [
+  gestor: [
     'colaboradores:read', 'colaboradores:write', 'colaboradores:export',
     'ferias:read', 'ferias:write', 'ferias:approve',
     'folha:read', 'folha:write',
@@ -115,17 +115,17 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'relatorios:read', 'relatorios:export',
     'auditoria:read'
   ],
-  analyst: [
-    'colaboradores:read',
-    'ferias:read',
+  rh: [
+    'colaboradores:read', 'colaboradores:write',
+    'ferias:read', 'ferias:write',
     'folha:read',
-    'beneficios:read',
-    'ponto:read',
-    'admissao:read',
-    'desligamento:read',
+    'beneficios:read', 'beneficios:write',
+    'ponto:read', 'ponto:write',
+    'admissao:read', 'admissao:write',
+    'desligamento:read', 'desligamento:write',
     'relatorios:read', 'relatorios:export'
   ],
-  viewer: [
+  user: [
     'colaboradores:read',
     'ferias:read',
     'folha:read',

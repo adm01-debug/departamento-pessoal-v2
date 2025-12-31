@@ -2911,6 +2911,30 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          permission_code: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permission_code: string
+          role: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permission_code?: string
+          role?: string
+        }
+        Relationships: []
+      }
       rubricas_folha: {
         Row: {
           ativo: boolean | null
