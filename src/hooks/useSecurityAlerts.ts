@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useRBAC } from '@/hooks/useRBAC';
+import { browserNotificationService } from '@/services/BrowserNotificationService';
 
 export interface SecurityAlert {
   id: string;
@@ -142,13 +143,23 @@ export function useSecurityAlerts() {
         (payload) => {
           const newAlert = payload.new as SecurityAlert;
           
-          // Mostrar notificação para alertas críticos
+          // Mostrar notificação toast
           if (newAlert.severity === 'critical') {
             toast.error(`⚠️ Alerta Crítico: ${newAlert.type}`, {
               duration: 10000,
             });
           } else if (newAlert.severity === 'high') {
             toast.warning(`Alerta: ${newAlert.type}`);
+          }
+
+          // Enviar notificação push do navegador
+          if (newAlert.severity === 'critical' || newAlert.severity === 'high') {
+            browserNotificationService.sendSecurityAlert(
+              newAlert.type,
+              newAlert.severity,
+              getAlertMessage(newAlert.type),
+              newAlert.details
+            );
           }
 
           // Atualizar lista de alertas
@@ -196,4 +207,20 @@ export function useSecurityAlerts() {
     createAlert,
     getAlertStats,
   };
+}
+
+// Helper para formatar mensagem do alerta
+function getAlertMessage(type: string): string {
+  const typeMessages: Record<string, string> = {
+    brute_force: 'Tentativas de login suspeitas detectadas',
+    rate_limit_exceeded: 'Limite de requisições excedido',
+    suspicious_login: 'Login de localização suspeita',
+    password_change: 'Senha alterada com sucesso',
+    mfa_disabled: 'Autenticação em dois fatores desativada',
+    new_device: 'Novo dispositivo detectado na conta',
+    session_hijack: 'Possível sequestro de sessão detectado',
+    unauthorized_access: 'Tentativa de acesso não autorizado',
+  };
+
+  return typeMessages[type] || `Alerta: ${type}`;
 }
