@@ -10,6 +10,7 @@ export { UserPermissionsManager } from './UserPermissionsManager';
 export { RolePermissionsManager } from './RolePermissionsManager';
 export { RolePermissionsEditor } from './RolePermissionsEditor';
 export { RoleManager } from './RoleManager';
+export { IPWhitelistManager } from './IPWhitelistManager';
 export { Can, withPermission } from './Can';
 export { PasskeyManager } from '@/components/auth/PasskeyManager';
 export { PasskeyLoginButton } from '@/components/auth/PasskeyLoginButton';
