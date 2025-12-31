@@ -630,6 +630,39 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_ips: {
+        Row: {
+          blocked_at: string | null
+          blocked_by: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          ip_address: string
+          permanent: boolean | null
+          reason: string | null
+        }
+        Insert: {
+          blocked_at?: string | null
+          blocked_by?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address: string
+          permanent?: boolean | null
+          reason?: string | null
+        }
+        Update: {
+          blocked_at?: string | null
+          blocked_by?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string
+          permanent?: boolean | null
+          reason?: string | null
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           agencia: string | null
@@ -1908,6 +1941,30 @@ export type Database = {
           },
         ]
       }
+      ip_whitelist: {
+        Row: {
+          added_by: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          ip_address: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          ip_address: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          ip_address?: string
+        }
+        Relationships: []
+      }
       lancamentos_folha: {
         Row: {
           automatico: boolean | null
@@ -1993,6 +2050,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      login_attempts: {
+        Row: {
+          created_at: string | null
+          email: string
+          failure_reason: string | null
+          id: string
+          ip_address: string
+          mfa_passed: boolean | null
+          mfa_required: boolean | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          failure_reason?: string | null
+          id?: string
+          ip_address: string
+          mfa_passed?: boolean | null
+          mfa_required?: boolean | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string
+          mfa_passed?: boolean | null
+          mfa_required?: boolean | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       notificacoes: {
         Row: {
@@ -2335,6 +2428,72 @@ export type Database = {
         }
         Relationships: []
       }
+      password_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          password_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          password_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          password_hash?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      password_policies: {
+        Row: {
+          created_at: string | null
+          id: string
+          lockout_attempts: number | null
+          lockout_duration_minutes: number | null
+          max_age_days: number | null
+          min_length: number | null
+          prevent_reuse_count: number | null
+          require_lowercase: boolean | null
+          require_numbers: boolean | null
+          require_special_chars: boolean | null
+          require_uppercase: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          lockout_attempts?: number | null
+          lockout_duration_minutes?: number | null
+          max_age_days?: number | null
+          min_length?: number | null
+          prevent_reuse_count?: number | null
+          require_lowercase?: boolean | null
+          require_numbers?: boolean | null
+          require_special_chars?: boolean | null
+          require_uppercase?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          lockout_attempts?: number | null
+          lockout_duration_minutes?: number | null
+          max_age_days?: number | null
+          min_length?: number | null
+          prevent_reuse_count?: number | null
+          require_lowercase?: boolean | null
+          require_numbers?: boolean | null
+          require_special_chars?: boolean | null
+          require_uppercase?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       periodos_aquisitivos: {
         Row: {
           colaborador_id: string
@@ -2527,6 +2686,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rate_limit_config: {
+        Row: {
+          block_duration_seconds: number
+          created_at: string | null
+          enabled: boolean | null
+          endpoint: string
+          id: string
+          max_requests: number
+          updated_at: string | null
+          window_seconds: number
+        }
+        Insert: {
+          block_duration_seconds?: number
+          created_at?: string | null
+          enabled?: boolean | null
+          endpoint: string
+          id?: string
+          max_requests?: number
+          updated_at?: string | null
+          window_seconds?: number
+        }
+        Update: {
+          block_duration_seconds?: number
+          created_at?: string | null
+          enabled?: boolean | null
+          endpoint?: string
+          id?: string
+          max_requests?: number
+          updated_at?: string | null
+          window_seconds?: number
+        }
+        Relationships: []
+      }
+      rate_limit_logs: {
+        Row: {
+          blocked: boolean | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: string
+          request_count: number | null
+          user_id: string | null
+          window_start: string | null
+        }
+        Insert: {
+          blocked?: boolean | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address: string
+          request_count?: number | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          blocked?: boolean | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: string
+          request_count?: number | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
       }
       registros_ponto: {
         Row: {
@@ -2728,6 +2953,45 @@ export type Database = {
         }
         Relationships: []
       }
+      security_alerts: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       tipos_beneficio: {
         Row: {
           ativo: boolean | null
@@ -2799,6 +3063,48 @@ export type Database = {
           },
         ]
       }
+      user_mfa: {
+        Row: {
+          backup_codes: string[] | null
+          created_at: string | null
+          id: string
+          mfa_enabled: boolean | null
+          mfa_secret: string | null
+          mfa_type: string | null
+          phone_number: string | null
+          recovery_email: string | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          id?: string
+          mfa_enabled?: boolean | null
+          mfa_secret?: string | null
+          mfa_type?: string | null
+          phone_number?: string | null
+          recovery_email?: string | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          id?: string
+          mfa_enabled?: boolean | null
+          mfa_secret?: string | null
+          mfa_type?: string | null
+          phone_number?: string | null
+          recovery_email?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2823,12 +3129,97 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          expires_at: string
+          id: string
+          ip_address: string | null
+          is_active: boolean | null
+          last_activity: string | null
+          location: Json | null
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          expires_at: string
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          location?: Json | null
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          location?: Json | null
+          session_token?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verification_tokens: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          token: string
+          type: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          token: string
+          type: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+          type?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
+      check_brute_force: {
+        Args: { check_email: string; check_ip: string }
+        Returns: Json
+      }
+      check_rate_limit: {
+        Args: {
+          check_endpoint: string
+          check_ip: string
+          check_user_id?: string
+        }
+        Returns: Json
+      }
+      cleanup_security_logs: { Args: never; Returns: undefined }
       get_user_default_empresa: { Args: { _user_id: string }; Returns: string }
       get_user_empresas: { Args: { _user_id: string }; Returns: string[] }
       get_user_roles: {
@@ -2843,6 +3234,8 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
+      is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
