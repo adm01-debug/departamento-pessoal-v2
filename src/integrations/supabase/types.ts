@@ -2572,6 +2572,87 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_config: {
+        Row: {
+          auto_expire_hours: number | null
+          id: string
+          notify_admins: boolean | null
+          notify_user_on_approval: boolean | null
+          notify_user_on_rejection: boolean | null
+          require_approval: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          auto_expire_hours?: number | null
+          id?: string
+          notify_admins?: boolean | null
+          notify_user_on_approval?: boolean | null
+          notify_user_on_rejection?: boolean | null
+          require_approval?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          auto_expire_hours?: number | null
+          id?: string
+          notify_admins?: boolean | null
+          notify_user_on_approval?: boolean | null
+          notify_user_on_rejection?: boolean | null
+          require_approval?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      password_reset_requests: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          ip_address: string | null
+          reason: string | null
+          requested_at: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          status: string
+          user_agent: string | null
+          user_email: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+          requested_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          user_agent?: string | null
+          user_email: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+          requested_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          user_agent?: string | null
+          user_email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       periodos_aquisitivos: {
         Row: {
           colaborador_id: string
