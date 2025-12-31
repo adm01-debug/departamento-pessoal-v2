@@ -19,3 +19,5 @@ export { PasskeyManager } from '@/components/auth/PasskeyManager';
 export { PasskeyLoginButton } from '@/components/auth/PasskeyLoginButton';
 export { MFASetup } from '@/components/auth/MFASetup';
 export { MFAVerification } from '@/components/auth/MFAVerification';
+export { LoginLockoutAlert } from './LoginLockoutAlert';
+export { useLoginRateLimit } from '@/hooks/useLoginRateLimit';

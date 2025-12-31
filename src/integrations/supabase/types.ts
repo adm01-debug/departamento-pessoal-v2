@@ -2165,6 +2165,39 @@ export type Database = {
         }
         Relationships: []
       }
+      login_rate_limits: {
+        Row: {
+          created_at: string
+          failed_attempts: number
+          id: string
+          identifier: string
+          identifier_type: string
+          last_attempt_at: string
+          locked_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          failed_attempts?: number
+          id?: string
+          identifier: string
+          identifier_type?: string
+          last_attempt_at?: string
+          locked_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          failed_attempts?: number
+          id?: string
+          identifier?: string
+          identifier_type?: string
+          last_attempt_at?: string
+          locked_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notificacoes: {
         Row: {
           created_at: string
@@ -3456,9 +3489,21 @@ export type Database = {
     }
     Functions: {
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
+      calculate_lockout_duration: {
+        Args: { attempts: number }
+        Returns: unknown
+      }
       check_brute_force: {
         Args: { check_email: string; check_ip: string }
         Returns: Json
+      }
+      check_login_lock: {
+        Args: { p_identifier: string; p_identifier_type?: string }
+        Returns: {
+          is_locked: boolean
+          locked_until_ts: string
+          remaining_seconds: number
+        }[]
       }
       check_rate_limit: {
         Args: {
@@ -3489,6 +3534,19 @@ export type Database = {
       }
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
+      record_failed_login: {
+        Args: { p_identifier: string; p_identifier_type?: string }
+        Returns: {
+          attempts: number
+          is_locked: boolean
+          locked_until_ts: string
+          lockout_minutes: number
+        }[]
+      }
+      reset_login_attempts: {
+        Args: { p_identifier: string; p_identifier_type?: string }
+        Returns: undefined
+      }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
