@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { useState, memo } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";

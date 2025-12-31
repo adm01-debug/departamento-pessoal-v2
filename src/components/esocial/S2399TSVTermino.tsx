@@ -18,9 +18,9 @@ export function S2399TSVTermino({ data, onSubmit, onCancel }: S2399TSVTerminoPro
     setLoading(true);
     try {
       onSubmit?.(data || {});
-      toast({ title: 'Evento enviado com sucesso', variant: 'success' });
+      toast.success('Evento enviado com sucesso');
     } catch (error) {
-      toast({ title: 'Erro ao enviar evento', variant: 'error' });
+      toast.error('Erro ao enviar evento');
     } finally {
       setLoading(false);
     }

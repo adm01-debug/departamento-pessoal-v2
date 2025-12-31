@@ -18,9 +18,9 @@ export function S2300TSVInicio({ data, onSubmit, onCancel }: S2300TSVInicioProps
     setLoading(true);
     try {
       onSubmit?.(data || {});
-      toast({ title: 'Evento enviado com sucesso', variant: 'success' });
+      toast.success('Evento enviado com sucesso');
     } catch (error) {
-      toast({ title: 'Erro ao enviar evento', variant: 'error' });
+      toast.error('Erro ao enviar evento');
     } finally {
       setLoading(false);
     }

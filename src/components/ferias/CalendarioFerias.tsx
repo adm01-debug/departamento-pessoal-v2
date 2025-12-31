@@ -26,6 +26,8 @@ const statusCores: Record<StatusFerias, { bg: string; text: string; border: stri
   em_gozo: { bg: 'bg-info/20', text: 'text-info', border: 'border-info/50' },
   concluida: { bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-muted' },
   cancelada: { bg: 'bg-destructive/20', text: 'text-destructive', border: 'border-destructive/50' },
+  rejeitada: { bg: 'bg-destructive/20', text: 'text-destructive', border: 'border-destructive/50' },
+  solicitada: { bg: 'bg-amber/20', text: 'text-amber-600', border: 'border-amber/50' },
 };
 
 export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: CalendarioFeriasProps) {
@@ -121,19 +123,19 @@ export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaCl
                         !ehInicio && !ehFim && "rounded-none"
                       )}
                     >
-                      {ehInicio && (
+                    {ehInicio && (
                         <span className="flex items-center gap-0.5">
                           <User className="w-2 h-2" />
-                          {f.colaborador_nome?.split(' ')[0]}
+                          {f.colaborador?.nome?.split(' ')[0] || 'N/A'}
                         </span>
                       )}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <div className="text-xs">
-                      <p className="font-medium">{f.colaborador_nome}</p>
+                      <p className="font-medium">{f.colaborador?.nome || 'N/A'}</p>
                       <p>{format(parseISO(f.data_inicio), 'dd/MM')} - {format(parseISO(f.data_fim), 'dd/MM')}</p>
-                      <p>{f.dias_gozo} dias</p>
+                      <p>{f.dias} dias</p>
                     </div>
                   </TooltipContent>
                 </Tooltip>
