@@ -47,7 +47,7 @@ export const TabContent = React.memo(function TabContent({
   return (
     <TabsContent
       value={value}
-      forceMount={forceMount}
+      forceMount={forceMount || undefined}
       className={cn(
         "mt-4 ring-offset-background",
         "focus-visible:outline-none focus-visible:ring-2",

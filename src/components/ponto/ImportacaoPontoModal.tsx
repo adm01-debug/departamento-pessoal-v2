@@ -98,12 +98,9 @@ export const ImportacaoPontoModal = memo(function ImportacaoPontoModal({ open, o
     setResultado(null);
     
     try {
-      const res = await importarArquivo(arquivo, formato, competencia);
-      setResultado(res);
-      
-      if (res.sucesso > 0 && res.erros.length === 0) {
-        onSuccess?.();
-      }
+      await importarArquivo(arquivo, formato, competencia);
+      setResultado({ sucesso: 1, erros: [] });
+      onSuccess?.();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setResultado({ sucesso: 0, erros: [errorMessage] });
