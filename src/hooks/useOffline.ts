@@ -1,24 +1,24 @@
 /**
- * @fileoverview Hook useOffline
+ * @fileoverview Hook useOffline - Detecta status de conexão
  * @module hooks/useOffline
  */
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useOffline() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
-  const execute = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Implementar lógica específica
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Erro desconhecido'));
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
-  return { loading, error, execute };
+  return { isOffline };
 }

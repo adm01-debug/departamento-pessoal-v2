@@ -30,6 +30,8 @@ const statusConfig: Record<StatusFerias, { label: string; icon: React.ElementTyp
   em_gozo: { label: 'Em Gozo', icon: Calendar, color: 'text-info' },
   concluida: { label: 'Concluída', icon: CheckCircle, color: 'text-muted-foreground' },
   cancelada: { label: 'Cancelada', icon: XCircle, color: 'text-destructive' },
+  rejeitada: { label: 'Rejeitada', icon: XCircle, color: 'text-destructive' },
+  solicitada: { label: 'Solicitada', icon: Clock, color: 'text-amber-600' },
 };
 
 export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: WorkflowAprovacaoFeriasProps) {
@@ -56,19 +58,19 @@ export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ f
     setConfirmDialogOpen(true);
   };
 
-  const executarAcao = () => {
+  const executarAcao = async () => {
     switch (acaoPendente) {
       case 'aprovar':
-        aprovarFerias.mutate({ id: ferias.id, aprovadoPor: 'current-user' });
+        await aprovarFerias(ferias.id, 'current-user');
         break;
       case 'rejeitar':
-        rejeitarFerias.mutate({ id: ferias.id, motivo: motivoRejeicao });
+        await rejeitarFerias(ferias.id, motivoRejeicao);
         break;
       case 'iniciar':
-        atualizarFerias.mutate({ id: ferias.id, status: 'em_gozo' as any });
+        await atualizarFerias(ferias.id, { status: 'em_gozo' });
         break;
       case 'concluir':
-        atualizarFerias.mutate({ id: ferias.id, status: 'concluida' as any });
+        await atualizarFerias(ferias.id, { status: 'concluida' });
         break;
     }
     setConfirmDialogOpen(false);
@@ -110,9 +112,9 @@ export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ f
                 <User className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium">{ferias.colaborador_nome}</p>
+                <p className="font-medium">{ferias.colaborador?.nome || 'N/A'}</p>
                 <p className="text-sm text-muted-foreground">
-                  {ferias.colaborador_cargo} • {ferias.colaborador_departamento}
+                  Colaborador
                 </p>
               </div>
             </div>
@@ -139,17 +141,17 @@ export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ f
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Férias ({ferias.dias_gozo}d)</span>
-                  <span>{formatCurrency(ferias.valor_ferias)}</span>
+                  <span className="text-muted-foreground">Férias ({ferias.dias}d)</span>
+                  <span>{formatCurrency(ferias.valor_ferias || 0)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">1/3 Constitucional</span>
-                  <span>{formatCurrency(ferias.valor_terco)}</span>
+                  <span>{formatCurrency(ferias.valor_terco || 0)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Líquido</span>
-                  <span className="text-success">{formatCurrency(ferias.valor_liquido)}</span>
+                  <span className="text-success">{formatCurrency(ferias.valor_total || 0)}</span>
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useState, memo, useCallback, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, Loader2, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
