@@ -1,17 +1,33 @@
-/**
- * Integração iFood Benefícios - Benefícios
- */
-export interface BeneficioConfig { apiKey: string; empresaCNPJ: string; ambiente: 'sandbox' | 'producao'; }
-export interface Pedido { colaboradorCPF: string; valor: number; produto: string; dataCredito: Date; }
-export interface Saldo { colaboradorCPF: string; saldoAtual: number; ultimaRecarga: Date; }
+export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface Response<T = any> { success: boolean; data?: T; error?: string; timestamp: string; }
 
-export class BeneficioIntegration {
-  private config: BeneficioConfig;
-  constructor(config: BeneficioConfig) { this.config = config; }
-  async realizarRecarga(pedidos: Pedido[]): Promise<{ protocolo: string; valor: number }> { return { protocolo: 'REC_' + Date.now(), valor: pedidos.reduce((s, p) => s + p.valor, 0) }; }
-  async consultarSaldos(cpfs: string[]): Promise<Saldo[]> { return cpfs.map(cpf => ({ colaboradorCPF: cpf, saldoAtual: 0, ultimaRecarga: new Date() })); }
-  async listarColaboradores(): Promise<{ cpf: string; nome: string; cartao: string }[]> { return []; }
-  async bloquearCartao(cpf: string): Promise<void> { console.log('Bloqueando cartão iFood Benefícios:', cpf); }
-  async status(): Promise<{ conectado: boolean }> { return { conectado: true }; }
+class Service {
+  private config: Config = { enabled: false, timeout: 30000 };
+  
+  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+  isEnabled() { return this.config.enabled; }
+  
+  async connect(): Promise<Response> {
+    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
+    console.log("[ifoodBeneficios] Connecting...");
+    return { success: true, data: { connected: true }, timestamp: new Date().toISOString() };
+  }
+  
+  async sync(): Promise<Response> {
+    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
+    return { success: true, data: { synced: true }, timestamp: new Date().toISOString() };
+  }
+  
+  async send(payload: any): Promise<Response> {
+    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
+    console.log("[ifoodBeneficios] Sending:", payload);
+    return { success: true, data: { id: crypto.randomUUID() }, timestamp: new Date().toISOString() };
+  }
+  
+  async getStatus(): Promise<{ connected: boolean; lastSync?: string }> {
+    return { connected: this.config.enabled, lastSync: new Date().toISOString() };
+  }
 }
-export default BeneficioIntegration;
+
+export const ifoodBeneficiosService = new Service();
+export default ifoodBeneficiosService;
