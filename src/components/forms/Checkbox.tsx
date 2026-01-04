@@ -1,18 +1,24 @@
-/**
- * @fileoverview Checkbox wrapper
- * @module components/forms/Checkbox
- */
-import { memo } from 'react';
-import { Checkbox as CheckboxUI } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import React from "react";
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
-interface CheckboxProps { id: string; label: string; checked: boolean; onChange: (checked: boolean) => void; disabled?: boolean; }
+interface CheckboxProps { className?: string; label?: string; value?: any; onChange?: (value: any) => void; disabled?: boolean; error?: string; required?: boolean; placeholder?: string; options?: { value: string; label: string }[]; }
 
-export const Checkbox = memo(function Checkbox({ id, label, checked, onChange, disabled }: CheckboxProps) {
+export function Checkbox({ className, label, value, onChange, disabled, error, required, placeholder, options = [] }: CheckboxProps) {
   return (
-    <div className="flex items-center gap-2">
-      <CheckboxUI id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} />
-      <Label htmlFor={id} className="cursor-pointer">{label}</Label>
+    <div className={cn("space-y-2", className)}>
+      {label && <Label className={cn(required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>{label}</Label>}
+      <input
+        type="text"
+        value={value || ""}
+        onChange={e => onChange?.(e.target.value)}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={cn("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm", disabled && "opacity-50 cursor-not-allowed", error && "border-red-500")}
+      />
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
-});
+}
+
+export default Checkbox;
