@@ -1,40 +1,13 @@
-/**
- * @fileoverview Tipos para configurações do sistema
- * @module types/configuracao
- */
-
-export interface ConfiguracaoEmpresa {
-  id: string;
-  empresaId: string;
-  logoUrl?: string;
-  corPrimaria: string;
-  corSecundaria: string;
-  timezone: string;
-  idioma: string;
-  moeda: string;
-  formatoData: string;
-}
-
-export interface ConfiguracaoNotificacoes {
-  emailAtivo: boolean;
-  pushAtivo: boolean;
-  smsAtivo: boolean;
-  digestoDiario: boolean;
-  alertasUrgentes: boolean;
-}
-
-export interface ConfiguracaoIntegracoes {
-  bitrix24Ativo: boolean;
-  bitrix24Webhook?: string;
-  esocialAtivo: boolean;
-  contabilAtivo: boolean;
-}
-
 export interface Configuracao {
   id: string;
-  empresa: ConfiguracaoEmpresa;
-  notificacoes: ConfiguracaoNotificacoes;
-  integracoes: ConfiguracaoIntegracoes;
+  nome: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
   updatedAt: string;
-  updatedBy: string;
+  metadata?: Record<string, any>;
 }
+export interface ConfiguracaoCreate extends Omit<Configuracao, "id" | "createdAt" | "updatedAt"> {}
+export interface ConfiguracaoUpdate extends Partial<ConfiguracaoCreate> {}
+export interface ConfiguracaoFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type ConfiguracaoStatus = "ativo" | "inativo" | "pendente";
