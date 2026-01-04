@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react';
-export function useCounter(initial = 0, { min, max }: { min?: number; max?: number } = {}) {
-  const [count, setCount] = useState(initial);
-  const inc = useCallback(() => setCount(c => max !== undefined ? Math.min(c + 1, max) : c + 1), [max]);
-  const dec = useCallback(() => setCount(c => min !== undefined ? Math.max(c - 1, min) : c - 1), [min]);
-  const reset = useCallback(() => setCount(initial), [initial]);
-  const set = useCallback((v: number) => setCount(v), []);
-  return { count, inc, dec, reset, set };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useCounter<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
+export default useCounter;
