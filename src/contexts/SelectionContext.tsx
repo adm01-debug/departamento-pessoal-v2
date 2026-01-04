@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface SelectionContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface SelectionContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const SelectionContext = createContext<SelectionContextType | undefined>(undefined);
-export function SelectionContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+export function SelectionContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <SelectionContext.Provider value={{ state, setState, reset }}>{children}</SelectionContext.Provider>;
 }
-export function useSelectionContext() { const context = useContext(SelectionContext); if (!context) throw new Error("useSelectionContext must be used within SelectionContextProvider"); return context; }
+export function useSelection() { const ctx = useContext(SelectionContext); if (!ctx) throw new Error("useSelection must be used within Provider"); return ctx; }
+export { SelectionContext };
 export default SelectionContext;
