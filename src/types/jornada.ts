@@ -1,44 +1,13 @@
-/**
- * Types para Jornada
- * Departamento Pessoal
- */
-
 export interface Jornada {
   id: string;
-  empresaId: string;
-  colaboradorId?: string;
-  descricao: string;
-  valor?: number;
-  dataInicio?: Date;
-  dataFim?: Date;
-  status: JornadaStatus;
-  observacoes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  nome: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export type JornadaStatus = 'ativo' | 'inativo' | 'pendente' | 'cancelado';
-
-export interface JornadaCreate extends Omit<Jornada, 'id' | 'createdAt' | 'updatedAt'> {}
-
+export interface JornadaCreate extends Omit<Jornada, "id" | "createdAt" | "updatedAt"> {}
 export interface JornadaUpdate extends Partial<JornadaCreate> {}
-
-export interface JornadaFilter {
-  empresaId?: string;
-  colaboradorId?: string;
-  status?: JornadaStatus;
-  dataInicio?: Date;
-  dataFim?: Date;
-  search?: string;
-}
-
-export interface JornadaListResponse {
-  data: Jornada[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export default Jornada;
+export interface JornadaFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type JornadaStatus = "ativo" | "inativo" | "pendente";
