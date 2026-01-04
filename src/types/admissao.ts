@@ -2,12 +2,18 @@ export interface Admissao {
   id: string;
   nome: string;
   descricao?: string;
-  status: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
 export interface AdmissaoCreate extends Omit<Admissao, "id" | "createdAt" | "updatedAt"> {}
-export interface AdmissaoUpdate extends Partial<AdmissaoCreate> {}
-export interface AdmissaoFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type AdmissaoStatus = "ativo" | "inativo" | "pendente";
+export interface AdmissaoUpdate extends Partial<Omit<Admissao, "id" | "createdAt">> {}
+export interface AdmissaoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; }
+export interface AdmissaoListResponse { data: Admissao[]; total: number; page: number; limit: number; }
+export type AdmissaoStatus = "ativo" | "inativo" | "pendente" | "cancelado";
