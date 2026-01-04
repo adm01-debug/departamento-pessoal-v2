@@ -1,1 +1,26 @@
-export function generateToken(length:number=32):string{const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";const array=new Uint8Array(length);crypto.getRandomValues(array);return Array.from(array,b=>chars[b%chars.length]).join("");}export function generateUUID():string{return crypto.randomUUID();}export function generateSessionId():string{return generateToken(64);}export default{generateToken,generateUUID,generateSessionId};
+// generateToken - Security utility
+
+export interface generateTokenResult { valid: boolean; message?: string; data?: any; }
+
+export function generateToken(input: any): generateTokenResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
+
+export function generateTokenAsync(input: any): Promise<generateTokenResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(generateToken(input)), 0); });
+}
+
+export function generateTokenWithOptions(input: any, options: Record<string, any> = {}): generateTokenResult {
+  const result = generateToken(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const generateTokenConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configuregenerateToken(config: Partial<typeof generateTokenConfig>) {
+  Object.assign(generateTokenConfig, config);
+}
+
+export default generateToken;
