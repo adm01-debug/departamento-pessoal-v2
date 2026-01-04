@@ -1,20 +1,18 @@
-/**
- * @fileoverview Modal de exclusão
- * @module components/modals/DeleteModal
- */
-import { memo } from 'react';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { Trash2 } from 'lucide-react';
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-interface DeleteModalProps { open: boolean; onOpenChange: (open: boolean) => void; titulo?: string; item?: string; onDelete: () => void; }
+interface DeleteModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
 
-export const DeleteModal = memo(function DeleteModal({ open, onOpenChange, titulo = 'Excluir item', item, onDelete }: DeleteModalProps) {
+export function DeleteModal({ open, onOpenChange, data, onConfirm, title = "DeleteModal", loading = false }: DeleteModalProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader><AlertDialogTitle className="flex items-center gap-2 text-red-600"><Trash2 className="h-5 w-5" />{titulo}</AlertDialogTitle><AlertDialogDescription>Tem certeza que deseja excluir {item || 'este item'}? Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader>
-        <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-red-600 hover:bg-red-700">Excluir</AlertDialogAction></AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
+        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
-});
+}
+export default DeleteModal;
