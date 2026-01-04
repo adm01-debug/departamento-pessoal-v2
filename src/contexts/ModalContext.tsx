@@ -1,10 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface ModalContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface ModalContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
-export function ModalContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+
+export function ModalContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <ModalContext.Provider value={{ state, setState, reset }}>{children}</ModalContext.Provider>;
 }
-export function useModalContext() { const context = useContext(ModalContext); if (!context) throw new Error("useModalContext must be used within ModalContextProvider"); return context; }
+
+export function useModal() {
+  const ctx = useContext(ModalContext);
+  if (!ctx) throw new Error("useModal must be used within ModalContextProvider");
+  return ctx;
+}
+
+export { ModalContext };
 export default ModalContext;
