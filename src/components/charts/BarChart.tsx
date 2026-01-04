@@ -1,78 +1,16 @@
-/**
- * @fileoverview Gráfico de barras com Recharts
- * @module components/charts/BarChart
- */
-import { memo, useMemo } from 'react';
-import { Bar, BarChart as RechartsBar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from "react";
+import { ResponsiveContainer, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-interface DataPoint {
-  name: string;
-  value: number;
-  [key: string]: string | number;
+interface DataPoint { name: string; value: number; }
+interface BarChartProps { data: DataPoint[]; title?: string; dataKey?: string; colors?: string[]; height?: number; showLegend?: boolean; className?: string; }
+
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+
+export function BarChart({ data, title, dataKey = "value", colors = COLORS, height = 300, showLegend = true, className }: BarChartProps) {
+  const chart = (<ResponsiveContainer width="100%" height={height}><RechartsBarChart data={data}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip />{showLegend && <Legend />}<Bar dataKey={dataKey} fill={colors[0]} /></RechartsBarChart></ResponsiveContainer>);
+  if (!title) return <div className={className}>{chart}</div>;
+  return <Card className={cn("", className)}><CardHeader><CardTitle>{title}</CardTitle></CardHeader><CardContent>{chart}</CardContent></Card>;
 }
-
-interface BarChartProps {
-  /** Título do gráfico */
-  title: string;
-  /** Dados do gráfico */
-  data: DataPoint[];
-  /** Cor das barras */
-  color?: string;
-  /** Campo de dados */
-  dataKey?: string;
-  /** Altura do gráfico */
-  height?: number;
-  /** Layout horizontal ou vertical */
-  layout?: 'horizontal' | 'vertical';
-}
-
-/**
- * Gráfico de barras responsivo
- */
-export const BarChart = memo(function BarChart({ 
-  title, 
-  data, 
-  color = '#8884d8', 
-  dataKey = 'value',
-  height = 300,
-  layout = 'horizontal'
-}: BarChartProps) {
-  const formattedData = useMemo(() => data, [data]);
-  
-  return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={height}>
-          <RechartsBar data={formattedData} layout={layout}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey={layout === 'horizontal' ? 'name' : undefined}
-              type={layout === 'horizontal' ? 'category' : 'number'}
-              className="text-xs" 
-              tick={{ fill: 'hsl(var(--muted-foreground))' }} 
-            />
-            <YAxis 
-              dataKey={layout === 'vertical' ? 'name' : undefined}
-              type={layout === 'vertical' ? 'category' : 'number'}
-              className="text-xs" 
-              tick={{ fill: 'hsl(var(--muted-foreground))' }} 
-            />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--popover))', 
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px'
-              }} 
-            />
-            <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
-          </RechartsBar>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  );
-});
-
+export default BarChart;
