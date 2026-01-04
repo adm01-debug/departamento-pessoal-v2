@@ -1,19 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock } from 'lucide-react';
-
-export function PendingApprovalsCard() {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+interface PendingApprovalsCardProps { title?: string; value?: number | string; data?: any[]; className?: string; }
+export function PendingApprovalsCard({ title = "PendingApprovalsCard", value, data = [], className }: PendingApprovalsCardProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Aprovações Pendentes</CardTitle>
-        <Clock className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
+    <Card className={className}>
+      <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{title}</CardTitle></CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">12</div>
-        <p className="text-xs text-muted-foreground">
-          Solicitações aguardando aprovação
-        </p>
+        {value !== undefined && <div className="text-2xl font-bold">{value}</div>}
+        {data.length > 0 && <div className="text-sm text-muted-foreground">{data.length} itens</div>}
       </CardContent>
     </Card>
   );
 }
+export default PendingApprovalsCard;
