@@ -1,8 +1,28 @@
-import { useState, useCallback, ChangeEvent } from 'react';
-export function useCheckbox(initial = false) {
-  const [checked, setChecked] = useState(initial);
-  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked), []);
-  const toggle = useCallback(() => setChecked(c => !c), []);
-  const reset = useCallback(() => setChecked(initial), [initial]);
-  return { checked, onChange, toggle, reset, setChecked, bind: { checked, onChange, type: 'checkbox' as const } };
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useCheckboxOptions { enabled?: boolean; debounce?: number; }
+export interface useCheckboxResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useCheckbox<T = any>(initialValue?: T, options: useCheckboxOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
+export default useCheckbox;
