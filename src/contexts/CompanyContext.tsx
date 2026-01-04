@@ -1,10 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface CompanyContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface CompanyContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const CompanyContext = createContext<CompanyContextType | undefined>(undefined);
-export function CompanyContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+
+export function CompanyContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <CompanyContext.Provider value={{ state, setState, reset }}>{children}</CompanyContext.Provider>;
 }
-export function useCompanyContext() { const context = useContext(CompanyContext); if (!context) throw new Error("useCompanyContext must be used within CompanyContextProvider"); return context; }
+
+export function useCompany() {
+  const ctx = useContext(CompanyContext);
+  if (!ctx) throw new Error("useCompany must be used within CompanyContextProvider");
+  return ctx;
+}
+
+export { CompanyContext };
 export default CompanyContext;
