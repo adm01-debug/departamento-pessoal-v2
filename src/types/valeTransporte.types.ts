@@ -1,14 +1,14 @@
 export interface ValeTransporte {
   id: string;
-  nome?: string;
+  nome: string;
   descricao?: string;
-  status?: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
   createdAt: string;
   updatedAt: string;
+  metadata?: Record<string, any>;
 }
 export interface ValeTransporteCreate extends Omit<ValeTransporte, "id" | "createdAt" | "updatedAt"> {}
 export interface ValeTransporteUpdate extends Partial<ValeTransporteCreate> {}
-export interface ValeTransporteFilter { id?: string; status?: string; search?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface ValeTransporteListResponse { data: ValeTransporte[]; total: number; page: number; limit: number; }
+export interface ValeTransporteFilter { search?: string; status?: string; page?: number; limit?: number; }
 export type ValeTransporteStatus = "ativo" | "inativo" | "pendente";
-export default ValeTransporte;
