@@ -1,32 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-const data = [
-  { mes: 'Jan', total: 100 },
-  { mes: 'Fev', total: 102 },
-  { mes: 'Mar', total: 105 },
-  { mes: 'Abr', total: 108 },
-  { mes: 'Mai', total: 110 },
-  { mes: 'Jun', total: 115 },
-];
-
-export function HeadcountChart() {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+interface HeadcountChartProps { title?: string; value?: number | string; data?: any[]; className?: string; }
+export function HeadcountChart({ title = "HeadcountChart", value, data = [], className }: HeadcountChartProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Evolução do Headcount</CardTitle>
-      </CardHeader>
+    <Card className={className}>
+      <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{title}</CardTitle></CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="mes" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
+        {value !== undefined && <div className="text-2xl font-bold">{value}</div>}
+        {data.length > 0 && <div className="text-sm text-muted-foreground">{data.length} itens</div>}
       </CardContent>
     </Card>
   );
 }
+export default HeadcountChart;
