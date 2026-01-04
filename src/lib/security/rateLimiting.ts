@@ -1,23 +1,26 @@
 // rateLimiting - Security utility
-export const rateLimiting = {
-  enabled: true,
 
-  configure(options?: Record<string, any>): void {
-    console.log('[Security] rateLimiting configured');
-  },
+export interface rateLimitingResult { valid: boolean; message?: string; data?: any; }
 
-  validate(input: any): boolean {
-    // Security validation logic
-    return true;
-  },
+export function rateLimiting(input: any): rateLimitingResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
 
-  sanitize(input: string): string {
-    return input.replace(/<[^>]*>/g, '').trim();
-  },
+export function rateLimitingAsync(input: any): Promise<rateLimitingResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(rateLimiting(input)), 0); });
+}
 
-  audit(): { secure: boolean; vulnerabilities: string[] } {
-    return { secure: true, vulnerabilities: [] };
-  },
-};
+export function rateLimitingWithOptions(input: any, options: Record<string, any> = {}): rateLimitingResult {
+  const result = rateLimiting(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const rateLimitingConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configurerateLimiting(config: Partial<typeof rateLimitingConfig>) {
+  Object.assign(rateLimitingConfig, config);
+}
 
 export default rateLimiting;
