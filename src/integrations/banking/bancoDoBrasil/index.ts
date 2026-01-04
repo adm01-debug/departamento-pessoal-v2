@@ -1,231 +1,324 @@
 /**
  * Integração Banco do Brasil
- * API para consultas, pagamentos e transferências
+ * API: https://developers.bb.com.br
+ * Funcionalidades: Pagamentos, Cobranças, Pix, Consulta Saldo/Extrato
  */
 
 export interface BBConfig {
   clientId: string;
   clientSecret: string;
-  certificado?: string;
+  developerKey: string;
   ambiente: "sandbox" | "producao";
-  gw_dev_app_key?: string;
-}
-
-export interface BBContaInfo {
+  certificado?: string;
   agencia: string;
   conta: string;
-  tipo: "corrente" | "poupanca";
-  saldo?: number;
-  saldoDisponivel?: number;
 }
 
-export interface BBBoleto {
-  numero: string;
-  codigoBarras: string;
-  linhaDigitavel: string;
+export interface BBToken {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+}
+
+export interface BBPagamento {
+  id?: string;
+  tipo: "transferencia" | "boleto" | "pix" | "folha";
   valor: number;
   dataVencimento: string;
-  dataEmissao: string;
-  pagador: { nome: string; cpfCnpj: string; endereco: string };
-  beneficiario: { nome: string; cpfCnpj: string };
-  status: "pendente" | "pago" | "vencido" | "cancelado";
-}
-
-export interface BBTransferencia {
-  id: string;
-  tipo: "ted" | "doc" | "pix" | "interna";
-  valor: number;
-  dataAgendamento?: string;
-  contaOrigem: BBContaInfo;
-  contaDestino: { banco: string; agencia: string; conta: string; tipo: string; titular: string; cpfCnpj: string };
+  beneficiario: {
+    nome: string;
+    cpfCnpj: string;
+    banco?: string;
+    agencia?: string;
+    conta?: string;
+    tipoConta?: "corrente" | "poupanca";
+    chavePix?: string;
+  };
   descricao?: string;
-  status: "pendente" | "processando" | "concluida" | "falha";
+  codigoBarras?: string;
 }
 
-class BancoDoBrasilIntegration {
-  private config: BBConfig | null = null;
-  private accessToken: string | null = null;
-  private tokenExpiry: Date | null = null;
-  private baseUrl: string = "";
+export interface BBExtrato {
+  dataInicio: string;
+  dataFim: string;
+  saldoInicial: number;
+  saldoFinal: number;
+  lancamentos: {
+    data: string;
+    descricao: string;
+    valor: number;
+    tipo: "credito" | "debito";
+    documento?: string;
+  }[];
+}
 
-  configure(config: BBConfig): void {
+class BancoDoBrasilService {
+  private config: BBConfig | null = null;
+  private token: BBToken | null = null;
+  private tokenExpiry: Date | null = null;
+  private baseUrl = "";
+
+  configurar(config: BBConfig): void {
     this.config = config;
     this.baseUrl = config.ambiente === "producao" 
       ? "https://api.bb.com.br" 
       : "https://api.sandbox.bb.com.br";
   }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken && this.tokenExpiry && new Date() < this.tokenExpiry) {
-      return this.accessToken;
+  private async obterToken(): Promise<string> {
+    if (!this.config) throw new Error("Banco do Brasil não configurado");
+    
+    if (this.token && this.tokenExpiry && new Date() < this.tokenExpiry) {
+      return this.token.access_token;
     }
 
-    if (!this.config) throw new Error("Integração não configurada");
-
+    const credentials = btoa(`${this.config.clientId}:${this.config.clientSecret}`);
+    
     const response = await fetch(`${this.baseUrl}/oauth/token`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Basic ${btoa(`${this.config.clientId}:${this.config.clientSecret}`)}`
+        "Authorization": `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: "grant_type=client_credentials&scope=cobrancas.boletos-requisicao cobrancas.boletos-info"
+      body: "grant_type=client_credentials&scope=cobrancas.boletos-info cobrancas.boletos-requisicao pagamentos-lote pagamentos-info"
     });
 
     if (!response.ok) throw new Error("Falha na autenticação BB");
 
+    this.token = await response.json();
+    this.tokenExpiry = new Date(Date.now() + (this.token!.expires_in - 60) * 1000);
+    
+    return this.token!.access_token;
+  }
+
+  async consultarSaldo(): Promise<{ disponivel: number; bloqueado: number; limite: number }> {
+    const token = await this.obterToken();
+    
+    const response = await fetch(
+      `${this.baseUrl}/contas-correntes/${this.config!.agencia}/${this.config!.conta}/saldo?gw-dev-app-key=${this.config!.developerKey}`,
+      { headers: { "Authorization": `Bearer ${token}` } }
+    );
+
+    if (!response.ok) throw new Error("Falha ao consultar saldo");
+    
     const data = await response.json();
-    this.accessToken = data.access_token;
-    this.tokenExpiry = new Date(Date.now() + (data.expires_in * 1000));
-    return this.accessToken;
+    return {
+      disponivel: data.saldoDisponivel || 0,
+      bloqueado: data.saldoBloqueado || 0,
+      limite: data.limiteCredito || 0
+    };
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-        "gw-dev-app-key": this.config?.gw_dev_app_key || "",
-        ...options.headers
-      }
-    });
+  async consultarExtrato(dataInicio: string, dataFim: string): Promise<BBExtrato> {
+    const token = await this.obterToken();
+    
+    const response = await fetch(
+      `${this.baseUrl}/contas-correntes/${this.config!.agencia}/${this.config!.conta}/extrato?gw-dev-app-key=${this.config!.developerKey}&dataInicioSolicitacao=${dataInicio}&dataFimSolicitacao=${dataFim}`,
+      { headers: { "Authorization": `Bearer ${token}` } }
+    );
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `Erro BB: ${response.status}`);
-    }
-
-    return response.json();
+    if (!response.ok) throw new Error("Falha ao consultar extrato");
+    
+    const data = await response.json();
+    return {
+      dataInicio,
+      dataFim,
+      saldoInicial: data.saldoInicial || 0,
+      saldoFinal: data.saldoFinal || 0,
+      lancamentos: (data.lancamentos || []).map((l: any) => ({
+        data: l.dataLancamento,
+        descricao: l.descricaoLancamento,
+        valor: l.valorLancamento,
+        tipo: l.indicadorSinal === "C" ? "credito" : "debito",
+        documento: l.numeroDocumento
+      }))
+    };
   }
 
-  async consultarSaldo(agencia: string, conta: string): Promise<{ saldo: number; saldoDisponivel: number }> {
-    return this.request(`/contas-correntes/v1/saldo?agencia=${agencia}&conta=${conta}`);
-  }
-
-  async consultarExtrato(agencia: string, conta: string, dataInicio: string, dataFim: string): Promise<any[]> {
-    return this.request(`/contas-correntes/v1/extrato?agencia=${agencia}&conta=${conta}&dataInicioSolicitacao=${dataInicio}&dataFimSolicitacao=${dataFim}`);
-  }
-
-  async emitirBoleto(dados: {
+  async gerarBoleto(dados: {
     valor: number;
     vencimento: string;
-    pagador: { nome: string; cpfCnpj: string; endereco: string; cidade: string; uf: string; cep: string };
+    pagador: { nome: string; cpfCnpj: string; endereco: string };
     descricao?: string;
-    multa?: number;
-    juros?: number;
-  }): Promise<BBBoleto> {
-    const payload = {
-      numeroTituloCliente: `${Date.now()}`,
-      dataEmissao: new Date().toISOString().split("T")[0],
-      dataVencimento: dados.vencimento,
+  }): Promise<{ codigoBarras: string; linhaDigitavel: string; urlBoleto: string }> {
+    const token = await this.obterToken();
+    
+    const body = {
+      numeroConvenio: this.config!.conta,
+      dataVencimento: dados.vencimento.replace(/-/g, "."),
       valorOriginal: dados.valor,
+      descricaoTipoTitulo: "DM",
       pagador: {
         tipoInscricao: dados.pagador.cpfCnpj.length === 11 ? 1 : 2,
-        numeroInscricao: dados.pagador.cpfCnpj.replace(/\D/g, ""),
+        numeroInscricao: dados.pagador.cpfCnpj,
         nome: dados.pagador.nome,
-        endereco: dados.pagador.endereco,
-        cidade: dados.pagador.cidade,
-        uf: dados.pagador.uf,
-        cep: dados.pagador.cep.replace(/\D/g, "")
-      },
-      multa: dados.multa ? { tipo: 2, valor: dados.multa } : undefined,
-      jurosMora: dados.juros ? { tipo: 2, valor: dados.juros } : undefined
-    };
-
-    return this.request("/cobrancas/v2/boletos", { method: "POST", body: JSON.stringify(payload) });
-  }
-
-  async consultarBoleto(numero: string): Promise<BBBoleto> {
-    return this.request(`/cobrancas/v2/boletos/${numero}`);
-  }
-
-  async cancelarBoleto(numero: string): Promise<void> {
-    await this.request(`/cobrancas/v2/boletos/${numero}/baixar`, { method: "POST" });
-  }
-
-  async listarBoletos(filtros: { dataInicio: string; dataFim: string; situacao?: string }): Promise<BBBoleto[]> {
-    const params = new URLSearchParams({
-      dataInicioVencimento: filtros.dataInicio,
-      dataFimVencimento: filtros.dataFim,
-      ...(filtros.situacao && { situacaoCobranca: filtros.situacao })
-    });
-    const result = await this.request<{ boletos: BBBoleto[] }>(`/cobrancas/v2/boletos?${params}`);
-    return result.boletos || [];
-  }
-
-  async realizarTransferencia(dados: Omit<BBTransferencia, "id" | "status">): Promise<BBTransferencia> {
-    const payload = {
-      tipoTransferencia: dados.tipo === "pix" ? 3 : dados.tipo === "ted" ? 1 : 2,
-      valor: dados.valor,
-      dataTransferencia: dados.dataAgendamento || new Date().toISOString().split("T")[0],
-      descricao: dados.descricao,
-      contaDebito: { agencia: dados.contaOrigem.agencia, conta: dados.contaOrigem.conta },
-      contaCredito: {
-        banco: dados.contaDestino.banco,
-        agencia: dados.contaDestino.agencia,
-        conta: dados.contaDestino.conta,
-        tipoConta: dados.contaDestino.tipo === "corrente" ? 1 : 2,
-        cpfCnpj: dados.contaDestino.cpfCnpj.replace(/\D/g, ""),
-        nome: dados.contaDestino.titular
+        endereco: dados.pagador.endereco
       }
     };
 
-    return this.request("/transferencias/v1", { method: "POST", body: JSON.stringify(payload) });
+    const response = await fetch(
+      `${this.baseUrl}/cobrancas/v2/boletos?gw-dev-app-key=${this.config!.developerKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (!response.ok) throw new Error("Falha ao gerar boleto");
+    
+    const data = await response.json();
+    return {
+      codigoBarras: data.codigoBarraNumerico,
+      linhaDigitavel: data.linhaDigitavel,
+      urlBoleto: data.urlBoleto || ""
+    };
   }
 
-  async consultarTransferencia(id: string): Promise<BBTransferencia> {
-    return this.request(`/transferencias/v1/${id}`);
-  }
-
-  async gerarPix(dados: { valor: number; descricao?: string; expiracao?: number }): Promise<{ qrcode: string; copiaCola: string; txid: string }> {
-    const payload = {
-      calendario: { expiracao: dados.expiracao || 3600 },
-      valor: { original: dados.valor.toFixed(2) },
-      infoAdicionais: dados.descricao ? [{ nome: "Descricao", valor: dados.descricao }] : []
+  async realizarTransferencia(pagamento: BBPagamento): Promise<{ protocolo: string; status: string }> {
+    const token = await this.obterToken();
+    
+    const body = {
+      numeroRequisicao: Date.now(),
+      agenciaDebito: this.config!.agencia,
+      contaCorrenteDebito: this.config!.conta,
+      digitoVerificadorContaDebito: "0",
+      tipoPagamento: pagamento.tipo === "pix" ? 128 : 1,
+      dataTransferencia: pagamento.dataVencimento.replace(/-/g, ""),
+      valorTransferencia: pagamento.valor,
+      documentoDebito: pagamento.descricao?.substring(0, 20) || "PAGAMENTO",
+      codigoFinalidadeTED: "10",
+      numeroAgenciaCredito: pagamento.beneficiario.agencia,
+      numeroContaCredito: pagamento.beneficiario.conta,
+      digitoVerificadorContaCredito: "0",
+      codigoBancoCredito: pagamento.beneficiario.banco,
+      nomeFavorecido: pagamento.beneficiario.nome,
+      documentoFavorecido: pagamento.beneficiario.cpfCnpj
     };
 
-    return this.request("/pix/v1/cob", { method: "POST", body: JSON.stringify(payload) });
+    const response = await fetch(
+      `${this.baseUrl}/pagamentos-lote/v1/transferencias?gw-dev-app-key=${this.config!.developerKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (!response.ok) throw new Error("Falha na transferência");
+    
+    const data = await response.json();
+    return {
+      protocolo: data.numeroProtocolo || data.id,
+      status: data.situacao || "PENDENTE"
+    };
   }
 
-  async consultarPix(txid: string): Promise<any> {
-    return this.request(`/pix/v1/cob/${txid}`);
+  async realizarPix(chavePix: string, valor: number, descricao?: string): Promise<{ txid: string; status: string }> {
+    const token = await this.obterToken();
+    
+    const body = {
+      valor: { original: valor.toFixed(2) },
+      chave: chavePix,
+      solicitacaoPagador: descricao || "Pagamento via PIX"
+    };
+
+    const response = await fetch(
+      `${this.baseUrl}/pix/v1/cob?gw-dev-app-key=${this.config!.developerKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (!response.ok) throw new Error("Falha no PIX");
+    
+    const data = await response.json();
+    return { txid: data.txid, status: data.status };
   }
 
-  // Métodos para folha de pagamento
-  async processarPagamentoFolha(pagamentos: Array<{
-    colaborador: { nome: string; cpf: string; banco: string; agencia: string; conta: string };
+  async processarFolhaPagamento(pagamentos: Array<{
+    colaboradorId: string;
+    nome: string;
+    cpf: string;
+    banco: string;
+    agencia: string;
+    conta: string;
     valor: number;
-    competencia: string;
-  }>): Promise<{ lote: string; pagamentos: Array<{ id: string; status: string }> }> {
-    const loteId = `FOLHA${Date.now()}`;
-    const results = [];
+  }>): Promise<{ loteId: string; quantidade: number; valorTotal: number }> {
+    const token = await this.obterToken();
+    
+    const lancamentos = pagamentos.map((p, index) => ({
+      numeroDocumentoDebito: index + 1,
+      dataTransferencia: new Date().toISOString().split("T")[0].replace(/-/g, ""),
+      valorTransferencia: p.valor,
+      codigoBancoCredito: p.banco,
+      agenciaCredito: p.agencia,
+      contaCorrenteCredito: p.conta,
+      nomeFavorecido: p.nome,
+      documentoFavorecido: p.cpf,
+      descricaoTransferencia: "PAGAMENTO SALARIO"
+    }));
 
-    for (const pag of pagamentos) {
-      try {
-        const result = await this.realizarTransferencia({
-          tipo: "ted",
-          valor: pag.valor,
-          contaOrigem: { agencia: "", conta: "", tipo: "corrente" },
-          contaDestino: {
-            banco: pag.colaborador.banco,
-            agencia: pag.colaborador.agencia,
-            conta: pag.colaborador.conta,
-            tipo: "corrente",
-            titular: pag.colaborador.nome,
-            cpfCnpj: pag.colaborador.cpf
-          },
-          descricao: `Salário ${pag.competencia}`
-        });
-        results.push({ id: result.id, status: "processando" });
-      } catch {
-        results.push({ id: "", status: "erro" });
+    const body = {
+      numeroRequisicao: Date.now(),
+      numeroContrato: this.config!.conta,
+      agenciaDebito: this.config!.agencia,
+      contaCorrenteDebito: this.config!.conta,
+      lancamentos
+    };
+
+    const response = await fetch(
+      `${this.baseUrl}/pagamentos-lote/v1/lotes?gw-dev-app-key=${this.config!.developerKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
       }
-    }
+    );
 
-    return { lote: loteId, pagamentos: results };
+    if (!response.ok) throw new Error("Falha ao processar folha");
+    
+    const data = await response.json();
+    return {
+      loteId: data.numeroLote || data.id,
+      quantidade: pagamentos.length,
+      valorTotal: pagamentos.reduce((sum, p) => sum + p.valor, 0)
+    };
+  }
+
+  async consultarStatusLote(loteId: string): Promise<{ status: string; pagamentosProcessados: number; pagamentosComErro: number }> {
+    const token = await this.obterToken();
+    
+    const response = await fetch(
+      `${this.baseUrl}/pagamentos-lote/v1/lotes/${loteId}?gw-dev-app-key=${this.config!.developerKey}`,
+      { headers: { "Authorization": `Bearer ${token}` } }
+    );
+
+    if (!response.ok) throw new Error("Falha ao consultar lote");
+    
+    const data = await response.json();
+    return {
+      status: data.situacaoLote,
+      pagamentosProcessados: data.quantidadePagamentosProcessados || 0,
+      pagamentosComErro: data.quantidadePagamentosComErro || 0
+    };
   }
 }
 
-export const bancoDoBrasil = new BancoDoBrasilIntegration();
-export default bancoDoBrasil;
+export const bancoDoBrasilService = new BancoDoBrasilService();
+export default bancoDoBrasilService;
