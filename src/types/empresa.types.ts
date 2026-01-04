@@ -3,13 +3,18 @@ export interface Empresa {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface EmpresaCreate extends Omit<Empresa, "id" | "createdAt" | "updatedAt"> {}
-export interface EmpresaUpdate extends Partial<EmpresaCreate> {}
-export interface EmpresaFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface EmpresaListResponse { data: Empresa[]; total: number; page: number; limit: number; }
-export type EmpresaStatus = "ativo" | "inativo" | "pendente";
+export interface EmpresaUpdate extends Partial<Omit<Empresa, "id" | "createdAt">> {}
+export interface EmpresaFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface EmpresaListResponse { data: Empresa[]; total: number; page: number; limit: number; totalPages: number; }
+export type EmpresaStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
