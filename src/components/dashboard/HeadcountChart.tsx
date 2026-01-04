@@ -1,8 +1,13 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-interface HeadcountChartProps { title?: string; value?: number | string; data?: any[]; className?: string; }
-export function HeadcountChart({ title = "HeadcountChart", value, data = [], className }: HeadcountChartProps) {
+import { cn } from "@/lib/utils";
+
+interface HeadcountChartProps { className?: string; title?: string; value?: number | string; data?: any[]; loading?: boolean; }
+
+export function HeadcountChart({ className, title = "HeadcountChart", value, data = [], loading = false }: HeadcountChartProps) {
+  if (loading) return <Card className={cn("animate-pulse", className)}><CardHeader><div className="h-4 bg-muted rounded w-1/2" /></CardHeader><CardContent><div className="h-8 bg-muted rounded w-1/3" /></CardContent></Card>;
   return (
-    <Card className={className}>
+    <Card className={cn("", className)}>
       <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{title}</CardTitle></CardHeader>
       <CardContent>
         {value !== undefined && <div className="text-2xl font-bold">{value}</div>}
@@ -11,4 +16,5 @@ export function HeadcountChart({ title = "HeadcountChart", value, data = [], cla
     </Card>
   );
 }
+
 export default HeadcountChart;
