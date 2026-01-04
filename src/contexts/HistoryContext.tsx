@@ -1,6 +1,12 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-interface HistoryEntry { path: string; timestamp: number; title?: string; }
-interface HistoryContextType { history: HistoryEntry[]; addEntry: (path: string, title?: string) => void; goBack: () => HistoryEntry | null; clear: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface HistoryContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined);
-export function HistoryProvider({ children }: { children: ReactNode }) { const [history, setHistory] = useState<HistoryEntry[]>([]); const addEntry = useCallback((path: string, title?: string) => setHistory(h => [...h, { path, timestamp: Date.now(), title }]), []); const goBack = useCallback(() => { if (history.length === 0) return null; const last = history[history.length - 1]; setHistory(h => h.slice(0, -1)); return last; }, [history]); const clear = useCallback(() => setHistory([]), []); return <HistoryContext.Provider value={{ history, addEntry, goBack, clear }}>{children}</HistoryContext.Provider>; }
-export function useHistory() { const ctx = useContext(HistoryContext); if (!ctx) throw new Error('useHistory must be used within HistoryProvider'); return ctx; }
+export function HistoryContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
+  return <HistoryContext.Provider value={{ state, setState, reset }}>{children}</HistoryContext.Provider>;
+}
+export function useHistory() { const ctx = useContext(HistoryContext); if (!ctx) throw new Error("useHistory must be used within Provider"); return ctx; }
+export { HistoryContext };
+export default HistoryContext;
