@@ -1,69 +1,28 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Folder, FileText, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { FileText, Download, Eye } from "lucide-react";
 
-interface TreeNode {
-  id: string;
-  nome: string;
-  tipo: 'pasta' | 'arquivo';
-  children?: TreeNode[];
-}
+interface DocumentoTreeProps { className?: string; data?: any; onAction?: (action: string, data?: any) => void; loading?: boolean; }
 
-interface DocumentoTreeProps {
-  data: TreeNode[];
-  onSelect?: (node: TreeNode) => void;
-}
-
-function TreeItem({ node, level = 0, onSelect }: { node: TreeNode; level?: number; onSelect?: (node: TreeNode) => void }) {
-  const [expanded, setExpanded] = useState(false);
-  const hasChildren = node.children && node.children.length > 0;
-
+export function DocumentoTree({ className, data, onAction, loading }: DocumentoTreeProps) {
+  if (loading) return <Card className={cn("animate-pulse", className)}><CardContent className="p-6"><div className="h-32 bg-muted rounded" /></CardContent></Card>;
+  
   return (
-    <div>
-      <div
-        className={cn(
-          'flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-muted',
-          { 'pl-4': level > 0 }
-        )}
-        style={{ paddingLeft: `${level * 16 + 8}px` }}
-        onClick={() => {
-          if (hasChildren) setExpanded(!expanded);
-          onSelect?.(node);
-        }}
-      >
-        {hasChildren && (
-          <ChevronRight className={cn('h-4 w-4 transition-transform', { 'rotate-90': expanded })} />
-        )}
-        {node.tipo === 'pasta' ? (
-          <Folder className="h-4 w-4 text-muted-foreground" />
-        ) : (
-          <FileText className="h-4 w-4 text-muted-foreground" />
-        )}
-        <span className="text-sm">{node.nome}</span>
-      </div>
-      {expanded && hasChildren && (
-        <div>
-          {node.children!.map((child) => (
-            <TreeItem key={child.id} node={child} level={level + 1} onSelect={onSelect} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export function DocumentoTree({ data, onSelect }: DocumentoTreeProps) {
-  return (
-    <Card>
+    <Card className={cn("", className)}>
       <CardHeader>
-        <CardTitle>Estrutura de Documentos</CardTitle>
+        <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />DocumentoTree</CardTitle>
       </CardHeader>
-      <CardContent>
-        {data.map((node) => (
-          <TreeItem key={node.id} node={node} onSelect={onSelect} />
-        ))}
+      <CardContent className="space-y-4">
+        <div className="text-sm text-muted-foreground">{data ? "Documento disponível" : "Nenhum documento"}</div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => onAction?.("view", data)}><Eye className="h-4 w-4 mr-2" />Visualizar</Button>
+          <Button variant="outline" size="sm" onClick={() => onAction?.("download", data)}><Download className="h-4 w-4 mr-2" />Baixar</Button>
+        </div>
       </CardContent>
     </Card>
   );
 }
+
+export default DocumentoTree;
