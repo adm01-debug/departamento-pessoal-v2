@@ -1,140 +1,153 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ZoomIn, ZoomOut, RotateCw, Download, X, Maximize2, Minimize2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Eye, Download, ZoomIn, ZoomOut, RotateCw, Maximize2, X, ChevronLeft, ChevronRight, FileText, Image, FileSpreadsheet } from "lucide-react";
 
 interface DocumentoPreviewProps {
-  url: string;
-  nome: string;
-  tipo: "pdf" | "image" | "office";
-  isOpen: boolean;
-  onClose: () => void;
+  documento: {
+    id: string;
+    nome: string;
+    tipo: string;
+    url: string;
+    formato: "pdf" | "image" | "office" | "text";
+    paginas?: number;
+  };
   onDownload?: () => void;
-  paginas?: number;
+  onFechar?: () => void;
+  modoModal?: boolean;
 }
 
-export function DocumentoPreview({
-  url,
-  nome,
-  tipo,
-  isOpen,
-  onClose,
-  onDownload,
-  paginas = 1
-}: DocumentoPreviewProps) {
+export function DocumentoPreview({ documento, onDownload, onFechar, modoModal = false }: DocumentoPreviewProps) {
   const [zoom, setZoom] = useState(100);
   const [rotacao, setRotacao] = useState(0);
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [carregando, setCarregando] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
 
   const aumentarZoom = () => setZoom(prev => Math.min(prev + 25, 200));
   const diminuirZoom = () => setZoom(prev => Math.max(prev - 25, 50));
   const rotacionar = () => setRotacao(prev => (prev + 90) % 360);
-
-  const proximaPagina = () => setPaginaAtual(prev => Math.min(prev + 1, paginas));
   const paginaAnterior = () => setPaginaAtual(prev => Math.max(prev - 1, 1));
+  const proximaPagina = () => setPaginaAtual(prev => Math.min(prev + 1, documento.paginas || 1));
 
   const renderPreview = () => {
-    if (tipo === "image") {
-      return (
-        <div className="flex items-center justify-center h-full overflow-auto">
-          <img
-            src={url}
-            alt={nome}
-            onLoad={() => setCarregando(false)}
-            style={{
-              transform: `scale(${zoom / 100}) rotate(${rotacao}deg)`,
-              transition: "transform 0.2s ease"
-            }}
-            className="max-w-full max-h-full object-contain"
+    const style = {
+      transform: `scale(${zoom / 100}) rotate(${rotacao}deg)`,
+      transition: "transform 0.3s ease"
+    };
+
+    switch (documento.formato) {
+      case "pdf":
+        return (
+          <iframe
+            src={`${documento.url}#page=${paginaAtual}`}
+            className="w-full h-[600px] border-0"
+            style={style}
+            title={documento.nome}
           />
-        </div>
-      );
+        );
+      case "image":
+        return (
+          <div className="flex items-center justify-center bg-gray-100 min-h-[400px]">
+            <img src={documento.url} alt={documento.nome} className="max-w-full max-h-[600px] object-contain" style={style} />
+          </div>
+        );
+      case "office":
+        return (
+          <iframe
+            src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(documento.url)}`}
+            className="w-full h-[600px] border-0"
+            title={documento.nome}
+          />
+        );
+      case "text":
+        return (
+          <div className="bg-gray-50 p-4 rounded-lg min-h-[400px] overflow-auto">
+            <pre className="whitespace-pre-wrap font-mono text-sm">Carregando conteúdo...</pre>
+          </div>
+        );
+      default:
+        return (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <FileText className="h-16 w-16 mb-4" />
+            <p>Preview não disponível para este formato</p>
+            <Button onClick={onDownload} className="mt-4"><Download className="h-4 w-4 mr-2" />Baixar Documento</Button>
+          </div>
+        );
     }
-
-    if (tipo === "pdf") {
-      return (
-        <iframe
-          src={`${url}#page=${paginaAtual}&zoom=${zoom}`}
-          className="w-full h-full border-0"
-          onLoad={() => setCarregando(false)}
-          title={nome}
-        />
-      );
-    }
-
-    // Office (docx, xlsx, pptx) - usar Office Online Viewer
-    return (
-      <iframe
-        src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`}
-        className="w-full h-full border-0"
-        onLoad={() => setCarregando(false)}
-        title={nome}
-      />
-    );
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`${fullscreen ? "max-w-full h-screen m-0 rounded-none" : "max-w-4xl h-[80vh]"} p-0 flex flex-col`}>
-        <DialogHeader className="p-4 border-b flex flex-row items-center justify-between">
-          <DialogTitle className="truncate flex-1">{nome}</DialogTitle>
-          <div className="flex items-center gap-2">
-            {tipo === "image" && (
-              <>
-                <Button variant="ghost" size="icon" onClick={diminuirZoom} disabled={zoom <= 50}>
-                  <ZoomOut className="h-4 w-4" />
-                </Button>
-                <span className="text-sm w-12 text-center">{zoom}%</span>
-                <Button variant="ghost" size="icon" onClick={aumentarZoom} disabled={zoom >= 200}>
-                  <ZoomIn className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={rotacionar}>
-                  <RotateCw className="h-4 w-4" />
-                </Button>
-              </>
-            )}
-            
-            {paginas > 1 && (
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={paginaAnterior} disabled={paginaAtual <= 1}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm">{paginaAtual}/{paginas}</span>
-                <Button variant="ghost" size="icon" onClick={proximaPagina} disabled={paginaAtual >= paginas}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
+  const formatoIcon = {
+    pdf: FileText,
+    image: Image,
+    office: FileSpreadsheet,
+    text: FileText
+  };
+  const Icon = formatoIcon[documento.formato] || FileText;
 
-            <Button variant="ghost" size="icon" onClick={() => setFullscreen(!fullscreen)}>
-              {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            </Button>
-
-            {onDownload && (
-              <Button variant="ghost" size="icon" onClick={onDownload}>
-                <Download className="h-4 w-4" />
-              </Button>
-            )}
-
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </DialogHeader>
-
-        <div className="flex-1 bg-gray-100 relative overflow-hidden">
-          {carregando && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white">
-              <Skeleton className="w-full h-full" />
-            </div>
-          )}
-          {renderPreview()}
+  const content = (
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between bg-muted p-2 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Icon className="h-5 w-5" />
+          <span className="font-medium truncate max-w-[200px]">{documento.nome}</span>
+          <Badge variant="secondary">{documento.tipo}</Badge>
         </div>
-      </DialogContent>
-    </Dialog>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={diminuirZoom} disabled={zoom <= 50}><ZoomOut className="h-4 w-4" /></Button>
+          <span className="text-sm w-12 text-center">{zoom}%</span>
+          <Button variant="ghost" size="icon" onClick={aumentarZoom} disabled={zoom >= 200}><ZoomIn className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={rotacionar}><RotateCw className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => setFullscreen(!fullscreen)}><Maximize2 className="h-4 w-4" /></Button>
+          {onDownload && <Button variant="ghost" size="icon" onClick={onDownload}><Download className="h-4 w-4" /></Button>}
+        </div>
+      </div>
+
+      {/* Preview Area */}
+      <div className={`border rounded-lg overflow-hidden ${fullscreen ? "fixed inset-0 z-50 bg-white" : ""}`}>
+        {fullscreen && (
+          <div className="absolute top-4 right-4 z-10">
+            <Button variant="outline" size="icon" onClick={() => setFullscreen(false)}><X className="h-4 w-4" /></Button>
+          </div>
+        )}
+        {renderPreview()}
+      </div>
+
+      {/* Paginação */}
+      {documento.paginas && documento.paginas > 1 && (
+        <div className="flex items-center justify-center gap-4">
+          <Button variant="outline" size="sm" onClick={paginaAnterior} disabled={paginaAtual === 1}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm">Página {paginaAtual} de {documento.paginas}</span>
+          <Button variant="outline" size="sm" onClick={proximaPagina} disabled={paginaAtual === documento.paginas}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
+  if (modoModal) {
+    return (
+      <Dialog open onOpenChange={() => onFechar?.()}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Eye className="h-5 w-5" />Visualizar Documento</DialogTitle></DialogHeader>
+          {content}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2"><Eye className="h-5 w-5" />Preview</CardTitle>
+      </CardHeader>
+      <CardContent>{content}</CardContent>
+    </Card>
   );
 }
 
