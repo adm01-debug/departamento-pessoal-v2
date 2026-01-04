@@ -1,11 +1,28 @@
-import { useState, useCallback } from 'react';
-interface ConfirmState { open: boolean; title: string; description: string; onConfirm: () => void; }
-export function useConfirm() {
-  const [state, setState] = useState<ConfirmState>({ open: false, title: '', description: '', onConfirm: () => {} });
-  const confirm = useCallback((opts: { title: string; description?: string; onConfirm: () => void }) => {
-    setState({ open: true, title: opts.title, description: opts.description || '', onConfirm: opts.onConfirm });
-  }, []);
-  const close = useCallback(() => setState(s => ({ ...s, open: false })), []);
-  const handleConfirm = useCallback(() => { state.onConfirm(); close(); }, [state, close]);
-  return { ...state, confirm, close, handleConfirm };
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useConfirmOptions { enabled?: boolean; debounce?: number; }
+export interface useConfirmResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useConfirm<T = any>(initialValue?: T, options: useConfirmOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
+export default useConfirm;
