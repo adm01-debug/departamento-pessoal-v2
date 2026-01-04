@@ -1,13 +1,18 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface AuthContextType { state: any; setState: (v: any) => void; reset: () => void; }
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextState { data: any; loading: boolean; error: Error | null; }
+interface AuthContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface AuthContextValue extends AuthContextState, AuthContextActions {}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
-  const [state, setStateInternal] = useState<any>(null);
-  const setState = useCallback((v: any) => setStateInternal(v), []);
-  const reset = useCallback(() => setStateInternal(null), []);
-  return <AuthContext.Provider value={{ state, setState, reset }}>{children}</AuthContext.Provider>;
+  const [state, setState] = useState<AuthContextState>({ data: null, loading: false, error: null });
+  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
+  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
+  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
+  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
+  return <AuthContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
