@@ -1,66 +1,16 @@
-/**
- * @fileoverview Hook para throttle de valores e callbacks
- * @module hooks/useThrottle
- */
-import { useState, useEffect, useRef, useCallback } from 'react';
-
-/**
- * Hook que retorna valor com throttle
- * @param value - Valor a ser throttled
- * @param limit - Limite em ms (padrão: 300ms)
- * @returns Valor throttled
- */
-export function useThrottle<T>(value: T, limit = 300): T {
-  const [throttledValue, setThrottledValue] = useState<T>(value);
-  const lastRan = useRef(Date.now());
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (Date.now() - lastRan.current >= limit) {
-        setThrottledValue(value);
-        lastRan.current = Date.now();
-      }
-    }, limit - (Date.now() - lastRan.current));
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, limit]);
-
-  return throttledValue;
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useThrottle<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
+  }, []);
+  return { data, loading, error, execute, setData };
 }
-
-/**
- * Hook que retorna função com throttle
- * @param callback - Função a ser throttled
- * @param limit - Limite em ms (padrão: 300ms)
- * @returns Função throttled
- */
-export function useThrottledCallback<T extends (...args: Parameters<T>) => void>(
-  callback: T,
-  limit = 300
-): (...args: Parameters<T>) => void {
-  const lastRan = useRef(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      const now = Date.now();
-      const timeSinceLastRan = now - lastRan.current;
-
-      if (timeSinceLastRan >= limit) {
-        callback(...args);
-        lastRan.current = now;
-      } else {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        timeoutRef.current = setTimeout(() => {
-          callback(...args);
-          lastRan.current = Date.now();
-        }, limit - timeSinceLastRan);
-      }
-    },
-    [callback, limit]
-  );
-}
+export default useThrottle;
