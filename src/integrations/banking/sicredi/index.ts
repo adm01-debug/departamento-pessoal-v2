@@ -1,6 +1,6 @@
 /**
  * Integração Sicredi
- * API para boletos, PIX e transferências cooperativas
+ * API: https://developers.sicredi.com.br
  */
 
 export interface SicrediConfig {
@@ -8,118 +8,87 @@ export interface SicrediConfig {
   cooperativa: string;
   posto: string;
   codigoBeneficiario: string;
-  certificado?: string;
   ambiente: "sandbox" | "producao";
 }
 
-export interface SicrediBoleto {
-  nossoNumero: string;
-  codigoBarras: string;
-  linhaDigitavel: string;
-  valor: number;
-  dataVencimento: string;
-  situacao: "PENDENTE" | "PAGO" | "BAIXADO" | "PROTESTADO";
-}
-
-class SicrediIntegration {
+class SicrediService {
   private config: SicrediConfig | null = null;
-  private accessToken: string | null = null;
-  private baseUrl: string = "";
+  private token: string | null = null;
+  private baseUrl = "";
 
-  configure(config: SicrediConfig): void {
+  configurar(config: SicrediConfig): void {
     this.config = config;
     this.baseUrl = config.ambiente === "producao" ? "https://api.sicredi.com.br" : "https://api-sandbox.sicredi.com.br";
   }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken) return this.accessToken;
-    if (!this.config) throw new Error("Integração não configurada");
+  private async obterToken(): Promise<string> {
+    if (!this.config) throw new Error("Sicredi não configurado");
+    if (this.token) return this.token;
     const response = await fetch(`${this.baseUrl}/auth/openapi/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded", "x-api-key": this.config.apiKey },
-      body: "grant_type=client_credentials&scope=cobranca"
+      body: `grant_type=client_credentials&scope=cobranca pix`
     });
     if (!response.ok) throw new Error("Falha na autenticação Sicredi");
     const data = await response.json();
-    this.accessToken = data.access_token;
-    return this.accessToken;
+    this.token = data.access_token;
+    return this.token!;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "x-api-key": this.config?.apiKey || "", "cooperativa": this.config?.cooperativa || "", "posto": this.config?.posto || "", ...options.headers }
+  async consultarSaldo(): Promise<{ disponivel: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/conta/v1/saldo`, {
+      headers: { "Authorization": `Bearer ${token}`, "x-api-key": this.config!.apiKey, "cooperativa": this.config!.cooperativa, "posto": this.config!.posto }
     });
-    if (!response.ok) throw new Error(`Erro Sicredi: ${response.status}`);
+    if (!response.ok) throw new Error("Falha ao consultar saldo");
+    const data = await response.json();
+    return { disponivel: data.saldo || 0 };
+  }
+
+  async consultarExtrato(dataInicio: string, dataFim: string): Promise<{ lancamentos: any[] }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/conta/v1/extrato?dataInicio=${dataInicio}&dataFim=${dataFim}`, {
+      headers: { "Authorization": `Bearer ${token}`, "x-api-key": this.config!.apiKey, "cooperativa": this.config!.cooperativa }
+    });
+    if (!response.ok) throw new Error("Falha ao consultar extrato");
     return response.json();
   }
 
-  async consultarSaldo(): Promise<{ saldoDisponivel: number }> {
-    return this.request("/conta/v1/saldo");
-  }
-
-  async emitirBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string; cidade: string; uf: string; cep: string } }): Promise<SicrediBoleto> {
-    return this.request("/cobranca/boleto/v1/boletos", {
+  async gerarBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string; cep: string; cidade: string; uf: string } }): Promise<{ nossoNumero: string; linhaDigitavel: string; codigoBarras: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/cobranca/boleto/v1/boletos`, {
       method: "POST",
-      body: JSON.stringify({
-        codigoBeneficiario: this.config?.codigoBeneficiario,
-        especieDocumento: "A",
-        seuNumero: `${Date.now()}`,
-        dataVencimento: dados.vencimento,
-        valor: dados.valor,
-        tipoDesconto: "ISENTO",
-        tipoJuros: "ISENTO",
-        tipoMulta: "ISENTO",
-        tipoPessoa: dados.pagador.cpfCnpj.length === 11 ? "PESSOA_FISICA" : "PESSOA_JURIDICA",
-        cpfCnpj: dados.pagador.cpfCnpj.replace(/\D/g, ""),
-        nome: dados.pagador.nome,
-        endereco: dados.pagador.endereco,
-        cidade: dados.pagador.cidade,
-        uf: dados.pagador.uf,
-        cep: dados.pagador.cep.replace(/\D/g, ""),
-        telefone: "",
-        email: ""
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "x-api-key": this.config!.apiKey, "cooperativa": this.config!.cooperativa, "posto": this.config!.posto, "codigoBeneficiario": this.config!.codigoBeneficiario },
+      body: JSON.stringify({ tipoCobranca: "NORMAL", especieDocumento: "DMI", seuNumero: Date.now().toString(), dataVencimento: dados.vencimento, valor: dados.valor, pagador: dados.pagador })
     });
+    if (!response.ok) throw new Error("Falha ao gerar boleto");
+    return response.json();
   }
 
-  async consultarBoleto(nossoNumero: string): Promise<SicrediBoleto> {
-    return this.request(`/cobranca/boleto/v1/boletos/${nossoNumero}`);
-  }
-
-  async listarBoletos(dataInicio: string, dataFim: string): Promise<SicrediBoleto[]> {
-    const result = await this.request<{ boletos: SicrediBoleto[] }>(`/cobranca/boleto/v1/boletos?dataInicio=${dataInicio}&dataFim=${dataFim}`);
-    return result.boletos || [];
-  }
-
-  async baixarBoleto(nossoNumero: string): Promise<void> {
-    await this.request(`/cobranca/boleto/v1/boletos/${nossoNumero}/baixa`, { method: "PATCH" });
-  }
-
-  async gerarPixCobranca(dados: { valor: number; descricao?: string }): Promise<{ txid: string; qrcode: string; pixCopiaECola: string }> {
-    return this.request("/pix/v2/cob", {
+  async realizarPix(chavePix: string, valor: number, descricao?: string): Promise<{ txid: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/pix/api/v2/cob`, {
       method: "POST",
-      body: JSON.stringify({ valor: { original: dados.valor.toFixed(2) }, calendario: { expiracao: 3600 } })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "x-api-key": this.config!.apiKey },
+      body: JSON.stringify({ calendario: { expiracao: 3600 }, valor: { original: valor.toFixed(2) }, chave: chavePix, solicitacaoPagador: descricao || "Pagamento" })
     });
+    if (!response.ok) throw new Error("Falha no PIX");
+    const data = await response.json();
+    return { txid: data.txid, status: data.status };
   }
 
-  async consultarPix(txid: string): Promise<any> {
-    return this.request(`/pix/v2/cob/${txid}`);
-  }
-
-  async realizarTransferencia(dados: { tipo: "TED" | "PIX"; valor: number; favorecido: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string } }): Promise<{ id: string; status: string }> {
-    return this.request("/transferencia/v1", { method: "POST", body: JSON.stringify(dados) });
-  }
-
-  async processarFolhaPagamento(pagamentos: Array<{ colaborador: { nome: string; cpf: string; banco: string; agencia: string; conta: string }; valor: number }>): Promise<{ lote: string; status: string }> {
-    const loteId = `FOLHA_SICREDI_${Date.now()}`;
-    for (const pag of pagamentos) {
-      await this.realizarTransferencia({ tipo: "TED", valor: pag.valor, favorecido: { nome: pag.colaborador.nome, cpfCnpj: pag.colaborador.cpf, banco: pag.colaborador.banco, agencia: pag.colaborador.agencia, conta: pag.colaborador.conta } });
-    }
-    return { lote: loteId, status: "processando" };
+  async processarFolhaPagamento(pagamentos: Array<{ nome: string; cpf: string; banco: string; agencia: string; conta: string; valor: number }>): Promise<{ loteId: string; quantidade: number; valorTotal: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/pagamentos/v1/lotes`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "x-api-key": this.config!.apiKey },
+      body: JSON.stringify({ pagamentos: pagamentos.map(p => ({ favorecido: p.nome, cpfCnpj: p.cpf, banco: p.banco, agencia: p.agencia, conta: p.conta, valor: p.valor })) })
+    });
+    if (!response.ok) throw new Error("Falha ao processar folha");
+    const data = await response.json();
+    return { loteId: data.idLote, quantidade: pagamentos.length, valorTotal: pagamentos.reduce((s, p) => s + p.valor, 0) };
   }
 }
 
-export const sicredi = new SicrediIntegration();
-export default sicredi;
+export const sicrediService = new SicrediService();
+export default sicrediService;
