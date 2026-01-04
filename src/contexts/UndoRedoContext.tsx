@@ -1,5 +1,12 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-interface UndoRedoContextType<T> { state: T; setState: (s: T) => void; undo: () => void; redo: () => void; canUndo: boolean; canRedo: boolean; }
-const UndoRedoContext = createContext<UndoRedoContextType<any> | undefined>(undefined);
-export function UndoRedoProvider<T>({ children, initialState }: { children: ReactNode; initialState: T }) { const [past, setPast] = useState<T[]>([]); const [state, setStateInternal] = useState(initialState); const [future, setFuture] = useState<T[]>([]); const setState = useCallback((s: T) => { setPast(p => [...p, state]); setStateInternal(s); setFuture([]); }, [state]); const undo = useCallback(() => { if (past.length === 0) return; const prev = past[past.length - 1]; setPast(p => p.slice(0, -1)); setFuture(f => [state, ...f]); setStateInternal(prev); }, [past, state]); const redo = useCallback(() => { if (future.length === 0) return; const next = future[0]; setFuture(f => f.slice(1)); setPast(p => [...p, state]); setStateInternal(next); }, [future, state]); return <UndoRedoContext.Provider value={{ state, setState, undo, redo, canUndo: past.length > 0, canRedo: future.length > 0 }}>{children}</UndoRedoContext.Provider>; }
-export function useUndoRedo<T>() { const ctx = useContext(UndoRedoContext); if (!ctx) throw new Error('useUndoRedo must be used within UndoRedoProvider'); return ctx as UndoRedoContextType<T>; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface UndoRedoContextType { state: any; setState: (v: any) => void; reset: () => void; }
+const UndoRedoContext = createContext<UndoRedoContextType | undefined>(undefined);
+export function UndoRedoContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
+  return <UndoRedoContext.Provider value={{ state, setState, reset }}>{children}</UndoRedoContext.Provider>;
+}
+export function useUndoRedo() { const ctx = useContext(UndoRedoContext); if (!ctx) throw new Error("useUndoRedo must be used within Provider"); return ctx; }
+export { UndoRedoContext };
+export default UndoRedoContext;
