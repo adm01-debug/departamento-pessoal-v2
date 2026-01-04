@@ -1,5 +1,10 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-interface PaginationContextType { page: number; pageSize: number; total: number; setPage: (p: number) => void; setPageSize: (s: number) => void; setTotal: (t: number) => void; totalPages: number; }
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface PaginationContextType { state: any; setState: (value: any) => void; reset: () => void; }
 const PaginationContext = createContext<PaginationContextType | undefined>(undefined);
-export function PaginationProvider({ children }: { children: ReactNode }) { const [page, setPage] = useState(1); const [pageSize, setPageSize] = useState(10); const [total, setTotal] = useState(0); return <PaginationContext.Provider value={{ page, pageSize, total, setPage, setPageSize, setTotal, totalPages: Math.ceil(total / pageSize) }}>{children}</PaginationContext.Provider>; }
-export function usePagination() { const ctx = useContext(PaginationContext); if (!ctx) throw new Error('usePagination must be used within PaginationProvider'); return ctx; }
+export function PaginationContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
+  const [state, setState] = useState(initialState || {});
+  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+  return <PaginationContext.Provider value={{ state, setState, reset }}>{children}</PaginationContext.Provider>;
+}
+export function usePaginationContext() { const context = useContext(PaginationContext); if (!context) throw new Error("usePaginationContext must be used within PaginationContextProvider"); return context; }
+export default PaginationContext;
