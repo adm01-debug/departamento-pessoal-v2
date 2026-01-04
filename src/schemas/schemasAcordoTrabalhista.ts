@@ -1,3 +1,26 @@
-import { z } from 'zod';
-export const acordoTrabalhistaSchema = z.object({ id: z.string(), colaboradorId: z.string(), dataAcordo: z.string(), tipo: z.enum(['compensacao', 'reducaoJornada', 'suspensaoContrato']), dataInicio: z.string(), dataFim: z.string(), descricao: z.string() });
-export type AcordoTrabalhista = z.infer<typeof acordoTrabalhistaSchema>;
+import { z } from "zod";
+
+export const schemasAcordoTrabalhista = z.object({
+  id: z.string().uuid().optional(),
+  nome: z.string().min(1, "Nome é obrigatório").max(200),
+  descricao: z.string().max(500).optional(),
+  codigo: z.string().max(50).optional(),
+  ativo: z.boolean().default(true),
+  valor: z.number().positive().optional(),
+  dataInicio: z.string().datetime().optional(),
+  dataFim: z.string().datetime().optional(),
+  observacoes: z.string().max(1000).optional(),
+  metadata: z.record(z.any()).optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
+
+export const schemasAcordoTrabalhistaCreate = schemasAcordoTrabalhista.omit({ id: true, createdAt: true, updatedAt: true });
+export const schemasAcordoTrabalhistaUpdate = schemasAcordoTrabalhista.partial().omit({ id: true, createdAt: true });
+
+export type AcordoTrabalhista = z.infer<typeof schemasAcordoTrabalhista>;
+export type AcordoTrabalhistaCreate = z.infer<typeof schemasAcordoTrabalhistaCreate>;
+export type AcordoTrabalhistaUpdate = z.infer<typeof schemasAcordoTrabalhistaUpdate>;
+
+export const validateAcordoTrabalhista = (data: unknown) => schemasAcordoTrabalhista.safeParse(data);
+export default schemasAcordoTrabalhista;
