@@ -1,14 +1,17 @@
-import { useState, useMemo } from "react";
-export interface PaginationResult<T> { currentPage: number; totalPages: number; pageSize: number; totalItems: number; paginatedData: T[]; goToPage: (page: number) => void; nextPage: () => void; prevPage: () => void; setPageSize: (size: number) => void; }
-export function usePagination<T>(data: T[], initialPageSize: number = 10): PaginationResult<T> {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSizeState] = useState(initialPageSize);
-  const totalPages = Math.ceil(data.length / pageSize);
-  const paginatedData = useMemo(() => { const start = (currentPage - 1) * pageSize; return data.slice(start, start + pageSize); }, [data, currentPage, pageSize]);
-  const goToPage = (page: number) => setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-  const nextPage = () => goToPage(currentPage + 1);
-  const prevPage = () => goToPage(currentPage - 1);
-  const setPageSize = (size: number) => { setPageSizeState(size); setCurrentPage(1); };
-  return { currentPage, totalPages, pageSize, totalItems: data.length, paginatedData, goToPage, nextPage, prevPage, setPageSize };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function usePagination<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
+  }, []);
+  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
+  return { data, loading, error, execute, reset, setData };
 }
 export default usePagination;
