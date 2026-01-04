@@ -1,13 +1,28 @@
-import { useState, useRef, useCallback, RefObject } from 'react';
-export function useHover<T extends HTMLElement>(): [RefObject<T>, boolean] {
-  const [isHovered, setIsHovered] = useState(false);
-  const ref = useRef<T>(null);
-  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
-  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
-  const callbackRef = useCallback((node: T | null) => {
-    if (ref.current) { ref.current.removeEventListener('mouseenter', handleMouseEnter); ref.current.removeEventListener('mouseleave', handleMouseLeave); }
-    if (node) { node.addEventListener('mouseenter', handleMouseEnter); node.addEventListener('mouseleave', handleMouseLeave); }
-    (ref as any).current = node;
-  }, [handleMouseEnter, handleMouseLeave]);
-  return [{ current: ref.current } as RefObject<T>, isHovered];
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useHoverOptions { enabled?: boolean; debounce?: number; }
+export interface useHoverResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useHover<T = any>(initialValue?: T, options: useHoverOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
+export default useHover;
