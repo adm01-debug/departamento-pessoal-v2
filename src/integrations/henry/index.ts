@@ -1,17 +1,33 @@
-/**
- * Integração Henry - Ponto Eletrônico
- */
-export interface PontoConfig { apiKey: string; empresaId: string; ambiente: 'sandbox' | 'producao'; }
-export interface Marcacao { colaboradorId: string; dataHora: Date; tipo: 'entrada' | 'saida'; latitude?: number; longitude?: number; }
-export interface Colaborador { id: string; nome: string; cpf: string; pis: string; departamento: string; }
+export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface Response<T = any> { success: boolean; data?: T; error?: string; timestamp: string; }
 
-export class PontoIntegration {
-  private config: PontoConfig;
-  constructor(config: PontoConfig) { this.config = config; }
-  async importarMarcacoes(dataInicio: Date, dataFim: Date): Promise<Marcacao[]> { return []; }
-  async exportarColaboradores(colaboradores: Colaborador[]): Promise<{ sucesso: number }> { return { sucesso: colaboradores.length }; }
-  async sincronizarJornadas(): Promise<void> { console.log('Sincronizando jornadas Henry'); }
-  async consultarAFD(periodo: { inicio: Date; fim: Date }): Promise<string> { return 'AFD_DATA'; }
-  async status(): Promise<{ conectado: boolean; ultimaSync: Date }> { return { conectado: true, ultimaSync: new Date() }; }
+class Service {
+  private config: Config = { enabled: false, timeout: 30000 };
+  
+  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+  isEnabled() { return this.config.enabled; }
+  
+  async connect(): Promise<Response> {
+    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
+    console.log("[henry] Connecting...");
+    return { success: true, data: { connected: true }, timestamp: new Date().toISOString() };
+  }
+  
+  async sync(): Promise<Response> {
+    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
+    return { success: true, data: { synced: true }, timestamp: new Date().toISOString() };
+  }
+  
+  async send(payload: any): Promise<Response> {
+    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
+    console.log("[henry] Sending:", payload);
+    return { success: true, data: { id: crypto.randomUUID() }, timestamp: new Date().toISOString() };
+  }
+  
+  async getStatus(): Promise<{ connected: boolean; lastSync?: string }> {
+    return { connected: this.config.enabled, lastSync: new Date().toISOString() };
+  }
 }
-export default PontoIntegration;
+
+export const henryService = new Service();
+export default henryService;
