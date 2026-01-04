@@ -1,14 +1,10 @@
-import { useRef, useEffect } from 'react';
-export function useClickOutside<T extends HTMLElement>(handler: () => void) {
-  const ref = useRef<T>(null);
-  useEffect(() => {
-    const listener = (e: MouseEvent | TouchEvent) => {
-      if (!ref.current || ref.current.contains(e.target as Node)) return;
-      handler();
-    };
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
-    return () => { document.removeEventListener('mousedown', listener); document.removeEventListener('touchstart', listener); };
-  }, [handler]);
-  return ref;
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useClickOutside<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
+export default useClickOutside;
