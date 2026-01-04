@@ -1,5 +1,11 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-export interface CountdownProps { className?: string; children?: React.ReactNode; }
-export function Countdown({ className, children }: CountdownProps) { return <div className={className}>{children || "Countdown Component"}</div>; }
+import * as React from "react";
+import { cn } from "@/lib/utils";
+export interface CountdownProps extends React.HTMLAttributes<HTMLDivElement> { variant?: "default" | "outline" | "ghost"; size?: "sm" | "md" | "lg"; disabled?: boolean; }
+const Countdown = React.forwardRef<HTMLDivElement, CountdownProps>(({ className, variant = "default", size = "md", disabled = false, children, ...props }, ref) => {
+  const variants = { default: "bg-primary text-primary-foreground", outline: "border border-input bg-background", ghost: "hover:bg-accent" };
+  const sizes = { sm: "p-2 text-sm", md: "p-4 text-base", lg: "p-6 text-lg" };
+  return (<div ref={ref} className={cn("rounded-lg transition-colors", variants[variant], sizes[size], disabled && "opacity-50 pointer-events-none", className)} {...props}>{children}</div>);
+});
+Countdown.displayName = "Countdown";
+export { Countdown };
 export default Countdown;
