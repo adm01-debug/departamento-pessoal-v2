@@ -1,22 +1,24 @@
-/**
- * @fileoverview TimePicker wrapper
- * @module components/forms/TimePicker
- */
-import { memo } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Clock } from 'lucide-react';
+import React from "react";
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
-interface TimePickerProps { id: string; label: string; value: string; onChange: (v: string) => void; disabled?: boolean; }
+interface TimePickerProps { className?: string; label?: string; value?: any; onChange?: (value: any) => void; disabled?: boolean; error?: string; required?: boolean; placeholder?: string; options?: { value: string; label: string }[]; }
 
-export const TimePicker = memo(function TimePicker({ id, label, value, onChange, disabled }: TimePickerProps) {
+export function TimePicker({ className, label, value, onChange, disabled, error, required, placeholder, options = [] }: TimePickerProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      <div className="relative">
-        <Input id={id} type="time" value={value} onChange={e => onChange(e.target.value)} disabled={disabled} />
-        <Clock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-      </div>
+    <div className={cn("space-y-2", className)}>
+      {label && <Label className={cn(required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>{label}</Label>}
+      <input
+        type="text"
+        value={value || ""}
+        onChange={e => onChange?.(e.target.value)}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={cn("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm", disabled && "opacity-50 cursor-not-allowed", error && "border-red-500")}
+      />
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
-});
+}
+
+export default TimePicker;
