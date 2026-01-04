@@ -2,12 +2,18 @@ export interface Beneficio {
   id: string;
   nome: string;
   descricao?: string;
-  status: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
 export interface BeneficioCreate extends Omit<Beneficio, "id" | "createdAt" | "updatedAt"> {}
-export interface BeneficioUpdate extends Partial<BeneficioCreate> {}
-export interface BeneficioFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type BeneficioStatus = "ativo" | "inativo" | "pendente";
+export interface BeneficioUpdate extends Partial<Omit<Beneficio, "id" | "createdAt">> {}
+export interface BeneficioFilter { search?: string; ativo?: boolean; page?: number; limit?: number; }
+export interface BeneficioListResponse { data: Beneficio[]; total: number; page: number; limit: number; }
+export type BeneficioStatus = "ativo" | "inativo" | "pendente" | "cancelado";
