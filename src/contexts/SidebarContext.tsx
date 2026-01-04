@@ -1,25 +1,43 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
 
-interface SidebarContextState { data: any; loading: boolean; error: Error | null; }
-interface SidebarContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface SidebarContextState {
+  data: any;
+  loading: boolean;
+  error: string | null;
+}
+
+interface SidebarContextActions {
+  setData: (data: any) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+  refresh: () => Promise<void>;
+}
+
 interface SidebarContextValue extends SidebarContextState, SidebarContextActions {}
+
+const initialState: SidebarContextState = { data: null, loading: false, error: null };
 
 const SidebarContext = createContext<SidebarContextValue | undefined>(undefined);
 
 export function SidebarContextProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<SidebarContextState>({ data: null, loading: false, error: null });
-  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
-  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
-  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
-  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
-  return <SidebarContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</SidebarContext.Provider>;
+  const [state, setState] = useState<SidebarContextState>(initialState);
+
+  const setData = useCallback((data: any) => setState(prev => ({ ...prev, data })), []);
+  const setLoading = useCallback((loading: boolean) => setState(prev => ({ ...prev, loading })), []);
+  const setError = useCallback((error: string | null) => setState(prev => ({ ...prev, error })), []);
+  const reset = useCallback(() => setState(initialState), []);
+  const refresh = useCallback(async () => { setLoading(true); try { /* fetch */ } finally { setLoading(false); } }, [setLoading]);
+
+  const value = useMemo(() => ({ ...state, setData, setLoading, setError, reset, refresh }), [state, setData, setLoading, setError, reset, refresh]);
+
+  return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
 }
 
-export function useSidebar() {
-  const ctx = useContext(SidebarContext);
-  if (!ctx) throw new Error("useSidebar must be used within SidebarContextProvider");
-  return ctx;
+export function useSidebarContext() {
+  const context = useContext(SidebarContext);
+  if (!context) throw new Error("useSidebarContext must be used within SidebarContextProvider");
+  return context;
 }
 
-export { SidebarContext };
 export default SidebarContext;
