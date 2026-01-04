@@ -1,13 +1,11 @@
-class whatsappServiceImpl {
-  private config: Record<string, any> = {};
-  configure(config: Record<string, any>): void { this.config = config; }
-  async initialize(): Promise<void> { console.log("whatsappService initialized"); }
-  async execute(action: string, params?: any): Promise<any> { return { action, params, timestamp: new Date().toISOString() }; }
-  async send(to: string, content: any): Promise<{ success: boolean; id: string }> { return { success: true, id: Date.now().toString() }; }
-  async get(key: string): Promise<any> { return this.config[key]; }
-  async set(key: string, value: any): Promise<void> { this.config[key] = value; }
-  async delete(key: string): Promise<boolean> { delete this.config[key]; return true; }
-  async list(): Promise<string[]> { return Object.keys(this.config); }
+export interface ServiceConfig { enabled: boolean; apiKey?: string; options?: Record<string, any>; }
+class Service {
+  private config: ServiceConfig = { enabled: true };
+  configure(c: Partial<ServiceConfig>) { this.config = { ...this.config, ...c }; }
+  isEnabled() { return this.config.enabled; }
+  async send(data: any) { if (!this.config.enabled) throw new Error("Disabled"); console.log("[whatsappService] Send:", data); return { success: true, id: crypto.randomUUID() }; }
+  async receive() { return { success: true, data: [] }; }
+  async getStatus() { return { enabled: this.config.enabled, connected: true }; }
 }
-export const whatsappService = new whatsappServiceImpl();
+export const whatsappService = new Service();
 export default whatsappService;
