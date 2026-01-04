@@ -7,100 +7,108 @@ export interface ValeTransporte {
   valor_diario: number;
   dias_uteis_mes: number;
   valor_mensal: number;
-  desconto_folha: number;
-  linhas: { tipo: string; empresa: string; valor: number }[];
+  desconto_6_porcento: number;
+  valor_liquido: number;
+  linhas: LinhaTransporte[];
   endereco_origem: string;
   endereco_destino: string;
-  ativo: boolean;
+  distancia_km?: number;
   created_at: string;
   updated_at: string;
 }
 
-class ValeTransporteService {
-  private tableName = "vales_transporte";
+export interface LinhaTransporte {
+  id: string;
+  vale_transporte_id: string;
+  tipo: "onibus" | "metro" | "trem" | "barca" | "vlt";
+  empresa: string;
+  linha: string;
+  sentido: "ida" | "volta" | "ida_volta";
+  valor_passagem: number;
+  quantidade_por_dia: number;
+}
 
-  async buscar(colaboradorId: string): Promise<ValeTransporte | null> {
-    const { data, error } = await supabase.from(this.tableName).select("*").eq("colaborador_id", colaboradorId).single();
+class ValeTransporteService {
+  async obterPorColaborador(colaboradorId: string): Promise<ValeTransporte | null> {
+    const { data, error } = await supabase.from("vales_transporte").select("*, linhas_transporte(*)").eq("colaborador_id", colaboradorId).single();
     if (error && error.code !== "PGRST116") throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
-  async criarOuAtualizar(colaboradorId: string, dados: Partial<ValeTransporte>): Promise<ValeTransporte> {
-    const existente = await this.buscar(colaboradorId);
+  async criar(vt: Partial<ValeTransporte>): Promise<ValeTransporte> {
+    const { linhas, ...dados } = vt;
     
-    const valorDiario = dados.linhas?.reduce((sum, l) => sum + l.valor, 0) || 0;
+    const valorDiario = linhas?.reduce((sum, l) => sum + (l.valor_passagem * l.quantidade_por_dia), 0) || 0;
     const diasUteis = dados.dias_uteis_mes || 22;
-    const valorMensal = valorDiario * diasUteis * 2; // ida e volta
+    const valorMensal = valorDiario * diasUteis;
+    
+    const { data: colab } = await supabase.from("colaboradores").select("salario").eq("id", dados.colaborador_id).single();
+    const desconto = colab ? Math.min(valorMensal, colab.salario * 0.06) : 0;
+    const valorLiquido = valorMensal - desconto;
 
-    // Desconto máximo 6% do salário
-    const { data: colaborador } = await supabase.from("colaboradores").select("salario").eq("id", colaboradorId).single();
-    const descontoMaximo = colaborador ? colaborador.salario * 0.06 : 0;
-    const desconto = Math.min(valorMensal, descontoMaximo);
-
-    const dadosCompletos = {
+    const { data, error } = await supabase.from("vales_transporte").insert([{
       ...dados,
-      colaborador_id: colaboradorId,
       valor_diario: valorDiario,
+      dias_uteis_mes: diasUteis,
       valor_mensal: valorMensal,
-      desconto_folha: desconto,
-      ativo: true
-    };
+      desconto_6_porcento: desconto,
+      valor_liquido: valorLiquido,
+      optante: true
+    }]).select().single();
+    if (error) throw new Error(`Erro: ${error.message}`);
 
-    if (existente) {
-      const { data, error } = await supabase
-        .from(this.tableName)
-        .update({ ...dadosCompletos, updated_at: new Date().toISOString() })
-        .eq("colaborador_id", colaboradorId)
-        .select().single();
-      if (error) throw new Error(`Erro: ${error.message}`);
-      return data;
+    if (linhas) {
+      for (const linha of linhas) {
+        await supabase.from("linhas_transporte").insert([{ ...linha, vale_transporte_id: data.id }]);
+      }
     }
 
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .insert([dadosCompletos])
-      .select().single();
+    return data;
+  }
+
+  async atualizar(id: string, vt: Partial<ValeTransporte>): Promise<ValeTransporte> {
+    const { data, error } = await supabase.from("vales_transporte").update({ ...vt, updated_at: new Date().toISOString() }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
-  async desativar(colaboradorId: string): Promise<void> {
-    const { error } = await supabase.from(this.tableName).update({ ativo: false, optante: false }).eq("colaborador_id", colaboradorId);
+  async adicionarLinha(vtId: string, linha: Partial<LinhaTransporte>): Promise<LinhaTransporte> {
+    const { data, error } = await supabase.from("linhas_transporte").insert([{ ...linha, vale_transporte_id: vtId }]).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
+    await this.recalcular(vtId);
+    return data;
+  }
+
+  async removerLinha(linhaId: string): Promise<void> {
+    const { data: linha } = await supabase.from("linhas_transporte").select("vale_transporte_id").eq("id", linhaId).single();
+    const { error } = await supabase.from("linhas_transporte").delete().eq("id", linhaId);
+    if (error) throw new Error(`Erro: ${error.message}`);
+    if (linha) await this.recalcular(linha.vale_transporte_id);
+  }
+
+  async recalcular(vtId: string): Promise<ValeTransporte> {
+    const { data: linhas } = await supabase.from("linhas_transporte").select("*").eq("vale_transporte_id", vtId);
+    const { data: vt } = await supabase.from("vales_transporte").select("*, colaboradores(salario)").eq("id", vtId).single();
+    
+    if (!vt) throw new Error("Vale transporte não encontrado");
+
+    const valorDiario = linhas?.reduce((sum, l) => sum + (l.valor_passagem * l.quantidade_por_dia), 0) || 0;
+    const valorMensal = valorDiario * vt.dias_uteis_mes;
+    const salario = (vt as any).colaboradores?.salario || 0;
+    const desconto = Math.min(valorMensal, salario * 0.06);
+    const valorLiquido = valorMensal - desconto;
+
+    return this.atualizar(vtId, { valor_diario: valorDiario, valor_mensal: valorMensal, desconto_6_porcento: desconto, valor_liquido: valorLiquido });
+  }
+
+  async cancelarOpcao(colaboradorId: string): Promise<void> {
+    await supabase.from("vales_transporte").update({ optante: false }).eq("colaborador_id", colaboradorId);
   }
 
   async calcularDescontoFolha(colaboradorId: string): Promise<number> {
-    const vt = await this.buscar(colaboradorId);
-    if (!vt || !vt.optante || !vt.ativo) return 0;
-    return vt.desconto_folha;
-  }
-
-  async listarPorEmpresa(empresaId: string): Promise<ValeTransporte[]> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .select("*, colaboradores!inner(empresa_id)")
-      .eq("colaboradores.empresa_id", empresaId)
-      .eq("ativo", true);
-    if (error) throw new Error(`Erro: ${error.message}`);
-    return data || [];
-  }
-
-  async obterResumoEmpresa(empresaId: string): Promise<{ total_optantes: number; custo_total: number; desconto_total: number }> {
-    const vts = await this.listarPorEmpresa(empresaId);
-    const optantes = vts.filter(v => v.optante);
-    
-    return {
-      total_optantes: optantes.length,
-      custo_total: optantes.reduce((sum, v) => sum + v.valor_mensal, 0),
-      desconto_total: optantes.reduce((sum, v) => sum + v.desconto_folha, 0)
-    };
-  }
-
-  async recalcularTodos(empresaId: string, diasUteis: number): Promise<void> {
-    const vts = await this.listarPorEmpresa(empresaId);
-    for (const vt of vts) {
-      await this.criarOuAtualizar(vt.colaborador_id, { ...vt, dias_uteis_mes: diasUteis });
-    }
+    const vt = await this.obterPorColaborador(colaboradorId);
+    if (!vt || !vt.optante) return 0;
+    return vt.desconto_6_porcento;
   }
 }
 
