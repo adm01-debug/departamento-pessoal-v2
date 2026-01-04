@@ -1,10 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface SearchContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface SearchContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
-export function SearchContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+
+export function SearchContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <SearchContext.Provider value={{ state, setState, reset }}>{children}</SearchContext.Provider>;
 }
-export function useSearchContext() { const context = useContext(SearchContext); if (!context) throw new Error("useSearchContext must be used within SearchContextProvider"); return context; }
+
+export function useSearch() {
+  const ctx = useContext(SearchContext);
+  if (!ctx) throw new Error("useSearch must be used within SearchContextProvider");
+  return ctx;
+}
+
+export { SearchContext };
 export default SearchContext;
