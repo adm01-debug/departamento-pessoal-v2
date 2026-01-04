@@ -1,6 +1,23 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
-const meta: Meta<typeof Sidebar> = { title: 'UI/Sidebar', component: Sidebar };
+import type { Meta, StoryObj } from "@storybook/react";
+import { Sidebar } from "@/components/Sidebar";
+
+const meta: Meta<typeof Sidebar> = {
+  title: "Components/Sidebar",
+  component: Sidebar,
+  parameters: { layout: "padded" },
+  tags: ["autodocs"],
+};
+
 export default meta;
-type Story = StoryObj<typeof Sidebar>;
-export const Default: Story = { render: () => <Sidebar><SidebarHeader>Logo</SidebarHeader><SidebarContent><SidebarMenu><SidebarMenuItem>Item 1</SidebarMenuItem></SidebarMenu></SidebarContent></Sidebar> };
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = { args: {} };
+export const WithData: Story = { args: { data: { title: "Sample", description: "Sample description" } } };
+export const Loading: Story = { args: { loading: true } };
+export const Error: Story = { args: { error: "Something went wrong" } };
+export const Empty: Story = { args: { data: null } };
+export const Compact: Story = { args: { variant: "compact" } };
+export const Expanded: Story = { args: { variant: "expanded" } };
+export const Mobile: Story = { parameters: { viewport: { defaultViewport: "mobile1" } } };
+export const Tablet: Story = { parameters: { viewport: { defaultViewport: "tablet" } } };
+export const Desktop: Story = { parameters: { viewport: { defaultViewport: "desktop" } } };
