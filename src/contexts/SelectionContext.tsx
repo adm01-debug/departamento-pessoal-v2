@@ -1,5 +1,10 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-interface SelectionContextType { selected: string[]; select: (id: string) => void; deselect: (id: string) => void; toggle: (id: string) => void; selectAll: (ids: string[]) => void; clear: () => void; isSelected: (id: string) => boolean; }
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface SelectionContextType { state: any; setState: (value: any) => void; reset: () => void; }
 const SelectionContext = createContext<SelectionContextType | undefined>(undefined);
-export function SelectionProvider({ children }: { children: ReactNode }) { const [selected, setSelected] = useState<string[]>([]); const select = useCallback((id: string) => setSelected(s => [...s, id]), []); const deselect = useCallback((id: string) => setSelected(s => s.filter(x => x !== id)), []); const toggle = useCallback((id: string) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]), []); const selectAll = useCallback((ids: string[]) => setSelected(ids), []); const clear = useCallback(() => setSelected([]), []); const isSelected = useCallback((id: string) => selected.includes(id), [selected]); return <SelectionContext.Provider value={{ selected, select, deselect, toggle, selectAll, clear, isSelected }}>{children}</SelectionContext.Provider>; }
-export function useSelection() { const ctx = useContext(SelectionContext); if (!ctx) throw new Error('useSelection must be used within SelectionProvider'); return ctx; }
+export function SelectionContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
+  const [state, setState] = useState(initialState || {});
+  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+  return <SelectionContext.Provider value={{ state, setState, reset }}>{children}</SelectionContext.Provider>;
+}
+export function useSelectionContext() { const context = useContext(SelectionContext); if (!context) throw new Error("useSelectionContext must be used within SelectionContextProvider"); return context; }
+export default SelectionContext;
