@@ -1,35 +1,14 @@
-/**
- * @fileoverview Tipos para integrações externas
- * @module types/integracao
- */
-
-export type TipoIntegracao = 'bitrix24' | 'esocial' | 'contabil' | 'bancaria' | 'ponto' | 'beneficios';
-export type StatusIntegracao = 'ativo' | 'inativo' | 'erro' | 'configurando';
-
 export interface Integracao {
   id: string;
-  tipo: TipoIntegracao;
   nome: string;
-  status: StatusIntegracao;
-  configuracao: Record<string, unknown>;
-  ultimaSincronizacao?: string;
-  erroMensagem?: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
   createdAt: string;
   updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export interface LogIntegracao {
-  id: string;
-  integracaoId: string;
-  acao: string;
-  status: 'sucesso' | 'erro';
-  detalhes?: string;
-  dataExecucao: string;
-}
-
-export interface WebhookConfig {
-  url: string;
-  secret?: string;
-  eventos: string[];
-  ativo: boolean;
-}
+export interface IntegracaoCreate extends Omit<Integracao, "id" | "createdAt" | "updatedAt"> {}
+export interface IntegracaoUpdate extends Partial<IntegracaoCreate> {}
+export interface IntegracaoFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type IntegracaoStatus = "ativo" | "inativo" | "pendente";
