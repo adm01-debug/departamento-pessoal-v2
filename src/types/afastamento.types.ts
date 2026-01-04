@@ -3,13 +3,18 @@ export interface Afastamento {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface AfastamentoCreate extends Omit<Afastamento, "id" | "createdAt" | "updatedAt"> {}
-export interface AfastamentoUpdate extends Partial<AfastamentoCreate> {}
-export interface AfastamentoFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface AfastamentoListResponse { data: Afastamento[]; total: number; page: number; limit: number; }
-export type AfastamentoStatus = "ativo" | "inativo" | "pendente";
+export interface AfastamentoUpdate extends Partial<Omit<Afastamento, "id" | "createdAt">> {}
+export interface AfastamentoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface AfastamentoListResponse { data: Afastamento[]; total: number; page: number; limit: number; totalPages: number; }
+export type AfastamentoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
