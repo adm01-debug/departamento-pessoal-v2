@@ -9,14 +9,12 @@ export interface Promocao {
   departamento_novo_id?: string;
   salario_anterior: number;
   salario_novo: number;
-  percentual_aumento: number;
   data_vigencia: string;
   motivo: string;
   aprovador_id?: string;
-  status: "pendente" | "aprovada" | "rejeitada" | "aplicada";
+  status: "pendente" | "aprovada" | "rejeitada" | "efetivada";
   observacoes?: string;
   created_at: string;
-  updated_at: string;
 }
 
 class PromocaoService {
@@ -38,14 +36,7 @@ class PromocaoService {
   }
 
   async criar(promocao: Partial<Promocao>): Promise<Promocao> {
-    const percentual = promocao.salario_anterior && promocao.salario_novo 
-      ? ((promocao.salario_novo - promocao.salario_anterior) / promocao.salario_anterior) * 100 
-      : 0;
-
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .insert([{ ...promocao, percentual_aumento: percentual, status: "pendente" }])
-      .select().single();
+    const { data, error } = await supabase.from(this.tableName).insert([{ ...promocao, status: "pendente" }]).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
@@ -53,7 +44,7 @@ class PromocaoService {
   async aprovar(id: string, aprovadorId: string): Promise<Promocao> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .update({ status: "aprovada", aprovador_id: aprovadorId, updated_at: new Date().toISOString() })
+      .update({ status: "aprovada", aprovador_id: aprovadorId })
       .eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
@@ -62,27 +53,24 @@ class PromocaoService {
   async rejeitar(id: string, motivo: string): Promise<Promocao> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .update({ status: "rejeitada", observacoes: motivo, updated_at: new Date().toISOString() })
+      .update({ status: "rejeitada", observacoes: motivo })
       .eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
-  async aplicar(id: string): Promise<Promocao> {
+  async efetivar(id: string): Promise<Promocao> {
     const promocao = await this.buscarPorId(id);
     if (!promocao) throw new Error("Promoção não encontrada");
     if (promocao.status !== "aprovada") throw new Error("Promoção deve estar aprovada");
 
-    await supabase.from("colaboradores").update({ 
+    await supabase.from("colaboradores").update({
       cargo_id: promocao.cargo_novo_id,
       departamento_id: promocao.departamento_novo_id || promocao.departamento_anterior_id,
-      salario: promocao.salario_novo 
+      salario: promocao.salario_novo
     }).eq("id", promocao.colaborador_id);
 
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "aplicada", updated_at: new Date().toISOString() })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({ status: "efetivada" }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
