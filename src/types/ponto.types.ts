@@ -3,12 +3,18 @@ export interface Ponto {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface PontoCreate extends Omit<Ponto, "id" | "createdAt" | "updatedAt"> {}
-export interface PontoUpdate extends Partial<PontoCreate> {}
-export interface PontoFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type PontoStatus = "ativo" | "inativo" | "pendente";
+export interface PontoUpdate extends Partial<Omit<Ponto, "id" | "createdAt">> {}
+export interface PontoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface PontoListResponse { data: Ponto[]; total: number; page: number; limit: number; totalPages: number; }
+export type PontoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
