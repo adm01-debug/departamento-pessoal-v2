@@ -1,37 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface TimelineItem {
-  id: string;
-  evento: string;
-  data: string;
-  status: string;
-}
-
-interface ESocialTimelineProps {
-  items?: TimelineItem[];
-}
-
-export function ESocialTimeline({ items = [] }: ESocialTimelineProps) {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+interface ESocialTimelineProps { title?: string; status?: "pendente" | "enviado" | "aceito" | "rejeitado"; data?: any; className?: string; }
+export function ESocialTimeline({ title = "ESocialTimeline", status = "pendente", data, className }: ESocialTimelineProps) {
+  const statusColors = { pendente: "bg-yellow-500", enviado: "bg-blue-500", aceito: "bg-green-500", rejeitado: "bg-red-500" };
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Timeline eSocial</CardTitle>
+    <Card className={className}>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Badge className={statusColors[status]}>{status}</Badge>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {items.map((item) => (
-            <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
-              <div className="w-2 h-2 mt-2 rounded-full bg-primary" />
-              <div>
-                <p className="text-sm font-medium">{item.evento}</p>
-                <p className="text-xs text-muted-foreground">{item.data} - {item.status}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
+      <CardContent>{data && <pre className="text-xs">{JSON.stringify(data, null, 2)}</pre>}</CardContent>
     </Card>
   );
 }
-
 export default ESocialTimeline;
