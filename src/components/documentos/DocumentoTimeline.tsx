@@ -1,37 +1,28 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { FileText, Download, Eye } from "lucide-react";
 
-interface TimelineItem {
-  id: string;
-  acao: string;
-  data: string;
-  usuario: string;
-}
+interface DocumentoTimelineProps { className?: string; data?: any; onAction?: (action: string, data?: any) => void; loading?: boolean; }
 
-interface DocumentoTimelineProps {
-  items: TimelineItem[];
-}
-
-export function DocumentoTimeline({ items }: DocumentoTimelineProps) {
+export function DocumentoTimeline({ className, data, onAction, loading }: DocumentoTimelineProps) {
+  if (loading) return <Card className={cn("animate-pulse", className)}><CardContent className="p-6"><div className="h-32 bg-muted rounded" /></CardContent></Card>;
+  
   return (
-    <Card>
+    <Card className={cn("", className)}>
       <CardHeader>
-        <CardTitle>Histórico</CardTitle>
+        <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />DocumentoTimeline</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {items.map((item) => (
-            <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
-              <div className="w-2 h-2 mt-2 rounded-full bg-primary" />
-              <div>
-                <p className="text-sm font-medium">{item.acao}</p>
-                <p className="text-xs text-muted-foreground">
-                  {item.data} • {item.usuario}
-                </p>
-              </div>
-            </div>
-          ))}
+      <CardContent className="space-y-4">
+        <div className="text-sm text-muted-foreground">{data ? "Documento disponível" : "Nenhum documento"}</div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => onAction?.("view", data)}><Eye className="h-4 w-4 mr-2" />Visualizar</Button>
+          <Button variant="outline" size="sm" onClick={() => onAction?.("download", data)}><Download className="h-4 w-4 mr-2" />Baixar</Button>
         </div>
       </CardContent>
     </Card>
   );
 }
+
+export default DocumentoTimeline;
