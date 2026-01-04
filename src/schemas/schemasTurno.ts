@@ -1,34 +1,23 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const schemasTurnoCreate = z.object({
-  empresaId: z.string().uuid(),
-  colaboradorId: z.string().uuid().optional(),
-  descricao: z.string().min(1, 'Descrição obrigatória'),
-  valor: z.number().min(0).optional(),
-  dataInicio: z.date().optional(),
-  dataFim: z.date().optional(),
-  status: z.enum(['ativo', 'inativo', 'pendente']).default('ativo'),
-  observacoes: z.string().optional(),
+export const schemasTurno = z.object({
+  id: z.string().uuid().optional(),
+  nome: z.string().min(1).max(200),
+  descricao: z.string().max(500).optional(),
+  codigo: z.string().max(50).optional(),
+  ativo: z.boolean().default(true),
+  valor: z.number().nonnegative().optional(),
+  dataInicio: z.string().datetime().optional(),
+  dataFim: z.string().datetime().optional(),
+  observacoes: z.string().max(1000).optional(),
+  metadata: z.record(z.any()).optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 
-export const schemasTurnoUpdate = schemasTurnoCreate.partial();
+export const schemasTurnoCreate = schemasTurno.omit({ id: true, createdAt: true, updatedAt: true });
+export const schemasTurnoUpdate = schemasTurno.partial();
 
-export const schemasTurnoFilter = z.object({
-  empresaId: z.string().uuid().optional(),
-  colaboradorId: z.string().uuid().optional(),
-  status: z.enum(['ativo', 'inativo', 'pendente']).optional(),
-  dataInicio: z.date().optional(),
-  dataFim: z.date().optional(),
-});
-
-export type TurnoCreate = z.infer<typeof schemasTurnoCreate>;
-export type TurnoUpdate = z.infer<typeof schemasTurnoUpdate>;
-export type TurnoFilter = z.infer<typeof schemasTurnoFilter>;
-
-export const schemasTurno = {
-  create: schemasTurnoCreate,
-  update: schemasTurnoUpdate,
-  filter: schemasTurnoFilter,
-};
-
+export type TurnoType = z.infer<typeof schemasTurno>;
+export const validateTurno = (data: unknown) => schemasTurno.safeParse(data);
 export default schemasTurno;
