@@ -1,49 +1,38 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-interface CalendarEvent { id: string; start: Date; color?: string; }
-interface MiniCalendarProps { events?: CalendarEvent[]; selectedDate?: Date; onDateSelect?: (date: Date) => void; className?: string; }
+interface MiniCalendarProps { selected?: Date; onSelect?: (date: Date) => void; highlightedDates?: Date[]; className?: string; }
 
-const WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
-
-export function MiniCalendar({ events = [], selectedDate, onDateSelect, className }: MiniCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date());
+export function MiniCalendar({ selected, onSelect, highlightedDates = [], className }: MiniCalendarProps) {
+  const [currentMonth, setCurrentMonth] = useState(selected || new Date());
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart);
-  const calendarEnd = endOfWeek(monthEnd);
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  const getEventsForDay = (day: Date) => events.filter(e => isSameDay(e.start, day));
+  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const isHighlighted = (date: Date) => highlightedDates.some(d => isSameDay(d, date));
 
   return (
-    <Card className={cn("w-[280px]", className)}>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(m => subMonths(m, 1))}><ChevronLeft className="h-4 w-4" /></Button>
-          <CardTitle className="text-sm">{format(currentMonth, "MMMM yyyy", { locale: ptBR })}</CardTitle>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(m => addMonths(m, 1))}><ChevronRight className="h-4 w-4" /></Button>
+    <Card className={cn("w-fit", className)}>
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(d => subMonths(d, 1))}><ChevronLeft className="h-4 w-4" /></Button>
+          <span className="text-sm font-medium">{format(currentMonth, "MMMM yyyy", { locale: ptBR })}</span>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(d => addMonths(d, 1))}><ChevronRight className="h-4 w-4" /></Button>
         </div>
-      </CardHeader>
-      <CardContent className="pb-3">
-        <div className="grid grid-cols-7 gap-1 mb-2">{WEEKDAYS.map((day, i) => <div key={i} className="text-center text-xs font-medium text-muted-foreground">{day}</div>)}</div>
-        <div className="grid grid-cols-7 gap-1">
-          {days.map((day, i) => {
-            const dayEvents = getEventsForDay(day);
-            const isCurrentMonth = isSameMonth(day, currentMonth);
-            const isSelected = selectedDate && isSameDay(day, selectedDate);
-            return (
-              <button key={i} onClick={() => onDateSelect?.(day)} className={cn("h-8 w-8 rounded-full text-sm flex flex-col items-center justify-center relative transition-colors", !isCurrentMonth && "text-muted-foreground/50", isToday(day) && "bg-primary/10 font-bold", isSelected && "bg-primary text-primary-foreground", !isSelected && isCurrentMonth && "hover:bg-muted")}>
-                {format(day, "d")}
-                {dayEvents.length > 0 && <div className="absolute bottom-0.5 flex gap-0.5">{dayEvents.slice(0, 3).map((e, j) => <div key={j} className="w-1 h-1 rounded-full" style={{ backgroundColor: e.color || "#3b82f6" }} />)}</div>}
-              </button>
-            );
-          })}
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {weekDays.map(day => <div key={day} className="text-xs text-muted-foreground font-medium py-1">{day}</div>)}
+          {days.map(day => (
+            <Button key={day.toISOString()} variant="ghost" size="sm" className={cn("h-8 w-8 p-0 font-normal", !isSameMonth(day, currentMonth) && "text-muted-foreground opacity-50", isToday(day) && "bg-primary/10", selected && isSameDay(day, selected) && "bg-primary text-primary-foreground", isHighlighted(day) && "ring-2 ring-primary ring-offset-1")} onClick={() => onSelect?.(day)}>
+              {format(day, "d")}
+            </Button>
+          ))}
         </div>
       </CardContent>
     </Card>
