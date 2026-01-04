@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
-export function useFocusReturn(active: boolean) {
-  const returnRef = useRef<HTMLElement | null>(null);
+import { useEffect, useRef } from "react";
+export function useFocusReturn(isOpen: boolean) {
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    if (active) { returnRef.current = document.activeElement as HTMLElement; }
-    else if (returnRef.current) { returnRef.current.focus(); returnRef.current = null; }
-  }, [active]);
+    if (isOpen) { returnFocusRef.current = document.activeElement as HTMLElement; }
+    else if (returnFocusRef.current) { returnFocusRef.current.focus(); returnFocusRef.current = null; }
+  }, [isOpen]);
+  return returnFocusRef;
 }
+export default useFocusReturn;
