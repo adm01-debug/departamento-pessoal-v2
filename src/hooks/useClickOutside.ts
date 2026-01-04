@@ -1,28 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-
-export interface useClickOutsideOptions { enabled?: boolean; debounce?: number; }
-export interface useClickOutsideResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
-
-export function useClickOutside<T = any>(initialValue?: T, options: useClickOutsideOptions = {}) {
-  const [data, setData] = useState<T | null>(initialValue ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const mountedRef = useRef(true);
-
-  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
-
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    if (!options.enabled && options.enabled !== undefined) return;
-    setLoading(true);
-    setError(null);
-    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
-    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
-    finally { if (mountedRef.current) { setLoading(false); } }
-  }, [options.enabled]);
-
-  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
-
-  return { data, loading, error, execute, reset, setData };
+import { useEffect, useRef, RefObject } from "react";
+export function useClickOutside<T extends HTMLElement>(handler: () => void): RefObject<T> {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) return;
+      handler();
+    };
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
+    return () => { document.removeEventListener("mousedown", listener); document.removeEventListener("touchstart", listener); };
+  }, [handler]);
+  return ref;
 }
-
 export default useClickOutside;
