@@ -1,40 +1,5 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
-
-interface FileUploaderProps {
-  className?: string;
-  children?: React.ReactNode;
-  variant?: 'default' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-}
-
-/**
- * Upload de arquivos
- * Componente UI avançado com variantes
- */
-export const FileUploader: React.FC<FileUploaderProps> = ({
-  className,
-  children,
-  variant = 'default',
-  size = 'md',
-}) => {
-  const variants = {
-    default: 'bg-primary text-primary-foreground',
-    outline: 'border border-input bg-background',
-    ghost: 'hover:bg-accent hover:text-accent-foreground',
-  };
-
-  const sizes = {
-    sm: 'h-8 text-sm px-3',
-    md: 'h-10 text-base px-4',
-    lg: 'h-12 text-lg px-6',
-  };
-
-  return (
-    <div className={cn('rounded-md', variants[variant], sizes[size], className)}>
-      {children}
-    </div>
-  );
-};
-
-export default FileUploader;
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+export function Component({ children }: { children?: React.ReactNode }) { return <Card><CardContent className="p-4">{children || "Componente em desenvolvimento"}</CardContent></Card>; }
+export default Component;
