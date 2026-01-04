@@ -1,11 +1,17 @@
-import { useState, useCallback } from 'react';
-export function useSelection<T extends string | number>(initialSelected: T[] = []) {
-  const [selected, setSelected] = useState<Set<T>>(new Set(initialSelected));
-  const toggle = useCallback((id: T) => setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }), []);
-  const select = useCallback((id: T) => setSelected(prev => new Set(prev).add(id)), []);
-  const deselect = useCallback((id: T) => setSelected(prev => { const n = new Set(prev); n.delete(id); return n; }), []);
-  const selectAll = useCallback((ids: T[]) => setSelected(new Set(ids)), []);
-  const clear = useCallback(() => setSelected(new Set()), []);
-  const isSelected = useCallback((id: T) => selected.has(id), [selected]);
-  return { selected: Array.from(selected), toggle, select, deselect, selectAll, clear, isSelected, count: selected.size };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useSelection<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
+  }, []);
+  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
+  return { data, loading, error, execute, reset, setData };
 }
+export default useSelection;
