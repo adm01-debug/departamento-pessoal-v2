@@ -1,34 +1,16 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-
-interface ESocialEventoFormProps {
-  evento?: string;
-  onSubmit?: (data: Record<string, unknown>) => void;
-  onCancel?: () => void;
-}
-
-export function ESocialEventoForm({ evento, onSubmit, onCancel }: ESocialEventoFormProps) {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+interface ESocialEventoFormProps { title?: string; status?: "pendente" | "enviado" | "aceito" | "rejeitado"; data?: any; className?: string; }
+export function ESocialEventoForm({ title = "ESocialEventoForm", status = "pendente", data, className }: ESocialEventoFormProps) {
+  const statusColors = { pendente: "bg-yellow-500", enviado: "bg-blue-500", aceito: "bg-green-500", rejeitado: "bg-red-500" };
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Evento {evento || 'eSocial'}</CardTitle>
+    <Card className={className}>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Badge className={statusColors[status]}>{status}</Badge>
       </CardHeader>
-      <CardContent>
-        <form className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="campo">Campo</Label>
-            <Input id="campo" placeholder="Valor" />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
-            <Button type="submit">Enviar</Button>
-          </div>
-        </form>
-      </CardContent>
+      <CardContent>{data && <pre className="text-xs">{JSON.stringify(data, null, 2)}</pre>}</CardContent>
     </Card>
   );
 }
-
 export default ESocialEventoForm;
