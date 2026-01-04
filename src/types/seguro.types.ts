@@ -3,12 +3,18 @@ export interface Seguro {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface SeguroCreate extends Omit<Seguro, "id" | "createdAt" | "updatedAt"> {}
-export interface SeguroUpdate extends Partial<SeguroCreate> {}
-export interface SeguroFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type SeguroStatus = "ativo" | "inativo" | "pendente";
+export interface SeguroUpdate extends Partial<Omit<Seguro, "id" | "createdAt">> {}
+export interface SeguroFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface SeguroListResponse { data: Seguro[]; total: number; page: number; limit: number; totalPages: number; }
+export type SeguroStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
