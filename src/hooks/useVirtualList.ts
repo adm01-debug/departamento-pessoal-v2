@@ -1,74 +1,16 @@
-import { useState, useMemo, useCallback, RefObject } from 'react';
-
-interface UseVirtualListOptions<T> {
-  items: T[];
-  itemHeight: number;
-  containerHeight: number;
-  overscan?: number;
-}
-
-interface VirtualItem<T> {
-  item: T;
-  index: number;
-  style: { position: 'absolute'; top: number; height: number; width: string };
-}
-
-interface UseVirtualListReturn<T> {
-  virtualItems: VirtualItem<T>[];
-  totalHeight: number;
-  scrollTo: (index: number) => void;
-  onScroll: (scrollTop: number) => void;
-}
-
-/**
- * Hook para virtualização de listas grandes
- */
-export function useVirtualList<T>({
-  items,
-  itemHeight,
-  containerHeight,
-  overscan = 3,
-}: UseVirtualListOptions<T>): UseVirtualListReturn<T> {
-  const [scrollTop, setScrollTop] = useState(0);
-
-  const totalHeight = items.length * itemHeight;
-
-  const virtualItems = useMemo(() => {
-    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
-    const endIndex = Math.min(
-      items.length - 1,
-      Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
-    );
-
-    const visibleItems: VirtualItem<T>[] = [];
-    for (let i = startIndex; i <= endIndex; i++) {
-      visibleItems.push({
-        item: items[i],
-        index: i,
-        style: {
-          position: 'absolute',
-          top: i * itemHeight,
-          height: itemHeight,
-          width: '100%',
-        },
-      });
-    }
-
-    return visibleItems;
-  }, [items, itemHeight, containerHeight, scrollTop, overscan]);
-
-  const scrollTo = useCallback(
-    (index: number) => {
-      setScrollTop(index * itemHeight);
-    },
-    [itemHeight]
-  );
-
-  const onScroll = useCallback((newScrollTop: number) => {
-    setScrollTop(newScrollTop);
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useVirtualList<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
   }, []);
-
-  return { virtualItems, totalHeight, scrollTo, onScroll };
+  return { data, loading, error, execute, setData };
 }
-
 export default useVirtualList;
