@@ -1,65 +1,25 @@
-/**
- * @fileoverview Gráfico de área com Recharts
- * @module components/charts/AreaChart
- */
-import { memo, useMemo } from 'react';
-import { Area, AreaChart as RechartsArea, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from "react";
+import { ResponsiveContainer, AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-interface DataPoint {
-  name: string;
-  value: number;
-  [key: string]: string | number;
-}
+interface DataPoint { name: string; value: number; [key: string]: any; }
+interface AreaChartProps { data: DataPoint[]; title?: string; description?: string; dataKey?: string; colors?: string[]; height?: number; showLegend?: boolean; showGrid?: boolean; className?: string; }
 
-interface AreaChartProps {
-  /** Título do gráfico */
-  title: string;
-  /** Dados do gráfico */
-  data: DataPoint[];
-  /** Cor da área */
-  color?: string;
-  /** Campo de dados a ser usado */
-  dataKey?: string;
-  /** Altura do gráfico */
-  height?: number;
-}
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
-/**
- * Gráfico de área responsivo
- */
-export const AreaChart = memo(function AreaChart({ 
-  title, 
-  data, 
-  color = '#8884d8', 
-  dataKey = 'value',
-  height = 300 
-}: AreaChartProps) {
-  const formattedData = useMemo(() => data, [data]);
-  
-  return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={height}>
-          <RechartsArea data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis dataKey="name" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-            <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--popover))', 
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px'
-              }} 
-            />
-            <Area type="monotone" dataKey={dataKey} stroke={color} fill={color} fillOpacity={0.3} />
-          </RechartsArea>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+export function AreaChart({ data, title, description, dataKey = "value", colors = COLORS, height = 300, showLegend = true, showGrid = true, className }: AreaChartProps) {
+  const chart = (
+    <ResponsiveContainer width="100%" height={height}>
+      <RechartsAreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        {showGrid && <CartesianGrid strokeDasharray="3 3" />}
+        <XAxis dataKey="name" /><YAxis /><Tooltip />
+        {showLegend && <Legend />}
+        <Area type="monotone" dataKey={dataKey} stroke={colors[0]} fill={colors[0]} fillOpacity={0.3} />
+      </RechartsAreaChart>
+    </ResponsiveContainer>
   );
-});
-
+  if (!title) return <div className={className}>{chart}</div>;
+  return <Card className={cn("", className)}><CardHeader><CardTitle>{title}</CardTitle>{description && <CardDescription>{description}</CardDescription>}</CardHeader><CardContent>{chart}</CardContent></Card>;
+}
+export default AreaChart;
