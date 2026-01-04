@@ -4,20 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { GitBranch, Clock, User, Download, Eye, RotateCcw, Plus, FileText, ChevronDown, ChevronRight } from "lucide-react";
+import { GitBranch, Clock, User, Download, Eye, RotateCcw, GitCompare, Plus, FileText } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 
 interface Versao {
   id: string;
   documento_id: string;
-  numero_versao: number;
+  numero_versao: string;
+  descricao_alteracao: string;
+  autor_id: string;
+  autor_nome: string;
   data_criacao: string;
-  criado_por: string;
-  criado_por_nome: string;
   tamanho: number;
   url: string;
-  descricao_alteracao?: string;
-  hash?: string;
+  hash: string;
   is_atual: boolean;
 }
 
@@ -28,8 +30,8 @@ interface DocumentoVersionamentoProps {
   onNovaVersao?: (arquivo: File, descricao: string) => Promise<void>;
   onRestaurar?: (versaoId: string) => Promise<void>;
   onDownload?: (versaoId: string) => Promise<string>;
+  onComparar?: (versaoA: string, versaoB: string) => Promise<string>;
   onPreview?: (versaoId: string) => void;
-  onComparar?: (versaoId1: string, versaoId2: string) => void;
   modoVisualizacao?: boolean;
 }
 
@@ -40,57 +42,57 @@ export function DocumentoVersionamento({
   onNovaVersao,
   onRestaurar,
   onDownload,
-  onPreview,
   onComparar,
+  onPreview,
   modoVisualizacao = false
 }: DocumentoVersionamentoProps) {
   const { toast } = useToast();
+  const [descricaoNovaVersao, setDescricaoNovaVersao] = useState("");
+  const [arquivoNovaVersao, setArquivoNovaVersao] = useState<File | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [arquivo, setArquivo] = useState<File | null>(null);
-  const [descricao, setDescricao] = useState("");
-  const [expandido, setExpandido] = useState<string[]>([]);
-  const [comparando, setComparando] = useState<string[]>([]);
+  const [compararDialogOpen, setCompararDialogOpen] = useState(false);
+  const [versaoA, setVersaoA] = useState<string>("");
+  const [versaoB, setVersaoB] = useState<string>("");
 
-  const formatarData = (data: string) => new Date(data).toLocaleString("pt-BR");
-  const formatarTamanho = (bytes: number) => {
+  const formatarTamanho = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const handleNovaVersao = async () => {
-    if (!arquivo) {
+    if (!arquivoNovaVersao) {
       toast({ title: "Erro", description: "Selecione um arquivo", variant: "destructive" });
       return;
     }
     try {
-      await onNovaVersao?.(arquivo, descricao);
-      toast({ title: "Sucesso", description: "Nova versão enviada" });
-      setArquivo(null);
-      setDescricao("");
+      await onNovaVersao?.(arquivoNovaVersao, descricaoNovaVersao);
+      toast({ title: "Sucesso", description: "Nova versão criada" });
+      setDescricaoNovaVersao("");
+      setArquivoNovaVersao(null);
       setDialogOpen(false);
     } catch {
-      toast({ title: "Erro", description: "Falha ao enviar versão", variant: "destructive" });
+      toast({ title: "Erro", description: "Falha ao criar versão", variant: "destructive" });
     }
   };
 
-  const handleRestaurar = async (versaoId: string) => {
-    if (!confirm("Deseja restaurar esta versão? Ela se tornará a versão atual.")) return;
+  const handleRestaurar = async (versaoId: string, numero: string) => {
+    if (!confirm(`Deseja restaurar a versão ${numero}? A versão atual será arquivada.`)) return;
     try {
       await onRestaurar?.(versaoId);
-      toast({ title: "Sucesso", description: "Versão restaurada" });
+      toast({ title: "Sucesso", description: `Versão ${numero} restaurada` });
     } catch {
       toast({ title: "Erro", description: "Falha ao restaurar", variant: "destructive" });
     }
   };
 
-  const handleDownload = async (versaoId: string) => {
+  const handleDownload = async (versaoId: string, nome: string) => {
     try {
       const url = await onDownload?.(versaoId);
       if (url) {
         const link = document.createElement("a");
         link.href = url;
-        link.download = `${documentoNome}_v${versoes.find(v => v.id === versaoId)?.numero_versao}`;
+        link.download = nome;
         link.click();
       }
     } catch {
@@ -98,26 +100,21 @@ export function DocumentoVersionamento({
     }
   };
 
-  const toggleExpandir = (id: string) => {
-    setExpandido(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
-  };
-
-  const toggleComparar = (id: string) => {
-    setComparando(prev => {
-      if (prev.includes(id)) return prev.filter(c => c !== id);
-      if (prev.length >= 2) return [prev[1], id];
-      return [...prev, id];
-    });
-  };
-
-  const executarComparacao = () => {
-    if (comparando.length === 2) {
-      onComparar?.(comparando[0], comparando[1]);
+  const handleComparar = async () => {
+    if (!versaoA || !versaoB) {
+      toast({ title: "Erro", description: "Selecione duas versões", variant: "destructive" });
+      return;
+    }
+    try {
+      await onComparar?.(versaoA, versaoB);
+      setCompararDialogOpen(false);
+    } catch {
+      toast({ title: "Erro", description: "Falha ao comparar", variant: "destructive" });
     }
   };
 
   const versaoAtual = versoes.find(v => v.is_atual);
-  const versoesAnteriores = versoes.filter(v => !v.is_atual).sort((a, b) => b.numero_versao - a.numero_versao);
+  const versoesAnteriores = versoes.filter(v => !v.is_atual);
 
   return (
     <Card>
@@ -127,10 +124,32 @@ export function DocumentoVersionamento({
           Histórico de Versões - {documentoNome}
         </CardTitle>
         <div className="flex gap-2">
-          {comparando.length === 2 && (
-            <Button variant="outline" size="sm" onClick={executarComparacao}>
-              Comparar v{versoes.find(v => v.id === comparando[0])?.numero_versao} com v{versoes.find(v => v.id === comparando[1])?.numero_versao}
-            </Button>
+          {versoes.length >= 2 && (
+            <Dialog open={compararDialogOpen} onOpenChange={setCompararDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm"><GitCompare className="h-4 w-4 mr-2" />Comparar</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Comparar Versões</DialogTitle></DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Versão A</label>
+                    <select className="w-full mt-1 p-2 border rounded-md" value={versaoA} onChange={e => setVersaoA(e.target.value)}>
+                      <option value="">Selecione...</option>
+                      {versoes.map(v => <option key={v.id} value={v.id}>v{v.numero_versao} - {format(new Date(v.data_criacao), "dd/MM/yyyy HH:mm")}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Versão B</label>
+                    <select className="w-full mt-1 p-2 border rounded-md" value={versaoB} onChange={e => setVersaoB(e.target.value)}>
+                      <option value="">Selecione...</option>
+                      {versoes.map(v => <option key={v.id} value={v.id}>v{v.numero_versao} - {format(new Date(v.data_criacao), "dd/MM/yyyy HH:mm")}</option>)}
+                    </select>
+                  </div>
+                  <Button onClick={handleComparar} className="w-full">Comparar Versões</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
           {!modoVisualizacao && (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -138,15 +157,17 @@ export function DocumentoVersionamento({
                 <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nova Versão</Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader><DialogTitle>Enviar Nova Versão</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle>Adicionar Nova Versão</DialogTitle></DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <input type="file" onChange={e => setArquivo(e.target.files?.[0] || null)} className="w-full" />
+                    <label className="text-sm font-medium">Arquivo</label>
+                    <input type="file" className="w-full mt-1 p-2 border rounded-md" onChange={e => setArquivoNovaVersao(e.target.files?.[0] || null)} />
                   </div>
                   <div>
-                    <Textarea placeholder="Descreva as alterações desta versão..." value={descricao} onChange={e => setDescricao(e.target.value)} rows={3} />
+                    <label className="text-sm font-medium">Descrição das Alterações</label>
+                    <Textarea value={descricaoNovaVersao} onChange={e => setDescricaoNovaVersao(e.target.value)} placeholder="Descreva as alterações desta versão..." />
                   </div>
-                  <Button onClick={handleNovaVersao} className="w-full">Enviar</Button>
+                  <Button onClick={handleNovaVersao} className="w-full">Enviar Nova Versão</Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -162,22 +183,20 @@ export function DocumentoVersionamento({
                 <FileText className="h-8 w-8 text-primary" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg">Versão {versaoAtual.numero_versao}</span>
+                    <span className="font-semibold">v{versaoAtual.numero_versao}</span>
                     <Badge>Atual</Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="h-3 w-3" />{formatarData(versaoAtual.data_criacao)}
-                    <User className="h-3 w-3 ml-2" />{versaoAtual.criado_por_nome}
-                    <span className="ml-2">{formatarTamanho(versaoAtual.tamanho)}</span>
+                  <p className="text-sm text-muted-foreground">{versaoAtual.descricao_alteracao || "Sem descrição"}</p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                    <span className="flex items-center gap-1"><User className="h-3 w-3" />{versaoAtual.autor_nome}</span>
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{format(new Date(versaoAtual.data_criacao), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
+                    <span>{formatarTamanho(versaoAtual.tamanho)}</span>
                   </div>
-                  {versaoAtual.descricao_alteracao && (
-                    <p className="text-sm mt-1">{versaoAtual.descricao_alteracao}</p>
-                  )}
                 </div>
               </div>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={() => onPreview?.(versaoAtual.id)}><Eye className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDownload(versaoAtual.id)}><Download className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => handleDownload(versaoAtual.id, `${documentoNome}_v${versaoAtual.numero_versao}`)}><Download className="h-4 w-4" /></Button>
               </div>
             </div>
           </div>
@@ -186,61 +205,50 @@ export function DocumentoVersionamento({
         {/* Versões Anteriores */}
         {versoesAnteriores.length > 0 && (
           <div className="space-y-2">
-            <h4 className="font-medium text-sm text-muted-foreground">Versões Anteriores</h4>
-            {versoesAnteriores.map(versao => {
-              const isExpanded = expandido.includes(versao.id);
-              const isComparando = comparando.includes(versao.id);
-
-              return (
-                <div key={versao.id} className={`border rounded-lg ${isComparando ? "border-blue-500 bg-blue-50" : ""}`}>
-                  <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/50" onClick={() => toggleExpandir(versao.id)}>
-                    <div className="flex items-center gap-3">
-                      {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                      <span className="font-medium">Versão {versao.numero_versao}</span>
-                      <span className="text-sm text-muted-foreground">{formatarData(versao.data_criacao)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" checked={isComparando} onChange={() => toggleComparar(versao.id)} onClick={e => e.stopPropagation()} title="Selecionar para comparação" />
-                      <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); onPreview?.(versao.id); }}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); handleDownload(versao.id); }}><Download className="h-4 w-4" /></Button>
-                      {!modoVisualizacao && (
-                        <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); handleRestaurar(versao.id); }} title="Restaurar esta versão"><RotateCcw className="h-4 w-4" /></Button>
-                      )}
-                    </div>
-                  </div>
-                  {isExpanded && (
-                    <div className="px-3 pb-3 pt-0 border-t">
-                      <div className="grid grid-cols-2 gap-2 text-sm mt-2">
-                        <div><span className="text-muted-foreground">Autor:</span> {versao.criado_por_nome}</div>
-                        <div><span className="text-muted-foreground">Tamanho:</span> {formatarTamanho(versao.tamanho)}</div>
-                        {versao.hash && <div className="col-span-2"><span className="text-muted-foreground">Hash:</span> <code className="text-xs">{versao.hash}</code></div>}
-                        {versao.descricao_alteracao && <div className="col-span-2"><span className="text-muted-foreground">Alterações:</span> {versao.descricao_alteracao}</div>}
+            <h4 className="text-sm font-medium text-muted-foreground">Versões Anteriores</h4>
+            <div className="relative">
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+              {versoesAnteriores.map((versao, index) => (
+                <div key={versao.id} className="relative pl-10 pb-4">
+                  <div className="absolute left-2.5 w-3 h-3 rounded-full bg-muted border-2 border-background" />
+                  <div className="p-3 border rounded-lg hover:bg-muted/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">v{versao.numero_versao}</span>
+                          <span className="text-sm text-muted-foreground">{versao.descricao_alteracao || "Sem descrição"}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                          <span className="flex items-center gap-1"><User className="h-3 w-3" />{versao.autor_nome}</span>
+                          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{format(new Date(versao.data_criacao), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
+                          <span>{formatarTamanho(versao.tamanho)}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => onPreview?.(versao.id)}><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDownload(versao.id, `${documentoNome}_v${versao.numero_versao}`)}><Download className="h-4 w-4" /></Button>
+                        {!modoVisualizacao && (
+                          <Button variant="ghost" size="icon" onClick={() => handleRestaurar(versao.id, versao.numero_versao)}><RotateCcw className="h-4 w-4" /></Button>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         )}
 
-        {versoes.length === 0 && <p className="text-center text-muted-foreground py-4">Nenhuma versão registrada</p>}
+        {versoes.length === 0 && (
+          <p className="text-center text-muted-foreground py-8">Nenhuma versão registrada</p>
+        )}
 
-        {/* Timeline visual */}
-        <div className="mt-4 pt-4 border-t">
-          <h4 className="font-medium text-sm text-muted-foreground mb-2">Timeline</h4>
-          <div className="flex items-center gap-1 overflow-x-auto pb-2">
-            {versoes.sort((a, b) => a.numero_versao - b.numero_versao).map((v, i) => (
-              <React.Fragment key={v.id}>
-                <div className={`flex flex-col items-center ${v.is_atual ? "text-primary" : "text-muted-foreground"}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${v.is_atual ? "bg-primary text-white" : "bg-muted"}`}>{v.numero_versao}</div>
-                  <span className="text-xs mt-1">{new Date(v.data_criacao).toLocaleDateString("pt-BR")}</span>
-                </div>
-                {i < versoes.length - 1 && <div className="w-8 h-0.5 bg-muted" />}
-              </React.Fragment>
-            ))}
+        {/* Info Hash */}
+        {versaoAtual && (
+          <div className="text-xs text-muted-foreground bg-muted p-2 rounded font-mono">
+            Hash: {versaoAtual.hash}
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
