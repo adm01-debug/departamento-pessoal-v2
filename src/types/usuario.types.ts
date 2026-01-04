@@ -3,13 +3,18 @@ export interface Usuario {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface UsuarioCreate extends Omit<Usuario, "id" | "createdAt" | "updatedAt"> {}
-export interface UsuarioUpdate extends Partial<UsuarioCreate> {}
-export interface UsuarioFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface UsuarioListResponse { data: Usuario[]; total: number; page: number; limit: number; }
-export type UsuarioStatus = "ativo" | "inativo" | "pendente";
+export interface UsuarioUpdate extends Partial<Omit<Usuario, "id" | "createdAt">> {}
+export interface UsuarioFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface UsuarioListResponse { data: Usuario[]; total: number; page: number; limit: number; totalPages: number; }
+export type UsuarioStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
