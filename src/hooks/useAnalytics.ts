@@ -1,24 +1,28 @@
-/**
- * @fileoverview Hook para analytics
- * @module hooks/useAnalytics
- */
-import { useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
-export function useAnalytics() {
-  const track = useCallback((event: string, properties?: Record<string, any>) => {
-    console.log('[Analytics]', event, properties);
-    // Integração com serviço de analytics aqui
-  }, []);
+export interface useAnalyticsOptions { enabled?: boolean; debounce?: number; }
+export interface useAnalyticsResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
 
-  const page = useCallback((name: string, properties?: Record<string, any>) => {
-    console.log('[Analytics] Page:', name, properties);
-  }, []);
+export function useAnalytics<T = any>(initialValue?: T, options: useAnalyticsOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
 
-  const identify = useCallback((userId: string, traits?: Record<string, any>) => {
-    console.log('[Analytics] Identify:', userId, traits);
-  }, []);
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
 
-  return { track, page, identify };
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
 
 export default useAnalytics;
