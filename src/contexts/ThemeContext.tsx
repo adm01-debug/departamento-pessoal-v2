@@ -1,13 +1,18 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface ThemeContextType { state: any; setState: (v: any) => void; reset: () => void; }
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+interface ThemeContextState { data: any; loading: boolean; error: Error | null; }
+interface ThemeContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface ThemeContextValue extends ThemeContextState, ThemeContextActions {}
+
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeContextProvider({ children }: { children: ReactNode }) {
-  const [state, setStateInternal] = useState<any>(null);
-  const setState = useCallback((v: any) => setStateInternal(v), []);
-  const reset = useCallback(() => setStateInternal(null), []);
-  return <ThemeContext.Provider value={{ state, setState, reset }}>{children}</ThemeContext.Provider>;
+  const [state, setState] = useState<ThemeContextState>({ data: null, loading: false, error: null });
+  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
+  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
+  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
+  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
+  return <ThemeContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
