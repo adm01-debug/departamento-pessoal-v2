@@ -1,6 +1,12 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-interface Breadcrumb { label: string; path: string; }
-interface BreadcrumbContextType { breadcrumbs: Breadcrumb[]; setBreadcrumbs: (b: Breadcrumb[]) => void; addBreadcrumb: (b: Breadcrumb) => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface BreadcrumbContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const BreadcrumbContext = createContext<BreadcrumbContextType | undefined>(undefined);
-export function BreadcrumbProvider({ children }: { children: ReactNode }) { const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([]); const addBreadcrumb = (b: Breadcrumb) => setBreadcrumbs(prev => [...prev, b]); return <BreadcrumbContext.Provider value={{ breadcrumbs, setBreadcrumbs, addBreadcrumb }}>{children}</BreadcrumbContext.Provider>; }
-export function useBreadcrumb() { const ctx = useContext(BreadcrumbContext); if (!ctx) throw new Error('useBreadcrumb must be used within BreadcrumbProvider'); return ctx; }
+export function BreadcrumbContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
+  return <BreadcrumbContext.Provider value={{ state, setState, reset }}>{children}</BreadcrumbContext.Provider>;
+}
+export function useBreadcrumb() { const ctx = useContext(BreadcrumbContext); if (!ctx) throw new Error("useBreadcrumb must be used within Provider"); return ctx; }
+export { BreadcrumbContext };
+export default BreadcrumbContext;
