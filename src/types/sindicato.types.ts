@@ -3,13 +3,18 @@ export interface Sindicato {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface SindicatoCreate extends Omit<Sindicato, "id" | "createdAt" | "updatedAt"> {}
-export interface SindicatoUpdate extends Partial<SindicatoCreate> {}
-export interface SindicatoFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface SindicatoListResponse { data: Sindicato[]; total: number; page: number; limit: number; }
-export type SindicatoStatus = "ativo" | "inativo" | "pendente";
+export interface SindicatoUpdate extends Partial<Omit<Sindicato, "id" | "createdAt">> {}
+export interface SindicatoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface SindicatoListResponse { data: Sindicato[]; total: number; page: number; limit: number; totalPages: number; }
+export type SindicatoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
