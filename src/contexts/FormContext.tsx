@@ -1,10 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface FormContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface FormContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const FormContext = createContext<FormContextType | undefined>(undefined);
-export function FormContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+
+export function FormContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <FormContext.Provider value={{ state, setState, reset }}>{children}</FormContext.Provider>;
 }
-export function useFormContext() { const context = useContext(FormContext); if (!context) throw new Error("useFormContext must be used within FormContextProvider"); return context; }
+
+export function useForm() {
+  const ctx = useContext(FormContext);
+  if (!ctx) throw new Error("useForm must be used within FormContextProvider");
+  return ctx;
+}
+
+export { FormContext };
 export default FormContext;
