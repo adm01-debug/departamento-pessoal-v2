@@ -1,33 +1,32 @@
-export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
-export interface Response<T = any> { success: boolean; data?: T; error?: string; timestamp: string; }
+export interface ControlidConfig { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface ControlidResponse<T = any> { success: boolean; data?: T; error?: string; requestId?: string; }
 
-class Service {
-  private config: Config = { enabled: false, timeout: 30000 };
-  
-  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+class ControlidService {
+  private config: ControlidConfig = { enabled: false, timeout: 30000 };
+  configure(c: Partial<ControlidConfig>) { this.config = { ...this.config, ...c }; }
   isEnabled() { return this.config.enabled; }
   
-  async connect(): Promise<Response> {
-    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
-    console.log("[controlid] Connecting...");
-    return { success: true, data: { connected: true }, timestamp: new Date().toISOString() };
+  async connect(): Promise<ControlidResponse> {
+    if (!this.config.enabled) return { success: false, error: "Service not enabled" };
+    console.log("[Controlid] Connecting...");
+    return { success: true, data: { connected: true, timestamp: new Date().toISOString() }, requestId: crypto.randomUUID() };
   }
   
-  async sync(): Promise<Response> {
-    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
-    return { success: true, data: { synced: true }, timestamp: new Date().toISOString() };
+  async sync(): Promise<ControlidResponse> {
+    if (!this.config.enabled) return { success: false, error: "Service not enabled" };
+    return { success: true, data: { synced: true }, requestId: crypto.randomUUID() };
   }
   
-  async send(payload: any): Promise<Response> {
-    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
-    console.log("[controlid] Sending:", payload);
-    return { success: true, data: { id: crypto.randomUUID() }, timestamp: new Date().toISOString() };
+  async send(data: any): Promise<ControlidResponse> {
+    if (!this.config.enabled) return { success: false, error: "Service not enabled" };
+    console.log("[Controlid] Sending:", data);
+    return { success: true, data: { sent: true }, requestId: crypto.randomUUID() };
   }
   
-  async getStatus(): Promise<{ connected: boolean; lastSync?: string }> {
-    return { connected: this.config.enabled, lastSync: new Date().toISOString() };
-  }
+  async getStatus() { return { enabled: this.config.enabled, connected: this.config.enabled, lastSync: new Date().toISOString() }; }
+  async testConnection() { return (await this.connect()).success; }
+  async disconnect() { console.log("[Controlid] Disconnected"); return { success: true }; }
 }
 
-export const controlidService = new Service();
+export const controlidService = new ControlidService();
 export default controlidService;
