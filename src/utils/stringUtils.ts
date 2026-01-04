@@ -1,1 +1,7 @@
-export const stringUtils = { capitalize: (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(), slugify: (str: string) => str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-'), truncate: (str: string, len: number) => str.length > len ? str.slice(0, len) + '...' : str, removeAccents: (str: string) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''), onlyNumbers: (str: string) => str.replace(/\D/g, '') };
+export function capitalize(str: string): string { return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); }
+export function titleCase(str: string): string { return str.split(" ").map(capitalize).join(" "); }
+export function slugify(str: string): string { return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+export function truncate(str: string, length: number, suffix = "..."): string { return str.length > length ? str.slice(0, length) + suffix : str; }
+export function removeAccents(str: string): string { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+export function extractInitials(name: string, count = 2): string { return name.split(" ").map(w => w[0]).slice(0, count).join("").toUpperCase(); }
+export default { capitalize, titleCase, slugify, truncate, removeAccents, extractInitials };
