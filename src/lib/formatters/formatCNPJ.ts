@@ -1,0 +1,5 @@
+export function formatCNPJ(cnpj: string): string { const n=cnpj.replace(/\D/g,"").slice(0,14); if(n.length<=2)return n; if(n.length<=5)return n.slice(0,2)+"."+n.slice(2); if(n.length<=8)return n.slice(0,2)+"."+n.slice(2,5)+"."+n.slice(5); if(n.length<=12)return n.slice(0,2)+"."+n.slice(2,5)+"."+n.slice(5,8)+"/"+n.slice(8); return n.slice(0,2)+"."+n.slice(2,5)+"."+n.slice(5,8)+"/"+n.slice(8,12)+"-"+n.slice(12); }
+export function unformatCNPJ(cnpj: string): string { return cnpj.replace(/\D/g,""); }
+export function validateCNPJ(cnpj: string): boolean { const n=cnpj.replace(/\D/g,""); if(n.length!==14||/^(\d)\1+$/.test(n))return false; const calc=(t:number)=>{let s=0,p=t-7; for(let i=0;i<t;i++){s+=parseInt(n[i])*p--;if(p<2)p=9;} const r=s%11; return r<2?0:11-r;}; return calc(12)===parseInt(n[12])&&calc(13)===parseInt(n[13]); }
+export function maskCNPJ(cnpj: string): string { const n=unformatCNPJ(cnpj); if(n.length!==14)return cnpj; return "**"+"."+n.slice(2,5)+"."+n.slice(5,8)+"/"+n.slice(8,12)+"-"+"**"; }
+export default { formatCNPJ, unformatCNPJ, validateCNPJ, maskCNPJ };
