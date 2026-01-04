@@ -1,12 +1,10 @@
-import { useState, useCallback } from 'react';
-
-export function useToggle(initialValue = false): [boolean, () => void, (value: boolean) => void] {
-  const [value, setValue] = useState(initialValue);
-
-  const toggle = useCallback(() => setValue(v => !v), []);
-  const setValueDirectly = useCallback((newValue: boolean) => setValue(newValue), []);
-
-  return [value, toggle, setValueDirectly];
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useToggle<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
-
 export default useToggle;
