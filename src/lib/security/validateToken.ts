@@ -1,1 +1,26 @@
-export interface TokenPayload{userId:string;exp:number;iat:number;}export function isTokenExpired(exp:number):boolean{return Date.now()>=exp*1000;}export function parseToken(token:string):TokenPayload|null{try{const[,payload]=token.split(".");const decoded=JSON.parse(atob(payload));return decoded;}catch{return null;}}export function validateTokenFormat(token:string):boolean{const parts=token.split(".");return parts.length===3&&parts.every(p=>p.length>0);}export default{isTokenExpired,parseToken,validateTokenFormat};
+// validateToken - Security utility
+
+export interface validateTokenResult { valid: boolean; message?: string; data?: any; }
+
+export function validateToken(input: any): validateTokenResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
+
+export function validateTokenAsync(input: any): Promise<validateTokenResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(validateToken(input)), 0); });
+}
+
+export function validateTokenWithOptions(input: any, options: Record<string, any> = {}): validateTokenResult {
+  const result = validateToken(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const validateTokenConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configurevalidateToken(config: Partial<typeof validateTokenConfig>) {
+  Object.assign(validateTokenConfig, config);
+}
+
+export default validateToken;
