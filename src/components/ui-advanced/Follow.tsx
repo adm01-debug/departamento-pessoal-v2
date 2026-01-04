@@ -1,13 +1,11 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
-
-interface FollowProps { className?: string; children?: React.ReactNode; }
-
-/**
- * Botão de seguir
- */
-export const Follow: React.FC<FollowProps> = ({ className, children }) => {
-  return <div className={cn('ui-component', className)}>{children}</div>;
-};
-
+import * as React from "react";
+import { cn } from "@/lib/utils";
+export interface FollowProps extends React.HTMLAttributes<HTMLDivElement> { variant?: "default" | "outline" | "ghost"; size?: "sm" | "md" | "lg"; disabled?: boolean; }
+const Follow = React.forwardRef<HTMLDivElement, FollowProps>(({ className, variant = "default", size = "md", disabled = false, children, ...props }, ref) => {
+  const variants = { default: "bg-primary text-primary-foreground", outline: "border border-input bg-background", ghost: "hover:bg-accent" };
+  const sizes = { sm: "p-2 text-sm", md: "p-4 text-base", lg: "p-6 text-lg" };
+  return (<div ref={ref} className={cn("rounded-lg transition-colors", variants[variant], sizes[size], disabled && "opacity-50 pointer-events-none", className)} {...props}>{children}</div>);
+});
+Follow.displayName = "Follow";
+export { Follow };
 export default Follow;
