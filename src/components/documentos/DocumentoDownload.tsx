@@ -1,141 +1,202 @@
 import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, FileText, FileSpreadsheet, File, Loader2, Check, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Download, FileDown, FolderDown, Archive, FileText, Image, FileSpreadsheet, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-type FormatoDownload = "pdf" | "docx" | "xlsx" | "original";
-
-interface DocumentoDownloadProps {
-  documentoId: string;
-  documentoNome: string;
-  urlOriginal?: string;
-  formatosDisponiveis?: FormatoDownload[];
-  onDownload?: (formato: FormatoDownload) => Promise<string>;
-  disabled?: boolean;
+interface Documento {
+  id: string;
+  nome: string;
+  tipo: string;
+  tamanho: number;
+  url: string;
+  formato: "pdf" | "docx" | "xlsx" | "jpg" | "png" | "zip" | "outros";
 }
 
-const formatoConfig: Record<FormatoDownload, { label: string; icon: React.ElementType; mime: string }> = {
-  pdf: { label: "PDF", icon: FileText, mime: "application/pdf" },
-  docx: { label: "Word (DOCX)", icon: FileText, mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-  xlsx: { label: "Excel (XLSX)", icon: FileSpreadsheet, mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-  original: { label: "Original", icon: File, mime: "application/octet-stream" }
+interface DocumentoDownloadProps {
+  documentos: Documento[];
+  onDownload?: (documentoId: string) => Promise<string>;
+  onDownloadMultiplo?: (documentoIds: string[], formato: string) => Promise<string>;
+  permitirSelecao?: boolean;
+  permitirZip?: boolean;
+}
+
+const formatoIcons: Record<string, React.ElementType> = {
+  pdf: FileText,
+  docx: FileText,
+  xlsx: FileSpreadsheet,
+  jpg: Image,
+  png: Image,
+  zip: Archive,
+  outros: FileText
 };
 
 export function DocumentoDownload({
-  documentoId,
-  documentoNome,
-  urlOriginal,
-  formatosDisponiveis = ["pdf", "original"],
+  documentos,
   onDownload,
-  disabled = false
+  onDownloadMultiplo,
+  permitirSelecao = true,
+  permitirZip = true
 }: DocumentoDownloadProps) {
-  const [downloading, setDownloading] = useState<FormatoDownload | null>(null);
-  const [progress, setProgress] = useState(0);
+  const { toast } = useToast();
+  const [selecionados, setSelecionados] = useState<string[]>([]);
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const [progresso, setProgresso] = useState(0);
+  const [formatoExport, setFormatoExport] = useState("original");
 
-  const handleDownload = async (formato: FormatoDownload) => {
+  const formatarTamanho = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleDownload = async (doc: Documento) => {
+    setDownloading(doc.id);
+    setProgresso(0);
+    
     try {
-      setDownloading(formato);
-      setProgress(10);
+      const interval = setInterval(() => {
+        setProgresso(prev => Math.min(prev + 10, 90));
+      }, 100);
 
-      let url: string;
+      const url = onDownload ? await onDownload(doc.id) : doc.url;
       
-      if (onDownload) {
-        setProgress(30);
-        url = await onDownload(formato);
-        setProgress(70);
-      } else if (urlOriginal && formato === "original") {
-        url = urlOriginal;
-        setProgress(50);
-      } else {
-        throw new Error("URL de download não disponível");
-      }
+      clearInterval(interval);
+      setProgresso(100);
 
-      setProgress(90);
-      
-      // Criar link e fazer download
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${documentoNome}.${formato === "original" ? "pdf" : formato}`;
+      link.download = doc.nome;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      setProgress(100);
-      toast.success("Download iniciado com sucesso!");
-      
-    } catch (error) {
-      toast.error("Erro ao fazer download do documento");
-      console.error(error);
+      toast({ title: "Sucesso", description: `${doc.nome} baixado com sucesso` });
+    } catch {
+      toast({ title: "Erro", description: "Falha ao baixar documento", variant: "destructive" });
     } finally {
-      setTimeout(() => {
-        setDownloading(null);
-        setProgress(0);
-      }, 500);
+      setDownloading(null);
+      setProgresso(0);
     }
   };
 
-  if (formatosDisponiveis.length === 1) {
-    const formato = formatosDisponiveis[0];
-    const config = formatoConfig[formato];
-    const Icon = config.icon;
+  const handleDownloadMultiplo = async () => {
+    if (selecionados.length === 0) {
+      toast({ title: "Aviso", description: "Selecione ao menos um documento", variant: "destructive" });
+      return;
+    }
 
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => handleDownload(formato)}
-        disabled={disabled || downloading !== null}
-      >
-        {downloading === formato ? (
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-        ) : (
-          <Download className="h-4 w-4 mr-2" />
-        )}
-        Download {config.label}
-      </Button>
-    );
-  }
+    setDownloading("multiple");
+    setProgresso(0);
+
+    try {
+      const interval = setInterval(() => {
+        setProgresso(prev => Math.min(prev + 5, 90));
+      }, 200);
+
+      const url = await onDownloadMultiplo?.(selecionados, formatoExport);
+      
+      clearInterval(interval);
+      setProgresso(100);
+
+      if (url) {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `documentos_${new Date().toISOString().split("T")[0]}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      toast({ title: "Sucesso", description: `${selecionados.length} documentos baixados` });
+      setSelecionados([]);
+    } catch {
+      toast({ title: "Erro", description: "Falha ao baixar documentos", variant: "destructive" });
+    } finally {
+      setDownloading(null);
+      setProgresso(0);
+    }
+  };
+
+  const toggleSelecao = (id: string) => {
+    setSelecionados(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+  };
+
+  const selecionarTodos = () => {
+    setSelecionados(selecionados.length === documentos.length ? [] : documentos.map(d => d.id));
+  };
+
+  const tamanhoTotal = documentos.filter(d => selecionados.includes(d.id)).reduce((sum, d) => sum + d.tamanho, 0);
 
   return (
-    <div className="flex flex-col gap-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" disabled={disabled || downloading !== null}>
-            {downloading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2"><Download className="h-5 w-5" />Downloads</CardTitle>
+        {permitirSelecao && selecionados.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">{selecionados.length} selecionados ({formatarTamanho(tamanhoTotal)})</Badge>
+            {permitirZip && (
+              <Select value={formatoExport} onValueChange={setFormatoExport}>
+                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="original">Original</SelectItem>
+                  <SelectItem value="pdf">Converter p/ PDF</SelectItem>
+                  <SelectItem value="zip">ZIP</SelectItem>
+                </SelectContent>
+              </Select>
             )}
-            Download
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {formatosDisponiveis.map((formato) => {
-            const config = formatoConfig[formato];
-            const Icon = config.icon;
-            return (
-              <DropdownMenuItem
-                key={formato}
-                onClick={() => handleDownload(formato)}
-                disabled={downloading !== null}
-              >
-                <Icon className="h-4 w-4 mr-2" />
-                {config.label}
-                {downloading === formato && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      
-      {downloading && progress > 0 && (
-        <Progress value={progress} className="h-1" />
-      )}
-    </div>
+            <Button onClick={handleDownloadMultiplo} disabled={downloading === "multiple"}>
+              {downloading === "multiple" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FolderDown className="h-4 w-4 mr-2" />}
+              Baixar Selecionados
+            </Button>
+          </div>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {permitirSelecao && documentos.length > 0 && (
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <Checkbox checked={selecionados.length === documentos.length} onCheckedChange={selecionarTodos} />
+            <span className="text-sm text-muted-foreground">Selecionar todos</span>
+          </div>
+        )}
+
+        {downloading && (
+          <div className="space-y-2">
+            <Progress value={progresso} className="h-2" />
+            <p className="text-sm text-center text-muted-foreground">{progresso}%</p>
+          </div>
+        )}
+
+        {documentos.map(doc => {
+          const Icon = formatoIcons[doc.formato] || FileText;
+          const isDownloading = downloading === doc.id;
+          const isSelected = selecionados.includes(doc.id);
+
+          return (
+            <div key={doc.id} className={`flex items-center justify-between p-3 border rounded-lg ${isSelected ? "bg-muted/50 border-primary" : ""}`}>
+              <div className="flex items-center gap-3">
+                {permitirSelecao && <Checkbox checked={isSelected} onCheckedChange={() => toggleSelecao(doc.id)} />}
+                <Icon className="h-8 w-8 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">{doc.nome}</p>
+                  <p className="text-sm text-muted-foreground">{doc.tipo} • {formatarTamanho(doc.tamanho)}</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => handleDownload(doc)} disabled={isDownloading}>
+                {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+              </Button>
+            </div>
+          );
+        })}
+
+        {documentos.length === 0 && <p className="text-center text-muted-foreground py-4">Nenhum documento disponível</p>}
+      </CardContent>
+    </Card>
   );
 }
 
-export type { FormatoDownload };
 export default DocumentoDownload;
