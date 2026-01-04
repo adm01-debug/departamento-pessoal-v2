@@ -1,23 +1,32 @@
-# 📋 CHANGELOG.md
+# CHANGELOG
 
-## [2.0.0] - 2025-12-27
+## Visão Geral
+Documentação do módulo CHANGELOG para o sistema de Departamento Pessoal.
 
-### ✨ Adicionado
-- 300 testes de componentes
-- 90 testes de hooks
-- 44 testes de pages
-- Integração Bitrix24
-- eSocial completo
+## Conteúdo
+- Introdução
+- Configuração
+- Uso
+- Exemplos
+- FAQ
 
-### 🔧 Alterado
-- Migração para Vite 5
-- React Query v5
-- Tailwind 3.4
+## Introdução
+Este documento descreve as funcionalidades e configurações do módulo.
 
-### 🐛 Corrigido
-- Cálculo INSS 2025
-- Validação CPF
-- Timezone handling
+## Configuração
+Siga as instruções abaixo para configurar o módulo.
 
-## [1.0.0] - 2024-06-01
-- Release inicial
+## Uso
+Exemplos de uso e boas práticas.
+
+## Exemplos
+```typescript
+// Exemplo de código
+const exemplo = "exemplo";
+```
+
+## FAQ
+Perguntas frequentes sobre o módulo.
+
+---
+*Documentação gerada automaticamente - Sistema DP v9*
