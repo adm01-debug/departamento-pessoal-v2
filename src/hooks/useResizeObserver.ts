@@ -1,14 +1,17 @@
-import { useState, useEffect, useRef, RefObject } from 'react';
-interface Size { width: number; height: number; }
-export function useResizeObserver<T extends Element>(): [RefObject<T>, Size] {
-  const ref = useRef<T>(null);
-  const [size, setSize] = useState<Size>({ width: 0, height: 0 });
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => { const { width, height } = entry.contentRect; setSize({ width, height }); });
-    observer.observe(el);
-    return () => observer.disconnect();
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useResizeObserver<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
   }, []);
-  return [ref, size];
+  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
+  return { data, loading, error, execute, reset, setData };
 }
+export default useResizeObserver;
