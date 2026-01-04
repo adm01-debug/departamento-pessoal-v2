@@ -4,16 +4,19 @@ export interface Sindicato {
   id: string;
   nome: string;
   cnpj: string;
-  codigo_entidade: string;
+  codigo_sindical: string;
+  categoria: string;
+  abrangencia: "municipal" | "estadual" | "nacional";
+  uf?: string;
+  cidade?: string;
   endereco: string;
-  cidade: string;
-  estado: string;
-  cep: string;
   telefone: string;
   email: string;
   site?: string;
   data_base: string;
-  percentual_contribuicao: number;
+  contribuicao_sindical: number;
+  contribuicao_assistencial: number;
+  contribuicao_confederativa: number;
   ativo: boolean;
   created_at: string;
 }
@@ -21,19 +24,22 @@ export interface Sindicato {
 export interface ConvencaoColetiva {
   id: string;
   sindicato_id: string;
-  ano_referencia: number;
+  ano_vigencia: number;
   data_inicio: string;
   data_fim: string;
   piso_salarial: number;
-  percentual_reajuste: number;
-  clausulas: string;
+  reajuste_percentual: number;
+  adicional_hora_extra: number;
+  adicional_noturno: number;
+  vale_refeicao: number;
+  vale_alimentacao: number;
+  plano_saude_obrigatorio: boolean;
   arquivo_url?: string;
-  created_at: string;
 }
 
 class SindicatoService {
   async listar(): Promise<Sindicato[]> {
-    const { data, error } = await supabase.from("sindicatos").select("*").eq("ativo", true).order("nome");
+    const { data, error } = await supabase.from("sindicatos").select("*").order("nome");
     if (error) throw new Error(`Erro: ${error.message}`);
     return data || [];
   }
@@ -57,15 +63,9 @@ class SindicatoService {
   }
 
   async listarConvencoes(sindicatoId: string): Promise<ConvencaoColetiva[]> {
-    const { data, error } = await supabase.from("convencoes_coletivas").select("*").eq("sindicato_id", sindicatoId).order("ano_referencia", { ascending: false });
+    const { data, error } = await supabase.from("convencoes_coletivas").select("*").eq("sindicato_id", sindicatoId).order("ano_vigencia", { ascending: false });
     if (error) throw new Error(`Erro: ${error.message}`);
     return data || [];
-  }
-
-  async criarConvencao(convencao: Partial<ConvencaoColetiva>): Promise<ConvencaoColetiva> {
-    const { data, error } = await supabase.from("convencoes_coletivas").insert([convencao]).select().single();
-    if (error) throw new Error(`Erro: ${error.message}`);
-    return data;
   }
 
   async obterConvencaoVigente(sindicatoId: string): Promise<ConvencaoColetiva | null> {
@@ -81,14 +81,22 @@ class SindicatoService {
     return data;
   }
 
-  async calcularContribuicaoSindical(colaboradorId: string, salario: number, sindicatoId: string): Promise<number> {
-    const sindicato = await this.buscarPorId(sindicatoId);
-    if (!sindicato) return 0;
-    return salario * (sindicato.percentual_contribuicao / 100);
+  async criarConvencao(convencao: Partial<ConvencaoColetiva>): Promise<ConvencaoColetiva> {
+    const { data, error } = await supabase.from("convencoes_coletivas").insert([convencao]).select().single();
+    if (error) throw new Error(`Erro: ${error.message}`);
+    return data;
   }
 
-  async vincularColaborador(colaboradorId: string, sindicatoId: string): Promise<void> {
-    await supabase.from("colaboradores").update({ sindicato_id: sindicatoId }).eq("id", colaboradorId);
+  async calcularContribuicoes(colaboradorId: string, sindicatoId: string): Promise<{ sindical: number; assistencial: number; confederativa: number }> {
+    const sindicato = await this.buscarPorId(sindicatoId);
+    const { data: colab } = await supabase.from("colaboradores").select("salario").eq("id", colaboradorId).single();
+    if (!sindicato || !colab) throw new Error("Dados não encontrados");
+
+    return {
+      sindical: colab.salario * (sindicato.contribuicao_sindical / 100),
+      assistencial: colab.salario * (sindicato.contribuicao_assistencial / 100),
+      confederativa: colab.salario * (sindicato.contribuicao_confederativa / 100)
+    };
   }
 }
 
