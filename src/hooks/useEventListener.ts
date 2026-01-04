@@ -1,15 +1,28 @@
-import { useEffect, useRef } from 'react';
-export function useEventListener<K extends keyof WindowEventMap>(
-  eventName: K,
-  handler: (event: WindowEventMap[K]) => void,
-  element: Window | HTMLElement | null = window
-) {
-  const savedHandler = useRef(handler);
-  useEffect(() => { savedHandler.current = handler; }, [handler]);
-  useEffect(() => {
-    if (!element) return;
-    const listener = (e: Event) => savedHandler.current(e as WindowEventMap[K]);
-    element.addEventListener(eventName, listener);
-    return () => element.removeEventListener(eventName, listener);
-  }, [eventName, element]);
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useEventListenerOptions { enabled?: boolean; debounce?: number; }
+export interface useEventListenerResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useEventListener<T = any>(initialValue?: T, options: useEventListenerOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
+export default useEventListener;
