@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface SettingsContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface SettingsContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
-export function SettingsContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+export function SettingsContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <SettingsContext.Provider value={{ state, setState, reset }}>{children}</SettingsContext.Provider>;
 }
-export function useSettingsContext() { const context = useContext(SettingsContext); if (!context) throw new Error("useSettingsContext must be used within SettingsContextProvider"); return context; }
+export function useSettings() { const ctx = useContext(SettingsContext); if (!ctx) throw new Error("useSettings must be used within Provider"); return ctx; }
+export { SettingsContext };
 export default SettingsContext;
