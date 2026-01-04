@@ -3,13 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 export interface Suspensao {
   id: string;
   colaborador_id: string;
-  tipo: "disciplinar" | "contrato" | "medica" | "judicial";
+  tipo: "disciplinar" | "contrato" | "judicial" | "medica";
   data_inicio: string;
   data_fim: string;
   dias: number;
   motivo: string;
   fundamentacao_legal?: string;
-  numero_advertencias_previas: number;
   documento_url?: string;
   aplicador_id: string;
   status: "ativa" | "cumprida" | "cancelada" | "convertida";
@@ -37,19 +36,12 @@ class SuspensaoService {
 
   async criar(suspensao: Partial<Suspensao>): Promise<Suspensao> {
     const dias = this.calcularDias(suspensao.data_inicio!, suspensao.data_fim!);
-    
-    // Contar advertências prévias
-    const { data: advertencias } = await supabase
-      .from("advertencias")
-      .select("id")
-      .eq("colaborador_id", suspensao.colaborador_id);
-
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .insert([{ ...suspensao, dias, numero_advertencias_previas: advertencias?.length || 0, status: "ativa" }])
-      .select().single();
+    if (suspensao.tipo === "disciplinar" && dias > 30) {
+      throw new Error("Suspensão disciplinar não pode exceder 30 dias");
+    }
+    const { data, error } = await supabase.from(this.tableName).insert([{ ...suspensao, dias, status: "ativa" }]).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
-
+    
     // Criar afastamento correspondente
     await supabase.from("afastamentos").insert([{
       colaborador_id: suspensao.colaborador_id,
@@ -58,7 +50,7 @@ class SuspensaoService {
       data_fim: suspensao.data_fim,
       motivo: suspensao.motivo
     }]);
-
+    
     return data;
   }
 
@@ -80,21 +72,10 @@ class SuspensaoService {
     return data;
   }
 
-  async converterEmJustaCausa(id: string): Promise<Suspensao> {
-    const suspensao = await this.buscarPorId(id);
-    if (!suspensao) throw new Error("Suspensão não encontrada");
-
-    // Criar registro de desligamento
-    await supabase.from("desligamentos").insert([{
-      colaborador_id: suspensao.colaborador_id,
-      tipo: "justa_causa",
-      motivo: `Conversão de suspensão: ${suspensao.motivo}`,
-      data_desligamento: new Date().toISOString().split("T")[0]
-    }]);
-
+  async converterEmDemissao(id: string): Promise<Suspensao> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .update({ status: "convertida" })
+      .update({ status: "convertida", observacoes: "Convertida em demissão por justa causa" })
       .eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
