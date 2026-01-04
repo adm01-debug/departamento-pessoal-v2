@@ -1,14 +1,27 @@
 import { z } from "zod";
-const cpfRegex = /^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-const cnpjRegex = /^\d{14}$|^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
-const telefoneRegex = /^\d{10,11}$|^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
+
 export const colaboradorSchema = z.object({
   id: z.string().uuid().optional(),
-  nome: z.string().min(3).max(100),
-  cpf: z.string().regex(cpfRegex), email: z.string().email().optional(), telefone: z.string().regex(telefoneRegex).optional(), dataAdmissao: z.string(), cargo: z.string(), departamento: z.string(), salario: z.number().positive(), status: z.enum(["ativo", "inativo", "ferias", "afastado"]),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  nome: z.string().min(1, "Nome obrigatório").max(200),
+  descricao: z.string().max(500).optional(),
+  codigo: z.string().max(50).optional(),
+  ativo: z.boolean().default(true),
+  valor: z.number().nonnegative().optional(),
+  dataInicio: z.string().datetime().optional(),
+  dataFim: z.string().datetime().optional(),
+  observacoes: z.string().max(1000).optional(),
+  metadata: z.record(z.any()).optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
-export type colaboradorSchemaType = z.infer<typeof colaboradorSchema>;
-export const validatecolaboradorSchema = (data: unknown) => colaboradorSchema.safeParse(data);
+
+export const colaboradorSchemaCreate = colaboradorSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export const colaboradorSchemaUpdate = colaboradorSchema.partial().omit({ id: true, createdAt: true });
+export const colaboradorSchemaFilter = z.object({ search: z.string().optional(), ativo: z.boolean().optional(), page: z.number().optional(), limit: z.number().optional() });
+
+export type colaboradorType = z.infer<typeof colaboradorSchema>;
+export type colaboradorCreateType = z.infer<typeof colaboradorSchemaCreate>;
+export type colaboradorUpdateType = z.infer<typeof colaboradorSchemaUpdate>;
+
+export const validatecolaborador = (data: unknown) => colaboradorSchema.safeParse(data);
 export default colaboradorSchema;
