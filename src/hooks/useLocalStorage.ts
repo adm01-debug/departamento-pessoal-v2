@@ -1,8 +1,28 @@
-import { useState, useEffect, useCallback } from "react";
-export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void, () => void] {
-  const [storedValue, setStoredValue] = useState<T>(() => { try { const item = window.localStorage.getItem(key); return item ? JSON.parse(item) : initialValue; } catch { return initialValue; } });
-  const setValue = useCallback((value: T | ((val: T) => T)) => { try { const valueToStore = value instanceof Function ? value(storedValue) : value; setStoredValue(valueToStore); window.localStorage.setItem(key, JSON.stringify(valueToStore)); } catch (e) { console.error(e); } }, [key, storedValue]);
-  const removeValue = useCallback(() => { try { window.localStorage.removeItem(key); setStoredValue(initialValue); } catch (e) { console.error(e); } }, [key, initialValue]);
-  return [storedValue, setValue, removeValue];
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useLocalStorageOptions { enabled?: boolean; debounce?: number; }
+export interface useLocalStorageResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useLocalStorage<T = any>(initialValue?: T, options: useLocalStorageOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
 export default useLocalStorage;
