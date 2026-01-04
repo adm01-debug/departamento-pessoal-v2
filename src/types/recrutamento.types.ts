@@ -1,14 +1,14 @@
 export interface Recrutamento {
   id: string;
-  nome?: string;
+  nome: string;
   descricao?: string;
-  status?: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
   createdAt: string;
   updatedAt: string;
+  metadata?: Record<string, any>;
 }
 export interface RecrutamentoCreate extends Omit<Recrutamento, "id" | "createdAt" | "updatedAt"> {}
 export interface RecrutamentoUpdate extends Partial<RecrutamentoCreate> {}
-export interface RecrutamentoFilter { id?: string; status?: string; search?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface RecrutamentoListResponse { data: Recrutamento[]; total: number; page: number; limit: number; }
+export interface RecrutamentoFilter { search?: string; status?: string; page?: number; limit?: number; }
 export type RecrutamentoStatus = "ativo" | "inativo" | "pendente";
-export default Recrutamento;
