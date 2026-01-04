@@ -1,119 +1,197 @@
-import React from "react";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Clock, AlertTriangle, CheckCircle, XCircle, CalendarClock } from "lucide-react";
-import { differenceInDays, format, parseISO, isAfter, isBefore, addDays } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, AlertTriangle, Clock, CheckCircle, Bell, RefreshCw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-type StatusValidade = "valido" | "proximo_vencer" | "vencido" | "sem_validade" | "indefinido";
+interface DocumentoComValidade {
+  id: string;
+  nome: string;
+  tipo: string;
+  colaborador_nome?: string;
+  data_emissao: string;
+  data_validade: string;
+  dias_para_vencer: number;
+  status: "valido" | "vencendo" | "vencido" | "sem_validade";
+  alerta_configurado: boolean;
+  dias_alerta: number;
+}
 
 interface DocumentoValidadeProps {
-  dataValidade?: string | null;
-  diasAlerta?: number;
-  showTooltip?: boolean;
-  showData?: boolean;
-  size?: "sm" | "md" | "lg";
+  documentos: DocumentoComValidade[];
+  onConfigurarAlerta?: (documentoId: string, diasAlerta: number) => Promise<void>;
+  onRenovar?: (documentoId: string) => void;
+  onNotificar?: (documentoId: string) => Promise<void>;
+  filtroStatus?: string;
 }
 
-const statusConfig: Record<StatusValidade, { icon: React.ElementType; label: string; bgColor: string; textColor: string }> = {
-  valido: { icon: CheckCircle, label: "Válido", bgColor: "bg-green-100", textColor: "text-green-700" },
-  proximo_vencer: { icon: AlertTriangle, label: "Próx. vencimento", bgColor: "bg-yellow-100", textColor: "text-yellow-700" },
-  vencido: { icon: XCircle, label: "Vencido", bgColor: "bg-red-100", textColor: "text-red-700" },
-  sem_validade: { icon: CheckCircle, label: "Sem validade", bgColor: "bg-gray-100", textColor: "text-gray-700" },
-  indefinido: { icon: Clock, label: "Não informado", bgColor: "bg-slate-100", textColor: "text-slate-700" }
+const statusConfig = {
+  valido: { label: "Válido", color: "bg-green-500", icon: CheckCircle },
+  vencendo: { label: "Vencendo", color: "bg-orange-500", icon: Clock },
+  vencido: { label: "Vencido", color: "bg-red-500", icon: AlertTriangle },
+  sem_validade: { label: "Sem Validade", color: "bg-gray-500", icon: Calendar }
 };
 
-export function calcularStatusValidade(dataValidade?: string | null, diasAlerta: number = 30): { status: StatusValidade; diasRestantes: number | null } {
-  if (!dataValidade) return { status: "indefinido", diasRestantes: null };
-  
-  const hoje = new Date();
-  const validade = parseISO(dataValidade);
-  const diasRestantes = differenceInDays(validade, hoje);
-
-  if (isBefore(validade, hoje)) return { status: "vencido", diasRestantes };
-  if (diasRestantes <= diasAlerta) return { status: "proximo_vencer", diasRestantes };
-  return { status: "valido", diasRestantes };
-}
-
 export function DocumentoValidade({
-  dataValidade,
-  diasAlerta = 30,
-  showTooltip = true,
-  showData = false,
-  size = "md"
+  documentos,
+  onConfigurarAlerta,
+  onRenovar,
+  onNotificar,
+  filtroStatus
 }: DocumentoValidadeProps) {
-  const { status, diasRestantes } = calcularStatusValidade(dataValidade, diasAlerta);
-  const config = statusConfig[status];
-  const Icon = config.icon;
+  const { toast } = useToast();
+  const [filtro, setFiltro] = useState(filtroStatus || "todos");
+  const [ordenacao, setOrdenacao] = useState<"vencimento" | "nome">("vencimento");
 
-  const sizeClasses = {
-    sm: "text-xs px-1.5 py-0.5",
-    md: "text-sm px-2 py-1",
-    lg: "text-base px-2.5 py-1.5"
+  const documentosFiltrados = documentos
+    .filter(d => filtro === "todos" || d.status === filtro)
+    .sort((a, b) => {
+      if (ordenacao === "vencimento") {
+        return a.dias_para_vencer - b.dias_para_vencer;
+      }
+      return a.nome.localeCompare(b.nome);
+    });
+
+  const resumo = {
+    total: documentos.length,
+    validos: documentos.filter(d => d.status === "valido").length,
+    vencendo: documentos.filter(d => d.status === "vencendo").length,
+    vencidos: documentos.filter(d => d.status === "vencido").length
   };
 
-  const iconSizes = { sm: "h-3 w-3", md: "h-4 w-4", lg: "h-5 w-5" };
-
-  const getTooltipContent = () => {
-    if (status === "indefinido") return "Data de validade não informada";
-    if (status === "sem_validade") return "Documento sem prazo de validade";
-    if (status === "vencido") return `Vencido há ${Math.abs(diasRestantes!)} dia(s)`;
-    if (status === "proximo_vencer") return `Vence em ${diasRestantes} dia(s)`;
-    return `Válido por mais ${diasRestantes} dia(s)`;
+  const handleConfigurarAlerta = async (docId: string, dias: number) => {
+    try {
+      await onConfigurarAlerta?.(docId, dias);
+      toast({ title: "Sucesso", description: `Alerta configurado para ${dias} dias antes do vencimento` });
+    } catch {
+      toast({ title: "Erro", description: "Falha ao configurar alerta", variant: "destructive" });
+    }
   };
 
-  const badge = (
-    <Badge className={`${config.bgColor} ${config.textColor} ${sizeClasses[size]} font-medium`}>
-      <Icon className={`${iconSizes[size]} mr-1`} />
-      {config.label}
-      {showData && dataValidade && status !== "indefinido" && (
-        <span className="ml-1 opacity-80">
-          ({format(parseISO(dataValidade), "dd/MM/yyyy", { locale: ptBR })})
-        </span>
-      )}
-    </Badge>
-  );
+  const formatarData = (data: string) => new Date(data).toLocaleDateString("pt-BR");
 
-  if (!showTooltip) return badge;
+  const getCorDias = (dias: number) => {
+    if (dias < 0) return "text-red-600 font-bold";
+    if (dias <= 30) return "text-orange-600 font-semibold";
+    if (dias <= 60) return "text-yellow-600";
+    return "text-green-600";
+  };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>{badge}</TooltipTrigger>
-        <TooltipContent>
-          <p>{getTooltipContent()}</p>
-          {dataValidade && status !== "indefinido" && (
-            <p className="text-xs opacity-80">
-              Validade: {format(parseISO(dataValidade), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-            </p>
-          )}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span className="flex items-center gap-2"><Calendar className="h-5 w-5" />Controle de Validade</span>
+          <div className="flex gap-2">
+            <Badge variant="secondary">{resumo.total} total</Badge>
+            {resumo.vencidos > 0 && <Badge variant="destructive">{resumo.vencidos} vencido(s)</Badge>}
+            {resumo.vencendo > 0 && <Badge className="bg-orange-500">{resumo.vencendo} vencendo</Badge>}
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Filtros */}
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <Label>Status</Label>
+            <Select value={filtro} onValueChange={setFiltro}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="valido">Válidos</SelectItem>
+                <SelectItem value="vencendo">Vencendo (30 dias)</SelectItem>
+                <SelectItem value="vencido">Vencidos</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex-1">
+            <Label>Ordenar por</Label>
+            <Select value={ordenacao} onValueChange={(v) => setOrdenacao(v as "vencimento" | "nome")}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="vencimento">Vencimento</SelectItem>
+                <SelectItem value="nome">Nome</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Cards de Resumo */}
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { label: "Total", value: resumo.total, color: "bg-blue-50 border-blue-200" },
+            { label: "Válidos", value: resumo.validos, color: "bg-green-50 border-green-200" },
+            { label: "Vencendo", value: resumo.vencendo, color: "bg-orange-50 border-orange-200" },
+            { label: "Vencidos", value: resumo.vencidos, color: "bg-red-50 border-red-200" }
+          ].map(item => (
+            <div key={item.label} className={`p-3 rounded-lg border ${item.color} text-center`}>
+              <p className="text-2xl font-bold">{item.value}</p>
+              <p className="text-sm text-muted-foreground">{item.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Lista de Documentos */}
+        <div className="space-y-2">
+          {documentosFiltrados.map(doc => {
+            const config = statusConfig[doc.status];
+            const StatusIcon = config.icon;
+
+            return (
+              <div key={doc.id} className={`flex items-center justify-between p-3 border rounded-lg ${doc.status === "vencido" ? "border-red-300 bg-red-50" : doc.status === "vencendo" ? "border-orange-300 bg-orange-50" : ""}`}>
+                <div className="flex items-center gap-3">
+                  <StatusIcon className={`h-5 w-5 ${config.color.replace("bg-", "text-")}`} />
+                  <div>
+                    <p className="font-medium">{doc.nome}</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {doc.colaborador_nome && <span>{doc.colaborador_nome}</span>}
+                      <span>•</span>
+                      <span>Emissão: {formatarData(doc.data_emissao)}</span>
+                      <span>•</span>
+                      <span>Validade: {formatarData(doc.data_validade)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className={getCorDias(doc.dias_para_vencer)}>
+                      {doc.dias_para_vencer < 0 
+                        ? `Vencido há ${Math.abs(doc.dias_para_vencer)} dias`
+                        : doc.dias_para_vencer === 0 
+                          ? "Vence hoje!"
+                          : `${doc.dias_para_vencer} dias restantes`
+                      }
+                    </p>
+                    {doc.alerta_configurado && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Bell className="h-3 w-3" />Alerta em {doc.dias_alerta} dias
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => onNotificar?.(doc.id)} title="Enviar notificação">
+                      <Bell className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => onRenovar?.(doc.id)} title="Renovar documento">
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {documentosFiltrados.length === 0 && (
+          <p className="text-center text-muted-foreground py-4">Nenhum documento encontrado com os filtros selecionados</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
-export function listarDocumentosProximosVencer(
-  documentos: { id: string; nome: string; dataValidade?: string }[],
-  diasAlerta: number = 30
-): { id: string; nome: string; dataValidade: string; diasRestantes: number }[] {
-  const hoje = new Date();
-  const limite = addDays(hoje, diasAlerta);
-
-  return documentos
-    .filter(doc => {
-      if (!doc.dataValidade) return false;
-      const validade = parseISO(doc.dataValidade);
-      return isAfter(validade, hoje) && isBefore(validade, limite);
-    })
-    .map(doc => ({
-      id: doc.id,
-      nome: doc.nome,
-      dataValidade: doc.dataValidade!,
-      diasRestantes: differenceInDays(parseISO(doc.dataValidade!), hoje)
-    }))
-    .sort((a, b) => a.diasRestantes - b.diasRestantes);
-}
-
-export type { StatusValidade };
 export default DocumentoValidade;
