@@ -1,16 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-interface State<T> { data: T | null; loading: boolean; error: Error | null; }
-export function useFetch<T>(url: string, options?: RequestInit) {
-  const [state, setState] = useState<State<T>>({ data: null, loading: true, error: null });
-  const refetch = useCallback(async () => {
-    setState(s => ({ ...s, loading: true, error: null }));
-    try {
-      const res = await fetch(url, options);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setState({ data, loading: false, error: null });
-    } catch (error) { setState({ data: null, loading: false, error: error as Error }); }
-  }, [url, options]);
-  useEffect(() => { refetch(); }, [refetch]);
-  return { ...state, refetch };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useFetch<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
+export default useFetch;
