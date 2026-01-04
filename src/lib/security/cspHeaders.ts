@@ -1,23 +1,26 @@
 // cspHeaders - Security utility
-export const cspHeaders = {
-  enabled: true,
 
-  configure(options?: Record<string, any>): void {
-    console.log('[Security] cspHeaders configured');
-  },
+export interface cspHeadersResult { valid: boolean; message?: string; data?: any; }
 
-  validate(input: any): boolean {
-    // Security validation logic
-    return true;
-  },
+export function cspHeaders(input: any): cspHeadersResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
 
-  sanitize(input: string): string {
-    return input.replace(/<[^>]*>/g, '').trim();
-  },
+export function cspHeadersAsync(input: any): Promise<cspHeadersResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(cspHeaders(input)), 0); });
+}
 
-  audit(): { secure: boolean; vulnerabilities: string[] } {
-    return { secure: true, vulnerabilities: [] };
-  },
-};
+export function cspHeadersWithOptions(input: any, options: Record<string, any> = {}): cspHeadersResult {
+  const result = cspHeaders(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const cspHeadersConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configurecspHeaders(config: Partial<typeof cspHeadersConfig>) {
+  Object.assign(cspHeadersConfig, config);
+}
 
 export default cspHeaders;
