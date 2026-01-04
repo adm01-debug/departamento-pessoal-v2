@@ -1,14 +1,43 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface PaginationContextState { data: any; loading: boolean; error: Error | null; }
-interface PaginationContextValue extends PaginationContextState { setData: (d: any) => void; setLoading: (l: boolean) => void; reset: () => void; }
-const PaginationContext = createContext<PaginationContextValue | undefined>(undefined);
-export function PaginationContextProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<PaginationContextState>({ data: null, loading: false, error: null });
-  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
-  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
-  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
-  return <PaginationContext.Provider value={{ ...state, setData, setLoading, reset }}>{children}</PaginationContext.Provider>;
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
+
+interface PaginationContextState {
+  data: any;
+  loading: boolean;
+  error: string | null;
 }
-export function usePagination() { const c = useContext(PaginationContext); if (!c) throw new Error("usePagination must be within Provider"); return c; }
-export { PaginationContext };
+
+interface PaginationContextActions {
+  setData: (data: any) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+  refresh: () => Promise<void>;
+}
+
+interface PaginationContextValue extends PaginationContextState, PaginationContextActions {}
+
+const initialState: PaginationContextState = { data: null, loading: false, error: null };
+
+const PaginationContext = createContext<PaginationContextValue | undefined>(undefined);
+
+export function PaginationContextProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<PaginationContextState>(initialState);
+
+  const setData = useCallback((data: any) => setState(prev => ({ ...prev, data })), []);
+  const setLoading = useCallback((loading: boolean) => setState(prev => ({ ...prev, loading })), []);
+  const setError = useCallback((error: string | null) => setState(prev => ({ ...prev, error })), []);
+  const reset = useCallback(() => setState(initialState), []);
+  const refresh = useCallback(async () => { setLoading(true); try { /* fetch */ } finally { setLoading(false); } }, [setLoading]);
+
+  const value = useMemo(() => ({ ...state, setData, setLoading, setError, reset, refresh }), [state, setData, setLoading, setError, reset, refresh]);
+
+  return <PaginationContext.Provider value={value}>{children}</PaginationContext.Provider>;
+}
+
+export function usePaginationContext() {
+  const context = useContext(PaginationContext);
+  if (!context) throw new Error("usePaginationContext must be used within PaginationContextProvider");
+  return context;
+}
+
 export default PaginationContext;
