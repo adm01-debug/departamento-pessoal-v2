@@ -1,18 +1,11 @@
-import { useState, useCallback, useMemo } from 'react';
-type SortDir = 'asc' | 'desc';
-interface SortConfig<T> { key: keyof T; direction: SortDir; }
-export function useSort<T>(data: T[], defaultKey?: keyof T) {
-  const [config, setConfig] = useState<SortConfig<T> | null>(defaultKey ? { key: defaultKey, direction: 'asc' } : null);
-  const sorted = useMemo(() => {
-    if (!config) return data;
-    return [...data].sort((a, b) => {
-      const va = a[config.key], vb = b[config.key];
-      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
-      return config.direction === 'asc' ? cmp : -cmp;
-    });
-  }, [data, config]);
-  const sort = useCallback((key: keyof T) => {
-    setConfig(prev => ({ key, direction: prev?.key === key && prev.direction === 'asc' ? 'desc' : 'asc' }));
-  }, []);
-  return { sorted, config, sort };
+import { useState, useMemo, useCallback } from "react";
+export type SortDirection = "asc" | "desc";
+export interface SortConfig { key: string; direction: SortDirection; }
+export function useSort<T extends Record<string, any>>(data: T[], defaultSort?: SortConfig) {
+  const [sortConfig, setSortConfig] = useState<SortConfig | null>(defaultSort || null);
+  const requestSort = useCallback((key: string) => { let direction: SortDirection = "asc"; if (sortConfig?.key === key && sortConfig.direction === "asc") direction = "desc"; setSortConfig({ key, direction }); }, [sortConfig]);
+  const clearSort = useCallback(() => setSortConfig(null), []);
+  const sortedData = useMemo(() => { if (!sortConfig) return data; return [...data].sort((a, b) => { const aVal = a[sortConfig.key]; const bVal = b[sortConfig.key]; if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1; if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1; return 0; }); }, [data, sortConfig]);
+  return { sortedData, sortConfig, requestSort, clearSort };
 }
+export default useSort;
