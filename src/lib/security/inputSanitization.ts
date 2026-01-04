@@ -1,23 +1,26 @@
 // inputSanitization - Security utility
-export const inputSanitization = {
-  enabled: true,
 
-  configure(options?: Record<string, any>): void {
-    console.log('[Security] inputSanitization configured');
-  },
+export interface inputSanitizationResult { valid: boolean; message?: string; data?: any; }
 
-  validate(input: any): boolean {
-    // Security validation logic
-    return true;
-  },
+export function inputSanitization(input: any): inputSanitizationResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
 
-  sanitize(input: string): string {
-    return input.replace(/<[^>]*>/g, '').trim();
-  },
+export function inputSanitizationAsync(input: any): Promise<inputSanitizationResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(inputSanitization(input)), 0); });
+}
 
-  audit(): { secure: boolean; vulnerabilities: string[] } {
-    return { secure: true, vulnerabilities: [] };
-  },
-};
+export function inputSanitizationWithOptions(input: any, options: Record<string, any> = {}): inputSanitizationResult {
+  const result = inputSanitization(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const inputSanitizationConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configureinputSanitization(config: Partial<typeof inputSanitizationConfig>) {
+  Object.assign(inputSanitizationConfig, config);
+}
 
 export default inputSanitization;
