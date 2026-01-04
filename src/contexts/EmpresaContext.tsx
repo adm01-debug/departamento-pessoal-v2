@@ -1,14 +1,43 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface EmpresaContextState { data: any; loading: boolean; error: Error | null; }
-interface EmpresaContextValue extends EmpresaContextState { setData: (d: any) => void; setLoading: (l: boolean) => void; reset: () => void; }
-const EmpresaContext = createContext<EmpresaContextValue | undefined>(undefined);
-export function EmpresaContextProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<EmpresaContextState>({ data: null, loading: false, error: null });
-  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
-  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
-  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
-  return <EmpresaContext.Provider value={{ ...state, setData, setLoading, reset }}>{children}</EmpresaContext.Provider>;
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
+
+interface EmpresaContextState {
+  data: any;
+  loading: boolean;
+  error: string | null;
 }
-export function useEmpresa() { const c = useContext(EmpresaContext); if (!c) throw new Error("useEmpresa must be within Provider"); return c; }
-export { EmpresaContext };
+
+interface EmpresaContextActions {
+  setData: (data: any) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+  refresh: () => Promise<void>;
+}
+
+interface EmpresaContextValue extends EmpresaContextState, EmpresaContextActions {}
+
+const initialState: EmpresaContextState = { data: null, loading: false, error: null };
+
+const EmpresaContext = createContext<EmpresaContextValue | undefined>(undefined);
+
+export function EmpresaContextProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<EmpresaContextState>(initialState);
+
+  const setData = useCallback((data: any) => setState(prev => ({ ...prev, data })), []);
+  const setLoading = useCallback((loading: boolean) => setState(prev => ({ ...prev, loading })), []);
+  const setError = useCallback((error: string | null) => setState(prev => ({ ...prev, error })), []);
+  const reset = useCallback(() => setState(initialState), []);
+  const refresh = useCallback(async () => { setLoading(true); try { /* fetch */ } finally { setLoading(false); } }, [setLoading]);
+
+  const value = useMemo(() => ({ ...state, setData, setLoading, setError, reset, refresh }), [state, setData, setLoading, setError, reset, refresh]);
+
+  return <EmpresaContext.Provider value={value}>{children}</EmpresaContext.Provider>;
+}
+
+export function useEmpresaContext() {
+  const context = useContext(EmpresaContext);
+  if (!context) throw new Error("useEmpresaContext must be used within EmpresaContextProvider");
+  return context;
+}
+
 export default EmpresaContext;
