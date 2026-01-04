@@ -1,20 +1,18 @@
-/**
- * @fileoverview Modal de formulário
- * @module components/modals/FormModal
- */
-import { memo } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-interface FormModalProps { open: boolean; onOpenChange: (open: boolean) => void; titulo: string; children: React.ReactNode; onSubmit: () => void; submitLabel?: string; loading?: boolean; }
+interface FormModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
 
-export const FormModal = memo(function FormModal({ open, onOpenChange, titulo, children, onSubmit, submitLabel = 'Salvar', loading }: FormModalProps) {
+export function FormModal({ open, onOpenChange, data, onConfirm, title = "FormModal", loading = false }: FormModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent><DialogHeader><DialogTitle>{titulo}</DialogTitle></DialogHeader>
-        <div className="py-4">{children}</div>
-        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>Cancelar</Button><Button onClick={onSubmit} disabled={loading}>{loading ? 'Salvando...' : submitLabel}</Button></DialogFooter>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
+        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   );
-});
+}
+export default FormModal;
