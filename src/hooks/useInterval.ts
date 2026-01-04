@@ -1,52 +1,10 @@
-/**
- * @fileoverview Hook para intervalos declarativos
- * @module hooks/useInterval
- */
-import { useEffect, useRef, useCallback } from 'react';
-
-/**
- * Hook que executa callback em intervalo regular
- * @param callback - Função a executar
- * @param delay - Intervalo em ms (null para pausar)
- */
-export function useInterval(callback: () => void, delay: number | null): void {
-  const savedCallback = useRef(callback);
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    if (delay === null) return;
-
-    const id = setInterval(() => savedCallback.current(), delay);
-    return () => clearInterval(id);
-  }, [delay]);
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useInterval<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
-
-/**
- * Hook para polling com controle
- */
-export function usePolling(
-  callback: () => Promise<void>,
-  intervalMs: number,
-  enabled = true
-): { refetch: () => Promise<void> } {
-  const savedCallback = useRef(callback);
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    if (!enabled) return;
-    const id = setInterval(() => savedCallback.current(), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs, enabled]);
-
-  const refetch = useCallback(async () => {
-    await savedCallback.current();
-  }, []);
-
-  return { refetch };
-}
+export default useInterval;
