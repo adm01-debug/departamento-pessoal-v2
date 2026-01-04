@@ -1,28 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-
-export interface useIntervalOptions { enabled?: boolean; debounce?: number; }
-export interface useIntervalResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
-
-export function useInterval<T = any>(initialValue?: T, options: useIntervalOptions = {}) {
-  const [data, setData] = useState<T | null>(initialValue ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const mountedRef = useRef(true);
-
-  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
-
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    if (!options.enabled && options.enabled !== undefined) return;
-    setLoading(true);
-    setError(null);
-    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
-    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
-    finally { if (mountedRef.current) { setLoading(false); } }
-  }, [options.enabled]);
-
-  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
-
-  return { data, loading, error, execute, reset, setData };
+import { useEffect, useRef } from "react";
+export function useInterval(callback: () => void, delay: number | null) {
+  const savedCallback = useRef(callback);
+  useEffect(() => { savedCallback.current = callback; }, [callback]);
+  useEffect(() => {
+    if (delay === null) return;
+    const id = setInterval(() => savedCallback.current(), delay);
+    return () => clearInterval(id);
+  }, [delay]);
 }
-
 export default useInterval;
