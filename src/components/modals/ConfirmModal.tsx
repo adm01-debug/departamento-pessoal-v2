@@ -1,19 +1,18 @@
-/**
- * @fileoverview Modal de confirmação
- * @module components/modals/ConfirmModal
- */
-import { memo } from 'react';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-interface ConfirmModalProps { open: boolean; onOpenChange: (open: boolean) => void; titulo: string; mensagem: string; onConfirm: () => void; confirmLabel?: string; cancelLabel?: string; }
+interface ConfirmModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
 
-export const ConfirmModal = memo(function ConfirmModal({ open, onOpenChange, titulo, mensagem, onConfirm, confirmLabel = 'Confirmar', cancelLabel = 'Cancelar' }: ConfirmModalProps) {
+export function ConfirmModal({ open, onOpenChange, data, onConfirm, title = "ConfirmModal", loading = false }: ConfirmModalProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader><AlertDialogTitle>{titulo}</AlertDialogTitle><AlertDialogDescription>{mensagem}</AlertDialogDescription></AlertDialogHeader>
-        <AlertDialogFooter><AlertDialogCancel>{cancelLabel}</AlertDialogCancel><AlertDialogAction onClick={onConfirm}>{confirmLabel}</AlertDialogAction></AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
+        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
-});
+}
+export default ConfirmModal;
