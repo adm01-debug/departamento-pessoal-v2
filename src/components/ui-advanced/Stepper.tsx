@@ -1,11 +1,47 @@
-import * as React from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
-export interface StepperProps extends React.HTMLAttributes<HTMLDivElement> { variant?: "default" | "outline" | "ghost"; size?: "sm" | "md" | "lg"; disabled?: boolean; }
-const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(({ className, variant = "default", size = "md", disabled = false, children, ...props }, ref) => {
-  const variants = { default: "bg-primary text-primary-foreground", outline: "border border-input bg-background", ghost: "hover:bg-accent" };
-  const sizes = { sm: "p-2 text-sm", md: "p-4 text-base", lg: "p-6 text-lg" };
-  return (<div ref={ref} className={cn("rounded-lg transition-colors", variants[variant], sizes[size], disabled && "opacity-50 pointer-events-none", className)} {...props}>{children}</div>);
-});
-Stepper.displayName = "Stepper";
-export { Stepper };
+
+interface StepperProps {
+  children?: React.ReactNode;
+  className?: string;
+  variant?: "default" | "primary" | "secondary" | "outline";
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: () => void;
+}
+
+export function Stepper({ children, className, variant = "default", size = "md", disabled = false, loading = false, onClick }: StepperProps) {
+  const sizeClasses = { sm: "text-sm p-2", md: "text-base p-3", lg: "text-lg p-4" };
+  const variantClasses = {
+    default: "bg-background border",
+    primary: "bg-primary text-primary-foreground",
+    secondary: "bg-secondary text-secondary-foreground",
+    outline: "border border-input bg-transparent",
+  };
+
+  return (
+    <div
+      className={cn(
+        "rounded-lg transition-all",
+        sizeClasses[size],
+        variantClasses[variant],
+        disabled && "opacity-50 cursor-not-allowed",
+        loading && "animate-pulse",
+        onClick && !disabled && "cursor-pointer hover:opacity-80",
+        className
+      )}
+      onClick={disabled ? undefined : onClick}
+      role={onClick ? "button" : undefined}
+      aria-disabled={disabled}
+    >
+      {loading ? (
+        <div className="flex items-center justify-center">
+          <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : children}
+    </div>
+  );
+}
+
 export default Stepper;
