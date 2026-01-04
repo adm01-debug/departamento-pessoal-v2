@@ -1,34 +1,23 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const schemasEPICreate = z.object({
-  empresaId: z.string().uuid(),
-  colaboradorId: z.string().uuid().optional(),
-  descricao: z.string().min(1, 'Descrição obrigatória'),
-  valor: z.number().min(0).optional(),
-  dataInicio: z.date().optional(),
-  dataFim: z.date().optional(),
-  status: z.enum(['ativo', 'inativo', 'pendente']).default('ativo'),
-  observacoes: z.string().optional(),
+export const schemasEPI = z.object({
+  id: z.string().uuid().optional(),
+  nome: z.string().min(1).max(200),
+  descricao: z.string().max(500).optional(),
+  codigo: z.string().max(50).optional(),
+  ativo: z.boolean().default(true),
+  valor: z.number().nonnegative().optional(),
+  dataInicio: z.string().datetime().optional(),
+  dataFim: z.string().datetime().optional(),
+  observacoes: z.string().max(1000).optional(),
+  metadata: z.record(z.any()).optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 
-export const schemasEPIUpdate = schemasEPICreate.partial();
+export const schemasEPICreate = schemasEPI.omit({ id: true, createdAt: true, updatedAt: true });
+export const schemasEPIUpdate = schemasEPI.partial();
 
-export const schemasEPIFilter = z.object({
-  empresaId: z.string().uuid().optional(),
-  colaboradorId: z.string().uuid().optional(),
-  status: z.enum(['ativo', 'inativo', 'pendente']).optional(),
-  dataInicio: z.date().optional(),
-  dataFim: z.date().optional(),
-});
-
-export type EPICreate = z.infer<typeof schemasEPICreate>;
-export type EPIUpdate = z.infer<typeof schemasEPIUpdate>;
-export type EPIFilter = z.infer<typeof schemasEPIFilter>;
-
-export const schemasEPI = {
-  create: schemasEPICreate,
-  update: schemasEPIUpdate,
-  filter: schemasEPIFilter,
-};
-
+export type EPIType = z.infer<typeof schemasEPI>;
+export const validateEPI = (data: unknown) => schemasEPI.safeParse(data);
 export default schemasEPI;
