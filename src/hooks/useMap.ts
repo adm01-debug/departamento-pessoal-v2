@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
-export function useMap<K, V>(initial: Map<K, V> = new Map()) {
-  const [map, setMap] = useState(initial);
-  const set = useCallback((key: K, value: V) => setMap(m => new Map(m).set(key, value)), []);
-  const remove = useCallback((key: K) => setMap(m => { const n = new Map(m); n.delete(key); return n; }), []);
-  const clear = useCallback(() => setMap(new Map()), []);
-  const get = useCallback((key: K) => map.get(key), [map]);
-  const has = useCallback((key: K) => map.has(key), [map]);
-  return { map, set, remove, clear, get, has, size: map.size };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useMap<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
+export default useMap;
