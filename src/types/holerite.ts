@@ -2,12 +2,18 @@ export interface Holerite {
   id: string;
   nome: string;
   descricao?: string;
-  status: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
 export interface HoleriteCreate extends Omit<Holerite, "id" | "createdAt" | "updatedAt"> {}
-export interface HoleriteUpdate extends Partial<HoleriteCreate> {}
-export interface HoleriteFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type HoleriteStatus = "ativo" | "inativo" | "pendente";
+export interface HoleriteUpdate extends Partial<Omit<Holerite, "id" | "createdAt">> {}
+export interface HoleriteFilter { search?: string; ativo?: boolean; page?: number; limit?: number; }
+export interface HoleriteListResponse { data: Holerite[]; total: number; page: number; limit: number; }
+export type HoleriteStatus = "ativo" | "inativo" | "pendente" | "cancelado";
