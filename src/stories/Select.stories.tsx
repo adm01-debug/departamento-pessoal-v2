@@ -1,6 +1,28 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-const meta: Meta<typeof Select> = { title: 'UI/Select', component: Select };
+import type { Meta, StoryObj } from "@storybook/react";
+import { Select } from "@/components/ui/Select";
+
+const meta: Meta<typeof Select> = {
+  title: "Components/UI/Select",
+  component: Select,
+  parameters: { layout: "centered" },
+  tags: ["autodocs"],
+  argTypes: {
+    variant: { control: "select", options: ["default", "primary", "secondary", "outline"] },
+    size: { control: "select", options: ["sm", "md", "lg"] },
+    disabled: { control: "boolean" },
+  },
+};
+
 export default meta;
-type Story = StoryObj<typeof Select>;
-export const Default: Story = { render: () => <Select><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent><SelectItem value="1">Opção 1</SelectItem></SelectContent></Select> };
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = { args: { children: "Select Default" } };
+export const Primary: Story = { args: { variant: "primary", children: "Select Primary" } };
+export const Secondary: Story = { args: { variant: "secondary", children: "Select Secondary" } };
+export const Small: Story = { args: { size: "sm", children: "Select Small" } };
+export const Large: Story = { args: { size: "lg", children: "Select Large" } };
+export const Disabled: Story = { args: { disabled: true, children: "Select Disabled" } };
+export const Loading: Story = { args: { loading: true, children: "Select Loading" } };
+export const WithIcon: Story = { args: { children: "With Icon", icon: "check" } };
+export const FullWidth: Story = { args: { className: "w-full", children: "Full Width" } };
+export const CustomStyle: Story = { args: { className: "bg-gradient-to-r from-blue-500 to-purple-500", children: "Custom" } };
