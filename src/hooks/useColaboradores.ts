@@ -1,309 +1,196 @@
 /**
- * @fileoverview Hook para gerenciamento de colaboradores
- * @module hooks/useColaboradores
+ * Hook para gerenciamento de colaboradores
+ * CRUD completo com cache e filtros
  */
-import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@/lib/logger';
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ColaboradorDB, Dependente, HistoricoCargo, DocumentoColaborador } from '@/types/colaborador';
-import { toast } from '@/hooks/use-toast';
-import { useAuth } from './useAuth';
-import { useEmpresas } from './useEmpresas';
+import { useToast } from '@/hooks/use-toast';
 
-
-export interface UseColaboradoresReturn {
-  colaboradores: ColaboradorDB[];
-  loading: boolean;
-  error: string | null;
-  fetchColaboradores: () => Promise<void>;
-  createColaborador: (data: Partial<ColaboradorDB>) => Promise<ColaboradorDB | null>;
-  updateColaborador: (id: string, data: Partial<ColaboradorDB>) => Promise<boolean>;
-  deleteColaborador: (id: string) => Promise<boolean>;
-  getColaboradorById: (id: string) => ColaboradorDB | undefined;
+export interface Colaborador {
+  id: string;
+  nome: string;
+  cpf: string;
+  email: string;
+  telefone?: string;
+  data_nascimento?: string;
+  data_admissao: string;
+  data_demissao?: string;
+  cargo_id?: string;
+  departamento_id?: string;
+  salario: number;
+  status: 'ativo' | 'inativo' | 'ferias' | 'afastado';
+  tipo_contrato: 'clt' | 'pj' | 'estagiario' | 'temporario';
+  created_at: string;
+  updated_at?: string;
+  // Joins
+  cargo?: { id: string; nome: string };
+  departamento?: { id: string; nome: string };
 }
 
-export function useColaboradores(): UseColaboradoresReturn {
-  const [colaboradores, setColaboradores] = useState<ColaboradorDB[]>([]);
+export interface FiltrosColaborador {
+  busca?: string;
+  status?: string;
+  departamento_id?: string;
+  cargo_id?: string;
+  tipo_contrato?: string;
+}
+
+export interface UseColaboradoresReturn {
+  colaboradores: Colaborador[];
+  loading: boolean;
+  error: string | null;
+  total: number;
+  buscar: (id: string) => Promise<Colaborador | null>;
+  criar: (dados: Partial<Colaborador>) => Promise<Colaborador>;
+  atualizar: (id: string, dados: Partial<Colaborador>) => Promise<Colaborador>;
+  excluir: (id: string) => Promise<void>;
+  recarregar: () => Promise<void>;
+  filtros: FiltrosColaborador;
+  setFiltros: (filtros: FiltrosColaborador) => void;
+}
+
+export function useColaboradores(filtrosIniciais?: FiltrosColaborador): UseColaboradoresReturn {
+  const { toast } = useToast();
+  const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
-  const { empresaAtualId } = useEmpresas();
+  const [filtros, setFiltros] = useState<FiltrosColaborador>(filtrosIniciais || {});
 
-  const fetchColaboradores = useCallback(async () => {
+  const carregarColaboradores = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       let query = supabase
         .from('colaboradores')
-        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
-        .order('nome_completo', { ascending: true });
+        .select('*, cargo:cargos(id, nome), departamento:departamentos(id, nome)')
+        .order('nome');
 
-      // Filtrar por empresa se houver uma selecionada
-      if (empresaAtualId) {
-        query = query.eq('empresa_id', empresaAtualId);
+      // Aplicar filtros
+      if (filtros.status) {
+        query = query.eq('status', filtros.status);
+      }
+      if (filtros.departamento_id) {
+        query = query.eq('departamento_id', filtros.departamento_id);
+      }
+      if (filtros.cargo_id) {
+        query = query.eq('cargo_id', filtros.cargo_id);
+      }
+      if (filtros.tipo_contrato) {
+        query = query.eq('tipo_contrato', filtros.tipo_contrato);
+      }
+      if (filtros.busca) {
+        query = query.or(`nome.ilike.%${filtros.busca}%,cpf.ilike.%${filtros.busca}%,email.ilike.%${filtros.busca}%`);
       }
 
-      const { data, error: fetchError } = await query;
+      const { data, error: queryError } = await query;
 
-      if (fetchError) throw fetchError;
-      
-      setColaboradores(data ?? []);
-    } catch (err: unknown) {
-      logger.error('Erro ao buscar colaboradores:', err);
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      if (queryError) throw queryError;
+      setColaboradores(data || []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao carregar colaboradores';
       setError(message);
-      toast({
-        title: 'Erro ao carregar colaboradores',
-        description: message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
-  }, [empresaAtualId]);
+  }, [filtros, toast]);
 
   useEffect(() => {
-    if (user) {
-      fetchColaboradores();
-    }
-  }, [user, fetchColaboradores]);
+    carregarColaboradores();
+  }, [carregarColaboradores]);
 
-  const createColaborador = async (data: Omit<ColaboradorDB, 'id' | 'created_at' | 'updated_at'>) => {
+  const buscar = useCallback(async (id: string): Promise<Colaborador | null> => {
     try {
-      const { data: newColaborador, error } = await supabase
+      const { data, error: queryError } = await supabase
         .from('colaboradores')
-        .insert([{ ...data, created_by: user?.id, empresa_id: empresaAtualId }])
+        .select('*, cargo:cargos(id, nome), departamento:departamentos(id, nome)')
+        .eq('id', id)
+        .single();
+
+      if (queryError) throw queryError;
+      return data;
+    } catch (err) {
+      toast({ title: 'Erro', description: 'Colaborador não encontrado', variant: 'destructive' });
+      return null;
+    }
+  }, [toast]);
+
+  const criar = useCallback(async (dados: Partial<Colaborador>): Promise<Colaborador> => {
+    try {
+      const { data, error: insertError } = await supabase
+        .from('colaboradores')
+        .insert([{ ...dados, status: dados.status || 'ativo' }])
         .select()
         .single();
 
-      if (error) throw error;
-
-      setColaboradores(prev => [...prev, newColaborador]);
-      toast({
-        title: 'Colaborador cadastrado!',
-        description: `${data.nome_completo} foi adicionado com sucesso.`,
-      });
+      if (insertError) throw insertError;
       
-      return newColaborador;
-    } catch (err: unknown) {
-      logger.error('Erro ao criar colaborador:', err);
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast({
-        title: 'Erro ao cadastrar',
-        description: message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Sucesso', description: 'Colaborador criado com sucesso' });
+      await carregarColaboradores();
+      return data;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao criar colaborador';
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
       throw err;
     }
-  };
+  }, [toast, carregarColaboradores]);
 
-  const updateColaborador = async (id: string, data: Partial<ColaboradorDB>) => {
+  const atualizar = useCallback(async (id: string, dados: Partial<Colaborador>): Promise<Colaborador> => {
     try {
-      const { data: updated, error } = await supabase
+      const { data, error: updateError } = await supabase
         .from('colaboradores')
-        .update(data)
+        .update({ ...dados, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();
 
-      if (error) throw error;
-
-      setColaboradores(prev => prev.map(c => c.id === id ? updated : c));
-      toast({
-        title: 'Colaborador atualizado!',
-        description: 'Os dados foram salvos com sucesso.',
-      });
+      if (updateError) throw updateError;
       
-      return updated;
-    } catch (err: unknown) {
-      logger.error('Erro ao atualizar colaborador:', err);
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast({
-        title: 'Erro ao atualizar',
-        description: message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Sucesso', description: 'Colaborador atualizado com sucesso' });
+      await carregarColaboradores();
+      return data;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao atualizar colaborador';
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
       throw err;
     }
-  };
+  }, [toast, carregarColaboradores]);
 
-  const deleteColaborador = async (id: string) => {
+  const excluir = useCallback(async (id: string): Promise<void> => {
     try {
-      const colaborador = colaboradores.find(c => c.id === id);
-      
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('colaboradores')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
-
-      setColaboradores(prev => prev.filter(c => c.id !== id));
-      toast({
-        title: 'Colaborador excluído',
-        description: colaborador ? `${colaborador.nome_completo} foi removido.` : 'Registro removido com sucesso.',
-      });
-    } catch (err: unknown) {
-      logger.error('Erro ao excluir colaborador:', err);
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast({
-        title: 'Erro ao excluir',
-        description: message,
-        variant: 'destructive',
-      });
+      if (deleteError) throw deleteError;
+      
+      toast({ title: 'Sucesso', description: 'Colaborador excluído com sucesso' });
+      await carregarColaboradores();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao excluir colaborador';
+      toast({ title: 'Erro', description: message, variant: 'destructive' });
       throw err;
     }
-  };
+  }, [toast, carregarColaboradores]);
 
-  const getColaboradorById = async (id: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('colaboradores')
-        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    } catch (err: unknown) {
-      logger.error('Erro ao buscar colaborador:', err);
-      throw err;
-    }
-  };
+  const total = useMemo(() => colaboradores.length, [colaboradores]);
 
   return {
     colaboradores,
     loading,
     error,
-    fetchColaboradores,
-    createColaborador,
-    updateColaborador,
-    deleteColaborador,
-    getColaboradorById,
+    total,
+    buscar,
+    criar,
+    atualizar,
+    excluir,
+    recarregar: carregarColaboradores,
+    filtros,
+    setFiltros
   };
 }
 
-export function useDependentes(colaboradorId: string) {
-  const [dependentes, setDependentes] = useState<Dependente[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchDependentes = useCallback(async () => {
-    if (!colaboradorId) return;
-    
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('dependentes')
-        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
-        .eq('colaborador_id', colaboradorId)
-        .order('nome', { ascending: true });
-
-      if (error) throw error;
-      setDependentes(data ?? []);
-    } catch (err: unknown) {
-      logger.error('Erro ao buscar dependentes:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [colaboradorId]);
-
-  useEffect(() => {
-    fetchDependentes();
-  }, [fetchDependentes]);
-
-  const addDependente = async (data: Omit<Dependente, 'id' | 'created_at'>) => {
-    try {
-      const { data: newDep, error } = await supabase
-        .from('dependentes')
-        .insert([data])
-        .select()
-        .single();
-
-      if (error) throw error;
-      setDependentes(prev => [...prev, newDep]);
-      toast({ title: 'Dependente adicionado!' });
-      return newDep;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast({ title: 'Erro', description: message, variant: 'destructive' });
-      throw err;
-    }
-  };
-
-  const removeDependente = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('dependentes')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      setDependentes(prev => prev.filter(d => d.id !== id));
-      toast({ title: 'Dependente removido!' });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast({ title: 'Erro', description: message, variant: 'destructive' });
-      throw err;
-    }
-  };
-
-  return { dependentes, loading, fetchDependentes, addDependente, removeDependente };
-}
-
-export function useHistoricoCargo(colaboradorId: string) {
-  const [historico, setHistorico] = useState<HistoricoCargo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
-
-  const fetchHistorico = useCallback(async () => {
-    if (!colaboradorId) return;
-    
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('historico_cargo')
-        .select('id, nome, cpf, email, status, cargo, departamento_id, data_admissao')
-        .eq('colaborador_id', colaboradorId)
-        .order('data_alteracao', { ascending: false });
-
-      if (error) throw error;
-      setHistorico(data ?? []);
-    } catch (err: unknown) {
-      logger.error('Erro ao buscar histórico:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [colaboradorId]);
-
-  useEffect(() => {
-    fetchHistorico();
-  }, [fetchHistorico]);
-
-  const addHistorico = async (data: Omit<HistoricoCargo, 'id' | 'created_at'>) => {
-    try {
-      const { data: newHist, error } = await supabase
-        .from('historico_cargo')
-        .insert([{ ...data, created_by: user?.id }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      setHistorico(prev => [newHist, ...prev]);
-      toast({ title: 'Histórico registrado!' });
-      return newHist;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Erro desconhecido';
-      toast({ title: 'Erro', description: message, variant: 'destructive' });
-      throw err;
-    }
-  };
-
-  return { historico, loading, fetchHistorico, addHistorico };
-}
-
-
-
-
-
-
+export default useColaboradores;
