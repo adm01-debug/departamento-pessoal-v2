@@ -1,8 +1,11 @@
-import React from "react";
-import { Circle, CheckCircle } from "lucide-react";
-interface TimelineItem { id: string; title: string; description?: string; date: string; status?: "completed" | "current" | "pending"; icon?: React.ReactNode; }
-interface Props { items: TimelineItem[]; }
-export function Timeline({ items }: Props) {
-  return (<div className="relative">{items.map((item, i) => (<div key={item.id} className="flex gap-4 pb-8 last:pb-0"><div className="relative flex flex-col items-center"><div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.status === "completed" ? "bg-green-500 text-white" : item.status === "current" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>{item.icon || (item.status === "completed" ? <CheckCircle className="h-4 w-4" /> : <Circle className="h-4 w-4" />)}</div>{i < items.length - 1 && <div className="w-0.5 h-full bg-gray-200 absolute top-8" />}</div><div className="flex-1 pb-4"><p className="font-medium">{item.title}</p>{item.description && <p className="text-sm text-muted-foreground">{item.description}</p>}<p className="text-xs text-muted-foreground mt-1">{item.date}</p></div></div>))}</div>);
-}
+import * as React from "react";
+import { cn } from "@/lib/utils";
+export interface TimelineProps extends React.HTMLAttributes<HTMLDivElement> { variant?: "default" | "outline" | "ghost"; size?: "sm" | "md" | "lg"; disabled?: boolean; }
+const Timeline = React.forwardRef<HTMLDivElement, TimelineProps>(({ className, variant = "default", size = "md", disabled = false, children, ...props }, ref) => {
+  const variants = { default: "bg-primary text-primary-foreground", outline: "border border-input bg-background", ghost: "hover:bg-accent" };
+  const sizes = { sm: "p-2 text-sm", md: "p-4 text-base", lg: "p-6 text-lg" };
+  return (<div ref={ref} className={cn("rounded-lg transition-colors", variants[variant], sizes[size], disabled && "opacity-50 pointer-events-none", className)} {...props}>{children}</div>);
+});
+Timeline.displayName = "Timeline";
+export { Timeline };
 export default Timeline;
