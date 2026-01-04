@@ -1,117 +1,116 @@
 /**
  * Integração Bradesco
- * API Bradesco para consultas, boletos e transferências
+ * API: https://developers.bradesco.com.br
  */
 
 export interface BradescoConfig {
   clientId: string;
   clientSecret: string;
-  certificado?: string;
+  certificado: string;
   ambiente: "sandbox" | "producao";
+  agencia: string;
+  conta: string;
 }
 
-export interface BradescoBoleto {
-  nossoNumero: string;
-  codigoBarras: string;
-  linhaDigitavel: string;
+export interface BradescoPagamento {
+  tipo: "transferencia" | "boleto" | "pix";
   valor: number;
   dataVencimento: string;
-  pagador: { nome: string; cpfCnpj: string };
-  status: "EMITIDO" | "PAGO" | "VENCIDO" | "BAIXADO";
+  beneficiario: { nome: string; cpfCnpj: string; banco?: string; agencia?: string; conta?: string; chavePix?: string };
 }
 
-export interface BradescoTransferencia {
-  id: string;
-  tipo: "TED" | "DOC" | "PIX";
-  valor: number;
-  favorecido: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string };
-  status: "PENDENTE" | "EFETIVADA" | "CANCELADA";
-}
-
-class BradescoIntegration {
+class BradescoService {
   private config: BradescoConfig | null = null;
-  private accessToken: string | null = null;
-  private baseUrl: string = "";
+  private token: string | null = null;
+  private baseUrl = "";
 
-  configure(config: BradescoConfig): void {
+  configurar(config: BradescoConfig): void {
     this.config = config;
     this.baseUrl = config.ambiente === "producao" ? "https://openapi.bradesco.com.br" : "https://proxy.api.prebanco.com.br";
   }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken) return this.accessToken;
-    if (!this.config) throw new Error("Integração não configurada");
+  private async obterToken(): Promise<string> {
+    if (!this.config) throw new Error("Bradesco não configurado");
+    if (this.token) return this.token;
 
-    const response = await fetch(`${this.baseUrl}/auth/server/v1.1/token`, {
+    const response = await fetch(`${this.baseUrl}/oauth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`
     });
+
     if (!response.ok) throw new Error("Falha na autenticação Bradesco");
     const data = await response.json();
-    this.accessToken = data.access_token;
-    return this.accessToken;
+    this.token = data.access_token;
+    return this.token!;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers }
+  async consultarSaldo(): Promise<{ disponivel: number; bloqueado: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/v1/contas/${this.config!.conta}/saldo`, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error(`Erro Bradesco: ${response.status}`);
+    if (!response.ok) throw new Error("Falha ao consultar saldo");
+    const data = await response.json();
+    return { disponivel: data.saldoDisponivel || 0, bloqueado: data.saldoBloqueado || 0 };
+  }
+
+  async consultarExtrato(dataInicio: string, dataFim: string): Promise<{ lancamentos: any[] }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/v1/contas/${this.config!.conta}/extrato?dataInicio=${dataInicio}&dataFim=${dataFim}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error("Falha ao consultar extrato");
     return response.json();
   }
 
-  async consultarSaldo(agencia: string, conta: string): Promise<{ saldo: number }> {
-    return this.request(`/v1/contas/${agencia}/${conta}/saldo`);
-  }
-
-  async consultarExtrato(agencia: string, conta: string, dataInicio: string, dataFim: string): Promise<any[]> {
-    return this.request(`/v1/contas/${agencia}/${conta}/extrato?inicio=${dataInicio}&fim=${dataFim}`);
-  }
-
-  async emitirBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string } }): Promise<BradescoBoleto> {
-    return this.request("/v1/boleto/registrarBoleto", {
+  async gerarBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string } }): Promise<{ codigoBarras: string; linhaDigitavel: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/v1/boletos`, {
       method: "POST",
-      body: JSON.stringify({
-        nuCPFCNPJ: dados.pagador.cpfCnpj.replace(/\D/g, ""),
-        filialCPFCNPJ: "0001",
-        ctrlCPFCNPJ: "00",
-        cdEspecieTitulo: "02",
-        vlNominalTitulo: dados.valor,
-        dtVencimentoTitulo: dados.vencimento.replace(/-/g, "."),
-        nomePagador: dados.pagador.nome,
-        enderecoPagador: dados.pagador.endereco,
-        nuCpfcnpjPagador: dados.pagador.cpfCnpj.replace(/\D/g, "")
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ agencia: this.config!.agencia, conta: this.config!.conta, valor: dados.valor, dataVencimento: dados.vencimento, pagador: dados.pagador })
     });
+    if (!response.ok) throw new Error("Falha ao gerar boleto");
+    return response.json();
   }
 
-  async consultarBoleto(nossoNumero: string): Promise<BradescoBoleto> {
-    return this.request(`/v1/boleto/${nossoNumero}`);
+  async realizarTransferencia(pagamento: BradescoPagamento): Promise<{ protocolo: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/v1/transferencias`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ ...pagamento, contaOrigem: this.config!.conta })
+    });
+    if (!response.ok) throw new Error("Falha na transferência");
+    const data = await response.json();
+    return { protocolo: data.protocolo, status: data.status };
   }
 
-  async baixarBoleto(nossoNumero: string): Promise<void> {
-    await this.request(`/v1/boleto/${nossoNumero}/baixar`, { method: "POST" });
+  async realizarPix(chavePix: string, valor: number, descricao?: string): Promise<{ txid: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/v1/pix/pagamentos`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: chavePix, valor, descricao })
+    });
+    if (!response.ok) throw new Error("Falha no PIX");
+    const data = await response.json();
+    return { txid: data.txid, status: data.status };
   }
 
-  async realizarTransferencia(dados: { tipo: "TED" | "PIX"; valor: number; favorecido: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string } }): Promise<BradescoTransferencia> {
-    return this.request("/v1/transferencias", { method: "POST", body: JSON.stringify(dados) });
-  }
-
-  async gerarPixCobranca(dados: { valor: number; descricao?: string }): Promise<{ qrcode: string; txid: string }> {
-    return this.request("/v1/spi/pix/cob", { method: "POST", body: JSON.stringify({ valor: { original: dados.valor.toFixed(2) } }) });
-  }
-
-  async processarFolhaPagamento(pagamentos: Array<{ colaborador: { nome: string; cpf: string; banco: string; agencia: string; conta: string }; valor: number }>): Promise<{ lote: string; status: string }> {
-    const loteId = `FOLHA_BRADESCO_${Date.now()}`;
-    for (const pag of pagamentos) {
-      await this.realizarTransferencia({ tipo: "TED", valor: pag.valor, favorecido: { nome: pag.colaborador.nome, cpfCnpj: pag.colaborador.cpf, banco: pag.colaborador.banco, agencia: pag.colaborador.agencia, conta: pag.colaborador.conta } });
-    }
-    return { lote: loteId, status: "processando" };
+  async processarFolhaPagamento(pagamentos: Array<{ nome: string; cpf: string; banco: string; agencia: string; conta: string; valor: number }>): Promise<{ loteId: string; quantidade: number; valorTotal: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/v1/folha-pagamento/lotes`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ contaOrigem: this.config!.conta, pagamentos })
+    });
+    if (!response.ok) throw new Error("Falha ao processar folha");
+    const data = await response.json();
+    return { loteId: data.loteId, quantidade: pagamentos.length, valorTotal: pagamentos.reduce((s, p) => s + p.valor, 0) };
   }
 }
 
-export const bradesco = new BradescoIntegration();
-export default bradesco;
+export const bradescoService = new BradescoService();
+export default bradescoService;
