@@ -1,41 +1,17 @@
-import { useState, useEffect } from 'react';
-
-interface ScrollPosition {
-  x: number;
-  y: number;
-}
-
-export function useScrollPosition(): ScrollPosition {
-  const [position, setPosition] = useState<ScrollPosition>({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setPosition({ x: window.scrollX, y: window.scrollY });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useScrollPosition<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
   }, []);
-
-  return position;
+  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
+  return { data, loading, error, execute, reset, setData };
 }
-
-export function useScrollDirection(): 'up' | 'down' | null {
-  const [direction, setDirection] = useState<'up' | 'down' | null>(null);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setDirection(currentScrollY > lastScrollY ? 'down' : 'up');
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
-
-  return direction;
-}
-
 export default useScrollPosition;
