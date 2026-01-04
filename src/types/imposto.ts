@@ -1,44 +1,13 @@
-/**
- * Types para Imposto
- * Departamento Pessoal
- */
-
 export interface Imposto {
   id: string;
-  empresaId: string;
-  colaboradorId?: string;
-  descricao: string;
-  valor?: number;
-  dataInicio?: Date;
-  dataFim?: Date;
-  status: ImpostoStatus;
-  observacoes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  nome: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export type ImpostoStatus = 'ativo' | 'inativo' | 'pendente' | 'cancelado';
-
-export interface ImpostoCreate extends Omit<Imposto, 'id' | 'createdAt' | 'updatedAt'> {}
-
+export interface ImpostoCreate extends Omit<Imposto, "id" | "createdAt" | "updatedAt"> {}
 export interface ImpostoUpdate extends Partial<ImpostoCreate> {}
-
-export interface ImpostoFilter {
-  empresaId?: string;
-  colaboradorId?: string;
-  status?: ImpostoStatus;
-  dataInicio?: Date;
-  dataFim?: Date;
-  search?: string;
-}
-
-export interface ImpostoListResponse {
-  data: Imposto[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export default Imposto;
+export interface ImpostoFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type ImpostoStatus = "ativo" | "inativo" | "pendente";
