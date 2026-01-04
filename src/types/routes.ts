@@ -1,26 +1,15 @@
-/** Rotas da aplicação */
-export const ROUTES = {
-  HOME: '/',
-  DASHBOARD: '/dashboard',
-  COLABORADORES: '/colaboradores',
-  FERIAS: '/ferias',
-  FOLHA: '/folha',
-  ADMISSAO: '/admissao',
-  BENEFICIOS: '/beneficios',
-  AFASTAMENTOS: '/afastamentos',
-  PONTO: '/ponto',
-  ESOCIAL: '/esocial',
-  RELATORIOS: '/relatorios',
-  DOCUMENTOS: '/documentos',
-  AUDITORIA: '/auditoria',
-  CONFIGURACOES: '/configuracoes',
-  USUARIOS: '/usuarios',
-  CARGOS: '/cargos',
-  DEPARTAMENTOS: '/departamentos',
-  FERIADOS: '/feriados',
-  PERFIL: '/perfil',
-  ASSINATURAS: '/assinaturas',
-  LOGIN: '/login',
-} as const;
-
-export type RoutePath = typeof ROUTES[keyof typeof ROUTES];
+export interface Routes {
+  id: string;
+  nome: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
+}
+export interface RoutesCreate extends Omit<Routes, "id" | "createdAt" | "updatedAt"> {}
+export interface RoutesUpdate extends Partial<RoutesCreate> {}
+export interface RoutesFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
+export interface RoutesListResponse { data: Routes[]; total: number; page: number; limit: number; }
+export type RoutesStatus = "ativo" | "inativo" | "pendente";
