@@ -1,36 +1,14 @@
-/**
- * @fileoverview Tipos para backup e restore
- * @module types/backup
- */
-
-export type StatusBackup = 'pendente' | 'em_progresso' | 'concluido' | 'erro';
-export type TipoBackup = 'completo' | 'incremental' | 'diferencial';
-
 export interface Backup {
   id: string;
-  tipo: TipoBackup;
-  status: StatusBackup;
-  tamanho: number;
-  urlDownload?: string;
-  dataInicio: string;
-  dataFim?: string;
-  erro?: string;
-  createdBy: string;
+  nome: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export interface RestorePoint {
-  id: string;
-  backupId: string;
-  descricao: string;
-  dataRestore: string;
-  status: StatusBackup;
-  restoredBy: string;
-}
-
-export interface BackupConfig {
-  automatico: boolean;
-  frequencia: 'diario' | 'semanal' | 'mensal';
-  horario: string;
-  retencaoDias: number;
-  incluirAnexos: boolean;
-}
+export interface BackupCreate extends Omit<Backup, "id" | "createdAt" | "updatedAt"> {}
+export interface BackupUpdate extends Partial<BackupCreate> {}
+export interface BackupFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type BackupStatus = "ativo" | "inativo" | "pendente";
