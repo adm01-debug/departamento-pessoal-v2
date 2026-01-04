@@ -1,22 +1,28 @@
-/**
- * @fileoverview Hook para geração de códigos de barras
- * @module hooks/useBarcode
- */
-import { useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
-export function useBarcode() {
-  const generateBarcode = useCallback((value: string, type: 'code128' | 'qrcode' = 'code128') => {
-    // Placeholder - integrar com biblioteca de barcode como JsBarcode ou qrcode
-    console.log('[Barcode] Generate:', type, value);
-    return `data:image/svg+xml,<svg></svg>`;
-  }, []);
+export interface useBarcodeOptions { enabled?: boolean; debounce?: number; }
+export interface useBarcodeResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
 
-  const printBarcode = useCallback((value: string, copies: number = 1) => {
-    console.log('[Barcode] Print:', value, 'copies:', copies);
-    // Integração com impressora
-  }, []);
+export function useBarcode<T = any>(initialValue?: T, options: useBarcodeOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
 
-  return { generateBarcode, printBarcode };
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
 
 export default useBarcode;
