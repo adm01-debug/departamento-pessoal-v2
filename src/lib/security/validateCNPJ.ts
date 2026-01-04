@@ -1,0 +1,1 @@
+export function validateCNPJ(cnpj:string):boolean{const n=cnpj.replace(/\D/g,"");if(n.length!==14||/^(\d)+$/.test(n))return false;const calc=(t:number)=>{let s=0,p=t-7;for(let i=0;i<t;i++){s+=parseInt(n[i])*p--;if(p<2)p=9;}const r=s%11;return r<2?0:11-r;};return calc(12)===parseInt(n[12])&&calc(13)===parseInt(n[13]);}export default{validateCNPJ};
