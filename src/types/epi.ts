@@ -1,44 +1,14 @@
-/**
- * Types para Epi
- * Departamento Pessoal
- */
-
 export interface Epi {
   id: string;
-  empresaId: string;
-  colaboradorId?: string;
-  descricao: string;
-  valor?: number;
-  dataInicio?: Date;
-  dataFim?: Date;
-  status: EpiStatus;
-  observacoes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  nome: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export type EpiStatus = 'ativo' | 'inativo' | 'pendente' | 'cancelado';
-
-export interface EpiCreate extends Omit<Epi, 'id' | 'createdAt' | 'updatedAt'> {}
-
+export interface EpiCreate extends Omit<Epi, "id" | "createdAt" | "updatedAt"> {}
 export interface EpiUpdate extends Partial<EpiCreate> {}
-
-export interface EpiFilter {
-  empresaId?: string;
-  colaboradorId?: string;
-  status?: EpiStatus;
-  dataInicio?: Date;
-  dataFim?: Date;
-  search?: string;
-}
-
-export interface EpiListResponse {
-  data: Epi[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export default Epi;
+export interface EpiFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type EpiStatus = "ativo" | "inativo" | "pendente";
