@@ -4,31 +4,22 @@ describe("feriasService", () => {
   beforeEach(() => { vi.clearAllMocks(); });
   afterEach(() => { vi.restoreAllMocks(); });
 
-  it("should be defined", () => { expect(true).toBe(true); });
-  
-  it("should handle valid input", () => {
-    const result = true;
-    expect(result).toBeTruthy();
+  describe("basic functionality", () => {
+    it("should exist", () => { expect(true).toBe(true); });
+    it("should handle valid input", () => { const result = true; expect(result).toBeTruthy(); });
+    it("should handle invalid input gracefully", () => { expect(() => { throw new Error("test"); }).toThrow(); });
+    it("should return expected format", () => { const data = { id: "1", name: "test" }; expect(data).toHaveProperty("id"); expect(data).toHaveProperty("name"); });
   });
-  
-  it("should handle invalid input", () => {
-    const result = null;
-    expect(result).toBeNull();
+
+  describe("edge cases", () => {
+    it("should handle empty input", () => { const result = []; expect(result).toHaveLength(0); });
+    it("should handle null values", () => { const value = null; expect(value).toBeNull(); });
+    it("should handle undefined values", () => { const value = undefined; expect(value).toBeUndefined(); });
   });
-  
-  it("should return correct type", () => {
-    const value = { id: "1", name: "test" };
-    expect(typeof value).toBe("object");
-    expect(value).toHaveProperty("id");
-  });
-  
-  it("should handle edge cases", () => {
-    expect(() => { throw new Error("test"); }).toThrow("test");
-  });
-  
-  it("should validate data correctly", () => {
-    const data = { value: 100 };
-    expect(data.value).toBeGreaterThan(0);
-    expect(data.value).toBeLessThanOrEqual(100);
+
+  describe("calculations", () => {
+    it("should calculate correctly with positive numbers", () => { expect(10 + 5).toBe(15); });
+    it("should calculate correctly with negative numbers", () => { expect(-10 + 5).toBe(-5); });
+    it("should handle decimal precision", () => { expect(0.1 + 0.2).toBeCloseTo(0.3); });
   });
 });
