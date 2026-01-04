@@ -1,45 +1,31 @@
 /**
  * Integração Caixa Econômica Federal
- * API para boletos, FGTS, transferências e PIX
+ * API: https://developers.caixa.gov.br
  */
 
 export interface CaixaConfig {
   clientId: string;
   clientSecret: string;
-  certificado?: string;
-  cnpjBeneficiario: string;
+  certificado: string;
   ambiente: "sandbox" | "producao";
+  agencia: string;
+  conta: string;
+  operacao: string;
 }
 
-export interface CaixaBoleto {
-  nossoNumero: string;
-  codigoBarras: string;
-  linhaDigitavel: string;
-  valor: number;
-  dataVencimento: string;
-  status: "EMITIDO" | "PAGO" | "VENCIDO" | "BAIXADO";
-}
-
-export interface CaixaFGTS {
-  colaboradorCpf: string;
-  saldo: number;
-  ultimoDeposito: string;
-  empresa: string;
-}
-
-class CaixaIntegration {
+class CaixaService {
   private config: CaixaConfig | null = null;
-  private accessToken: string | null = null;
-  private baseUrl: string = "";
+  private token: string | null = null;
+  private baseUrl = "";
 
-  configure(config: CaixaConfig): void {
+  configurar(config: CaixaConfig): void {
     this.config = config;
-    this.baseUrl = config.ambiente === "producao" ? "https://api.caixa.gov.br" : "https://api-hom.caixa.gov.br";
+    this.baseUrl = config.ambiente === "producao" ? "https://api.caixa.gov.br" : "https://api-sandbox.caixa.gov.br";
   }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken) return this.accessToken;
-    if (!this.config) throw new Error("Integração não configurada");
+  private async obterToken(): Promise<string> {
+    if (!this.config) throw new Error("Caixa não configurada");
+    if (this.token) return this.token;
     const response = await fetch(`${this.baseUrl}/oauth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -47,73 +33,83 @@ class CaixaIntegration {
     });
     if (!response.ok) throw new Error("Falha na autenticação Caixa");
     const data = await response.json();
-    this.accessToken = data.access_token;
-    return this.accessToken;
+    this.token = data.access_token;
+    return this.token!;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers }
+  async consultarSaldo(): Promise<{ disponivel: number; bloqueado: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/contas/v1/${this.config!.agencia}/${this.config!.operacao}/${this.config!.conta}/saldo`, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error(`Erro Caixa: ${response.status}`);
+    if (!response.ok) throw new Error("Falha ao consultar saldo");
+    const data = await response.json();
+    return { disponivel: data.saldoDisponivel || 0, bloqueado: data.saldoBloqueado || 0 };
+  }
+
+  async consultarExtrato(dataInicio: string, dataFim: string): Promise<{ lancamentos: any[] }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/contas/v1/${this.config!.agencia}/${this.config!.operacao}/${this.config!.conta}/extrato?dataInicio=${dataInicio}&dataFim=${dataFim}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error("Falha ao consultar extrato");
     return response.json();
   }
 
-  async consultarSaldo(agencia: string, conta: string): Promise<{ saldo: number }> {
-    return this.request(`/contas/v1/${agencia}/${conta}/saldo`);
-  }
-
-  async emitirBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string } }): Promise<CaixaBoleto> {
-    return this.request("/cobranca/v2/boletos", {
+  async gerarBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string } }): Promise<{ codigoBarras: string; linhaDigitavel: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/cobranca/v2/boletos`, {
       method: "POST",
-      body: JSON.stringify({
-        cnpjBeneficiario: this.config?.cnpjBeneficiario,
-        valor: dados.valor,
-        dataVencimento: dados.vencimento,
-        pagador: { nome: dados.pagador.nome, cpfCnpj: dados.pagador.cpfCnpj, endereco: dados.pagador.endereco }
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ unidade: this.config!.agencia, contaCorrente: this.config!.conta, ...dados })
     });
+    if (!response.ok) throw new Error("Falha ao gerar boleto");
+    return response.json();
   }
 
-  async consultarBoleto(nossoNumero: string): Promise<CaixaBoleto> {
-    return this.request(`/cobranca/v2/boletos/${nossoNumero}`);
+  async realizarTransferencia(beneficiario: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string }, valor: number): Promise<{ protocolo: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/transferencias/v1`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ contaOrigem: { agencia: this.config!.agencia, conta: this.config!.conta }, beneficiario, valor })
+    });
+    if (!response.ok) throw new Error("Falha na transferência");
+    const data = await response.json();
+    return { protocolo: data.protocolo, status: data.status };
   }
 
-  async baixarBoleto(nossoNumero: string): Promise<void> {
-    await this.request(`/cobranca/v2/boletos/${nossoNumero}/baixar`, { method: "POST" });
+  async realizarPix(chavePix: string, valor: number, descricao?: string): Promise<{ txid: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/pix/v1/cob`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: chavePix, valor: { original: valor.toFixed(2) }, solicitacaoPagador: descricao })
+    });
+    if (!response.ok) throw new Error("Falha no PIX");
+    const data = await response.json();
+    return { txid: data.txid, status: data.status };
   }
 
-  async realizarTransferencia(dados: { tipo: "TED" | "PIX"; valor: number; favorecido: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string } }): Promise<{ id: string; status: string }> {
-    return this.request("/transferencias/v1", { method: "POST", body: JSON.stringify(dados) });
+  async processarFolhaPagamento(pagamentos: Array<{ nome: string; cpf: string; banco: string; agencia: string; conta: string; valor: number }>): Promise<{ loteId: string; quantidade: number; valorTotal: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/pagamentos/v1/lotes`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ contaDebito: { agencia: this.config!.agencia, conta: this.config!.conta }, pagamentos })
+    });
+    if (!response.ok) throw new Error("Falha ao processar folha");
+    const data = await response.json();
+    return { loteId: data.idLote, quantidade: pagamentos.length, valorTotal: pagamentos.reduce((s, p) => s + p.valor, 0) };
   }
 
-  async gerarPixCobranca(dados: { valor: number; descricao?: string }): Promise<{ qrcode: string; txid: string }> {
-    return this.request("/pix/v1/cob", { method: "POST", body: JSON.stringify({ valor: { original: dados.valor.toFixed(2) } }) });
-  }
-
-  // Métodos específicos FGTS
-  async consultarSaldoFGTS(cpf: string): Promise<CaixaFGTS> {
-    return this.request(`/fgts/v1/saldo/${cpf.replace(/\D/g, "")}`);
-  }
-
-  async gerarGRRF(dados: { colaboradorCpf: string; valor: number; competencia: string }): Promise<{ codigoBarras: string; valor: number }> {
-    return this.request("/fgts/v1/grrf", { method: "POST", body: JSON.stringify(dados) });
-  }
-
-  async consultarDepositosFGTS(cpf: string, anoInicio: number, anoFim: number): Promise<any[]> {
-    return this.request(`/fgts/v1/depositos/${cpf}?anoInicio=${anoInicio}&anoFim=${anoFim}`);
-  }
-
-  async processarFolhaPagamento(pagamentos: Array<{ colaborador: { nome: string; cpf: string; banco: string; agencia: string; conta: string }; valor: number }>): Promise<{ lote: string; status: string }> {
-    const loteId = `FOLHA_CAIXA_${Date.now()}`;
-    for (const pag of pagamentos) {
-      await this.realizarTransferencia({ tipo: "TED", valor: pag.valor, favorecido: { nome: pag.colaborador.nome, cpfCnpj: pag.colaborador.cpf, banco: pag.colaborador.banco, agencia: pag.colaborador.agencia, conta: pag.colaborador.conta } });
-    }
-    return { lote: loteId, status: "processando" };
+  async consultarFGTS(pis: string): Promise<{ saldo: number; dataSaldo: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/fgts/v1/consulta/${pis}`, { headers: { "Authorization": `Bearer ${token}` } });
+    if (!response.ok) throw new Error("Falha ao consultar FGTS");
+    return response.json();
   }
 }
 
-export const caixa = new CaixaIntegration();
-export default caixa;
+export const caixaService = new CaixaService();
+export default caixaService;
