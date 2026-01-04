@@ -1,5 +1,20 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-interface PermissionsContextType { permissions: string[]; hasPermission: (p: string) => boolean; setPermissions: (p: string[]) => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface PermissionsContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const PermissionsContext = createContext<PermissionsContextType | undefined>(undefined);
-export function PermissionsProvider({ children }: { children: ReactNode }) { const [permissions, setPermissions] = useState<string[]>([]); const hasPermission = (p: string) => permissions.includes(p); return <PermissionsContext.Provider value={{ permissions, hasPermission, setPermissions }}>{children}</PermissionsContext.Provider>; }
-export function usePermissions() { const ctx = useContext(PermissionsContext); if (!ctx) throw new Error('usePermissions must be used within PermissionsProvider'); return ctx; }
+
+export function PermissionsContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
+  return <PermissionsContext.Provider value={{ state, setState, reset }}>{children}</PermissionsContext.Provider>;
+}
+
+export function usePermissions() {
+  const ctx = useContext(PermissionsContext);
+  if (!ctx) throw new Error("usePermissions must be used within PermissionsContextProvider");
+  return ctx;
+}
+
+export { PermissionsContext };
+export default PermissionsContext;
