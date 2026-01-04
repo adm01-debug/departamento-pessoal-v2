@@ -1,44 +1,13 @@
-/**
- * Types para Holerite
- * Departamento Pessoal
- */
-
 export interface Holerite {
   id: string;
-  empresaId: string;
-  colaboradorId?: string;
-  descricao: string;
-  valor?: number;
-  dataInicio?: Date;
-  dataFim?: Date;
-  status: HoleriteStatus;
-  observacoes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  nome: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export type HoleriteStatus = 'ativo' | 'inativo' | 'pendente' | 'cancelado';
-
-export interface HoleriteCreate extends Omit<Holerite, 'id' | 'createdAt' | 'updatedAt'> {}
-
+export interface HoleriteCreate extends Omit<Holerite, "id" | "createdAt" | "updatedAt"> {}
 export interface HoleriteUpdate extends Partial<HoleriteCreate> {}
-
-export interface HoleriteFilter {
-  empresaId?: string;
-  colaboradorId?: string;
-  status?: HoleriteStatus;
-  dataInicio?: Date;
-  dataFim?: Date;
-  search?: string;
-}
-
-export interface HoleriteListResponse {
-  data: Holerite[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export default Holerite;
+export interface HoleriteFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type HoleriteStatus = "ativo" | "inativo" | "pendente";
