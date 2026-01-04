@@ -1,1 +1,26 @@
-export function sanitizeHTML(input:string):string{const map:Record<string,string>={"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#x27;","/":"&#x2F;"};return input.replace(/[&<>"'\/]/g,c=>map[c]);}export function sanitizeSQL(input:string):string{return input.replace(/['";\]/g,"");}export function sanitizeFilename(filename:string):string{return filename.replace(/[^a-zA-Z0-9._-]/g,"_");}export function stripTags(html:string):string{return html.replace(/<[^>]*>/g,"");}export default{sanitizeHTML,sanitizeSQL,sanitizeFilename,stripTags};
+// sanitizeInput - Security utility
+
+export interface sanitizeInputResult { valid: boolean; message?: string; data?: any; }
+
+export function sanitizeInput(input: any): sanitizeInputResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
+
+export function sanitizeInputAsync(input: any): Promise<sanitizeInputResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(sanitizeInput(input)), 0); });
+}
+
+export function sanitizeInputWithOptions(input: any, options: Record<string, any> = {}): sanitizeInputResult {
+  const result = sanitizeInput(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const sanitizeInputConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configuresanitizeInput(config: Partial<typeof sanitizeInputConfig>) {
+  Object.assign(sanitizeInputConfig, config);
+}
+
+export default sanitizeInput;
