@@ -1,13 +1,16 @@
-export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; }
-export interface Response<T = any> { success: boolean; data?: T; error?: string; }
-class Service {
-  private config: Config = { enabled: false };
-  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+export interface SwileConfig { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface SwileResponse<T = any> { success: boolean; data?: T; error?: string; requestId?: string; }
+
+class SwileService {
+  private config: SwileConfig = { enabled: false, timeout: 30000 };
+  configure(c: Partial<SwileConfig>) { this.config = { ...this.config, ...c }; }
   isEnabled() { return this.config.enabled; }
-  async connect(): Promise<Response> { if (!this.config.enabled) return { success: false, error: "Not enabled" }; return { success: true, data: { connected: true } }; }
-  async sync(): Promise<Response> { return { success: true, data: { synced: true } }; }
-  async send(p: any): Promise<Response> { console.log("[swile] Send:", p); return { success: true, data: { id: crypto.randomUUID() } }; }
-  async getStatus() { return { connected: this.config.enabled }; }
+  async connect(): Promise<SwileResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { connected: true }, requestId: crypto.randomUUID() }; }
+  async sync(): Promise<SwileResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { synced: true } }; }
+  async send(data: any): Promise<SwileResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { sent: true } }; }
+  async getStatus() { return { enabled: this.config.enabled, connected: this.config.enabled }; }
+  async testConnection() { return (await this.connect()).success; }
 }
-export const swileService = new Service();
+
+export const swileService = new SwileService();
 export default swileService;
