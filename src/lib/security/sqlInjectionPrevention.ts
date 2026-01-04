@@ -1,23 +1,26 @@
 // sqlInjectionPrevention - Security utility
-export const sqlInjectionPrevention = {
-  enabled: true,
 
-  configure(options?: Record<string, any>): void {
-    console.log('[Security] sqlInjectionPrevention configured');
-  },
+export interface sqlInjectionPreventionResult { valid: boolean; message?: string; data?: any; }
 
-  validate(input: any): boolean {
-    // Security validation logic
-    return true;
-  },
+export function sqlInjectionPrevention(input: any): sqlInjectionPreventionResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
 
-  sanitize(input: string): string {
-    return input.replace(/<[^>]*>/g, '').trim();
-  },
+export function sqlInjectionPreventionAsync(input: any): Promise<sqlInjectionPreventionResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(sqlInjectionPrevention(input)), 0); });
+}
 
-  audit(): { secure: boolean; vulnerabilities: string[] } {
-    return { secure: true, vulnerabilities: [] };
-  },
-};
+export function sqlInjectionPreventionWithOptions(input: any, options: Record<string, any> = {}): sqlInjectionPreventionResult {
+  const result = sqlInjectionPrevention(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const sqlInjectionPreventionConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configuresqlInjectionPrevention(config: Partial<typeof sqlInjectionPreventionConfig>) {
+  Object.assign(sqlInjectionPreventionConfig, config);
+}
 
 export default sqlInjectionPrevention;
