@@ -1,30 +1,10 @@
-/**
- * @fileoverview Exportações de componentes de dashboard
- * @module components/dashboard
- */
-export { AbsenteeismChart } from './AbsenteeismChart';
-export { AdmissionsLineChart } from './AdmissionsLineChart';
-export { AlertHistoryModal } from './AlertHistoryModal';
-export { AlertsList } from './AlertsList';
-export { BirthdayCard } from './BirthdayCard';
-export { ComplianceCard } from './ComplianceCard';
-export { DashboardCustomizer } from './DashboardCustomizer';
-export { DepartmentBarChart } from './DepartmentBarChart';
-export { DepartmentChart } from './DepartmentChart';
-export { EmployeeStatusCard } from './EmployeeStatusCard';
-export { IndicatorAlertsCard } from './IndicatorAlertsCard';
-export { KPICard } from './KPICard';
-export { MetricsGrid } from './MetricsGrid';
-export { MiniCalendar } from './MiniCalendar';
-export { NotificationsPanel } from './NotificationsPanel';
-export { PayrollCostChart } from './PayrollCostChart';
-export { QuickActions } from './QuickActions';
-export { RecentActivities } from './RecentActivities';
-export { StatusPieChart } from './StatusPieChart';
-export { TasksPanel } from './TasksPanel';
-export { TurnoverDetailModal } from './TurnoverDetailModal';
-export { TurnoverEvolutionChart } from './TurnoverEvolutionChart';
-export { TurnoverGauge } from './TurnoverGauge';
-export { TurnoverYearComparisonChart } from './TurnoverYearComparisonChart';
-export { VacationCalendar } from './VacationCalendar';
-export { WelcomeCard } from './WelcomeCard';
+
+export { default as VacationCard } from "./VacationCard";
+export { default as PendingApprovalsCard } from "./PendingApprovalsCard";
+export { default as PayrollSummaryCard } from "./PayrollSummaryCard";
+export { default as FeriasVencidasCard } from "./FeriasVencidasCard";
+export { default as AbsenteismChart } from "./AbsenteismChart";
+export { default as HeadcountChart } from "./HeadcountChart";
+export { default as MetricCard } from "./MetricCard";
+export { default as TurnoverChart } from "./TurnoverChart";
+export { default as DepartmentDistributionChart } from "./DepartmentDistributionChart";
