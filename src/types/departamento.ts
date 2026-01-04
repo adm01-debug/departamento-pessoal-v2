@@ -1,34 +1,15 @@
-/**
- * @fileoverview Tipos para gestão de departamentos
- * @module types/departamento
- */
-
 export interface Departamento {
   id: string;
   nome: string;
   descricao?: string;
-  gestor_id?: string;
-  gestor_nome?: string;
-  empresa_id?: string;
-  parent_id?: string;
-  nivel?: number;
-  ativo?: boolean;
-  created_at?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export interface DepartamentoFormData extends Omit<Departamento, 'id' | 'created_at' | 'gestor_nome'> {}
-
-export interface DepartamentoFilters {
-  empresa_id?: string;
-  ativo?: boolean;
-  search?: string;
-}
-
-export interface DepartamentoStats {
-  id: string;
-  nome: string;
-  total_colaboradores: number;
-  colaboradores_ativos: number;
-  colaboradores_afastados: number;
-}
-
+export interface DepartamentoCreate extends Omit<Departamento, "id" | "createdAt" | "updatedAt"> {}
+export interface DepartamentoUpdate extends Partial<DepartamentoCreate> {}
+export interface DepartamentoFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
+export interface DepartamentoListResponse { data: Departamento[]; total: number; page: number; limit: number; }
+export type DepartamentoStatus = "ativo" | "inativo" | "pendente";
