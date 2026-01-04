@@ -1,11 +1,47 @@
 import React from "react";
-import { ChevronRight, ChevronDown, Folder, File } from "lucide-react";
-interface TreeNode { id: string; label: string; children?: TreeNode[]; icon?: React.ReactNode; }
-interface Props { data: TreeNode[]; onSelect?: (node: TreeNode) => void; defaultExpanded?: string[]; }
-export function TreeView({ data, onSelect, defaultExpanded = [] }: Props) {
-  const [expanded, setExpanded] = React.useState<Set<string>>(new Set(defaultExpanded));
-  const toggle = (id: string) => setExpanded(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
-  const renderNode = (node: TreeNode, level: number = 0) => (<div key={node.id}><div className="flex items-center gap-1 py-1 px-2 hover:bg-muted rounded cursor-pointer" style={{ paddingLeft: level * 16 }} onClick={() => { if (node.children) toggle(node.id); onSelect?.(node); }}>{node.children ? (expanded.has(node.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />) : <span className="w-4" />}{node.icon || (node.children ? <Folder className="h-4 w-4 text-yellow-500" /> : <File className="h-4 w-4" />)}<span>{node.label}</span></div>{node.children && expanded.has(node.id) && node.children.map(child => renderNode(child, level + 1))}</div>);
-  return <div className="text-sm">{data.map(node => renderNode(node))}</div>;
+import { cn } from "@/lib/utils";
+
+interface TreeViewProps {
+  children?: React.ReactNode;
+  className?: string;
+  variant?: "default" | "primary" | "secondary" | "outline";
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: () => void;
 }
+
+export function TreeView({ children, className, variant = "default", size = "md", disabled = false, loading = false, onClick }: TreeViewProps) {
+  const sizeClasses = { sm: "text-sm p-2", md: "text-base p-3", lg: "text-lg p-4" };
+  const variantClasses = {
+    default: "bg-background border",
+    primary: "bg-primary text-primary-foreground",
+    secondary: "bg-secondary text-secondary-foreground",
+    outline: "border border-input bg-transparent",
+  };
+
+  return (
+    <div
+      className={cn(
+        "rounded-lg transition-all",
+        sizeClasses[size],
+        variantClasses[variant],
+        disabled && "opacity-50 cursor-not-allowed",
+        loading && "animate-pulse",
+        onClick && !disabled && "cursor-pointer hover:opacity-80",
+        className
+      )}
+      onClick={disabled ? undefined : onClick}
+      role={onClick ? "button" : undefined}
+      aria-disabled={disabled}
+    >
+      {loading ? (
+        <div className="flex items-center justify-center">
+          <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : children}
+    </div>
+  );
+}
+
 export default TreeView;
