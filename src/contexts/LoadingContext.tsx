@@ -1,13 +1,18 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface LoadingContextType { state: any; setState: (v: any) => void; reset: () => void; }
-const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
+interface LoadingContextState { data: any; loading: boolean; error: Error | null; }
+interface LoadingContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface LoadingContextValue extends LoadingContextState, LoadingContextActions {}
+
+const LoadingContext = createContext<LoadingContextValue | undefined>(undefined);
 
 export function LoadingContextProvider({ children }: { children: ReactNode }) {
-  const [state, setStateInternal] = useState<any>(null);
-  const setState = useCallback((v: any) => setStateInternal(v), []);
-  const reset = useCallback(() => setStateInternal(null), []);
-  return <LoadingContext.Provider value={{ state, setState, reset }}>{children}</LoadingContext.Provider>;
+  const [state, setState] = useState<LoadingContextState>({ data: null, loading: false, error: null });
+  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
+  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
+  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
+  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
+  return <LoadingContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</LoadingContext.Provider>;
 }
 
 export function useLoading() {
