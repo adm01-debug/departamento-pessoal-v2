@@ -1,10 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-export function usePermission<T = any>(initialValue?: T) {
-  const [value, setValue] = useState<T | undefined>(initialValue);
+export function usePermission<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
-  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
-  return { value, setValue, loading, error, reset, execute };
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
+  }, []);
+  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
+  return { data, loading, error, execute, reset, setData };
 }
 export default usePermission;
