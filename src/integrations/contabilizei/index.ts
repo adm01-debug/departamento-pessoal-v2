@@ -1,33 +1,32 @@
-export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
-export interface Response<T = any> { success: boolean; data?: T; error?: string; timestamp: string; }
+export interface ContabilizeiConfig { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface ContabilizeiResponse<T = any> { success: boolean; data?: T; error?: string; requestId?: string; }
 
-class Service {
-  private config: Config = { enabled: false, timeout: 30000 };
-  
-  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+class ContabilizeiService {
+  private config: ContabilizeiConfig = { enabled: false, timeout: 30000 };
+  configure(c: Partial<ContabilizeiConfig>) { this.config = { ...this.config, ...c }; }
   isEnabled() { return this.config.enabled; }
   
-  async connect(): Promise<Response> {
-    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
-    console.log("[contabilizei] Connecting...");
-    return { success: true, data: { connected: true }, timestamp: new Date().toISOString() };
+  async connect(): Promise<ContabilizeiResponse> {
+    if (!this.config.enabled) return { success: false, error: "Service not enabled" };
+    console.log("[Contabilizei] Connecting...");
+    return { success: true, data: { connected: true, timestamp: new Date().toISOString() }, requestId: crypto.randomUUID() };
   }
   
-  async sync(): Promise<Response> {
-    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
-    return { success: true, data: { synced: true }, timestamp: new Date().toISOString() };
+  async sync(): Promise<ContabilizeiResponse> {
+    if (!this.config.enabled) return { success: false, error: "Service not enabled" };
+    return { success: true, data: { synced: true }, requestId: crypto.randomUUID() };
   }
   
-  async send(payload: any): Promise<Response> {
-    if (!this.config.enabled) return { success: false, error: "Not enabled", timestamp: new Date().toISOString() };
-    console.log("[contabilizei] Sending:", payload);
-    return { success: true, data: { id: crypto.randomUUID() }, timestamp: new Date().toISOString() };
+  async send(data: any): Promise<ContabilizeiResponse> {
+    if (!this.config.enabled) return { success: false, error: "Service not enabled" };
+    console.log("[Contabilizei] Sending:", data);
+    return { success: true, data: { sent: true }, requestId: crypto.randomUUID() };
   }
   
-  async getStatus(): Promise<{ connected: boolean; lastSync?: string }> {
-    return { connected: this.config.enabled, lastSync: new Date().toISOString() };
-  }
+  async getStatus() { return { enabled: this.config.enabled, connected: this.config.enabled, lastSync: new Date().toISOString() }; }
+  async testConnection() { return (await this.connect()).success; }
+  async disconnect() { console.log("[Contabilizei] Disconnected"); return { success: true }; }
 }
 
-export const contabilizeiService = new Service();
+export const contabilizeiService = new ContabilizeiService();
 export default contabilizeiService;
