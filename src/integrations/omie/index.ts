@@ -1,16 +1,13 @@
-/**
- * Integração Omie ERP
- * Sincronização contábil e fiscal
- */
-export interface IntegrationConfig { apiKey: string; ambiente: 'sandbox' | 'producao'; }
-export interface LancamentoContabil { data: Date; debito: string; credito: string; valor: number; historico: string; }
-export interface NotaFiscal { numero: string; serie: string; dataEmissao: Date; valorTotal: number; }
-
-export class Integration {
-  private config: IntegrationConfig;
-  constructor(config: IntegrationConfig) { this.config = config; }
-  async sincronizar(dados: any[]): Promise<{ sucesso: number }> { return { sucesso: dados.length }; }
-  async importar(periodo: { inicio: Date; fim: Date }): Promise<any[]> { return []; }
-  async status(): Promise<{ conectado: boolean }> { return { conectado: true }; }
+export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; }
+export interface Response<T = any> { success: boolean; data?: T; error?: string; }
+class Service {
+  private config: Config = { enabled: false };
+  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+  isEnabled() { return this.config.enabled; }
+  async connect(): Promise<Response> { if (!this.config.enabled) return { success: false, error: "Not enabled" }; return { success: true, data: { connected: true } }; }
+  async sync(): Promise<Response> { return { success: true, data: { synced: true } }; }
+  async send(p: any): Promise<Response> { console.log("[omie] Send:", p); return { success: true, data: { id: crypto.randomUUID() } }; }
+  async getStatus() { return { connected: this.config.enabled }; }
 }
-export default Integration;
+export const omieService = new Service();
+export default omieService;
