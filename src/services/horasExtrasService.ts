@@ -6,13 +6,13 @@ export interface HoraExtra {
   data: string;
   hora_inicio: string;
   hora_fim: string;
-  horas: number;
+  quantidade_horas: number;
   tipo: "50" | "100" | "noturna";
+  percentual_adicional: number;
   motivo: string;
   aprovador_id?: string;
   status: "pendente" | "aprovada" | "rejeitada" | "paga" | "compensada";
-  ponto_id?: string;
-  valor?: number;
+  destino: "pagamento" | "banco_horas";
   observacoes?: string;
   created_at: string;
 }
@@ -39,46 +39,41 @@ class HorasExtrasService {
 
   async criar(horaExtra: Partial<HoraExtra>): Promise<HoraExtra> {
     const horas = this.calcularHoras(horaExtra.hora_inicio!, horaExtra.hora_fim!);
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .insert([{ ...horaExtra, horas, status: "pendente" }])
-      .select().single();
+    const tipo = this.determinarTipo(horaExtra.data!, horaExtra.hora_inicio!, horaExtra.hora_fim!);
+    const percentual = tipo === "50" ? 50 : tipo === "100" ? 100 : 20;
+
+    const { data, error } = await supabase.from(this.tableName).insert([{
+      ...horaExtra,
+      quantidade_horas: horas,
+      tipo,
+      percentual_adicional: percentual,
+      status: "pendente",
+      destino: horaExtra.destino || "pagamento"
+    }]).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
   async aprovar(id: string, aprovadorId: string): Promise<HoraExtra> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "aprovada", aprovador_id: aprovadorId })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({ status: "aprovada", aprovador_id: aprovadorId }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
   async rejeitar(id: string, motivo: string): Promise<HoraExtra> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "rejeitada", observacoes: motivo })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({ status: "rejeitada", observacoes: motivo }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
-  async marcarPaga(id: string, valor: number): Promise<HoraExtra> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "paga", valor })
-      .eq("id", id).select().single();
+  async marcarPaga(id: string): Promise<HoraExtra> {
+    const { data, error } = await supabase.from(this.tableName).update({ status: "paga" }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
   async marcarCompensada(id: string): Promise<HoraExtra> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "compensada" })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({ status: "compensada" }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
@@ -86,31 +81,56 @@ class HorasExtrasService {
   private calcularHoras(inicio: string, fim: string): number {
     const [hI, mI] = inicio.split(":").map(Number);
     const [hF, mF] = fim.split(":").map(Number);
-    return ((hF * 60 + mF) - (hI * 60 + mI)) / 60;
+    let minutos = (hF * 60 + mF) - (hI * 60 + mI);
+    if (minutos < 0) minutos += 24 * 60;
+    return minutos / 60;
   }
 
-  async calcularValor(colaboradorId: string, horas: number, tipo: "50" | "100" | "noturna"): Promise<number> {
-    const { data: colaborador } = await supabase.from("colaboradores").select("salario").eq("id", colaboradorId).single();
-    if (!colaborador) return 0;
-
-    const valorHora = colaborador.salario / 220;
-    const multiplicador = tipo === "50" ? 1.5 : tipo === "100" ? 2 : 1.2;
-    return valorHora * multiplicador * horas;
+  private determinarTipo(data: string, inicio: string, fim: string): "50" | "100" | "noturna" {
+    const dia = new Date(data).getDay();
+    if (dia === 0 || dia === 6) return "100";
+    
+    const horaInicio = parseInt(inicio.split(":")[0]);
+    if (horaInicio >= 22 || horaInicio < 5) return "noturna";
+    
+    return "50";
   }
 
-  async obterResumoMensal(colaboradorId: string, mes: string): Promise<{ total_horas: number; horas_50: number; horas_100: number; valor_total: number }> {
+  async calcularValor(id: string): Promise<{ valor_base: number; adicional: number; total: number }> {
+    const he = await this.buscarPorId(id);
+    if (!he) throw new Error("Hora extra não encontrada");
+
+    const { data: colab } = await supabase.from("colaboradores").select("salario").eq("id", he.colaborador_id).single();
+    if (!colab) throw new Error("Colaborador não encontrado");
+
+    const valorHora = colab.salario / 220;
+    const valorBase = valorHora * he.quantidade_horas;
+    const adicional = valorBase * (he.percentual_adicional / 100);
+
+    return { valor_base: valorBase, adicional, total: valorBase + adicional };
+  }
+
+  async obterResumoMensal(colaboradorId: string, mes: string): Promise<{ total_horas: number; valor_estimado: number; por_tipo: Record<string, number> }> {
     const [ano, mesNum] = mes.split("-");
-    const dataInicio = `${ano}-${mesNum}-01`;
-    const dataFim = new Date(Number(ano), Number(mesNum), 0).toISOString().split("T")[0];
+    const horasExtras = await this.listar({
+      colaborador_id: colaboradorId,
+      data_inicio: `${ano}-${mesNum}-01`,
+      data_fim: `${ano}-${mesNum}-31`,
+      status: "aprovada"
+    });
 
-    const horas = await this.listar({ colaborador_id: colaboradorId, data_inicio: dataInicio, data_fim: dataFim, status: "aprovada" });
+    const porTipo: Record<string, number> = { "50": 0, "100": 0, "noturna": 0 };
+    let totalHoras = 0;
+    let valorEstimado = 0;
 
-    return {
-      total_horas: horas.reduce((sum, h) => sum + h.horas, 0),
-      horas_50: horas.filter(h => h.tipo === "50").reduce((sum, h) => sum + h.horas, 0),
-      horas_100: horas.filter(h => h.tipo === "100").reduce((sum, h) => sum + h.horas, 0),
-      valor_total: horas.reduce((sum, h) => sum + (h.valor || 0), 0)
-    };
+    for (const he of horasExtras) {
+      porTipo[he.tipo] += he.quantidade_horas;
+      totalHoras += he.quantidade_horas;
+      const { total } = await this.calcularValor(he.id);
+      valorEstimado += total;
+    }
+
+    return { total_horas: totalHoras, valor_estimado: valorEstimado, por_tipo: porTipo };
   }
 }
 
