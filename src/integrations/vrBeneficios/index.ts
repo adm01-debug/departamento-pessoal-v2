@@ -1,17 +1,13 @@
-/**
- * Integração VR Benefícios - Benefícios
- */
-export interface BeneficioConfig { apiKey: string; empresaCNPJ: string; ambiente: 'sandbox' | 'producao'; }
-export interface Pedido { colaboradorCPF: string; valor: number; produto: string; dataCredito: Date; }
-export interface Saldo { colaboradorCPF: string; saldoAtual: number; ultimaRecarga: Date; }
-
-export class BeneficioIntegration {
-  private config: BeneficioConfig;
-  constructor(config: BeneficioConfig) { this.config = config; }
-  async realizarRecarga(pedidos: Pedido[]): Promise<{ protocolo: string; valor: number }> { return { protocolo: 'REC_' + Date.now(), valor: pedidos.reduce((s, p) => s + p.valor, 0) }; }
-  async consultarSaldos(cpfs: string[]): Promise<Saldo[]> { return cpfs.map(cpf => ({ colaboradorCPF: cpf, saldoAtual: 0, ultimaRecarga: new Date() })); }
-  async listarColaboradores(): Promise<{ cpf: string; nome: string; cartao: string }[]> { return []; }
-  async bloquearCartao(cpf: string): Promise<void> { console.log('Bloqueando cartão VR Benefícios:', cpf); }
-  async status(): Promise<{ conectado: boolean }> { return { conectado: true }; }
+export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; }
+export interface Response<T = any> { success: boolean; data?: T; error?: string; }
+class Service {
+  private config: Config = { enabled: false };
+  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+  isEnabled() { return this.config.enabled; }
+  async connect(): Promise<Response> { if (!this.config.enabled) return { success: false, error: "Not enabled" }; return { success: true, data: { connected: true } }; }
+  async sync(): Promise<Response> { return { success: true, data: { synced: true } }; }
+  async send(p: any): Promise<Response> { console.log("[vrBeneficios] Send:", p); return { success: true, data: { id: crypto.randomUUID() } }; }
+  async getStatus() { return { connected: this.config.enabled }; }
 }
-export default BeneficioIntegration;
+export const vrBeneficiosService = new Service();
+export default vrBeneficiosService;
