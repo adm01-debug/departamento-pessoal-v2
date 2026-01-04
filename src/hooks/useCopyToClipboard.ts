@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
-export function useCopyToClipboard(): [boolean, (text: string) => Promise<void>] {
-  const [copied, setCopied] = useState(false);
-  const copy = useCallback(async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, []);
-  return [copied, copy];
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useCopyToClipboard<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
+export default useCopyToClipboard;
