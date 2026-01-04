@@ -1,13 +1,18 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface SortContextType { state: any; setState: (v: any) => void; reset: () => void; }
-const SortContext = createContext<SortContextType | undefined>(undefined);
+interface SortContextState { data: any; loading: boolean; error: Error | null; }
+interface SortContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface SortContextValue extends SortContextState, SortContextActions {}
+
+const SortContext = createContext<SortContextValue | undefined>(undefined);
 
 export function SortContextProvider({ children }: { children: ReactNode }) {
-  const [state, setStateInternal] = useState<any>(null);
-  const setState = useCallback((v: any) => setStateInternal(v), []);
-  const reset = useCallback(() => setStateInternal(null), []);
-  return <SortContext.Provider value={{ state, setState, reset }}>{children}</SortContext.Provider>;
+  const [state, setState] = useState<SortContextState>({ data: null, loading: false, error: null });
+  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
+  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
+  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
+  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
+  return <SortContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</SortContext.Provider>;
 }
 
 export function useSort() {
