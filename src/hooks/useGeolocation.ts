@@ -1,26 +1,75 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-interface Position { latitude: number; longitude: number; accuracy: number; }
+interface useGeolocationData { id?: string; [key: string]: any; }
+interface useGeolocationState { data: useGeolocationData[]; loading: boolean; error: string | null; }
 
-export function useGeolocation(options?: PositionOptions) {
-  const [position, setPosition] = useState<Position | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+export function useGeolocation() {
+  const [state, setState] = useState<useGeolocationState>({ data: [], loading: false, error: null });
+  const { toast } = useToast();
 
-  const getPosition = useCallback(() => {
-    setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setPosition({ latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy });
-        setLoading(false);
-      },
-      (err) => { setError(err.message); setLoading(false); },
-      options
-    );
-  }, [options]);
+  const fetchAll = useCallback(async (filters?: Record<string, any>) => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
+    try {
+      let query = supabase.from("items").select("*");
+      if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) query = query.eq(k, v); });
+      const { data, error } = await query;
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: data || [], loading: false }));
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  }, [toast]);
 
-  useEffect(() => { getPosition(); }, [getPosition]);
+  const create = useCallback(async (data: Omit<useGeolocationData, "id">) => {
+    setState(prev => ({ ...prev, loading: true }));
+    try {
+      const { data: result, error } = await supabase.from("items").insert(data).select().single();
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: [...prev.data, result], loading: false }));
+      toast({ title: "Sucesso", description: "Criado com sucesso" });
+      return result;
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
+    }
+  }, [toast]);
 
-  return { position, error, loading, refresh: getPosition };
+  const update = useCallback(async (id: string, data: Partial<useGeolocationData>) => {
+    setState(prev => ({ ...prev, loading: true }));
+    try {
+      const { data: result, error } = await supabase.from("items").update(data).eq("id", id).select().single();
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: prev.data.map(i => i.id === id ? result : i), loading: false }));
+      toast({ title: "Sucesso", description: "Atualizado com sucesso" });
+      return result;
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
+    }
+  }, [toast]);
+
+  const remove = useCallback(async (id: string) => {
+    setState(prev => ({ ...prev, loading: true }));
+    try {
+      const { error } = await supabase.from("items").delete().eq("id", id);
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: prev.data.filter(i => i.id !== id), loading: false }));
+      toast({ title: "Sucesso", description: "Removido com sucesso" });
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
+    }
+  }, [toast]);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  return { ...state, fetchAll, create, update, remove, refresh: fetchAll };
 }
+
 export default useGeolocation;
