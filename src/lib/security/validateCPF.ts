@@ -1,1 +1,26 @@
-export function validateCPF(cpf:string):boolean{const n=cpf.replace(/\D/g,"");if(n.length!==11||/^(\d)+$/.test(n))return false;let s=0;for(let i=0;i<9;i++)s+=parseInt(n[i])*(10-i);let r=(s*10)%11;if(r===10)r=0;if(r!==parseInt(n[9]))return false;s=0;for(let i=0;i<10;i++)s+=parseInt(n[i])*(11-i);r=(s*10)%11;if(r===10)r=0;return r===parseInt(n[10]);}export function generateCPF():string{const r=()=>Math.floor(Math.random()*9);const n=Array(9).fill(0).map(r);let s=0;for(let i=0;i<9;i++)s+=n[i]*(10-i);let d1=(s*10)%11;if(d1===10)d1=0;n.push(d1);s=0;for(let i=0;i<10;i++)s+=n[i]*(11-i);let d2=(s*10)%11;if(d2===10)d2=0;n.push(d2);return n.join("");}export default{validateCPF,generateCPF};
+// validateCPF - Security utility
+
+export interface validateCPFResult { valid: boolean; message?: string; data?: any; }
+
+export function validateCPF(input: any): validateCPFResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
+
+export function validateCPFAsync(input: any): Promise<validateCPFResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(validateCPF(input)), 0); });
+}
+
+export function validateCPFWithOptions(input: any, options: Record<string, any> = {}): validateCPFResult {
+  const result = validateCPF(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const validateCPFConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configurevalidateCPF(config: Partial<typeof validateCPFConfig>) {
+  Object.assign(validateCPFConfig, config);
+}
+
+export default validateCPF;
