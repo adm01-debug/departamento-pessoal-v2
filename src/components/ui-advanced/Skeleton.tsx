@@ -1,13 +1,5 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
-
-interface SkeletonProps { className?: string; children?: React.ReactNode; }
-
-/**
- * Skeleton loader
- */
-export const Skeleton: React.FC<SkeletonProps> = ({ className, children }) => {
-  return <div className={cn('ui-component', className)}>{children}</div>;
-};
-
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+export interface SkeletonProps { className?: string; children?: React.ReactNode; }
+export function Skeleton({ className, children }: SkeletonProps) { return <div className={className}>{children || "Skeleton Component"}</div>; }
 export default Skeleton;
