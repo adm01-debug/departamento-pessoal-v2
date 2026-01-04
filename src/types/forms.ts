@@ -1,19 +1,15 @@
-import type { FieldError } from 'react-hook-form';
-/** Campo de formulário */
-export interface FormField<T = string> {
-  value: T;
-  error?: FieldError;
-  touched?: boolean;
+export interface Forms {
+  id: string;
+  nome: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-/** Estado de submit */
-export interface SubmitState {
-  isSubmitting: boolean;
-  isSubmitted: boolean;
-  submitCount: number;
-}
-/** Props base de modal de formulário */
-export interface FormModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}
+export interface FormsCreate extends Omit<Forms, "id" | "createdAt" | "updatedAt"> {}
+export interface FormsUpdate extends Partial<FormsCreate> {}
+export interface FormsFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
+export interface FormsListResponse { data: Forms[]; total: number; page: number; limit: number; }
+export type FormsStatus = "ativo" | "inativo" | "pendente";
