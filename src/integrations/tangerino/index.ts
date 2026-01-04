@@ -1,13 +1,16 @@
-export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; }
-export interface Response<T = any> { success: boolean; data?: T; error?: string; }
-class Service {
-  private config: Config = { enabled: false };
-  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+export interface TangerinoConfig { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface TangerinoResponse<T = any> { success: boolean; data?: T; error?: string; requestId?: string; }
+
+class TangerinoService {
+  private config: TangerinoConfig = { enabled: false, timeout: 30000 };
+  configure(c: Partial<TangerinoConfig>) { this.config = { ...this.config, ...c }; }
   isEnabled() { return this.config.enabled; }
-  async connect(): Promise<Response> { if (!this.config.enabled) return { success: false, error: "Not enabled" }; return { success: true, data: { connected: true } }; }
-  async sync(): Promise<Response> { return { success: true, data: { synced: true } }; }
-  async send(p: any): Promise<Response> { console.log("[tangerino] Send:", p); return { success: true, data: { id: crypto.randomUUID() } }; }
-  async getStatus() { return { connected: this.config.enabled }; }
+  async connect(): Promise<TangerinoResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { connected: true }, requestId: crypto.randomUUID() }; }
+  async sync(): Promise<TangerinoResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { synced: true } }; }
+  async send(data: any): Promise<TangerinoResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { sent: true } }; }
+  async getStatus() { return { enabled: this.config.enabled, connected: this.config.enabled }; }
+  async testConnection() { return (await this.connect()).success; }
 }
-export const tangerinoService = new Service();
+
+export const tangerinoService = new TangerinoService();
 export default tangerinoService;
