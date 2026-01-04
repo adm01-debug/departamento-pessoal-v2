@@ -1,28 +1,16 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-
-export interface useMediaQueryOptions { enabled?: boolean; debounce?: number; }
-export interface useMediaQueryResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
-
-export function useMediaQuery<T = any>(initialValue?: T, options: useMediaQueryOptions = {}) {
-  const [data, setData] = useState<T | null>(initialValue ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const mountedRef = useRef(true);
-
-  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
-
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    if (!options.enabled && options.enabled !== undefined) return;
-    setLoading(true);
-    setError(null);
-    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
-    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
-    finally { if (mountedRef.current) { setLoading(false); } }
-  }, [options.enabled]);
-
-  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
-
-  return { data, loading, error, execute, reset, setData };
+import { useState, useEffect } from "react";
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mq.addEventListener("change", handler);
+    setMatches(mq.matches);
+    return () => mq.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
 }
-
+export const useIsMobile = () => useMediaQuery("(max-width: 768px)");
+export const useIsTablet = () => useMediaQuery("(min-width: 769px) and (max-width: 1024px)");
+export const useIsDesktop = () => useMediaQuery("(min-width: 1025px)");
 export default useMediaQuery;
