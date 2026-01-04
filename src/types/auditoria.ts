@@ -1,36 +1,14 @@
-/**
- * @fileoverview Tipos para auditoria
- * @module types/auditoria
- */
-export interface AuditLog {
+export interface Auditoria {
   id: string;
-  usuario_id: string;
-  usuario_nome?: string;
-  acao: 'criar' | 'editar' | 'excluir' | 'visualizar' | 'exportar' | 'login' | 'logout';
-  entidade: string;
-  entidade_id?: string;
-  dados_anteriores?: Record<string, unknown>;
-  dados_novos?: Record<string, unknown>;
-  ip_address?: string;
-  user_agent?: string;
-  timestamp: string;
-  empresa_id?: string;
+  nome: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export interface AuditFilters {
-  usuario_id?: string;
-  acao?: AuditLog['acao'];
-  entidade?: string;
-  entidade_id?: string;
-  data_inicio?: string;
-  data_fim?: string;
-  empresa_id?: string;
-}
-
-export interface AuditStats {
-  total_acoes: number;
-  por_acao: Record<string, number>;
-  por_usuario: Record<string, number>;
-  por_entidade: Record<string, number>;
-}
-
+export interface AuditoriaCreate extends Omit<Auditoria, "id" | "createdAt" | "updatedAt"> {}
+export interface AuditoriaUpdate extends Partial<AuditoriaCreate> {}
+export interface AuditoriaFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type AuditoriaStatus = "ativo" | "inativo" | "pendente";
