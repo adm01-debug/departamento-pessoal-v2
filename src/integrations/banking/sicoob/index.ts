@@ -1,114 +1,94 @@
 /**
  * Integração Sicoob
- * API para boletos, PIX e transferências cooperativas
+ * API: https://developers.sicoob.com.br
  */
 
 export interface SicoobConfig {
   clientId: string;
   certificado: string;
-  chavePrivada: string;
-  numeroCooperativa: string;
-  numeroContaCorrente: string;
+  chaveCertificado: string;
   ambiente: "sandbox" | "producao";
+  numeroContrato: string;
 }
 
-export interface SicoobBoleto {
-  nossoNumero: number;
-  codigoBarras: string;
-  linhaDigitavel: string;
-  valor: number;
-  dataVencimento: string;
-  situacao: "EM_ABERTO" | "BAIXADO" | "LIQUIDADO";
-}
-
-class SicoobIntegration {
+class SicoobService {
   private config: SicoobConfig | null = null;
-  private accessToken: string | null = null;
-  private baseUrl: string = "";
+  private token: string | null = null;
+  private baseUrl = "";
 
-  configure(config: SicoobConfig): void {
+  configurar(config: SicoobConfig): void {
     this.config = config;
     this.baseUrl = config.ambiente === "producao" ? "https://api.sicoob.com.br" : "https://sandbox.sicoob.com.br";
   }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken) return this.accessToken;
-    if (!this.config) throw new Error("Integração não configurada");
-    const response = await fetch(`${this.baseUrl}/oauth/token`, {
+  private async obterToken(): Promise<string> {
+    if (!this.config) throw new Error("Sicoob não configurado");
+    if (this.token) return this.token;
+    const response = await fetch(`${this.baseUrl}/cooperado/oauth/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `grant_type=client_credentials&client_id=${this.config.clientId}&scope=cobranca_boletos_consultar cobranca_boletos_incluir pix_cob`
+      body: `grant_type=client_credentials&client_id=${this.config.clientId}&scope=cobranca_boletos_consultar cobranca_boletos_incluir cobranca_boletos_pagador pix_cob_write pix_cob_read conta_corrente_saldo conta_corrente_extrato`
     });
     if (!response.ok) throw new Error("Falha na autenticação Sicoob");
     const data = await response.json();
-    this.accessToken = data.access_token;
-    return this.accessToken;
+    this.token = data.access_token;
+    return this.token!;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "client_id": this.config?.clientId || "", ...options.headers }
+  async consultarSaldo(): Promise<{ disponivel: number; bloqueado: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/conta-corrente/v2/saldo?numeroContaCorrente=${this.config!.numeroContrato}`, {
+      headers: { "Authorization": `Bearer ${token}`, "client_id": this.config!.clientId }
     });
-    if (!response.ok) throw new Error(`Erro Sicoob: ${response.status}`);
+    if (!response.ok) throw new Error("Falha ao consultar saldo");
+    const data = await response.json();
+    return { disponivel: data.saldoDisponivel || 0, bloqueado: data.saldoBloqueado || 0 };
+  }
+
+  async consultarExtrato(dataInicio: string, dataFim: string): Promise<{ lancamentos: any[] }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/conta-corrente/v2/extrato?numeroContaCorrente=${this.config!.numeroContrato}&dataInicio=${dataInicio}&dataFim=${dataFim}`, {
+      headers: { "Authorization": `Bearer ${token}`, "client_id": this.config!.clientId }
+    });
+    if (!response.ok) throw new Error("Falha ao consultar extrato");
     return response.json();
   }
 
-  async consultarSaldo(): Promise<{ saldoDisponivel: number; saldoBloqueado: number }> {
-    return this.request(`/conta-corrente/v1/contas/${this.config?.numeroContaCorrente}/saldo`);
-  }
-
-  async emitirBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string; cidade: string; uf: string; cep: string } }): Promise<SicoobBoleto> {
-    return this.request("/cobranca-bancaria/v2/boletos", {
+  async gerarBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string } }): Promise<{ nossoNumero: string; linhaDigitavel: string; codigoBarras: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/cobranca-bancaria/v2/boletos`, {
       method: "POST",
-      body: JSON.stringify({
-        numeroContrato: 0,
-        modalidade: 1,
-        numeroContaCorrente: Number(this.config?.numeroContaCorrente),
-        especieDocumento: "DM",
-        dataEmissao: new Date().toISOString().split("T")[0],
-        seuNumero: `${Date.now()}`,
-        identificacaoBoletoEmpresa: `BOL${Date.now()}`,
-        identificacaoEmissaoBoleto: 2,
-        valor: dados.valor,
-        dataVencimento: dados.vencimento,
-        pagador: { numeroCpfCnpj: dados.pagador.cpfCnpj.replace(/\D/g, ""), nome: dados.pagador.nome, endereco: dados.pagador.endereco, cidade: dados.pagador.cidade, uf: dados.pagador.uf, cep: dados.pagador.cep.replace(/\D/g, "") }
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "client_id": this.config!.clientId },
+      body: JSON.stringify({ numeroContrato: this.config!.numeroContrato, modalidade: 1, seuNumero: Date.now().toString(), dataVencimento: dados.vencimento, valor: dados.valor, pagador: dados.pagador })
     });
+    if (!response.ok) throw new Error("Falha ao gerar boleto");
+    return response.json();
   }
 
-  async consultarBoleto(nossoNumero: number): Promise<SicoobBoleto> {
-    return this.request(`/cobranca-bancaria/v2/boletos?nossoNumero=${nossoNumero}`);
-  }
-
-  async baixarBoleto(nossoNumero: number): Promise<void> {
-    await this.request(`/cobranca-bancaria/v2/boletos/${nossoNumero}/baixar`, { method: "POST" });
-  }
-
-  async gerarPixCobranca(dados: { valor: number; descricao?: string; expiracao?: number }): Promise<{ txid: string; qrcode: string; pixCopiaECola: string }> {
-    return this.request("/pix/api/v2/cob", {
+  async realizarPix(chavePix: string, valor: number, descricao?: string): Promise<{ txid: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/pix/api/v2/cob`, {
       method: "POST",
-      body: JSON.stringify({ calendario: { expiracao: dados.expiracao || 3600 }, valor: { original: dados.valor.toFixed(2) }, infoAdicionais: dados.descricao ? [{ nome: "Descricao", valor: dados.descricao }] : [] })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "client_id": this.config!.clientId },
+      body: JSON.stringify({ calendario: { expiracao: 3600 }, devedor: { nome: "Pagamento" }, valor: { original: valor.toFixed(2) }, chave: chavePix, solicitacaoPagador: descricao })
     });
+    if (!response.ok) throw new Error("Falha no PIX");
+    const data = await response.json();
+    return { txid: data.txid, status: data.status };
   }
 
-  async consultarPix(txid: string): Promise<any> {
-    return this.request(`/pix/api/v2/cob/${txid}`);
-  }
-
-  async realizarTransferencia(dados: { tipo: "TED" | "PIX"; valor: number; favorecido: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string } }): Promise<{ id: string; status: string }> {
-    return this.request("/conta-corrente/v1/transferencias", { method: "POST", body: JSON.stringify(dados) });
-  }
-
-  async processarFolhaPagamento(pagamentos: Array<{ colaborador: { nome: string; cpf: string; banco: string; agencia: string; conta: string }; valor: number }>): Promise<{ lote: string; status: string }> {
-    const loteId = `FOLHA_SICOOB_${Date.now()}`;
-    for (const pag of pagamentos) {
-      await this.realizarTransferencia({ tipo: "TED", valor: pag.valor, favorecido: { nome: pag.colaborador.nome, cpfCnpj: pag.colaborador.cpf, banco: pag.colaborador.banco, agencia: pag.colaborador.agencia, conta: pag.colaborador.conta } });
-    }
-    return { lote: loteId, status: "processando" };
+  async processarFolhaPagamento(pagamentos: Array<{ nome: string; cpf: string; banco: string; agencia: string; conta: string; valor: number }>): Promise<{ loteId: string; quantidade: number; valorTotal: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/pagamentos/v1/lotes`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", "client_id": this.config!.clientId },
+      body: JSON.stringify({ numeroContrato: this.config!.numeroContrato, pagamentos: pagamentos.map(p => ({ favorecido: { nome: p.nome, cpfCnpj: p.cpf }, conta: { banco: p.banco, agencia: p.agencia, numero: p.conta }, valor: p.valor })) })
+    });
+    if (!response.ok) throw new Error("Falha ao processar folha");
+    const data = await response.json();
+    return { loteId: data.numeroLote, quantidade: pagamentos.length, valorTotal: pagamentos.reduce((s, p) => s + p.valor, 0) };
   }
 }
 
-export const sicoob = new SicoobIntegration();
-export default sicoob;
+export const sicoobService = new SicoobService();
+export default sicoobService;
