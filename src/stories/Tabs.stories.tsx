@@ -1,8 +1,28 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import type { Meta, StoryObj } from "@storybook/react";
+import { Tabs } from "@/components/ui/Tabs";
 
-const meta: Meta<typeof Tabs> = { title: 'UI/Tabs', component: Tabs, tags: ['autodocs'] };
+const meta: Meta<typeof Tabs> = {
+  title: "Components/UI/Tabs",
+  component: Tabs,
+  parameters: { layout: "centered" },
+  tags: ["autodocs"],
+  argTypes: {
+    variant: { control: "select", options: ["default", "primary", "secondary", "outline"] },
+    size: { control: "select", options: ["sm", "md", "lg"] },
+    disabled: { control: "boolean" },
+  },
+};
+
 export default meta;
-type Story = StoryObj<typeof Tabs>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = { render: () => (<Tabs defaultValue="tab1"><TabsList><TabsTrigger value="tab1">Tab 1</TabsTrigger><TabsTrigger value="tab2">Tab 2</TabsTrigger></TabsList><TabsContent value="tab1">Content 1</TabsContent><TabsContent value="tab2">Content 2</TabsContent></Tabs>) };
+export const Default: Story = { args: { children: "Tabs Default" } };
+export const Primary: Story = { args: { variant: "primary", children: "Tabs Primary" } };
+export const Secondary: Story = { args: { variant: "secondary", children: "Tabs Secondary" } };
+export const Small: Story = { args: { size: "sm", children: "Tabs Small" } };
+export const Large: Story = { args: { size: "lg", children: "Tabs Large" } };
+export const Disabled: Story = { args: { disabled: true, children: "Tabs Disabled" } };
+export const Loading: Story = { args: { loading: true, children: "Tabs Loading" } };
+export const WithIcon: Story = { args: { children: "With Icon", icon: "check" } };
+export const FullWidth: Story = { args: { className: "w-full", children: "Full Width" } };
+export const CustomStyle: Story = { args: { className: "bg-gradient-to-r from-blue-500 to-purple-500", children: "Custom" } };
