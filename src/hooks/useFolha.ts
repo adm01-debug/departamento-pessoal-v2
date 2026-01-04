@@ -1,25 +1,75 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-interface FolhaData { colaboradorId: string; mes: number; ano: number; salarioBruto: number; descontos: number; liquido: number; }
+import { useToast } from "@/hooks/use-toast";
+
+interface useFolhaData { id?: string; [key: string]: any; }
+interface useFolhaState { data: useFolhaData[]; loading: boolean; error: string | null; }
+
 export function useFolha() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<FolhaData[]>([]);
-  const fetchFolha = useCallback(async (mes: number, ano: number) => {
-    setLoading(true); setError(null);
+  const [state, setState] = useState<useFolhaState>({ data: [], loading: false, error: null });
+  const { toast } = useToast();
+
+  const fetchAll = useCallback(async (filters?: Record<string, any>) => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const { data: result, error: err } = await supabase.from("folha_pagamento").select("*").eq("mes", mes).eq("ano", ano);
-      if (err) throw err;
-      setData(result || []);
-    } catch (e: any) { setError(e.message); } finally { setLoading(false); }
-  }, []);
-  const calcularFolha = useCallback(async (colaboradorId: string, mes: number, ano: number) => {
-    setLoading(true);
+      let query = supabase.from("items").select("*");
+      if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) query = query.eq(k, v); });
+      const { data, error } = await query;
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: data || [], loading: false }));
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  }, [toast]);
+
+  const create = useCallback(async (data: Omit<useFolhaData, "id">) => {
+    setState(prev => ({ ...prev, loading: true }));
     try {
-      const { data: result } = await supabase.rpc("calcular_folha", { p_colaborador_id: colaboradorId, p_mes: mes, p_ano: ano });
+      const { data: result, error } = await supabase.from("items").insert(data).select().single();
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: [...prev.data, result], loading: false }));
+      toast({ title: "Sucesso", description: "Criado com sucesso" });
       return result;
-    } finally { setLoading(false); }
-  }, []);
-  return { loading, error, data, fetchFolha, calcularFolha };
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
+    }
+  }, [toast]);
+
+  const update = useCallback(async (id: string, data: Partial<useFolhaData>) => {
+    setState(prev => ({ ...prev, loading: true }));
+    try {
+      const { data: result, error } = await supabase.from("items").update(data).eq("id", id).select().single();
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: prev.data.map(i => i.id === id ? result : i), loading: false }));
+      toast({ title: "Sucesso", description: "Atualizado com sucesso" });
+      return result;
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
+    }
+  }, [toast]);
+
+  const remove = useCallback(async (id: string) => {
+    setState(prev => ({ ...prev, loading: true }));
+    try {
+      const { error } = await supabase.from("items").delete().eq("id", id);
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: prev.data.filter(i => i.id !== id), loading: false }));
+      toast({ title: "Sucesso", description: "Removido com sucesso" });
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
+    }
+  }, [toast]);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  return { ...state, fetchAll, create, update, remove, refresh: fetchAll };
 }
+
 export default useFolha;
