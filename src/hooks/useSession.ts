@@ -1,240 +1,75 @@
-/**
- * @fileoverview Hook para gerenciamento de sessões
- * @module hooks/useSession
- */
-import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-export interface UserSession {
-  id: string;
-  session_token: string;
-  ip_address: string | null;
-  user_agent: string | null;
-  device_info: Record<string, any> | null;
-  location: Record<string, any> | null;
-  is_active: boolean;
-  last_activity: string;
-  expires_at: string;
-  created_at: string;
-}
-
-// Sessão expira em 24 horas
-const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
-// Refresh a cada 1 hora
-const REFRESH_INTERVAL_MS = 60 * 60 * 1000;
+interface useSessionData { id?: string; [key: string]: any; }
+interface useSessionState { data: useSessionData[]; loading: boolean; error: string | null; }
 
 export function useSession() {
-  const { user } = useAuth();
-  const [sessions, setSessions] = useState<UserSession[]>([]);
-  const [currentSession, setCurrentSession] = useState<UserSession | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState<useSessionState>({ data: [], loading: false, error: null });
+  const { toast } = useToast();
 
-  // Buscar todas as sessões do usuário
-  const fetchSessions = useCallback(async () => {
-    if (!user?.id) return [];
-
-    setIsLoading(true);
+  const fetchAll = useCallback(async (filters?: Record<string, any>) => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const { data, error } = await supabase
-        .from('user_sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('last_activity', { ascending: false });
-
-      if (error) {
-        console.error('Erro ao buscar sessões:', error);
-        return [];
-      }
-
-      setSessions(data as UserSession[]);
-      return data as UserSession[];
-    } catch (err) {
-      console.error('Erro:', err);
-      return [];
-    } finally {
-      setIsLoading(false);
+      let query = supabase.from("items").select("*");
+      if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) query = query.eq(k, v); });
+      const { data, error } = await query;
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: data || [], loading: false }));
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
     }
-  }, [user?.id]);
+  }, [toast]);
 
-  // Criar nova sessão
-  const createSession = useCallback(async () => {
-    if (!user?.id) return null;
-
-    const sessionToken = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + SESSION_DURATION_MS).toISOString();
-
-    // Obter informações do dispositivo
-    const userAgent = navigator.userAgent;
-    const deviceInfo = {
-      platform: navigator.platform,
-      language: navigator.language,
-      cookieEnabled: navigator.cookieEnabled,
-    };
-
+  const create = useCallback(async (data: Omit<useSessionData, "id">) => {
+    setState(prev => ({ ...prev, loading: true }));
     try {
-      const { data, error } = await supabase
-        .from('user_sessions')
-        .insert({
-          user_id: user.id,
-          session_token: sessionToken,
-          user_agent: userAgent,
-          device_info: deviceInfo,
-          is_active: true,
-          expires_at: expiresAt,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro ao criar sessão:', error);
-        return null;
-      }
-
-      setCurrentSession(data as UserSession);
-      
-      // Salvar token no localStorage
-      localStorage.setItem('session_token', sessionToken);
-      
-      return data as UserSession;
-    } catch (err) {
-      console.error('Erro:', err);
-      return null;
+      const { data: result, error } = await supabase.from("items").insert(data).select().single();
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: [...prev.data, result], loading: false }));
+      toast({ title: "Sucesso", description: "Criado com sucesso" });
+      return result;
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
     }
-  }, [user?.id]);
+  }, [toast]);
 
-  // Atualizar atividade da sessão (refresh)
-  const refreshSession = useCallback(async () => {
-    const sessionToken = localStorage.getItem('session_token');
-    if (!sessionToken || !user?.id) return false;
-
+  const update = useCallback(async (id: string, data: Partial<useSessionData>) => {
+    setState(prev => ({ ...prev, loading: true }));
     try {
-      const newExpiresAt = new Date(Date.now() + SESSION_DURATION_MS).toISOString();
-      
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({
-          last_activity: new Date().toISOString(),
-          expires_at: newExpiresAt,
-        })
-        .eq('session_token', sessionToken)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Erro ao atualizar sessão:', error);
-        return false;
-      }
-
-      return true;
-    } catch (err) {
-      console.error('Erro:', err);
-      return false;
+      const { data: result, error } = await supabase.from("items").update(data).eq("id", id).select().single();
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: prev.data.map(i => i.id === id ? result : i), loading: false }));
+      toast({ title: "Sucesso", description: "Atualizado com sucesso" });
+      return result;
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
     }
-  }, [user?.id]);
+  }, [toast]);
 
-  // Encerrar sessão específica
-  const terminateSession = useCallback(async (sessionId: string) => {
+  const remove = useCallback(async (id: string) => {
+    setState(prev => ({ ...prev, loading: true }));
     try {
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({ is_active: false })
-        .eq('id', sessionId);
-
-      if (error) {
-        toast.error('Erro ao encerrar sessão');
-        return false;
-      }
-
-      toast.success('Sessão encerrada');
-      await fetchSessions();
-      return true;
-    } catch (err) {
-      toast.error('Erro ao encerrar sessão');
-      return false;
+      const { error } = await supabase.from("items").delete().eq("id", id);
+      if (error) throw error;
+      setState(prev => ({ ...prev, data: prev.data.filter(i => i.id !== id), loading: false }));
+      toast({ title: "Sucesso", description: "Removido com sucesso" });
+    } catch (e: any) {
+      setState(prev => ({ ...prev, error: e.message, loading: false }));
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      throw e;
     }
-  }, [fetchSessions]);
+  }, [toast]);
 
-  // Encerrar todas as outras sessões
-  const terminateAllOtherSessions = useCallback(async () => {
-    const sessionToken = localStorage.getItem('session_token');
-    if (!user?.id || !sessionToken) return false;
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
-    try {
-      const { error } = await supabase
-        .from('user_sessions')
-        .update({ is_active: false })
-        .eq('user_id', user.id)
-        .neq('session_token', sessionToken);
-
-      if (error) {
-        toast.error('Erro ao encerrar sessões');
-        return false;
-      }
-
-      toast.success('Todas as outras sessões foram encerradas');
-      await fetchSessions();
-      return true;
-    } catch (err) {
-      toast.error('Erro ao encerrar sessões');
-      return false;
-    }
-  }, [user?.id, fetchSessions]);
-
-  // Verificar se sessão atual é válida
-  const validateCurrentSession = useCallback(async (): Promise<boolean> => {
-    const sessionToken = localStorage.getItem('session_token');
-    if (!sessionToken) return false;
-
-    try {
-      const { data, error } = await supabase
-        .from('user_sessions')
-        .select('*')
-        .eq('session_token', sessionToken)
-        .eq('is_active', true)
-        .single();
-
-      if (error || !data) return false;
-
-      // Verificar se expirou
-      if (new Date(data.expires_at) < new Date()) {
-        await terminateSession(data.id);
-        localStorage.removeItem('session_token');
-        return false;
-      }
-
-      setCurrentSession(data as UserSession);
-      return true;
-    } catch {
-      return false;
-    }
-  }, [terminateSession]);
-
-  // Auto-refresh da sessão
-  useEffect(() => {
-    if (!user?.id) return;
-
-    // Validar sessão ao montar
-    validateCurrentSession();
-
-    // Configurar refresh automático
-    const interval = setInterval(() => {
-      refreshSession();
-    }, REFRESH_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [user?.id, validateCurrentSession, refreshSession]);
-
-  return {
-    sessions,
-    currentSession,
-    isLoading,
-    fetchSessions,
-    createSession,
-    refreshSession,
-    terminateSession,
-    terminateAllOtherSessions,
-    validateCurrentSession,
-  };
+  return { ...state, fetchAll, create, update, remove, refresh: fetchAll };
 }
+
+export default useSession;
