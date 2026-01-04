@@ -1,5 +1,10 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-interface FilterContextType { filters: Record<string, any>; setFilter: (key: string, value: any) => void; clearFilters: () => void; hasFilters: boolean; }
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface FilterContextType { state: any; setState: (value: any) => void; reset: () => void; }
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
-export function FilterProvider({ children }: { children: ReactNode }) { const [filters, setFilters] = useState<Record<string, any>>({}); const setFilter = (key: string, value: any) => setFilters(f => ({ ...f, [key]: value })); const clearFilters = () => setFilters({}); return <FilterContext.Provider value={{ filters, setFilter, clearFilters, hasFilters: Object.keys(filters).length > 0 }}>{children}</FilterContext.Provider>; }
-export function useFilter() { const ctx = useContext(FilterContext); if (!ctx) throw new Error('useFilter must be used within FilterProvider'); return ctx; }
+export function FilterContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
+  const [state, setState] = useState(initialState || {});
+  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+  return <FilterContext.Provider value={{ state, setState, reset }}>{children}</FilterContext.Provider>;
+}
+export function useFilterContext() { const context = useContext(FilterContext); if (!context) throw new Error("useFilterContext must be used within FilterContextProvider"); return context; }
+export default FilterContext;
