@@ -1,22 +1,24 @@
-/**
- * @fileoverview RadioGroup wrapper
- * @module components/forms/RadioGroup
- */
-import { memo } from 'react';
-import { RadioGroup as RG, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import React from "react";
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
-interface RadioGroupProps { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; }
+interface RadioGroupProps { className?: string; label?: string; value?: any; onChange?: (value: any) => void; disabled?: boolean; error?: string; required?: boolean; placeholder?: string; options?: { value: string; label: string }[]; }
 
-export const RadioGroup = memo(function RadioGroup({ value, onChange, options }: RadioGroupProps) {
+export function RadioGroup({ className, label, value, onChange, disabled, error, required, placeholder, options = [] }: RadioGroupProps) {
   return (
-    <RG value={value} onValueChange={onChange}>
-      {options.map(o => (
-        <div key={o.value} className="flex items-center gap-2">
-          <RadioGroupItem value={o.value} id={o.value} />
-          <Label htmlFor={o.value}>{o.label}</Label>
-        </div>
-      ))}
-    </RG>
+    <div className={cn("space-y-2", className)}>
+      {label && <Label className={cn(required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>{label}</Label>}
+      <input
+        type="text"
+        value={value || ""}
+        onChange={e => onChange?.(e.target.value)}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={cn("flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm", disabled && "opacity-50 cursor-not-allowed", error && "border-red-500")}
+      />
+      {error && <p className="text-sm text-red-500">{error}</p>}
+    </div>
   );
-});
+}
+
+export default RadioGroup;
