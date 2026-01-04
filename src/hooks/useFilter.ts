@@ -1,11 +1,28 @@
-import { useState, useMemo, useCallback } from "react";
-export interface FilterConfig<T> { key: keyof T; type: "text" | "select" | "date" | "range" | "boolean"; }
-export function useFilter<T extends Record<string, any>>(data: T[], configs: FilterConfig<T>[]) {
-  const [filters, setFilters] = useState<Record<string, any>>({});
-  const setFilter = useCallback((key: string, value: any) => setFilters(prev => ({ ...prev, [key]: value })), []);
-  const clearFilter = useCallback((key: string) => setFilters(prev => { const { [key]: _, ...rest } = prev; return rest; }), []);
-  const clearAllFilters = useCallback(() => setFilters({}), []);
-  const filteredData = useMemo(() => data.filter(item => Object.entries(filters).every(([key, value]) => { if (value === undefined || value === null || value === "") return true; const itemValue = item[key]; if (typeof value === "string") return String(itemValue).toLowerCase().includes(value.toLowerCase()); return itemValue === value; })), [data, filters]);
-  return { filteredData, filters, setFilter, clearFilter, clearAllFilters, activeFiltersCount: Object.keys(filters).length };
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useFilterOptions { enabled?: boolean; debounce?: number; }
+export interface useFilterResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useFilter<T = any>(initialValue?: T, options: useFilterOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
 export default useFilter;
