@@ -1,148 +1,105 @@
 /**
  * Integração Banco Inter
- * API completa para boletos, PIX e pagamentos
+ * API: https://developers.inter.co
  */
 
 export interface InterConfig {
   clientId: string;
   clientSecret: string;
   certificado: string;
-  chavePrivada: string;
-  contaCorrente: string;
+  chaveCertificado: string;
   ambiente: "sandbox" | "producao";
+  contaCorrente: string;
 }
 
-export interface InterBoleto {
-  codigoSolicitacao: string;
-  nossoNumero: string;
-  codigoBarras: string;
-  linhaDigitavel: string;
-  valor: number;
-  dataVencimento: string;
-  situacao: "EMITIDO" | "PAGO" | "CANCELADO" | "EXPIRADO";
-}
-
-export interface InterPix {
-  txid: string;
-  pixCopiaECola: string;
-  qrcode: string;
-  valor: number;
-  status: "ATIVA" | "CONCLUIDA" | "REMOVIDA_PELO_USUARIO_RECEBEDOR";
-}
-
-class InterIntegration {
+class InterService {
   private config: InterConfig | null = null;
-  private accessToken: string | null = null;
-  private baseUrl: string = "";
+  private token: string | null = null;
+  private baseUrl = "";
 
-  configure(config: InterConfig): void {
+  configurar(config: InterConfig): void {
     this.config = config;
     this.baseUrl = config.ambiente === "producao" ? "https://cdpj.partners.bancointer.com.br" : "https://cdpj-sandbox.partners.bancointer.com.br";
   }
 
-  private async getAccessToken(): Promise<string> {
-    if (this.accessToken) return this.accessToken;
-    if (!this.config) throw new Error("Integração não configurada");
+  private async obterToken(): Promise<string> {
+    if (!this.config) throw new Error("Inter não configurado");
+    if (this.token) return this.token;
     const response = await fetch(`${this.baseUrl}/oauth/v2/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}&scope=boleto-cobranca.read boleto-cobranca.write pix.read pix.write`
+      body: `client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}&scope=extrato.read boleto-cobranca.read boleto-cobranca.write pagamento-boleto.read pagamento-boleto.write pix.read pix.write&grant_type=client_credentials`
     });
     if (!response.ok) throw new Error("Falha na autenticação Inter");
     const data = await response.json();
-    this.accessToken = data.access_token;
-    return this.accessToken;
+    this.token = data.access_token;
+    return this.token!;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json", ...options.headers }
+  async consultarSaldo(): Promise<{ disponivel: number; bloqueadoCheque: number; bloqueadoJudicial: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/banking/v2/saldo`, { headers: { "Authorization": `Bearer ${token}` } });
+    if (!response.ok) throw new Error("Falha ao consultar saldo");
+    const data = await response.json();
+    return { disponivel: data.disponivel || 0, bloqueadoCheque: data.bloqueadoCheque || 0, bloqueadoJudicial: data.bloqueadoJudicial || 0 };
+  }
+
+  async consultarExtrato(dataInicio: string, dataFim: string): Promise<{ transacoes: any[] }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/banking/v2/extrato?dataInicio=${dataInicio}&dataFim=${dataFim}`, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error(`Erro Inter: ${response.status}`);
+    if (!response.ok) throw new Error("Falha ao consultar extrato");
     return response.json();
   }
 
-  async consultarSaldo(): Promise<{ disponivel: number; bloqueadoCheque: number; bloqueadoJudicial: number; total: number }> {
-    return this.request("/banking/v2/saldo");
-  }
-
-  async consultarExtrato(dataInicio: string, dataFim: string): Promise<any[]> {
-    return this.request(`/banking/v2/extrato?dataInicio=${dataInicio}&dataFim=${dataFim}`);
-  }
-
-  async emitirBoleto(dados: { valor: number; vencimento: string; numDiasAgenda?: number; pagador: { nome: string; cpfCnpj: string; email?: string; endereco: string; cidade: string; uf: string; cep: string } }): Promise<InterBoleto> {
-    return this.request("/cobranca/v3/cobrancas", {
+  async gerarBoleto(dados: { valor: number; vencimento: string; pagador: { nome: string; cpfCnpj: string; endereco: string; cidade: string; uf: string; cep: string } }): Promise<{ nossoNumero: string; codigoBarras: string; linhaDigitavel: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/cobranca/v3/cobrancas`, {
       method: "POST",
-      body: JSON.stringify({
-        seuNumero: `${Date.now()}`,
-        valorNominal: dados.valor,
-        dataVencimento: dados.vencimento,
-        numDiasAgenda: dados.numDiasAgenda || 60,
-        pagador: { cpfCnpj: dados.pagador.cpfCnpj.replace(/\D/g, ""), tipoPessoa: dados.pagador.cpfCnpj.length === 11 ? "FISICA" : "JURIDICA", nome: dados.pagador.nome, email: dados.pagador.email, endereco: dados.pagador.endereco, cidade: dados.pagador.cidade, uf: dados.pagador.uf, cep: dados.pagador.cep.replace(/\D/g, "") }
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ seuNumero: Date.now().toString(), valorNominal: dados.valor, dataVencimento: dados.vencimento, pagador: dados.pagador })
     });
+    if (!response.ok) throw new Error("Falha ao gerar boleto");
+    return response.json();
   }
 
-  async consultarBoleto(codigoSolicitacao: string): Promise<InterBoleto> {
-    return this.request(`/cobranca/v3/cobrancas/${codigoSolicitacao}`);
-  }
-
-  async cancelarBoleto(codigoSolicitacao: string, motivo: string): Promise<void> {
-    await this.request(`/cobranca/v3/cobrancas/${codigoSolicitacao}/cancelar`, { method: "POST", body: JSON.stringify({ motivoCancelamento: motivo }) });
-  }
-
-  async gerarPixCobranca(dados: { valor: number; descricao?: string; expiracaoSegundos?: number; devedor?: { nome: string; cpf: string } }): Promise<InterPix> {
-    return this.request("/pix/v2/cob", {
+  async realizarPix(chavePix: string, valor: number, descricao?: string): Promise<{ endToEndId: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/banking/v2/pix`, {
       method: "POST",
-      body: JSON.stringify({
-        calendario: { expiracao: dados.expiracaoSegundos || 3600 },
-        valor: { original: dados.valor.toFixed(2) },
-        infoAdicionais: dados.descricao ? [{ nome: "Descricao", valor: dados.descricao }] : [],
-        devedor: dados.devedor ? { cpf: dados.devedor.cpf.replace(/\D/g, ""), nome: dados.devedor.nome } : undefined
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: chavePix, valor, descricao })
     });
+    if (!response.ok) throw new Error("Falha no PIX");
+    const data = await response.json();
+    return { endToEndId: data.endToEndId, status: data.status };
   }
 
-  async consultarPix(txid: string): Promise<InterPix> {
-    return this.request(`/pix/v2/cob/${txid}`);
-  }
-
-  async realizarPixPagamento(dados: { chave: string; valor: number; descricao?: string }): Promise<{ endToEndId: string; status: string }> {
-    return this.request("/pix/v2/pix", {
+  async pagarBoleto(codigoBarras: string, valor: number, dataVencimento: string): Promise<{ codigoTransacao: string; status: string }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/banking/v2/pagamento`, {
       method: "POST",
-      body: JSON.stringify({ valor: dados.valor.toFixed(2), destinatario: { tipo: "CHAVE", chave: dados.chave }, descricao: dados.descricao })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ codBarraLinhaDigitavel: codigoBarras, valorPagar: valor, dataPagamento: dataVencimento })
     });
+    if (!response.ok) throw new Error("Falha ao pagar boleto");
+    const data = await response.json();
+    return { codigoTransacao: data.codigoTransacao, status: data.statusPagamento };
   }
 
-  async realizarTED(dados: { valor: number; favorecido: { nome: string; cpfCnpj: string; banco: string; agencia: string; conta: string; tipoConta: string } }): Promise<{ codigoTransacao: string; status: string }> {
-    return this.request("/banking/v2/ted", {
+  async processarFolhaPagamento(pagamentos: Array<{ nome: string; cpf: string; banco: string; agencia: string; conta: string; valor: number }>): Promise<{ loteId: string; quantidade: number; valorTotal: number }> {
+    const token = await this.obterToken();
+    const response = await fetch(`${this.baseUrl}/banking/v2/pagamento/lote`, {
       method: "POST",
-      body: JSON.stringify({
-        valor: dados.valor,
-        contaDestino: { banco: dados.favorecido.banco, agencia: dados.favorecido.agencia, conta: dados.favorecido.conta, tipoConta: dados.favorecido.tipoConta },
-        favorecido: { nome: dados.favorecido.nome, cpfCnpj: dados.favorecido.cpfCnpj.replace(/\D/g, "") }
-      })
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ meuIdentificador: `FOLHA_${Date.now()}`, pagamentos: pagamentos.map(p => ({ tipo: "TED", nome: p.nome, cpfCnpj: p.cpf, banco: p.banco, agencia: p.agencia, conta: p.conta, valor: p.valor })) })
     });
-  }
-
-  async processarFolhaPagamento(pagamentos: Array<{ colaborador: { nome: string; cpf: string; chavePix?: string; banco?: string; agencia?: string; conta?: string }; valor: number }>): Promise<{ lote: string; resultados: Array<{ status: string }> }> {
-    const loteId = `FOLHA_INTER_${Date.now()}`;
-    const resultados = [];
-    for (const pag of pagamentos) {
-      try {
-        if (pag.colaborador.chavePix) {
-          await this.realizarPixPagamento({ chave: pag.colaborador.chavePix, valor: pag.valor, descricao: "Pagamento de salário" });
-        } else if (pag.colaborador.banco) {
-          await this.realizarTED({ valor: pag.valor, favorecido: { nome: pag.colaborador.nome, cpfCnpj: pag.colaborador.cpf, banco: pag.colaborador.banco!, agencia: pag.colaborador.agencia!, conta: pag.colaborador.conta!, tipoConta: "CORRENTE" } });
-        }
-        resultados.push({ status: "sucesso" });
-      } catch { resultados.push({ status: "erro" }); }
-    }
-    return { lote: loteId, resultados };
+    if (!response.ok) throw new Error("Falha ao processar folha");
+    const data = await response.json();
+    return { loteId: data.idLote || data.meuIdentificador, quantidade: pagamentos.length, valorTotal: pagamentos.reduce((s, p) => s + p.valor, 0) };
   }
 }
 
-export const inter = new InterIntegration();
-export default inter;
+export const interService = new InterService();
+export default interService;
