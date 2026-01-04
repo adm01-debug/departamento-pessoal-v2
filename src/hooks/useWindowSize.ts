@@ -1,29 +1,10 @@
-import { useState, useEffect } from 'react';
-
-interface WindowSize {
-  width: number;
-  height: number;
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useWindowSize<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
-
-export function useWindowSize(): WindowSize {
-  const [size, setSize] = useState<WindowSize>({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0,
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return size;
-}
-
 export default useWindowSize;
