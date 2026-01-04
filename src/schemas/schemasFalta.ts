@@ -1,34 +1,23 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const schemasFaltaCreate = z.object({
-  empresaId: z.string().uuid(),
-  colaboradorId: z.string().uuid().optional(),
-  descricao: z.string().min(1, 'Descrição obrigatória'),
-  valor: z.number().min(0).optional(),
-  dataInicio: z.date().optional(),
-  dataFim: z.date().optional(),
-  status: z.enum(['ativo', 'inativo', 'pendente']).default('ativo'),
-  observacoes: z.string().optional(),
+export const schemasFalta = z.object({
+  id: z.string().uuid().optional(),
+  nome: z.string().min(1).max(200),
+  descricao: z.string().max(500).optional(),
+  codigo: z.string().max(50).optional(),
+  ativo: z.boolean().default(true),
+  valor: z.number().nonnegative().optional(),
+  dataInicio: z.string().datetime().optional(),
+  dataFim: z.string().datetime().optional(),
+  observacoes: z.string().max(1000).optional(),
+  metadata: z.record(z.any()).optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 
-export const schemasFaltaUpdate = schemasFaltaCreate.partial();
+export const schemasFaltaCreate = schemasFalta.omit({ id: true, createdAt: true, updatedAt: true });
+export const schemasFaltaUpdate = schemasFalta.partial();
 
-export const schemasFaltaFilter = z.object({
-  empresaId: z.string().uuid().optional(),
-  colaboradorId: z.string().uuid().optional(),
-  status: z.enum(['ativo', 'inativo', 'pendente']).optional(),
-  dataInicio: z.date().optional(),
-  dataFim: z.date().optional(),
-});
-
-export type FaltaCreate = z.infer<typeof schemasFaltaCreate>;
-export type FaltaUpdate = z.infer<typeof schemasFaltaUpdate>;
-export type FaltaFilter = z.infer<typeof schemasFaltaFilter>;
-
-export const schemasFalta = {
-  create: schemasFaltaCreate,
-  update: schemasFaltaUpdate,
-  filter: schemasFaltaFilter,
-};
-
+export type FaltaType = z.infer<typeof schemasFalta>;
+export const validateFalta = (data: unknown) => schemasFalta.safeParse(data);
 export default schemasFalta;
