@@ -1,4 +1,28 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-export function useDebounce<T>(value: T, delay: number): T { const [debouncedValue, setDebouncedValue] = useState<T>(value); useEffect(() => { const handler = setTimeout(() => setDebouncedValue(value), delay); return () => clearTimeout(handler); }, [value, delay]); return debouncedValue; }
-export function useDebouncedCallback<T extends (...args: any[]) => any>(callback: T, delay: number): T { const timeoutRef = useRef<NodeJS.Timeout>(); return useCallback((...args: Parameters<T>) => { if (timeoutRef.current) clearTimeout(timeoutRef.current); timeoutRef.current = setTimeout(() => callback(...args), delay); }, [callback, delay]) as T; }
+
+export interface useDebounceOptions { enabled?: boolean; debounce?: number; }
+export interface useDebounceResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useDebounce<T = any>(initialValue?: T, options: useDebounceOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
+}
+
 export default useDebounce;
