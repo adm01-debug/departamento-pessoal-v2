@@ -3,12 +3,18 @@ export interface FolhaPagamento {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface FolhaPagamentoCreate extends Omit<FolhaPagamento, "id" | "createdAt" | "updatedAt"> {}
-export interface FolhaPagamentoUpdate extends Partial<FolhaPagamentoCreate> {}
-export interface FolhaPagamentoFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type FolhaPagamentoStatus = "ativo" | "inativo" | "pendente";
+export interface FolhaPagamentoUpdate extends Partial<Omit<FolhaPagamento, "id" | "createdAt">> {}
+export interface FolhaPagamentoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface FolhaPagamentoListResponse { data: FolhaPagamento[]; total: number; page: number; limit: number; totalPages: number; }
+export type FolhaPagamentoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
