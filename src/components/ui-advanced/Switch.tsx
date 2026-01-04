@@ -1,10 +1,11 @@
-class SwitchClass {
-  async execute(params: any): Promise<any> { console.log("Switch executed", params); return { success: true }; }
-  async list(filters?: any): Promise<any[]> { return []; }
-  async getById(id: string): Promise<any | null> { return null; }
-  async create(data: any): Promise<any> { return { id: Date.now().toString(), ...data }; }
-  async update(id: string, data: any): Promise<any> { return { id, ...data }; }
-  async delete(id: string): Promise<boolean> { return true; }
-}
-export const Switch = new SwitchClass();
+import * as React from "react";
+import { cn } from "@/lib/utils";
+export interface SwitchProps extends React.HTMLAttributes<HTMLDivElement> { variant?: "default" | "outline" | "ghost"; size?: "sm" | "md" | "lg"; disabled?: boolean; }
+const Switch = React.forwardRef<HTMLDivElement, SwitchProps>(({ className, variant = "default", size = "md", disabled = false, children, ...props }, ref) => {
+  const variants = { default: "bg-primary text-primary-foreground", outline: "border border-input bg-background", ghost: "hover:bg-accent" };
+  const sizes = { sm: "p-2 text-sm", md: "p-4 text-base", lg: "p-6 text-lg" };
+  return (<div ref={ref} className={cn("rounded-lg transition-colors", variants[variant], sizes[size], disabled && "opacity-50 pointer-events-none", className)} {...props}>{children}</div>);
+});
+Switch.displayName = "Switch";
+export { Switch };
 export default Switch;
