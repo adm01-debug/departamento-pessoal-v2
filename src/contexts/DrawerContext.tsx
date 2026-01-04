@@ -1,13 +1,18 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-interface DrawerContextType { state: any; setState: (v: any) => void; reset: () => void; }
-const DrawerContext = createContext<DrawerContextType | undefined>(undefined);
+interface DrawerContextState { data: any; loading: boolean; error: Error | null; }
+interface DrawerContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface DrawerContextValue extends DrawerContextState, DrawerContextActions {}
+
+const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
 
 export function DrawerContextProvider({ children }: { children: ReactNode }) {
-  const [state, setStateInternal] = useState<any>(null);
-  const setState = useCallback((v: any) => setStateInternal(v), []);
-  const reset = useCallback(() => setStateInternal(null), []);
-  return <DrawerContext.Provider value={{ state, setState, reset }}>{children}</DrawerContext.Provider>;
+  const [state, setState] = useState<DrawerContextState>({ data: null, loading: false, error: null });
+  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
+  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
+  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
+  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
+  return <DrawerContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</DrawerContext.Provider>;
 }
 
 export function useDrawer() {
