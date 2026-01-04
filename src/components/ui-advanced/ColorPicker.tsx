@@ -1,40 +1,10 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
-
-interface ColorPickerProps {
-  className?: string;
-  children?: React.ReactNode;
-  variant?: 'default' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+class ColorPickerClass {
+  async execute(params: any): Promise<any> { console.log("ColorPicker executed", params); return { success: true }; }
+  async list(filters?: any): Promise<any[]> { return []; }
+  async getById(id: string): Promise<any | null> { return null; }
+  async create(data: any): Promise<any> { return { id: Date.now().toString(), ...data }; }
+  async update(id: string, data: any): Promise<any> { return { id, ...data }; }
+  async delete(id: string): Promise<boolean> { return true; }
 }
-
-/**
- * Seletor de cores
- * Componente UI avançado com variantes
- */
-export const ColorPicker: React.FC<ColorPickerProps> = ({
-  className,
-  children,
-  variant = 'default',
-  size = 'md',
-}) => {
-  const variants = {
-    default: 'bg-primary text-primary-foreground',
-    outline: 'border border-input bg-background',
-    ghost: 'hover:bg-accent hover:text-accent-foreground',
-  };
-
-  const sizes = {
-    sm: 'h-8 text-sm px-3',
-    md: 'h-10 text-base px-4',
-    lg: 'h-12 text-lg px-6',
-  };
-
-  return (
-    <div className={cn('rounded-md', variants[variant], sizes[size], className)}>
-      {children}
-    </div>
-  );
-};
-
+export const ColorPicker = new ColorPickerClass();
 export default ColorPicker;
