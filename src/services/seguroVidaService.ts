@@ -4,31 +4,39 @@ export interface SeguroVida {
   id: string;
   empresa_id: string;
   seguradora: string;
-  nome_plano: string;
   numero_apolice: string;
-  capital_segurado: number;
-  capital_invalidez: number;
-  valor_mensal: number;
-  coberturas: string[];
+  tipo: "vida" | "vida_e_acidentes" | "acidentes_pessoais";
+  capital_segurado_morte: number;
+  capital_segurado_invalidez: number;
+  capital_segurado_funeral: number;
+  valor_premio_mensal: number;
+  percentual_empresa: number;
+  percentual_colaborador: number;
+  cobertura_conjuge: boolean;
+  cobertura_filhos: boolean;
   vigencia_inicio: string;
   vigencia_fim: string;
+  contato: string;
+  telefone: string;
   ativo: boolean;
   created_at: string;
 }
 
 export interface BeneficiarioSeguro {
   id: string;
-  seguro_id: string;
+  seguro_vida_id: string;
   colaborador_id: string;
-  beneficiarios_indicados: { nome: string; parentesco: string; percentual: number }[];
-  data_adesao: string;
-  valor_desconto: number;
-  ativo: boolean;
+  nome: string;
+  cpf: string;
+  parentesco: string;
+  percentual_participacao: number;
+  data_inclusao: string;
+  status: "ativo" | "inativo";
 }
 
 class SeguroVidaService {
   async listarSeguros(empresaId: string): Promise<SeguroVida[]> {
-    const { data, error } = await supabase.from("seguros_vida").select("*").eq("empresa_id", empresaId).eq("ativo", true);
+    const { data, error } = await supabase.from("seguros_vida").select("*").eq("empresa_id", empresaId).order("seguradora");
     if (error) throw new Error(`Erro: ${error.message}`);
     return data || [];
   }
@@ -45,44 +53,63 @@ class SeguroVidaService {
     return data;
   }
 
-  async incluirColaborador(dados: Partial<BeneficiarioSeguro>): Promise<BeneficiarioSeguro> {
-    const seguro = await this.buscarSeguro(dados.seguro_id!);
-    if (!seguro) throw new Error("Seguro não encontrado");
+  async vincularColaborador(seguroId: string, colaboradorId: string): Promise<void> {
+    const { error } = await supabase.from("seguros_colaboradores").insert([{ seguro_vida_id: seguroId, colaborador_id: colaboradorId, data_adesao: new Date().toISOString().split("T")[0], status: "ativo" }]);
+    if (error) throw new Error(`Erro: ${error.message}`);
+  }
 
-    const { data, error } = await supabase
-      .from("beneficiarios_seguro")
-      .insert([{ ...dados, valor_desconto: seguro.valor_mensal, ativo: true }])
-      .select().single();
+  async adicionarBeneficiario(seguroId: string, colaboradorId: string, dados: Partial<BeneficiarioSeguro>): Promise<BeneficiarioSeguro> {
+    const beneficiarios = await this.listarBeneficiarios(seguroId, colaboradorId);
+    const totalPercentual = beneficiarios.reduce((sum, b) => sum + b.percentual_participacao, 0);
+    
+    if (totalPercentual + (dados.percentual_participacao || 0) > 100) {
+      throw new Error("Total de participação não pode exceder 100%");
+    }
+
+    const { data, error } = await supabase.from("beneficiarios_seguro").insert([{
+      seguro_vida_id: seguroId,
+      colaborador_id: colaboradorId,
+      data_inclusao: new Date().toISOString().split("T")[0],
+      status: "ativo",
+      ...dados
+    }]).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
-  async atualizarBeneficiarios(id: string, beneficiarios: { nome: string; parentesco: string; percentual: number }[]): Promise<BeneficiarioSeguro> {
-    const total = beneficiarios.reduce((sum, b) => sum + b.percentual, 0);
-    if (total !== 100) throw new Error("Percentuais devem somar 100%");
-
-    const { data, error } = await supabase
-      .from("beneficiarios_seguro")
-      .update({ beneficiarios_indicados: beneficiarios })
-      .eq("id", id).select().single();
-    if (error) throw new Error(`Erro: ${error.message}`);
-    return data;
-  }
-
-  async excluirColaborador(id: string): Promise<void> {
-    const { error } = await supabase.from("beneficiarios_seguro").update({ ativo: false }).eq("id", id);
-    if (error) throw new Error(`Erro: ${error.message}`);
-  }
-
-  async listarBeneficiarios(colaboradorId: string): Promise<BeneficiarioSeguro[]> {
-    const { data, error } = await supabase.from("beneficiarios_seguro").select("*, seguros_vida(*)").eq("colaborador_id", colaboradorId).eq("ativo", true);
+  async listarBeneficiarios(seguroId: string, colaboradorId: string): Promise<BeneficiarioSeguro[]> {
+    const { data, error } = await supabase.from("beneficiarios_seguro").select("*").eq("seguro_vida_id", seguroId).eq("colaborador_id", colaboradorId).eq("status", "ativo");
     if (error) throw new Error(`Erro: ${error.message}`);
     return data || [];
   }
 
-  async calcularDescontoFolha(colaboradorId: string): Promise<number> {
-    const beneficiarios = await this.listarBeneficiarios(colaboradorId);
-    return beneficiarios.reduce((sum, b) => sum + b.valor_desconto, 0);
+  async calcularDesconto(colaboradorId: string): Promise<{ valor_empresa: number; valor_colaborador: number }> {
+    const { data: vinculos } = await supabase.from("seguros_colaboradores").select("*, seguros_vida(*)").eq("colaborador_id", colaboradorId).eq("status", "ativo");
+    
+    let totalEmpresa = 0;
+    let totalColaborador = 0;
+
+    if (vinculos) {
+      for (const v of vinculos) {
+        const seguro = (v as any).seguros_vida as SeguroVida;
+        totalEmpresa += seguro.valor_premio_mensal * (seguro.percentual_empresa / 100);
+        totalColaborador += seguro.valor_premio_mensal * (seguro.percentual_colaborador / 100);
+      }
+    }
+
+    return { valor_empresa: totalEmpresa, valor_colaborador: totalColaborador };
+  }
+
+  async registrarSinistro(seguroId: string, colaboradorId: string, tipo: string, descricao: string): Promise<void> {
+    const { error } = await supabase.from("sinistros_seguro").insert([{
+      seguro_vida_id: seguroId,
+      colaborador_id: colaboradorId,
+      tipo,
+      descricao,
+      data_ocorrencia: new Date().toISOString().split("T")[0],
+      status: "em_analise"
+    }]);
+    if (error) throw new Error(`Erro: ${error.message}`);
   }
 }
 
