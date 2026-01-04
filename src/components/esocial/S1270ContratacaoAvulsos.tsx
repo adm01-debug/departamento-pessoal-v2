@@ -1,16 +1,30 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-interface S1270ContratacaoAvulsosProps { title?: string; status?: "pendente" | "enviado" | "aceito" | "rejeitado"; data?: any; className?: string; }
-export function S1270ContratacaoAvulsos({ title = "S1270ContratacaoAvulsos", status = "pendente", data, className }: S1270ContratacaoAvulsosProps) {
-  const statusColors = { pendente: "bg-yellow-500", enviado: "bg-blue-500", aceito: "bg-green-500", rejeitado: "bg-red-500" };
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+interface S1270ContratacaoAvulsosProps { className?: string; data?: any[]; onSubmit?: (data: any) => void; loading?: boolean; }
+
+export function S1270ContratacaoAvulsos({ className, data = [], onSubmit, loading = false }: S1270ContratacaoAvulsosProps) {
+  const handleSubmit = () => { if (onSubmit) onSubmit({ component: "S1270ContratacaoAvulsos", timestamp: new Date().toISOString() }); };
+  
+  if (loading) return <Card className={cn("animate-pulse", className)}><CardContent className="p-6"><div className="h-20 bg-muted rounded" /></CardContent></Card>;
+  
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Badge className={statusColors[status]}>{status}</Badge>
+    <Card className={cn("", className)}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div><CardTitle className="text-lg">S1270ContratacaoAvulsos</CardTitle><CardDescription>Componente eSocial</CardDescription></div>
+          <Badge variant="outline">eSocial</Badge>
+        </div>
       </CardHeader>
-      <CardContent>{data && <pre className="text-xs">{JSON.stringify(data, null, 2)}</pre>}</CardContent>
+      <CardContent className="space-y-4">
+        <div className="text-sm text-muted-foreground">{data.length > 0 ? data.length + " registros" : "Nenhum registro"}</div>
+        <Button onClick={handleSubmit} disabled={loading}>Processar</Button>
+      </CardContent>
     </Card>
   );
 }
+
 export default S1270ContratacaoAvulsos;
