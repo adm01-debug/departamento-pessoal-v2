@@ -1,44 +1,13 @@
-/**
- * Types para Dependente
- * Departamento Pessoal
- */
-
 export interface Dependente {
   id: string;
-  empresaId: string;
-  colaboradorId?: string;
-  descricao: string;
-  valor?: number;
-  dataInicio?: Date;
-  dataFim?: Date;
-  status: DependenteStatus;
-  observacoes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  nome: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export type DependenteStatus = 'ativo' | 'inativo' | 'pendente' | 'cancelado';
-
-export interface DependenteCreate extends Omit<Dependente, 'id' | 'createdAt' | 'updatedAt'> {}
-
+export interface DependenteCreate extends Omit<Dependente, "id" | "createdAt" | "updatedAt"> {}
 export interface DependenteUpdate extends Partial<DependenteCreate> {}
-
-export interface DependenteFilter {
-  empresaId?: string;
-  colaboradorId?: string;
-  status?: DependenteStatus;
-  dataInicio?: Date;
-  dataFim?: Date;
-  search?: string;
-}
-
-export interface DependenteListResponse {
-  data: Dependente[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export default Dependente;
+export interface DependenteFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type DependenteStatus = "ativo" | "inativo" | "pendente";
