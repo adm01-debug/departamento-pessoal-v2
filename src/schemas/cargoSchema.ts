@@ -2,26 +2,33 @@ import { z } from "zod";
 
 export const cargoSchema = z.object({
   id: z.string().uuid().optional(),
-  nome: z.string().min(1, "Nome obrigatório").max(200),
-  descricao: z.string().max(500).optional(),
-  codigo: z.string().max(50).optional(),
+  nome: z.string().min(1, "Nome obrigatório").max(100),
+  descricao: z.string().optional(),
+  codigo: z.string().optional(),
   ativo: z.boolean().default(true),
-  valor: z.number().nonnegative().optional(),
-  dataInicio: z.string().datetime().optional(),
-  dataFim: z.string().datetime().optional(),
-  observacoes: z.string().max(1000).optional(),
-  metadata: z.record(z.any()).optional(),
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
+  dataCriacao: z.date().optional(),
+  dataAtualizacao: z.date().optional(),
+  criadoPor: z.string().optional(),
+  atualizadoPor: z.string().optional(),
 });
 
-export const cargoSchemaCreate = cargoSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export const cargoSchemaUpdate = cargoSchema.partial().omit({ id: true, createdAt: true });
-export const cargoSchemaFilter = z.object({ search: z.string().optional(), ativo: z.boolean().optional(), page: z.number().optional(), limit: z.number().optional() });
+export const cargoSchemaCreate = cargoSchema.omit({ id: true, dataCriacao: true, dataAtualizacao: true });
+export const cargoSchemaUpdate = cargoSchema.partial().required({ id: true });
+export const cargoSchemaFilter = cargoSchema.partial();
 
-export type cargoType = z.infer<typeof cargoSchema>;
-export type cargoCreateType = z.infer<typeof cargoSchemaCreate>;
-export type cargoUpdateType = z.infer<typeof cargoSchemaUpdate>;
+export type cargoSchemaType = z.infer<typeof cargoSchema>;
+export type cargoSchemaCreateType = z.infer<typeof cargoSchemaCreate>;
+export type cargoSchemaUpdateType = z.infer<typeof cargoSchemaUpdate>;
+export type cargoSchemaFilterType = z.infer<typeof cargoSchemaFilter>;
 
-export const validatecargo = (data: unknown) => cargoSchema.safeParse(data);
+export function validatecargoSchema(data: unknown): cargoSchemaType {
+  return cargoSchema.parse(data);
+}
+
+export function safeValidatecargoSchema(data: unknown): { success: boolean; data?: cargoSchemaType; error?: z.ZodError } {
+  const result = cargoSchema.safeParse(data);
+  if (result.success) return { success: true, data: result.data };
+  return { success: false, error: result.error };
+}
+
 export default cargoSchema;
