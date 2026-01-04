@@ -1,25 +1,43 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
 
-interface ThemeContextState { data: any; loading: boolean; error: Error | null; }
-interface ThemeContextActions { setData: (d: any) => void; setLoading: (l: boolean) => void; setError: (e: Error | null) => void; reset: () => void; }
+interface ThemeContextState {
+  data: any;
+  loading: boolean;
+  error: string | null;
+}
+
+interface ThemeContextActions {
+  setData: (data: any) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+  refresh: () => Promise<void>;
+}
+
 interface ThemeContextValue extends ThemeContextState, ThemeContextActions {}
+
+const initialState: ThemeContextState = { data: null, loading: false, error: null };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeContextProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<ThemeContextState>({ data: null, loading: false, error: null });
-  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
-  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
-  const setError = useCallback((e: Error | null) => setState(s => ({ ...s, error: e })), []);
-  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
-  return <ThemeContext.Provider value={{ ...state, setData, setLoading, setError, reset }}>{children}</ThemeContext.Provider>;
+  const [state, setState] = useState<ThemeContextState>(initialState);
+
+  const setData = useCallback((data: any) => setState(prev => ({ ...prev, data })), []);
+  const setLoading = useCallback((loading: boolean) => setState(prev => ({ ...prev, loading })), []);
+  const setError = useCallback((error: string | null) => setState(prev => ({ ...prev, error })), []);
+  const reset = useCallback(() => setState(initialState), []);
+  const refresh = useCallback(async () => { setLoading(true); try { /* fetch */ } finally { setLoading(false); } }, [setLoading]);
+
+  const value = useMemo(() => ({ ...state, setData, setLoading, setError, reset, refresh }), [state, setData, setLoading, setError, reset, refresh]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeContextProvider");
-  return ctx;
+export function useThemeContext() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("useThemeContext must be used within ThemeContextProvider");
+  return context;
 }
 
-export { ThemeContext };
 export default ThemeContext;
