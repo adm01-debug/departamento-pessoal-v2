@@ -3,20 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 export interface Transferencia {
   id: string;
   colaborador_id: string;
-  tipo: "departamento" | "filial" | "cargo" | "cidade";
-  departamento_origem_id?: string;
-  departamento_destino_id?: string;
-  filial_origem_id?: string;
-  filial_destino_id?: string;
-  cargo_origem_id?: string;
-  cargo_destino_id?: string;
-  cidade_origem?: string;
-  cidade_destino?: string;
+  tipo: "departamento" | "filial" | "cargo" | "unidade";
+  origem_departamento_id?: string;
+  destino_departamento_id?: string;
+  origem_filial_id?: string;
+  destino_filial_id?: string;
+  origem_cargo_id?: string;
+  destino_cargo_id?: string;
   data_solicitacao: string;
   data_efetivacao: string;
   motivo: string;
-  adicional_transferencia?: number;
-  ajuda_custo?: number;
+  solicitante_id: string;
   aprovador_id?: string;
   status: "pendente" | "aprovada" | "rejeitada" | "efetivada" | "cancelada";
   observacoes?: string;
@@ -43,28 +40,29 @@ class TransferenciaService {
   }
 
   async criar(transferencia: Partial<Transferencia>): Promise<Transferencia> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .insert([{ ...transferencia, status: "pendente" }])
-      .select().single();
+    const { data, error } = await supabase.from(this.tableName).insert([{
+      ...transferencia,
+      data_solicitacao: new Date().toISOString().split("T")[0],
+      status: "pendente"
+    }]).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
   async aprovar(id: string, aprovadorId: string): Promise<Transferencia> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "aprovada", aprovador_id: aprovadorId })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({
+      status: "aprovada",
+      aprovador_id: aprovadorId
+    }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
   async rejeitar(id: string, motivo: string): Promise<Transferencia> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "rejeitada", observacoes: motivo })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({
+      status: "rejeitada",
+      observacoes: motivo
+    }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
@@ -74,34 +72,27 @@ class TransferenciaService {
     if (!transferencia) throw new Error("Transferência não encontrada");
     if (transferencia.status !== "aprovada") throw new Error("Transferência deve estar aprovada");
 
-    const atualizacoes: Record<string, unknown> = {};
-    if (transferencia.departamento_destino_id) atualizacoes.departamento_id = transferencia.departamento_destino_id;
-    if (transferencia.filial_destino_id) atualizacoes.filial_id = transferencia.filial_destino_id;
-    if (transferencia.cargo_destino_id) atualizacoes.cargo_id = transferencia.cargo_destino_id;
-    if (transferencia.cidade_destino) atualizacoes.cidade = transferencia.cidade_destino;
+    const atualizacao: Record<string, unknown> = {};
+    if (transferencia.destino_departamento_id) atualizacao.departamento_id = transferencia.destino_departamento_id;
+    if (transferencia.destino_cargo_id) atualizacao.cargo_id = transferencia.destino_cargo_id;
+    if (transferencia.destino_filial_id) atualizacao.filial_id = transferencia.destino_filial_id;
 
-    await supabase.from("colaboradores").update(atualizacoes).eq("id", transferencia.colaborador_id);
+    if (Object.keys(atualizacao).length > 0) {
+      await supabase.from("colaboradores").update(atualizacao).eq("id", transferencia.colaborador_id);
+    }
 
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "efetivada" })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({ status: "efetivada" }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
 
   async cancelar(id: string, motivo: string): Promise<Transferencia> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .update({ status: "cancelada", observacoes: motivo })
-      .eq("id", id).select().single();
+    const { data, error } = await supabase.from(this.tableName).update({
+      status: "cancelada",
+      observacoes: motivo
+    }).eq("id", id).select().single();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
-  }
-
-  async calcularAdicionalTransferencia(salario: number, distanciaKm: number): Promise<number> {
-    if (distanciaKm < 50) return 0;
-    return salario * 0.25; // 25% do salário para transferências > 50km
   }
 
   async obterHistorico(colaboradorId: string): Promise<Transferencia[]> {
