@@ -3,12 +3,18 @@ export interface Departamento {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface DepartamentoCreate extends Omit<Departamento, "id" | "createdAt" | "updatedAt"> {}
-export interface DepartamentoUpdate extends Partial<DepartamentoCreate> {}
-export interface DepartamentoFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type DepartamentoStatus = "ativo" | "inativo" | "pendente";
+export interface DepartamentoUpdate extends Partial<Omit<Departamento, "id" | "createdAt">> {}
+export interface DepartamentoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface DepartamentoListResponse { data: Departamento[]; total: number; page: number; limit: number; totalPages: number; }
+export type DepartamentoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
