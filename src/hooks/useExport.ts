@@ -1,22 +1,28 @@
-import { useCallback, useState } from "react";
-export function useExport<T extends Record<string, any>>() {
-  const [isExporting, setIsExporting] = useState(false);
-  const exportToCSV = useCallback((data: T[], filename: string, columns?: { key: keyof T; label: string }[]) => {
-    setIsExporting(true);
-    try {
-      const cols = columns || Object.keys(data[0] || {}).map(k => ({ key: k as keyof T, label: k }));
-      const header = cols.map(c => c.label).join(";");
-      const rows = data.map(item => cols.map(c => String(item[c.key] ?? "").replace(/;/g, ",")).join(";")).join("\n");
-      const csv = "\uFEFF" + header + "\n" + rows;
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `${filename}.csv`; link.click();
-    } finally { setIsExporting(false); }
-  }, []);
-  const exportToJSON = useCallback((data: T[], filename: string) => {
-    setIsExporting(true);
-    try { const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `${filename}.json`; link.click(); }
-    finally { setIsExporting(false); }
-  }, []);
-  return { exportToCSV, exportToJSON, isExporting };
+import { useState, useEffect, useCallback, useRef } from "react";
+
+export interface useExportOptions { enabled?: boolean; debounce?: number; }
+export interface useExportResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+
+export function useExport<T = any>(initialValue?: T, options: useExportOptions = {}) {
+  const [data, setData] = useState<T | null>(initialValue ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    if (!options.enabled && options.enabled !== undefined) return;
+    setLoading(true);
+    setError(null);
+    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
+    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
+    finally { if (mountedRef.current) { setLoading(false); } }
+  }, [options.enabled]);
+
+  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+
+  return { data, loading, error, execute, reset, setData };
 }
+
 export default useExport;
