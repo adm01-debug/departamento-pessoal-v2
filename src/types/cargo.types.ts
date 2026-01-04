@@ -1,20 +1,64 @@
-export interface Cargo {
+export interface cargoBase {
   id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface cargoData extends cargoBase {
   nome: string;
   descricao?: string;
   codigo?: string;
   ativo: boolean;
-  valor?: number;
-  dataInicio?: string;
-  dataFim?: string;
-  observacoes?: string;
-  metadata?: Record<string, any>;
-  createdAt: string;
-  updatedAt: string;
+  metadata?: Record<string, unknown>;
 }
 
-export interface CargoCreate extends Omit<Cargo, "id" | "createdAt" | "updatedAt"> {}
-export interface CargoUpdate extends Partial<Omit<Cargo, "id" | "createdAt">> {}
-export interface CargoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
-export interface CargoListResponse { data: Cargo[]; total: number; page: number; limit: number; totalPages: number; }
-export type CargoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
+export interface cargoCreate extends Omit<cargoData, "id" | "createdAt" | "updatedAt"> {}
+
+export interface cargoUpdate extends Partial<cargoCreate> {
+  id: string;
+}
+
+export interface cargoFilter {
+  id?: string;
+  nome?: string;
+  ativo?: boolean;
+  createdAtFrom?: Date;
+  createdAtTo?: Date;
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: keyof cargoData;
+  sortOrder?: "asc" | "desc";
+}
+
+export interface cargoListResponse {
+  data: cargoData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface cargoStats {
+  total: number;
+  ativos: number;
+  inativos: number;
+  criadosHoje: number;
+  criadosSemana: number;
+  criadosMes: number;
+}
+
+export type cargoStatus = "ativo" | "inativo" | "pendente" | "arquivado";
+
+export const cargoStatusLabels: Record<cargoStatus, string> = {
+  ativo: "Ativo",
+  inativo: "Inativo",
+  pendente: "Pendente",
+  arquivado: "Arquivado",
+};
+
+export function iscargoData(obj: unknown): obj is cargoData {
+  return typeof obj === "object" && obj !== null && "id" in obj && "nome" in obj;
+}
