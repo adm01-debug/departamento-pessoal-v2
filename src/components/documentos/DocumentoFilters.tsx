@@ -1,34 +1,28 @@
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { FileText, Download, Eye } from "lucide-react";
 
-interface DocumentoFiltersProps {
-  onSearchChange?: (search: string) => void;
-  onTipoChange?: (tipo: string) => void;
-}
+interface DocumentoFiltersProps { className?: string; data?: any; onAction?: (action: string, data?: any) => void; loading?: boolean; }
 
-export function DocumentoFilters({ onSearchChange, onTipoChange }: DocumentoFiltersProps) {
+export function DocumentoFilters({ className, data, onAction, loading }: DocumentoFiltersProps) {
+  if (loading) return <Card className={cn("animate-pulse", className)}><CardContent className="p-6"><div className="h-32 bg-muted rounded" /></CardContent></Card>;
+  
   return (
-    <div className="flex gap-4">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Buscar documentos..."
-          className="pl-9"
-          onChange={(e) => onSearchChange?.(e.target.value)}
-        />
-      </div>
-      <Select onValueChange={onTipoChange}>
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Tipo de documento" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="todos">Todos</SelectItem>
-          <SelectItem value="contrato">Contrato</SelectItem>
-          <SelectItem value="atestado">Atestado</SelectItem>
-          <SelectItem value="documento_pessoal">Documento Pessoal</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <Card className={cn("", className)}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />DocumentoFilters</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="text-sm text-muted-foreground">{data ? "Documento disponível" : "Nenhum documento"}</div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => onAction?.("view", data)}><Eye className="h-4 w-4 mr-2" />Visualizar</Button>
+          <Button variant="outline" size="sm" onClick={() => onAction?.("download", data)}><Download className="h-4 w-4 mr-2" />Baixar</Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
+
+export default DocumentoFilters;
