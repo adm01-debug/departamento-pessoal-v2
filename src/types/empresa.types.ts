@@ -1,14 +1,15 @@
 export interface Empresa {
   id: string;
-  nome?: string;
+  nome: string;
   descricao?: string;
-  status?: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
   createdAt: string;
   updatedAt: string;
+  metadata?: Record<string, any>;
 }
 export interface EmpresaCreate extends Omit<Empresa, "id" | "createdAt" | "updatedAt"> {}
 export interface EmpresaUpdate extends Partial<EmpresaCreate> {}
-export interface EmpresaFilter { id?: string; status?: string; search?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
+export interface EmpresaFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
 export interface EmpresaListResponse { data: Empresa[]; total: number; page: number; limit: number; }
 export type EmpresaStatus = "ativo" | "inativo" | "pendente";
-export default Empresa;
