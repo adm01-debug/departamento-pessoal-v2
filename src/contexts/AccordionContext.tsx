@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface AccordionContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface AccordionContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const AccordionContext = createContext<AccordionContextType | undefined>(undefined);
-export function AccordionContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+export function AccordionContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <AccordionContext.Provider value={{ state, setState, reset }}>{children}</AccordionContext.Provider>;
 }
-export function useAccordionContext() { const context = useContext(AccordionContext); if (!context) throw new Error("useAccordionContext must be used within AccordionContextProvider"); return context; }
+export function useAccordion() { const ctx = useContext(AccordionContext); if (!ctx) throw new Error("useAccordion must be used within Provider"); return ctx; }
+export { AccordionContext };
 export default AccordionContext;
