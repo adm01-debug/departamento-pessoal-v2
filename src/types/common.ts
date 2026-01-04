@@ -2,12 +2,18 @@ export interface Common {
   id: string;
   nome: string;
   descricao?: string;
-  status: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
 export interface CommonCreate extends Omit<Common, "id" | "createdAt" | "updatedAt"> {}
-export interface CommonUpdate extends Partial<CommonCreate> {}
-export interface CommonFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type CommonStatus = "ativo" | "inativo" | "pendente";
+export interface CommonUpdate extends Partial<Omit<Common, "id" | "createdAt">> {}
+export interface CommonFilter { search?: string; ativo?: boolean; page?: number; limit?: number; }
+export interface CommonListResponse { data: Common[]; total: number; page: number; limit: number; }
+export type CommonStatus = "ativo" | "inativo" | "pendente" | "cancelado";
