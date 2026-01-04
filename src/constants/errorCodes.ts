@@ -1,1 +1,10 @@
-export const ERROR_CODES = { VALIDATION_ERROR: 'E001', AUTH_ERROR: 'E002', NOT_FOUND: 'E003', PERMISSION_DENIED: 'E004', SERVER_ERROR: 'E005', NETWORK_ERROR: 'E006', TIMEOUT: 'E007', DUPLICATE: 'E008' };
+export const errorCodes = {
+  DEFAULT: "default",
+  ITEMS: [] as string[],
+  MAP: {} as Record<string, any>,
+  get(key: string): any { return this.MAP[key] || this.DEFAULT; },
+  has(key: string): boolean { return key in this.MAP; },
+  all(): string[] { return Object.keys(this.MAP); },
+} as const;
+export type errorCodesType = keyof typeof errorCodes;
+export default errorCodes;
