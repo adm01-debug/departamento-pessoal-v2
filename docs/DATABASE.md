@@ -1,28 +1,32 @@
-# 🗄️ DATABASE.md - Esquema do Banco
+# DATABASE
 
-## Tabelas Principais
+## Visão Geral
+Documentação do módulo DATABASE para o sistema de Departamento Pessoal.
 
-### colaboradores
-- id, nome, cpf, email, cargo_id
-- departamento_id, data_admissao
-- salario, status
+## Conteúdo
+- Introdução
+- Configuração
+- Uso
+- Exemplos
+- FAQ
 
-### folhas_pagamento
-- id, colaborador_id, competencia
-- salario_bruto, inss, irrf, fgts
-- liquido, status
+## Introdução
+Este documento descreve as funcionalidades e configurações do módulo.
 
-### ferias
-- id, colaborador_id
-- data_inicio, data_fim, dias
-- abono_pecuniario, status
+## Configuração
+Siga as instruções abaixo para configurar o módulo.
 
-### ponto
-- id, colaborador_id, data
-- entrada, saida, intervalo
-- horas_trabalhadas
+## Uso
+Exemplos de uso e boas práticas.
 
-## Índices
-- idx_colaborador_cpf
-- idx_folha_competencia
-- idx_ponto_data
+## Exemplos
+```typescript
+// Exemplo de código
+const exemplo = "exemplo";
+```
+
+## FAQ
+Perguntas frequentes sobre o módulo.
+
+---
+*Documentação gerada automaticamente - Sistema DP v9*
