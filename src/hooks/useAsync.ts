@@ -1,17 +1,10 @@
-import { useState, useCallback } from 'react';
-interface AsyncState<T> { data: T | null; loading: boolean; error: Error | null; }
-export function useAsync<T>() {
-  const [state, setState] = useState<AsyncState<T>>({ data: null, loading: false, error: null });
-  const execute = useCallback(async (asyncFn: () => Promise<T>) => {
-    setState({ data: null, loading: true, error: null });
-    try {
-      const data = await asyncFn();
-      setState({ data, loading: false, error: null });
-      return data;
-    } catch (error) {
-      setState({ data: null, loading: false, error: error as Error });
-      throw error;
-    }
-  }, []);
-  return { ...state, execute };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useAsync<T = any>(initialValue?: T) {
+  const [value, setValue] = useState<T | undefined>(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const reset = useCallback(() => { setValue(initialValue); setError(null); }, [initialValue]);
+  const execute = useCallback(async (fn: () => Promise<T>) => { setLoading(true); setError(null); try { const result = await fn(); setValue(result); return result; } catch (e) { setError(e as Error); throw e; } finally { setLoading(false); } }, []);
+  return { value, setValue, loading, error, reset, execute };
 }
+export default useAsync;
