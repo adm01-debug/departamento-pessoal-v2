@@ -3,12 +3,18 @@ export interface Cargo {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface CargoCreate extends Omit<Cargo, "id" | "createdAt" | "updatedAt"> {}
-export interface CargoUpdate extends Partial<CargoCreate> {}
-export interface CargoFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type CargoStatus = "ativo" | "inativo" | "pendente";
+export interface CargoUpdate extends Partial<Omit<Cargo, "id" | "createdAt">> {}
+export interface CargoFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface CargoListResponse { data: Cargo[]; total: number; page: number; limit: number; totalPages: number; }
+export type CargoStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
