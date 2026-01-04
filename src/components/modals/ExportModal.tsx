@@ -1,24 +1,18 @@
-/**
- * @fileoverview Modal de exportação (modals)
- * @module components/modals/ExportModal
- */
-import { memo, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Download } from 'lucide-react';
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-interface ExportModalProps { open: boolean; onOpenChange: (open: boolean) => void; onExport: (format: string) => void; formats?: { value: string; label: string }[]; }
+interface ExportModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
 
-export const ExportModal = memo(function ExportModal({ open, onOpenChange, onExport, formats = [{ value: 'xlsx', label: 'Excel' }, { value: 'csv', label: 'CSV' }, { value: 'pdf', label: 'PDF' }] }: ExportModalProps) {
-  const [format, setFormat] = useState(formats[0]?.value || 'xlsx');
+export function ExportModal({ open, onOpenChange, data, onConfirm, title = "ExportModal", loading = false }: ExportModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent><DialogHeader><DialogTitle className="flex items-center gap-2"><Download className="h-5 w-5" />Exportar</DialogTitle></DialogHeader>
-        <RadioGroup value={format} onValueChange={setFormat}>{formats.map(f => <div key={f.value} className="flex items-center gap-2 p-2 border rounded-lg"><RadioGroupItem value={f.value} id={f.value} /><Label htmlFor={f.value}>{f.label}</Label></div>)}</RadioGroup>
-        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onExport(format); onOpenChange(false); }}>Exportar</Button></DialogFooter>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
+        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   );
-});
+}
+export default ExportModal;
