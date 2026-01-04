@@ -1,13 +1,16 @@
-export interface Config { apiKey?: string; baseUrl?: string; enabled: boolean; }
-export interface Response<T = any> { success: boolean; data?: T; error?: string; }
-class Service {
-  private config: Config = { enabled: false };
-  configure(c: Partial<Config>) { this.config = { ...this.config, ...c }; }
+export interface OcrConfig { apiKey?: string; baseUrl?: string; enabled: boolean; timeout?: number; }
+export interface OcrResponse<T = any> { success: boolean; data?: T; error?: string; requestId?: string; }
+
+class OcrService {
+  private config: OcrConfig = { enabled: false, timeout: 30000 };
+  configure(c: Partial<OcrConfig>) { this.config = { ...this.config, ...c }; }
   isEnabled() { return this.config.enabled; }
-  async connect(): Promise<Response> { if (!this.config.enabled) return { success: false, error: "Not enabled" }; return { success: true, data: { connected: true } }; }
-  async sync(): Promise<Response> { return { success: true, data: { synced: true } }; }
-  async send(p: any): Promise<Response> { console.log("[ocr] Send:", p); return { success: true, data: { id: crypto.randomUUID() } }; }
-  async getStatus() { return { connected: this.config.enabled }; }
+  async connect(): Promise<OcrResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { connected: true }, requestId: crypto.randomUUID() }; }
+  async sync(): Promise<OcrResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { synced: true } }; }
+  async send(data: any): Promise<OcrResponse> { if (!this.config.enabled) return { success: false, error: "Disabled" }; return { success: true, data: { sent: true } }; }
+  async getStatus() { return { enabled: this.config.enabled, connected: this.config.enabled }; }
+  async testConnection() { return (await this.connect()).success; }
 }
-export const ocrService = new Service();
+
+export const ocrService = new OcrService();
 export default ocrService;
