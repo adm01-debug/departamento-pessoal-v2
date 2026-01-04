@@ -2,26 +2,33 @@ import { z } from "zod";
 
 export const documentoSchema = z.object({
   id: z.string().uuid().optional(),
-  nome: z.string().min(1, "Nome obrigatório").max(200),
-  descricao: z.string().max(500).optional(),
-  codigo: z.string().max(50).optional(),
+  nome: z.string().min(1, "Nome obrigatório").max(100),
+  descricao: z.string().optional(),
+  codigo: z.string().optional(),
   ativo: z.boolean().default(true),
-  valor: z.number().nonnegative().optional(),
-  dataInicio: z.string().datetime().optional(),
-  dataFim: z.string().datetime().optional(),
-  observacoes: z.string().max(1000).optional(),
-  metadata: z.record(z.any()).optional(),
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
+  dataCriacao: z.date().optional(),
+  dataAtualizacao: z.date().optional(),
+  criadoPor: z.string().optional(),
+  atualizadoPor: z.string().optional(),
 });
 
-export const documentoSchemaCreate = documentoSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export const documentoSchemaUpdate = documentoSchema.partial().omit({ id: true, createdAt: true });
-export const documentoSchemaFilter = z.object({ search: z.string().optional(), ativo: z.boolean().optional(), page: z.number().optional(), limit: z.number().optional() });
+export const documentoSchemaCreate = documentoSchema.omit({ id: true, dataCriacao: true, dataAtualizacao: true });
+export const documentoSchemaUpdate = documentoSchema.partial().required({ id: true });
+export const documentoSchemaFilter = documentoSchema.partial();
 
-export type documentoType = z.infer<typeof documentoSchema>;
-export type documentoCreateType = z.infer<typeof documentoSchemaCreate>;
-export type documentoUpdateType = z.infer<typeof documentoSchemaUpdate>;
+export type documentoSchemaType = z.infer<typeof documentoSchema>;
+export type documentoSchemaCreateType = z.infer<typeof documentoSchemaCreate>;
+export type documentoSchemaUpdateType = z.infer<typeof documentoSchemaUpdate>;
+export type documentoSchemaFilterType = z.infer<typeof documentoSchemaFilter>;
 
-export const validatedocumento = (data: unknown) => documentoSchema.safeParse(data);
+export function validatedocumentoSchema(data: unknown): documentoSchemaType {
+  return documentoSchema.parse(data);
+}
+
+export function safeValidatedocumentoSchema(data: unknown): { success: boolean; data?: documentoSchemaType; error?: z.ZodError } {
+  const result = documentoSchema.safeParse(data);
+  if (result.success) return { success: true, data: result.data };
+  return { success: false, error: result.error };
+}
+
 export default documentoSchema;
