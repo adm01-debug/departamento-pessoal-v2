@@ -1,12 +1,17 @@
-import { useMemo } from 'react';
-import { useTableSort } from './useTableSort';
-import { useTableFilter } from './useTableFilter';
-interface Opts { pageSize?: number; }
-export function useTable<T extends Record<string, unknown>>(data: T[], opts: Opts = {}) {
-  const { pageSize = 10 } = opts;
-  const { sorted, sort, handleSort } = useTableSort(data);
-  const { filtered, filters, setFilter, clearFilters, hasFilters } = useTableFilter(sorted);
-  const totalPages = Math.ceil(filtered.length / pageSize);
-  const processedData = useMemo(() => filtered, [filtered]);
-  return { data: processedData, sort, handleSort, filters, setFilter, clearFilters, hasFilters, totalPages, total: filtered.length };
+import { useState, useEffect, useCallback, useRef } from "react";
+export function useTable<T = any>(init?: T) {
+  const [data, setData] = useState<T | null>(init ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const ref = useRef(true);
+  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
+  const execute = useCallback(async (fn: () => Promise<T>) => {
+    setLoading(true); setError(null);
+    try { const r = await fn(); if (ref.current) setData(r); return r; }
+    catch (e) { if (ref.current) setError(e as Error); throw e; }
+    finally { if (ref.current) setLoading(false); }
+  }, []);
+  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
+  return { data, loading, error, execute, reset, setData };
 }
+export default useTable;
