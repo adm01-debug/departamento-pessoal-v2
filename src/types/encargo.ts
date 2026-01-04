@@ -1,44 +1,13 @@
-/**
- * Types para Encargo
- * Departamento Pessoal
- */
-
 export interface Encargo {
   id: string;
-  empresaId: string;
-  colaboradorId?: string;
-  descricao: string;
-  valor?: number;
-  dataInicio?: Date;
-  dataFim?: Date;
-  status: EncargoStatus;
-  observacoes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  nome: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export type EncargoStatus = 'ativo' | 'inativo' | 'pendente' | 'cancelado';
-
-export interface EncargoCreate extends Omit<Encargo, 'id' | 'createdAt' | 'updatedAt'> {}
-
+export interface EncargoCreate extends Omit<Encargo, "id" | "createdAt" | "updatedAt"> {}
 export interface EncargoUpdate extends Partial<EncargoCreate> {}
-
-export interface EncargoFilter {
-  empresaId?: string;
-  colaboradorId?: string;
-  status?: EncargoStatus;
-  dataInicio?: Date;
-  dataFim?: Date;
-  search?: string;
-}
-
-export interface EncargoListResponse {
-  data: Encargo[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export default Encargo;
+export interface EncargoFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type EncargoStatus = "ativo" | "inativo" | "pendente";
