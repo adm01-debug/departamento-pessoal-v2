@@ -1,27 +1,32 @@
-# 🔐 SECURITY.md - Guia de Segurança
+# SECURITY
 
-## Práticas de Segurança
+## Visão Geral
+Documentação do módulo SECURITY para o sistema de Departamento Pessoal.
 
-### Autenticação
-- JWT com refresh tokens
-- Sessões com timeout de 30 minutos
-- MFA disponível para admins
+## Conteúdo
+- Introdução
+- Configuração
+- Uso
+- Exemplos
+- FAQ
 
-### Autorização
-- RBAC (Role-Based Access Control)
-- Permissões granulares por módulo
-- Audit trail completo
+## Introdução
+Este documento descreve as funcionalidades e configurações do módulo.
 
-### Dados Sensíveis
-- Criptografia AES-256 em repouso
-- TLS 1.3 em trânsito
-- Mascaramento de CPF/PIS
+## Configuração
+Siga as instruções abaixo para configurar o módulo.
 
-### LGPD
-- Consentimento explícito
-- Direito ao esquecimento
-- Portabilidade de dados
-- DPO designado
+## Uso
+Exemplos de uso e boas práticas.
 
-### Vulnerabilidades
-Reporte via: security@empresa.com
+## Exemplos
+```typescript
+// Exemplo de código
+const exemplo = "exemplo";
+```
+
+## FAQ
+Perguntas frequentes sobre o módulo.
+
+---
+*Documentação gerada automaticamente - Sistema DP v9*
