@@ -1,53 +1,43 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react";
-import { FormStep } from "./FormStep";
 
 interface WizardStep { id: string; title: string; description?: string; content: React.ReactNode; validate?: () => boolean | Promise<boolean>; }
-interface FormWizardProps { steps: WizardStep[]; onComplete: (data: any) => void | Promise<void>; onCancel?: () => void; title?: string; className?: string; showProgress?: boolean; allowSkip?: boolean; }
+interface FormWizardProps { steps: WizardStep[]; onComplete: (data: any) => void | Promise<void>; onCancel?: () => void; title?: string; description?: string; className?: string; }
 
-export function FormWizard({ steps, onComplete, onCancel, title, className, showProgress = true, allowSkip = false }: FormWizardProps) {
+export function FormWizard({ steps, onComplete, onCancel, title, description, className }: FormWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
-
   const progress = ((currentStep + 1) / steps.length) * 100;
+  const step = steps[currentStep];
   const isFirst = currentStep === 0;
   const isLast = currentStep === steps.length - 1;
 
   const handleNext = async () => {
-    const step = steps[currentStep];
-    if (step.validate) {
-      setLoading(true);
-      const isValid = await step.validate();
-      setLoading(false);
-      if (!isValid) return;
-    }
-    setCompletedSteps(prev => [...new Set([...prev, currentStep])]);
-    if (isLast) { setLoading(true); await onComplete({}); setLoading(false); }
-    else setCurrentStep(prev => prev + 1);
+    if (step.validate) { setLoading(true); const valid = await step.validate(); setLoading(false); if (!valid) return; }
+    if (isLast) { setLoading(true); await onComplete({}); setLoading(false); } else setCurrentStep(s => s + 1);
   };
-
-  const handlePrev = () => { if (!isFirst) setCurrentStep(prev => prev - 1); };
-  const handleStepClick = (index: number) => { if (completedSteps.includes(index) || index <= currentStep) setCurrentStep(index); };
+  const handlePrev = () => { if (!isFirst) setCurrentStep(s => s - 1); };
 
   return (
-    <Card className={cn("", className)}>
-      {title && <CardHeader><CardTitle>{title}</CardTitle></CardHeader>}
-      <CardContent className="space-y-6">
-        <FormStep steps={steps.map((s, i) => ({ id: s.id, title: s.title, description: s.description }))} currentStep={currentStep} onStepClick={handleStepClick} completedSteps={completedSteps} />
-        {showProgress && <Progress value={progress} className="h-2" />}
-        <div className="min-h-[200px]">{steps[currentStep].content}</div>
-      </CardContent>
+    <Card className={cn("w-full max-w-2xl mx-auto", className)}>
+      <CardHeader>
+        {title && <CardTitle>{title}</CardTitle>}
+        {description && <CardDescription>{description}</CardDescription>}
+        <div className="pt-4 space-y-2">
+          <div className="flex justify-between text-sm"><span className="font-medium">{step.title}</span><span className="text-muted-foreground">Passo {currentStep + 1} de {steps.length}</span></div>
+          <Progress value={progress} className="h-2" />
+        </div>
+      </CardHeader>
+      <CardContent className="min-h-[300px]">{step.description && <p className="text-sm text-muted-foreground mb-4">{step.description}</p>}{step.content}</CardContent>
       <CardFooter className="flex justify-between">
         <div>{onCancel && <Button variant="ghost" onClick={onCancel}>Cancelar</Button>}</div>
         <div className="flex gap-2">
-          {!isFirst && <Button variant="outline" onClick={handlePrev} disabled={loading}><ChevronLeft className="h-4 w-4 mr-1" />Anterior</Button>}
-          {allowSkip && !isLast && <Button variant="ghost" onClick={() => setCurrentStep(prev => prev + 1)}>Pular</Button>}
-          <Button onClick={handleNext} disabled={loading}>{loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{isLast ? <><Check className="h-4 w-4 mr-1" />Concluir</> : <>Próximo<ChevronRight className="h-4 w-4 ml-1" /></>}</Button>
+          <Button variant="outline" onClick={handlePrev} disabled={isFirst || loading}><ChevronLeft className="h-4 w-4 mr-1" />Anterior</Button>
+          <Button onClick={handleNext} disabled={loading}>{loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : isLast ? <Check className="h-4 w-4 mr-1" /> : null}{isLast ? "Concluir" : "Próximo"}{!isLast && <ChevronRight className="h-4 w-4 ml-1" />}</Button>
         </div>
       </CardFooter>
     </Card>
