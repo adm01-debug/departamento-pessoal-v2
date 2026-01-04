@@ -1,25 +1,12 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-interface Notification { id: string; type: 'success' | 'error' | 'warning' | 'info'; message: string; }
-interface NotificationsContextValue {
-  notifications: Notification[];
-  addNotification: (n: Omit<Notification, 'id'>) => void;
-  removeNotification: (id: string) => void;
-  clearAll: () => void;
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface NotificationsContextType { state: any; setState: (v: any) => void; reset: () => void; }
+const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
+export function NotificationsContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
+  return <NotificationsContext.Provider value={{ state, setState, reset }}>{children}</NotificationsContext.Provider>;
 }
-const NotificationsContext = createContext<NotificationsContextValue | null>(null);
-export function NotificationsProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const addNotification = useCallback((n: Omit<Notification, 'id'>) => {
-    const id = crypto.randomUUID();
-    setNotifications(prev => [...prev, { ...n, id }]);
-    setTimeout(() => setNotifications(prev => prev.filter(x => x.id !== id)), 5000);
-  }, []);
-  const removeNotification = useCallback((id: string) => setNotifications(prev => prev.filter(x => x.id !== id)), []);
-  const clearAll = useCallback(() => setNotifications([]), []);
-  return <NotificationsContext.Provider value={{ notifications, addNotification, removeNotification, clearAll }}>{children}</NotificationsContext.Provider>;
-}
-export function useNotificationsContext() {
-  const ctx = useContext(NotificationsContext);
-  if (!ctx) throw new Error('useNotificationsContext must be used within NotificationsProvider');
-  return ctx;
-}
+export function useNotifications() { const ctx = useContext(NotificationsContext); if (!ctx) throw new Error("useNotifications must be used within Provider"); return ctx; }
+export { NotificationsContext };
+export default NotificationsContext;
