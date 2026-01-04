@@ -1,1 +1,0 @@
-export const ESTADOS_CIVIS = [{ codigo: 1, descricao: 'Solteiro(a)' }, { codigo: 2, descricao: 'Casado(a)' }, { codigo: 3, descricao: 'Divorciado(a)' }, { codigo: 4, descricao: 'Viúvo(a)' }, { codigo: 5, descricao: 'União Estável' }];
