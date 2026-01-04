@@ -1,45 +1,13 @@
-/**
- * @fileoverview Tipos para usuários
- * @module types/usuario
- */
 export interface Usuario {
   id: string;
-  email: string;
   nome: string;
-  avatar_url?: string;
-  telefone?: string;
-  cargo?: string;
-  departamento_id?: string;
-  empresa_id?: string;
-  
-  // Permissões
-  role: 'admin' | 'gestor' | 'rh' | 'colaborador' | 'viewer';
-  permissions?: string[];
-  
-  // Status
-  ativo: boolean;
-  email_verificado?: boolean;
-  ultimo_acesso?: string;
-  
-  // Metadados
-  created_at: string;
-  updated_at?: string;
+  descricao?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-
-export interface UsuarioFormData extends Omit<Usuario, 'id' | 'created_at' | 'updated_at' | 'ultimo_acesso'> {}
-
-export interface UsuarioFilters {
-  search?: string;
-  role?: Usuario['role'];
-  ativo?: boolean;
-  departamento_id?: string;
-  empresa_id?: string;
-}
-
-export interface Session {
-  user: Usuario;
-  access_token: string;
-  refresh_token?: string;
-  expires_at?: number;
-}
-
+export interface UsuarioCreate extends Omit<Usuario, "id" | "createdAt" | "updatedAt"> {}
+export interface UsuarioUpdate extends Partial<UsuarioCreate> {}
+export interface UsuarioFilter { search?: string; status?: string; page?: number; limit?: number; }
+export type UsuarioStatus = "ativo" | "inativo" | "pendente";
