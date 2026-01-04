@@ -3,12 +3,18 @@ export interface ValeTransporte {
   nome: string;
   descricao?: string;
   codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
+
 export interface ValeTransporteCreate extends Omit<ValeTransporte, "id" | "createdAt" | "updatedAt"> {}
-export interface ValeTransporteUpdate extends Partial<ValeTransporteCreate> {}
-export interface ValeTransporteFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type ValeTransporteStatus = "ativo" | "inativo" | "pendente";
+export interface ValeTransporteUpdate extends Partial<Omit<ValeTransporte, "id" | "createdAt">> {}
+export interface ValeTransporteFilter { search?: string; ativo?: boolean; page?: number; limit?: number; orderBy?: string; order?: "asc" | "desc"; }
+export interface ValeTransporteListResponse { data: ValeTransporte[]; total: number; page: number; limit: number; totalPages: number; }
+export type ValeTransporteStatus = "ativo" | "inativo" | "pendente" | "aprovado" | "rejeitado" | "cancelado";
