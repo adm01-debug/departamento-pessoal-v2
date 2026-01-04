@@ -1,16 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-export function useTimeout<T = any>(init?: T) {
-  const [data, setData] = useState<T | null>(init ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const ref = useRef(true);
-  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    setLoading(true); setError(null);
-    try { const r = await fn(); if (ref.current) setData(r); return r; }
-    catch (e) { if (ref.current) setError(e as Error); throw e; }
-    finally { if (ref.current) setLoading(false); }
-  }, []);
-  return { data, loading, error, execute, setData };
+import { useEffect, useRef, useCallback } from "react";
+export function useTimeout(callback: () => void, delay: number | null) {
+  const savedCallback = useRef(callback);
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  useEffect(() => { savedCallback.current = callback; }, [callback]);
+  const clear = useCallback(() => { timeoutRef.current && clearTimeout(timeoutRef.current); }, []);
+  useEffect(() => {
+    if (delay === null) return;
+    timeoutRef.current = setTimeout(() => savedCallback.current(), delay);
+    return clear;
+  }, [delay, clear]);
+  return clear;
 }
 export default useTimeout;
