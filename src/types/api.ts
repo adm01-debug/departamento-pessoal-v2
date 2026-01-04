@@ -2,12 +2,18 @@ export interface Api {
   id: string;
   nome: string;
   descricao?: string;
-  status: "ativo" | "inativo" | "pendente";
+  codigo?: string;
+  ativo: boolean;
+  valor?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  observacoes?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
 }
 export interface ApiCreate extends Omit<Api, "id" | "createdAt" | "updatedAt"> {}
-export interface ApiUpdate extends Partial<ApiCreate> {}
-export interface ApiFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type ApiStatus = "ativo" | "inativo" | "pendente";
+export interface ApiUpdate extends Partial<Omit<Api, "id" | "createdAt">> {}
+export interface ApiFilter { search?: string; ativo?: boolean; page?: number; limit?: number; }
+export interface ApiListResponse { data: Api[]; total: number; page: number; limit: number; }
+export type ApiStatus = "ativo" | "inativo" | "pendente" | "cancelado";
