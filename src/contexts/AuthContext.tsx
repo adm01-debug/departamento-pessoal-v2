@@ -1,10 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface AuthContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface AuthContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-export function AuthContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+
+export function AuthContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <AuthContext.Provider value={{ state, setState, reset }}>{children}</AuthContext.Provider>;
 }
-export function useAuthContext() { const context = useContext(AuthContext); if (!context) throw new Error("useAuthContext must be used within AuthContextProvider"); return context; }
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthContextProvider");
+  return ctx;
+}
+
+export { AuthContext };
 export default AuthContext;
