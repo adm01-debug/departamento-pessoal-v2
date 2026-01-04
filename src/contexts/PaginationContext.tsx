@@ -1,12 +1,14 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface PaginationContextType { state: any; setState: (v: any) => void; reset: () => void; }
-const PaginationContext = createContext<PaginationContextType | undefined>(undefined);
+import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+interface PaginationContextState { data: any; loading: boolean; error: Error | null; }
+interface PaginationContextValue extends PaginationContextState { setData: (d: any) => void; setLoading: (l: boolean) => void; reset: () => void; }
+const PaginationContext = createContext<PaginationContextValue | undefined>(undefined);
 export function PaginationContextProvider({ children }: { children: ReactNode }) {
-  const [state, setStateInternal] = useState<any>(null);
-  const setState = useCallback((v: any) => setStateInternal(v), []);
-  const reset = useCallback(() => setStateInternal(null), []);
-  return <PaginationContext.Provider value={{ state, setState, reset }}>{children}</PaginationContext.Provider>;
+  const [state, setState] = useState<PaginationContextState>({ data: null, loading: false, error: null });
+  const setData = useCallback((d: any) => setState(s => ({ ...s, data: d })), []);
+  const setLoading = useCallback((l: boolean) => setState(s => ({ ...s, loading: l })), []);
+  const reset = useCallback(() => setState({ data: null, loading: false, error: null }), []);
+  return <PaginationContext.Provider value={{ ...state, setData, setLoading, reset }}>{children}</PaginationContext.Provider>;
 }
-export function usePagination() { const ctx = useContext(PaginationContext); if (!ctx) throw new Error("usePagination must be used within Provider"); return ctx; }
+export function usePagination() { const c = useContext(PaginationContext); if (!c) throw new Error("usePagination must be within Provider"); return c; }
 export { PaginationContext };
 export default PaginationContext;
