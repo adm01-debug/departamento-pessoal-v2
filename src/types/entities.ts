@@ -1,23 +1,15 @@
-/** Entidade base com campos comuns */
-export interface BaseEntity {
+export interface Entities {
   id: string;
-  created_at: string;
-  updated_at?: string;
+  nome: string;
+  descricao?: string;
+  codigo?: string;
+  status: "ativo" | "inativo" | "pendente";
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
-/** Status genérico */
-export type EntityStatus = 'active' | 'inactive' | 'pending' | 'archived';
-/** Resultado de operação */
-export interface OperationResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-/** Filtros de listagem */
-export interface ListFilters {
-  search?: string;
-  status?: EntityStatus;
-  startDate?: string;
-  endDate?: string;
-  page?: number;
-  limit?: number;
-}
+export interface EntitiesCreate extends Omit<Entities, "id" | "createdAt" | "updatedAt"> {}
+export interface EntitiesUpdate extends Partial<EntitiesCreate> {}
+export interface EntitiesFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
+export interface EntitiesListResponse { data: Entities[]; total: number; page: number; limit: number; }
+export type EntitiesStatus = "ativo" | "inativo" | "pendente";
