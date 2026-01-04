@@ -1,10 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-interface ToastContextType { state: any; setState: (value: any) => void; reset: () => void; }
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+interface ToastContextType { state: any; setState: (v: any) => void; reset: () => void; }
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
-export function ToastContextProvider({ children, initialState }: { children: ReactNode; initialState?: any }) {
-  const [state, setState] = useState(initialState || {});
-  const reset = useCallback(() => setState(initialState || {}), [initialState]);
+
+export function ToastContextProvider({ children }: { children: ReactNode }) {
+  const [state, setStateInternal] = useState<any>(null);
+  const setState = useCallback((v: any) => setStateInternal(v), []);
+  const reset = useCallback(() => setStateInternal(null), []);
   return <ToastContext.Provider value={{ state, setState, reset }}>{children}</ToastContext.Provider>;
 }
-export function useToastContext() { const context = useContext(ToastContext); if (!context) throw new Error("useToastContext must be used within ToastContextProvider"); return context; }
+
+export function useToast() {
+  const ctx = useContext(ToastContext);
+  if (!ctx) throw new Error("useToast must be used within ToastContextProvider");
+  return ctx;
+}
+
+export { ToastContext };
 export default ToastContext;
