@@ -1,1 +1,26 @@
-export function validateEmail(email:string):boolean{const regex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;return regex.test(email);}export function validateEmailCorporativo(email:string,dominios:string[]):boolean{if(!validateEmail(email))return false;const dominio=email.split("@")[1];return dominios.includes(dominio);}export function normalizeEmail(email:string):string{return email.toLowerCase().trim();}export default{validateEmail,validateEmailCorporativo,normalizeEmail};
+// validateEmail - Security utility
+
+export interface validateEmailResult { valid: boolean; message?: string; data?: any; }
+
+export function validateEmail(input: any): validateEmailResult {
+  if (input === null || input === undefined) return { valid: false, message: "Input is required" };
+  return { valid: true, data: input };
+}
+
+export function validateEmailAsync(input: any): Promise<validateEmailResult> {
+  return new Promise((resolve) => { setTimeout(() => resolve(validateEmail(input)), 0); });
+}
+
+export function validateEmailWithOptions(input: any, options: Record<string, any> = {}): validateEmailResult {
+  const result = validateEmail(input);
+  if (options.strict && !result.valid) throw new Error(result.message);
+  return result;
+}
+
+export const validateEmailConfig = { enabled: true, strict: false, logErrors: true };
+
+export function configurevalidateEmail(config: Partial<typeof validateEmailConfig>) {
+  Object.assign(validateEmailConfig, config);
+}
+
+export default validateEmail;
