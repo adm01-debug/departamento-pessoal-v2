@@ -1,0 +1,11 @@
+export { default as workflowDemissao } from './workflowDemissao';
+export { default as workflowFerias } from './workflowFerias';
+export { default as workflowFolha } from './workflowFolha';
+export { default as workflowPonto } from './workflowPonto';
+export { default as workflowBeneficios } from './workflowBeneficios';
+export { default as workflowESocial } from './workflowESocial';
+export { default as workflowPromocao } from './workflowPromocao';
+export { default as workflowTransferencia } from './workflowTransferencia';
+export { default as workflowAtestado } from './workflowAtestado';
+export { default as workflowTreinamento } from './workflowTreinamento';
+export { default as workflowAvaliacao } from './workflowAvaliacao';
