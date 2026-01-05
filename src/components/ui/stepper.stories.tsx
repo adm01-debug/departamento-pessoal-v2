@@ -1,0 +1,10 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { Stepper } from "./stepper";
+const meta: Meta<typeof Stepper> = { title: "UI/Stepper", component: Stepper };
+export default meta;
+type Story = StoryObj<typeof Stepper>;
+const steps = [{ id: "1", title: "Dados Pessoais" }, { id: "2", title: "Contrato" }, { id: "3", title: "Lotação" }, { id: "4", title: "Confirmação" }];
+export const Step1: Story = { args: { steps, currentStep: 0 } };
+export const Step2: Story = { args: { steps, currentStep: 1 } };
+export const Step3: Story = { args: { steps, currentStep: 2 } };
+export const Complete: Story = { args: { steps, currentStep: 3 } };
