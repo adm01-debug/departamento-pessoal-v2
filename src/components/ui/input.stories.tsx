@@ -1,0 +1,12 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { Input } from './input';
+const meta: Meta<typeof Input> = { title: 'UI/Input', component: Input, tags: ['autodocs'] };
+export default meta;
+type Story = StoryObj<typeof Input>;
+export const Default: Story = { args: { placeholder: 'Digite algo...' } };
+export const WithValue: Story = { args: { value: 'Valor preenchido', readOnly: true } };
+export const Disabled: Story = { args: { placeholder: 'Desabilitado', disabled: true } };
+export const WithType: Story = { args: { type: 'email', placeholder: 'email@exemplo.com' } };
+export const Password: Story = { args: { type: 'password', placeholder: 'Senha' } };
+export const Number: Story = { args: { type: 'number', placeholder: '0.00' } };
+export const Date: Story = { args: { type: 'date' } };
