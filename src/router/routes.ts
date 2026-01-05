@@ -1,0 +1,22 @@
+export const ROUTES = {
+  HOME: "/",
+  LOGIN: "/login",
+  COLABORADORES: "/colaboradores",
+  COLABORADOR_DETALHE: (id: string) => `/colaboradores/${id}`,
+  COLABORADOR_NOVO: "/colaboradores/novo",
+  FOLHA: "/folha",
+  FOLHA_COMPETENCIA: (competencia: string) => `/folha/${competencia}`,
+  FERIAS: "/ferias",
+  FERIAS_PROGRAMAR: "/ferias/programar",
+  PONTO: "/ponto",
+  PONTO_ESPELHO: (colaboradorId: string) => `/ponto/espelho/${colaboradorId}`,
+  BENEFICIOS: "/beneficios",
+  ESOCIAL: "/esocial",
+  ESOCIAL_EVENTO: (id: string) => `/esocial/${id}`,
+  RELATORIOS: "/relatorios",
+  CONFIGURACOES: "/configuracoes",
+  CONFIGURACOES_EMPRESA: "/configuracoes/empresa",
+  CONFIGURACOES_USUARIOS: "/configuracoes/usuarios",
+  CONFIGURACOES_PARAMETROS: "/configuracoes/parametros",
+};
+export default ROUTES;
