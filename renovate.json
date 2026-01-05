@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    ":preserveSemverRanges",
+    "group:allNonMajor"
+  ],
+  "labels": ["dependencies"],
+  "assignees": ["adm01-debug"],
+  "reviewers": ["adm01-debug"],
+  "schedule": ["before 6am on monday"],
+  "timezone": "America/Sao_Paulo",
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "matchPackagePatterns": ["eslint", "prettier", "typescript"],
+      "groupName": "linters and formatters"
+    },
+    {
+      "matchPackagePatterns": ["@types/*"],
+      "groupName": "type definitions"
+    },
+    {
+      "matchPackagePatterns": ["react", "react-dom", "react-router"],
+      "groupName": "react packages"
+    },
+    {
+      "matchPackagePatterns": ["@tanstack/*"],
+      "groupName": "tanstack packages"
+    },
+    {
+      "matchPackagePatterns": ["vitest", "@vitest/*", "@testing-library/*"],
+      "groupName": "testing packages"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  }
+}
