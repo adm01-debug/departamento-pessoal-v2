@@ -1,0 +1,13 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from './button';
+import { Plus, Save, Trash2, Edit, Download } from 'lucide-react';
+const meta: Meta<typeof Button> = { title: 'UI/Button', component: Button, tags: ['autodocs'], argTypes: { variant: { control: 'select', options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'] }, size: { control: 'select', options: ['default', 'sm', 'lg', 'icon'] } } };
+export default meta;
+type Story = StoryObj<typeof Button>;
+export const Default: Story = { args: { children: 'Button' } };
+export const Destructive: Story = { args: { children: 'Delete', variant: 'destructive' } };
+export const Outline: Story = { args: { children: 'Outline', variant: 'outline' } };
+export const WithIcon: Story = { args: { children: <><Plus className="w-4 h-4 mr-2" />Adicionar</> } };
+export const IconOnly: Story = { args: { children: <Save className="w-4 h-4" />, size: 'icon' } };
+export const Loading: Story = { args: { children: 'Salvando...', disabled: true } };
+export const AllVariants: Story = { render: () => <div className="flex gap-2"><Button>Default</Button><Button variant="secondary">Secondary</Button><Button variant="destructive">Destructive</Button><Button variant="outline">Outline</Button><Button variant="ghost">Ghost</Button><Button variant="link">Link</Button></div> };
