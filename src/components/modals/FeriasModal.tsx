@@ -1,18 +1,1 @@
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
-interface FeriasModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
-
-export function FeriasModal({ open, onOpenChange, data, onConfirm, title = "FeriasModal", loading = false }: FeriasModalProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
-        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
-        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-export default FeriasModal;
+import React from'react';import{useQuery}from'@tanstack/react-query';import{Dialog,DialogContent,DialogHeader,DialogTitle}from'@/components/ui/dialog';import{FeriasForm}from'@/components/forms/FeriasForm';import{Ferias}from'@/types/ferias';import{api}from'@/lib/api';interface Props{open:boolean;onOpenChange:(open:boolean)=>void;ferias?:Ferias;colaboradorId?:string;onSubmit:(data:any)=>void;}export function FeriasModal({open,onOpenChange,ferias,colaboradorId,onSubmit}:Props){const{data:colaboradores=[]}=useQuery({queryKey:['colaboradores-ativos'],queryFn:async()=>(await api.get('/colaboradores',{params:{status:'ativo'}})).data,enabled:!colaboradorId});const handleSubmit=(data:any)=>{onSubmit(data);onOpenChange(false);};return(<Dialog open={open}onOpenChange={onOpenChange}><DialogContent className="max-w-lg"><DialogHeader><DialogTitle>{ferias?'Editar Férias':'Programar Férias'}</DialogTitle></DialogHeader><FeriasForm defaultValues={ferias||{colaboradorId}}colaboradores={colaboradorId?[]:colaboradores}onSubmit={handleSubmit}onCancel={()=>onOpenChange(false)}/></DialogContent></Dialog>);}
