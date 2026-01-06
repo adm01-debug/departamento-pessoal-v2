@@ -1,12 +1,1 @@
-import { supabase } from "@/integrations/supabase/client";
-export interface BeneficioData { id?: string; nome?: string; descricao?: string; valor?: number; tipo?: string; ativo?: boolean; }
-class BeneficioService {
-  private tableName = "beneficios";
-  async getAll(filters?: Record<string, any>): Promise<BeneficioData[]> { let q = supabase.from(this.tableName).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-  async getById(id: string): Promise<BeneficioData | null> { const { data, error } = await supabase.from(this.tableName).select("*").eq("id", id).single(); if (error) throw error; return data; }
-  async create(data: Omit<BeneficioData, "id">): Promise<BeneficioData> { const { data: result, error } = await supabase.from(this.tableName).insert(data).select().single(); if (error) throw error; return result; }
-  async update(id: string, data: Partial<BeneficioData>): Promise<BeneficioData> { const { data: result, error } = await supabase.from(this.tableName).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-  async delete(id: string): Promise<void> { const { error } = await supabase.from(this.tableName).delete().eq("id", id); if (error) throw error; }
-}
-export const beneficioService = new BeneficioService();
-export default beneficioService;
+import{api}from'@/lib/api';export interface BeneficioData{nome:string;tipo:string;valor:number;fornecedor?:string;desconto?:number;modalidadeDesconto:'valor_fixo'|'percentual';ativo:boolean;}export const beneficioService={async listar(){const r=await api.get('/beneficios');return r.data;},async buscar(id:string){const r=await api.get(`/beneficios/${id}`);return r.data;},async criar(data:BeneficioData){const r=await api.post('/beneficios',data);return r.data;},async atualizar(id:string,data:Partial<BeneficioData>){const r=await api.put(`/beneficios/${id}`,data);return r.data;},async excluir(id:string){await api.delete(`/beneficios/${id}`);},async vincularColaborador(beneficioId:string,colaboradorId:string,valor?:number){const r=await api.post(`/beneficios/${beneficioId}/colaboradores`,{colaboradorId,valor});return r.data;},async desvincularColaborador(beneficioId:string,colaboradorId:string){await api.delete(`/beneficios/${beneficioId}/colaboradores/${colaboradorId}`);},async listarColaboradores(beneficioId:string){const r=await api.get(`/beneficios/${beneficioId}/colaboradores`);return r.data;},async getBeneficiosColaborador(colaboradorId:string){const r=await api.get(`/colaboradores/${colaboradorId}/beneficios`);return r.data;}};
