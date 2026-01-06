@@ -1,16 +1,62 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-export function useTheme<T = any>(init?: T) {
-  const [data, setData] = useState<T | null>(init ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const ref = useRef(true);
-  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    setLoading(true); setError(null);
-    try { const r = await fn(); if (ref.current) setData(r); return r; }
-    catch (e) { if (ref.current) setError(e as Error); throw e; }
-    finally { if (ref.current) setLoading(false); }
+import { useState, useEffect, useCallback, useMemo } from "react";
+
+type Theme = 'light' | 'dark' | 'system';
+
+export function useTheme() {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as Theme) || 'system';
+    }
+    return 'system';
+  });
+
+  const systemDark = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
   }, []);
-  return { data, loading, error, execute, setData };
+
+  const isDark = useMemo(() => {
+    if (theme === 'system') return systemDark;
+    return theme === 'dark';
+  }, [theme, systemDark]);
+
+  const setTheme = useCallback((newTheme: Theme) => {
+    setThemeState(newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', newTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [isDark]);
+
+  useEffect(() => {
+    if (theme !== 'system') return;
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => {
+      const root = document.documentElement;
+      if (e.matches) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [theme]);
+
+  return { theme, setTheme, isDark };
 }
+
 export default useTheme;

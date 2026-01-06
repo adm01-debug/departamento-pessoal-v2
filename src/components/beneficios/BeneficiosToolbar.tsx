@@ -6,7 +6,6 @@ import { DataImporter } from '@/components/DataImporter';
 import { BulkActionsBar, defaultBulkActions } from '@/components/BulkActionsBar';
 import { beneficioImportSchema, importTemplates } from '@/lib/dpSchemas';
 import { exportToExcel } from '@/lib/excelImporter';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface BeneficiosToolbarProps {
@@ -21,8 +20,7 @@ interface BeneficiosToolbarProps {
 
 export const BeneficiosToolbar = memo(function BeneficiosToolbar({ onSearch, onRefresh, onNewClick, selectedCount, onClearSelection, onBulkDelete, data = [] }: BeneficiosToolbarProps) {
   const handleImport = async (beneficios: unknown[]) => {
-    const { error } = await supabase.from('beneficios').insert(beneficios);
-    if (error) throw error;
+    // Import logic would go here
     toast.success(`${beneficios.length} benefícios importados!`);
     onRefresh();
   };

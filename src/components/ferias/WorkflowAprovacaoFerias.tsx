@@ -1,7 +1,6 @@
 import { useState, memo } from 'react';
 import { 
-  CheckCircle, XCircle, Clock, AlertTriangle, History, 
-  User, Calendar, DollarSign, FileText, Loader2, ChevronDown
+  CheckCircle, XCircle, Clock, Calendar, DollarSign, FileText, User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,11 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
-import { FeriasComColaborador, StatusFerias, HistoricoFerias } from '@/types/ferias';
+import { FeriasComColaborador, StatusFerias } from '@/types/ferias';
 import { useFeriasMelhorado } from '@/hooks/useFeriasMelhorado';
-import { useHistoricoRegistro } from '@/hooks/useAuditoria';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrency } from '@/lib/calculosTrabalhistas';
@@ -34,6 +31,14 @@ const statusConfig: Record<StatusFerias, { label: string; icon: React.ElementTyp
   solicitada: { label: 'Solicitada', icon: Clock, color: 'text-amber-600' },
 };
 
+// Helper to get values (supports both snake_case and camelCase)
+const getDataInicio = (f: FeriasComColaborador): string => f.data_inicio || f.dataInicio || '';
+const getDataFim = (f: FeriasComColaborador): string => f.data_fim || f.dataFim || '';
+const getValorFerias = (f: FeriasComColaborador): number => f.valor_ferias ?? f.valorFerias ?? 0;
+const getValorTerco = (f: FeriasComColaborador): number => f.valor_terco ?? 0;
+const getValorTotal = (f: FeriasComColaborador): number => f.valor_total ?? f.valorTotal ?? 0;
+const getObservacoes = (f: FeriasComColaborador): string => f.observacoes ?? f.observacao ?? '';
+
 export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ ferias, open, onOpenChange }: WorkflowAprovacaoFeriasProps) {
   const { 
     aprovarFerias, 
@@ -41,17 +46,15 @@ export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ f
     atualizarFerias,
   } = useFeriasMelhorado();
   
-  const { data: historico, isLoading: loadingHistorico } = useHistoricoRegistro('ferias', ferias.id);
-  
   const [motivoRejeicao, setMotivoRejeicao] = useState('');
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [acaoPendente, setAcaoPendente] = useState<'aprovar' | 'rejeitar' | 'iniciar' | 'concluir' | null>(null);
-  const [historicoOpen, setHistoricoOpen] = useState(false);
 
   const config = statusConfig[ferias.status] || statusConfig.programada;
   const StatusIcon = config.icon;
 
-  const diasParaInicio = differenceInDays(parseISO(ferias.data_inicio), new Date());
+  const dataInicioStr = getDataInicio(ferias);
+  const diasParaInicio = dataInicioStr ? differenceInDays(parseISO(dataInicioStr), new Date()) : 999;
 
   const handleAcao = (acao: typeof acaoPendente) => {
     setAcaoPendente(acao);
@@ -123,13 +126,13 @@ export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ f
               <div className="p-3 rounded-lg bg-muted/30">
                 <p className="text-xs text-muted-foreground mb-1">Início</p>
                 <p className="font-semibold">
-                  {format(parseISO(ferias.data_inicio), "dd/MM/yyyy", { locale: ptBR })}
+                  {dataInicioStr ? format(parseISO(dataInicioStr), "dd/MM/yyyy", { locale: ptBR }) : '-'}
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-muted/30">
                 <p className="text-xs text-muted-foreground mb-1">Término</p>
                 <p className="font-semibold">
-                  {format(parseISO(ferias.data_fim), "dd/MM/yyyy", { locale: ptBR })}
+                  {getDataFim(ferias) ? format(parseISO(getDataFim(ferias)), "dd/MM/yyyy", { locale: ptBR }) : '-'}
                 </p>
               </div>
             </div>
@@ -142,27 +145,27 @@ export const WorkflowAprovacaoFerias = memo(function WorkflowAprovacaoFerias({ f
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Férias ({ferias.dias}d)</span>
-                  <span>{formatCurrency(ferias.valor_ferias || 0)}</span>
+                  <span>{formatCurrency(getValorFerias(ferias))}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">1/3 Constitucional</span>
-                  <span>{formatCurrency(ferias.valor_terco || 0)}</span>
+                  <span>{formatCurrency(getValorTerco(ferias))}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Líquido</span>
-                  <span className="text-success">{formatCurrency(ferias.valor_total || 0)}</span>
+                  <span className="text-success">{formatCurrency(getValorTotal(ferias))}</span>
                 </div>
               </div>
             </div>
 
-            {ferias.observacoes && (
+            {getObservacoes(ferias) && (
               <div className="p-3 rounded-lg bg-muted/30">
                 <div className="flex items-center gap-2 mb-2">
                   <FileText className="w-4 h-4 text-muted-foreground" />
                   <p className="font-medium text-sm">Observações</p>
                 </div>
-                <p className="text-sm text-muted-foreground">{ferias.observacoes}</p>
+                <p className="text-sm text-muted-foreground">{getObservacoes(ferias)}</p>
               </div>
             )}
           </div>

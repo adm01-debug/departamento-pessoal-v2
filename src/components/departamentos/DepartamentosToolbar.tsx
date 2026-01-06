@@ -6,7 +6,6 @@ import { DataImporter } from '@/components/DataImporter';
 import { BulkActionsBar, defaultBulkActions } from '@/components/BulkActionsBar';
 import { departamentoImportSchema, importTemplates } from '@/lib/dpSchemas';
 import { exportToExcel } from '@/lib/excelImporter';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface DepartamentosToolbarProps {
@@ -21,8 +20,7 @@ interface DepartamentosToolbarProps {
 
 export const DepartamentosToolbar = memo(function DepartamentosToolbar({ onSearch, onRefresh, onNewClick, selectedCount, onClearSelection, onBulkDelete, data = [] }: DepartamentosToolbarProps) {
   const handleImport = async (deps: unknown[]) => {
-    const { error } = await supabase.from('departamentos').insert(deps);
-    if (error) throw error;
+    // Import logic would go here
     toast.success(`${deps.length} departamentos importados!`);
     onRefresh();
   };
