@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import{Header}from'@/components/layout/Header';describe('Header',()=>{it.skip('should render header',()=>{render(<Header/>);expect(screen.getByText('Departamento Pessoal')).toBeInTheDocument();});});
