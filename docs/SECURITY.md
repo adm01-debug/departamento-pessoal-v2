@@ -1,32 +1,27 @@
-# SECURITY
+# Security
 
-## Visão Geral
-Documentação do módulo SECURITY para o sistema de Departamento Pessoal.
+## Reporting Vulnerabilities
 
-## Conteúdo
-- Introdução
-- Configuração
-- Uso
-- Exemplos
-- FAQ
+Please report security issues to: security@example.com
 
-## Introdução
-Este documento descreve as funcionalidades e configurações do módulo.
+## Best Practices
 
-## Configuração
-Siga as instruções abaixo para configurar o módulo.
+### Authentication
+- JWT tokens with expiration
+- Secure password hashing (bcrypt)
+- Rate limiting on auth endpoints
 
-## Uso
-Exemplos de uso e boas práticas.
+### Data Protection
+- All data encrypted in transit (HTTPS)
+- Sensitive data encrypted at rest
+- Input validation and sanitization
 
-## Exemplos
-```typescript
-// Exemplo de código
-const exemplo = "exemplo";
-```
+### Access Control
+- Role-based permissions
+- Principle of least privilege
+- Audit logging
 
-## FAQ
-Perguntas frequentes sobre o módulo.
-
----
-*Documentação gerada automaticamente - Sistema DP v9*
+### Dependencies
+- Regular security audits
+- Dependabot enabled
+- npm audit checks
