@@ -1,22 +1,18 @@
 ---
 name: Feature Request
-about: Sugerir uma nova funcionalidade
+about: Sugira uma feature
 title: '[FEATURE] '
 labels: enhancement
-assignees: ''
 ---
 
-## Descrição da Funcionalidade
-Uma descrição clara e concisa da funcionalidade.
+## Problema
 
-## Problema que Resolve
-Qual problema essa funcionalidade resolve?
+<!-- Descreva o problema -->
 
-## Solução Proposta
-Descreva a solução que você gostaria.
+## Solução proposta
 
-## Alternativas Consideradas
-Descreva alternativas que você considerou.
+<!-- Como resolver -->
 
-## Contexto Adicional
-Qualquer outro contexto ou screenshots.
+## Alternativas
+
+<!-- Outras opções consideradas -->
