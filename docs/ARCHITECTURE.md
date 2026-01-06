@@ -1,32 +1,24 @@
-# ARCHITECTURE
+# Arquitetura do Sistema
 
-## Visão Geral
-Documentação do módulo ARCHITECTURE para o sistema de Departamento Pessoal.
+## Stack Tecnológico
 
-## Conteúdo
-- Introdução
-- Configuração
-- Uso
-- Exemplos
-- FAQ
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: TailwindCSS + shadcn/ui
+- **State**: React Query
+- **Forms**: React Hook Form + Zod
+- **Charts**: Recharts
+- **Tables**: TanStack Table
+- **Tests**: Vitest
 
-## Introdução
-Este documento descreve as funcionalidades e configurações do módulo.
+## Estrutura de Pastas
 
-## Configuração
-Siga as instruções abaixo para configurar o módulo.
 
-## Uso
-Exemplos de uso e boas práticas.
 
-## Exemplos
-```typescript
-// Exemplo de código
-const exemplo = "exemplo";
-```
+## Padrões
 
-## FAQ
-Perguntas frequentes sobre o módulo.
-
----
-*Documentação gerada automaticamente - Sistema DP v9*
+- Componentes funcionais com hooks
+- Barrel exports (index.ts)
+- Validação com Zod
+- React Query para cache e mutations
+- Formatação BR para datas e valores
