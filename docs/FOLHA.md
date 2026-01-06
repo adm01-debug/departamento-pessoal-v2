@@ -1,26 +1,25 @@
-# 💰 FOLHA.md - Guia Folha de Pagamento
+# Folha de Pagamento
 
-## Processo Mensal
+## Cálculos
 
-### Pré-processamento
-1. Importar ponto
-2. Validar afastamentos
-3. Calcular horas extras
+### INSS 2024
 
-### Cálculo
-1. Salário base
-2. Adicionais (periculosidade, insalubridade)
-3. Descontos (INSS, IRRF, VT, benefícios)
-4. FGTS
+| Faixa | Até | Alíquota |
+|-------|-----|----------|
+| 1ª | R\$ 1.412,00 | 7,5% |
+| 2ª | R\$ 2.666,68 | 9% |
+| 3ª | R\$ 4.000,03 | 12% |
+| 4ª | R\$ 7.786,02 | 14% |
 
-### Fechamento
-1. Conferência
-2. Aprovação gerencial
-3. Geração de holerites
-4. Envio eSocial
-5. Pagamento
+### IRRF 2024
 
-## Tabelas 2025
-- INSS: 7.5% a 14%
-- IRRF: 0% a 27.5%
-- FGTS: 8%
+| Até | Alíquota | Dedução |
+|-----|----------|----------|
+| R\$ 2.259,20 | Isento | - |
+| R\$ 2.826,65 | 7,5% | R\$ 169,44 |
+| R\$ 3.751,05 | 15% | R\$ 381,44 |
+| R\$ 4.664,68 | 22,5% | R\$ 662,77 |
+| Acima | 27,5% | R\$ 896,00 |
+
+### Dedução Dependente
+- R\$ 189,59 por dependente
