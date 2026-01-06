@@ -1,7 +1,1 @@
-import { useState, useCallback, FocusEvent } from 'react';
-export function useFocus() {
-  const [isFocused, setIsFocused] = useState(false);
-  const onFocus = useCallback((e?: FocusEvent) => setIsFocused(true), []);
-  const onBlur = useCallback((e?: FocusEvent) => setIsFocused(false), []);
-  return { isFocused, onFocus, onBlur, focusProps: { onFocus, onBlur } };
-}
+import{useState,useRef,useCallback}from'react';export function useFocus<T extends HTMLElement>():[React.RefObject<T>,boolean,{focus:()=>void;blur:()=>void}]{const ref=useRef<T>(null);const[isFocused,setIsFocused]=useState(false);const focus=useCallback(()=>{ref.current?.focus();setIsFocused(true);},[]);const blur=useCallback(()=>{ref.current?.blur();setIsFocused(false);},[]);return[ref,isFocused,{focus,blur}];}
