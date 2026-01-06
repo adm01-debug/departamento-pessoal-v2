@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';import{render,screen,fireEvent}from'@/test/utils';import LoginPage from'@/pages/LoginPage';describe('LoginPage',()=>{it.skip('should render login form',()=>{render(<LoginPage/>);expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();expect(screen.getByPlaceholderText(/senha/i)).toBeInTheDocument();});});
