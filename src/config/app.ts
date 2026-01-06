@@ -1,0 +1,1 @@
+export const APP_CONFIG={name:import.meta.env.VITE_APP_NAME||'Sistema DP',version:'1.0.0',apiUrl:import.meta.env.VITE_API_URL||'http://localhost:3001/api',pagination:{defaultPageSize:10,pageSizeOptions:[10,20,50,100]},dateFormat:'dd/MM/yyyy',dateTimeFormat:'dd/MM/yyyy HH:mm',currency:'BRL',locale:'pt-BR',features:{darkMode:true,notifications:true,audit:true,esocial:true}};
