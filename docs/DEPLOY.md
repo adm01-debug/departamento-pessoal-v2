@@ -1,35 +1,52 @@
 # Deploy
 
-## Ambientes
+## Prerequisites
 
-| Ambiente | URL | Branch |
-|----------|-----|--------|
-| Produção | https://dp.promobrindes.com.br | main |
-| Staging | https://dp-staging.promobrindes.com.br | develop |
+- Node.js 18+
+- npm or yarn
 
-## Deploy Manual
+## Build
 
 ```bash
-# Build
+npm install
 npm run build
-
-# Preview
-npm run preview
 ```
 
-## Variáveis de Ambiente
+## Environment Variables
 
-```env
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-VITE_API_URL=
-VITE_BITRIX24_WEBHOOK=
+```
+VITE_API_URL=https://api.example.com
+VITE_APP_NAME=Sistema DP
 ```
 
-## Checklist Pre-Deploy
+## Docker
 
-- [ ] Testes passando
-- [ ] Build sem erros
-- [ ] Variáveis configuradas
-- [ ] Migrations executadas
-- [ ] Cache limpo
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "preview"]
+```
+
+## Vercel
+
+1. Connect repository
+2. Set environment variables
+3. Deploy
+
+## Nginx Config
+
+```nginx
+server {
+    listen 80;
+    root /var/www/dist;
+    index index.html;
+    location / {
+        try_files \ /index.html;
+    }
+}
+```
