@@ -1,2 +1,1 @@
-export * from "./PontoInconsistencias";
-export * from "./RegistroPontoCard";
+export*from'./RegistroPonto';
