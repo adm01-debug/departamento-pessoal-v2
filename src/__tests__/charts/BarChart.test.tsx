@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{render}from'@/test/utils';import{BarChart}from'@/components/charts/BarChart';describe('BarChart',()=>{it.skip('should render chart',()=>{const data=[{name:'Jan',value:100},{name:'Feb',value:200}];const{container}=render(<BarChart data={data}dataKey="value"xKey="name"/>);expect(container).toBeInTheDocument();});});
