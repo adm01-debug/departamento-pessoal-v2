@@ -22,33 +22,21 @@ import { useDuplicate, duplicateTransforms } from '@/hooks/useDuplicate';
 import { cn } from '@/lib/utils';
 
 interface DuplicateButtonProps<T extends Record<string, unknown>> {
-  /** Registro a ser duplicado */
   record: T;
-  /** Nome da tabela */
   tableName: string;
-  /** Campo usado como nome/título */
   nameField?: keyof T;
-  /** Campos que podem ser modificados antes de duplicar */
   editableFields?: {
     key: keyof T;
     label: string;
     type?: 'text' | 'number' | 'checkbox';
   }[];
-  /** Campos a serem excluídos da duplicação */
   excludeFields?: (keyof T)[];
-  /** Campos a serem resetados (zerados) */
   resetFields?: (keyof T)[];
-  /** Callback após duplicação */
   onDuplicated?: (original: T, duplicate: T) => void;
-  /** Query keys para invalidar */
   invalidateQueries?: string[][];
-  /** Variante do botão */
-  variant?: 'default' | 'outline' | 'ghost' | 'icon';
-  /** Tamanho do botão */
+  variant?: 'default' | 'outline' | 'ghost' | 'secondary';
   size?: 'default' | 'sm' | 'lg' | 'icon';
-  /** Classes adicionais */
   className?: string;
-  /** Desabilitado */
   disabled?: boolean;
 }
 
@@ -84,7 +72,6 @@ export const DuplicateButton = memo(function DuplicateButton<T extends Record<st
   });
 
   const handleDuplicate = () => {
-    // Mesclar valores editados com o registro original
     const recordWithEdits = {
       ...record,
       ...editedValues,
@@ -107,7 +94,6 @@ export const DuplicateButton = memo(function DuplicateButton<T extends Record<st
     return record[key];
   };
 
-  // Se não há campos editáveis, duplicar diretamente
   if (editableFields.length === 0) {
     return (
       <TooltipProvider>
@@ -136,7 +122,6 @@ export const DuplicateButton = memo(function DuplicateButton<T extends Record<st
     );
   }
 
-  // Com campos editáveis, mostrar modal
   return (
     <>
       <TooltipProvider>

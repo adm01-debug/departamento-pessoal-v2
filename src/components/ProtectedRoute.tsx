@@ -7,9 +7,9 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const auth = useAuth();
+  const { user, loading } = useAuth();
 
-  if (auth.loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!auth.user) {
+  if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
