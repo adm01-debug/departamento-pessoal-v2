@@ -1,7 +1,14 @@
 /**
- * logger utilities
+ * Logger utilities
  * @module lib/logger
  */
+
+export interface Logger {
+  info: (message: string, ...args: any[]) => void;
+  warn: (message: string, ...args: any[]) => void;
+  error: (message: string, ...args: any[]) => void;
+  debug: (message: string, ...args: any[]) => void;
+}
 
 export const loggerConfig = { enabled: true, debug: false, timeout: 30000 };
 
@@ -64,4 +71,30 @@ export class loggerManager {
   clear(): void { this.data.clear(); }
 }
 
-export default { configure: configurelogger, init: loggerInit, process: loggerProcess, async: loggerAsync, validate: loggerValidate, transform: loggerTransform, batch: loggerBatch, Manager: loggerManager };
+// Named export for components that import { logger }
+export const logger: Logger = {
+  info: (message: string, ...args: any[]) => {
+    if (loggerConfig.enabled) console.log(`[INFO] ${message}`, ...args);
+  },
+  warn: (message: string, ...args: any[]) => {
+    if (loggerConfig.enabled) console.warn(`[WARN] ${message}`, ...args);
+  },
+  error: (message: string, ...args: any[]) => {
+    console.error(`[ERROR] ${message}`, ...args);
+  },
+  debug: (message: string, ...args: any[]) => {
+    if (loggerConfig.debug) console.log(`[DEBUG] ${message}`, ...args);
+  },
+};
+
+export default { 
+  configure: configurelogger, 
+  init: loggerInit, 
+  process: loggerProcess, 
+  async: loggerAsync, 
+  validate: loggerValidate, 
+  transform: loggerTransform, 
+  batch: loggerBatch, 
+  Manager: loggerManager,
+  ...logger
+};
