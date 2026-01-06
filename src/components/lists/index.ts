@@ -1,1 +1,1 @@
-export*from'./BeneficioList';export*from'./CargoList';export*from'./DepartamentoList';export*from'./DocumentoList';
+export*from'./ColaboradorList';export*from'./FeriasList';export*from'./FolhaList';export*from'./BeneficioList';export*from'./CargoList';export*from'./DepartamentoList';export*from'./UsuarioList';export*from'./DocumentoList';export*from'./EventoList';export*from'./NotificacaoList';
