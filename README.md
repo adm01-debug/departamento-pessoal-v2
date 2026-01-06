@@ -1,21 +1,8 @@
-# Sistema de Departamento Pessoal
+# Sistema DP - Departamento Pessoal
 
-Sistema completo para gestão de departamento pessoal, incluindo:
+Sistema completo para gestão de Departamento Pessoal.
 
-## Funcionalidades
-
-- 👥 **Colaboradores** - Cadastro e gestão completa
-- 📝 **Admissões** - Fluxo de admissão automatizado
-- 🚪 **Demissões** - Processo de desligamento
-- 🏖️ **Férias** - Programação e controle
-- 💰 **Folha de Pagamento** - Cálculo automático
-- ⏰ **Ponto** - Registro e controle
-- 🎁 **Benefícios** - Gestão de benefícios
-- 📄 **Documentos** - Armazenamento digital
-- 📊 **eSocial** - Integração completa
-- 📈 **Relatórios** - Diversos relatórios gerenciais
-
-## Tecnologias
+## 🚀 Tecnologias
 
 - React 18 + TypeScript
 - Vite
@@ -25,14 +12,35 @@ Sistema completo para gestão de departamento pessoal, incluindo:
 - Recharts
 - Vitest
 
-## Como executar
+## 📦 Instalação
 
+```bash
+npm install
+npm run dev
+```
 
+## 🧪 Testes
 
-## Testes
+```bash
+npm run test
+npm run test:coverage
+```
 
+## 📁 Estrutura
 
+```
+src/
+├── components/     # Componentes React
+├── contexts/       # Contextos React
+├── hooks/          # Custom Hooks
+├── lib/            # Utilitários
+├── pages/          # Páginas
+├── schemas/        # Schemas Zod
+├── services/       # Serviços API
+├── types/          # Tipos TypeScript
+└── utils/          # Funções utilitárias
+```
 
-## Build
+## 📄 Licença
 
-
+MIT
