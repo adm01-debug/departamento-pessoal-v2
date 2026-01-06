@@ -1,15 +1,1 @@
-export { colaboradoresService } from './colaboradoresService';
-export { feriasService } from './feriasService';
-export { folhaService } from './folhaService';
-export { pontoService } from './pontoService';
-export { auditoriaService } from './auditoriaService';
-export { esocialService } from './esocialService';
-export { empresasService } from './empresasService';
-export { departamentosService } from './departamentosService';
-export { cargosService } from './cargosService';
-export { feriadosService } from './feriadosService';
-export { afastamentosService } from './afastamentosService';
-export { beneficiosService } from './beneficiosService';
-export { relatoriosService } from './relatoriosService';
-export { usuariosService } from './usuariosService';
-export { documentosService } from './documentosService';
+export*from'./admissaoService';export*from'./beneficioService';export*from'./cargoService';export*from'./colaboradorService';export*from'./contratoService';export*from'./departamentoService';export*from'./documentoService';export*from'./empresaService';export*from'./esocialService';export*from'./feriasService';export*from'./folhaService';export*from'./notificacaoService';export*from'./pontoService';export*from'./relatorioService';export*from'./usuarioService';export*from'./demissaoService';
