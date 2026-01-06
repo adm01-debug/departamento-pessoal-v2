@@ -1,16 +1,1 @@
-import React from "react";
-import { ResponsiveContainer, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-
-interface DataPoint { name: string; value: number; }
-interface BarChartProps { data: DataPoint[]; title?: string; dataKey?: string; colors?: string[]; height?: number; showLegend?: boolean; className?: string; }
-
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
-
-export function BarChart({ data, title, dataKey = "value", colors = COLORS, height = 300, showLegend = true, className }: BarChartProps) {
-  const chart = (<ResponsiveContainer width="100%" height={height}><RechartsBarChart data={data}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip />{showLegend && <Legend />}<Bar dataKey={dataKey} fill={colors[0]} /></RechartsBarChart></ResponsiveContainer>);
-  if (!title) return <div className={className}>{chart}</div>;
-  return <Card className={cn("", className)}><CardHeader><CardTitle>{title}</CardTitle></CardHeader><CardContent>{chart}</CardContent></Card>;
-}
-export default BarChart;
+import React from'react';import{BarChart as RechartsBarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Legend}from'recharts';interface DataItem{name:string;[key:string]:string|number;}interface Props{data:DataItem[];dataKey:string;xAxisKey?:string;color?:string;secondaryDataKey?:string;secondaryColor?:string;height?:number;showGrid?:boolean;showLegend?:boolean;}export function BarChart({data,dataKey,xAxisKey='name',color='#3b82f6',secondaryDataKey,secondaryColor='#10b981',height=300,showGrid=true,showLegend=false}:Props){return(<ResponsiveContainer width="100%"height={height}><RechartsBarChart data={data}margin={{top:5,right:30,left:20,bottom:5}}>{showGrid&&<CartesianGrid strokeDasharray="3 3"/>}<XAxis dataKey={xAxisKey}/><YAxis/><Tooltip/>{showLegend&&<Legend/>}<Bar dataKey={dataKey}fill={color}radius={[4,4,0,0]}/>{secondaryDataKey&&<Bar dataKey={secondaryDataKey}fill={secondaryColor}radius={[4,4,0,0]}/>}</RechartsBarChart></ResponsiveContainer>);}
