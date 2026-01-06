@@ -1,12 +1,1 @@
-import { supabase } from "@/integrations/supabase/client";
-export interface EmpresaData { id?: string; razaoSocial?: string; nomeFantasia?: string; cnpj?: string; inscricaoEstadual?: string; ativo?: boolean; }
-class EmpresaService {
-  private tableName = "empresas";
-  async getAll(filters?: Record<string, any>): Promise<EmpresaData[]> { let q = supabase.from(this.tableName).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-  async getById(id: string): Promise<EmpresaData | null> { const { data, error } = await supabase.from(this.tableName).select("*").eq("id", id).single(); if (error) throw error; return data; }
-  async create(data: Omit<EmpresaData, "id">): Promise<EmpresaData> { const { data: result, error } = await supabase.from(this.tableName).insert(data).select().single(); if (error) throw error; return result; }
-  async update(id: string, data: Partial<EmpresaData>): Promise<EmpresaData> { const { data: result, error } = await supabase.from(this.tableName).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-  async delete(id: string): Promise<void> { const { error } = await supabase.from(this.tableName).delete().eq("id", id); if (error) throw error; }
-}
-export const empresaService = new EmpresaService();
-export default empresaService;
+import{api}from'@/lib/api';export interface EmpresaData{razaoSocial:string;nomeFantasia?:string;cnpj:string;inscricaoEstadual?:string;inscricaoMunicipal?:string;cnae?:string;regimeTributario:string;email:string;telefone:string;endereco?:any;}export const empresaService={async listar(){const r=await api.get('/empresas');return r.data;},async buscar(id:string){const r=await api.get(`/empresas/${id}`);return r.data;},async getAtual(){const r=await api.get('/empresas/atual');return r.data;},async criar(data:EmpresaData){const r=await api.post('/empresas',data);return r.data;},async atualizar(id:string,data:Partial<EmpresaData>){const r=await api.put(`/empresas/${id}`,data);return r.data;},async excluir(id:string){await api.delete(`/empresas/${id}`);},async uploadLogo(empresaId:string,file:File){const fd=new FormData();fd.append('logo',file);const r=await api.post(`/empresas/${empresaId}/logo`,fd);return r.data;},async getEstatisticas(id:string){const r=await api.get(`/empresas/${id}/estatisticas`);return r.data;},async getConfiguracoes(id:string){const r=await api.get(`/empresas/${id}/configuracoes`);return r.data;},async atualizarConfiguracoes(id:string,config:any){const r=await api.put(`/empresas/${id}/configuracoes`,config);return r.data;}};
