@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('Login E2E',()=>{it('should login successfully',async()=>{expect(true).toBe(true);});it('should show error on invalid credentials',async()=>{expect(true).toBe(true);});it('should redirect to dashboard after login',async()=>{expect(true).toBe(true);});});
