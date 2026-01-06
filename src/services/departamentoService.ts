@@ -1,12 +1,1 @@
-import { supabase } from "@/integrations/supabase/client";
-export interface DepartamentoData { id?: string; nome?: string; descricao?: string; codigo?: string; responsavel?: string; ativo?: boolean; }
-class DepartamentoService {
-  private tableName = "departamentos";
-  async getAll(filters?: Record<string, any>): Promise<DepartamentoData[]> { let q = supabase.from(this.tableName).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-  async getById(id: string): Promise<DepartamentoData | null> { const { data, error } = await supabase.from(this.tableName).select("*").eq("id", id).single(); if (error) throw error; return data; }
-  async create(data: Omit<DepartamentoData, "id">): Promise<DepartamentoData> { const { data: result, error } = await supabase.from(this.tableName).insert(data).select().single(); if (error) throw error; return result; }
-  async update(id: string, data: Partial<DepartamentoData>): Promise<DepartamentoData> { const { data: result, error } = await supabase.from(this.tableName).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-  async delete(id: string): Promise<void> { const { error } = await supabase.from(this.tableName).delete().eq("id", id); if (error) throw error; }
-}
-export const departamentoService = new DepartamentoService();
-export default departamentoService;
+import{api}from'@/lib/api';export interface DepartamentoData{nome:string;codigo:string;gestorId?:string;centroCusto?:string;email?:string;telefone?:string;ativo:boolean;}export const departamentoService={async listar(filtros?:{ativo?:boolean}){const r=await api.get('/departamentos',{params:filtros});return r.data;},async buscar(id:string){const r=await api.get(`/departamentos/${id}`);return r.data;},async criar(data:DepartamentoData){const r=await api.post('/departamentos',data);return r.data;},async atualizar(id:string,data:Partial<DepartamentoData>){const r=await api.put(`/departamentos/${id}`,data);return r.data;},async excluir(id:string){await api.delete(`/departamentos/${id}`);},async ativar(id:string){const r=await api.patch(`/departamentos/${id}/ativar`);return r.data;},async desativar(id:string){const r=await api.patch(`/departamentos/${id}/desativar`);return r.data;},async getColaboradores(id:string){const r=await api.get(`/departamentos/${id}/colaboradores`);return r.data;},async getCargos(id:string){const r=await api.get(`/departamentos/${id}/cargos`);return r.data;},async getEstatisticas(id:string){const r=await api.get(`/departamentos/${id}/estatisticas`);return r.data;}};
