@@ -1,6 +1,6 @@
 # Contribuindo
 
-## Como Contribuir
+## Como contribuir
 
 1. Fork o repositório
 2. Crie uma branch: `git checkout -b feature/minha-feature`
@@ -8,19 +8,16 @@
 4. Push: `git push origin feature/minha-feature`
 5. Abra um Pull Request
 
-## Padrões de Commit
+## Padrões de código
+
+- ESLint + Prettier
+- TypeScript strict
+- Testes para utils e hooks
+
+## Commits
 
 Usamos Conventional Commits:
 - `feat:` nova funcionalidade
-- `fix:` correção de bug
+- `fix:` correção
 - `docs:` documentação
-- `style:` formatação
-- `refactor:` refatoração
 - `test:` testes
-- `chore:` manutenção
-
-## Code Review
-
-- Todos os PRs precisam de 1 aprovação
-- Testes devem passar
-- Cobertura não pode diminuir
