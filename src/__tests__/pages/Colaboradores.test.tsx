@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import ColaboradoresPage from'@/pages/ColaboradoresPage';describe('ColaboradoresPage',()=>{it.skip('should render colaboradores page',()=>{render(<ColaboradoresPage/>);expect(screen.getByText('Colaboradores')).toBeInTheDocument();});});
