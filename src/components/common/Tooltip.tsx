@@ -1,13 +1,1 @@
-import { memo, type ReactNode } from 'react';
-import { Tooltip as TooltipPrimitive, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-interface Props { children: ReactNode; content: string; side?: 'top' | 'right' | 'bottom' | 'left'; }
-export const Tooltip = memo(function Tooltip({ children, content, side = 'top' }: Props) {
-  return (
-    <TooltipProvider>
-      <TooltipPrimitive>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side={side}><p>{content}</p></TooltipContent>
-      </TooltipPrimitive>
-    </TooltipProvider>
-  );
-});
+import React from'react';import*as TooltipPrimitive from'@radix-ui/react-tooltip';import{cn}from'@/lib/utils';interface Props{content:React.ReactNode;children:React.ReactNode;side?:'top'|'right'|'bottom'|'left';delayDuration?:number;}export function Tooltip({content,children,side='top',delayDuration=200}:Props){return(<TooltipPrimitive.Provider><TooltipPrimitive.Root delayDuration={delayDuration}><TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger><TooltipPrimitive.Portal><TooltipPrimitive.Content side={side}className={cn('z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md','animate-in fade-in-0 zoom-in-95')}sideOffset={4}>{content}</TooltipPrimitive.Content></TooltipPrimitive.Portal></TooltipPrimitive.Root></TooltipPrimitive.Provider>);}
