@@ -1,1 +1,1 @@
-import React from'react';export function Footer(){return(<footer className="border-t py-4 px-6 text-center text-sm text-muted-foreground"><p>© {new Date().getFullYear()} Sistema DP. Todos os direitos reservados.</p></footer>);}
+import React from'react';export function Footer(){return(<footer className="py-4 px-6 border-t text-center text-sm text-muted-foreground"><p>© {new Date().getFullYear()} Sistema DP - Todos os direitos reservados</p></footer>);}
