@@ -1,28 +1,33 @@
-# Documentação da API
+# API Documentation
 
-## Endpoints
+## Autenticação
 
-### Colaboradores
+### POST /auth/login
+Login do usuário.
 
-- `GET /api/colaboradores` - Listar colaboradores
-- `POST /api/colaboradores` - Criar colaborador
-- `GET /api/colaboradores/:id` - Buscar colaborador
-- `PUT /api/colaboradores/:id` - Atualizar colaborador
-- `DELETE /api/colaboradores/:id` - Excluir colaborador
+**Request:**
+```json
+{"email":"user@email.com","senha":"password"}
+```
 
-### Férias
+**Response:**
+```json
+{"user":{"id":"1","nome":"User"},"token":"jwt-token"}
+```
 
-- `GET /api/ferias` - Listar férias
-- `POST /api/ferias` - Programar férias
-- `POST /api/ferias/:id/aprovar` - Aprovar férias
+## Colaboradores
 
-### Folha
+### GET /colaboradores
+Lista todos os colaboradores.
 
-- `GET /api/folha` - Listar folhas
-- `POST /api/folha/calcular` - Calcular folha
-- `POST /api/folha/fechar` - Fechar folha
+### GET /colaboradores/:id
+Busca colaborador por ID.
 
-### Ponto
+### POST /colaboradores
+Cria novo colaborador.
 
-- `GET /api/ponto` - Listar registros
-- `POST /api/ponto/registrar` - Registrar ponto
+### PUT /colaboradores/:id
+Atualiza colaborador.
+
+### DELETE /colaboradores/:id
+Exclui colaborador.
