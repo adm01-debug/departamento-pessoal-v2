@@ -1,8 +1,6 @@
 import { memo, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/Pagination';
-import { useBulkActions } from '@/hooks/useBulkActions';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +37,29 @@ export const EntityListWrapper = memo(function EntityListWrapper<T extends { id:
   emptyState,
   className,
 }: EntityListWrapperProps<T>) {
-  const { selectedIds, toggleSelect, toggleAll, clearSelection, isAllSelected } = useBulkActions(data);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    if (selectedIds.size === data.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(data.map(item => item.id)));
+    }
+  }, [data, selectedIds.size]);
+
+  const isAllSelected = selectedIds.size === data.length && data.length > 0;
 
   const totalPages = Math.ceil(total / pageSize);
 

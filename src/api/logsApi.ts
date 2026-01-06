@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 const TABLE = "auditoria_logs";
 
 export async function list(filters?: Record<string, any>) {
-  let q = supabase.from(TABLE).select("*");
+  let q = (supabase.from(TABLE) as any).select("*");
   if (filters) {
     Object.entries(filters).forEach(([k, v]) => {
       if (v) q = q.eq(k, v);
@@ -15,31 +15,31 @@ export async function list(filters?: Record<string, any>) {
 }
 
 export async function getById(id: string) {
-  const { data, error } = await supabase.from(TABLE).select("*").eq("id", id).single();
+  const { data, error } = await (supabase.from(TABLE) as any).select("*").eq("id", id).single();
   if (error) throw error;
   return data;
 }
 
 export async function create(data: any) {
-  const { data: result, error } = await supabase.from(TABLE).insert([data]).select().single();
+  const { data: result, error } = await (supabase.from(TABLE) as any).insert([data]).select().single();
   if (error) throw error;
   return result;
 }
 
 export async function update(id: string, data: any) {
-  const { data: result, error } = await supabase.from(TABLE).update(data).eq("id", id).select().single();
+  const { data: result, error } = await (supabase.from(TABLE) as any).update(data).eq("id", id).select().single();
   if (error) throw error;
   return result;
 }
 
 export async function remove(id: string) {
-  const { error } = await supabase.from(TABLE).delete().eq("id", id);
+  const { error } = await (supabase.from(TABLE) as any).delete().eq("id", id);
   if (error) throw error;
   return true;
 }
 
 export async function count(filters?: Record<string, any>) {
-  let q = supabase.from(TABLE).select("*", { count: "exact", head: true });
+  let q = (supabase.from(TABLE) as any).select("*", { count: "exact", head: true });
   if (filters) {
     Object.entries(filters).forEach(([k, v]) => {
       if (v) q = q.eq(k, v);
