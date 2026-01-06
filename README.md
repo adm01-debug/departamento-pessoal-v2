@@ -1,46 +1,44 @@
-# Sistema DP - Departamento Pessoal
+# Sistema de Departamento Pessoal
 
-Sistema completo para gestão de Departamento Pessoal.
+Sistema completo para gestão de departamento pessoal.
 
-## 🚀 Tecnologias
+## Funcionalidades
 
-- React 18 + TypeScript
+- Gestão de Colaboradores
+- Folha de Pagamento
+- Férias
+- Ponto Eletrônico
+- Benefícios
+- eSocial
+- Relatórios
+
+## Tecnologias
+
+- React 18
+- TypeScript
 - Vite
-- TailwindCSS + shadcn/ui
+- TailwindCSS
+- shadcn/ui
 - React Query
 - React Hook Form + Zod
-- Recharts
 - Vitest
 
-## 📦 Instalação
+## Instalação
 
 ```bash
 npm install
 npm run dev
 ```
 
-## 🧪 Testes
+## Testes
 
 ```bash
-npm run test
+npm test
 npm run test:coverage
 ```
 
-## 📁 Estrutura
+## Build
 
+```bash
+npm run build
 ```
-src/
-├── components/     # Componentes React
-├── contexts/       # Contextos React
-├── hooks/          # Custom Hooks
-├── lib/            # Utilitários
-├── pages/          # Páginas
-├── schemas/        # Schemas Zod
-├── services/       # Serviços API
-├── types/          # Tipos TypeScript
-└── utils/          # Funções utilitárias
-```
-
-## 📄 Licença
-
-MIT
