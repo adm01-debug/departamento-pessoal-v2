@@ -1,1 +1,1 @@
-export*from'./api';export*from'./queryClient';export*from'./utils';export*from'./date';export*from'./number';export*from'./string';export*from'./array';export*from'./object';export*from'./validation';
+export*from'./api';export*from'./queryClient';export*from'./axios';export*from'./utils';
