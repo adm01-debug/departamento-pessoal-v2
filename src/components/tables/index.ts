@@ -1,5 +1,1 @@
-export * from "./ColaboradoresTable";
-export * from "./FolhaEventosTable";
-export * from "./FeriasTable";
-export * from "./ESocialTable";
-export * from "./RubricasTable";
+export*from'./ColaboradorTable';export*from'./FolhaTable';export*from'./FeriasTable';export*from'./PontoTable';
