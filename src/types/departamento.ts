@@ -1,15 +1,1 @@
-export interface Departamento {
-  id: string;
-  nome: string;
-  descricao?: string;
-  codigo?: string;
-  status: "ativo" | "inativo" | "pendente";
-  createdAt: string;
-  updatedAt: string;
-  metadata?: Record<string, any>;
-}
-export interface DepartamentoCreate extends Omit<Departamento, "id" | "createdAt" | "updatedAt"> {}
-export interface DepartamentoUpdate extends Partial<DepartamentoCreate> {}
-export interface DepartamentoFilter { search?: string; status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc"; }
-export interface DepartamentoListResponse { data: Departamento[]; total: number; page: number; limit: number; }
-export type DepartamentoStatus = "ativo" | "inativo" | "pendente";
+export interface Departamento{id:string;nome:string;codigo:string;gestorId?:string;gestorNome?:string;centroCusto?:string;email?:string;telefone?:string;colaboradores:number;cargos:number;ativo:boolean;createdAt:string;updatedAt:string;}export interface DepartamentoFormData{nome:string;codigo:string;gestorId?:string;centroCusto?:string;email?:string;telefone?:string;ativo:boolean;}export interface DepartamentoResumo{id:string;nome:string;codigo:string;colaboradores:number;}export interface DepartamentoEstatisticas{totalColaboradores:number;totalCargos:number;mediaSlabrial:number;custoMensal:number;admissoesMes:number;demissoesMes:number;}
