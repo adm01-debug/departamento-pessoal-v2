@@ -1,17 +1,1 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-export function useSort<T = any>(init?: T) {
-  const [data, setData] = useState<T | null>(init ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const ref = useRef(true);
-  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    setLoading(true); setError(null);
-    try { const r = await fn(); if (ref.current) setData(r); return r; }
-    catch (e) { if (ref.current) setError(e as Error); throw e; }
-    finally { if (ref.current) setLoading(false); }
-  }, []);
-  const reset = useCallback(() => { setData(init ?? null); setError(null); }, [init]);
-  return { data, loading, error, execute, reset, setData };
-}
-export default useSort;
+import{useState,useMemo,useCallback}from'react';type SortOrder='asc'|'desc';interface UseSortProps<T>{data:T[];defaultSortBy?:keyof T;defaultOrder?:SortOrder;}interface UseSortReturn<T>{sortedData:T[];sortBy:keyof T|null;sortOrder:SortOrder;handleSort:(key:keyof T)=>void;resetSort:()=>void;}export function useSort<T extends Record<string,any>>({data,defaultSortBy=null,defaultOrder='asc'}:UseSortProps<T>):UseSortReturn<T>{const[sortBy,setSortBy]=useState<keyof T|null>(defaultSortBy);const[sortOrder,setSortOrder]=useState<SortOrder>(defaultOrder);const sortedData=useMemo(()=>{if(!sortBy)return data;return[...data].sort((a,b)=>{const aVal=a[sortBy];const bVal=b[sortBy];if(aVal===bVal)return 0;if(aVal===null||aVal===undefined)return 1;if(bVal===null||bVal===undefined)return-1;const comparison=aVal<bVal?-1:1;return sortOrder==='asc'?comparison:-comparison;});},[data,sortBy,sortOrder]);const handleSort=useCallback((key:keyof T)=>{if(sortBy===key){setSortOrder(prev=>prev==='asc'?'desc':'asc');}else{setSortBy(key);setSortOrder('asc');}},[sortBy]);const resetSort=useCallback(()=>{setSortBy(defaultSortBy);setSortOrder(defaultOrder);},[defaultSortBy,defaultOrder]);return{sortedData,sortBy,sortOrder,handleSort,resetSort};}
