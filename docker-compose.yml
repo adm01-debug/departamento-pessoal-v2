@@ -1,20 +1,18 @@
-version: '3.8'
+version:'3.8'
 services:
-  app:
+  frontend:
     build: .
     ports:
-      - "3000:80"
-    environment:
-      - NODE_ENV=production
+      - '3000:80'
     depends_on:
-      - redis
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+  backend:
+    image: node:18-alpine
+    working_dir: /app
     volumes:
-      - redis_data:/data
-
-volumes:
-  redis_data:
+      - ./backend:/app
+    ports:
+      - '3001:3001'
+    command: npm run dev
