@@ -1,32 +1,38 @@
-# DEPLOYMENT
+# Deploy
 
-## Visão Geral
-Documentação do módulo DEPLOYMENT para o sistema de Departamento Pessoal.
+## Build
 
-## Conteúdo
-- Introdução
-- Configuração
-- Uso
-- Exemplos
-- FAQ
-
-## Introdução
-Este documento descreve as funcionalidades e configurações do módulo.
-
-## Configuração
-Siga as instruções abaixo para configurar o módulo.
-
-## Uso
-Exemplos de uso e boas práticas.
-
-## Exemplos
-```typescript
-// Exemplo de código
-const exemplo = "exemplo";
+```bash
+npm run build
 ```
 
-## FAQ
-Perguntas frequentes sobre o módulo.
+Os arquivos serão gerados em `dist/`.
 
----
-*Documentação gerada automaticamente - Sistema DP v9*
+## Variáveis de Ambiente
+
+| Variável | Descrição |
+|----------|------------|
+| VITE_API_URL | URL da API |
+| VITE_APP_NAME | Nome do app |
+
+## Docker
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "preview"]
+```
+
+## Nginx
+
+```nginx
+location / {
+  root /var/www/dist;
+  try_files \ /index.html;
+}
+```
