@@ -1,21 +1,30 @@
-# 🏖️ FERIAS.md - Guia de Férias
+# Férias
 
-## Regras CLT
+## Regras
 
-### Período Aquisitivo
-- 12 meses de trabalho
-- Direito a 30 dias
+- Período aquisitivo: 12 meses
+- Período concessivo: 12 meses seguintes
+- Dias: 30 dias corridos
+- Abono pecuniário: até 1/3 (10 dias)
 
-### Período Concessivo
-- 12 meses após aquisitivo
-- Pode dividir em até 3 períodos
-- Mínimo 14 dias corridos
+## Cálculo
 
-### Abono Pecuniário
-- Venda de até 10 dias
-- Solicitação 15 dias antes
+```
+Valor Férias = (Salário / 30) * Dias
+Terço Férias = Valor Férias / 3
+Total Bruto = Valor Férias + Terço Férias
+```
 
-### Cálculo
-- Salário + 1/3 constitucional
-- Adicionais proporcionais
-- Descontos: INSS e IRRF
+## Descontos
+
+- INSS: sobre total bruto
+- IRRF: sobre (total bruto - INSS)
+
+## Abono Pecuniário
+
+```
+Valor Abono = (Salário / 30) * Dias Vendidos
+Terço Abono = Valor Abono / 3
+```
+
+O abono não sofre desconto de INSS e IRRF.
