@@ -1,46 +1,48 @@
 # API Documentation
 
-## Services
+## Authentication
 
-### admissoesService
-```typescript
-getAll(): Promise<Admissao[]>
-getById(id: string): Promise<Admissao>
-create(data: AdmissaoInput): Promise<Admissao>
-update(id: string, data: Partial<AdmissaoInput>): Promise<Admissao>
-delete(id: string): Promise<void>
-```
+### POST /auth/login
+Login with email and password.
 
-### colaboradoresService
-```typescript
-getAll(filters?: ColaboradorFilters): Promise<Colaborador[]>
-getById(id: string): Promise<Colaborador>
-create(data: ColaboradorInput): Promise<Colaborador>
-update(id: string, data: Partial<ColaboradorInput>): Promise<Colaborador>
-deactivate(id: string): Promise<void>
-```
+### POST /auth/logout
+Logout current user.
 
-### backupService
-```typescript
-getAll(): Promise<Backup[]>
-create(): Promise<Backup>
-restore(id: string): Promise<void>
-delete(id: string): Promise<void>
-```
+## Colaboradores
 
-## Hooks
+### GET /colaboradores
+List all colaboradores.
 
-### useColaboradores
-```typescript
-const { data, isLoading, error, refetch } = useColaboradores(filters?)
-```
+### GET /colaboradores/:id
+Get colaborador by ID.
 
-### useAdmissoes
-```typescript
-const { data, create, update, delete: remove } = useAdmissoes()
-```
+### POST /colaboradores
+Create new colaborador.
 
-### useFeatureFlag
-```typescript
-const { isEnabled, isLoading } = useFeatureFlag('feature-name')
-```
+### PUT /colaboradores/:id
+Update colaborador.
+
+### DELETE /colaboradores/:id
+Delete colaborador.
+
+## Folha de Pagamento
+
+### GET /folha
+List all folhas.
+
+### POST /folha/:id/calcular
+Calculate folha.
+
+### POST /folha/:id/fechar
+Close folha.
+
+## Férias
+
+### GET /ferias
+List all ferias.
+
+### POST /ferias/:id/aprovar
+Approve ferias.
+
+### POST /ferias/:id/cancelar
+Cancel ferias.
