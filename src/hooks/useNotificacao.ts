@@ -1,11 +1,1 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { notificacaoService } from "@/services/notificacaoService";
-export function useNotificacao(usuarioId: string) {
-  const qc = useQueryClient();
-  const { data: notificacoes = [], isLoading } = useQuery({ queryKey: ["notificacoes", usuarioId], queryFn: () => notificacaoService.getByUsuario(usuarioId) });
-  const { data: naoLidas = [] } = useQuery({ queryKey: ["notificacoes-nao-lidas", usuarioId], queryFn: () => notificacaoService.getNaoLidas(usuarioId) });
-  const marcarLida = useMutation({ mutationFn: notificacaoService.marcarLida, onSuccess: () => qc.invalidateQueries({queryKey:["notificacoes"]}) });
-  const marcarTodasLidas = useMutation({ mutationFn: () => notificacaoService.marcarTodasLidas(usuarioId), onSuccess: () => qc.invalidateQueries({queryKey:["notificacoes"]}) });
-  return { notificacoes, naoLidas, isLoading, quantidadeNaoLidas: naoLidas.length, marcarLida: marcarLida.mutateAsync, marcarTodasLidas: marcarTodasLidas.mutateAsync };
-}
-export default useNotificacao;
+import{useQuery,useMutation,useQueryClient}from'@tanstack/react-query';import{api}from'@/lib/api';export interface Notificacao{id:string;titulo:string;mensagem:string;tipo:string;lida:boolean;createdAt:string;}export function useNotificacoes(){return useQuery<Notificacao[]>({queryKey:['notificacoes'],queryFn:async()=>{const r=await api.get('/notificacoes');return r.data;}});}export function useNotificacoesNaoLidas(){return useQuery<{count:number}>({queryKey:['notificacoes-count'],queryFn:async()=>{const r=await api.get('/notificacoes/count');return r.data;},refetchInterval:30000});}export function useMarcarLida(){const qc=useQueryClient();return useMutation({mutationFn:async(id:string)=>{await api.patch(`/notificacoes/${id}/lida`);},onSuccess:()=>{qc.invalidateQueries({queryKey:['notificacoes']});qc.invalidateQueries({queryKey:['notificacoes-count']});}});}export function useMarcarTodasLidas(){const qc=useQueryClient();return useMutation({mutationFn:async()=>{await api.post('/notificacoes/marcar-todas');},onSuccess:()=>{qc.invalidateQueries({queryKey:['notificacoes']});qc.invalidateQueries({queryKey:['notificacoes-count']});}});}
