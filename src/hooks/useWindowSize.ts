@@ -1,16 +1,1 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-export function useWindowSize<T = any>(init?: T) {
-  const [data, setData] = useState<T | null>(init ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const ref = useRef(true);
-  useEffect(() => { ref.current = true; return () => { ref.current = false; }; }, []);
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    setLoading(true); setError(null);
-    try { const r = await fn(); if (ref.current) setData(r); return r; }
-    catch (e) { if (ref.current) setError(e as Error); throw e; }
-    finally { if (ref.current) setLoading(false); }
-  }, []);
-  return { data, loading, error, execute, setData };
-}
-export default useWindowSize;
+import{useState,useEffect}from'react';interface WindowSize{width:number;height:number;}export function useWindowSize():WindowSize{const[windowSize,setWindowSize]=useState<WindowSize>({width:typeof window!=='undefined'?window.innerWidth:0,height:typeof window!=='undefined'?window.innerHeight:0});useEffect(()=>{const handleResize=()=>{setWindowSize({width:window.innerWidth,height:window.innerHeight});};window.addEventListener('resize',handleResize);return()=>window.removeEventListener('resize',handleResize);},[]);return windowSize;}
