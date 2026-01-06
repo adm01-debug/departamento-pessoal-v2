@@ -1,3 +1,1 @@
-export * from './AreaChartWrapper';
-export * from './BarChartWrapper';
-export * from './PieChartWrapper';
+export*from'./LineChart';export*from'./BarChart';export*from'./PieChart';export*from'./AreaChart';
