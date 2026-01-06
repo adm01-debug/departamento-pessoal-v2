@@ -1,32 +1,33 @@
-# CONTRIBUTING
+# Contributing
 
-## Visão Geral
-Documentação do módulo CONTRIBUTING para o sistema de Departamento Pessoal.
+## Getting Started
 
-## Conteúdo
-- Introdução
-- Configuração
-- Uso
-- Exemplos
-- FAQ
+1. Fork the repository
+2. Clone your fork
+3. Install dependencies: `npm install`
+4. Create a branch: `git checkout -b feature/my-feature`
 
-## Introdução
-Este documento descreve as funcionalidades e configurações do módulo.
+## Development
 
-## Configuração
-Siga as instruções abaixo para configurar o módulo.
+- Run dev server: `npm run dev`
+- Run tests: `npm test`
+- Lint code: `npm run lint`
 
-## Uso
-Exemplos de uso e boas práticas.
+## Commit Convention
 
-## Exemplos
-```typescript
-// Exemplo de código
-const exemplo = "exemplo";
-```
+Use conventional commits:
 
-## FAQ
-Perguntas frequentes sobre o módulo.
+- `feat:` new feature
+- `fix:` bug fix
+- `docs:` documentation
+- `style:` formatting
+- `refactor:` code refactoring
+- `test:` tests
+- `chore:` maintenance
 
----
-*Documentação gerada automaticamente - Sistema DP v9*
+## Pull Request
+
+1. Update tests
+2. Update documentation
+3. Submit PR with description
+4. Wait for review
