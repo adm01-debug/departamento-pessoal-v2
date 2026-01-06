@@ -1,15 +1,1 @@
-import { memo } from 'react';
-import { cn } from '@/lib/utils';
-interface Props { value: number; max?: number; showLabel?: boolean; className?: string; color?: 'default' | 'success' | 'warning' | 'error'; }
-const colors = { default: 'bg-primary', success: 'bg-green-500', warning: 'bg-yellow-500', error: 'bg-red-500' };
-export const ProgressBar = memo(function ProgressBar({ value, max = 100, showLabel = false, className, color = 'default' }: Props) {
-  const percent = Math.min(100, Math.max(0, (value / max) * 100));
-  return (
-    <div className={cn('w-full', className)}>
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className={cn('h-2 rounded-full transition-all', colors[color])} style={{ width: `${percent}%` }} />
-      </div>
-      {showLabel && <span className="text-xs text-muted-foreground mt-1">{percent.toFixed(0)}%</span>}
-    </div>
-  );
-});
+import React from'react';import{cn}from'@/lib/utils';interface Props{value:number;max?:number;showLabel?:boolean;size?:'sm'|'md'|'lg';color?:'primary'|'success'|'warning'|'danger';}const sizes={sm:'h-1',md:'h-2',lg:'h-4'};const colors={primary:'bg-primary',success:'bg-green-500',warning:'bg-yellow-500',danger:'bg-red-500'};export function ProgressBar({value,max=100,showLabel=false,size='md',color='primary'}:Props){const percentage=Math.min(100,(value/max)*100);return(<div className="w-full"><div className={cn('w-full bg-secondary rounded-full overflow-hidden',sizes[size])}><div className={cn('h-full transition-all duration-300',colors[color])}style={{width:`${percentage}%`}}/></div>{showLabel&&<span className="text-xs text-muted-foreground mt-1">{percentage.toFixed(0)}%</span>}</div>);}
