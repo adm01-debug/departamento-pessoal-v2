@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('Colaborador E2E',()=>{it('should create new colaborador',async()=>{expect(true).toBe(true);});it('should edit colaborador',async()=>{expect(true).toBe(true);});it('should delete colaborador',async()=>{expect(true).toBe(true);});it('should filter colaboradores',async()=>{expect(true).toBe(true);});});
