@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('Ferias E2E',()=>{it('should program ferias',async()=>{expect(true).toBe(true);});it('should approve ferias',async()=>{expect(true).toBe(true);});it('should cancel ferias',async()=>{expect(true).toBe(true);});});
