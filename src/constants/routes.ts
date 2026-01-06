@@ -1,10 +1,1 @@
-export const routes = {
-  DEFAULT: "default",
-  ITEMS: [] as string[],
-  MAP: {} as Record<string, any>,
-  get(key: string): any { return this.MAP[key] || this.DEFAULT; },
-  has(key: string): boolean { return key in this.MAP; },
-  all(): string[] { return Object.keys(this.MAP); },
-} as const;
-export type routesType = keyof typeof routes;
-export default routes;
+export const ROUTES={HOME:'/',LOGIN:'/login',DASHBOARD:'/',COLABORADORES:'/colaboradores',COLABORADOR_NOVO:'/colaboradores/novo',COLABORADOR_EDITAR:'/colaboradores/:id/editar',COLABORADOR_DETALHES:'/colaboradores/:id',ADMISSOES:'/admissoes',ADMISSAO_NOVA:'/admissoes/novo',DEMISSOES:'/demissoes',DEMISSAO_NOVA:'/demissoes/novo',FERIAS:'/ferias',FERIAS_PROGRAMAR:'/ferias/programar',FOLHA:'/folha',FOLHA_CALCULAR:'/folha/calcular',PONTO:'/ponto',PONTO_REGISTRAR:'/ponto/registrar',BENEFICIOS:'/beneficios',CARGOS:'/cargos',DEPARTAMENTOS:'/departamentos',DOCUMENTOS:'/documentos',ESOCIAL:'/esocial',RELATORIOS:'/relatorios',CONFIGURACOES:'/configuracoes',USUARIOS:'/usuarios',PERFIL:'/perfil',AUDITORIA:'/auditoria'};export function getColaboradorDetalhesRoute(id:string):string{return ROUTES.COLABORADOR_DETALHES.replace(':id',id);}export function getColaboradorEditarRoute(id:string):string{return ROUTES.COLABORADOR_EDITAR.replace(':id',id);}
