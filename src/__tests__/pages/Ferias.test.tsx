@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import FeriasPage from'@/pages/FeriasPage';describe('FeriasPage',()=>{it.skip('should render ferias page',()=>{render(<FeriasPage/>);expect(screen.getByText('Férias')).toBeInTheDocument();});});
