@@ -1,1 +1,1 @@
-export*from'./colaborador.schema';export*from'./ferias.schema';export*from'./folha.schema';export*from'./ponto.schema';export*from'./auth.schema';
+export*from'./colaborador';export*from'./ferias';export*from'./folha';export*from'./ponto';export*from'./usuario';export*from'./beneficio';export*from'./cargo';export*from'./departamento';export*from'./empresa';
