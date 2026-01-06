@@ -1,0 +1,1 @@
+export type NotificationType='success'|'error'|'warning'|'info';export interface Notification{id:string;type:NotificationType;title:string;message?:string;duration?:number;action?:{label:string;onClick:()=>void};}export interface NotificationConfig{position?:'top-right'|'top-left'|'bottom-right'|'bottom-left';maxVisible?:number;defaultDuration?:number;}
