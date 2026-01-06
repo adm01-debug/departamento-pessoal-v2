@@ -1,1 +1,1 @@
-export * from "./ColaboradorCard";
+export*from'./ColaboradorCard';export*from'./ColaboradorList';
