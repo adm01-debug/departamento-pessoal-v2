@@ -1,9 +1,66 @@
 import { supabase } from "@/integrations/supabase/client";
-const TABLE = "dashboard";
-export async function list(filters?: Record<string, any>) { let q = supabase.from(TABLE).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-export async function getById(id: string) { const { data, error } = await supabase.from(TABLE).select("*").eq("id", id).single(); if (error) throw error; return data; }
-export async function create(data: any) { const { data: result, error } = await supabase.from(TABLE).insert([data]).select().single(); if (error) throw error; return result; }
-export async function update(id: string, data: any) { const { data: result, error } = await supabase.from(TABLE).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-export async function remove(id: string) { const { error } = await supabase.from(TABLE).delete().eq("id", id); if (error) throw error; return true; }
-export async function count(filters?: Record<string, any>) { let q = supabase.from(TABLE).select("*", { count: "exact", head: true }); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); }); const { count, error } = await q; if (error) throw error; return count || 0; }
-export default { list, getById, create, update, remove, count };
+
+// Dashboard API - aggregates data from multiple tables
+
+export interface DashboardStats {
+  totalColaboradores: number;
+  totalEmpresas: number;
+  feriasAtivas: number;
+  afastamentosAtivos: number;
+  admissoesRecentes: number;
+  folhasPendentes: number;
+}
+
+export async function getStats(): Promise<DashboardStats> {
+  const [
+    colaboradores,
+    empresas,
+    ferias,
+    afastamentos,
+    admissoes,
+    folhas
+  ] = await Promise.all([
+    supabase.from("colaboradores").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+    supabase.from("empresas").select("*", { count: "exact", head: true }).eq("ativa", true),
+    supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "aprovado"),
+    supabase.from("afastamentos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+    supabase.from("admissoes").select("*", { count: "exact", head: true }),
+    supabase.from("folhas_pagamento").select("*", { count: "exact", head: true }).eq("status", "aberta"),
+  ]);
+
+  return {
+    totalColaboradores: colaboradores.count || 0,
+    totalEmpresas: empresas.count || 0,
+    feriasAtivas: ferias.count || 0,
+    afastamentosAtivos: afastamentos.count || 0,
+    admissoesRecentes: admissoes.count || 0,
+    folhasPendentes: folhas.count || 0,
+  };
+}
+
+// Stub implementations for CRUD operations (dashboard doesn't have its own table)
+export async function list(_filters?: Record<string, any>) {
+  return [];
+}
+
+export async function getById(_id: string) {
+  return null;
+}
+
+export async function create(_data: any) {
+  return null;
+}
+
+export async function update(_id: string, _data: any) {
+  return null;
+}
+
+export async function remove(_id: string) {
+  return false;
+}
+
+export async function count(_filters?: Record<string, any>) {
+  return 0;
+}
+
+export default { getStats, list, getById, create, update, remove, count };
