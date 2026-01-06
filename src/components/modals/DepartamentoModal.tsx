@@ -1,18 +1,1 @@
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
-interface DepartamentoModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
-
-export function DepartamentoModal({ open, onOpenChange, data, onConfirm, title = "DepartamentoModal", loading = false }: DepartamentoModalProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
-        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
-        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-export default DepartamentoModal;
+import React from'react';import{useQuery}from'@tanstack/react-query';import{Dialog,DialogContent,DialogHeader,DialogTitle}from'@/components/ui/dialog';import{DepartamentoForm}from'@/components/forms/DepartamentoForm';import{Departamento}from'@/types/departamento';import{api}from'@/lib/api';interface Props{open:boolean;onOpenChange:(open:boolean)=>void;departamento?:Departamento;onSubmit:(data:any)=>void;}export function DepartamentoModal({open,onOpenChange,departamento,onSubmit}:Props){const{data:gestores=[]}=useQuery({queryKey:['gestores'],queryFn:async()=>{const r=await api.get('/colaboradores',{params:{cargo:'gestor'}});return r.data;}});const handleSubmit=(data:any)=>{onSubmit(data);onOpenChange(false);};return(<Dialog open={open}onOpenChange={onOpenChange}><DialogContent className="max-w-lg"><DialogHeader><DialogTitle>{departamento?'Editar Departamento':'Novo Departamento'}</DialogTitle></DialogHeader><DepartamentoForm defaultValues={departamento}gestores={gestores}onSubmit={handleSubmit}onCancel={()=>onOpenChange(false)}/></DialogContent></Dialog>);}
