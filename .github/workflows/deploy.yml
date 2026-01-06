@@ -13,5 +13,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Deploy
-        run: echo 'Deploy placeholder'
+      - name: Deploy to Server
+        run: echo 'Deploy step'
