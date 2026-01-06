@@ -1,16 +1,1 @@
-import React from "react";
-import { ResponsiveContainer, LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-
-interface DataPoint { name: string; value: number; }
-interface LineChartProps { data: DataPoint[]; title?: string; dataKey?: string; colors?: string[]; height?: number; className?: string; }
-
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b"];
-
-export function LineChart({ data, title, dataKey = "value", colors = COLORS, height = 300, className }: LineChartProps) {
-  const chart = (<ResponsiveContainer width="100%" height={height}><RechartsLineChart data={data}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Legend /><Line type="monotone" dataKey={dataKey} stroke={colors[0]} strokeWidth={2} /></RechartsLineChart></ResponsiveContainer>);
-  if (!title) return <div className={className}>{chart}</div>;
-  return <Card className={cn("", className)}><CardHeader><CardTitle>{title}</CardTitle></CardHeader><CardContent>{chart}</CardContent></Card>;
-}
-export default LineChart;
+import React from'react';import{LineChart as RechartsLineChart,Line,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Legend}from'recharts';interface DataItem{name:string;[key:string]:string|number;}interface Props{data:DataItem[];dataKey:string;xAxisKey?:string;color?:string;secondaryDataKey?:string;secondaryColor?:string;height?:number;showGrid?:boolean;showLegend?:boolean;curved?:boolean;}export function LineChart({data,dataKey,xAxisKey='name',color='#3b82f6',secondaryDataKey,secondaryColor='#10b981',height=300,showGrid=true,showLegend=false,curved=true}:Props){return(<ResponsiveContainer width="100%"height={height}><RechartsLineChart data={data}margin={{top:5,right:30,left:20,bottom:5}}>{showGrid&&<CartesianGrid strokeDasharray="3 3"/>}<XAxis dataKey={xAxisKey}/><YAxis/><Tooltip/>{showLegend&&<Legend/>}<Line type={curved?'monotone':'linear'}dataKey={dataKey}stroke={color}strokeWidth={2}dot={{r:4}}/>{secondaryDataKey&&<Line type={curved?'monotone':'linear'}dataKey={secondaryDataKey}stroke={secondaryColor}strokeWidth={2}dot={{r:4}}/>}</RechartsLineChart></ResponsiveContainer>);}
