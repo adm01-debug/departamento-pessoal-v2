@@ -1,1 +1,1 @@
-import{QueryClient}from'@tanstack/react-query';export const queryClient=new QueryClient({defaultOptions:{queries:{staleTime:1000*60*5,gcTime:1000*60*30,retry:1,refetchOnWindowFocus:false,},mutations:{retry:0,},},});
+import{QueryClient}from'@tanstack/react-query';export const queryClient=new QueryClient({defaultOptions:{queries:{retry:1,refetchOnWindowFocus:false,staleTime:5*60*1000,gcTime:10*60*1000},mutations:{retry:0}}});
