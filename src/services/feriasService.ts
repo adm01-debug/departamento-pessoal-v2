@@ -1,12 +1,1 @@
-import { supabase } from "@/integrations/supabase/client";
-export interface FeriasData { id?: string; colaboradorId?: string; dataInicio?: Date; dataFim?: Date; diasGozo?: number; status?: string; }
-class FeriasService {
-  private tableName = "ferias";
-  async getAll(filters?: Record<string, any>): Promise<FeriasData[]> { let q = supabase.from(this.tableName).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-  async getById(id: string): Promise<FeriasData | null> { const { data, error } = await supabase.from(this.tableName).select("*").eq("id", id).single(); if (error) throw error; return data; }
-  async create(data: Omit<FeriasData, "id">): Promise<FeriasData> { const { data: result, error } = await supabase.from(this.tableName).insert(data).select().single(); if (error) throw error; return result; }
-  async update(id: string, data: Partial<FeriasData>): Promise<FeriasData> { const { data: result, error } = await supabase.from(this.tableName).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-  async delete(id: string): Promise<void> { const { error } = await supabase.from(this.tableName).delete().eq("id", id); if (error) throw error; }
-}
-export const feriasService = new FeriasService();
-export default feriasService;
+import{api}from'@/lib/api';export interface FeriasData{colaboradorId:string;dataInicio:string;dataFim:string;dias:number;abonoPecuniario:boolean;diasAbono?:number;}export const feriasService={async listar(filtros?:{status?:string;mes?:string;ano?:string}){const r=await api.get('/ferias',{params:filtros});return r.data;},async buscar(id:string){const r=await api.get(`/ferias/${id}`);return r.data;},async programar(data:FeriasData){const r=await api.post('/ferias',data);return r.data;},async atualizar(id:string,data:Partial<FeriasData>){const r=await api.put(`/ferias/${id}`,data);return r.data;},async aprovar(id:string){const r=await api.post(`/ferias/${id}/aprovar`);return r.data;},async cancelar(id:string,motivo:string){const r=await api.post(`/ferias/${id}/cancelar`,{motivo});return r.data;},async iniciar(id:string){const r=await api.post(`/ferias/${id}/iniciar`);return r.data;},async concluir(id:string){const r=await api.post(`/ferias/${id}/concluir`);return r.data;},async calcularSaldo(colaboradorId:string){const r=await api.get(`/colaboradores/${colaboradorId}/ferias/saldo`);return r.data;},async getProximasVencer(){const r=await api.get('/ferias/proximas-vencer');return r.data;}};
