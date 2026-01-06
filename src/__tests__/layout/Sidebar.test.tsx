@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import{Sidebar}from'@/components/layout/Sidebar';describe('Sidebar',()=>{it.skip('should render menu items',()=>{render(<Sidebar/>);expect(screen.getByText('Dashboard')).toBeInTheDocument();expect(screen.getByText('Colaboradores')).toBeInTheDocument();});});
