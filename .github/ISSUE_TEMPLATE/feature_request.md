@@ -1,18 +1,18 @@
 ---
 name: Feature Request
-about: Sugira uma feature
+about: Sugira uma nova funcionalidade
 title: '[FEATURE] '
 labels: enhancement
 ---
 
-## Problema
+## Descrição
 
-<!-- Descreva o problema -->
+<!-- Descreva a feature -->
+
+## Motivação
+
+<!-- Por que isso seria útil? -->
 
 ## Solução proposta
 
-<!-- Como resolver -->
-
-## Alternativas
-
-<!-- Outras opções consideradas -->
+<!-- Como você imagina isso funcionando? -->
