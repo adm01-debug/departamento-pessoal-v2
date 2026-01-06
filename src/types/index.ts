@@ -1,13 +1,1 @@
-export interface Index {
-  id: string;
-  nome: string;
-  descricao?: string;
-  status: "ativo" | "inativo" | "pendente";
-  createdAt: string;
-  updatedAt: string;
-  metadata?: Record<string, any>;
-}
-export interface IndexCreate extends Omit<Index, "id" | "createdAt" | "updatedAt"> {}
-export interface IndexUpdate extends Partial<IndexCreate> {}
-export interface IndexFilter { search?: string; status?: string; page?: number; limit?: number; }
-export type IndexStatus = "ativo" | "inativo" | "pendente";
+export*from'./beneficio';export*from'./cargo';export*from'./colaborador';export*from'./contrato';export*from'./departamento';export*from'./documento';export*from'./esocial';export*from'./ferias';export*from'./folha';export*from'./ponto';export*from'./usuario';export*from'./empresa';export*from'./notificacao';export*from'./relatorio';export interface PaginatedResponse<T>{data:T[];total:number;page:number;limit:number;totalPages:number;}export interface ApiResponse<T>{success:boolean;data?:T;error?:string;message?:string;}export interface SelectOption{value:string;label:string;}export interface DateRange{start:Date;end:Date;}
