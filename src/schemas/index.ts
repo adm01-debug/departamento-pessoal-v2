@@ -1,10 +1,1 @@
-export * from "./colaboradorSchema";
-export * from "./folhaSchema";
-export * from "./feriasSchema";
-export * from "./pontoSchema";
-export * from "./beneficioSchema";
-export * from "./esocialSchema";
-export * from "./empresaSchema";
-export * from "./departamentoSchema";
-export * from "./cargoSchema";
-export * from "./contratoSchema";
+export*from'./colaborador';export*from'./beneficio';export*from'./cargo';export*from'./contrato';export*from'./departamento';export*from'./ferias';export*from'./folha';export*from'./ponto';export*from'./usuario';export*from'./empresa';
