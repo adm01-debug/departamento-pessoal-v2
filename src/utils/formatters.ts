@@ -1,13 +1,1 @@
-export const formatters = {
-  cpf: (value: string): string => value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"),
-  cnpj: (value: string): string => value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5"),
-  telefone: (value: string): string => value.length === 11 ? value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : value.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3"),
-  cep: (value: string): string => value.replace(/(\d{5})(\d{3})/, "$1-$2"),
-  moeda: (value: number, currency: string = "BRL"): string => new Intl.NumberFormat("pt-BR", { style: "currency", currency }).format(value),
-  percentual: (value: number, decimals: number = 2): string => `${value.toFixed(decimals)}%`,
-  data: (date: Date | string, format: string = "DD/MM/YYYY"): string => { const d = typeof date === "string" ? new Date(date) : date; const dd = String(d.getDate()).padStart(2, "0"); const mm = String(d.getMonth() + 1).padStart(2, "0"); const yyyy = d.getFullYear(); return format.replace("DD", dd).replace("MM", mm).replace("YYYY", String(yyyy)); },
-  hora: (date: Date | string): string => { const d = typeof date === "string" ? new Date(date) : date; return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); },
-  pis: (value: string): string => value.replace(/(\d{3})(\d{5})(\d{2})(\d{1})/, "$1.$2.$3-$4"),
-  ctps: (value: string): string => value.replace(/(\d+)(\d{4})/, "$1/$2"),
-};
-export default formatters;
+export function formatCurrency(value:number):string{return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(value);}export function formatDate(date:string|Date):string{const d=typeof date==='string'?new Date(date):date;return new Intl.DateTimeFormat('pt-BR').format(d);}export function formatDateTime(date:string|Date):string{const d=typeof date==='string'?new Date(date):date;return new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(d);}export function formatCPF(cpf:string):string{return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}export function formatCNPJ(cnpj:string):string{return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');}export function formatPhone(phone:string):string{if(phone.length===11)return phone.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');return phone.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');}export function formatBytes(bytes:number):string{if(bytes===0)return'0 Bytes';const k=1024;const sizes=['Bytes','KB','MB','GB'];const i=Math.floor(Math.log(bytes)/Math.log(k));return parseFloat((bytes/Math.pow(k,i)).toFixed(2))+' '+sizes[i];}export function formatPercentage(value:number):string{return new Intl.NumberFormat('pt-BR',{style:'percent',minimumFractionDigits:1}).format(value/100);}
