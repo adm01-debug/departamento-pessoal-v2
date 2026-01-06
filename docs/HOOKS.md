@@ -1,81 +1,38 @@
-# 🎣 Documentação de Hooks
+# Documentação de Hooks
 
-## Observers
+## Data Fetching
 
-### useIntersectionObserver
-Detecta visibilidade de elementos.
+### useColaboradores
 ```tsx
-const [ref, isVisible] = useIntersectionObserver({ threshold: 0.5 });
-<div ref={ref}>{isVisible ? 'Visível' : 'Oculto'}</div>
+const { data, isLoading, error } = useColaboradores();
 ```
 
-### useResizeObserver
-Monitora mudanças de tamanho.
+### useColaborador
 ```tsx
-const [ref, { width, height }] = useResizeObserver();
+const { data } = useColaborador(id);
 ```
 
-## Eventos
+## Mutations
 
-### useClickOutside
-Detecta cliques fora do elemento.
+### useCreateColaborador
 ```tsx
-const ref = useClickOutside(() => setOpen(false));
-<div ref={ref}>Dropdown</div>
+const mutation = useCreateColaborador();
+mutation.mutate(data);
 ```
 
-### useHover / useFocus
-Estado de hover e focus.
+## Utilities
+
+### useDebounce
 ```tsx
-const [ref, isHovered] = useHover();
-const { isFocused, focusProps } = useFocus();
+const debouncedValue = useDebounce(value, 300);
 ```
 
-## Estado
-
-### useToggle
-Boolean com toggle.
+### useLocalStorage
 ```tsx
-const [isOpen, toggle, setIsOpen] = useToggle(false);
+const [value, setValue] = useLocalStorage('key', 'default');
 ```
 
-### useCounter
-Contador com limites.
+### usePagination
 ```tsx
-const { count, increment, decrement, reset } = useCounter(0, { min: 0, max: 10 });
-```
-
-### useArray / useMap
-Helpers para arrays e maps.
-```tsx
-const { array, push, remove, update } = useArray([]);
-const { map, set, get, has } = useMap();
-```
-
-## Async
-
-### useAsync / useFetch
-Operações assíncronas.
-```tsx
-const { data, loading, error, execute } = useAsync(fetchData);
-const { data, loading } = useFetch('/api/users');
-```
-
-### useInterval / useTimeout
-Timers declarativos.
-```tsx
-useInterval(callback, 1000);
-useTimeout(callback, 5000);
-```
-
-## Form
-
-### useInput / useSelect / useCheckbox / useRadio
-Helpers para formulários.
-```tsx
-const name = useInput('');
-<input {...name.bind} />
-
-const agree = useCheckbox(false);
-<input {...agree.bind} />
+const { currentPage, totalPages, nextPage } = usePagination({ totalItems: 100 });
 ```
