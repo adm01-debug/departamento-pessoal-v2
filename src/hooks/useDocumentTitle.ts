@@ -1,9 +1,1 @@
-import { useEffect, useRef } from "react";
-export function useDocumentTitle(title: string, restoreOnUnmount = true) {
-  const previousTitle = useRef(document.title);
-  useEffect(() => {
-    document.title = title;
-    return () => { if (restoreOnUnmount) document.title = previousTitle.current; };
-  }, [title, restoreOnUnmount]);
-}
-export default useDocumentTitle;
+import{useEffect,useRef}from'react';export function useDocumentTitle(title:string,restoreOnUnmount=true){const previousTitle=useRef(document.title);useEffect(()=>{document.title=title?title+' | Sistema DP':'Sistema DP';},[title]);useEffect(()=>{if(restoreOnUnmount){return()=>{document.title=previousTitle.current;};}},[restoreOnUnmount]);}
