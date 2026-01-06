@@ -1,5 +1,1 @@
-export * from "./AdmissaoModal";
-export * from "./DemissaoModal";
-export * from "./FeriasProgramacaoModal";
-export * from "./LancamentoFolhaModal";
-export * from "./TratamentoPontoModal";
+export*from'./ColaboradorModal';export*from'./FeriasModal';export*from'./BeneficioModal';export*from'./CargoModal';export*from'./DepartamentoModal';export*from'./UsuarioModal';export*from'./ConfirmModal';
