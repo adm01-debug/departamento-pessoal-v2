@@ -1,24 +1,29 @@
 # Arquitetura do Sistema
 
-## Stack Tecnológico
-
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS + shadcn/ui
-- **State**: React Query
-- **Forms**: React Hook Form + Zod
-- **Charts**: Recharts
-- **Tables**: TanStack Table
-- **Tests**: Vitest
-
 ## Estrutura de Pastas
 
-
-
-## Padrões
-
-- Componentes funcionais com hooks
-- Barrel exports (index.ts)
-- Validação com Zod
-- React Query para cache e mutations
-- Formatação BR para datas e valores
+```
+src/
+├── api/          # Configuração de endpoints
+├── assets/       # Imagens e assets
+├── components/   # Componentes React
+│   ├── common/   # Componentes genéricos
+│   ├── forms/    # Formulários
+│   ├── layout/   # Layout components
+│   └── ui/       # shadcn/ui components
+├── config/       # Configurações
+├── constants/    # Constantes
+├── contexts/     # React contexts
+├── data/         # Mock data
+├── features/     # Feature modules
+├── hooks/        # Custom hooks
+├── lib/          # Bibliotecas
+├── pages/        # Páginas
+├── routes/       # Rotas
+├── schemas/      # Zod schemas
+├── services/     # API services
+├── store/        # Zustand store
+├── styles/       # CSS
+├── types/        # TypeScript types
+└── utils/        # Utilitários
+```
