@@ -1,1 +1,1 @@
-export*from'./colaborador';export*from'./beneficio';export*from'./cargo';export*from'./contrato';export*from'./departamento';export*from'./ferias';export*from'./folha';export*from'./ponto';export*from'./usuario';export*from'./empresa';export*from'./dependente';export*from'./admissao';export*from'./demissao';
+export*from'./colaborador';export*from'./ferias';export*from'./ponto';export*from'./beneficio';export*from'./cargo';export*from'./departamento';export*from'./usuario';export*from'./empresa';export*from'./dependente';export*from'./admissao';export*from'./demissao';
