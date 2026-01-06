@@ -1,23 +1,27 @@
-# 📋 ESOCIAL.md - Guia eSocial
+# Integração eSocial
 
-## Eventos Implementados
+## Eventos Suportados
 
-### Tabelas
-- S-1000: Empregador
-- S-1005: Estabelecimentos
-- S-1010: Rubricas
-- S-1020: Lotações
+### S-1000 - Informações do Empregador
+- Cadastro inicial
+- Alteração de dados cadastrais
 
-### Não Periódicos
-- S-2200: Admissão
-- S-2206: Alteração contratual
-- S-2299: Desligamento
-- S-2230: Afastamento
+### S-2200 - Cadastramento Inicial/Admissão
+- Admissão de trabalhador
+- Dados do contrato
 
-### Periódicos
-- S-1200: Remuneração
-- S-1210: Pagamentos
-- S-1299: Fechamento
+### S-2206 - Alteração de Contrato
+- Alteração de cargo
+- Alteração de salário
 
-## Certificado A1
-Configurar em: Configurações > eSocial > Certificado
+### S-2299 - Desligamento
+- Demissão
+- Rescisão
+
+## Geração de Eventos
+
+```ts
+import { gerarXMLEvento } from '@/utils/esocial';
+
+const xml = gerarXMLEvento('S-2200', dados);
+```
