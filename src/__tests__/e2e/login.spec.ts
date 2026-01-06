@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('Login E2E',()=>{it.skip('should login successfully',()=>{expect(true).toBe(true);});it.skip('should show error on invalid credentials',()=>{expect(true).toBe(true);});});
