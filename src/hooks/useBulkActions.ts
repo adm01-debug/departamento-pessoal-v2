@@ -12,17 +12,11 @@ export interface BulkAction<T> {
 }
 
 export interface UseBulkActionsOptions<T> {
-  /** Nome da tabela para invalidar queries */
   tableName: string;
-  /** Ações disponíveis */
   actions?: Record<string, BulkAction<T>>;
-  /** Callback após ação bem-sucedida */
   onSuccess?: () => void;
 }
 
-/**
- * Hook para gerenciar seleção e ações em lote
- */
 export function useBulkActions<T extends { id: string }>(
   items: T[],
   options: UseBulkActionsOptions<T>
@@ -33,51 +27,48 @@ export function useBulkActions<T extends { id: string }>(
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
 
-  // Selecionar/deselecionar item
-  const toggleSelect = useCallback((id: string, shiftKey?: boolean) => {
-    setSelectedIds((prev) => {
-      const newSet = new Set(prev);
+  const toggleSelect = useCallback(
+    (id: string, shiftKey?: boolean) => {
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
 
-      if (shiftKey && lastSelectedId) {
-        // Seleção em range com Shift
-        const currentIndex = items.findIndex((item) => item.id === id);
-        const lastIndex = items.findIndex((item) => item.id === lastSelectedId);
+        if (shiftKey && lastSelectedId) {
+          const currentIndex = items.findIndex((item) => item.id === id);
+          const lastIndex = items.findIndex((item) => item.id === lastSelectedId);
 
-        if (currentIndex !== -1 && lastIndex !== -1) {
-          const start = Math.min(currentIndex, lastIndex);
-          const end = Math.max(currentIndex, lastIndex);
+          if (currentIndex !== -1 && lastIndex !== -1) {
+            const start = Math.min(currentIndex, lastIndex);
+            const end = Math.max(currentIndex, lastIndex);
 
-          for (let i = start; i <= end; i++) {
-            newSet.add(items[i].id);
+            for (let i = start; i <= end; i++) {
+              newSet.add(items[i].id);
+            }
+          }
+        } else {
+          if (newSet.has(id)) {
+            newSet.delete(id);
+          } else {
+            newSet.add(id);
           }
         }
-      } else {
-        // Toggle normal
-        if (newSet.has(id)) {
-          newSet.delete(id);
-        } else {
-          newSet.add(id);
-        }
-      }
 
-      return newSet;
-    });
+        return newSet;
+      });
 
-    setLastSelectedId(id);
-  }, [items, lastSelectedId]);
+      setLastSelectedId(id);
+    },
+    [items, lastSelectedId]
+  );
 
-  // Selecionar todos
   const selectAll = useCallback(() => {
     setSelectedIds(new Set(items.map((item) => item.id)));
   }, [items]);
 
-  // Desselecionar todos
   const clearSelection = useCallback(() => {
     setSelectedIds(new Set());
     setLastSelectedId(null);
   }, []);
 
-  // Toggle todos
   const toggleAll = useCallback(() => {
     if (selectedIds.size === items.length) {
       clearSelection();
@@ -86,13 +77,11 @@ export function useBulkActions<T extends { id: string }>(
     }
   }, [selectedIds.size, items.length, clearSelection, selectAll]);
 
-  // Items selecionados
   const selectedItems = useMemo(
     () => items.filter((item) => selectedIds.has(item.id)),
     [items, selectedIds]
   );
 
-  // Mutation para executar ação
   const executeMutation = useMutation({
     mutationFn: async ({
       actionKey,
@@ -116,7 +105,6 @@ export function useBulkActions<T extends { id: string }>(
     },
   });
 
-  // Executar ação predefinida
   const executeAction = useCallback(
     (actionKey: string) => {
       const action = actions[actionKey];
@@ -133,7 +121,6 @@ export function useBulkActions<T extends { id: string }>(
     [actions, executeMutation]
   );
 
-  // Executar ação customizada
   const executeCustomAction = useCallback(
     (action: (items: T[]) => Promise<void>) => {
       executeMutation.mutate({ customAction: action });
@@ -163,13 +150,7 @@ export function useBulkActions<T extends { id: string }>(
   };
 }
 
-/**
- * Ações em lote comuns para Supabase
- */
-export function createBulkSupabaseActions<T extends { id: string }>(
-  tableName: string,
-  queryClient: ReturnType<typeof useQueryClient>
-) {
+export function createBulkSupabaseActions<T extends { id: string }>(tableName: string) {
   return {
     delete: {
       label: 'Excluir Selecionados',
@@ -177,10 +158,7 @@ export function createBulkSupabaseActions<T extends { id: string }>(
       confirmMessage: 'Tem certeza que deseja excluir os itens selecionados?',
       action: async (items: T[]) => {
         const ids = items.map((item) => item.id);
-        const { error } = await supabase
-          .from(tableName)
-          .delete()
-          .in('id', ids);
+        const { error } = await supabase.from(tableName).delete().in('id', ids);
 
         if (error) throw error;
         toast.success(`${items.length} itens excluídos`);
@@ -206,10 +184,7 @@ export function createBulkSupabaseActions<T extends { id: string }>(
       label: 'Restaurar Selecionados',
       action: async (items: T[]) => {
         const ids = items.map((item) => item.id);
-        const { error } = await supabase
-          .from(tableName)
-          .update({ deleted_at: null })
-          .in('id', ids);
+        const { error } = await supabase.from(tableName).update({ deleted_at: null }).in('id', ids);
 
         if (error) throw error;
         toast.success(`${items.length} itens restaurados`);
@@ -232,32 +207,9 @@ export function createBulkSupabaseActions<T extends { id: string }>(
   };
 }
 
-/**
- * Componente de checkbox para seleção
- */
-export function BulkSelectCheckbox({
-  checked,
-  indeterminate,
-  onChange,
-  label,
-}: {
+export interface BulkSelectCheckboxProps {
   checked: boolean;
   indeterminate?: boolean;
   onChange: () => void;
   label?: string;
-}) {
-  return (
-    <label className="flex items-center cursor-pointer">
-      <input
-        type="checkbox"
-        checked={checked}
-        ref={(el) => {
-          if (el) el.indeterminate = indeterminate ?? false;
-        }}
-        onChange={onChange}
-        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-      />
-      {label && <span className="ml-2 text-sm">{label}</span>}
-    </label>
-  );
 }
