@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { 
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, 
   isSameMonth, isSameDay, isToday, addMonths, subMonths,
-  isWithinInterval, parseISO
+  parseISO
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { FeriasComColaborador, StatusFerias } from '@/types/ferias';
@@ -27,8 +27,12 @@ const statusCores: Record<StatusFerias, { bg: string; text: string; border: stri
   concluida: { bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-muted' },
   cancelada: { bg: 'bg-destructive/20', text: 'text-destructive', border: 'border-destructive/50' },
   rejeitada: { bg: 'bg-destructive/20', text: 'text-destructive', border: 'border-destructive/50' },
-  solicitada: { bg: 'bg-amber/20', text: 'text-amber-600', border: 'border-amber/50' },
+  solicitada: { bg: 'bg-amber-500/20', text: 'text-amber-600', border: 'border-amber-500/50' },
 };
+
+// Helper to get date field (supports both snake_case and camelCase)
+const getDataInicio = (f: FeriasComColaborador): string => f.data_inicio || f.dataInicio || '';
+const getDataFim = (f: FeriasComColaborador): string => f.data_fim || f.dataFim || '';
 
 export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaClick, onFeriasClick }: CalendarioFeriasProps) {
   const [mesAtual, setMesAtual] = useState(new Date());
@@ -52,8 +56,12 @@ export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaCl
     ferias.forEach(f => {
       if (f.status === 'cancelada') return;
       
-      const inicio = parseISO(f.data_inicio);
-      const fim = parseISO(f.data_fim);
+      const inicioStr = getDataInicio(f);
+      const fimStr = getDataFim(f);
+      if (!inicioStr || !fimStr) return;
+      
+      const inicio = parseISO(inicioStr);
+      const fim = parseISO(fimStr);
       
       // Percorrer todos os dias das férias
       const dias = eachDayOfInterval({ start: inicio, end: fim });
@@ -102,9 +110,11 @@ export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaCl
         
         <div className="space-y-0.5">
           {feriasNoDia.slice(0, 3).map((f, idx) => {
-            const cores = statusCores[f.status];
-            const ehInicio = isSameDay(parseISO(f.data_inicio), dia);
-            const ehFim = isSameDay(parseISO(f.data_fim), dia);
+            const cores = statusCores[f.status] || statusCores.programada;
+            const inicioStr = getDataInicio(f);
+            const fimStr = getDataFim(f);
+            const ehInicio = inicioStr ? isSameDay(parseISO(inicioStr), dia) : false;
+            const ehFim = fimStr ? isSameDay(parseISO(fimStr), dia) : false;
             
             return (
               <TooltipProvider key={`${f.id}-${idx}`}>
@@ -134,7 +144,7 @@ export const CalendarioFerias = memo(function CalendarioFerias({ ferias, onDiaCl
                   <TooltipContent>
                     <div className="text-xs">
                       <p className="font-medium">{f.colaborador?.nome || 'N/A'}</p>
-                      <p>{format(parseISO(f.data_inicio), 'dd/MM')} - {format(parseISO(f.data_fim), 'dd/MM')}</p>
+                      <p>{inicioStr ? format(parseISO(inicioStr), 'dd/MM') : '-'} - {fimStr ? format(parseISO(fimStr), 'dd/MM') : '-'}</p>
                       <p>{f.dias} dias</p>
                     </div>
                   </TooltipContent>

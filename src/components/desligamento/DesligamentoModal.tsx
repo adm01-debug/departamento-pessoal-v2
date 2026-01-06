@@ -1,4 +1,4 @@
-import { useState, memo, useMemo, useCallback } from 'react';
+import { useState, memo, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CalendarIcon, User, AlertTriangle, Calculator } from 'lucide-react';
 import { format, differenceInDays, differenceInMonths } from 'date-fns';
@@ -89,6 +88,12 @@ const tiposDesligamentoInfo: Record<TipoDesligamento, { label: string; descripti
   },
 };
 
+// Helper to get colaborador values (supports both naming conventions)
+const getSalarioBase = (col: any): number => col?.salario_base ?? col?.salarioBase ?? col?.salario ?? 0;
+const getDataAdmissao = (col: any): string => col?.data_admissao ?? col?.dataAdmissao ?? '';
+const getNomeCompleto = (col: any): string => col?.nome_completo ?? col?.nomeCompleto ?? col?.nome ?? '';
+const getMatricula = (col: any): string => col?.matricula ?? '';
+
 export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenChange, onSubmit }: DesligamentoModalProps) {
   const [colaboradorId, setColaboradorId] = useState<string>('');
   const [tipoDesligamento, setTipoDesligamento] = useState<TipoDesligamento | ''>('');
@@ -104,8 +109,11 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
   const calculo = useMemo<CalculoRescisao | null>(() => {
     if (!colaboradorSelecionado || !tipoDesligamento || !dataDesligamento) return null;
 
-    const salario = colaboradorSelecionado.salario_base;
-    const dataAdmissao = new Date(colaboradorSelecionado.data_admissao);
+    const salario = getSalarioBase(colaboradorSelecionado);
+    const dataAdmissaoStr = getDataAdmissao(colaboradorSelecionado);
+    if (!dataAdmissaoStr) return null;
+    
+    const dataAdmissao = new Date(dataAdmissaoStr);
     const diasTrabalhados = differenceInDays(dataDesligamento, new Date(dataDesligamento.getFullYear(), dataDesligamento.getMonth(), 1)) + 1;
     const mesesTrabalhados = differenceInMonths(dataDesligamento, dataAdmissao);
     const mesesAno = dataDesligamento.getMonth() + 1;
@@ -244,7 +252,7 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
                       <SelectItem key={col.id} value={col.id}>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4" />
-                          <span>{col.nome_completo}</span>
+                          <span>{getNomeCompleto(col)}</span>
                           <span className="text-muted-foreground">• {col.cargo}</span>
                         </div>
                       </SelectItem>
@@ -258,7 +266,7 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <span className="text-muted-foreground">Matrícula:</span>{' '}
-                      <span className="font-medium">{colaboradorSelecionado.matricula || '-'}</span>
+                      <span className="font-medium">{getMatricula(colaboradorSelecionado) || '-'}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Departamento:</span>{' '}
@@ -266,7 +274,7 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
                     </div>
                     <div>
                       <span className="text-muted-foreground">Salário:</span>{' '}
-                      <span className="font-medium">{formatCurrency(colaboradorSelecionado.salario_base)}</span>
+                      <span className="font-medium">{formatCurrency(getSalarioBase(colaboradorSelecionado))}</span>
                     </div>
                   </div>
                 </div>
@@ -314,7 +322,8 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
               </Label>
               <Popover open={dateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger asChild>
-                  <Button aria-label="Ação"
+                  <Button
+                    aria-label="Selecionar data"
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
@@ -451,10 +460,12 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
                 </div>
 
                 {/* Total Líquido */}
-                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">Valor Líquido a Pagar</span>
-                    <span className="text-2xl font-bold text-primary">{formatCurrency(calculo.totalLiquido)}</span>
+                <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold">Valor Líquido da Rescisão</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {formatCurrency(calculo.totalLiquido)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -462,12 +473,12 @@ export const DesligamentoModal = memo(function DesligamentoModal({ open, onOpenC
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
             <Button type="submit" variant="destructive" disabled={!calculo}>
-              Iniciar Desligamento
+              Confirmar Desligamento
             </Button>
           </div>
         </form>

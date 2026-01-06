@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileTemplate, Plus, Edit, Trash2, Copy, Download, Eye, Variable } from "lucide-react";
+import { FileText, Plus, Edit, Trash2, Copy, Download, Eye, Variable } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Template {
@@ -141,7 +141,7 @@ export function DocumentoTemplate({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2"><FileTemplate className="h-5 w-5" />Templates de Documentos</CardTitle>
+        <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />Templates de Documentos</CardTitle>
         {!modoVisualizacao && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-2" />Novo Template</Button></DialogTrigger>
@@ -184,7 +184,7 @@ export function DocumentoTemplate({
         {templates.map(template => (
           <div key={template.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
             <div className="flex items-center gap-3">
-              <FileTemplate className="h-8 w-8 text-muted-foreground" />
+              <FileText className="h-8 w-8 text-muted-foreground" />
               <div>
                 <p className="font-medium">{template.nome}</p>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
