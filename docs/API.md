@@ -1,35 +1,28 @@
-# API Documentation
+# Documentação da API
 
 ## Endpoints
 
 ### Colaboradores
 
-- `GET /api/colaboradores` - Lista colaboradores
-- `GET /api/colaboradores/:id` - Busca colaborador
-- `POST /api/colaboradores` - Cria colaborador
-- `PUT /api/colaboradores/:id` - Atualiza colaborador
-- `DELETE /api/colaboradores/:id` - Remove colaborador
+- `GET /api/colaboradores` - Listar colaboradores
+- `POST /api/colaboradores` - Criar colaborador
+- `GET /api/colaboradores/:id` - Buscar colaborador
+- `PUT /api/colaboradores/:id` - Atualizar colaborador
+- `DELETE /api/colaboradores/:id` - Excluir colaborador
 
 ### Férias
 
-- `GET /api/ferias` - Lista férias
-- `POST /api/ferias` - Programa férias
-- `POST /api/ferias/:id/aprovar` - Aprova férias
-- `POST /api/ferias/:id/rejeitar` - Rejeita férias
+- `GET /api/ferias` - Listar férias
+- `POST /api/ferias` - Programar férias
+- `POST /api/ferias/:id/aprovar` - Aprovar férias
 
 ### Folha
 
-- `GET /api/folha/:competencia` - Lista folha
-- `POST /api/folha/calcular` - Calcula folha
-- `POST /api/folha/fechar` - Fecha folha
+- `GET /api/folha` - Listar folhas
+- `POST /api/folha/calcular` - Calcular folha
+- `POST /api/folha/fechar` - Fechar folha
 
 ### Ponto
 
-- `GET /api/ponto` - Lista registros
-- `POST /api/ponto/registrar` - Registra ponto
-
-### Autenticação
-
-- `POST /api/auth/login` - Login
-- `POST /api/auth/logout` - Logout
-- `POST /api/auth/refresh` - Refresh token
+- `GET /api/ponto` - Listar registros
+- `POST /api/ponto/registrar` - Registrar ponto
