@@ -1,16 +1,1 @@
-import React from "react";
-import { ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-
-interface DataPoint { name: string; value: number; }
-interface PieChartProps { data: DataPoint[]; title?: string; colors?: string[]; height?: number; className?: string; }
-
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
-
-export function PieChart({ data, title, colors = COLORS, height = 300, className }: PieChartProps) {
-  const chart = (<ResponsiveContainer width="100%" height={height}><RechartsPieChart><Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>{data.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}</Pie><Tooltip /><Legend /></RechartsPieChart></ResponsiveContainer>);
-  if (!title) return <div className={className}>{chart}</div>;
-  return <Card className={cn("", className)}><CardHeader><CardTitle>{title}</CardTitle></CardHeader><CardContent>{chart}</CardContent></Card>;
-}
-export default PieChart;
+import React from'react';import{PieChart as RechartsPieChart,Pie,Cell,Tooltip,ResponsiveContainer,Legend}from'recharts';interface DataItem{name:string;value:number;color?:string;}interface Props{data:DataItem[];height?:number;showLegend?:boolean;innerRadius?:number;outerRadius?:number;}const COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16'];export function PieChart({data,height=300,showLegend=true,innerRadius=0,outerRadius=80}:Props){return(<ResponsiveContainer width="100%"height={height}><RechartsPieChart><Pie data={data}cx="50%"cy="50%"innerRadius={innerRadius}outerRadius={outerRadius}paddingAngle={2}dataKey="value"label={({name,percent})=>`${name} ${(percent*100).toFixed(0)}%`}>{data.map((entry,index)=>(<Cell key={index}fill={entry.color||COLORS[index%COLORS.length]}/>))}</Pie><Tooltip formatter={(value:number)=>value.toLocaleString()}/>{showLegend&&<Legend/>}</RechartsPieChart></ResponsiveContainer>);}
