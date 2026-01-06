@@ -1,9 +1,39 @@
-import { supabase } from "@/integrations/supabase/client";
-const TABLE = "cargos";
-export async function list(filters?: Record<string, any>) { let q = supabase.from(TABLE).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-export async function getById(id: string) { const { data, error } = await supabase.from(TABLE).select("*").eq("id", id).single(); if (error) throw error; return data; }
-export async function create(data: any) { const { data: result, error } = await supabase.from(TABLE).insert([data]).select().single(); if (error) throw error; return result; }
-export async function update(id: string, data: any) { const { data: result, error } = await supabase.from(TABLE).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-export async function remove(id: string) { const { error } = await supabase.from(TABLE).delete().eq("id", id); if (error) throw error; return true; }
-export async function count(filters?: Record<string, any>) { let q = supabase.from(TABLE).select("*", { count: "exact", head: true }); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v) q = q.eq(k, v); }); const { count, error } = await q; if (error) throw error; return count || 0; }
+// Cargos API - stub implementation (no separate cargos table)
+// Cargos are stored as text field in colaboradores table
+
+export interface Cargo {
+  id: string;
+  nome: string;
+  descricao?: string;
+  ativo: boolean;
+}
+
+export async function list(_filters?: Record<string, any>): Promise<Cargo[]> {
+  // Stub: return empty array - cargos are embedded in colaboradores
+  return [];
+}
+
+export async function getById(_id: string): Promise<Cargo | null> {
+  return null;
+}
+
+export async function create(_data: Partial<Cargo>): Promise<Cargo | null> {
+  console.warn('Cargos create: not implemented - cargos are managed via colaboradores');
+  return null;
+}
+
+export async function update(_id: string, _data: Partial<Cargo>): Promise<Cargo | null> {
+  console.warn('Cargos update: not implemented');
+  return null;
+}
+
+export async function remove(_id: string): Promise<boolean> {
+  console.warn('Cargos remove: not implemented');
+  return false;
+}
+
+export async function count(_filters?: Record<string, any>): Promise<number> {
+  return 0;
+}
+
 export default { list, getById, create, update, remove, count };
