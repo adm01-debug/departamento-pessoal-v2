@@ -1,12 +1,1 @@
-import { supabase } from "@/integrations/supabase/client";
-export interface CargoData { id?: string; nome?: string; descricao?: string; cbo?: string; nivel?: string; ativo?: boolean; }
-class CargoService {
-  private tableName = "cargos";
-  async getAll(filters?: Record<string, any>): Promise<CargoData[]> { let q = supabase.from(this.tableName).select("*"); if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) q = q.eq(k, v); }); const { data, error } = await q; if (error) throw error; return data || []; }
-  async getById(id: string): Promise<CargoData | null> { const { data, error } = await supabase.from(this.tableName).select("*").eq("id", id).single(); if (error) throw error; return data; }
-  async create(data: Omit<CargoData, "id">): Promise<CargoData> { const { data: result, error } = await supabase.from(this.tableName).insert(data).select().single(); if (error) throw error; return result; }
-  async update(id: string, data: Partial<CargoData>): Promise<CargoData> { const { data: result, error } = await supabase.from(this.tableName).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-  async delete(id: string): Promise<void> { const { error } = await supabase.from(this.tableName).delete().eq("id", id); if (error) throw error; }
-}
-export const cargoService = new CargoService();
-export default cargoService;
+import{api}from'@/lib/api';export interface CargoData{nome:string;cbo:string;nivel:string;departamentoId:string;salarioBase:number;salarioTeto?:number;descricao?:string;requisitos?:string[];ativo:boolean;}export const cargoService={async listar(filtros?:{departamentoId?:string;ativo?:boolean}){const r=await api.get('/cargos',{params:filtros});return r.data;},async buscar(id:string){const r=await api.get(`/cargos/${id}`);return r.data;},async criar(data:CargoData){const r=await api.post('/cargos',data);return r.data;},async atualizar(id:string,data:Partial<CargoData>){const r=await api.put(`/cargos/${id}`,data);return r.data;},async excluir(id:string){await api.delete(`/cargos/${id}`);},async ativar(id:string){const r=await api.patch(`/cargos/${id}/ativar`);return r.data;},async desativar(id:string){const r=await api.patch(`/cargos/${id}/desativar`);return r.data;},async buscarPorCBO(cbo:string){const r=await api.get('/cargos/cbo',{params:{cbo}});return r.data;},async getColaboradores(cargoId:string){const r=await api.get(`/cargos/${cargoId}/colaboradores`);return r.data;}};
