@@ -1,18 +1,1 @@
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
-interface CargoModalProps { open: boolean; onOpenChange: (open: boolean) => void; data?: any; onConfirm?: (data?: any) => void; title?: string; loading?: boolean; }
-
-export function CargoModal({ open, onOpenChange, data, onConfirm, title = "CargoModal", loading = false }: CargoModalProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
-        <div className="py-4">{data ? <pre className="text-sm bg-muted p-4 rounded overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre> : <p className="text-muted-foreground text-center">Nenhum dado disponível</p>}</div>
-        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button onClick={() => { onConfirm?.(data); onOpenChange(false); }} disabled={loading}>{loading ? "Processando..." : "Confirmar"}</Button></DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-export default CargoModal;
+import React from'react';import{useQuery}from'@tanstack/react-query';import{Dialog,DialogContent,DialogHeader,DialogTitle}from'@/components/ui/dialog';import{CargoForm}from'@/components/forms/CargoForm';import{Cargo}from'@/types/cargo';import{api}from'@/lib/api';interface Props{open:boolean;onOpenChange:(open:boolean)=>void;cargo?:Cargo;onSubmit:(data:any)=>void;}export function CargoModal({open,onOpenChange,cargo,onSubmit}:Props){const{data:departamentos=[]}=useQuery({queryKey:['departamentos'],queryFn:async()=>{const r=await api.get('/departamentos');return r.data;}});const handleSubmit=(data:any)=>{onSubmit(data);onOpenChange(false);};return(<Dialog open={open}onOpenChange={onOpenChange}><DialogContent className="max-w-lg"><DialogHeader><DialogTitle>{cargo?'Editar Cargo':'Novo Cargo'}</DialogTitle></DialogHeader><CargoForm defaultValues={cargo}departamentos={departamentos}onSubmit={handleSubmit}onCancel={()=>onOpenChange(false)}/></DialogContent></Dialog>);}
