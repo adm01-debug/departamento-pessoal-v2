@@ -1,1 +1,71 @@
-import React from'react';import{useNotifications}from'@/contexts/NotificationContext';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Badge}from'@/components/ui/badge';import{Bell,Check,CheckCheck,Trash2}from'lucide-react';import{formatDateTime}from'@/utils/formatters';const tipoColors={info:'bg-blue-100 text-blue-800',alerta:'bg-yellow-100 text-yellow-800',sucesso:'bg-green-100 text-green-800',erro:'bg-red-100 text-red-800'};export default function NotificacoesPage(){const{notifications,markAsRead,markAllAsRead}=useNotifications();return(<PageLayout><PageHeader title="Notificações"description="Gerencie suas notificações"actions={<Button variant="outline"onClick={markAllAsRead}><CheckCheck className="w-4 h-4 mr-2"/>Marcar todas como lidas</Button>}/><Card><CardContent className="p-0">{notifications.length===0?<div className="py-12 text-center"><Bell className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4"/><p className="text-muted-foreground">Nenhuma notificação</p></div>:<div className="divide-y">{notifications.map(n=>(<div key={n.id}className={\}><Badge className={tipoColors[n.tipo as keyof typeof tipoColors]||''}>{n.tipo}</Badge><div className="flex-1"><p className="font-medium">{n.titulo}</p><p className="text-sm text-muted-foreground">{n.mensagem}</p><p className="text-xs text-muted-foreground mt-1">{formatDateTime(n.createdAt)}</p></div>{!n.lida&&<Button variant="ghost"size="sm"onClick={()=>markAsRead(n.id)}><Check className="w-4 h-4"/></Button>}</div>))}</div>}</CardContent></Card></PageLayout>);}
+import React from 'react';
+import { useNotifications } from '@/contexts/NotificationContext';
+import { PageLayout } from '@/components/layout/PageLayout';
+import { PageHeader } from '@/components/common/PageHeader';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Bell, Check, CheckCheck } from 'lucide-react';
+import { formatDateTime } from '@/utils/formatters';
+
+const tipoColors: Record<string, string> = {
+  info: 'bg-blue-100 text-blue-800',
+  alerta: 'bg-yellow-100 text-yellow-800',
+  sucesso: 'bg-green-100 text-green-800',
+  erro: 'bg-red-100 text-red-800'
+};
+
+export default function NotificacoesPage() {
+  const { notifications, markAsRead, markAllAsRead } = useNotifications();
+
+  return (
+    <PageLayout>
+      <PageHeader 
+        title="Notificações" 
+        description="Gerencie suas notificações"
+        actions={
+          <Button variant="outline" onClick={markAllAsRead}>
+            <CheckCheck className="w-4 h-4 mr-2" />
+            Marcar todas como lidas
+          </Button>
+        }
+      />
+      
+      <Card>
+        <CardContent className="p-0">
+          {notifications.length === 0 ? (
+            <div className="py-12 text-center">
+              <Bell className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
+              <p className="text-muted-foreground">Nenhuma notificação</p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {notifications.map(n => (
+                <div 
+                  key={n.id} 
+                  className={`flex items-start gap-4 p-4 ${!n.lida ? 'bg-muted/50' : ''}`}
+                >
+                  <Badge className={tipoColors[n.tipo] || 'bg-gray-100 text-gray-800'}>
+                    {n.tipo}
+                  </Badge>
+                  <div className="flex-1">
+                    <p className="font-medium">{n.titulo}</p>
+                    <p className="text-sm text-muted-foreground">{n.mensagem}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formatDateTime(n.createdAt)}
+                    </p>
+                  </div>
+                  {!n.lida && (
+                    <Button variant="ghost" size="sm" onClick={() => markAsRead(n.id)}>
+                      <Check className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </PageLayout>
+  );
+}
