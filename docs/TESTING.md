@@ -1,32 +1,45 @@
-# TESTING
+# Testes
 
-## Visão Geral
-Documentação do módulo TESTING para o sistema de Departamento Pessoal.
+## Tecnologias
+- Vitest
+- React Testing Library
+- MSW (Mock Service Worker)
 
-## Conteúdo
-- Introdução
-- Configuração
-- Uso
-- Exemplos
-- FAQ
+## Executar Testes
 
-## Introdução
-Este documento descreve as funcionalidades e configurações do módulo.
+```bash
+# Rodar todos os testes
+npm run test
 
-## Configuração
-Siga as instruções abaixo para configurar o módulo.
+# Com interface
+npm run test:ui
 
-## Uso
-Exemplos de uso e boas práticas.
-
-## Exemplos
-```typescript
-// Exemplo de código
-const exemplo = "exemplo";
+# Com cobertura
+npm run test:coverage
 ```
 
-## FAQ
-Perguntas frequentes sobre o módulo.
+## Estrutura
 
----
-*Documentação gerada automaticamente - Sistema DP v9*
+```
+src/
+├── test/
+│   ├── setup.ts
+│   ├── utils.tsx
+│   └── mocks/
+│       ├── handlers.ts
+│       └── server.ts
+└── components/
+    └── __tests__/
+```
+
+## Exemplo
+
+```tsx
+import{render,screen}from'@/test/utils';
+import{Button}from'./Button';
+
+test('renders button',()=>{
+  render(<Button>Click</Button>);
+  expect(screen.getByText('Click')).toBeInTheDocument();
+});
+```
