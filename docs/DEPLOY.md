@@ -1,22 +1,15 @@
-# Deploy
+# Guia de Deploy
 
-## Prerequisites
+## Requisitos
 
 - Node.js 18+
-- npm or yarn
+- npm ou yarn
 
 ## Build
 
 ```bash
 npm install
 npm run build
-```
-
-## Environment Variables
-
-```
-VITE_API_URL=https://api.example.com
-VITE_APP_NAME=Sistema DP
 ```
 
 ## Docker
@@ -32,21 +25,7 @@ EXPOSE 3000
 CMD ["npm", "run", "preview"]
 ```
 
-## Vercel
+## Variáveis de Ambiente
 
-1. Connect repository
-2. Set environment variables
-3. Deploy
-
-## Nginx Config
-
-```nginx
-server {
-    listen 80;
-    root /var/www/dist;
-    index index.html;
-    location / {
-        try_files \ /index.html;
-    }
-}
-```
+- `VITE_API_URL` - URL da API
+- `VITE_APP_NAME` - Nome da aplicação
