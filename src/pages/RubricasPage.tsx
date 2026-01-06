@@ -1,11 +1,1 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
-import { RubricasTable } from "@/components/tables/RubricasTable";
-import { Plus, Download } from "lucide-react";
-const mockRubricas = [{ id: "1", codigo: "1001", descricao: "Salário Base", tipo: "PROVENTO" as const, natureza: "Salário", incideINSS: true, incideIRRF: true, incideFGTS: true, ativo: true }, { id: "2", codigo: "2001", descricao: "INSS Empregado", tipo: "DESCONTO" as const, natureza: "Contribuição", incideINSS: false, incideIRRF: false, incideFGTS: false, ativo: true }];
-export function RubricasPage() {
-  return (<div className="space-y-6"><PageHeader title="Rubricas" description="Cadastro de rubricas da folha de pagamento"><Button variant="outline"><Download className="h-4 w-4 mr-2" />Exportar</Button><Button><Plus className="h-4 w-4 mr-2" />Nova Rubrica</Button></PageHeader><Card><CardContent className="p-0"><RubricasTable data={mockRubricas} /></CardContent></Card></div>);
-}
-export default RubricasPage;
+import React from'react';import{Card,CardContent}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{DataTable}from'@/components/ui/data-table';import{Badge}from'@/components/ui/badge';import{PageHeader}from'@/components/common/PageHeader';import{Plus,List}from'lucide-react';const mockRubricas=[{id:'1',codigo:'001',nome:'Salário Base',tipo:'provento',incidencias:'INSS, IRRF, FGTS'},{id:'2',codigo:'002',nome:'Horas Extras 50%',tipo:'provento',incidencias:'INSS, IRRF, FGTS'},{id:'3',codigo:'100',nome:'INSS',tipo:'desconto',incidencias:'-'},{id:'4',codigo:'101',nome:'IRRF',tipo:'desconto',incidencias:'-'},{id:'5',codigo:'102',nome:'Vale Transporte',tipo:'desconto',incidencias:'-'}];const columns=[{accessorKey:'codigo',header:'Código'},{accessorKey:'nome',header:'Rubrica'},{accessorKey:'tipo',header:'Tipo',cell:({row}:any)=><Badge variant={row.original.tipo==='provento'?'default':'destructive'}>{row.original.tipo}</Badge>},{accessorKey:'incidencias',header:'Incidências'}];export default function RubricasPage(){return(<div className="space-y-6"><PageHeader title="Rubricas"description="Eventos da folha de pagamento"icon={List}actions={<Button><Plus className="w-4 h-4 mr-2"/>Nova Rubrica</Button>}/><Card><CardContent className="pt-6"><DataTable columns={columns}data={mockRubricas}/></CardContent></Card></div>);}
