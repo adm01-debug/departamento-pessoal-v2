@@ -1,48 +1,35 @@
 # API Documentation
 
-## Authentication
+## Endpoints
 
-### POST /auth/login
-Login with email and password.
+### Colaboradores
 
-### POST /auth/logout
-Logout current user.
+- `GET /api/colaboradores` - Lista colaboradores
+- `GET /api/colaboradores/:id` - Busca colaborador
+- `POST /api/colaboradores` - Cria colaborador
+- `PUT /api/colaboradores/:id` - Atualiza colaborador
+- `DELETE /api/colaboradores/:id` - Remove colaborador
 
-## Colaboradores
+### Férias
 
-### GET /colaboradores
-List all colaboradores.
+- `GET /api/ferias` - Lista férias
+- `POST /api/ferias` - Programa férias
+- `POST /api/ferias/:id/aprovar` - Aprova férias
+- `POST /api/ferias/:id/rejeitar` - Rejeita férias
 
-### GET /colaboradores/:id
-Get colaborador by ID.
+### Folha
 
-### POST /colaboradores
-Create new colaborador.
+- `GET /api/folha/:competencia` - Lista folha
+- `POST /api/folha/calcular` - Calcula folha
+- `POST /api/folha/fechar` - Fecha folha
 
-### PUT /colaboradores/:id
-Update colaborador.
+### Ponto
 
-### DELETE /colaboradores/:id
-Delete colaborador.
+- `GET /api/ponto` - Lista registros
+- `POST /api/ponto/registrar` - Registra ponto
 
-## Folha de Pagamento
+### Autenticação
 
-### GET /folha
-List all folhas.
-
-### POST /folha/:id/calcular
-Calculate folha.
-
-### POST /folha/:id/fechar
-Close folha.
-
-## Férias
-
-### GET /ferias
-List all ferias.
-
-### POST /ferias/:id/aprovar
-Approve ferias.
-
-### POST /ferias/:id/cancelar
-Cancel ferias.
+- `POST /api/auth/login` - Login
+- `POST /api/auth/logout` - Logout
+- `POST /api/auth/refresh` - Refresh token
