@@ -1,18 +1,1 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-
-interface DashboardLayoutProps { children: React.ReactNode; className?: string; sidebar?: React.ReactNode; header?: React.ReactNode; footer?: React.ReactNode; }
-
-export function DashboardLayout({ children, className, sidebar, header, footer }: DashboardLayoutProps) {
-  return (
-    <div className={cn("min-h-screen flex flex-col", className)}>
-      {header && <header className="border-b bg-background">{header}</header>}
-      <div className="flex flex-1">
-        {sidebar && <aside className="w-64 border-r bg-muted/10">{sidebar}</aside>}
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-      {footer && <footer className="border-t bg-background">{footer}</footer>}
-    </div>
-  );
-}
-export default DashboardLayout;
+import React from'react';import{Sidebar}from'@/components/layout/Sidebar';import{Header}from'@/components/layout/Header';import{useAppStore}from'@/stores/useAppStore';import{cn}from'@/lib/utils';interface Props{children:React.ReactNode;}export function DashboardLayout({children}:Props){const{sidebarOpen,sidebarCollapsed}=useAppStore();return(<div className="min-h-screen bg-gray-50"><Sidebar/><div className={cn('transition-all duration-300',sidebarOpen&&!sidebarCollapsed&&'lg:ml-64',sidebarOpen&&sidebarCollapsed&&'lg:ml-16')}><Header/><main className="p-6">{children}</main></div></div>);}
