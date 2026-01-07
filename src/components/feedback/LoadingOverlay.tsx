@@ -1,6 +1,1 @@
-import { Loader2 } from 'lucide-react';
-interface LoadingOverlayProps { loading: boolean; message?: string; }
-export function LoadingOverlay({ loading, message = 'Carregando...' }: LoadingOverlayProps) {
-  if (!loading) return null;
-  return (<div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"><div className="flex flex-col items-center gap-4"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="text-sm text-muted-foreground">{message}</p></div></div>);
-}
+import React from'react';import{Loader2}from'lucide-react';interface Props{message?:string;}export function LoadingOverlay({message='Carregando...'}:Props){return(<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center gap-4"><Loader2 className="w-8 h-8 animate-spin text-primary"/><p className="text-gray-700">{message}</p></div></div>);}
