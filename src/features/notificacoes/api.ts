@@ -1,0 +1,1 @@
+import{api}from'@/lib/api';export const notificacoesApi={async listar(lidas?:boolean){const{data}=await api.get('/notificacoes',{params:{lidas}});return data;},async marcarLida(id:string){await api.put(`/notificacoes/${id}/lida`);},async marcarTodasLidas(){await api.put('/notificacoes/lidas');},async excluir(id:string){await api.delete(`/notificacoes/${id}`);}};
