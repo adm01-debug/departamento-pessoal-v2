@@ -1,0 +1,1 @@
+import{AppException}from'./AppException';export class ValidationException extends AppException{public errors:Record<string,string[]>;constructor(errors:Record<string,string[]>){super('Erro de validação','VALIDATION_ERROR',400,errors);this.name='ValidationException';this.errors=errors;Object.setPrototypeOf(this,ValidationException.prototype);}}
