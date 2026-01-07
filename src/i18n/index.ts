@@ -1,1 +1,1 @@
-export*from'./pt-BR';
+import{ptBR}from'./pt-BR';export const translations={ptBR};export type TranslationKey=keyof typeof ptBR;export function t(key:string):string{const keys=key.split('.');let value:any=ptBR;for(const k of keys){value=value?.[k];}return value||key;}
