@@ -1,1 +1,1 @@
-export*from'./colaboradores.mock';export*from'./ferias.mock';export*from'./folha.mock';export*from'./ponto.mock';
+export{handlers}from'./handlers';export{server}from'./server';
