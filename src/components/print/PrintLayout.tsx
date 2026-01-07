@@ -1,10 +1,1 @@
-import { memo } from 'react';
-interface PrintLayoutProps { children: React.ReactNode; titulo?: string; }
-export const PrintLayout = memo(function PrintLayout({ children, titulo }: PrintLayoutProps) {
-  return (
-    <div className="print:block hidden">
-      {titulo && <h1 className="text-2xl font-bold mb-4 text-center">{titulo}</h1>}
-      <div className="print:text-black">{children}</div>
-    </div>
-  );
-});
+import React from'react';interface Props{children:React.ReactNode;title:string;subtitle?:string;}export function PrintLayout({children,title,subtitle}:Props){return(<div className="print:block hidden p-8"><header className="mb-8 border-b pb-4"><h1 className="text-2xl font-bold">{title}</h1>{subtitle&&<p className="text-gray-600">{subtitle}</p>}<p className="text-sm text-gray-500">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p></header><main>{children}</main><footer className="mt-8 pt-4 border-t text-center text-sm text-gray-500">Sistema de Departamento Pessoal</footer></div>);}
