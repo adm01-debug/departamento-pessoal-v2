@@ -1,0 +1,1 @@
+export{EventosList}from'./EventosList';
