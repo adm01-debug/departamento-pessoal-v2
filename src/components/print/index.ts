@@ -1,5 +1,1 @@
-export * from "./HoleritePrint";
-export * from "./FichaRegistroPrint";
-export * from "./ReciboFeriasPrint";
-export * from "./TermoRescisaoPrint";
-export * from "./EspelhoPontoPrint";
+export{PrintLayout}from'./PrintLayout';export{PrintButton}from'./PrintButton';export{PrintTable}from'./PrintTable';
