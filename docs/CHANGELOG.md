@@ -1,32 +1,14 @@
-# CHANGELOG
+# Changelog
 
-## Visão Geral
-Documentação do módulo CHANGELOG para o sistema de Departamento Pessoal.
+## [1.0.0] - 2024-01-15
 
-## Conteúdo
-- Introdução
-- Configuração
-- Uso
-- Exemplos
-- FAQ
-
-## Introdução
-Este documento descreve as funcionalidades e configurações do módulo.
-
-## Configuração
-Siga as instruções abaixo para configurar o módulo.
-
-## Uso
-Exemplos de uso e boas práticas.
-
-## Exemplos
-```typescript
-// Exemplo de código
-const exemplo = "exemplo";
-```
-
-## FAQ
-Perguntas frequentes sobre o módulo.
-
----
-*Documentação gerada automaticamente - Sistema DP v9*
+### Added
+- Initial release
+- Colaboradores management
+- Ferias management
+- Folha de pagamento
+- Ponto eletronico
+- Beneficios
+- eSocial integration
+- Reports
+- User management
