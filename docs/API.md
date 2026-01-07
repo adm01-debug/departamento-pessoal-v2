@@ -1,33 +1,25 @@
 # API Documentation
 
-## Autenticação
+## Endpoints
 
-### POST /auth/login
-Login do usuário.
+### Auth
+- POST /api/auth/login
+- POST /api/auth/logout
+- POST /api/auth/refresh
 
-**Request:**
-```json
-{"email":"user@email.com","senha":"password"}
-```
+### Colaboradores
+- GET /api/colaboradores
+- GET /api/colaboradores/:id
+- POST /api/colaboradores
+- PUT /api/colaboradores/:id
+- DELETE /api/colaboradores/:id
 
-**Response:**
-```json
-{"user":{"id":"1","nome":"User"},"token":"jwt-token"}
-```
+### Férias
+- GET /api/ferias
+- POST /api/ferias
+- POST /api/ferias/:id/aprovar
 
-## Colaboradores
-
-### GET /colaboradores
-Lista todos os colaboradores.
-
-### GET /colaboradores/:id
-Busca colaborador por ID.
-
-### POST /colaboradores
-Cria novo colaborador.
-
-### PUT /colaboradores/:id
-Atualiza colaborador.
-
-### DELETE /colaboradores/:id
-Exclui colaborador.
+### Folha
+- GET /api/folha
+- POST /api/folha/calcular
+- POST /api/folha/fechar
