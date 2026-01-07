@@ -1,5 +1,1 @@
-export * from "./documentValidators";
-export * from "./colaboradorValidator";
-export * from "./feriasValidator";
-export * from "./pontoValidator";
-export * from "./lancamentoValidator";
+export{validarCPFCompleto,validarDigitoCPF}from'./cpf';export{validarCNPJCompleto,validarDigitoCNPJ}from'./cnpj';export{validarPIS}from'./pis';export{validarEmailCompleto,validarDominio}from'./email';
