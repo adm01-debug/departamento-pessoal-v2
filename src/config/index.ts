@@ -1,1 +1,1 @@
-export*from'./app';export*from'./navigation';export*from'./permissions';
+export{APP_CONFIG}from'./app';export{NAVIGATION}from'./navigation';export{PERMISSIONS,ROLES,ROLE_PERMISSIONS}from'./permissions';export{THEME}from'./theme';
