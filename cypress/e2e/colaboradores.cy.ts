@@ -1,0 +1,1 @@
+describe('Colaboradores',()=>{beforeEach(()=>{cy.visit('/');});it('should list colaboradores',()=>{cy.visit('/colaboradores');cy.get('[data-testid="colaboradores-table"]').should('be.visible');});it('should open new colaborador form',()=>{cy.visit('/colaboradores');cy.get('[data-testid="btn-novo"]').click();cy.url().should('include','/colaboradores/novo');});});
