@@ -1,0 +1,1 @@
+import{AppException}from'./AppException';export class NotFoundException extends AppException{constructor(resource:string='Recurso'){super(`${resource} não encontrado`,'NOT_FOUND',404);this.name='NotFoundException';Object.setPrototypeOf(this,NotFoundException.prototype);}}
