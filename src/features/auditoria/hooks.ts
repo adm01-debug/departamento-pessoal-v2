@@ -1,0 +1,1 @@
+import{useQuery}from'@tanstack/react-query';import{auditoriaApi}from'./api';export function useAuditoria(params?:any){return useQuery({queryKey:['auditoria',params],queryFn:()=>auditoriaApi.listar(params)});}export function useAuditoriaDetalhe(id:string){return useQuery({queryKey:['auditoria',id],queryFn:()=>auditoriaApi.buscar(id),enabled:!!id});}
