@@ -1,28 +1,18 @@
 version: '3.8'
 services:
-  frontend:
+  app:
     build: .
     ports:
-      - '3000:80'
+      - '3000:3000'
     environment:
-      - VITE_API_URL=http://localhost:3001/api
+      - VITE_API_URL=http://api:3001/api
     depends_on:
       - api
   api:
     image: node:18-alpine
     working_dir: /app
-    volumes:
-      - ./api:/app
     ports:
       - '3001:3001'
-    command: npm start
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: dp
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
     volumes:
-      - pgdata:/var/lib/postgresql/data
-volumes:
-  pgdata:
+      - ./backend:/app
+    command: npm run dev
