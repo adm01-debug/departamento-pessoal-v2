@@ -1,36 +1,18 @@
-# Componentes
+# Components
 
-## UI Components (shadcn/ui)
+## UI Components
 
-- Button
-- Card
-- Dialog
-- DataTable
-- Form
-- Input
-- Select
-- Badge
-- Toast
+### Button
+Variants: default, secondary, outline, ghost, destructive
 
-## Common Components
+### Card
+Usage: CardHeader, CardContent, CardFooter
 
-### PageHeader
-Cabeçalho padrão das páginas.
+### DataTable
+Features: Sorting, Filtering, Pagination
 
-```tsx
-<PageHeader
-  title="Colaboradores"
-  description="Lista de colaboradores"
-  icon={Users}
-  actions={<Button>Novo</Button>}
-/>
-```
+### Form
+Components: Input, Select, Checkbox, RadioGroup
 
-### LoadingSpinner
-Indicador de carregamento.
-
-### EmptyState
-Estado vazio com ícone e mensagem.
-
-### SearchInput
-Campo de busca com debounce.
+### Modal
+Usage: Modal, ModalHeader, ModalBody, ModalFooter
