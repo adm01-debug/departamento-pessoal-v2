@@ -1,8 +1,1 @@
-export function toAPI(data: any): any { return { ...data, updatedAt: new Date().toISOString() }; }
-export function fromAPI(data: any): any { return { ...data, updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined }; }
-export function toForm(data: any): any { return Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v ?? ""])); }
-export function fromForm(data: any): any { return Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== "")); }
-export function toExport(data: any[]): any[] { return data.map(item => ({ ...item, _exported: true })); }
-export function fromImport(data: any[]): any[] { return data.map(item => { const { _exported, ...rest } = item; return rest; }); }
-export const feriasTransformer = { toAPI, fromAPI, toForm, fromForm, toExport, fromImport };
-export default feriasTransformer;
+import{formatDate,formatCurrency}from'@/utils/formatters';export function transformFeriasToView(ferias:any){return{...ferias,dataInicioFormatada:formatDate(ferias.dataInicio),dataFimFormatada:formatDate(ferias.dataFim),valorFormatado:ferias.valor?formatCurrency(ferias.valor):'-'};}export function transformFeriasToApi(dados:any){return{...dados,dataInicio:dados.dataInicio,dataFim:dados.dataFim,diasGozo:parseInt(dados.diasGozo)||30,diasAbono:parseInt(dados.diasAbono)||0};}
