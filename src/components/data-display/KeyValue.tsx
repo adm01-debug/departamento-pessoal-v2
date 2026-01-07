@@ -1,0 +1,1 @@
+import React from'react';interface Props{label:string;value:React.ReactNode;className?:string;}export function KeyValue({label,value,className}:Props){return(<div className={className}><span className="text-sm text-muted-foreground">{label}</span><span className="block font-medium">{value}</span></div>);}
