@@ -1,8 +1,1 @@
-export { ColaboradorCard } from './ColaboradorCard';
-export { ColaboradorFilter } from './ColaboradorFilter';
-export { ColaboradorFormCompleto } from './ColaboradorFormCompleto';
-export { ColaboradorFormModal } from './ColaboradorFormModal';
-export { ColaboradorList } from './ColaboradorList';
-export { ColaboradorModal } from './ColaboradorModal';
-export { DocumentosColaborador } from './DocumentosColaborador';
-export { ImportacaoColaboradoresModal } from './ImportacaoColaboradoresModal';
+export{ColaboradorCard}from'./ColaboradorCard';export{ColaboradorAvatar}from'./ColaboradorAvatar';export{ColaboradorStatus}from'./ColaboradorStatus';export{ColaboradorInfo}from'./ColaboradorInfo';export{ColaboradorFilters}from'./ColaboradorFilters';
