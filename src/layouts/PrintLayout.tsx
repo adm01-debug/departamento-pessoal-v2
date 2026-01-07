@@ -1,18 +1,1 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-
-interface PrintLayoutProps { children: React.ReactNode; className?: string; sidebar?: React.ReactNode; header?: React.ReactNode; footer?: React.ReactNode; }
-
-export function PrintLayout({ children, className, sidebar, header, footer }: PrintLayoutProps) {
-  return (
-    <div className={cn("min-h-screen flex flex-col", className)}>
-      {header && <header className="border-b bg-background">{header}</header>}
-      <div className="flex flex-1">
-        {sidebar && <aside className="w-64 border-r bg-muted/10">{sidebar}</aside>}
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-      {footer && <footer className="border-t bg-background">{footer}</footer>}
-    </div>
-  );
-}
-export default PrintLayout;
+import React from'react';interface Props{children:React.ReactNode;title:string;subtitle?:string;}export function PrintLayout({children,title,subtitle}:Props){return(<div className="p-8 bg-white"><header className="mb-8 pb-4 border-b-2 border-black"><h1 className="text-2xl font-bold">{title}</h1>{subtitle&&<p className="text-gray-600">{subtitle}</p>}<p className="text-sm text-gray-500">Impresso em: {new Date().toLocaleString('pt-BR')}</p></header><main>{children}</main><footer className="mt-8 pt-4 border-t text-center text-sm text-gray-500">Sistema de Departamento Pessoal</footer></div>);}
