@@ -1,0 +1,1 @@
+import React from'react';import{Navigate}from'react-router-dom';import{useAuthStore}from'@/stores/useAuthStore';interface Props{children:React.ReactNode;}export function GuestGuard({children}:Props){const{isAuthenticated}=useAuthStore();if(isAuthenticated){return<Navigate to="/"replace/>;}return<>{children}</>;}
