@@ -1,18 +1,1 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-
-interface AuthLayoutProps { children: React.ReactNode; className?: string; sidebar?: React.ReactNode; header?: React.ReactNode; footer?: React.ReactNode; }
-
-export function AuthLayout({ children, className, sidebar, header, footer }: AuthLayoutProps) {
-  return (
-    <div className={cn("min-h-screen flex flex-col", className)}>
-      {header && <header className="border-b bg-background">{header}</header>}
-      <div className="flex flex-1">
-        {sidebar && <aside className="w-64 border-r bg-muted/10">{sidebar}</aside>}
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-      {footer && <footer className="border-t bg-background">{footer}</footer>}
-    </div>
-  );
-}
-export default AuthLayout;
+import React from'react';interface Props{children:React.ReactNode;}export function AuthLayout({children}:Props){return(<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100"><div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg">{children}</div></div>);}
