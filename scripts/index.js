@@ -1,0 +1,1 @@
+console.log('Available scripts:');console.log('  node scripts/generate-component.js ComponentName');console.log('  node scripts/generate-page.js PageName');console.log('  node scripts/generate-hook.js useHookName');console.log('  node scripts/generate-service.js serviceName');
