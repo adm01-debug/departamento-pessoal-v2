@@ -1,0 +1,1 @@
+import React from'react';import{Navigate,useLocation}from'react-router-dom';import{useAuthStore}from'@/stores/useAuthStore';interface Props{children:React.ReactNode;}export function AuthGuard({children}:Props){const{isAuthenticated}=useAuthStore();const location=useLocation();if(!isAuthenticated){return<Navigate to="/login"state={{from:location}}replace/>;}return<>{children}</>;}
