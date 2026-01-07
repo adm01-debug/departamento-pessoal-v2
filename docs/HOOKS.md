@@ -1,38 +1,19 @@
-# Documentação de Hooks
+# Custom Hooks
 
-## Data Fetching
+## useDebounce
+Debounce values for search inputs
 
-### useColaboradores
-```tsx
-const { data, isLoading, error } = useColaboradores();
-```
+## useLocalStorage
+Persist state in localStorage
 
-### useColaborador
-```tsx
-const { data } = useColaborador(id);
-```
+## usePagination
+Handle pagination state
 
-## Mutations
+## useFilter
+Filter and search data
 
-### useCreateColaborador
-```tsx
-const mutation = useCreateColaborador();
-mutation.mutate(data);
-```
+## useModal
+Modal open/close state
 
-## Utilities
-
-### useDebounce
-```tsx
-const debouncedValue = useDebounce(value, 300);
-```
-
-### useLocalStorage
-```tsx
-const [value, setValue] = useLocalStorage('key', 'default');
-```
-
-### usePagination
-```tsx
-const { currentPage, totalPages, nextPage } = usePagination({ totalItems: 100 });
-```
+## useAsync
+Handle async operations
