@@ -1,0 +1,1 @@
+export interface CreateFeriasDTO{colaboradorId:string;periodoAquisitivo:string;dataInicio:string;dataFim:string;diasGozo:number;abonoPecuniario:boolean;diasAbono?:number;observacoes?:string;}export interface FeriasResponseDTO{id:string;colaborador:{id:string;nome:string;};periodoAquisitivo:string;dataInicio:string;dataFim:string;diasGozo:number;status:string;valor?:number;}
