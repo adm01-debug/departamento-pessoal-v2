@@ -1,1 +1,1 @@
-export*from'./LineChart';export*from'./BarChart';export*from'./PieChart';export*from'./AreaChart';export*from'./DonutChart';
+export{BarChart}from'./BarChart';export{LineChart}from'./LineChart';export{PieChart}from'./PieChart';export{AreaChart}from'./AreaChart';
