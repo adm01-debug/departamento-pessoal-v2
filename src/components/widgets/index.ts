@@ -1,1 +1,1 @@
-export*from'./StatsCard';export*from'./QuickActions';export*from'./RecentActivity';export*from'./UpcomingEvents';export*from'./PendingTasks';
+export{QuickActions}from'./QuickActions';export{RecentActivity}from'./RecentActivity';export{Notifications}from'./Notifications';export{MiniCalendar}from'./Calendar';
