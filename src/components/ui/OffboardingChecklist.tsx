@@ -11,7 +11,6 @@ interface OffboardingChecklistProps { title?: string; items: ChecklistItem[]; on
 export function OffboardingChecklist({ title = "Checklist de Desligamento", items, onToggle, className }: OffboardingChecklistProps) {
   const completedCount = items.filter((i) => i.completed).length;
   const progress = (completedCount / items.length) * 100;
-
   return (
     <Card className={className}>
       <CardHeader className="pb-2">
