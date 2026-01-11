@@ -1,38 +1,63 @@
-// queueService - Service implementation
+// V15-106: src/services/queueService.ts
 
-export interface ServiceConfig { enabled: boolean; options?: Record<string, any>; }
-export interface ServiceResult<T = any> { success: boolean; data?: T; error?: string; timestamp?: string; }
-
-class ServiceImpl {
-  private config: ServiceConfig = { enabled: true };
-  private initialized = false;
-
-  configure(config: Partial<ServiceConfig>): void { this.config = { ...this.config, ...config }; }
-  isEnabled(): boolean { return this.config.enabled; }
-
-  async init(): Promise<ServiceResult> {
-    if (this.initialized) return { success: true, data: { already: true } };
-    console.log("[queueService] Initializing...");
-    this.initialized = true;
-    return { success: true, timestamp: new Date().toISOString() };
-  }
-
-  async execute<T>(fn: () => Promise<T>): Promise<ServiceResult<T>> {
-    if (!this.config.enabled) return { success: false, error: "Service disabled" };
-    try { const data = await fn(); return { success: true, data, timestamp: new Date().toISOString() }; }
-    catch (error) { return { success: false, error: String(error) }; }
-  }
-
-  async getStatus(): Promise<{ enabled: boolean; initialized: boolean; timestamp: string }> {
-    return { enabled: this.config.enabled, initialized: this.initialized, timestamp: new Date().toISOString() };
-  }
-
-  async destroy(): Promise<ServiceResult> {
-    console.log("[queueService] Destroying...");
-    this.initialized = false;
-    return { success: true };
-  }
+interface QueueItem<T> {
+  id: string;
+  data: T;
+  priority: number;
+  retries: number;
+  createdAt: Date;
 }
 
-export const queueService = new ServiceImpl();
-export default queueService;
+interface QueueOptions {
+  maxRetries?: number;
+  concurrency?: number;
+  retryDelay?: number;
+}
+
+export class QueueService<T> {
+  private queue: QueueItem<T>[] = [];
+  private processing = false;
+  private options: Required<QueueOptions>;
+
+  constructor(options: QueueOptions = {}) {
+    this.options = {
+      maxRetries: options.maxRetries ?? 3,
+      concurrency: options.concurrency ?? 1,
+      retryDelay: options.retryDelay ?? 1000,
+    };
+  }
+
+  add(data: T, priority = 0): string {
+    const id = crypto.randomUUID();
+    this.queue.push({ id, data, priority, retries: 0, createdAt: new Date() });
+    this.queue.sort((a, b) => b.priority - a.priority);
+    return id;
+  }
+
+  async process(handler: (data: T) => Promise<void>): Promise<void> {
+    if (this.processing) return;
+    this.processing = true;
+
+    while (this.queue.length > 0) {
+      const item = this.queue.shift()!;
+      try {
+        await handler(item.data);
+      } catch (error) {
+        if (item.retries < this.options.maxRetries) {
+          item.retries++;
+          await new Promise(r => setTimeout(r, this.options.retryDelay));
+          this.queue.push(item);
+        } else {
+          console.error(`Queue item ${item.id} failed after ${item.retries} retries`);
+        }
+      }
+    }
+    this.processing = false;
+  }
+
+  get length(): number { return this.queue.length; }
+  get isProcessing(): boolean { return this.processing; }
+  clear(): void { this.queue = []; }
+}
+
+export const createQueue = <T>(options?: QueueOptions) => new QueueService<T>(options);
