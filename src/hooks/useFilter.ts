@@ -1,1 +1,10 @@
-import{useState,useMemo,useCallback}from'react';export function useFilter<T extends Record<string,any>>(data:T[]){const[search,setSearch]=useState('');const[filters,setFilters]=useState<Record<string,any>>({});const setFieldFilter=useCallback((field:string,value:any)=>{setFilters(prev=>({...prev,[field]:value}));},[]);const clearFilters=useCallback(()=>{setSearch('');setFilters({});},[]);const filteredData=useMemo(()=>{return data.filter(item=>{if(search){const searchLower=search.toLowerCase();const matches=Object.values(item).some(v=>String(v).toLowerCase().includes(searchLower));if(!matches)return false;}for(const[key,value]of Object.entries(filters)){if(value&&item[key]!==value)return false;}return true;});},[data,search,filters]);return{filteredData,search,setSearch,filters,setFieldFilter,clearFilters};}
+// V15-451
+import { useState, useMemo } from 'react';
+export function useFilter<T>(data: T[], filterFn: (item: T, filters: Record<string, any>) => boolean) {
+  const [filters, setFilters] = useState<Record<string, any>>({});
+  const filteredData = useMemo(() => data.filter(item => filterFn(item, filters)), [data, filters, filterFn]);
+  const setFilter = (key: string, value: any) => setFilters(prev => ({ ...prev, [key]: value }));
+  const clearFilters = () => setFilters({});
+  const hasFilters = Object.keys(filters).some(k => filters[k] !== undefined && filters[k] !== '');
+  return { filteredData, filters, setFilter, clearFilters, hasFilters };
+}
