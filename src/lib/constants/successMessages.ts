@@ -1,1 +1,0 @@
-export const SUCCESS_MESSAGES = { CREATED: 'Registro criado com sucesso!', UPDATED: 'Registro atualizado com sucesso!', DELETED: 'Registro excluído com sucesso!', SAVED: 'Alterações salvas com sucesso!', SENT: 'Enviado com sucesso!', IMPORTED: 'Importação concluída com sucesso!', EXPORTED: 'Exportação concluída com sucesso!' };

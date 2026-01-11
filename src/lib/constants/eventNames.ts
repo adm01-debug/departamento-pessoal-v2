@@ -1,1 +1,0 @@
-export const EVENT_NAMES = { USER_LOGIN: 'user:login', USER_LOGOUT: 'user:logout', DATA_UPDATED: 'data:updated', NOTIFICATION_RECEIVED: 'notification:received', SYNC_STARTED: 'sync:started', SYNC_COMPLETED: 'sync:completed', ERROR_OCCURRED: 'error:occurred' };
