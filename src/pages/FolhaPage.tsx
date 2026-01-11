@@ -1,1 +1,70 @@
-import React,{useState}from'react';import{useFolhas,useCalcularFolha,useFecharFolha}from'@/hooks/useFolha';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Badge}from'@/components/ui/badge';import{DataTable}from'@/components/ui/data-table';import{StatsCard}from'@/components/widgets/StatsCard';import{LoadingSpinner}from'@/components/common/LoadingSpinner';import{Plus,Calculator,Lock,DollarSign,Users}from'lucide-react';import{formatCurrency}from'@/utils/formatters';const statusColors={aberta:'bg-yellow-100 text-yellow-800',calculada:'bg-blue-100 text-blue-800',fechada:'bg-green-100 text-green-800'};export default function FolhaPage(){const{data:folhas,isLoading}=useFolhas();const calcularMutation=useCalcularFolha();const fecharMutation=useFecharFolha();const handleCalcular=(id:string)=>calcularMutation.mutateAsync(id);const handleFechar=(id:string)=>fecharMutation.mutateAsync(id);const columns=[{accessorKey:'competencia',header:'Competência'},{accessorKey:'tipo',header:'Tipo'},{accessorKey:'colaboradores',header:'Colaboradores'},{accessorKey:'totalLiquido',header:'Total Líquido',cell:({row}:any)=>formatCurrency(row.original.totalLiquido)},{accessorKey:'status',header:'Status',cell:({row}:any)=><Badge className={statusColors[row.original.status as keyof typeof statusColors]||''}>{row.original.status}</Badge>},{id:'actions',cell:({row}:any)=><div className="flex gap-1">{row.original.status==='aberta'&&<Button variant="ghost"size="sm"onClick={()=>handleCalcular(row.original.id)}><Calculator className="w-4 h-4"/></Button>}{row.original.status==='calculada'&&<Button variant="ghost"size="sm"onClick={()=>handleFechar(row.original.id)}><Lock className="w-4 h-4"/></Button>}</div>}];if(isLoading)return<LoadingSpinner/>;const totalLiquido=folhas?.reduce((s:number,f:any)=>s+(f.totalLiquido||0),0)||0;return(<PageLayout><PageHeader title="Folha de Pagamento"actions={<Button><Plus className="w-4 h-4 mr-2"/>Nova Folha</Button>}/><div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"><StatsCard title="Total Folhas"value={folhas?.length||0}icon={DollarSign}/><StatsCard title="Total Líquido"value={formatCurrency(totalLiquido)}icon={DollarSign}/><StatsCard title="Colaboradores"value={folhas?.[0]?.colaboradores||0}icon={Users}/></div><Card><CardContent className="p-0"><DataTable columns={columns}data={folhas||[]}/></CardContent></Card></PageLayout>);}
+// V15-225: src/pages/FolhaPage.tsx
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { PageLayout } from '@/components/layout';
+import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { FolhaStatus } from '@/components/ui/status-badge';
+import { EmptyList } from '@/components/ui/empty-state';
+import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@/components/ui/button';
+import { folhaService } from '@/services';
+import { Eye, Calculator } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+export default function FolhaPage() {
+  const [competencia, setCompetencia] = useState('');
+  const navigate = useNavigate();
+
+  const { data: folhas, isLoading } = useQuery({
+    queryKey: ['folhas', competencia],
+    queryFn: () => folhaService.list({ competencia: competencia || undefined }),
+  });
+
+  const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  return (
+    <PageLayout title="Folha de Pagamento" description="Gestão de folhas de pagamento" actions={<Button onClick={() => navigate('/folha/calcular')}><Calculator className="h-4 w-4 mr-2" />Calcular Folha</Button>}>
+      <DataTableToolbar
+        search={competencia}
+        onSearchChange={setCompetencia}
+        searchPlaceholder="Competência (AAAA-MM)"
+      />
+
+      {isLoading ? (
+        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+      ) : !folhas?.length ? (
+        <EmptyList entityName="folha" onCreate={() => navigate('/folha/calcular')} />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Competência</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Total Proventos</TableHead>
+              <TableHead>Total Descontos</TableHead>
+              <TableHead>Total Líquido</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[80px]">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {folhas.map((f) => (
+              <TableRow key={f.id}>
+                <TableCell className="font-medium">{f.competencia}</TableCell>
+                <TableCell className="capitalize">{f.tipo.replace('_', ' ')}</TableCell>
+                <TableCell className="text-green-600">{formatCurrency(f.total_proventos)}</TableCell>
+                <TableCell className="text-red-600">{formatCurrency(f.total_descontos)}</TableCell>
+                <TableCell className="font-bold">{formatCurrency(f.total_liquido)}</TableCell>
+                <TableCell><FolhaStatus status={f.status} /></TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="icon" onClick={() => navigate(`/folha/${f.id}`)}><Eye className="h-4 w-4" /></Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </PageLayout>
+  );
+}
