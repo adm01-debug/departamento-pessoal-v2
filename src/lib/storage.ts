@@ -1,67 +1,72 @@
-/**
- * storage utilities
- * @module lib/storage
- */
+// V15-130: src/lib/storage.ts
+const PREFIX = 'dp_';
 
-export const storageConfig = { enabled: true, debug: false, timeout: 30000 };
+export const storage = {
+  get<T>(key: string, defaultValue?: T): T | null {
+    try {
+      const item = localStorage.getItem(PREFIX + key);
+      return item ? JSON.parse(item) : defaultValue ?? null;
+    } catch { return defaultValue ?? null; }
+  },
 
-export function configurestorage(config: Partial<typeof storageConfig>) {
-  Object.assign(storageConfig, config);
-}
+  set<T>(key: string, value: T): void {
+    try { localStorage.setItem(PREFIX + key, JSON.stringify(value)); }
+    catch (e) { console.error('Storage set error:', e); }
+  },
 
-export function storageInit(): boolean {
-  console.log("[storage] Initialized");
-  return true;
-}
+  remove(key: string): void {
+    localStorage.removeItem(PREFIX + key);
+  },
 
-export function storageProcess(data: any): any {
-  if (!storageConfig.enabled) return data;
-  if (storageConfig.debug) console.log("[storage] Processing:", data);
-  return data;
-}
+  clear(): void {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith(PREFIX))
+      .forEach(k => localStorage.removeItem(k));
+  },
 
-export async function storageAsync<T>(fn: () => Promise<T>): Promise<T> {
-  const start = Date.now();
-  try {
-    const result = await fn();
-    if (storageConfig.debug) console.log("[storage] Completed in", Date.now() - start, "ms");
-    return result;
-  } catch (error) {
-    console.error("[storage] Error:", error);
-    throw error;
+  keys(): string[] {
+    return Object.keys(localStorage)
+      .filter(k => k.startsWith(PREFIX))
+      .map(k => k.slice(PREFIX.length));
   }
-}
+};
 
-export function storageValidate(value: unknown): boolean {
-  return value !== null && value !== undefined;
-}
+export const sessionStore = {
+  get<T>(key: string, defaultValue?: T): T | null {
+    try {
+      const item = sessionStorage.getItem(PREFIX + key);
+      return item ? JSON.parse(item) : defaultValue ?? null;
+    } catch { return defaultValue ?? null; }
+  },
 
-export function storageTransform<T, R>(data: T, transformer: (item: T) => R): R {
-  return transformer(data);
-}
+  set<T>(key: string, value: T): void {
+    try { sessionStorage.setItem(PREFIX + key, JSON.stringify(value)); }
+    catch (e) { console.error('Session set error:', e); }
+  },
 
-export function storageBatch<T>(items: T[], batchSize: number): T[][] {
-  const batches: T[][] = [];
-  for (let i = 0; i < items.length; i += batchSize) {
-    batches.push(items.slice(i, i + batchSize));
+  remove(key: string): void {
+    sessionStorage.removeItem(PREFIX + key);
+  },
+
+  clear(): void {
+    Object.keys(sessionStorage)
+      .filter(k => k.startsWith(PREFIX))
+      .forEach(k => sessionStorage.removeItem(k));
   }
-  return batches;
+};
+
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [value, setValue] = React.useState<T>(() => storage.get(key) ?? initialValue);
+  
+  const setStoredValue = React.useCallback((newValue: T | ((prev: T) => T)) => {
+    setValue(prev => {
+      const val = typeof newValue === 'function' ? (newValue as (prev: T) => T)(prev) : newValue;
+      storage.set(key, val);
+      return val;
+    });
+  }, [key]);
+
+  return [value, setStoredValue] as const;
 }
 
-export class storageManager {
-  private static instance: storageManager;
-  private data: Map<string, any> = new Map();
-
-  static getInstance(): storageManager {
-    if (!storageManager.instance) storageManager.instance = new storageManager();
-    return storageManager.instance;
-  }
-
-  set(key: string, value: any): void { this.data.set(key, value); }
-  get(key: string): any { return this.data.get(key); }
-  has(key: string): boolean { return this.data.has(key); }
-  delete(key: string): boolean { return this.data.delete(key); }
-  clear(): void { this.data.clear(); }
-}
-
-export default { configure: configurestorage, init: storageInit, process: storageProcess, async: storageAsync, validate: storageValidate, transform: storageTransform, batch: storageBatch, Manager: storageManager };
+import React from 'react';
