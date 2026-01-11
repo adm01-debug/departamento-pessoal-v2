@@ -1,1 +1,40 @@
-import React,{useState}from'react';import{useGerarRelatorio}from'@/hooks/useRelatorio';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Select,SelectContent,SelectItem,SelectTrigger,SelectValue}from'@/components/ui/select';import{Input}from'@/components/ui/input';import{Label}from'@/components/ui/label';import{FileText,Download,Users,DollarSign,Calendar,Clock}from'lucide-react';import{downloadBlob}from'@/lib/utils';const relatorios=[{tipo:'folha_pagamento',nome:'Folha de Pagamento',icon:DollarSign},{tipo:'colaboradores',nome:'Colaboradores',icon:Users},{tipo:'ferias',nome:'Férias',icon:Calendar},{tipo:'ponto',nome:'Ponto',icon:Clock}];export default function RelatoriosPage(){const[tipo,setTipo]=useState('');const[dataInicio,setDataInicio]=useState('');const[dataFim,setDataFim]=useState('');const[formato,setFormato]=useState<'pdf'|'xlsx'>('pdf');const gerarMutation=useGerarRelatorio();const handleGerar=async()=>{if(!tipo||!dataInicio||!dataFim)return;const blob=await gerarMutation.mutateAsync({tipo,dataInicio,dataFim,formato});downloadBlob(blob,'relatorio.'+formato);};return(<PageLayout><PageHeader title="Relatórios"description="Gere relatórios do sistema"/><div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">{relatorios.map(r=>(<Card key={r.tipo}className="cursor-pointer hover:bg-muted/50"onClick={()=>setTipo(r.tipo)}><CardContent className="flex items-center gap-4 pt-6"><r.icon className="w-8 h-8 text-primary"/><span className="font-medium">{r.nome}</span></CardContent></Card>))}</div><Card><CardHeader><CardTitle>Configurar Relatório</CardTitle></CardHeader><CardContent className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-4 gap-4"><div><Label>Tipo</Label><Select value={tipo}onValueChange={setTipo}><SelectTrigger><SelectValue placeholder="Selecione"/></SelectTrigger><SelectContent>{relatorios.map(r=>(<SelectItem key={r.tipo}value={r.tipo}>{r.nome}</SelectItem>))}</SelectContent></Select></div><div><Label>Data Início</Label><Input type="date"value={dataInicio}onChange={e=>setDataInicio(e.target.value)}/></div><div><Label>Data Fim</Label><Input type="date"value={dataFim}onChange={e=>setDataFim(e.target.value)}/></div><div><Label>Formato</Label><Select value={formato}onValueChange={(v:any)=>setFormato(v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="pdf">PDF</SelectItem><SelectItem value="xlsx">Excel</SelectItem></SelectContent></Select></div></div><Button onClick={handleGerar}disabled={!tipo||!dataInicio||!dataFim||gerarMutation.isPending}><Download className="w-4 h-4 mr-2"/>Gerar Relatório</Button></CardContent></Card></PageLayout>);}
+// V15-229: src/pages/RelatoriosPage.tsx
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FileText, Users, DollarSign, Calendar, TrendingUp, Cake } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const relatorios = [
+  { id: 'folha', title: 'Folha de Pagamento', description: 'Relatório detalhado da folha por competência', icon: DollarSign },
+  { id: 'colaboradores', title: 'Resumo Colaboradores', description: 'Resumo geral dos colaboradores', icon: Users },
+  { id: 'ferias', title: 'Férias Vencidas', description: 'Colaboradores com férias vencendo', icon: Calendar },
+  { id: 'aniversariantes', title: 'Aniversariantes', description: 'Aniversariantes do mês', icon: Cake },
+  { id: 'turnover', title: 'Turnover', description: 'Análise de rotatividade', icon: TrendingUp },
+  { id: 'encargos', title: 'Encargos Sociais', description: 'Resumo de encargos (INSS, FGTS)', icon: FileText },
+];
+
+export default function RelatoriosPage() {
+  const navigate = useNavigate();
+
+  return (
+    <PageLayout title="Relatórios" description="Relatórios gerenciais e operacionais">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {relatorios.map(({ id, title, description, icon: Icon }) => (
+          <Card key={id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/relatorios/${id}`)}>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <div className="p-2 bg-primary/10 rounded"><Icon className="h-6 w-6 text-primary" /></div>
+              <div>
+                <CardTitle className="text-base">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" size="sm" className="w-full">Gerar Relatório</Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </PageLayout>
+  );
+}
