@@ -1,1 +1,41 @@
-import React from'react';import{Outlet}from'react-router-dom';import{Sidebar}from'./Sidebar';import{Header}from'./Header';export function MainLayout(){return(<div className="flex h-screen bg-background"><Sidebar/><div className="flex-1 flex flex-col overflow-hidden"><Header/><main className="flex-1 overflow-y-auto p-6"><Outlet/></main></div></div>);}
+// V15-195: src/components/layout/MainLayout.tsx
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { Sidebar } from './Sidebar';
+import { Header } from './Header';
+
+export function MainLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  return (
+    <div className="flex h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <div className={cn('hidden lg:block transition-all', sidebarOpen ? 'w-64' : 'w-16')}>
+        <Sidebar collapsed={!sidebarOpen} />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setMobileSidebarOpen(false)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute left-0 top-0 h-full w-64" onClick={(e) => e.stopPropagation()}>
+            <Sidebar />
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header 
+          onMenuClick={() => setMobileSidebarOpen(true)}
+          user={{ name: 'Admin', email: 'admin@empresa.com' }}
+        />
+        <main className="flex-1 overflow-auto p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}
