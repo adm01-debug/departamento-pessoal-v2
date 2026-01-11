@@ -1,1 +1,15 @@
-import React,{useState}from'react';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Select,SelectContent,SelectItem,SelectTrigger,SelectValue}from'@/components/ui/select';import{useExport}from'@/hooks/useExport';import{FileText,Download}from'lucide-react';const declaracoes=[{id:'dirf',nome:'DIRF',desc:'Declaração do Imposto de Renda Retido na Fonte'},{id:'rais',nome:'RAIS',desc:'Relação Anual de Informações Sociais'},{id:'sefip',nome:'SEFIP/GFIP',desc:'Sistema Empresa de Recolhimento do FGTS'}];export default function DeclaracoesPage(){const[anoBase,setAnoBase]=useState('2024');const{exportData,loading}=useExport();const handleGerar=(tipo:string)=>{exportData(`/declaracoes/${tipo}`,`${tipo}_${anoBase}`,'pdf',{anoBase});};return(<PageLayout><PageHeader title="Declarações"description="Gere declarações obrigatórias"/><div className="mb-4"><Select value={anoBase}onValueChange={setAnoBase}><SelectTrigger className="w-32"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="2024">2024</SelectItem><SelectItem value="2023">2023</SelectItem><SelectItem value="2022">2022</SelectItem></SelectContent></Select></div><div className="grid grid-cols-1 md:grid-cols-3 gap-4">{declaracoes.map(d=>(<Card key={d.id}><CardHeader><CardTitle className="flex items-center gap-2"><FileText className="w-5 h-5"/>{d.nome}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground mb-4">{d.desc}</p><Button onClick={()=>handleGerar(d.id)}disabled={loading}><Download className="w-4 h-4 mr-2"/>Gerar {d.nome}</Button></CardContent></Card>))}</div></PageLayout>);}
+// V15-403
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FileText, Download } from 'lucide-react';
+const declaracoes = [{ id: 'vinculo', nome: 'Declaração de Vínculo', descricao: 'Comprova vínculo empregatício' }, { id: 'rendimentos', nome: 'Informe de Rendimentos', descricao: 'Para declaração de IR' }, { id: 'salario', nome: 'Declaração de Salário', descricao: 'Comprova remuneração atual' }, { id: 'ferias', nome: 'Recibo de Férias', descricao: 'Comprovante de férias gozadas' }];
+export default function DeclaracoesPage() {
+  return (
+    <PageLayout title="Declarações" description="Emissão de declarações e documentos">
+      <div className="grid gap-4 md:grid-cols-2">
+        {declaracoes.map(d => (<Card key={d.id}><CardHeader className="flex flex-row items-center gap-4"><FileText className="h-8 w-8 text-primary" /><div><CardTitle className="text-base">{d.nome}</CardTitle><CardDescription>{d.descricao}</CardDescription></div></CardHeader><CardContent><Button variant="outline" className="w-full"><Download className="h-4 w-4 mr-2" />Gerar</Button></CardContent></Card>))}
+      </div>
+    </PageLayout>
+  );
+}
