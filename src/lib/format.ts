@@ -1,67 +1,44 @@
-/**
- * format utilities
- * @module lib/format
- */
+// V15-099: src/lib/format.ts
 
-export const formatConfig = { enabled: true, debug: false, timeout: 30000 };
-
-export function configureformat(config: Partial<typeof formatConfig>) {
-  Object.assign(formatConfig, config);
+export function formatCPF(cpf: string): string {
+  const cleaned = cpf.replace(/\D/g, '').slice(0, 11);
+  return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-export function formatInit(): boolean {
-  console.log("[format] Initialized");
-  return true;
+export function formatCNPJ(cnpj: string): string {
+  const cleaned = cnpj.replace(/\D/g, '').slice(0, 14);
+  return cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 }
 
-export function formatProcess(data: any): any {
-  if (!formatConfig.enabled) return data;
-  if (formatConfig.debug) console.log("[format] Processing:", data);
-  return data;
-}
-
-export async function formatAsync<T>(fn: () => Promise<T>): Promise<T> {
-  const start = Date.now();
-  try {
-    const result = await fn();
-    if (formatConfig.debug) console.log("[format] Completed in", Date.now() - start, "ms");
-    return result;
-  } catch (error) {
-    console.error("[format] Error:", error);
-    throw error;
+export function formatPhone(phone: string): string {
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 11) {
+    return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   }
+  return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
 }
 
-export function formatValidate(value: unknown): boolean {
-  return value !== null && value !== undefined;
+export function formatCEP(cep: string): string {
+  const cleaned = cep.replace(/\D/g, '').slice(0, 8);
+  return cleaned.replace(/(\d{5})(\d{3})/, '$1-$2');
 }
 
-export function formatTransform<T, R>(data: T, transformer: (item: T) => R): R {
-  return transformer(data);
+export function formatCurrency(value: number, locale = 'pt-BR'): string {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
 }
 
-export function formatBatch<T>(items: T[], batchSize: number): T[][] {
-  const batches: T[][] = [];
-  for (let i = 0; i < items.length; i += batchSize) {
-    batches.push(items.slice(i, i + batchSize));
-  }
-  return batches;
+export function formatDate(date: Date | string, format = 'dd/MM/yyyy'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear();
+  return format.replace('dd', day).replace('MM', month).replace('yyyy', year.toString());
 }
 
-export class formatManager {
-  private static instance: formatManager;
-  private data: Map<string, any> = new Map();
-
-  static getInstance(): formatManager {
-    if (!formatManager.instance) formatManager.instance = new formatManager();
-    return formatManager.instance;
-  }
-
-  set(key: string, value: any): void { this.data.set(key, value); }
-  get(key: string): any { return this.data.get(key); }
-  has(key: string): boolean { return this.data.has(key); }
-  delete(key: string): boolean { return this.data.delete(key); }
-  clear(): void { this.data.clear(); }
+export function formatPIS(pis: string): string {
+  const cleaned = pis.replace(/\D/g, '').slice(0, 11);
+  return cleaned.replace(/(\d{3})(\d{5})(\d{2})(\d{1})/, '$1.$2.$3-$4');
 }
-
-export default { configure: configureformat, init: formatInit, process: formatProcess, async: formatAsync, validate: formatValidate, transform: formatTransform, batch: formatBatch, Manager: formatManager };
