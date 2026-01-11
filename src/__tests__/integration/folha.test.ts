@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('Folha Integration',()=>{it.skip('should calculate folha correctly',()=>{expect(true).toBe(true);});it.skip('should close folha',()=>{expect(true).toBe(true);});});

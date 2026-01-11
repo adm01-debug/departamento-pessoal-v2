@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render}from'@/test/utils';import{PieChart}from'@/components/charts/PieChart';describe('PieChart',()=>{it.skip('should render chart',()=>{const data=[{name:'A',value:100},{name:'B',value:200}];const{container}=render(<PieChart data={data}/>);expect(container).toBeInTheDocument();});});

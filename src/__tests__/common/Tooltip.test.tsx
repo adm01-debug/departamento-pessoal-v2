@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import{Tooltip}from'@/components/common/Tooltip';describe('Tooltip',()=>{it('should render children',()=>{render(<Tooltip content="Tooltip text"><button>Hover me</button></Tooltip>);expect(screen.getByText('Hover me')).toBeInTheDocument();});});

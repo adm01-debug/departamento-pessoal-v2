@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('Ferias Integration',()=>{it.skip('should programar ferias',()=>{expect(true).toBe(true);});it.skip('should aprovar ferias',()=>{expect(true).toBe(true);});});

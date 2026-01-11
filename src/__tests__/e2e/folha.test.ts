@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('Folha E2E',()=>{it('should create folha',async()=>{expect(true).toBe(true);});it('should calculate folha',async()=>{expect(true).toBe(true);});it('should close folha',async()=>{expect(true).toBe(true);});it('should export folha',async()=>{expect(true).toBe(true);});});

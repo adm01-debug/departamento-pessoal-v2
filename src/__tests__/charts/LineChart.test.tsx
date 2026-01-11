@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render}from'@/test/utils';import{LineChart}from'@/components/charts/LineChart';describe('LineChart',()=>{it.skip('should render chart',()=>{const data=[{name:'Jan',value:100},{name:'Feb',value:200}];const{container}=render(<LineChart data={data}dataKey="value"xKey="name"/>);expect(container).toBeInTheDocument();});});
