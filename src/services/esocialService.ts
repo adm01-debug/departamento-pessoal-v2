@@ -1,1 +1,9 @@
-import{api}from'@/lib/api';import{ENDPOINTS}from'@/api/endpoints';import{EventoESocial}from'@/types/esocial';export const esocialService={async listarEventos(status?:string):Promise<EventoESocial[]>{const{data}=await api.get(ENDPOINTS.ESOCIAL.EVENTOS,{params:{status}});return data;},async buscarEvento(id:string):Promise<EventoESocial>{const{data}=await api.get(`${ENDPOINTS.ESOCIAL.EVENTOS}/${id}`);return data;},async enviarEvento(id:string):Promise<{protocolo:string}>{const{data}=await api.post(ENDPOINTS.ESOCIAL.ENVIAR(id));return data;},async consultarRetorno(protocolo:string):Promise<any>{const{data}=await api.get(`${ENDPOINTS.ESOCIAL.BASE}/retorno/${protocolo}`);return data;},async gerarXML(tipo:string,dados:any):Promise<string>{const{data}=await api.post(`${ENDPOINTS.ESOCIAL.BASE}/gerar-xml`,{tipo,dados});return data.xml;}};
+// V15-395
+import { supabase } from '@/integrations/supabase/client';
+export interface EventoESocial { id: string; empresa_id: string; codigo: string; nome: string; status: 'pendente' | 'enviado' | 'processando' | 'erro' | 'aceito'; data_envio?: string; protocolo?: string; mensagem_erro?: string; xml?: string; }
+export const esocialService = {
+  async list(empresaId: string, status?: string) { let query = supabase.from('esocial_eventos').select('*').eq('empresa_id', empresaId).order('created_at', { ascending: false }); if (status) query = query.eq('status', status); const { data, error } = await query; if (error) throw error; return data as EventoESocial[]; },
+  async getById(id: string) { const { data, error } = await supabase.from('esocial_eventos').select('*').eq('id', id).single(); if (error) throw error; return data as EventoESocial; },
+  async enviar(id: string) { const { data, error } = await supabase.from('esocial_eventos').update({ status: 'enviado', data_envio: new Date().toISOString() }).eq('id', id).select().single(); if (error) throw error; return data; },
+  async consultar(id: string) { const evento = await this.getById(id); return evento; },
+};
