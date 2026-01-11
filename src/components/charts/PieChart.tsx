@@ -1,1 +1,30 @@
-import React from'react';import{Pie,PieChart as RechartsPie,Cell,Tooltip,ResponsiveContainer,Legend}from'recharts';const COLORS=['#3b82f6','#22c55e','#ef4444','#f59e0b','#8b5cf6'];interface Props{data:{name:string;value:number}[];}export function PieChart({data}:Props){return(<ResponsiveContainer width="100%"height={300}><RechartsPie><Pie data={data}cx="50%"cy="50%"labelLine={false}outerRadius={80}dataKey="value"label={({name,percent})=>`${name} ${(percent*100).toFixed(0)}%`}>{data.map((_,i)=>(<Cell key={i}fill={COLORS[i%COLORS.length]}/>))}</Pie><Tooltip/><Legend/></RechartsPie></ResponsiveContainer>);}
+// V15-270: src/components/charts/PieChart.tsx
+import { PieChart as RechartsPie, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface PieChartProps {
+  title: string;
+  data: Array<{ name: string; value: number; color: string }>;
+  height?: number;
+}
+
+export function PieChart({ title, data, height = 300 }: PieChartProps) {
+  return (
+    <Card>
+      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={height}>
+          <RechartsPie>
+            <Pie data={data} cx="50%" cy="50%" labelLine={false} outerRadius={80} fill="#8884d8" dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </RechartsPie>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
