@@ -1,0 +1,42 @@
+// V15-199: src/components/forms/FormSelect.tsx
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface Option {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+interface FormSelectProps {
+  label?: string;
+  error?: string;
+  description?: string;
+  placeholder?: string;
+  options: Option[];
+  value?: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
+  className?: string;
+}
+
+export function FormSelect({ label, error, description, placeholder = 'Selecione...', options, value, onChange, disabled, className }: FormSelectProps) {
+  return (
+    <div className="space-y-2">
+      {label && <Label className={cn(error && 'text-destructive')}>{label}</Label>}
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger className={cn(error && 'border-destructive', className)}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value} disabled={opt.disabled}>{opt.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {description && !error && <p className="text-sm text-muted-foreground">{description}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
+    </div>
+  );
+}
