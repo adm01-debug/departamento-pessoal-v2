@@ -1,25 +1,23 @@
 # API Documentation
 
-## Endpoints
+## Colaboradores
+- GET /colaboradores - Listar
+- GET /colaboradores/:id - Obter
+- POST /colaboradores - Criar
+- PUT /colaboradores/:id - Atualizar
 
-### Auth
-- POST /api/auth/login
-- POST /api/auth/logout
-- POST /api/auth/refresh
+## Empresas
+- GET /empresas - Listar
+- POST /empresas - Criar
 
-### Colaboradores
-- GET /api/colaboradores
-- GET /api/colaboradores/:id
-- POST /api/colaboradores
-- PUT /api/colaboradores/:id
-- DELETE /api/colaboradores/:id
+## Folha
+- GET /folha - Listar folhas
+- POST /folha/calcular - Calcular
 
-### Férias
-- GET /api/ferias
-- POST /api/ferias
-- POST /api/ferias/:id/aprovar
+## Férias
+- GET /ferias - Listar
+- POST /ferias/solicitar - Solicitar
 
-### Folha
-- GET /api/folha
-- POST /api/folha/calcular
-- POST /api/folha/fechar
+## Ponto
+- GET /ponto - Espelho
+- POST /ponto/registrar - Registrar
