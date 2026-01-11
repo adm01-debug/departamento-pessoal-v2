@@ -1,1 +1,55 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Badge}from'@/components/ui/badge';import{FileText,Send,CheckCircle,XCircle,Clock}from'lucide-react';import{formatDateTime}from'@/utils/formatters';interface Props{evento:{id:string;tipo:string;descricao:string;status:'pendente'|'enviado'|'processado'|'erro';dataGeracao:string;protocolo?:string;};onClick?:()=>void;}const statusConfig={pendente:{icon:Clock,color:'text-yellow-600',bg:'bg-yellow-100'},enviado:{icon:Send,color:'text-blue-600',bg:'bg-blue-100'},processado:{icon:CheckCircle,color:'text-green-600',bg:'bg-green-100'},erro:{icon:XCircle,color:'text-red-600',bg:'bg-red-100'}};export function EventoCard({evento,onClick}:Props){const config=statusConfig[evento.status];const Icon=config.icon;return(<Card className="cursor-pointer hover:shadow-md"onClick={onClick}><CardHeader className="pb-2"><div className="flex items-center justify-between"><CardTitle className="text-lg flex items-center gap-2"><FileText className="w-4 h-4"/>{evento.tipo}</CardTitle><Badge className={`${config.bg} ${config.color}`}><Icon className="w-3 h-3 mr-1"/>{evento.status}</Badge></div></CardHeader><CardContent><p className="text-sm text-muted-foreground mb-2">{evento.descricao}</p><div className="flex justify-between text-xs text-muted-foreground"><span>Gerado: {formatDateTime(evento.dataGeracao)}</span>{evento.protocolo&&<span>Protocolo: {evento.protocolo}</span>}</div></CardContent></Card>);}
+// V15-275: src/components/esocial/EventoCard.tsx
+import { Card, CardContent } from '@/components/ui/card';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { Button } from '@/components/ui/button';
+import { Send, RefreshCw, Eye, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+
+interface Evento {
+  codigo: string;
+  nome: string;
+  status: 'enviado' | 'pendente' | 'erro' | 'processando';
+  dataEnvio?: string;
+  mensagem?: string;
+}
+
+interface EventoCardProps {
+  evento: Evento;
+  onEnviar?: () => void;
+  onReenviar?: () => void;
+  onVisualizar?: () => void;
+}
+
+const statusConfig = {
+  enviado: { icon: CheckCircle, variant: 'success', color: 'text-green-600' },
+  pendente: { icon: Clock, variant: 'warning', color: 'text-yellow-600' },
+  erro: { icon: AlertCircle, variant: 'error', color: 'text-red-600' },
+  processando: { icon: RefreshCw, variant: 'info', color: 'text-blue-600' },
+};
+
+export function EventoCard({ evento, onEnviar, onReenviar, onVisualizar }: EventoCardProps) {
+  const config = statusConfig[evento.status];
+  const Icon = config.icon;
+
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Icon className={`h-5 w-5 ${config.color}`} />
+            <div>
+              <p className="font-medium">{evento.codigo} - {evento.nome}</p>
+              {evento.dataEnvio && <p className="text-sm text-muted-foreground">Enviado em {evento.dataEnvio}</p>}
+              {evento.mensagem && <p className="text-sm text-red-600">{evento.mensagem}</p>}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusBadge status={evento.status} variant={config.variant as any} />
+            {evento.status === 'pendente' && onEnviar && <Button size="sm" onClick={onEnviar}><Send className="h-4 w-4 mr-1" />Enviar</Button>}
+            {evento.status === 'erro' && onReenviar && <Button size="sm" variant="destructive" onClick={onReenviar}><RefreshCw className="h-4 w-4 mr-1" />Reenviar</Button>}
+            {onVisualizar && <Button size="sm" variant="ghost" onClick={onVisualizar}><Eye className="h-4 w-4" /></Button>}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
