@@ -1,1 +1,77 @@
-import React,{useState}from'react';import{useColaboradores}from'@/hooks/useColaborador';import{useDepartamentos}from'@/hooks/useDepartamento';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{ColaboradorTable}from'@/components/tables/ColaboradorTable';import{ColaboradorFilter}from'@/components/filters/ColaboradorFilter';import{ColaboradorModal}from'@/components/modals/ColaboradorModal';import{LoadingSpinner}from'@/components/common/LoadingSpinner';import{Plus}from'lucide-react';import{useNavigate}from'react-router-dom';export default function ColaboradoresPage(){const navigate=useNavigate();const[filters,setFilters]=useState({search:'',status:'',departamentoId:''});const{data:colaboradores,isLoading}=useColaboradores(filters);const{data:departamentos}=useDepartamentos();const[modalOpen,setModalOpen]=useState(false);const[selectedColab,setSelectedColab]=useState<any>(null);const handleView=(id:string)=>navigate('/colaboradores/'+id);const handleEdit=(id:string)=>{const c=colaboradores?.find((x:any)=>x.id===id);setSelectedColab(c);setModalOpen(true);};if(isLoading)return<LoadingSpinner/>;return(<PageLayout><PageHeader title="Colaboradores"description="Gerencie os colaboradores"actions={<Button onClick={()=>{setSelectedColab(null);setModalOpen(true);}}><Plus className="w-4 h-4 mr-2"/>Novo</Button>}/><Card><CardContent className="space-y-4"><ColaboradorFilter filters={filters}departamentos={departamentos||[]}onChange={setFilters}onClear={()=>setFilters({search:'',status:'',departamentoId:''})}/><ColaboradorTable colaboradores={colaboradores||[]}onView={handleView}onEdit={handleEdit}/></CardContent></Card><ColaboradorModal open={modalOpen}onClose={()=>setModalOpen(false)}colaborador={selectedColab}/></PageLayout>);}
+// V15-222: src/pages/ColaboradoresPage.tsx
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { PageLayout } from '@/components/layout';
+import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ColaboradorStatus } from '@/components/ui/status-badge';
+import { EmptyList } from '@/components/ui/empty-state';
+import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@/components/ui/button';
+import { colaboradorService } from '@/services';
+import { Eye, Edit, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+export default function ColaboradoresPage() {
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const navigate = useNavigate();
+
+  const { data: colaboradores, isLoading } = useQuery({
+    queryKey: ['colaboradores', search, statusFilter],
+    queryFn: () => colaboradorService.list({ search, status: statusFilter as any }),
+  });
+
+  const statusOptions = [
+    { value: 'ativo', label: 'Ativo' },
+    { value: 'inativo', label: 'Inativo' },
+    { value: 'ferias', label: 'Férias' },
+    { value: 'afastado', label: 'Afastado' },
+  ];
+
+  return (
+    <PageLayout title="Colaboradores" description="Gestão de colaboradores" actions={<Button onClick={() => navigate('/colaboradores/novo')}>Novo Colaborador</Button>}>
+      <DataTableToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Buscar colaborador..."
+        filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter }]}
+        onExport={() => {}}
+      />
+
+      {isLoading ? (
+        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+      ) : !colaboradores?.length ? (
+        <EmptyList entityName="colaborador" onCreate={() => navigate('/colaboradores/novo')} />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>CPF</TableHead>
+              <TableHead>Cargo</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[100px]">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {colaboradores.map((c) => (
+              <TableRow key={c.id}>
+                <TableCell className="font-medium">{c.nome}</TableCell>
+                <TableCell>{c.cpf}</TableCell>
+                <TableCell>{c.cargo}</TableCell>
+                <TableCell><ColaboradorStatus status={c.status} /></TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => navigate(`/colaboradores/${c.id}`)}><Eye className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => navigate(`/colaboradores/${c.id}/editar`)}><Edit className="h-4 w-4" /></Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </PageLayout>
+  );
+}
