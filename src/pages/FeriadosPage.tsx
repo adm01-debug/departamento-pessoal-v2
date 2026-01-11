@@ -1,1 +1,16 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{DataTable}from'@/components/ui/data-table';import{Badge}from'@/components/ui/badge';import{PageHeader}from'@/components/common/PageHeader';import{Calendar,Plus}from'lucide-react';import{formatDate}from'@/utils/formatters';const mockFeriados=[{id:'1',nome:'Confraternização Universal',data:'2024-01-01',tipo:'nacional'},{id:'2',nome:'Carnaval',data:'2024-02-13',tipo:'nacional'},{id:'3',nome:'Aniversário da Cidade',data:'2024-01-25',tipo:'municipal'},{id:'4',nome:'Paixão de Cristo',data:'2024-03-29',tipo:'nacional'}];const tipoColors={nacional:'bg-blue-100 text-blue-800',estadual:'bg-green-100 text-green-800',municipal:'bg-yellow-100 text-yellow-800'};const columns=[{accessorKey:'nome',header:'Feriado'},{accessorKey:'data',header:'Data',cell:({row}:any)=>formatDate(row.original.data)},{accessorKey:'tipo',header:'Tipo',cell:({row}:any)=><Badge className={tipoColors[row.original.tipo as keyof typeof tipoColors]}>{row.original.tipo}</Badge>}];export default function FeriadosPage(){return(<div className="space-y-6"><PageHeader title="Feriados"description="Calendário de feriados"icon={Calendar}actions={<Button><Plus className="w-4 h-4 mr-2"/>Novo Feriado</Button>}/><Card><CardContent className="pt-6"><DataTable columns={columns}data={mockFeriados}/></CardContent></Card></div>);}
+// V15-328
+import { PageLayout } from '@/components/layout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+const feriados = [{ id: '1', data: '01/01/2025', nome: 'Confraternização Universal', tipo: 'nacional' }, { id: '2', data: '25/01/2025', nome: 'Aniversário de São Paulo', tipo: 'municipal' }, { id: '3', data: '03/03/2025', nome: 'Carnaval', tipo: 'nacional' }, { id: '4', data: '18/04/2025', nome: 'Sexta-Feira Santa', tipo: 'nacional' }];
+export default function FeriadosPage() {
+  return (
+    <PageLayout title="Feriados" actions={<Button><Plus className="h-4 w-4 mr-2" />Novo</Button>}>
+      <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead className="w-[100px]">Ações</TableHead></TableRow></TableHeader>
+        <TableBody>{feriados.map(f => (<TableRow key={f.id}><TableCell>{f.data}</TableCell><TableCell className="font-medium">{f.nome}</TableCell><TableCell><Badge variant={f.tipo === 'nacional' ? 'default' : 'secondary'}>{f.tipo}</Badge></TableCell><TableCell><div className="flex gap-1"><Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4" /></Button></div></TableCell></TableRow>))}</TableBody>
+      </Table>
+    </PageLayout>
+  );
+}
