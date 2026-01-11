@@ -1,1 +1,28 @@
-import React,{useState}from'react';import{useQuery}from'@tanstack/react-query';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent}from'@/components/ui/card';import{Input}from'@/components/ui/input';import{DataTable}from'@/components/ui/data-table';import{StatsCard}from'@/components/widgets/StatsCard';import{LoadingSpinner}from'@/components/common/LoadingSpinner';import{api}from'@/lib/api';import{formatCurrency}from'@/utils/formatters';import{DollarSign}from'lucide-react';export default function EncargosPage(){const[competencia,setCompetencia]=useState('2024-01');const{data:encargos,isLoading}=useQuery({queryKey:['encargos',competencia],queryFn:async()=>(await api.get('/encargos',{params:{competencia}})).data});const columns=[{accessorKey:'encargo',header:'Encargo'},{accessorKey:'base',header:'Base Cálculo',cell:({row}:any)=>formatCurrency(row.original.base)},{accessorKey:'aliquota',header:'Alíquota',cell:({row}:any)=>row.original.aliquota+'%'},{accessorKey:'valor',header:'Valor',cell:({row}:any)=>formatCurrency(row.original.valor)},{accessorKey:'vencimento',header:'Vencimento'}];if(isLoading)return<LoadingSpinner/>;const total=encargos?.reduce((s:number,e:any)=>s+e.valor,0)||0;return(<PageLayout><PageHeader title="Encargos Sociais"/><div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"><StatsCard title="Total Encargos"value={formatCurrency(total)}icon={DollarSign}/></div><Card><CardContent className="space-y-4 pt-4"><Input type="month"value={competencia}onChange={e=>setCompetencia(e.target.value)}className="w-40"/><DataTable columns={columns}data={encargos||[]}/></CardContent></Card></PageLayout>);}
+// V15-406
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { BarChart } from '@/components/charts';
+const encargos = [{ competencia: '01/2025', inss: 45000, fgts: 32000, irrf: 28000, total: 105000 }, { competencia: '12/2024', inss: 44000, fgts: 31500, irrf: 27500, total: 103000 }];
+const chartData = [{ mes: 'Set', inss: 42000, fgts: 30000, irrf: 26000 }, { mes: 'Out', inss: 43000, fgts: 31000, irrf: 27000 }, { mes: 'Nov', inss: 44000, fgts: 31500, irrf: 27500 }, { mes: 'Dez', inss: 44000, fgts: 31500, irrf: 27500 }, { mes: 'Jan', inss: 45000, fgts: 32000, irrf: 28000 }];
+export default function EncargosPage() {
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return (
+    <PageLayout title="Encargos Sociais">
+      <div className="grid gap-4 md:grid-cols-4 mb-6">
+        <Card><CardContent className="pt-6"><p className="text-sm text-muted-foreground">INSS</p><p className="text-2xl font-bold">{fmt(45000)}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-sm text-muted-foreground">FGTS</p><p className="text-2xl font-bold">{fmt(32000)}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-sm text-muted-foreground">IRRF</p><p className="text-2xl font-bold">{fmt(28000)}</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><p className="text-sm text-muted-foreground">Total</p><p className="text-2xl font-bold text-primary">{fmt(105000)}</p></CardContent></Card>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        <BarChart title="Evolução de Encargos" data={chartData} xKey="mes" bars={[{ dataKey: 'inss', color: '#3b82f6', name: 'INSS' }, { dataKey: 'fgts', color: '#22c55e', name: 'FGTS' }, { dataKey: 'irrf', color: '#f59e0b', name: 'IRRF' }]} />
+        <Card><CardHeader><CardTitle>Histórico</CardTitle></CardHeader><CardContent>
+          <Table><TableHeader><TableRow><TableHead>Competência</TableHead><TableHead>INSS</TableHead><TableHead>FGTS</TableHead><TableHead>IRRF</TableHead><TableHead>Total</TableHead></TableRow></TableHeader>
+            <TableBody>{encargos.map((e, i) => (<TableRow key={i}><TableCell>{e.competencia}</TableCell><TableCell>{fmt(e.inss)}</TableCell><TableCell>{fmt(e.fgts)}</TableCell><TableCell>{fmt(e.irrf)}</TableCell><TableCell className="font-bold">{fmt(e.total)}</TableCell></TableRow>))}</TableBody>
+          </Table>
+        </CardContent></Card>
+      </div>
+    </PageLayout>
+  );
+}
