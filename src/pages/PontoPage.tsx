@@ -1,1 +1,71 @@
-import React,{useState}from'react';import{usePontos,useRegistrarPonto}from'@/hooks/usePonto';import{useAuth}from'@/contexts/AuthContext';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Input}from'@/components/ui/input';import{PontoTable}from'@/components/tables/PontoTable';import{LoadingSpinner}from'@/components/common/LoadingSpinner';import{Clock,LogIn,Coffee,LogOut}from'lucide-react';import{format}from'date-fns';export default function PontoPage(){const{user}=useAuth();const[data,setData]=useState(format(new Date(),'yyyy-MM-dd'));const{data:pontos,isLoading}=usePontos({data});const registrarMutation=useRegistrarPonto();const handleRegistrar=(tipo:'entrada'|'saida_almoco'|'retorno_almoco'|'saida')=>{registrarMutation.mutate({colaboradorId:user?.id||'',tipo});};if(isLoading)return<LoadingSpinner/>;return(<PageLayout><PageHeader title="Registro de Ponto"description={format(new Date(),'EEEE, dd/MM/yyyy')}/><div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"><Card className="cursor-pointer hover:bg-muted/50"onClick={()=>handleRegistrar('entrada')}><CardContent className="flex items-center gap-4 pt-6"><LogIn className="w-8 h-8 text-green-600"/><div><p className="font-medium">Entrada</p><p className="text-sm text-muted-foreground">Registrar entrada</p></div></CardContent></Card><Card className="cursor-pointer hover:bg-muted/50"onClick={()=>handleRegistrar('saida_almoco')}><CardContent className="flex items-center gap-4 pt-6"><Coffee className="w-8 h-8 text-orange-600"/><div><p className="font-medium">Saída Almoço</p><p className="text-sm text-muted-foreground">Iniciar intervalo</p></div></CardContent></Card><Card className="cursor-pointer hover:bg-muted/50"onClick={()=>handleRegistrar('retorno_almoco')}><CardContent className="flex items-center gap-4 pt-6"><Coffee className="w-8 h-8 text-blue-600"/><div><p className="font-medium">Retorno</p><p className="text-sm text-muted-foreground">Fim do intervalo</p></div></CardContent></Card><Card className="cursor-pointer hover:bg-muted/50"onClick={()=>handleRegistrar('saida')}><CardContent className="flex items-center gap-4 pt-6"><LogOut className="w-8 h-8 text-red-600"/><div><p className="font-medium">Saída</p><p className="text-sm text-muted-foreground">Encerrar expediente</p></div></CardContent></Card></div><Card><CardHeader><CardTitle className="flex items-center justify-between">Registros<Input type="date"value={data}onChange={e=>setData(e.target.value)}className="w-40"/></CardTitle></CardHeader><CardContent className="p-0"><PontoTable pontos={pontos||[]}/></CardContent></Card></PageLayout>);}
+// V15-227: src/pages/PontoPage.tsx
+import { useState } from 'react';
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Clock, LogIn, Coffee, LogOut } from 'lucide-react';
+import { pontoService } from '@/services';
+import { useNotification } from '@/contexts';
+
+export default function PontoPage() {
+  const [loading, setLoading] = useState<string | null>(null);
+  const { success, error } = useNotification();
+
+  const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
+    setLoading(tipo);
+    try {
+      let coords: { lat: number; lng: number } | undefined;
+      if (navigator.geolocation) {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => 
+          navigator.geolocation.getCurrentPosition(resolve, reject)
+        ).catch(() => null);
+        if (pos) coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      }
+      await pontoService.registrar('user-id', tipo, coords);
+      success('Ponto registrado!', `${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+    } catch (err: any) {
+      error('Erro ao registrar ponto', err.message);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const buttons = [
+    { tipo: 'entrada' as const, label: 'Entrada', icon: LogIn, color: 'bg-green-600 hover:bg-green-700' },
+    { tipo: 'saida_almoco' as const, label: 'Saída Almoço', icon: Coffee, color: 'bg-yellow-600 hover:bg-yellow-700' },
+    { tipo: 'retorno_almoco' as const, label: 'Retorno Almoço', icon: Coffee, color: 'bg-blue-600 hover:bg-blue-700' },
+    { tipo: 'saida' as const, label: 'Saída', icon: LogOut, color: 'bg-red-600 hover:bg-red-700' },
+  ];
+
+  return (
+    <PageLayout title="Ponto Eletrônico" description="Registre sua jornada de trabalho">
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Registrar Ponto
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-center mb-6">{new Date().toLocaleTimeString('pt-BR')}</div>
+            <div className="grid grid-cols-2 gap-4">
+              {buttons.map(({ tipo, label, icon: Icon, color }) => (
+                <Button key={tipo} onClick={() => registrar(tipo)} disabled={loading !== null} className={`${color} text-white`}>
+                  <Icon className="h-4 w-4 mr-2" />
+                  {loading === tipo ? 'Registrando...' : label}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>Registros de Hoje</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Nenhum registro encontrado</p>
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
+  );
+}
