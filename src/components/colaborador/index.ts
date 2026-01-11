@@ -1,9 +1,4 @@
-// V15-006: src/components/colaborador/index.ts
-export { ColaboradorForm } from './ColaboradorForm';
-export { ColaboradorList } from './ColaboradorList';
+// V15-250: src/components/colaborador/index.ts
 export { ColaboradorCard } from './ColaboradorCard';
-export { ColaboradorDetails } from './ColaboradorDetails';
-export { ColaboradorSearch } from './ColaboradorSearch';
-export { ColaboradorSelect } from './ColaboradorSelect';
-export { useColaborador } from './hooks/useColaborador';
-export type { Colaborador, ColaboradorFormData } from './types';
+export { ColaboradorList } from './ColaboradorList';
+export { ColaboradorFilters } from './ColaboradorFilters';
