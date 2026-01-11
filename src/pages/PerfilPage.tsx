@@ -1,1 +1,24 @@
-import React,{useState}from'react';import{useAuth}from'@/contexts/AuthContext';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Input}from'@/components/ui/input';import{Label}from'@/components/ui/label';import{Avatar}from'@/components/common/Avatar';import{useToast}from'@/hooks/useToast';import{api}from'@/lib/api';import{Camera,Save}from'lucide-react';export default function PerfilPage(){const{user,updateUser}=useAuth();const{toast}=useToast();const[nome,setNome]=useState(user?.nome||'');const[email,setEmail]=useState(user?.email||'');const[senhaAtual,setSenhaAtual]=useState('');const[novaSenha,setNovaSenha]=useState('');const[loading,setLoading]=useState(false);const handleUpdateProfile=async()=>{try{setLoading(true);await api.put('/usuarios/perfil',{nome,email});updateUser({nome,email});toast({title:'Perfil atualizado'});}catch(e){toast({title:'Erro ao atualizar',variant:'destructive'});}finally{setLoading(false);}};const handleChangePassword=async()=>{if(!senhaAtual||!novaSenha){toast({title:'Preencha os campos',variant:'destructive'});return;}try{setLoading(true);await api.post('/usuarios/alterar-senha',{senhaAtual,novaSenha});toast({title:'Senha alterada'});setSenhaAtual('');setNovaSenha('');}catch(e){toast({title:'Erro ao alterar senha',variant:'destructive'});}finally{setLoading(false);}};return(<PageLayout><PageHeader title="Meu Perfil"description="Gerencie suas informações pessoais"/><div className="grid gap-6 md:grid-cols-2"><Card><CardHeader><CardTitle>Informações Pessoais</CardTitle></CardHeader><CardContent className="space-y-4"><div className="flex justify-center"><div className="relative"><Avatar name={user?.nome||''}size="xl"/><Button size="icon"className="absolute bottom-0 right-0 rounded-full w-8 h-8"><Camera className="w-4 h-4"/></Button></div></div><div><Label>Nome</Label><Input value={nome}onChange={e=>setNome(e.target.value)}/></div><div><Label>Email</Label><Input type="email"value={email}onChange={e=>setEmail(e.target.value)}/></div><Button onClick={handleUpdateProfile}disabled={loading}><Save className="w-4 h-4 mr-2"/>Salvar</Button></CardContent></Card><Card><CardHeader><CardTitle>Alterar Senha</CardTitle></CardHeader><CardContent className="space-y-4"><div><Label>Senha Atual</Label><Input type="password"value={senhaAtual}onChange={e=>setSenhaAtual(e.target.value)}/></div><div><Label>Nova Senha</Label><Input type="password"value={novaSenha}onChange={e=>setNovaSenha(e.target.value)}/></div><Button onClick={handleChangePassword}disabled={loading}>Alterar Senha</Button></CardContent></Card></div></PageLayout>);}
+// V15-327
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { FormField, FormSwitch } from '@/components/forms';
+import { FormActions } from '@/components/forms/FormSection';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+export default function PerfilPage() {
+  return (
+    <PageLayout title="Meu Perfil">
+      <div className="flex items-center gap-6 mb-6">
+        <Avatar className="h-20 w-20"><AvatarFallback className="text-2xl">AD</AvatarFallback></Avatar>
+        <div><h2 className="text-xl font-bold">Administrador</h2><p className="text-muted-foreground">admin@empresa.com</p></div>
+      </div>
+      <Tabs defaultValue="dados">
+        <TabsList><TabsTrigger value="dados">Dados</TabsTrigger><TabsTrigger value="senha">Senha</TabsTrigger><TabsTrigger value="preferencias">Preferências</TabsTrigger></TabsList>
+        <TabsContent value="dados"><Card><CardContent className="pt-6 space-y-4"><FormField label="Nome" defaultValue="Administrador" /><FormField label="Email" type="email" defaultValue="admin@empresa.com" /><FormField label="Telefone" defaultValue="(11) 99999-9999" /><FormActions><Button>Salvar</Button></FormActions></CardContent></Card></TabsContent>
+        <TabsContent value="senha"><Card><CardContent className="pt-6 space-y-4"><FormField label="Senha Atual" type="password" /><FormField label="Nova Senha" type="password" /><FormField label="Confirmar Senha" type="password" /><FormActions><Button>Alterar Senha</Button></FormActions></CardContent></Card></TabsContent>
+        <TabsContent value="preferencias"><Card><CardContent className="pt-6 space-y-4"><FormSwitch label="Notificações por Email" /><FormSwitch label="Tema Escuro" /><FormSwitch label="Som de Notificações" /><FormActions><Button>Salvar</Button></FormActions></CardContent></Card></TabsContent>
+      </Tabs>
+    </PageLayout>
+  );
+}
