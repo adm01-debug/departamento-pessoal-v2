@@ -1,1 +1,10 @@
-import{api}from'@/lib/api';import{ENDPOINTS}from'@/api/endpoints';import{Departamento}from'@/types/departamento';export const departamentoService={async listar():Promise<Departamento[]>{const{data}=await api.get(ENDPOINTS.DEPARTAMENTOS.BASE);return data;},async buscar(id:string):Promise<Departamento>{const{data}=await api.get(`${ENDPOINTS.DEPARTAMENTOS.BASE}/${id}`);return data;},async criar(dados:Partial<Departamento>):Promise<Departamento>{const{data}=await api.post(ENDPOINTS.DEPARTAMENTOS.BASE,dados);return data;},async atualizar(id:string,dados:Partial<Departamento>):Promise<Departamento>{const{data}=await api.put(`${ENDPOINTS.DEPARTAMENTOS.BASE}/${id}`,dados);return data;},async excluir(id:string):Promise<void>{await api.delete(`${ENDPOINTS.DEPARTAMENTOS.BASE}/${id}`);}};
+// V15-388
+import { supabase } from '@/integrations/supabase/client';
+export interface Departamento { id: string; empresa_id: string; nome: string; sigla?: string; responsavel_id?: string; created_at: string; }
+export const departamentoService = {
+  async list(empresaId: string) { const { data, error } = await supabase.from('departamentos').select('*').eq('empresa_id', empresaId).order('nome'); if (error) throw error; return data as Departamento[]; },
+  async getById(id: string) { const { data, error } = await supabase.from('departamentos').select('*').eq('id', id).single(); if (error) throw error; return data as Departamento; },
+  async create(departamento: Omit<Departamento, 'id' | 'created_at'>) { const { data, error } = await supabase.from('departamentos').insert(departamento).select().single(); if (error) throw error; return data as Departamento; },
+  async update(id: string, departamento: Partial<Departamento>) { const { data, error } = await supabase.from('departamentos').update(departamento).eq('id', id).select().single(); if (error) throw error; return data as Departamento; },
+  async delete(id: string) { const { error } = await supabase.from('departamentos').delete().eq('id', id); if (error) throw error; },
+};
