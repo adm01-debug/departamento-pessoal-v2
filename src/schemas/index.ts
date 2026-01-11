@@ -1,1 +1,5 @@
-export*from'./colaborador';export*from'./ferias';export*from'./folha';export*from'./ponto';export*from'./usuario';export*from'./beneficio';export*from'./cargo';export*from'./departamento';export*from'./empresa';
+// V15-285
+export * from './colaborador';
+export * from './empresa';
+export * from './ferias';
+export * from './beneficio';
