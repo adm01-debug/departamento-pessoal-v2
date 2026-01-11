@@ -1,1 +1,5 @@
-export*from'./ColaboradorModal';export*from'./FeriasModal';export*from'./BeneficioModal';export*from'./CargoModal';export*from'./DepartamentoModal';export*from'./UsuarioModal';export*from'./ConfirmModal';
+// V15-420
+export { ColaboradorModal } from './ColaboradorModal';
+export { FeriasModal } from './FeriasModal';
+export { DepartamentoModal } from './DepartamentoModal';
+export { CargoModal } from './CargoModal';
