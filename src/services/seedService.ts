@@ -1,38 +1,43 @@
-// seedService - Service implementation
+// V15-105: src/services/seedService.ts
+import { supabase } from '@/integrations/supabase/client';
 
-export interface ServiceConfig { enabled: boolean; options?: Record<string, any>; }
-export interface ServiceResult<T = any> { success: boolean; data?: T; error?: string; timestamp?: string; }
-
-class ServiceImpl {
-  private config: ServiceConfig = { enabled: true };
-  private initialized = false;
-
-  configure(config: Partial<ServiceConfig>): void { this.config = { ...this.config, ...config }; }
-  isEnabled(): boolean { return this.config.enabled; }
-
-  async init(): Promise<ServiceResult> {
-    if (this.initialized) return { success: true, data: { already: true } };
-    console.log("[seedService] Initializing...");
-    this.initialized = true;
-    return { success: true, timestamp: new Date().toISOString() };
-  }
-
-  async execute<T>(fn: () => Promise<T>): Promise<ServiceResult<T>> {
-    if (!this.config.enabled) return { success: false, error: "Service disabled" };
-    try { const data = await fn(); return { success: true, data, timestamp: new Date().toISOString() }; }
-    catch (error) { return { success: false, error: String(error) }; }
-  }
-
-  async getStatus(): Promise<{ enabled: boolean; initialized: boolean; timestamp: string }> {
-    return { enabled: this.config.enabled, initialized: this.initialized, timestamp: new Date().toISOString() };
-  }
-
-  async destroy(): Promise<ServiceResult> {
-    console.log("[seedService] Destroying...");
-    this.initialized = false;
-    return { success: true };
-  }
+export interface SeedOptions {
+  truncate?: boolean;
+  count?: number;
 }
 
-export const seedService = new ServiceImpl();
-export default seedService;
+export const seedService = {
+  async seedEmpresas(options: SeedOptions = {}) {
+    if (options.truncate) await supabase.from('empresas').delete().neq('id', '');
+    const empresas = Array.from({ length: options.count || 5 }, (_, i) => ({
+      razao_social: `Empresa Teste ${i + 1} LTDA`,
+      nome_fantasia: `Empresa ${i + 1}`,
+      cnpj: `${String(i + 1).padStart(2, '0')}.000.000/0001-00`,
+      inscricao_estadual: `${String(i + 1).padStart(9, '0')}`,
+      email: `empresa${i + 1}@teste.com`,
+      telefone: `(11) 9${String(i + 1).padStart(4, '0')}-0000`,
+    }));
+    return supabase.from('empresas').insert(empresas);
+  },
+
+  async seedColaboradores(empresaId: string, options: SeedOptions = {}) {
+    if (options.truncate) await supabase.from('colaboradores').delete().eq('empresa_id', empresaId);
+    const colaboradores = Array.from({ length: options.count || 10 }, (_, i) => ({
+      empresa_id: empresaId,
+      nome: `Colaborador Teste ${i + 1}`,
+      cpf: `${String(i + 1).padStart(3, '0')}.000.000-00`,
+      email: `colaborador${i + 1}@teste.com`,
+      data_admissao: new Date().toISOString().split('T')[0],
+      salario: 3000 + (i * 500),
+      cargo: `Cargo ${i + 1}`,
+    }));
+    return supabase.from('colaboradores').insert(colaboradores);
+  },
+
+  async clearAll() {
+    await supabase.from('folha_pagamento').delete().neq('id', '');
+    await supabase.from('ferias').delete().neq('id', '');
+    await supabase.from('colaboradores').delete().neq('id', '');
+    await supabase.from('empresas').delete().neq('id', '');
+  }
+};
