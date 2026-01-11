@@ -1,8 +1,7 @@
-export * from "./colaboradoresQueries";
-export * from "./folhaQueries";
-export * from "./feriasQueries";
-export * from "./pontoQueries";
-export * from "./esocialQueries";
-export * from "./beneficiosQueries";
-export * from "./dashboardQueries";
-export * from "./auditoriaQueries";
+// V15-303
+export * from './colaboradores';
+export * from './empresas';
+export * from './folha';
+export * from './ferias';
+export * from './beneficios';
+export * from './ponto';
