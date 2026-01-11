@@ -1,1 +1,4 @@
-export{validarCPFCompleto,validarDigitoCPF}from'./cpf';export{validarCNPJCompleto,validarDigitoCNPJ}from'./cnpj';export{validarPIS}from'./pis';export{validarEmailCompleto,validarDominio}from'./email';
+// V15-314
+export * from './cpf';
+export * from './cnpj';
+export * from './pis';
