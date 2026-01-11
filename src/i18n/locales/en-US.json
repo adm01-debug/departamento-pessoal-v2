@@ -1,0 +1,64 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password",
+    "register": "Register",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "colaborador": {
+    "title": "Employees",
+    "new": "New Employee",
+    "name": "Name",
+    "cpf": "CPF",
+    "email": "Email",
+    "phone": "Phone",
+    "admissionDate": "Hire Date",
+    "salary": "Salary",
+    "department": "Department",
+    "position": "Position",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "folha": {
+    "title": "Payroll",
+    "competence": "Period",
+    "calculate": "Calculate",
+    "close": "Close",
+    "reopen": "Reopen",
+    "gross": "Gross",
+    "discounts": "Deductions",
+    "net": "Net"
+  },
+  "ferias": {
+    "title": "Vacation",
+    "acquisitionPeriod": "Accrual Period",
+    "enjoymentPeriod": "Vacation Period",
+    "days": "Days",
+    "schedule": "Schedule",
+    "pending": "Pending",
+    "scheduled": "Scheduled",
+    "completed": "Completed"
+  }
+}
