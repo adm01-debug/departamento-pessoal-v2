@@ -1,1 +1,12 @@
-export{default as Dashboard}from'./Dashboard';export{default as LoginPage}from'./LoginPage';export{default as ColaboradoresPage}from'./ColaboradoresPage';export{default as FeriasPage}from'./FeriasPage';export{default as FolhaPage}from'./FolhaPage';export{default as PontoPage}from'./PontoPage';export{default as Admissoes}from'./Admissoes';export{default as Demissoes}from'./Demissoes';export{default as BeneficiosPage}from'./BeneficiosPage';export{default as CargosPage}from'./CargosPage';export{default as DepartamentosPage}from'./DepartamentosPage';export{default as DocumentosPage}from'./DocumentosPage';export{default as ESocialPage}from'./ESocialPage';export{default as RelatoriosPage}from'./RelatoriosPage';export{default as ConfiguracoesPage}from'./ConfiguracoesPage';export{default as UsuariosPage}from'./UsuariosPage';export{default as PerfilPage}from'./PerfilPage';export{default as NotFoundPage}from'./NotFoundPage';
+// V15-230: src/pages/index.ts
+export { default as LoginPage } from './LoginPage';
+export { default as DashboardPage } from './DashboardPage';
+export { default as ColaboradoresPage } from './ColaboradoresPage';
+export { default as ColaboradorFormPage } from './ColaboradorFormPage';
+export { default as EmpresasPage } from './EmpresasPage';
+export { default as FolhaPage } from './FolhaPage';
+export { default as FeriasPage } from './FeriasPage';
+export { default as PontoPage } from './PontoPage';
+export { default as BeneficiosPage } from './BeneficiosPage';
+export { default as RelatoriosPage } from './RelatoriosPage';
+export { default as LoadingPage } from './LoadingPage';
