@@ -1,1 +1,18 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{PageHeader}from'@/components/common/PageHeader';import{FileText}from'lucide-react';export default function TermosPage(){return(<div className="space-y-6"><PageHeader title="Termos de Uso"icon={FileText}/><Card><CardContent className="pt-6 prose max-w-none"><h2>1. Aceitação dos Termos</h2><p>Ao acessar e usar este sistema, você concorda com estes termos de uso.</p><h2>2. Uso do Sistema</h2><p>O sistema deve ser utilizado apenas para fins legítimos relacionados à gestão de departamento pessoal.</p><h2>3. Privacidade</h2><p>Os dados inseridos no sistema são tratados de acordo com a LGPD.</p><h2>4. Responsabilidades</h2><p>O usuário é responsável pela veracidade das informações inseridas.</p><h2>5. Alterações</h2><p>Estes termos podem ser alterados a qualquer momento.</p></CardContent></Card></div>);}
+// V15-479
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+export default function TermosPage() {
+  return (
+    <PageLayout title="Termos de Uso">
+      <Card><CardHeader><CardTitle>Termos de Uso do Sistema</CardTitle></CardHeader>
+        <CardContent className="prose max-w-none">
+          <h3>1. Aceitação dos Termos</h3><p>Ao utilizar este sistema, você concorda com os termos aqui estabelecidos.</p>
+          <h3>2. Uso do Sistema</h3><p>O sistema deve ser utilizado exclusivamente para fins de gestão de departamento pessoal.</p>
+          <h3>3. Responsabilidades</h3><p>O usuário é responsável pela confidencialidade de suas credenciais de acesso.</p>
+          <h3>4. Privacidade</h3><p>Os dados inseridos no sistema são tratados conforme nossa política de privacidade e a LGPD.</p>
+          <h3>5. Modificações</h3><p>Reservamo-nos o direito de modificar estes termos a qualquer momento.</p>
+        </CardContent>
+      </Card>
+    </PageLayout>
+  );
+}
