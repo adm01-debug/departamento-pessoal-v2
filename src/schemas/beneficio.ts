@@ -1,1 +1,12 @@
-import{z}from'zod';export const beneficioSchema=z.object({nome:z.string().min(2,'Nome deve ter pelo menos 2 caracteres'),tipo:z.enum(['vale_refeicao','vale_alimentacao','vale_transporte','plano_saude','plano_odonto','seguro_vida','gympass','outro']),descricao:z.string().optional(),valor:z.number().min(0,'Valor deve ser positivo'),desconto:z.number().min(0,'Desconto deve ser positivo'),percentualDesconto:z.number().min(0).max(100).optional(),fornecedor:z.string().optional(),ativo:z.boolean()});export const beneficioColaboradorSchema=z.object({colaboradorId:z.string().min(1,'Colaborador obrigatório'),beneficioId:z.string().min(1,'Benefício obrigatório'),valor:z.number().min(0),desconto:z.number().min(0),dataInicio:z.string().min(1,'Data de início obrigatória'),dataFim:z.string().optional()});export type BeneficioFormData=z.infer<typeof beneficioSchema>;export type BeneficioColaboradorFormData=z.infer<typeof beneficioColaboradorSchema>;
+// V15-284
+import { z } from 'zod';
+export const beneficioSchema = z.object({
+  nome: z.string().min(2),
+  tipo: z.enum(['vale_transporte', 'vale_refeicao', 'vale_alimentacao', 'plano_saude', 'plano_odontologico', 'seguro_vida', 'outros']),
+  valor_empresa: z.number().min(0),
+  valor_colaborador: z.number().min(0),
+  tipo_desconto: z.enum(['percentual', 'fixo', 'sem_desconto']),
+  fornecedor: z.string().optional(),
+  ativo: z.boolean().default(true),
+});
+export type BeneficioSchema = z.infer<typeof beneficioSchema>;
