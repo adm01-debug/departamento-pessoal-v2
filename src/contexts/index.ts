@@ -1,1 +1,5 @@
-export{AuthContext,AuthProvider,useAuth}from'./AuthContext';export{ThemeContext,ThemeProvider,useTheme}from'./ThemeContext';export{ToastContext,ToastProvider,useToast}from'./ToastContext';export{SidebarContext,SidebarProvider,useSidebar}from'./SidebarContext';
+// V15-219: src/contexts/index.ts
+export { AppProvider, useAppContext, useTheme, useSidebar } from './AppContext';
+export { AuthProvider, useAuth } from './AuthContext';
+export { EmpresaProvider, useEmpresa } from './EmpresaContext';
+export { NotificationProvider, useNotification } from './NotificationContext';
