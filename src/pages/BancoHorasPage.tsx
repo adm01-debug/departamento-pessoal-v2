@@ -1,1 +1,23 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{DataTable}from'@/components/ui/data-table';import{Badge}from'@/components/ui/badge';import{PageHeader}from'@/components/common/PageHeader';import{Clock}from'lucide-react';const mock=[{id:'1',colaborador:'João Silva',saldo:'+24:30',positivo:true},{id:'2',colaborador:'Maria Santos',saldo:'-08:15',positivo:false},{id:'3',colaborador:'Pedro Lima',saldo:'+12:00',positivo:true},{id:'4',colaborador:'Ana Costa',saldo:'00:00',positivo:null}];const columns=[{accessorKey:'colaborador',header:'Colaborador'},{accessorKey:'saldo',header:'Saldo',cell:({row}:any)=><Badge className={row.original.positivo===true?'bg-green-100 text-green-800':row.original.positivo===false?'bg-red-100 text-red-800':'bg-gray-100 text-gray-800'}>{row.original.saldo}</Badge>}];export default function BancoHorasPage(){return(<div className="space-y-6"><PageHeader title="Banco de Horas"icon={Clock}/><div className="grid gap-4 md:grid-cols-3"><Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">Total Positivo</p><p className="text-2xl font-bold text-green-600">+36:30</p></CardContent></Card><Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">Total Negativo</p><p className="text-2xl font-bold text-red-600">-08:15</p></CardContent></Card><Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">Saldo Líquido</p><p className="text-2xl font-bold text-blue-600">+28:15</p></CardContent></Card></div><Card><CardContent className="pt-6"><DataTable columns={columns}data={mock}/></CardContent></Card></div>);}
+// V15-324
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Clock, TrendingUp, TrendingDown } from 'lucide-react';
+const registros = [{ id: '1', data: '10/01/2025', tipo: 'credito', horas: '+02:30', motivo: 'Hora extra' }, { id: '2', data: '08/01/2025', tipo: 'debito', horas: '-01:00', motivo: 'Compensação' }];
+export default function BancoHorasPage() {
+  return (
+    <PageLayout title="Banco de Horas">
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        <Card><CardContent className="pt-6 flex items-center gap-4"><div className="p-3 bg-green-100 rounded-full"><TrendingUp className="h-6 w-6 text-green-600" /></div><div><p className="text-2xl font-bold">+45:30</p><p className="text-sm text-muted-foreground">Créditos</p></div></CardContent></Card>
+        <Card><CardContent className="pt-6 flex items-center gap-4"><div className="p-3 bg-red-100 rounded-full"><TrendingDown className="h-6 w-6 text-red-600" /></div><div><p className="text-2xl font-bold">-12:00</p><p className="text-sm text-muted-foreground">Débitos</p></div></CardContent></Card>
+        <Card><CardContent className="pt-6 flex items-center gap-4"><div className="p-3 bg-blue-100 rounded-full"><Clock className="h-6 w-6 text-blue-600" /></div><div><p className="text-2xl font-bold">+33:30</p><p className="text-sm text-muted-foreground">Saldo</p></div></CardContent></Card>
+      </div>
+      <Card><CardHeader><CardTitle>Movimentações</CardTitle></CardHeader><CardContent>
+        <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Tipo</TableHead><TableHead>Horas</TableHead><TableHead>Motivo</TableHead></TableRow></TableHeader>
+          <TableBody>{registros.map(r => (<TableRow key={r.id}><TableCell>{r.data}</TableCell><TableCell><Badge variant={r.tipo === 'credito' ? 'default' : 'destructive'}>{r.tipo === 'credito' ? 'Crédito' : 'Débito'}</Badge></TableCell><TableCell className={r.tipo === 'credito' ? 'text-green-600' : 'text-red-600'}>{r.horas}</TableCell><TableCell>{r.motivo}</TableCell></TableRow>))}</TableBody>
+        </Table>
+      </CardContent></Card>
+    </PageLayout>
+  );
+}
