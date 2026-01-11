@@ -1,5 +1,4 @@
-// V15-175: src/config/index.ts
+// V15-355
 export * from './app';
-export * from './theme';
-export * from './constants';
-export * from './messages';
+export * from './routes';
+export * from './menu';
