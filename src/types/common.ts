@@ -1,1 +1,7 @@
-export interface PaginatedResponse<T>{data:T[];total:number;page:number;pageSize:number;totalPages:number;}export interface ApiResponse<T>{data:T;message?:string;success:boolean;}export interface ApiError{message:string;code:string;details?:any;}export type SortOrder='asc'|'desc';export interface SortConfig{field:string;order:SortOrder;}export interface FilterConfig{field:string;operator:'eq'|'ne'|'gt'|'lt'|'gte'|'lte'|'contains'|'startsWith'|'endsWith';value:any;}export type Status='ativo'|'inativo'|'pendente'|'aprovado'|'rejeitado';export interface SelectOption{value:string;label:string;disabled?:boolean;}
+// V15-439
+export interface PaginatedResponse<T> { data: T[]; total: number; page: number; per_page: number; total_pages: number; }
+export interface ApiError { message: string; code?: string; details?: Record<string, any>; }
+export interface SelectOption { value: string; label: string; disabled?: boolean; }
+export interface DateRange { from: Date; to: Date; }
+export type SortOrder = 'asc' | 'desc';
+export interface SortConfig { field: string; order: SortOrder; }
