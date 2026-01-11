@@ -1,1 +1,16 @@
-export function validarDigitoCPF(cpf:string,peso:number[]):number{let soma=0;for(let i=0;i<peso.length;i++){soma+=parseInt(cpf[i])*peso[i];}const resto=soma%11;return resto<2?0:11-resto;}export function validarCPFCompleto(cpf:string):boolean{cpf=cpf.replace(/\D/g,'');if(cpf.length!==11)return false;if(/^(\d){10}\$/.test(cpf))return false;const peso1=[10,9,8,7,6,5,4,3,2];const peso2=[11,10,9,8,7,6,5,4,3,2];const digito1=validarDigitoCPF(cpf,peso1);const digito2=validarDigitoCPF(cpf,peso2);return digito1===parseInt(cpf[9])&&digito2===parseInt(cpf[10]);}
+// V15-311
+export function validarCPF(cpf: string): boolean {
+  const cleaned = cpf.replace(/\D/g, '');
+  if (cleaned.length !== 11 || /^(\d)+$/.test(cleaned)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(cleaned[i]) * (10 - i);
+  let d1 = (sum * 10) % 11; if (d1 === 10) d1 = 0;
+  if (d1 !== parseInt(cleaned[9])) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(cleaned[i]) * (11 - i);
+  let d2 = (sum * 10) % 11; if (d2 === 10) d2 = 0;
+  return d2 === parseInt(cleaned[10]);
+}
+export function formatarCPF(cpf: string): string {
+  return cpf.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '..-');
+}
