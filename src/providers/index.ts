@@ -1,7 +1,4 @@
-// V15-077: src/providers/index.ts
-export { AppProvider } from './AppProvider';
-export { ThemeProvider } from './ThemeProvider';
-export { AuthProvider } from './AuthProvider';
+// V15-351
 export { QueryProvider } from './QueryProvider';
-export { NotificationProvider } from './NotificationProvider';
+export { ThemeProvider, useTheme } from './ThemeProvider';
 export { ToastProvider } from './ToastProvider';
