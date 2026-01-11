@@ -1,1 +1,17 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{DataTable}from'@/components/ui/data-table';import{Badge}from'@/components/ui/badge';import{PageHeader}from'@/components/common/PageHeader';import{Plus,UserX}from'lucide-react';import{formatDate}from'@/utils/formatters';const mockAfastamentos=[{id:'1',colaborador:'João Silva',motivo:'Doença',dataInicio:'2024-01-10',dataFim:'2024-01-20',dias:11,status:'em_andamento'},{id:'2',colaborador:'Maria Santos',motivo:'Licença Maternidade',dataInicio:'2024-01-01',dataFim:'2024-04-30',dias:120,status:'em_andamento'},{id:'3',colaborador:'Pedro Costa',motivo:'Acidente de Trabalho',dataInicio:'2023-12-01',dataFim:'2023-12-15',dias:15,status:'encerrado'}];const statusColors={em_andamento:'bg-yellow-100 text-yellow-800',encerrado:'bg-green-100 text-green-800'};const columns=[{accessorKey:'colaborador',header:'Colaborador'},{accessorKey:'motivo',header:'Motivo'},{accessorKey:'dataInicio',header:'Início',cell:({row}:any)=>formatDate(row.original.dataInicio)},{accessorKey:'dataFim',header:'Fim',cell:({row}:any)=>formatDate(row.original.dataFim)},{accessorKey:'dias',header:'Dias'},{accessorKey:'status',header:'Status',cell:({row}:any)=><Badge className={statusColors[row.original.status as keyof typeof statusColors]}>{row.original.status}</Badge>}];export default function AfastamentosPage(){return(<div className="space-y-6"><PageHeader title="Afastamentos"icon={UserX}actions={<Button><Plus className="w-4 h-4 mr-2"/>Novo Afastamento</Button>}/><Card><CardContent className="pt-6"><DataTable columns={columns}data={mockAfastamentos}/></CardContent></Card></div>);}
+// V15-321
+import { PageLayout } from '@/components/layout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { Button } from '@/components/ui/button';
+import { Plus, Eye } from 'lucide-react';
+const afastamentos = [{ id: '1', colaborador: 'João Silva', tipo: 'Doença', inicio: '01/01/2025', fim: '15/01/2025', dias: 15, status: 'ativo' }, { id: '2', colaborador: 'Maria Santos', tipo: 'Licença Maternidade', inicio: '10/12/2024', fim: '10/04/2025', dias: 120, status: 'ativo' }];
+export default function AfastamentosPage() {
+  return (
+    <PageLayout title="Afastamentos" actions={<Button><Plus className="h-4 w-4 mr-2" />Novo</Button>}>
+      <Table>
+        <TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Tipo</TableHead><TableHead>Início</TableHead><TableHead>Fim</TableHead><TableHead>Dias</TableHead><TableHead>Status</TableHead><TableHead className="w-[80px]">Ações</TableHead></TableRow></TableHeader>
+        <TableBody>{afastamentos.map(a => (<TableRow key={a.id}><TableCell className="font-medium">{a.colaborador}</TableCell><TableCell>{a.tipo}</TableCell><TableCell>{a.inicio}</TableCell><TableCell>{a.fim}</TableCell><TableCell>{a.dias}</TableCell><TableCell><StatusBadge status={a.status} variant="info" /></TableCell><TableCell><Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button></TableCell></TableRow>))}</TableBody>
+      </Table>
+    </PageLayout>
+  );
+}
