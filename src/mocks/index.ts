@@ -1,8 +1,7 @@
-// V15-051: src/mocks/index.ts
-export { mockColaboradores } from './colaboradores';
-export { mockEmpresas } from './empresas';
-export { mockFolha } from './folha';
-export { mockFerias } from './ferias';
-export { mockPonto } from './ponto';
-export { setupMocks } from './setup';
-export type { MockConfig } from './types';
+// src/mocks/index.ts - Mock data exports
+export { colaboradoresMock } from './colaboradores.mock';
+export { feriasMock } from './ferias.mock';
+export { folhaMock } from './folha.mock';
+export { pontoMock } from './ponto.mock';
+export { handlers } from './handlers';
+export { server } from './server';
