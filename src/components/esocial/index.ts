@@ -1,1 +1,2 @@
-export{EventoCard}from'./EventoCard';export{EventoTimeline}from'./EventoTimeline';export{EventoStats}from'./EventoStats';
+// V15-276: src/components/esocial/index.ts
+export { EventoCard } from './EventoCard';
