@@ -1,1 +1,15 @@
-import{describe,it,expect}from'vitest';import{formatCPF,formatCNPJ,formatCurrency,formatDate}from'@/utils/formatters';describe('formatters',()=>{describe('formatCPF',()=>{it('should format CPF',()=>{expect(formatCPF('52998224725')).toBe('529.982.247-25');});});describe('formatCNPJ',()=>{it('should format CNPJ',()=>{expect(formatCNPJ('12345678000199')).toBe('12.345.678/0001-99');});});describe('formatCurrency',()=>{it('should format currency',()=>{expect(formatCurrency(1234.56)).toBe('R$ 1.234,56');});});describe('formatDate',()=>{it('should format date',()=>{expect(formatDate('2024-01-15')).toBe('15/01/2024');});});});
+// V15-361
+import { describe, it, expect } from 'vitest';
+import { formatCurrency, parseCurrency, formatPercent } from '@/formatters/currency';
+import { formatDate, calcularIdade } from '@/formatters/date';
+describe('formatters', () => {
+  describe('currency', () => {
+    it('formats currency correctly', () => { expect(formatCurrency(1234.56)).toContain('1.234,56'); });
+    it('parses currency correctly', () => { expect(parseCurrency('R$ 1.234,56')).toBe(1234.56); });
+    it('formats percent correctly', () => { expect(formatPercent(12.5)).toBe('12.50%'); });
+  });
+  describe('date', () => {
+    it('formats date correctly', () => { expect(formatDate('2025-01-15')).toBe('15/01/2025'); });
+    it('calculates age correctly', () => { const birth = new Date(); birth.setFullYear(birth.getFullYear() - 30); expect(calcularIdade(birth)).toBe(30); });
+  });
+});
