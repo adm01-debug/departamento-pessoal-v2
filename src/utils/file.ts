@@ -1,4 +1,5 @@
 // V15-152: src/utils/file.ts
+
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -8,11 +9,14 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function getFileExtension(filename: string): string {
-  return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2).toLowerCase();
+  return filename
+    .slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2)
+    .toLowerCase();
 }
 
 export function getFileName(path: string): string {
-  return path.split('/').pop()?.split('\').pop() || '';
+  const parts = path.split(/[/\\]/);
+  return parts[parts.length - 1] || '';
 }
 
 export function isImage(filename: string): boolean {
@@ -32,8 +36,12 @@ export function isDocument(filename: string): boolean {
 export function getMimeType(filename: string): string {
   const ext = getFileExtension(filename);
   const types: Record<string, string> = {
-    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif',
-    pdf: 'application/pdf', doc: 'application/msword',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    pdf: 'application/pdf',
+    doc: 'application/msword',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     xls: 'application/vnd.ms-excel',
     xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -56,5 +64,14 @@ export async function readFileAsDataURL(file: File): Promise<string> {
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = reject;
     reader.readAsDataURL(file);
+  });
+}
+
+export async function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
   });
 }
