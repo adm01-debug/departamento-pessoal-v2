@@ -1,1 +1,19 @@
-import React from'react';import{useParams}from'react-router-dom';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{DataTable}from'@/components/ui/data-table';import{PageHeader}from'@/components/common/PageHeader';import{Plus,Users}from'lucide-react';import{formatDate}from'@/utils/formatters';const mockDependentes=[{id:'1',nome:'Maria Silva',parentesco:'Esposa',dataNascimento:'1992-05-15',cpf:'123.456.789-00',irrf:true,salarioFamilia:false},{id:'2',nome:'João Silva Jr',parentesco:'Filho',dataNascimento:'2015-08-20',cpf:'987.654.321-00',irrf:true,salarioFamilia:true}];const columns=[{accessorKey:'nome',header:'Nome'},{accessorKey:'parentesco',header:'Parentesco'},{accessorKey:'dataNascimento',header:'Nascimento',cell:({row}:any)=>formatDate(row.original.dataNascimento)},{accessorKey:'cpf',header:'CPF'},{accessorKey:'irrf',header:'IRRF',cell:({row}:any)=>row.original.irrf?'Sim':'Não'},{accessorKey:'salarioFamilia',header:'Sal. Família',cell:({row}:any)=>row.original.salarioFamilia?'Sim':'Não'}];export default function DependentesPage(){const{id}=useParams();return(<div className="space-y-6"><PageHeader title="Dependentes"description="Gerenciar dependentes do colaborador"icon={Users}breadcrumb={[{label:'Colaboradores',href:'/colaboradores'},{label:'Dependentes'}]}actions={<Button><Plus className="w-4 h-4 mr-2"/>Novo Dependente</Button>}/><Card><CardContent className="pt-6"><DataTable columns={columns}data={mockDependentes}/></CardContent></Card></div>);}
+// V15-322
+import { useParams } from 'react-router-dom';
+import { PageLayout } from '@/components/layout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+const dependentes = [{ id: '1', nome: 'Ana Silva', parentesco: 'Filha', nascimento: '15/03/2015', idade: 9, irDeducao: true, salarioFamilia: true }, { id: '2', nome: 'Pedro Silva', parentesco: 'Filho', nascimento: '22/07/2018', idade: 6, irDeducao: true, salarioFamilia: true }];
+export default function DependentesPage() {
+  const { colaboradorId } = useParams();
+  return (
+    <PageLayout title="Dependentes" description="Gestão de dependentes do colaborador" actions={<Button><Plus className="h-4 w-4 mr-2" />Adicionar</Button>}>
+      <Table>
+        <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Parentesco</TableHead><TableHead>Nascimento</TableHead><TableHead>Idade</TableHead><TableHead>IR</TableHead><TableHead>Sal. Família</TableHead><TableHead className="w-[100px]">Ações</TableHead></TableRow></TableHeader>
+        <TableBody>{dependentes.map(d => (<TableRow key={d.id}><TableCell className="font-medium">{d.nome}</TableCell><TableCell>{d.parentesco}</TableCell><TableCell>{d.nascimento}</TableCell><TableCell>{d.idade} anos</TableCell><TableCell>{d.irDeducao ? <Badge>Sim</Badge> : <Badge variant="secondary">Não</Badge>}</TableCell><TableCell>{d.salarioFamilia ? <Badge>Sim</Badge> : <Badge variant="secondary">Não</Badge>}</TableCell><TableCell><div className="flex gap-1"><Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4" /></Button></div></TableCell></TableRow>))}</TableBody>
+      </Table>
+    </PageLayout>
+  );
+}
