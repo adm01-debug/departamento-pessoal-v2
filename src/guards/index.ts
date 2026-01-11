@@ -1,1 +1,3 @@
-export{AuthGuard}from'./AuthGuard';export{PermissionGuard}from'./PermissionGuard';export{GuestGuard}from'./GuestGuard';
+// V15-344
+export { AuthGuard } from './AuthGuard';
+export { RoleGuard } from './RoleGuard';
