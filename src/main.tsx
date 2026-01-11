@@ -1,11 +1,31 @@
-// V15-233: src/main.tsx
+// V15-441
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryProvider, ThemeProvider, ToastProvider } from '@/providers';
+import { AuthProvider, NotificationProvider, EmpresaProvider } from '@/contexts';
+import { ErrorBoundary } from '@/errors';
 import App from './App';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary>
+      <QueryProvider>
+        <BrowserRouter>
+          <ThemeProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <NotificationProvider>
+                  <EmpresaProvider>
+                    <App />
+                  </EmpresaProvider>
+                </NotificationProvider>
+              </AuthProvider>
+            </ToastProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </QueryProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
