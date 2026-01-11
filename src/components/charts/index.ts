@@ -1,1 +1,4 @@
-export{BarChart}from'./BarChart';export{LineChart}from'./LineChart';export{PieChart}from'./PieChart';export{AreaChart}from'./AreaChart';
+// V15-271: src/components/charts/index.ts
+export { LineChart } from './LineChart';
+export { BarChart } from './BarChart';
+export { PieChart } from './PieChart';
