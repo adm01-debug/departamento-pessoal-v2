@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';describe('utils/export',()=>{it.skip('should export to CSV',()=>{const data=[{nome:'João',idade:30},{nome:'Maria',idade:25}];expect(data).toHaveLength(2);});it.skip('should export to JSON',()=>{const data={nome:'Test'};expect(data.nome).toBe('Test');});});
