@@ -1,1 +1,17 @@
-import React from'react';import{Card,CardContent}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{DataTable}from'@/components/ui/data-table';import{PageHeader}from'@/components/common/PageHeader';import{Plus,FileHeart}from'lucide-react';import{formatDate}from'@/utils/formatters';const mock=[{id:'1',colaborador:'João Silva',dataInicio:'2024-01-10',dataFim:'2024-01-12',dias:3,cid:'J11',medico:'Dr. Carlos'},{id:'2',colaborador:'Maria Santos',dataInicio:'2024-01-15',dataFim:'2024-01-15',dias:1,cid:'R51',medico:'Dra. Ana'}];const columns=[{accessorKey:'colaborador',header:'Colaborador'},{accessorKey:'dataInicio',header:'Início',cell:({row}:any)=>formatDate(row.original.dataInicio)},{accessorKey:'dataFim',header:'Fim',cell:({row}:any)=>formatDate(row.original.dataFim)},{accessorKey:'dias',header:'Dias'},{accessorKey:'cid',header:'CID'},{accessorKey:'medico',header:'Médico'}];export default function AtestadosPage(){return(<div className="space-y-6"><PageHeader title="Atestados Médicos"icon={FileHeart}actions={<Button><Plus className="w-4 h-4 mr-2"/>Novo Atestado</Button>}/><Card><CardContent className="pt-6"><DataTable columns={columns}data={mock}/></CardContent></Card></div>);}
+// V15-410
+import { PageLayout } from '@/components/layout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Eye, Check, X } from 'lucide-react';
+const atestados = [{ id: '1', colaborador: 'João Silva', tipo: 'Médico', inicio: '10/01/2025', dias: 3, cid: 'J11', status: 'aprovado' }, { id: '2', colaborador: 'Maria Santos', tipo: 'Médico', inicio: '08/01/2025', dias: 1, cid: 'R51', status: 'pendente' }];
+export default function AtestadosPage() {
+  const statusVariant = (s: string) => s === 'aprovado' ? 'default' : s === 'pendente' ? 'secondary' : 'destructive';
+  return (
+    <PageLayout title="Atestados" actions={<Button><Plus className="h-4 w-4 mr-2" />Lançar Atestado</Button>}>
+      <Table><TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Tipo</TableHead><TableHead>Data Início</TableHead><TableHead>Dias</TableHead><TableHead>CID</TableHead><TableHead>Status</TableHead><TableHead className="w-[120px]">Ações</TableHead></TableRow></TableHeader>
+        <TableBody>{atestados.map(a => (<TableRow key={a.id}><TableCell className="font-medium">{a.colaborador}</TableCell><TableCell>{a.tipo}</TableCell><TableCell>{a.inicio}</TableCell><TableCell>{a.dias}</TableCell><TableCell>{a.cid}</TableCell><TableCell><Badge variant={statusVariant(a.status)}>{a.status}</Badge></TableCell><TableCell><div className="flex gap-1"><Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>{a.status === 'pendente' && <><Button variant="ghost" size="icon" className="text-green-600"><Check className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-red-600"><X className="h-4 w-4" /></Button></>}</div></TableCell></TableRow>))}</TableBody>
+      </Table>
+    </PageLayout>
+  );
+}
