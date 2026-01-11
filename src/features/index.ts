@@ -1,1 +1,5 @@
-export*from'./admissao';export*from'./demissao';export*from'./beneficios';export*from'./cargos';export*from'./departamentos';export*from'./usuarios';export*from'./esocial';export*from'./relatorios';export*from'./empresa';export*from'./auth';export*from'./documentos';export*from'./auditoria';export*from'./notificacoes';export*from'./backup';
+// V15-514
+export * from './colaboradores';
+export * from './folha';
+export * from './ferias';
+export * from './ponto';
