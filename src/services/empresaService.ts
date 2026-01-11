@@ -1,1 +1,34 @@
-import{api}from'@/lib/api';import{ENDPOINTS}from'@/api/endpoints';import{Empresa}from'@/types/empresa';export const empresaService={async buscar():Promise<Empresa>{const{data}=await api.get(ENDPOINTS.EMPRESA.BASE);return data;},async atualizar(dados:Partial<Empresa>):Promise<Empresa>{const{data}=await api.put(ENDPOINTS.EMPRESA.BASE,dados);return data;},async uploadLogo(file:File):Promise<string>{const formData=new FormData();formData.append('logo',file);const{data}=await api.post(`${ENDPOINTS.EMPRESA.BASE}/logo`,formData,{headers:{'Content-Type':'multipart/form-data'}});return data.url;}};
+// V15-208: src/services/empresaService.ts
+import { supabase } from '@/integrations/supabase/client';
+import type { Empresa, EmpresaFormData } from '@/types';
+
+export const empresaService = {
+  async list() {
+    const { data, error } = await supabase.from('empresas').select('*').order('razao_social');
+    if (error) throw error;
+    return data as Empresa[];
+  },
+
+  async getById(id: string) {
+    const { data, error } = await supabase.from('empresas').select('*').eq('id', id).single();
+    if (error) throw error;
+    return data as Empresa;
+  },
+
+  async create(data: EmpresaFormData) {
+    const { data: created, error } = await supabase.from('empresas').insert(data).select().single();
+    if (error) throw error;
+    return created as Empresa;
+  },
+
+  async update(id: string, data: Partial<EmpresaFormData>) {
+    const { data: updated, error } = await supabase.from('empresas').update(data).eq('id', id).select().single();
+    if (error) throw error;
+    return updated as Empresa;
+  },
+
+  async delete(id: string) {
+    const { error } = await supabase.from('empresas').delete().eq('id', id);
+    if (error) throw error;
+  }
+};
