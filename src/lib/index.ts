@@ -1,19 +1,6 @@
-// V15-158: src/lib/index.ts
-export * from './abbreviate';
-export * from './capitalize';
-export * from './debounce';
-export * from './deepClone';
-export * from './format';
-export * from './groupBy';
-export * from './isEmpty';
-export * from './random';
-export * from './slugify';
-export * from './throttle';
-export * from './validators';
-export * from './date';
-export * from './masks';
-export * from './currency';
-export * from './storage';
+// V15-158: src/lib/index.ts - Central exports
 export * from './api';
-export * from './validation';
+export * from './constants';
+export * from './formatters';
+export * from './masks';
 export * from './utils';
