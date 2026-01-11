@@ -1,1 +1,12 @@
-import React from'react';import{Navigate,useLocation}from'react-router-dom';import{useAuthStore}from'@/stores/useAuthStore';interface Props{children:React.ReactNode;}export function AuthGuard({children}:Props){const{isAuthenticated}=useAuthStore();const location=useLocation();if(!isAuthenticated){return<Navigate to="/login"state={{from:location}}replace/>;}return<>{children}</>;}
+// V15-342
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Spinner } from '@/components/ui/spinner';
+interface AuthGuardProps { children: React.ReactNode; }
+export function AuthGuard({ children }: AuthGuardProps) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><Spinner size="lg" /></div>;
+  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  return <>{children}</>;
+}
