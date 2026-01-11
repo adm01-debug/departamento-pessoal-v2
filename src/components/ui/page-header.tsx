@@ -1,9 +1,33 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-interface PageHeaderProps { title: string; description?: string; children?: React.ReactNode; className?: string; }
-export function PageHeader({ title, description, children, className }: PageHeaderProps) {
+// V15-181: src/components/ui/page-header.tsx
+import { cn } from '@/lib/utils';
+import { Button } from './button';
+import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+interface PageHeaderProps {
+  title: string;
+  description?: string;
+  backUrl?: string;
+  actions?: React.ReactNode;
+  className?: string;
+}
+
+export function PageHeader({ title, description, backUrl, actions, className }: PageHeaderProps) {
+  const navigate = useNavigate();
   return (
-    <div className={cn("flex flex-col gap-4 md:flex-row md:items-center md:justify-between", className)}><div><h1 className="text-3xl font-bold tracking-tight">{title}</h1>{description && <p className="text-muted-foreground mt-1">{description}</p>}</div>{children && <div className="flex items-center gap-2">{children}</div>}</div>
+    <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6', className)}>
+      <div className="flex items-center gap-4">
+        {backUrl && (
+          <Button variant="ghost" size="icon" onClick={() => navigate(backUrl)}>
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        )}
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          {description && <p className="text-muted-foreground">{description}</p>}
+        </div>
+      </div>
+      {actions && <div className="flex items-center gap-2">{actions}</div>}
+    </div>
   );
 }
-export default PageHeader;
