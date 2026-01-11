@@ -1,1 +1,4 @@
-export{PontoMarcacao}from'./PontoMarcacao';export{EspelhoPonto}from'./EspelhoPonto';export{BancoHoras}from'./BancoHoras';
+// V15-260: src/components/ponto/index.ts
+export { PontoButton } from './PontoButton';
+export { PontoRelogio } from './PontoRelogio';
+export { PontoHistorico } from './PontoHistorico';
