@@ -1,1 +1,48 @@
-import React,{useState}from'react';import{useEventos,useEnviarEvento}from'@/hooks/useESocial';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Badge}from'@/components/ui/badge';import{DataTable}from'@/components/ui/data-table';import{StatsCard}from'@/components/widgets/StatsCard';import{LoadingSpinner}from'@/components/common/LoadingSpinner';import{Send,RefreshCw,FileText,CheckCircle,XCircle,Clock}from'lucide-react';import{formatDateTime}from'@/utils/formatters';const statusColors={pendente:'bg-yellow-100 text-yellow-800',enviado:'bg-blue-100 text-blue-800',aceito:'bg-green-100 text-green-800',rejeitado:'bg-red-100 text-red-800'};export default function ESocialPage(){const{data:eventos,isLoading}=useEventos();const enviarMutation=useEnviarEvento();const handleEnviar=(id:string)=>enviarMutation.mutateAsync(id);const columns=[{accessorKey:'tipo',header:'Evento'},{accessorKey:'colaboradorNome',header:'Colaborador'},{accessorKey:'createdAt',header:'Criado em',cell:({row}:any)=>formatDateTime(row.original.createdAt)},{accessorKey:'status',header:'Status',cell:({row}:any)=><Badge className={statusColors[row.original.status as keyof typeof statusColors]||''}>{row.original.status}</Badge>},{accessorKey:'recibo',header:'Recibo',cell:({row}:any)=>row.original.recibo||'-'},{id:'actions',cell:({row}:any)=>row.original.status==='pendente'&&<Button variant="ghost"size="sm"onClick={()=>handleEnviar(row.original.id)}><Send className="w-4 h-4"/></Button>}];if(isLoading)return<LoadingSpinner/>;const pendentes=eventos?.filter((e:any)=>e.status==='pendente').length||0;const aceitos=eventos?.filter((e:any)=>e.status==='aceito').length||0;return(<PageLayout><PageHeader title="eSocial"description="Gestão de eventos eSocial"actions={<Button variant="outline"><RefreshCw className="w-4 h-4 mr-2"/>Sincronizar</Button>}/><div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"><StatsCard title="Pendentes"value={pendentes}icon={Clock}/><StatsCard title="Aceitos"value={aceitos}icon={CheckCircle}/><StatsCard title="Total"value={eventos?.length||0}icon={FileText}/></div><Card><CardContent className="p-0"><DataTable columns={columns}data={eventos||[]}/></CardContent></Card></PageLayout>);}
+// V15-244: src/pages/ESocialPage.tsx
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { FileCheck, Send, AlertCircle, CheckCircle } from 'lucide-react';
+
+const eventos = [
+  { codigo: 'S-1000', nome: 'Informações do Empregador', status: 'enviado', data: '10/01/2025' },
+  { codigo: 'S-1005', nome: 'Tabela de Estabelecimentos', status: 'enviado', data: '10/01/2025' },
+  { codigo: 'S-1010', nome: 'Tabela de Rubricas', status: 'pendente', data: '-' },
+  { codigo: 'S-1200', nome: 'Remuneração de Trabalhador', status: 'erro', data: '08/01/2025' },
+  { codigo: 'S-2200', nome: 'Cadastramento Inicial', status: 'enviado', data: '05/01/2025' },
+];
+
+export default function ESocialPage() {
+  const statusVariant = (s: string) => s === 'enviado' ? 'success' : s === 'erro' ? 'error' : 'warning';
+  return (
+    <PageLayout title="eSocial" description="Gestão de eventos eSocial">
+      <div className="grid gap-4 md:grid-cols-4 mb-6">
+        <Card><CardContent className="pt-6"><div className="text-2xl font-bold">15</div><p className="text-xs text-muted-foreground">Eventos Enviados</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><div className="text-2xl font-bold text-yellow-600">3</div><p className="text-xs text-muted-foreground">Pendentes</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><div className="text-2xl font-bold text-red-600">1</div><p className="text-xs text-muted-foreground">Com Erro</p></CardContent></Card>
+        <Card><CardContent className="pt-6"><div className="text-2xl font-bold text-green-600">98%</div><p className="text-xs text-muted-foreground">Conformidade</p></CardContent></Card>
+      </div>
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><FileCheck className="h-5 w-5" />Eventos Recentes</CardTitle></CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {eventos.map((e) => (
+              <div key={e.codigo} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-4">
+                  {e.status === 'enviado' ? <CheckCircle className="h-5 w-5 text-green-600" /> : e.status === 'erro' ? <AlertCircle className="h-5 w-5 text-red-600" /> : <Send className="h-5 w-5 text-yellow-600" />}
+                  <div><p className="font-medium">{e.codigo} - {e.nome}</p><p className="text-sm text-muted-foreground">{e.data}</p></div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={e.status} variant={statusVariant(e.status) as any} />
+                  {e.status === 'pendente' && <Button size="sm">Enviar</Button>}
+                  {e.status === 'erro' && <Button size="sm" variant="destructive">Reenviar</Button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </PageLayout>
+  );
+}
