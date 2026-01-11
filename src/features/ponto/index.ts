@@ -1,6 +1,3 @@
-// V15-067: src/features/ponto/index.ts
-export * from './api';
-export * from './hooks';
-export * from './types';
-export { PontoProvider } from './PontoProvider';
-export { usePontoContext } from './PontoContext';
+// V15-513
+export { PontoRegistro } from './PontoRegistro';
+export { EspelhoPonto } from './EspelhoPonto';
