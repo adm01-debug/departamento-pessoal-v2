@@ -1,1 +1,10 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{UserPlus,Calendar,FileText,Clock}from'lucide-react';import{useNavigate}from'react-router-dom';const actions=[{label:'Nova Admissão',icon:UserPlus,path:'/admissoes/nova',color:'text-green-600'},{label:'Programar Férias',icon:Calendar,path:'/ferias/nova',color:'text-blue-600'},{label:'Gerar Relatório',icon:FileText,path:'/relatorios',color:'text-purple-600'},{label:'Registrar Ponto',icon:Clock,path:'/ponto',color:'text-orange-600'}];export function QuickActions(){const navigate=useNavigate();return(<Card><CardHeader><CardTitle>Ações Rápidas</CardTitle></CardHeader><CardContent><div className="grid grid-cols-2 gap-2">{actions.map(a=>(<Button key={a.label}variant="outline"className="h-20 flex-col gap-2"onClick={()=>navigate(a.path)}><a.icon className={`w-6 h-6 ${a.color}`}/><span className="text-xs">{a.label}</span></Button>))}</div></CardContent></Card>);}
+// V15-426
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { UserPlus, Calculator, Calendar, Clock, FileText, DollarSign } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+const actions = [{ icon: UserPlus, label: 'Admissão', path: '/admissao' }, { icon: Calculator, label: 'Calcular Folha', path: '/folha/calcular' }, { icon: Calendar, label: 'Férias', path: '/ferias' }, { icon: Clock, label: 'Ponto', path: '/ponto' }, { icon: FileText, label: 'Relatórios', path: '/relatorios' }, { icon: DollarSign, label: 'Benefícios', path: '/beneficios' }];
+export function QuickActions() {
+  const navigate = useNavigate();
+  return (<Card><CardHeader><CardTitle className="text-base">Ações Rápidas</CardTitle></CardHeader><CardContent><div className="grid grid-cols-3 gap-2">{actions.map(a => (<Button key={a.path} variant="outline" className="flex-col h-auto py-3" onClick={() => navigate(a.path)}><a.icon className="h-5 w-5 mb-1" /><span className="text-xs">{a.label}</span></Button>))}</div></CardContent></Card>);
+}
