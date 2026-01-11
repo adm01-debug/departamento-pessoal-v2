@@ -1,1 +1,16 @@
-import{Home,Users,Calendar,DollarSign,Clock,Gift,Building,FileText,Send,BarChart3,Settings,User}from'lucide-react';export const menuItems=[{label:'Dashboard',path:'/',icon:Home},{label:'Colaboradores',path:'/colaboradores',icon:Users},{label:'Férias',path:'/ferias',icon:Calendar},{label:'Folha',path:'/folha',icon:DollarSign},{label:'Ponto',path:'/ponto',icon:Clock},{label:'Benefícios',path:'/beneficios',icon:Gift},{label:'Cargos',path:'/cargos',icon:Building},{label:'Departamentos',path:'/departamentos',icon:Building},{label:'Documentos',path:'/documentos',icon:FileText},{label:'eSocial',path:'/esocial',icon:Send},{label:'Relatórios',path:'/relatorios',icon:BarChart3},{label:'Configurações',path:'/configuracoes',icon:Settings},{label:'Usuários',path:'/usuarios',icon:User}];
+// V15-354
+import { Home, Users, Building2, FileText, Calendar, Clock, Gift, BarChart3, Settings, FileCheck, Briefcase, DollarSign, Shield } from 'lucide-react';
+export const MENU_ITEMS = [
+  { path: '/dashboard', label: 'Dashboard', icon: Home },
+  { path: '/colaboradores', label: 'Colaboradores', icon: Users },
+  { path: '/empresas', label: 'Empresas', icon: Building2 },
+  { path: '/folha', label: 'Folha', icon: DollarSign },
+  { path: '/ferias', label: 'Férias', icon: Calendar },
+  { path: '/ponto', label: 'Ponto', icon: Clock },
+  { path: '/beneficios', label: 'Benefícios', icon: Gift },
+  { path: '/departamentos', label: 'Departamentos', icon: Briefcase },
+  { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
+  { path: '/esocial', label: 'eSocial', icon: FileCheck },
+  { path: '/auditoria', label: 'Auditoria', icon: Shield },
+  { path: '/configuracoes', label: 'Configurações', icon: Settings },
+] as const;
