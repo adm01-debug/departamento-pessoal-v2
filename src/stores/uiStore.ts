@@ -1,1 +1,4 @@
-import{create}from'zustand';interface UIState{sidebarOpen:boolean;sidebarCollapsed:boolean;theme:'light'|'dark';toggleSidebar:()=>void;toggleCollapse:()=>void;setTheme:(theme:'light'|'dark')=>void;}export const useUIStore=create<UIState>((set)=>({sidebarOpen:true,sidebarCollapsed:false,theme:'light',toggleSidebar:()=>set((s)=>({sidebarOpen:!s.sidebarOpen})),toggleCollapse:()=>set((s)=>({sidebarCollapsed:!s.sidebarCollapsed})),setTheme:(theme)=>set({theme})}));
+// V15-293
+import { create } from 'zustand';
+interface UIState { sidebarOpen: boolean; theme: 'light' | 'dark'; loading: boolean; toggleSidebar: () => void; setTheme: (t: 'light' | 'dark') => void; setLoading: (l: boolean) => void; }
+export const useUIStore = create<UIState>((set) => ({ sidebarOpen: true, theme: 'light', loading: false, toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })), setTheme: (theme) => set({ theme }), setLoading: (loading) => set({ loading }) }));
