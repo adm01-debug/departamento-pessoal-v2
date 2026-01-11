@@ -1,1 +1,19 @@
-import{z}from'zod';import{validarCNPJ}from'@/utils/validators';export const empresaSchema=z.object({razaoSocial:z.string().min(3,'Razão social obrigatória'),nomeFantasia:z.string().min(2,'Nome fantasia obrigatório'),cnpj:z.string().refine(validarCNPJ,'CNPJ inválido'),inscricaoEstadual:z.string().optional(),inscricaoMunicipal:z.string().optional(),cnae:z.string().min(5,'CNAE obrigatório'),naturezaJuridica:z.string().min(1,'Natureza jurídica obrigatória'),regime:z.enum(['simples','lucro_presumido','lucro_real']),endereco:z.object({cep:z.string().length(9,'CEP inválido'),logradouro:z.string().min(1,'Logradouro obrigatório'),numero:z.string().min(1,'Número obrigatório'),complemento:z.string().optional(),bairro:z.string().min(1,'Bairro obrigatório'),cidade:z.string().min(1,'Cidade obrigatória'),uf:z.string().length(2,'UF inválida')}),telefone:z.string().min(10,'Telefone inválido'),email:z.string().email('E-mail inválido'),site:z.string().url().optional().or(z.literal(''))});export type EmpresaFormData=z.infer<typeof empresaSchema>;
+// V15-282
+import { z } from 'zod';
+export const empresaSchema = z.object({
+  razao_social: z.string().min(3),
+  nome_fantasia: z.string().optional(),
+  cnpj: z.string().length(14),
+  inscricao_estadual: z.string().optional(),
+  email: z.string().email().optional(),
+  telefone: z.string().optional(),
+  cep: z.string().optional(),
+  logradouro: z.string().optional(),
+  numero: z.string().optional(),
+  bairro: z.string().optional(),
+  cidade: z.string().optional(),
+  uf: z.string().length(2).optional(),
+  regime_tributario: z.enum(['simples_nacional', 'lucro_presumido', 'lucro_real']).optional(),
+  status: z.enum(['ativa', 'inativa', 'suspensa']).default('ativa'),
+});
+export type EmpresaSchema = z.infer<typeof empresaSchema>;
