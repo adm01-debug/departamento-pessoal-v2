@@ -1,3 +1,2 @@
-// V15-292
-export { api, apiRequest } from './client';
-export { ENDPOINTS } from './endpoints';
+// V15-531
+export { http } from './http';
