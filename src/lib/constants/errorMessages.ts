@@ -1,1 +1,0 @@
-export const ERROR_MESSAGES = { GENERIC: 'Ocorreu um erro. Tente novamente.', NETWORK: 'Erro de conexão. Verifique sua internet.', UNAUTHORIZED: 'Sessão expirada. Faça login novamente.', FORBIDDEN: 'Você não tem permissão para esta ação.', NOT_FOUND: 'Recurso não encontrado.', VALIDATION: 'Dados inválidos. Verifique os campos.', SERVER: 'Erro interno do servidor.' };

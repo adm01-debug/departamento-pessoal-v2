@@ -1,1 +1,0 @@
-export const QUERY_KEYS = { COLABORADORES: 'colaboradores', CARGOS: 'cargos', DEPARTAMENTOS: 'departamentos', FOLHA: 'folha', FERIAS: 'ferias', BENEFICIOS: 'beneficios', ADMISSOES: 'admissoes', DESLIGAMENTOS: 'desligamentos', RELATORIOS: 'relatorios', USER: 'user', SETTINGS: 'settings', NOTIFICATIONS: 'notifications' };
