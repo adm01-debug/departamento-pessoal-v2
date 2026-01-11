@@ -1,1 +1,3 @@
-export{FolhaResumo}from'./FolhaResumo';export{HoleritePreview}from'./HoleritePreview';export{FolhaChart}from'./FolhaChart';
+// V15-253: src/components/folha/index.ts
+export { FolhaResumo } from './FolhaResumo';
+export { FolhaItemTable } from './FolhaItemTable';
