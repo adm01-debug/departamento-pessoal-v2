@@ -1,1 +1,10 @@
-import{api}from'@/lib/api';import{ENDPOINTS}from'@/api/endpoints';import{Cargo}from'@/types/cargo';export const cargoService={async listar(departamentoId?:string):Promise<Cargo[]>{const{data}=await api.get(ENDPOINTS.CARGOS.BASE,{params:{departamentoId}});return data;},async buscar(id:string):Promise<Cargo>{const{data}=await api.get(`${ENDPOINTS.CARGOS.BASE}/${id}`);return data;},async criar(dados:Partial<Cargo>):Promise<Cargo>{const{data}=await api.post(ENDPOINTS.CARGOS.BASE,dados);return data;},async atualizar(id:string,dados:Partial<Cargo>):Promise<Cargo>{const{data}=await api.put(`${ENDPOINTS.CARGOS.BASE}/${id}`,dados);return data;},async excluir(id:string):Promise<void>{await api.delete(`${ENDPOINTS.CARGOS.BASE}/${id}`);}};
+// V15-389
+import { supabase } from '@/integrations/supabase/client';
+export interface Cargo { id: string; empresa_id: string; nome: string; cbo?: string; nivel?: string; salario_min?: number; salario_max?: number; created_at: string; }
+export const cargoService = {
+  async list(empresaId: string) { const { data, error } = await supabase.from('cargos').select('*').eq('empresa_id', empresaId).order('nome'); if (error) throw error; return data as Cargo[]; },
+  async getById(id: string) { const { data, error } = await supabase.from('cargos').select('*').eq('id', id).single(); if (error) throw error; return data as Cargo; },
+  async create(cargo: Omit<Cargo, 'id' | 'created_at'>) { const { data, error } = await supabase.from('cargos').insert(cargo).select().single(); if (error) throw error; return data as Cargo; },
+  async update(id: string, cargo: Partial<Cargo>) { const { data, error } = await supabase.from('cargos').update(cargo).eq('id', id).select().single(); if (error) throw error; return data as Cargo; },
+  async delete(id: string) { const { error } = await supabase.from('cargos').delete().eq('id', id); if (error) throw error; },
+};
