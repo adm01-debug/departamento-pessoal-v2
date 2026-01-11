@@ -1,28 +1,54 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+// V15-144: src/hooks/useEventListener.ts
+import { useEffect, useRef, RefObject } from 'react';
 
-export interface useEventListenerOptions { enabled?: boolean; debounce?: number; }
-export interface useEventListenerResult<T = any> { data: T | null; loading: boolean; error: Error | null; }
+type EventHandler<E extends Event> = (event: E) => void;
 
-export function useEventListener<T = any>(initialValue?: T, options: useEventListenerOptions = {}) {
-  const [data, setData] = useState<T | null>(initialValue ?? null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const mountedRef = useRef(true);
+export function useEventListener<K extends keyof WindowEventMap>(
+  eventName: K,
+  handler: EventHandler<WindowEventMap[K]>,
+  element?: undefined,
+  options?: boolean | AddEventListenerOptions
+): void;
 
-  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+export function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLElement>(
+  eventName: K,
+  handler: EventHandler<HTMLElementEventMap[K]>,
+  element: RefObject<T>,
+  options?: boolean | AddEventListenerOptions
+): void;
 
-  const execute = useCallback(async (fn: () => Promise<T>) => {
-    if (!options.enabled && options.enabled !== undefined) return;
-    setLoading(true);
-    setError(null);
-    try { const result = await fn(); if (mountedRef.current) { setData(result); } return result; }
-    catch (e) { if (mountedRef.current) { setError(e as Error); } throw e; }
-    finally { if (mountedRef.current) { setLoading(false); } }
-  }, [options.enabled]);
+export function useEventListener<K extends keyof DocumentEventMap>(
+  eventName: K,
+  handler: EventHandler<DocumentEventMap[K]>,
+  element: RefObject<Document>,
+  options?: boolean | AddEventListenerOptions
+): void;
 
-  const reset = useCallback(() => { setData(initialValue ?? null); setError(null); setLoading(false); }, [initialValue]);
+export function useEventListener<
+  KW extends keyof WindowEventMap,
+  KH extends keyof HTMLElementEventMap,
+  T extends HTMLElement | void
+>(
+  eventName: KW | KH,
+  handler: EventHandler<WindowEventMap[KW] | HTMLElementEventMap[KH] | Event>,
+  element?: RefObject<T>,
+  options?: boolean | AddEventListenerOptions
+) {
+  const savedHandler = useRef(handler);
 
-  return { data, loading, error, execute, reset, setData };
+  useEffect(() => {
+    savedHandler.current = handler;
+  }, [handler]);
+
+  useEffect(() => {
+    const targetElement: T | Window = element?.current ?? window;
+    if (!(targetElement && targetElement.addEventListener)) return;
+
+    const eventListener: EventHandler<Event> = (event) => savedHandler.current(event);
+    targetElement.addEventListener(eventName, eventListener, options);
+
+    return () => {
+      targetElement.removeEventListener(eventName, eventListener, options);
+    };
+  }, [eventName, element, options]);
 }
-
-export default useEventListener;
