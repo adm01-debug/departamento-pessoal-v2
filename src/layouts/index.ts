@@ -1,1 +1,3 @@
-export{AuthLayout}from'./AuthLayout';export{DashboardLayout}from'./DashboardLayout';export{PrintLayout}from'./PrintLayout';
+// V15-517
+export { AuthLayout } from './AuthLayout';
+export { AppLayout } from './AppLayout';
