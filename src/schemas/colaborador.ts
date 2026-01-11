@@ -1,1 +1,16 @@
-import{z}from'zod';import{validarCPF}from'@/utils/validators';export const colaboradorSchema=z.object({nome:z.string().min(3,'Nome deve ter pelo menos 3 caracteres'),cpf:z.string().refine(validarCPF,'CPF inválido'),rg:z.string().min(5,'RG inválido'),dataNascimento:z.string().min(1,'Data de nascimento obrigatória'),email:z.string().email('E-mail inválido'),telefone:z.string().min(10,'Telefone inválido'),endereco:z.object({cep:z.string().length(9,'CEP inválido'),logradouro:z.string().min(1,'Logradouro obrigatório'),numero:z.string().min(1,'Número obrigatório'),complemento:z.string().optional(),bairro:z.string().min(1,'Bairro obrigatório'),cidade:z.string().min(1,'Cidade obrigatória'),uf:z.string().length(2,'UF inválida')}),dataAdmissao:z.string().min(1,'Data de admissão obrigatória'),cargoId:z.string().min(1,'Cargo obrigatório'),departamentoId:z.string().min(1,'Departamento obrigatório'),salario:z.number().min(1,'Salário deve ser maior que zero'),tipoContrato:z.string().min(1,'Tipo de contrato obrigatório'),jornadaTrabalho:z.string().min(1,'Jornada obrigatória')});export type ColaboradorFormData=z.infer<typeof colaboradorSchema>;
+// V15-281
+import { z } from 'zod';
+export const colaboradorSchema = z.object({
+  nome: z.string().min(3),
+  cpf: z.string().length(11),
+  email: z.string().email().optional().or(z.literal('')),
+  telefone: z.string().optional(),
+  data_nascimento: z.string().optional(),
+  data_admissao: z.string().min(1),
+  salario: z.number().positive(),
+  cargo_id: z.string().optional(),
+  departamento_id: z.string().optional(),
+  tipo_contrato: z.enum(['clt', 'pj', 'estagio', 'temporario', 'autonomo']).default('clt'),
+  status: z.enum(['ativo', 'inativo', 'ferias', 'afastado', 'demitido']).default('ativo'),
+});
+export type ColaboradorSchema = z.infer<typeof colaboradorSchema>;
