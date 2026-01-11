@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import{QuickActions}from'@/components/widgets/QuickActions';describe('QuickActions',()=>{it.skip('should render quick action buttons',()=>{render(<QuickActions/>);expect(screen.getByText('Nova Admissão')).toBeInTheDocument();});});

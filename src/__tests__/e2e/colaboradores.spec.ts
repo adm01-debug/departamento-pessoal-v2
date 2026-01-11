@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('Colaboradores E2E',()=>{it.skip('should list colaboradores',()=>{expect(true).toBe(true);});it.skip('should create colaborador',()=>{expect(true).toBe(true);});it.skip('should edit colaborador',()=>{expect(true).toBe(true);});});

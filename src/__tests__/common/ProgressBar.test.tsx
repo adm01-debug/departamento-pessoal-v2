@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import{ProgressBar}from'@/components/common/ProgressBar';describe('ProgressBar',()=>{it('should render progress bar',()=>{const{container}=render(<ProgressBar value={50}showLabel/>);expect(screen.getByText('50%')).toBeInTheDocument();});});

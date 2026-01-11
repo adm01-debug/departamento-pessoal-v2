@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import FolhaPage from'@/pages/FolhaPage';describe('FolhaPage',()=>{it.skip('should render folha page',()=>{render(<FolhaPage/>);expect(screen.getByText('Folha de Pagamento')).toBeInTheDocument();});});

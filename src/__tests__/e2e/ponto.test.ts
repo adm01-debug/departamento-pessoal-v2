@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('Ponto E2E',()=>{it('should register entry',async()=>{expect(true).toBe(true);});it('should register lunch break',async()=>{expect(true).toBe(true);});it('should register exit',async()=>{expect(true).toBe(true);});it('should view espelho',async()=>{expect(true).toBe(true);});});
