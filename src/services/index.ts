@@ -1,4 +1,5 @@
-// V15-215: src/services/index.ts
+// V15-400 - Services Index
+export { authService } from './authService';
 export { colaboradorService } from './colaboradorService';
 export { empresaService } from './empresaService';
 export { folhaService } from './folhaService';
@@ -7,5 +8,15 @@ export { pontoService } from './pontoService';
 export { beneficioService } from './beneficioService';
 export { documentoService } from './documentoService';
 export { relatorioService } from './relatorioService';
-export { seedService } from './seedService';
-export { queueService, createQueue } from './queueService';
+export { departamentoService } from './departamentoService';
+export { cargoService } from './cargoService';
+export { feriadoService } from './feriadoService';
+export { dependenteService } from './dependenteService';
+export { afastamentoService } from './afastamentoService';
+export { rubricaService } from './rubricaService';
+export { bancoHorasService } from './bancoHorasService';
+export { esocialService } from './esocialService';
+export { auditoriaService } from './auditoriaService';
+export { backupService } from './backupService';
+export { usuarioService } from './usuarioService';
+export { sindicatoService } from './sindicatoService';
