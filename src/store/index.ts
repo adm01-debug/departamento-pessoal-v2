@@ -1,6 +1,2 @@
-// V15-079: src/store/index.ts
-export { store } from './store';
-export { useStore } from './hooks/useStore';
-export { createStore } from './createStore';
-export { Provider } from './Provider';
-export type { StoreState, StoreAction, StoreDispatch } from './types';
+// src/store/index.ts - Re-exports from stores for backwards compatibility
+export { useUIStore, useAuthStore, useEmpresaStore } from '@/stores';

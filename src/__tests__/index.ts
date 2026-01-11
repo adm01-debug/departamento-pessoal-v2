@@ -1,7 +1,4 @@
-// V15-087: src/__tests__/index.ts
+// src/__tests__/index.ts - Test utilities
 export * from './setup';
-export * from './utils';
-export * from './mocks';
-export { customRender as render } from './customRender';
-export { createTestStore } from './createTestStore';
-export type { TestContext } from './types';
+export { server, setupTestServer, addHandler, resetHandlers } from './mocks/server';
+export { handlers, mockColaboradores, mockFolhas, mockFerias } from './mocks/handlers';
