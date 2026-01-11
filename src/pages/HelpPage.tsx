@@ -1,47 +1,24 @@
-import React, { useState } from 'react';
-import { Search, Book, MessageCircle, Phone, Mail, ExternalLink, ChevronDown, HelpCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+// V15-412
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { PageHeader } from '@/components/common/PageHeader';
-import { PageLayout } from '@/components/layout/PageLayout';
-
-const faqs = [
-  { q: 'Como cadastrar um novo colaborador?', a: 'Acesse Colaboradores > Novo e preencha os dados.' },
-  { q: 'Como calcular a folha de pagamento?', a: 'Acesse Folha > Calcular e selecione a competência.' },
-  { q: 'Como gerar eventos do eSocial?', a: 'Acesse eSocial > Eventos e clique em Gerar.' },
-  { q: 'Como programar férias?', a: 'Acesse Férias > Programar e selecione o colaborador.' },
-];
-
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Book, MessageCircle, Video, FileText } from 'lucide-react';
+const faqs = [{ q: 'Como cadastrar um novo colaborador?', a: 'Acesse Colaboradores > Novo e preencha os dados.' }, { q: 'Como calcular a folha de pagamento?', a: 'Acesse Folha > Calcular Folha e selecione a competência.' }, { q: 'Como solicitar férias?', a: 'O colaborador pode solicitar via portal ou RH pode lançar.' }];
 export default function HelpPage() {
-  const [search, setSearch] = useState('');
-  const filtered = faqs.filter(f => f.q.toLowerCase().includes(search.toLowerCase()));
-
   return (
-    <PageLayout>
-      <PageHeader title="Central de Ajuda" description="Encontre respostas e suporte" breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Ajuda' }]} />
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" /><Input placeholder="Buscar na ajuda..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 h-12 text-lg" /></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 text-center"><Book className="w-8 h-8 mx-auto mb-2 text-blue-600" /><p className="font-medium">Documentação</p></CardContent></Card>
-          <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 text-center"><MessageCircle className="w-8 h-8 mx-auto mb-2 text-green-600" /><p className="font-medium">Chat</p></CardContent></Card>
-          <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 text-center"><Mail className="w-8 h-8 mx-auto mb-2 text-purple-600" /><p className="font-medium">Email</p></CardContent></Card>
-        </div>
-        <Card>
-          <CardHeader><CardTitle>Perguntas Frequentes</CardTitle></CardHeader>
-          <CardContent>
-            <Accordion type="single" collapsible>
-              {filtered.map((faq, i) => (
-                <AccordionItem key={i} value={`faq-${i}`}>
-                  <AccordionTrigger>{faq.q}</AccordionTrigger>
-                  <AccordionContent>{faq.a}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardContent>
-        </Card>
+    <PageLayout title="Ajuda" description="Central de ajuda e suporte">
+      <div className="max-w-2xl mx-auto mb-8"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input placeholder="Buscar na ajuda..." className="pl-10" /></div></div>
+      <div className="grid gap-4 md:grid-cols-4 mb-8">
+        <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 flex flex-col items-center text-center"><Book className="h-8 w-8 text-primary mb-2" /><p className="font-medium">Documentação</p></CardContent></Card>
+        <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 flex flex-col items-center text-center"><Video className="h-8 w-8 text-primary mb-2" /><p className="font-medium">Tutoriais</p></CardContent></Card>
+        <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 flex flex-col items-center text-center"><FileText className="h-8 w-8 text-primary mb-2" /><p className="font-medium">Artigos</p></CardContent></Card>
+        <Card className="cursor-pointer hover:shadow-md"><CardContent className="pt-6 flex flex-col items-center text-center"><MessageCircle className="h-8 w-8 text-primary mb-2" /><p className="font-medium">Suporte</p></CardContent></Card>
       </div>
+      <Card><CardHeader><CardTitle>Perguntas Frequentes</CardTitle></CardHeader><CardContent>
+        <Accordion type="single" collapsible>{faqs.map((f, i) => (<AccordionItem key={i} value={`item-${i}`}><AccordionTrigger>{f.q}</AccordionTrigger><AccordionContent>{f.a}</AccordionContent></AccordionItem>))}</Accordion>
+      </CardContent></Card>
     </PageLayout>
   );
 }
