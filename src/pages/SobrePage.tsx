@@ -1,1 +1,16 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{PageHeader}from'@/components/common/PageHeader';import{Info,Code,Users,Shield}from'lucide-react';export default function SobrePage(){return(<div className="space-y-6"><PageHeader title="Sobre o Sistema"icon={Info}/><div className="grid md:grid-cols-2 gap-6"><Card><CardHeader><CardTitle className="flex items-center gap-2"><Code className="w-5 h-5"/>Tecnologias</CardTitle></CardHeader><CardContent><ul className="space-y-2 text-sm"><li>• React 18 + TypeScript</li><li>• Vite + TailwindCSS</li><li>• shadcn/ui Components</li><li>• React Query + React Hook Form</li><li>• Zod Validation</li></ul></CardContent></Card><Card><CardHeader><CardTitle className="flex items-center gap-2"><Shield className="w-5 h-5"/>Segurança</CardTitle></CardHeader><CardContent><ul className="space-y-2 text-sm"><li>• Autenticação JWT</li><li>• Controle de Permissões</li><li>• Auditoria de Ações</li><li>• LGPD Compliance</li><li>• Backup Automático</li></ul></CardContent></Card></div><Card><CardHeader><CardTitle>Sistema de Departamento Pessoal v1.0</CardTitle></CardHeader><CardContent><p className="text-muted-foreground">Sistema desenvolvido para gestão completa de departamento pessoal, incluindo colaboradores, folha de pagamento, férias, ponto eletrônico, benefícios e integração com eSocial.</p></CardContent></Card></div>);}
+// V15-481
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { APP_CONFIG } from '@/config/app';
+import { Building2, Code, Shield, Zap } from 'lucide-react';
+const features = [{ icon: Zap, title: 'Rápido', desc: 'Processamento instantâneo' }, { icon: Shield, title: 'Seguro', desc: 'Dados protegidos' }, { icon: Code, title: 'Moderno', desc: 'Tecnologia de ponta' }];
+export default function SobrePage() {
+  return (
+    <PageLayout title="Sobre o Sistema">
+      <Card className="mb-6"><CardHeader className="flex flex-row items-center gap-4"><Building2 className="h-12 w-12 text-primary" /><div><CardTitle>{APP_CONFIG.name}</CardTitle><p className="text-muted-foreground">Versão {APP_CONFIG.version}</p></div></CardHeader><CardContent><p className="text-muted-foreground">{APP_CONFIG.description}</p></CardContent></Card>
+      <div className="grid gap-4 md:grid-cols-3">
+        {features.map(f => (<Card key={f.title}><CardContent className="pt-6 flex items-center gap-4"><f.icon className="h-8 w-8 text-primary" /><div><p className="font-medium">{f.title}</p><p className="text-sm text-muted-foreground">{f.desc}</p></div></CardContent></Card>))}
+      </div>
+    </PageLayout>
+  );
+}
