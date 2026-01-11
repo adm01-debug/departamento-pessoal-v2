@@ -1,1 +1,6 @@
-export const TABELA_INSS_2024=[{faixa:1,ate:1412.00,aliquota:7.5},{faixa:2,ate:2666.68,aliquota:9.0},{faixa:3,ate:4000.03,aliquota:12.0},{faixa:4,ate:7786.02,aliquota:14.0}];export const TABELA_IRRF_2024=[{faixa:1,ate:2259.20,aliquota:0,deducao:0},{faixa:2,ate:2826.65,aliquota:7.5,deducao:169.44},{faixa:3,ate:3751.05,aliquota:15.0,deducao:381.44},{faixa:4,ate:4664.68,aliquota:22.5,deducao:662.77},{faixa:5,ate:999999.99,aliquota:27.5,deducao:896.00}];export const DEDUCAO_DEPENDENTE=189.59;export const TETO_INSS=7786.02;export const SALARIO_MINIMO=1412.00;
+// V15-288
+export const TABELA_INSS_2024 = [{ min: 0, max: 1412.00, aliquota: 7.5 }, { min: 1412.01, max: 2666.68, aliquota: 9 }, { min: 2666.69, max: 4000.03, aliquota: 12 }, { min: 4000.04, max: 7786.02, aliquota: 14 }];
+export const TABELA_IRRF_2024 = [{ min: 0, max: 2259.20, aliquota: 0, deducao: 0 }, { min: 2259.21, max: 2826.65, aliquota: 7.5, deducao: 169.44 }, { min: 2826.66, max: 3751.05, aliquota: 15, deducao: 381.44 }, { min: 3751.06, max: 4664.68, aliquota: 22.5, deducao: 662.77 }, { min: 4664.69, max: Infinity, aliquota: 27.5, deducao: 896.00 }];
+export const DEDUCAO_DEPENDENTE_IRRF = 189.59;
+export const PERCENTUAL_FGTS = 8;
+export const SALARIO_FAMILIA_2024 = [{ limite: 1819.26, valor: 62.04 }];
