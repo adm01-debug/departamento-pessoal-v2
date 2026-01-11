@@ -1,1 +1,37 @@
-import{api}from'@/lib/api';import{ENDPOINTS}from'@/api/endpoints';import{Ponto}from'@/types/ponto';interface ListParams{colaboradorId?:string;data?:string;mes?:string;ano?:string;}export const pontoService={async listar(params?:ListParams):Promise<Ponto[]>{const{data}=await api.get(ENDPOINTS.PONTO.BASE,{params});return data;},async registrar(tipo:'entrada'|'saida_almoco'|'retorno_almoco'|'saida'):Promise<Ponto>{const{data}=await api.post(ENDPOINTS.PONTO.REGISTRAR,{tipo,dataHora:new Date().toISOString()});return data;},async getEspelho(colaboradorId:string,mes:string,ano:string):Promise<Ponto[]>{const{data}=await api.get(ENDPOINTS.PONTO.ESPELHO,{params:{colaboradorId,mes,ano}});return data;},async justificar(pontoId:string,motivo:string,anexo?:string):Promise<void>{await api.post(`${ENDPOINTS.PONTO.BASE}/${pontoId}/justificar`,{motivo,anexo});}};
+// V15-211: src/services/pontoService.ts
+import { supabase } from '@/integrations/supabase/client';
+import type { RegistroPonto, EspelhoPonto, TipoRegistro } from '@/types';
+
+export const pontoService = {
+  async registrar(colaboradorId: string, tipo: TipoRegistro, coords?: { lat: number; lng: number }) {
+    const registro = {
+      colaborador_id: colaboradorId,
+      data: new Date().toISOString().split('T')[0],
+      tipo,
+      hora: new Date().toTimeString().split(' ')[0],
+      latitude: coords?.lat,
+      longitude: coords?.lng,
+    };
+    const { data, error } = await supabase.from('registros_ponto').insert(registro).select().single();
+    if (error) throw error;
+    return data as RegistroPonto;
+  },
+
+  async listByColaborador(colaboradorId: string, dataInicio: string, dataFim: string) {
+    const { data, error } = await supabase.from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).gte('data', dataInicio).lte('data', dataFim).order('data').order('hora');
+    if (error) throw error;
+    return data as RegistroPonto[];
+  },
+
+  async getEspelho(colaboradorId: string, competencia: string) {
+    const { data, error } = await supabase.rpc('gerar_espelho_ponto', { p_colaborador_id: colaboradorId, p_competencia: competencia });
+    if (error) throw error;
+    return data as EspelhoPonto;
+  },
+
+  async ajustar(id: string, hora: string, motivo: string, aprovadorId: string) {
+    const { data, error } = await supabase.from('registros_ponto').update({ hora, ajustado: true, motivo_ajuste: motivo, aprovador_ajuste_id: aprovadorId }).eq('id', id).select().single();
+    if (error) throw error;
+    return data as RegistroPonto;
+  }
+};
