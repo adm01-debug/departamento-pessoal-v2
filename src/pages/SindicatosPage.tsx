@@ -1,1 +1,15 @@
-import React from'react';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{DataTable}from'@/components/ui/data-table';import{PageHeader}from'@/components/common/PageHeader';import{Plus,Building2}from'lucide-react';const mockSindicatos=[{id:'1',nome:'Sindicato dos Comerciários',cnpj:'12.345.678/0001-99',contribuicao:20,dataBase:'Setembro',colaboradores:35},{id:'2',nome:'Sindicato dos Metalúrgicos',cnpj:'98.765.432/0001-11',contribuicao:25,dataBase:'Novembro',colaboradores:20}];const columns=[{accessorKey:'nome',header:'Sindicato'},{accessorKey:'cnpj',header:'CNPJ'},{accessorKey:'contribuicao',header:'Contribuição',cell:({row}:any)=>`R$ ${row.original.contribuicao},00`},{accessorKey:'dataBase',header:'Data Base'},{accessorKey:'colaboradores',header:'Colaboradores'}];export default function SindicatosPage(){return(<div className="space-y-6"><PageHeader title="Sindicatos"description="Gerenciar sindicatos"icon={Building2}actions={<Button><Plus className="w-4 h-4 mr-2"/>Novo Sindicato</Button>}/><Card><CardContent className="pt-6"><DataTable columns={columns}data={mockSindicatos}/></CardContent></Card></div>);}
+// V15-330
+import { PageLayout } from '@/components/layout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+const sindicatos = [{ id: '1', nome: 'Sindicato dos Metalúrgicos', cnpj: '12.345.678/0001-90', contribuicao: 'R$ 50,00', dataBase: 'Janeiro' }, { id: '2', nome: 'Sindicato do Comércio', cnpj: '98.765.432/0001-10', contribuicao: 'R$ 35,00', dataBase: 'Março' }];
+export default function SindicatosPage() {
+  return (
+    <PageLayout title="Sindicatos" actions={<Button><Plus className="h-4 w-4 mr-2" />Novo</Button>}>
+      <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>CNPJ</TableHead><TableHead>Contribuição</TableHead><TableHead>Data Base</TableHead><TableHead className="w-[100px]">Ações</TableHead></TableRow></TableHeader>
+        <TableBody>{sindicatos.map(s => (<TableRow key={s.id}><TableCell className="font-medium">{s.nome}</TableCell><TableCell>{s.cnpj}</TableCell><TableCell>{s.contribuicao}</TableCell><TableCell>{s.dataBase}</TableCell><TableCell><div className="flex gap-1"><Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4" /></Button></div></TableCell></TableRow>))}</TableBody>
+      </Table>
+    </PageLayout>
+  );
+}
