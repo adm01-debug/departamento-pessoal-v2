@@ -1,1 +1,3 @@
-export*from'./ColaboradorForm';export*from'./FeriasForm';export*from'./FolhaForm';export*from'./PontoForm';export*from'./BeneficioForm';export*from'./CargoForm';export*from'./DepartamentoForm';export*from'./UsuarioForm';export*from'./AdmissaoForm';export*from'./DemissaoForm';export*from'./DependenteForm';export*from'./DocumentoForm';export*from'./EmpresaForm';export*from'./LoginForm';export*from'./PerfilForm';export*from'./ConfiguracaoForm';export*from'./ESocialForm';export*from'./RelatorioForm';
+// V15-200: src/components/forms/index.ts
+export { FormField } from './FormField';
+export { FormSelect } from './FormSelect';
