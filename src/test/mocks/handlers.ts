@@ -1,1 +1,7 @@
-import{http,HttpResponse}from'msw';const API_URL='http://localhost:3001/api';export const handlers=[http.get(`${API_URL}/colaboradores`,()=>{return HttpResponse.json({data:[],total:0});}),http.post(`${API_URL}/auth/login`,async({request})=>{const body=await request.json()as{email:string;senha:string};if(body.email==='admin@test.com'){return HttpResponse.json({user:{id:'1',nome:'Admin',email:'admin@test.com'},token:'fake-token'});}return HttpResponse.json({message:'Credenciais inválidas'},{status:401});})];
+// V15-358
+import { http, HttpResponse } from 'msw';
+export const handlers = [
+  http.get('/api/colaboradores', () => HttpResponse.json([{ id: '1', nome: 'João Silva', cpf: '12345678900', status: 'ativo' }])),
+  http.get('/api/empresas', () => HttpResponse.json([{ id: '1', razao_social: 'Empresa Teste', cnpj: '12345678000190' }])),
+  http.post('/api/auth/login', async ({ request }) => { const { email } = await request.json() as any; return HttpResponse.json({ token: 'fake-token', user: { id: '1', email } }); }),
+];
