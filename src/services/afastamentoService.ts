@@ -1,13 +1,9 @@
-import { supabase } from "@/integrations/supabase/client";
-export interface AfastamentoData { id?: string; colaboradorId: string; tipo: string; dataInicio: Date; dataFim?: Date; dias: number; cid?: string; crm?: string; inss: boolean; documentoId?: string; observacao?: string; }
-class AfastamentoService {
-  private table = "afastamentos";
-  async getAll(): Promise<AfastamentoData[]> { const { data, error } = await supabase.from(this.table).select("*").order("data_inicio", { ascending: false }); if (error) throw error; return data || []; }
-  async getById(id: string): Promise<AfastamentoData | null> { const { data, error } = await supabase.from(this.table).select("*").eq("id", id).single(); if (error) throw error; return data; }
-  async getByColaborador(colaboradorId: string): Promise<AfastamentoData[]> { const { data, error } = await supabase.from(this.table).select("*").eq("colaborador_id", colaboradorId); if (error) throw error; return data || []; }
-  async create(data: Omit<AfastamentoData, "id">): Promise<AfastamentoData> { const { data: result, error } = await supabase.from(this.table).insert(data).select().single(); if (error) throw error; return result; }
-  async update(id: string, data: Partial<AfastamentoData>): Promise<AfastamentoData> { const { data: result, error } = await supabase.from(this.table).update(data).eq("id", id).select().single(); if (error) throw error; return result; }
-  async delete(id: string): Promise<void> { const { error } = await supabase.from(this.table).delete().eq("id", id); if (error) throw error; }
-}
-export const afastamentoService = new AfastamentoService();
-export default afastamentoService;
+// V15-392
+import { supabase } from '@/integrations/supabase/client';
+export interface Afastamento { id: string; colaborador_id: string; tipo: string; data_inicio: string; data_fim?: string; motivo?: string; cid?: string; documento_url?: string; status: 'ativo' | 'encerrado'; }
+export const afastamentoService = {
+  async list(colaboradorId?: string) { let query = supabase.from('afastamentos').select('*, colaborador:colaboradores(nome)').order('data_inicio', { ascending: false }); if (colaboradorId) query = query.eq('colaborador_id', colaboradorId); const { data, error } = await query; if (error) throw error; return data; },
+  async create(afastamento: Omit<Afastamento, 'id'>) { const { data, error } = await supabase.from('afastamentos').insert(afastamento).select().single(); if (error) throw error; return data as Afastamento; },
+  async update(id: string, afastamento: Partial<Afastamento>) { const { data, error } = await supabase.from('afastamentos').update(afastamento).eq('id', id).select().single(); if (error) throw error; return data as Afastamento; },
+  async encerrar(id: string, dataFim: string) { return this.update(id, { data_fim: dataFim, status: 'encerrado' }); },
+};
