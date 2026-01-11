@@ -1,1 +1,47 @@
-import React,{createContext,useContext,useState,useEffect,ReactNode}from'react';import{api}from'@/lib/api';interface Empresa{id:string;razaoSocial:string;nomeFantasia?:string;cnpj:string;logo?:string;}interface EmpresaContextType{empresa:Empresa|null;isLoading:boolean;setEmpresa:(empresa:Empresa)=>void;reloadEmpresa:()=>Promise<void>;}const EmpresaContext=createContext<EmpresaContextType|undefined>(undefined);export function EmpresaProvider({children}:{children:ReactNode}){const[empresa,setEmpresa]=useState<Empresa|null>(null);const[isLoading,setIsLoading]=useState(true);const loadEmpresa=async()=>{try{const r=await api.get('/empresas/atual');setEmpresa(r.data);}catch{setEmpresa(null);}finally{setIsLoading(false);}};useEffect(()=>{loadEmpresa();},[]);const reloadEmpresa=async()=>{setIsLoading(true);await loadEmpresa();};return(<EmpresaContext.Provider value={{empresa,isLoading,setEmpresa,reloadEmpresa}}>{children}</EmpresaContext.Provider>);}export function useEmpresa(){const ctx=useContext(EmpresaContext);if(!ctx)throw new Error('useEmpresa must be used within EmpresaProvider');return ctx;}
+// V15-217: src/contexts/EmpresaContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { empresaService } from '@/services';
+import type { Empresa } from '@/types';
+
+interface EmpresaContextType {
+  empresas: Empresa[];
+  empresaAtual: Empresa | null;
+  loading: boolean;
+  setEmpresaAtual: (empresa: Empresa | null) => void;
+  refresh: () => Promise<void>;
+}
+
+const EmpresaContext = createContext<EmpresaContextType | undefined>(undefined);
+
+export function EmpresaProvider({ children }: { children: ReactNode }) {
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [empresaAtual, setEmpresaAtual] = useState<Empresa | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      const data = await empresaService.list();
+      setEmpresas(data);
+      if (!empresaAtual && data.length > 0) {
+        setEmpresaAtual(data[0]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { refresh(); }, []);
+
+  return (
+    <EmpresaContext.Provider value={{ empresas, empresaAtual, loading, setEmpresaAtual, refresh }}>
+      {children}
+    </EmpresaContext.Provider>
+  );
+}
+
+export function useEmpresa() {
+  const context = useContext(EmpresaContext);
+  if (!context) throw new Error('useEmpresa must be used within EmpresaProvider');
+  return context;
+}
