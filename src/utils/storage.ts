@@ -1,1 +1,7 @@
-const PREFIX='dp_';export const storage={get<T>(key:string,defaultValue:T|null=null):T|null{try{const item=localStorage.getItem(PREFIX+key);return item?JSON.parse(item):defaultValue;}catch{return defaultValue;}},set<T>(key:string,value:T):void{try{localStorage.setItem(PREFIX+key,JSON.stringify(value));}catch(e){console.error('Storage set error:',e);}},remove(key:string):void{localStorage.removeItem(PREFIX+key);},clear():void{Object.keys(localStorage).filter(k=>k.startsWith(PREFIX)).forEach(k=>localStorage.removeItem(k));}};export const sessionStorage={get<T>(key:string,defaultValue:T|null=null):T|null{try{const item=window.sessionStorage.getItem(PREFIX+key);return item?JSON.parse(item):defaultValue;}catch{return defaultValue;}},set<T>(key:string,value:T):void{try{window.sessionStorage.setItem(PREFIX+key,JSON.stringify(value));}catch(e){console.error('Session storage set error:',e);}},remove(key:string):void{window.sessionStorage.removeItem(PREFIX+key);}};
+// V15-384
+export const storage = {
+  get: <T>(key: string, defaultValue?: T): T | null => { try { const item = localStorage.getItem(key); return item ? JSON.parse(item) : defaultValue ?? null; } catch { return defaultValue ?? null; } },
+  set: <T>(key: string, value: T): void => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+  remove: (key: string): void => { try { localStorage.removeItem(key); } catch {} },
+  clear: (): void => { try { localStorage.clear(); } catch {} },
+};
