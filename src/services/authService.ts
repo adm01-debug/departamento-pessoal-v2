@@ -1,1 +1,10 @@
-import{api}from'@/lib/api';import{ENDPOINTS}from'@/api/endpoints';import{storage}from'@/utils/storage';interface LoginResponse{user:{id:string;nome:string;email:string;perfil:string};token:string;refreshToken:string;}export const authService={async login(email:string,senha:string):Promise<LoginResponse>{const{data}=await api.post(ENDPOINTS.AUTH.LOGIN,{email,senha});storage.set('token',data.token);storage.set('refreshToken',data.refreshToken);return data;},async logout():Promise<void>{try{await api.post(ENDPOINTS.AUTH.LOGOUT);}finally{storage.remove('token');storage.remove('refreshToken');}},async refreshToken():Promise<string>{const refreshToken=storage.get<string>('refreshToken');const{data}=await api.post(ENDPOINTS.AUTH.REFRESH,{refreshToken});storage.set('token',data.token);return data.token;},async forgotPassword(email:string):Promise<void>{await api.post(ENDPOINTS.AUTH.FORGOT_PASSWORD,{email});},async resetPassword(token:string,senha:string):Promise<void>{await api.post(ENDPOINTS.AUTH.RESET_PASSWORD,{token,senha});}};
+// V15-387
+import { supabase } from '@/integrations/supabase/client';
+export const authService = {
+  async signIn(email: string, password: string) { const { data, error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; return data; },
+  async signUp(email: string, password: string, metadata?: Record<string, any>) { const { data, error } = await supabase.auth.signUp({ email, password, options: { data: metadata } }); if (error) throw error; return data; },
+  async signOut() { const { error } = await supabase.auth.signOut(); if (error) throw error; },
+  async resetPassword(email: string) { const { error } = await supabase.auth.resetPasswordForEmail(email); if (error) throw error; },
+  async getSession() { const { data, error } = await supabase.auth.getSession(); if (error) throw error; return data.session; },
+  async getUser() { const { data, error } = await supabase.auth.getUser(); if (error) throw error; return data.user; },
+};
