@@ -1,1 +1,20 @@
-import React from'react';import{PageLayout}from'@/components/layout/PageLayout';import{PageHeader}from'@/components/common/PageHeader';import{Card,CardContent,CardHeader,CardTitle}from'@/components/ui/card';import{Button}from'@/components/ui/button';import{Input}from'@/components/ui/input';import{Textarea}from'@/components/ui/textarea';import{Label}from'@/components/ui/label';import{HelpCircle,Mail,Phone,MessageSquare}from'lucide-react';export default function SuportePage(){return(<PageLayout><PageHeader title="Suporte"icon={HelpCircle}/><div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"><Card className="text-center"><CardContent className="pt-6"><Phone className="w-12 h-12 mx-auto text-primary"/><h3 className="mt-4 font-bold">Telefone</h3><p className="text-muted-foreground">(11) 3000-0000</p></CardContent></Card><Card className="text-center"><CardContent className="pt-6"><Mail className="w-12 h-12 mx-auto text-primary"/><h3 className="mt-4 font-bold">Email</h3><p className="text-muted-foreground">suporte@sistemadp.com.br</p></CardContent></Card><Card className="text-center"><CardContent className="pt-6"><MessageSquare className="w-12 h-12 mx-auto text-primary"/><h3 className="mt-4 font-bold">Chat</h3><p className="text-muted-foreground">Seg-Sex 8h às 18h</p></CardContent></Card></div><Card><CardHeader><CardTitle>Enviar Mensagem</CardTitle></CardHeader><CardContent className="space-y-4"><div><Label>Assunto</Label><Input placeholder="Descreva o problema"/></div><div><Label>Mensagem</Label><Textarea placeholder="Detalhe sua dúvida ou problema..."rows={5}/></div><Button>Enviar</Button></CardContent></Card></PageLayout>);}
+// V15-482
+import { PageLayout } from '@/components/layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FormField, FormTextarea } from '@/components/forms';
+import { Button } from '@/components/ui/button';
+import { MessageCircle, Phone, Mail, Clock } from 'lucide-react';
+export default function SuportePage() {
+  return (
+    <PageLayout title="Suporte">
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card><CardHeader><CardTitle>Contato</CardTitle><CardDescription>Entre em contato conosco</CardDescription></CardHeader><CardContent className="space-y-4">
+          <div className="flex items-center gap-3"><Phone className="h-5 w-5 text-primary" /><span>(11) 3000-0000</span></div>
+          <div className="flex items-center gap-3"><Mail className="h-5 w-5 text-primary" /><span>suporte@empresa.com</span></div>
+          <div className="flex items-center gap-3"><Clock className="h-5 w-5 text-primary" /><span>Seg a Sex, 8h às 18h</span></div>
+        </CardContent></Card>
+        <Card><CardHeader><CardTitle>Abrir Chamado</CardTitle></CardHeader><CardContent><form className="space-y-4"><FormField label="Assunto" placeholder="Descreva brevemente" /><FormTextarea label="Descrição" placeholder="Detalhe seu problema ou dúvida" rows={5} /><Button className="w-full"><MessageCircle className="h-4 w-4 mr-2" />Enviar</Button></form></CardContent></Card>
+      </div>
+    </PageLayout>
+  );
+}
