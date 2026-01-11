@@ -1,1 +1,54 @@
-import React,{useState}from'react';import{Link,useLocation}from'react-router-dom';import{cn}from'@/lib/utils';import{Button}from'@/components/ui/button';import{ScrollArea}from'@/components/ui/scroll-area';import{Home,Users,Calendar,DollarSign,Clock,UserPlus,UserMinus,Gift,Briefcase,Building,FileText,Cloud,BarChart3,Settings,ChevronLeft,ChevronRight}from'lucide-react';const menuItems=[{icon:Home,label:'Dashboard',path:'/'},{icon:Users,label:'Colaboradores',path:'/colaboradores'},{icon:UserPlus,label:'Admissões',path:'/admissoes'},{icon:UserMinus,label:'Demissões',path:'/demissoes'},{icon:Calendar,label:'Férias',path:'/ferias'},{icon:DollarSign,label:'Folha',path:'/folha'},{icon:Clock,label:'Ponto',path:'/ponto'},{icon:Gift,label:'Benefícios',path:'/beneficios'},{icon:Briefcase,label:'Cargos',path:'/cargos'},{icon:Building,label:'Departamentos',path:'/departamentos'},{icon:FileText,label:'Documentos',path:'/documentos'},{icon:Cloud,label:'eSocial',path:'/esocial'},{icon:BarChart3,label:'Relatórios',path:'/relatorios'},{icon:Settings,label:'Configurações',path:'/configuracoes'}];export function Sidebar(){const[collapsed,setCollapsed]=useState(false);const location=useLocation();return(<aside className={cn('h-screen bg-card border-r flex flex-col transition-all',collapsed?'w-16':'w-64')}><div className="p-4 border-b flex items-center justify-between"><h1 className={cn('font-bold text-xl',collapsed&&'hidden')}>Sistema DP</h1><Button variant="ghost"size="icon"onClick={()=>setCollapsed(!collapsed)}>{collapsed?<ChevronRight/>:<ChevronLeft/>}</Button></div><ScrollArea className="flex-1"><nav className="p-2 space-y-1">{menuItems.map(item=>(<Link key={item.path}to={item.path}className={cn('flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',location.pathname===item.path?'bg-primary text-primary-foreground':'hover:bg-muted')}><item.icon className="w-5 h-5 flex-shrink-0"/>{!collapsed&&<span>{item.label}</span>}</Link>))}</nav></ScrollArea></aside>);}
+// V15-193: src/components/layout/Sidebar.tsx
+import { cn } from '@/lib/utils';
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Users, Building2, FileText, Calendar, Clock, Gift, BarChart3, Settings, FileCheck } from 'lucide-react';
+
+const menuItems = [
+  { path: '/dashboard', label: 'Dashboard', icon: Home },
+  { path: '/colaboradores', label: 'Colaboradores', icon: Users },
+  { path: '/empresas', label: 'Empresas', icon: Building2 },
+  { path: '/folha', label: 'Folha', icon: FileText },
+  { path: '/ferias', label: 'Férias', icon: Calendar },
+  { path: '/ponto', label: 'Ponto', icon: Clock },
+  { path: '/beneficios', label: 'Benefícios', icon: Gift },
+  { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
+  { path: '/esocial', label: 'eSocial', icon: FileCheck },
+  { path: '/configuracoes', label: 'Configurações', icon: Settings },
+];
+
+interface SidebarProps {
+  collapsed?: boolean;
+  className?: string;
+}
+
+export function Sidebar({ collapsed = false, className }: SidebarProps) {
+  const location = useLocation();
+
+  return (
+    <aside className={cn('flex flex-col h-full bg-card border-r', collapsed ? 'w-16' : 'w-64', className)}>
+      <div className="p-4 border-b">
+        <h1 className={cn('font-bold text-primary', collapsed ? 'text-center text-xl' : 'text-xl')}>
+          {collapsed ? 'DP' : 'Dept. Pessoal'}
+        </h1>
+      </div>
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+        {menuItems.map(({ path, label, icon: Icon }) => {
+          const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
+          return (
+            <Link
+              key={path}
+              to={path}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
+                isActive ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Icon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span>{label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
