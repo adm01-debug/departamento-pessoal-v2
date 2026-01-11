@@ -1,1 +1,5 @@
-export{menuItems}from'./menu';export{PERMISSIONS}from'./permissions';export{APP_CONFIG}from'./settings';
+// V15-175: src/config/index.ts
+export * from './app';
+export * from './theme';
+export * from './constants';
+export * from './messages';
