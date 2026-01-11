@@ -1,2 +1,0 @@
-export const sortByField = <T>(arr: T[], field: keyof T, order: 'asc' | 'desc' = 'asc') => [...arr].sort((a, b) => { if (a[field] < b[field]) return order === 'asc' ? -1 : 1; if (a[field] > b[field]) return order === 'asc' ? 1 : -1; return 0; });
-export const sortByMultipleFields = <T>(arr: T[], fields: { field: keyof T; order: 'asc' | 'desc' }[]) => [...arr].sort((a, b) => { for (const { field, order } of fields) { if (a[field] < b[field]) return order === 'asc' ? -1 : 1; if (a[field] > b[field]) return order === 'asc' ? 1 : -1; } return 0; });
