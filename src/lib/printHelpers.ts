@@ -1,2 +1,0 @@
-export const printElement = (elementId: string) => { const el = document.getElementById(elementId); if (!el) return; const w = window.open('', '_blank'); if (!w) return; w.document.write('<html><head><title>Print</title></head><body>' + el.innerHTML + '</body></html>'); w.document.close(); w.print(); w.close(); };
-export const printUrl = (url: string) => { const w = window.open(url, '_blank'); w?.addEventListener('load', () => { w.print(); w.close(); }); };

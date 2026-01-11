@@ -1,2 +1,0 @@
-export const highlight = (text: string, query: string) => { if (!query) return text; const regex = new RegExp('(' + query + ')', 'gi'); return text.replace(regex, '<mark>$1</mark>'); };
-export const fuzzyMatch = (text: string, query: string) => { const q = query.toLowerCase(); const t = text.toLowerCase(); let qi = 0; for (let i = 0; i < t.length && qi < q.length; i++) { if (t[i] === q[qi]) qi++; } return qi === q.length; };
