@@ -1,11 +1,19 @@
-// V17-S102: TabelaINSSService Real
-export const TABELA_INSS_2025 = [
-  { ate: 1518.00, aliquota: 7.5 },
-  { ate: 2793.88, aliquota: 9 },
-  { ate: 4190.83, aliquota: 12 },
-  { ate: 8157.41, aliquota: 14 }
-];
+-e // V19-S017: TabelaINSSService Real
+import { TABELA_INSS_2026, TETO_INSS_2026 } from "@/constants/tabelas.constants";
 export const tabelaINSSServiceReal = {
-  getTabela(ano: number = 2025) { return TABELA_INSS_2025; },
-  getTeto(ano: number = 2025) { return 8157.41; }
-}; export default tabelaINSSServiceReal;
+  getTabela: () => TABELA_INSS_2026,
+  getTeto: () => TETO_INSS_2026,
+  getHistorico: () => [{ ano: 2026, tabela: TABELA_INSS_2026, teto: TETO_INSS_2026 }],
+  calcular(salario: number) {
+    let inss = 0;
+    let baseRestante = Math.min(salario, TETO_INSS_2026);
+    for (const faixa of TABELA_INSS_2026) {
+      if (baseRestante <= 0) break;
+      const baseNaFaixa = Math.min(baseRestante, faixa.ate - (faixa.de || 0));
+      inss += baseNaFaixa * (faixa.aliquota / 100);
+      baseRestante -= baseNaFaixa;
+    }
+    return Math.round(inss * 100) / 100;
+  }
+};
+export default tabelaINSSServiceReal;
