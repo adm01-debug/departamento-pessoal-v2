@@ -1,7 +1,13 @@
-// V17-S104: TabelaSalarioFamiliaService Real
-export const TABELA_SF_2025 = { limite: 1819.26, valor: 62.04 };
+-e // V19-S018: TabelaSalarioFamiliaService Real
+import { LIMITE_SALARIO_FAMILIA_2026, VALOR_COTA_SALARIO_FAMILIA_2026 } from "@/constants/tabelas.constants";
 export const tabelaSalarioFamiliaServiceReal = {
-  getTabela(ano: number = 2025) { return TABELA_SF_2025; },
-  temDireito(salario: number) { return salario <= TABELA_SF_2025.limite; },
-  getValorCota() { return TABELA_SF_2025.valor; }
-}; export default tabelaSalarioFamiliaServiceReal;
+  getLimite: () => LIMITE_SALARIO_FAMILIA_2026,
+  getValorCota: () => VALOR_COTA_SALARIO_FAMILIA_2026,
+  temDireito: (salario: number) => salario <= LIMITE_SALARIO_FAMILIA_2026,
+  calcular(salario: number, dependentes: number) {
+    if (salario > LIMITE_SALARIO_FAMILIA_2026) return 0;
+    return dependentes * VALOR_COTA_SALARIO_FAMILIA_2026;
+  },
+  getHistorico: () => [{ ano: 2026, limite: LIMITE_SALARIO_FAMILIA_2026, valor: VALOR_COTA_SALARIO_FAMILIA_2026 }]
+};
+export default tabelaSalarioFamiliaServiceReal;
