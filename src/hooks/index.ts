@@ -1,5 +1,5 @@
-// V17.3: Index de Hooks - Real Implementations
-// Core
+// V18: Index de Hooks - Completo
+// Real Implementations - Core
 export { useAfastamentosReal } from "./useAfastamentos.real";
 export { useAdmissaoReal } from "./useAdmissao.real";
 export { useDemissaoReal } from "./useDemissao.real";
@@ -27,23 +27,33 @@ export { useValesReal } from "./useVales.real";
 export { useESocialReal } from "./useESocial.real";
 export { useESocialEnvioReal } from "./useESocialEnvio.real";
 export { useESocialConsultaReal } from "./useESocialConsulta.real";
+export { useESocialValidacaoReal } from "./useESocialValidacao.real";
+export { useESocialLotesReal } from "./useESocialLotes.real";
 
-// Relatórios
+// Relatórios e Export
 export { useRelatoriosReal } from "./useRelatorios.real";
 export { useExportReal } from "./useExport.real";
 export { useDashboardReal } from "./useDashboard.real";
 export { useIndicadoresReal } from "./useIndicadores.real";
+export { useGraficosReal } from "./useGraficos.real";
+export { usePDFReal } from "./usePDF.real";
+export { useExcelReal } from "./useExcel.real";
+export { useImportReal } from "./useImport.real";
+export { usePrintReal } from "./usePrint.real";
 
-// UI/Sistema
+// Sistema
 export { useNotificacoesReal } from "./useNotificacoes.real";
+export { useNotificacoesPushReal } from "./useNotificacoesPush.real";
 export { usePermissoesReal } from "./usePermissoes.real";
 export { useUsuariosReal } from "./useUsuarios.real";
 export { useBackupReal } from "./useBackup.real";
 export { useConfigReal } from "./useConfig.real";
 export { useLogsReal } from "./useLogs.real";
 export { useHealthReal } from "./useHealth.real";
+export { useWebSocketReal } from "./useWebSocket.real";
+export { useCacheReal } from "./useCache.real";
 
-// Tabelas/Auxiliares
+// Auxiliares
 export { useLotacoesReal } from "./useLotacoes.real";
 export { useSindicatosReal } from "./useSindicatos.real";
 export { useFeriadosReal } from "./useFeriados.real";
@@ -56,10 +66,5 @@ export { useColaboradoresReal } from "./useColaboradores.real";
 export { useDebounce } from "./useDebounce";
 export { useLocalStorage } from "./useLocalStorage";
 export { useMediaQuery } from "./useMediaQuery";
-export { useOnClickOutside } from "./useOnClickOutside";
 export { usePagination } from "./usePagination";
-export { useSort } from "./useSort";
-export { useFilter } from "./useFilter";
-export { useSelection } from "./useSelection";
-export { useClipboard } from "./useClipboard";
 export { useToast } from "./useToast";
