@@ -1,10 +1,8 @@
 // V20-UTIL001: Export Helpers
 export const exportToCSV = (data: any[], filename: string) => {
   const headers = Object.keys(data[0] || {}).join(",");
-  const rows = data.map(row => Object.values(row).join(",")).join("
-");
-  const csv = headers + "
-" + rows;
+  const rows = data.map(row => Object.values(row).join(",")).join("\n");
+  const csv = headers + "\n" + rows;
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
