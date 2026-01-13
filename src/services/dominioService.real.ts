@@ -1,6 +1,9 @@
-// V17.2-S112: DominioService Real
-export const dominioServiceReal = {
-  getTiposContrato() { return [{ codigo: '1', descricao: 'Prazo Indeterminado' }, { codigo: '2', descricao: 'Prazo Determinado' }, { codigo: '3', descricao: 'Experiência' }]; },
-  getCategoriasTrabalhador() { return [{ codigo: '101', descricao: 'Empregado Geral' }, { codigo: '102', descricao: 'Aprendiz' }, { codigo: '103', descricao: 'Contrato temporário' }]; },
-  getMotivosAfastamento() { return [{ codigo: '01', descricao: 'Acidente/Doença do Trabalho' }, { codigo: '03', descricao: 'Licença Maternidade' }, { codigo: '15', descricao: 'Férias' }]; }
-}; export default dominioServiceReal;
+// V20-SE019: dominioService Expandido
+import { supabase } from "@/integrations/supabase/client";
+export class DominioServiceExpanded {
+  async listar(tipo: string) { const { data } = await supabase.from("dominios").select("*").eq("tipo", tipo); return data || []; }
+  async criar(dados: any) { const { data } = await supabase.from("dominios").insert(dados).select().single(); return data; }
+  async atualizar(id: string, dados: any) { const { data } = await supabase.from("dominios").update(dados).eq("id", id).select().single(); return data; }
+  async excluir(id: string) { await supabase.from("dominios").delete().eq("id", id); return true; }
+}
+export const dominioServiceReal = new DominioServiceExpanded();
