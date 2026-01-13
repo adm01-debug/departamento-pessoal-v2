@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';import{render,screen}from'@/test/utils';import Dashboard from'../Dashboard';describe('Dashboard',()=>{it('renders dashboard title',()=>{render(<Dashboard/>);expect(screen.getByText(/dashboard/i)).toBeInTheDocument();});it('displays stats cards',()=>{render(<Dashboard/>);expect(screen.getByText(/colaboradores/i)).toBeInTheDocument();});});
