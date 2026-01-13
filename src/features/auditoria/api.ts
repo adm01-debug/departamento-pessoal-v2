@@ -1,1 +1,0 @@
-import{api}from'@/lib/api';export const auditoriaApi={async listar(params?:{usuarioId?:string;entidade?:string;dataInicio?:string;dataFim?:string}){const{data}=await api.get('/auditoria',{params});return data;},async buscar(id:string){const{data}=await api.get(`/auditoria/${id}`);return data;}};
