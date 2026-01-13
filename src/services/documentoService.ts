@@ -1,46 +1,51 @@
-// V15-213: src/services/documentoService.ts
-import { supabase } from '@/integrations/supabase/client';
-import type { Documento, DocumentoFormData, DocumentoFilters, EntidadeTipo } from '@/types';
+// V17-S007: DocumentoService Real
+import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 
-export const documentoService = {
-  async list(entidadeTipo: EntidadeTipo, entidadeId: string, filters?: DocumentoFilters) {
-    let query = supabase.from('documentos').select('*').eq('entidade_tipo', entidadeTipo).eq('entidade_id', entidadeId).order('created_at', { ascending: false });
-    if (filters?.tipo) query = query.eq('tipo', filters.tipo);
-    if (filters?.search) query = query.ilike('nome', `%${filters.search}%`);
-    const { data, error } = await query;
-    if (error) throw error;
-    return data as Documento[];
+export type TipoDocumento = 'rg' | 'cpf' | 'cnh' | 'ctps' | 'titulo_eleitor' | 'reservista' | 'comprovante_residencia' | 'certidao' | 'diploma' | 'aso' | 'contrato' | 'outro';
+
+export interface Documento {
+  id: string; colaborador_id: string; tipo: TipoDocumento; nome: string;
+  url: string; data_validade?: string; validado: boolean; validado_por?: string;
+  created_at: string; updated_at: string;
+}
+
+export const documentoServiceReal = {
+  async getByColaborador(colaboradorId: string) {
+    const { data, error } = await supabase.from('documentos').select('*').eq('colaborador_id', colaboradorId).order('created_at', { ascending: false });
+    if (error) throw new Error(handleSupabaseError(error));
+    return data || [];
   },
-
-  async upload(data: DocumentoFormData) {
-    const fileName = `${Date.now()}_${data.arquivo.name}`;
-    const filePath = `${data.entidade_tipo}/${data.entidade_id}/${fileName}`;
-    
-    const { error: uploadError } = await supabase.storage.from('documentos').upload(filePath, data.arquivo);
-    if (uploadError) throw uploadError;
-
-    const { data: urlData } = supabase.storage.from('documentos').getPublicUrl(filePath);
-
-    const doc = {
-      entidade_tipo: data.entidade_tipo,
-      entidade_id: data.entidade_id,
-      tipo: data.tipo,
-      nome: data.nome,
-      descricao: data.descricao,
-      arquivo_url: urlData.publicUrl,
-      arquivo_nome: data.arquivo.name,
-      arquivo_tamanho: data.arquivo.size,
-      arquivo_tipo: data.arquivo.type,
-      privado: data.privado || false,
-    };
-
-    const { data: created, error } = await supabase.from('documentos').insert(doc).select().single();
-    if (error) throw error;
-    return created as Documento;
+  async upload(colaboradorId: string, file: File, tipo: TipoDocumento) {
+    const fileName = `${colaboradorId}/${tipo}_${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('documentos').upload(fileName, file);
+    if (uploadError) throw new Error(uploadError.message);
+    const { data: urlData } = supabase.storage.from('documentos').getPublicUrl(fileName);
+    const { data, error } = await supabase.from('documentos').insert({ colaborador_id: colaboradorId, tipo, nome: file.name, url: urlData.publicUrl, validado: false }).select().single();
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
   },
-
   async delete(id: string) {
+    const doc = await this.getById(id);
+    if (doc?.url) { const path = doc.url.split('/').slice(-2).join('/'); await supabase.storage.from('documentos').remove([path]); }
     const { error } = await supabase.from('documentos').delete().eq('id', id);
-    if (error) throw error;
+    if (error) throw new Error(handleSupabaseError(error));
+  },
+  async getById(id: string) {
+    const { data, error } = await supabase.from('documentos').select('*').eq('id', id).single();
+    if (error?.code === 'PGRST116') return null;
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async validar(id: string, usuarioId: string) {
+    const { data, error } = await supabase.from('documentos').update({ validado: true, validado_por: usuarioId, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async getVencendo(empresaId: string, dias: number = 30) {
+    const dataLimite = new Date(); dataLimite.setDate(dataLimite.getDate() + dias);
+    const { data, error } = await supabase.from('documentos').select('*, colaborador:colaboradores!inner(id, nome, empresa_id)').not('data_validade', 'is', null).lte('data_validade', dataLimite.toISOString().split('T')[0]).eq('colaborador.empresa_id', empresaId);
+    if (error) throw new Error(handleSupabaseError(error));
+    return data || [];
   }
 };
+export default documentoServiceReal;

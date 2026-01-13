@@ -1,4 +1,3 @@
-// V15-296
 export { useUIStore } from './uiStore';
-export { useAuthStore } from './authStore';
+export { useAuthStore } from './useAuthStore';
 export { useEmpresaStore } from './empresaStore';

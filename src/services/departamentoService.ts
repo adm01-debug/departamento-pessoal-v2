@@ -1,10 +1,32 @@
-// V15-388
-import { supabase } from '@/integrations/supabase/client';
-export interface Departamento { id: string; empresa_id: string; nome: string; sigla?: string; responsavel_id?: string; created_at: string; }
-export const departamentoService = {
-  async list(empresaId: string) { const { data, error } = await supabase.from('departamentos').select('*').eq('empresa_id', empresaId).order('nome'); if (error) throw error; return data as Departamento[]; },
-  async getById(id: string) { const { data, error } = await supabase.from('departamentos').select('*').eq('id', id).single(); if (error) throw error; return data as Departamento; },
-  async create(departamento: Omit<Departamento, 'id' | 'created_at'>) { const { data, error } = await supabase.from('departamentos').insert(departamento).select().single(); if (error) throw error; return data as Departamento; },
-  async update(id: string, departamento: Partial<Departamento>) { const { data, error } = await supabase.from('departamentos').update(departamento).eq('id', id).select().single(); if (error) throw error; return data as Departamento; },
-  async delete(id: string) { const { error } = await supabase.from('departamentos').delete().eq('id', id); if (error) throw error; },
+// V16-016: DepartamentoService - Production Ready
+import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
+import type { Departamento, Insertable, Updatable } from '@/integrations/supabase/database.types';
+
+export const departamentoServiceReal = {
+  async getAll(empresaId: string): Promise<Departamento[]> {
+    const { data, error } = await supabase.from('departamentos').select('*').eq('empresa_id', empresaId).eq('ativo', true).order('nome');
+    if (error) throw new Error(handleSupabaseError(error));
+    return data || [];
+  },
+  async getById(id: string): Promise<Departamento | null> {
+    const { data, error } = await supabase.from('departamentos').select('*').eq('id', id).single();
+    if (error?.code === 'PGRST116') return null;
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async create(depto: Insertable<'departamentos'>): Promise<Departamento> {
+    const { data, error } = await supabase.from('departamentos').insert(depto).select().single();
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async update(id: string, depto: Updatable<'departamentos'>): Promise<Departamento> {
+    const { data, error } = await supabase.from('departamentos').update(depto).eq('id', id).select().single();
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('departamentos').update({ ativo: false }).eq('id', id);
+    if (error) throw new Error(handleSupabaseError(error));
+  },
 };
+export default departamentoServiceReal;

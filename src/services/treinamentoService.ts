@@ -1,10 +1,8 @@
-import { supabase } from "@/integrations/supabase/client";
-class TreinamentoService {
-  async getAll() { const { data } = await supabase.from("treinamentos").select("*").order("nome"); return data || []; }
-  async getById(id: string) { const { data } = await supabase.from("treinamentos").select("*").eq("id", id).single(); return data; }
-  async create(d: any) { const { data } = await supabase.from("treinamentos").insert(d).select().single(); return data; }
-  async update(id: string, d: any) { const { data } = await supabase.from("treinamentos").update(d).eq("id", id).select().single(); return data; }
-  async delete(id: string) { await supabase.from("treinamentos").delete().eq("id", id); }
-}
-export const treinamentoService = new TreinamentoService();
-export default treinamentoService;
+// V17-S086: TreinamentoService Real
+import { supabase } from '@/integrations/supabase/client';
+export const treinamentoServiceReal = {
+  async getAll(empresaId: string) { const { data } = await supabase.from('treinamentos').select('*').eq('empresa_id', empresaId).order('data', { ascending: false }); return data || []; },
+  async criar(empresaId: string, nome: string, descricao: string, data: string, cargaHoraria: number) { const { data: t } = await supabase.from('treinamentos').insert({ empresa_id: empresaId, nome, descricao, data, carga_horaria: cargaHoraria }).select().single(); return t; },
+  async inscrever(treinamentoId: string, colaboradorId: string) { await supabase.from('treinamento_participantes').insert({ treinamento_id: treinamentoId, colaborador_id: colaboradorId }); },
+  async registrarPresenca(treinamentoId: string, colaboradorId: string, presente: boolean) { await supabase.from('treinamento_participantes').update({ presente }).eq('treinamento_id', treinamentoId).eq('colaborador_id', colaboradorId); }
+}; export default treinamentoServiceReal;

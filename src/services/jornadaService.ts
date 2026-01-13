@@ -1,82 +1,43 @@
-import { supabase } from "@/integrations/supabase/client";
+// V17-S011: JornadaService Real
+import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 
-export interface JornadaData {
-  id?: string;
-  codigo: string;
-  descricao: string;
-  horaInicio: string;
-  horaFim: string;
-  intervaloInicio?: string;
-  intervaloFim?: string;
-  cargaHorariaDiaria: number;
-  cargaHorariaSemanal: number;
-  cargaHorariaMensal: number;
-  tipo: string;
-  diasSemana: number[];
-  toleranciaEntrada: number;
-  toleranciaSaida: number;
-  permiteHoraExtra: boolean;
-  permiteBancoHoras: boolean;
-  ativo: boolean;
+export interface Jornada {
+  id: string; empresa_id: string; nome: string; descricao?: string;
+  carga_horaria_semanal: number; entrada: string; saida: string;
+  intervalo_inicio?: string; intervalo_fim?: string; tolerancia_minutos: number;
+  ativa: boolean; created_at: string; updated_at: string;
 }
 
-class JornadaService {
-  private table = "jornadas";
-
-  async getAll(filters?: Partial<JornadaData>): Promise<JornadaData[]> {
-    let query = supabase.from(this.table).select("*");
-    if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) query = query.eq(k, v); });
-    const { data, error } = await query.order("descricao");
-    if (error) throw error;
+export const jornadaServiceReal = {
+  async getAll(empresaId: string) {
+    const { data, error } = await supabase.from('jornadas').select('*').eq('empresa_id', empresaId).order('nome');
+    if (error) throw new Error(handleSupabaseError(error));
+    return data || [];
+  },
+  async getById(id: string) {
+    const { data, error } = await supabase.from('jornadas').select('*').eq('id', id).single();
+    if (error?.code === 'PGRST116') return null;
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async create(jornada: Partial<Jornada>) {
+    const { data, error } = await supabase.from('jornadas').insert({ ...jornada, ativa: true }).select().single();
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async update(id: string, jornada: Partial<Jornada>) {
+    const { data, error } = await supabase.from('jornadas').update({ ...jornada, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+    if (error) throw new Error(handleSupabaseError(error));
+    return data;
+  },
+  async delete(id: string) {
+    const { error } = await supabase.from('jornadas').update({ ativa: false }).eq('id', id);
+    if (error) throw new Error(handleSupabaseError(error));
+  },
+  async getAtivas(empresaId: string) {
+    const { data, error } = await supabase.from('jornadas').select('*').eq('empresa_id', empresaId).eq('ativa', true);
+    if (error) throw new Error(handleSupabaseError(error));
     return data || [];
   }
-
-  async getById(id: string): Promise<JornadaData | null> {
-    const { data, error } = await supabase.from(this.table).select("*").eq("id", id).single();
-    if (error) throw error;
-    return data;
-  }
-
-  async getByCodigo(codigo: string): Promise<JornadaData | null> {
-    const { data, error } = await supabase.from(this.table).select("*").eq("codigo", codigo).single();
-    if (error && error.code !== "PGRST116") throw error;
-    return data;
-  }
-
-  async create(data: Omit<JornadaData, "id">): Promise<JornadaData> {
-    const { data: result, error } = await supabase.from(this.table).insert(data).select().single();
-    if (error) throw error;
-    return result;
-  }
-
-  async update(id: string, data: Partial<JornadaData>): Promise<JornadaData> {
-    const { data: result, error } = await supabase.from(this.table).update(data).eq("id", id).select().single();
-    if (error) throw error;
-    return result;
-  }
-
-  async delete(id: string): Promise<void> {
-    const { error } = await supabase.from(this.table).delete().eq("id", id);
-    if (error) throw error;
-  }
-
-  async count(filters?: Partial<JornadaData>): Promise<number> {
-    let query = supabase.from(this.table).select("*", { count: "exact", head: true });
-    if (filters) Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) query = query.eq(k, v); });
-    const { count, error } = await query;
-    if (error) throw error;
-    return count || 0;
-  }
-
-  calcularCargaHoraria(horaInicio: string, horaFim: string, intervalo: number = 0): number {
-    const [hi, mi] = horaInicio.split(":").map(Number);
-    const [hf, mf] = horaFim.split(":").map(Number);
-    const inicio = hi * 60 + mi;
-    const fim = hf * 60 + mf;
-    const total = (fim > inicio ? fim - inicio : 1440 - inicio + fim) - intervalo;
-    return total / 60;
-  }
-}
-
-export const jornadaService = new JornadaService();
-export default jornadaService;
+};
+export default jornadaServiceReal;
