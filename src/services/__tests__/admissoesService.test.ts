@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';describe('admissoesService',()=>{it('init',()=>{expect(true).toBe(true)});it('exec',async()=>{expect([]).toEqual([])});it('err',()=>{expect(null).toBeNull()})});

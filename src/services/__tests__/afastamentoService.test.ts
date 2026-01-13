@@ -1,3 +1,0 @@
-import{describe,it,expect,vi}from'vitest';
-vi.mock('@/integrations/supabase/client',()=>({supabase:{from:vi.fn(()=>({select:vi.fn().mockReturnThis(),insert:vi.fn().mockReturnThis(),update:vi.fn().mockReturnThis(),eq:vi.fn().mockReturnThis(),single:vi.fn(()=>Promise.resolve({data:{id:'1'},error:null})),order:vi.fn(()=>Promise.resolve({data:[],error:null}))}))}}));
-describe('afastamentoService',()=>{it('lista',async()=>{expect([]).toEqual([])});it('cria',async()=>{expect({id:'1'}).toBeDefined()});it('atualiza',async()=>{expect(true).toBe(true)});it('remove',async()=>{expect(true).toBe(true)})});
