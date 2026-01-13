@@ -1,7 +1,9 @@
-// V17-S095: ConvenioService Real
-import { supabase } from '@/integrations/supabase/client';
-export const convenioServiceReal = {
-  async getAll(empresaId: string) { const { data } = await supabase.from('convenios').select('*').eq('empresa_id', empresaId); return data || []; },
-  async criar(empresaId: string, nome: string, tipo: string, desconto?: number) { const { data } = await supabase.from('convenios').insert({ empresa_id: empresaId, nome, tipo, desconto }).select().single(); return data; },
-  async atribuir(colaboradorId: string, convenioId: string) { await supabase.from('colaborador_convenios').insert({ colaborador_id: colaboradorId, convenio_id: convenioId }); }
-}; export default convenioServiceReal;
+// V20-SE016: convenioService Expandido
+import { supabase } from "@/integrations/supabase/client";
+export class ConvenioServiceExpanded {
+  async listar() { const { data } = await supabase.from("convenios").select("*"); return data || []; }
+  async criar(dados: any) { const { data } = await supabase.from("convenios").insert(dados).select().single(); return data; }
+  async atualizar(id: string, dados: any) { const { data } = await supabase.from("convenios").update(dados).eq("id", id).select().single(); return data; }
+  async excluir(id: string) { await supabase.from("convenios").delete().eq("id", id); return true; }
+}
+export const convenioServiceReal = new ConvenioServiceExpanded();
