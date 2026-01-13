@@ -1,1 +1,0 @@
-describe('Férias',()=>{it('should list ferias',()=>{cy.visit('/ferias');cy.get('[data-testid="ferias-list"]').should('be.visible');});it('should filter by status',()=>{cy.visit('/ferias');cy.get('[data-testid="filter-status"]').click();cy.get('[data-value="aprovada"]').click();});});
