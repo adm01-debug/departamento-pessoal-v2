@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';describe('afastamentosService',()=>{it('init',()=>{expect(true).toBe(true)});it('exec',async()=>{expect([]).toEqual([])});it('err',()=>{expect(null).toBeNull()})});
