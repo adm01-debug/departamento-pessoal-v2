@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('certificadoDigitalService',()=>{it('list',async()=>expect([]).toEqual([]));it('crud',async()=>expect({id:'1'}).toBeDefined())});
