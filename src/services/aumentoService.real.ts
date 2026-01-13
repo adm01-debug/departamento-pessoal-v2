@@ -1,6 +1,49 @@
-// V17-S093: AumentoService Real
+// V20-SE006: aumentoService Expandido
 import { supabase } from '@/integrations/supabase/client';
-export const aumentoServiceReal = {
-  async conceder(colaboradorId: string, salarioAnterior: number, salarioNovo: number, motivo: string, dataVigencia: string) { const percentual = ((salarioNovo - salarioAnterior) / salarioAnterior) * 100; const { data } = await supabase.from('aumentos').insert({ colaborador_id: colaboradorId, salario_anterior: salarioAnterior, salario_novo: salarioNovo, percentual, motivo, data_vigencia: dataVigencia }).select().single(); await supabase.from('colaboradores').update({ salario: salarioNovo }).eq('id', colaboradorId); return data; },
-  async getHistorico(colaboradorId: string) { const { data } = await supabase.from('aumentos').select('*').eq('colaborador_id', colaboradorId).order('data_vigencia', { ascending: false }); return data || []; }
-}; export default aumentoServiceReal;
+
+export class aumentoServiceExpanded {
+  async listar(filtros?: Record<string, any>) {
+    const { data, error } = await supabase.from('aumentos').select('*');
+    if (error) throw error;
+    return data || [];
+  }
+
+  async buscarPorId(id: string) {
+    const { data, error } = await supabase.from('aumentos').select('*').eq('id', id).single();
+    if (error) throw error;
+    return data;
+  }
+
+  async criar(dados: Record<string, any>) {
+    const { data, error } = await supabase.from('aumentos').insert(dados).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  async atualizar(id: string, dados: Record<string, any>) {
+    const { data, error } = await supabase.from('aumentos').update(dados).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  async excluir(id: string) {
+    const { error } = await supabase.from('aumentos').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  }
+
+  async validar(dados: Record<string, any>) {
+    const erros: string[] = [];
+    if (!dados.id) erros.push('ID obrigatorio');
+    return { valido: erros.length === 0, erros };
+  }
+
+  async exportar(formato: 'json' | 'csv' = 'json') {
+    const dados = await this.listar();
+    return formato === 'json' ? JSON.stringify(dados) : dados.map(d => Object.values(d).join(',')).join('
+');
+  }
+}
+
+export const aumentoServiceReal = new aumentoServiceExpanded();
+export default aumentoServiceReal;
