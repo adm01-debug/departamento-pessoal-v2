@@ -40,8 +40,7 @@ export class aumentoServiceExpanded {
 
   async exportar(formato: 'json' | 'csv' = 'json') {
     const dados = await this.listar();
-    return formato === 'json' ? JSON.stringify(dados) : dados.map(d => Object.values(d).join(',')).join('
-');
+    return formato === 'json' ? JSON.stringify(dados) : dados.map(d => Object.values(d).join(',')).join('\n');
   }
 }
 
