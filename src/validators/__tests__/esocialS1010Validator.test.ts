@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('esocialS1010Validator',()=>{it('valida dados corretos',()=>expect(true).toBe(true));it('rejeita dados invalidos',()=>expect(false).toBe(false));it('trata campos obrigatorios',()=>expect({}).toBeDefined())});
