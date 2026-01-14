@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('alertaIntegration',()=>{it('integrates correctly',()=>expect(true).toBe(true));it('handles API calls',async()=>expect(await Promise.resolve([])).toEqual([]));it('manages state',()=>expect({}).toBeDefined())});
