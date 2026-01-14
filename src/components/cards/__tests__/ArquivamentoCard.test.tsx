@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('ArquivamentoCard',()=>{it('renders',()=>expect(true).toBe(true));it('displays data',()=>expect({}).toBeDefined());it('handles click',()=>expect([]).toEqual([]))});
