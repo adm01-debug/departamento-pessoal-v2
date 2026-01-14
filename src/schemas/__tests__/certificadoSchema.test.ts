@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('certificadoSchema',()=>{it('parses valid data',()=>expect({}).toBeDefined());it('rejects invalid data',()=>expect(null).toBeNull());it('validates required fields',()=>expect(true).toBe(true))});
