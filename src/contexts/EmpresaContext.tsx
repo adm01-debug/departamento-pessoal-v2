@@ -1,7 +1,16 @@
-// V15-217: src/contexts/EmpresaContext.tsx
+// V16: src/contexts/EmpresaContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { empresaService } from '@/services';
-import type { Empresa } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Empresa {
+  id: string;
+  razao_social: string;
+  nome_fantasia?: string | null;
+  cnpj?: string | null;
+  email?: string | null;
+  telefone?: string | null;
+  ativa?: boolean | null;
+}
 
 interface EmpresaContextType {
   empresas: Empresa[];
@@ -21,17 +30,31 @@ export function EmpresaProvider({ children }: { children: ReactNode }) {
   const refresh = async () => {
     setLoading(true);
     try {
-      const data = await empresaService.list();
-      setEmpresas(data);
-      if (!empresaAtual && data.length > 0) {
-        setEmpresaAtual(data[0]);
+      const { data, error } = await supabase
+        .from('empresas')
+        .select('id, razao_social, nome_fantasia, cnpj, email, telefone, ativa')
+        .eq('ativa', true)
+        .order('razao_social');
+      
+      if (error) throw error;
+      
+      const fetchedEmpresas = data || [];
+      setEmpresas(fetchedEmpresas);
+      
+      if (!empresaAtual && fetchedEmpresas.length > 0) {
+        setEmpresaAtual(fetchedEmpresas[0]);
       }
+    } catch (err) {
+      console.error('Erro ao carregar empresas:', err);
+      setEmpresas([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { 
+    refresh(); 
+  }, []);
 
   return (
     <EmpresaContext.Provider value={{ empresas, empresaAtual, loading, setEmpresaAtual, refresh }}>
