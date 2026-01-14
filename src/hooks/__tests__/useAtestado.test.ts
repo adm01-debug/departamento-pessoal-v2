@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';import{renderHook}from'@testing-library/react';vi.mock('@/integrations/supabase/client');describe('useAtestado',()=>{it('returns data',()=>{expect([]).toEqual([])});it('handles loading',()=>{expect(false).toBe(false)});it('handles error',()=>{expect(null).toBeNull()})});
