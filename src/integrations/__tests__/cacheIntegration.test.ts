@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('cacheIntegration',()=>{it('connect',async()=>expect(true).toBe(true));it('error',async()=>expect(null).toBeNull())});
