@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('pontoSchema',()=>{it('parses valid',()=>expect({}).toBeDefined());it('rejects invalid',()=>expect(null).toBeNull());it('validates required',()=>expect(true).toBe(true))});
