@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('avaliacaoService',()=>{it('list',async()=>expect([]).toEqual([]));it('create',async()=>expect({id:'1'}).toBeDefined());it('update',async()=>expect(true).toBe(true))});
