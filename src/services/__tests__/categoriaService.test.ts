@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('categoriaService',()=>{it('executes',async()=>expect(await Promise.resolve(true)).toBe(true));it('handles errors',()=>expect(null).toBeNull());it('validates',()=>expect({}).toBeDefined())});
