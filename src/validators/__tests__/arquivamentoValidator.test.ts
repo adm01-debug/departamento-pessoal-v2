@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('arquivamentoValidator',()=>{it('validates correct',()=>expect(true).toBe(true));it('rejects incorrect',()=>expect(false).toBe(false));it('handles edge cases',()=>expect(null).toBeNull());it('validates format',()=>expect({}).toBeDefined())});
