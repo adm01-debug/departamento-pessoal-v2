@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('bancoHorasService',()=>{it('list',async()=>expect([]).toEqual([]));it('create',async()=>expect({id:'1'}).toBeDefined());it('update',async()=>expect(true).toBe(true));it('delete',async()=>expect(true).toBe(true))});
