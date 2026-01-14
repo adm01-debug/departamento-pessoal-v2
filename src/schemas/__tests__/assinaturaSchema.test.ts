@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('assinaturaSchema',()=>{it('parses valid data',()=>expect({}).toBeDefined());it('rejects invalid data',()=>expect(null).toBeNull());it('validates required fields',()=>expect(true).toBe(true))});
