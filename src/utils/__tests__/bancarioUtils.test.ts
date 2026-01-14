@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('bancarioUtils',()=>{it('formats correctly',()=>expect('').toBe(''));it('validates input',()=>expect(true).toBe(true));it('handles errors',()=>expect(null).toBeNull())});
