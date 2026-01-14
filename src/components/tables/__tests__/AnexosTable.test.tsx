@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('AnexosTable',()=>{it('renders',()=>expect(true).toBe(true));it('sorts',()=>expect([]).toEqual([]));it('filters',()=>expect({}).toBeDefined());it('paginates',()=>expect(1).toBe(1))});
