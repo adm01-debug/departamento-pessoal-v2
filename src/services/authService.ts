@@ -153,4 +153,6 @@ export const authServiceReal = {
   },
 };
 
+// Named export for compatibility
+export const authService = authServiceReal;
 export default authServiceReal;

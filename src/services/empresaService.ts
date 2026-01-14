@@ -1,37 +1,25 @@
-// V16-010: EmpresaService - Production Ready with Supabase
-import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
-import type { Empresa, Insertable, Updatable } from '@/integrations/supabase/database.types';
+// V20: Empresa Service
+import { supabase } from '@/integrations/supabase/client';
 
-export interface EmpresaFilters {
-  status?: string;
-  uf?: string;
-  regime_tributario?: string;
-  search?: string;
+export interface Empresa {
+  id: string;
+  razao_social: string;
+  nome_fantasia?: string | null;
+  cnpj?: string | null;
+  email?: string | null;
+  telefone?: string | null;
+  ativa?: boolean | null;
 }
 
-export interface EmpresaStats {
-  total_colaboradores: number;
-  total_departamentos: number;
-  total_cargos: number;
-  folha_atual: number;
-}
-
-export const empresaServiceReal = {
-  async getAll(filters: EmpresaFilters = {}): Promise<Empresa[]> {
-    let query = supabase
+export const empresaService = {
+  async list(): Promise<Empresa[]> {
+    const { data, error } = await supabase
       .from('empresas')
-      .select('*')
+      .select('id, razao_social, nome_fantasia, cnpj, email, telefone, ativa')
+      .eq('ativa', true)
       .order('razao_social');
-
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.uf) query = query.eq('uf', filters.uf);
-    if (filters.regime_tributario) query = query.eq('regime_tributario', filters.regime_tributario);
-    if (filters.search) {
-      query = query.or(`razao_social.ilike.%${filters.search}%,nome_fantasia.ilike.%${filters.search}%,cnpj.ilike.%${filters.search}%`);
-    }
-
-    const { data, error } = await query;
-    if (error) throw new Error(handleSupabaseError(error));
+    
+    if (error) throw error;
     return data || [];
   },
 
@@ -41,90 +29,38 @@ export const empresaServiceReal = {
       .select('*')
       .eq('id', id)
       .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') return null;
-      throw new Error(handleSupabaseError(error));
-    }
+    
+    if (error) return null;
     return data;
   },
 
-  async getByCnpj(cnpj: string): Promise<Empresa | null> {
-    const cleanCnpj = cnpj.replace(/\D/g, '');
+  async create(empresa: Partial<Empresa>): Promise<Empresa> {
     const { data, error } = await supabase
       .from('empresas')
-      .select('*')
-      .eq('cnpj', cleanCnpj)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') return null;
-      throw new Error(handleSupabaseError(error));
-    }
-    return data;
-  },
-
-  async create(empresa: Insertable<'empresas'>): Promise<Empresa> {
-    const { data, error } = await supabase
-      .from('empresas')
-      .insert({
-        ...empresa,
-        cnpj: empresa.cnpj.replace(/\D/g, ''),
-      })
+      .insert({ razao_social: empresa.razao_social || '', ...empresa })
       .select()
       .single();
-
-    if (error) throw new Error(handleSupabaseError(error));
+    
+    if (error) throw error;
     return data;
   },
 
-  async update(id: string, empresa: Updatable<'empresas'>): Promise<Empresa> {
-    const updateData: Updatable<'empresas'> = {
-      ...empresa,
-      updated_at: new Date().toISOString(),
-    };
-    if (empresa.cnpj) {
-      updateData.cnpj = empresa.cnpj.replace(/\D/g, '');
-    }
-
+  async update(id: string, empresa: Partial<Empresa>): Promise<Empresa> {
     const { data, error } = await supabase
       .from('empresas')
-      .update(updateData)
+      .update(empresa)
       .eq('id', id)
       .select()
       .single();
-
-    if (error) throw new Error(handleSupabaseError(error));
+    
+    if (error) throw error;
     return data;
   },
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('empresas')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw new Error(handleSupabaseError(error));
-  },
-
-  async getStats(empresaId: string): Promise<EmpresaStats> {
-    const [colaboradores, departamentos, cargos] = await Promise.all([
-      supabase.from('colaboradores').select('id', { count: 'exact' }).eq('empresa_id', empresaId).eq('status', 'ativo'),
-      supabase.from('departamentos').select('id', { count: 'exact' }).eq('empresa_id', empresaId).eq('ativo', true),
-      supabase.from('cargos').select('id', { count: 'exact' }).eq('empresa_id', empresaId).eq('ativo', true),
-    ]);
-
-    return {
-      total_colaboradores: colaboradores.count || 0,
-      total_departamentos: departamentos.count || 0,
-      total_cargos: cargos.count || 0,
-      folha_atual: 0,
-    };
-  },
-
-  async getAtivas(): Promise<Empresa[]> {
-    return this.getAll({ status: 'ativa' });
-  },
+    const { error } = await supabase.from('empresas').delete().eq('id', id);
+    if (error) throw error;
+  }
 };
 
-export default empresaServiceReal;
+export default empresaService;
