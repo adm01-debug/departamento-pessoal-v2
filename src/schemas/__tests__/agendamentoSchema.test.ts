@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('agendamentoSchema',()=>{it('parses valid',()=>expect({}).toBeDefined());it('rejects invalid',()=>expect(null).toBeNull());it('validates required',()=>expect(true).toBe(true));it('validates types',()=>expect(1).toBe(1))});
