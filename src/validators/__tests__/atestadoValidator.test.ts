@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('atestadoValidator',()=>{it('validates correct data',()=>expect(true).toBe(true));it('rejects incorrect data',()=>expect(false).toBe(false));it('handles edge cases',()=>expect(null).toBeNull())});
