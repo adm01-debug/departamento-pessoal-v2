@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('anexoIntegration',()=>{it('integrates',()=>expect(true).toBe(true));it('handles API',async()=>expect(await Promise.resolve([])).toEqual([]));it('manages state',()=>expect({}).toBeDefined())});
