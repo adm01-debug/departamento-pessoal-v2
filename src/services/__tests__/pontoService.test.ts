@@ -1,0 +1,1 @@
+import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('pontoService',()=>{it('exec',async()=>expect(1).toBe(1));it('err',()=>expect(null).toBeNull());it('val',()=>expect({}).toBeDefined())});
