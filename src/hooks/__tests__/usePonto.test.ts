@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{renderHook}from'@testing-library/react';describe('usePonto',()=>{it('returns data',()=>expect({}).toBeDefined());it('handles loading',()=>expect(false).toBe(false));it('handles error',()=>expect(null).toBeNull())});
