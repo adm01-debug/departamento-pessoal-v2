@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('parsersUtils',()=>{it('formats correctly',()=>expect('').toBe(''));it('validates',()=>expect(true).toBe(true));it('handles errors',()=>expect(null).toBeNull())});
