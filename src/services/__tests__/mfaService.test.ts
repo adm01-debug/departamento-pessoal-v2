@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('mfaService',()=>{it('exec',async()=>expect(true).toBe(true));it('error',async()=>expect(null).toBeNull())});
