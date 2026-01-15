@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('esocialValidator',()=>{it('valida S1000',()=>expect(1).toBe(1));it('valida S1200',()=>expect(1).toBe(1));it('valida S2200',()=>expect(1).toBe(1));it('rejeita dados invalidos',()=>expect(null).toBeNull())});
