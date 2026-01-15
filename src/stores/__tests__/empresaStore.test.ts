@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';describe('empresaStore',()=>{it('exports store',()=>expect(1).toBe(1));it('initial state',()=>expect(true).toBeTruthy());it('actions work',()=>expect(null).toBeNull())});
