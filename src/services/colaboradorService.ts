@@ -1,4 +1,5 @@
-// V16-009: ColaboradorService - Production Ready with Supabase
+// V18-FIX: ColaboradorService - Production Ready with Supabase
+// Atualizado em 16/01/2026 - Adicionado método list para compatibilidade
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 import type { Colaborador, Insertable, Updatable } from '@/integrations/supabase/database.types';
 
@@ -38,6 +39,11 @@ export const colaboradorServiceReal = {
     const { data, error } = await query;
     if (error) throw new Error(handleSupabaseError(error));
     return data || [];
+  },
+
+  // Alias para compatibilidade com ColaboradoresPage
+  async list(filters?: ColaboradorFilters): Promise<ColaboradorWithRelations[]> {
+    return this.getAll(filters || {});
   },
 
   async getById(id: string): Promise<ColaboradorWithRelations | null> {
