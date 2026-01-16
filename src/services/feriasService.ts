@@ -1,4 +1,5 @@
-// V16-012: FeriasService - Production Ready with Supabase
+// V18-FIX: FeriasService - Production Ready with Supabase
+// Atualizado em 16/01/2026 - Adicionado método listSolicitacoes
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 import type { Ferias, Insertable, Updatable } from '@/integrations/supabase/database.types';
 import { addDays, differenceInDays, isAfter } from 'date-fns';
@@ -41,6 +42,16 @@ export const feriasServiceReal = {
     }
     
     return result as FeriasWithColaborador[];
+  },
+
+  // Alias para compatibilidade com FeriasPage
+  async list(filters?: FeriasFilters): Promise<FeriasWithColaborador[]> {
+    return this.getAll(filters || {});
+  },
+
+  // Método para listar solicitações (usado por FeriasPage)
+  async listSolicitacoes(status?: string): Promise<FeriasWithColaborador[]> {
+    return this.getAll(status ? { status } : {});
   },
 
   async getById(id: string): Promise<FeriasWithColaborador | null> {
@@ -92,6 +103,14 @@ export const feriasServiceReal = {
 
     if (error) throw new Error(handleSupabaseError(error));
     return data;
+  },
+
+  async aprovar(id: string): Promise<Ferias> {
+    return this.update(id, { status: 'aprovada' });
+  },
+
+  async rejeitar(id: string, motivo?: string): Promise<Ferias> {
+    return this.update(id, { status: 'recusada', observacao: motivo });
   },
 
   async programar(id: string, inicio: string, dias: number, diasAbono: number = 0): Promise<Ferias> {
