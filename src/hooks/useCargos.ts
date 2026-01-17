@@ -1,7 +1,8 @@
-// V18-BUILD: useCargos Hook - Usando cargoService
+// V18-BUILD: useCargos Hook - Com contexto de empresa
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cargoService } from '@/services';
 import { useToast } from '@/hooks/useToast';
+import { useEmpresa } from '@/contexts';
 
 export interface Cargo {
   id: string;
@@ -22,18 +23,22 @@ export interface Cargo {
 export function useCargos() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { empresaAtual } = useEmpresa();
+  const empresaId = empresaAtual?.id;
 
   const query = useQuery<Cargo[]>({
-    queryKey: ['cargos'],
+    queryKey: ['cargos', empresaId],
     queryFn: async () => {
-      return cargoService.getAll();
+      if (!empresaId) return [];
+      return cargoService.getAll(empresaId);
     },
+    enabled: !!empresaId,
     staleTime: 5 * 60 * 1000,
   });
 
   const create = useMutation({
     mutationFn: async (cargo: Omit<Cargo, 'id' | 'total_colaboradores' | 'departamento_nome'>) => {
-      return cargoService.create(cargo);
+      return cargoService.create({ ...cargo, empresa_id: empresaId! });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cargos'] });
