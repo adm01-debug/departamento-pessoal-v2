@@ -2,36 +2,40 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
-e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
-
 ## [18.0.0] - 2026-01-17
 
 ### Adicionado
 - Calculadora de rescisão completa com todos os tipos (sem justa causa, acordo, justa causa, pedido demissão)
 - Calculadora FGTS com projeções e correção monetária
 - Calculadora de horas extras com DSR integrado
-- Funções de formatação para PIS, CPF e CNPJ
+- Sistema de backup completo com agendamento
+- Sistema de notificações com configurações por usuário
+- Sistema de configurações da empresa e usuário
+- Funções de formatação para PIS, CPF, CNPJ, CEP, telefone, CTPS
 - Validação completa de período aquisitivo de férias
 - Redução automática de férias por faltas
+- Tipos TypeScript completos para todas as entidades
 
 ### Corrigido
-- Validador PIS formatado e documentado
-- Validador CPF formatado e documentado
-- Validador CNPJ formatado e documentado
-- Calculadora de férias com validações
-- Calculadora FGTS com acordo (20%)
+- Formatação de todos os validadores (PIS, CPF, CNPJ, email, telefone, CEP, CTPS)
+- Formatação de todos os tipos (colaborador, folha, férias, ponto, benefício, empresa)
+- Calculadora PLR atualizada para tabela 2026
+- Calculadora salário maternidade com teto INSS 2026
+- Services expandidos (relatório, backup, notificação, config, rescisão)
+- Hook useColaboradores formatado e documentado
 
 ### Atualizado
 - Versão do package.json para 18.0.0
 - README.md com documentação completa
 - Tabelas trabalhistas 2026 (INSS, IRRF, Salário Família)
 - Constantes atualizadas para 2026
+- Index files de types, constants e formatters
 
 ### Melhorado
-- Documentação inline em todas as calculadoras
-- Tipagem TypeScript mais rigorosa
-- Tratamento de erros nos serviços
+- Documentação inline em todas as calculadoras e services
+- Tipagem TypeScript mais rigorosa em todas as interfaces
+- Tratamento de erros consistente nos services
+- Código formatado e legível em todos os arquivos
 
 ## [17.4.0] - 2026-01-12
 
