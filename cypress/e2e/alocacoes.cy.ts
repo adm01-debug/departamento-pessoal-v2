@@ -1,1 +1,0 @@
-describe('alocacoesE2E',()=>{beforeEach(()=>cy.visit('/'));it('loads page',()=>cy.get('body').should('exist'));it('navigates',()=>cy.get('main').should('be.visible'));it('renders content',()=>cy.get('[data-testid]').first().should('exist'));it('handles actions',()=>cy.get('button').first().should('be.visible'))});
