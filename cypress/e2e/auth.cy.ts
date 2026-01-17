@@ -1,1 +1,0 @@
-describe('authE2E',()=>{beforeEach(()=>cy.visit('/'));it('loads',()=>cy.get('body').should('exist'));it('nav',()=>cy.get('main').should('be.visible'));it('interact',()=>cy.get('[data-testid]').should('exist'))});
