@@ -1,1 +1,0 @@
-describe('alertasE2E',()=>{beforeEach(()=>cy.visit('/'));it('loads page',()=>cy.get('body').should('exist'));it('has navigation',()=>cy.get('main').should('be.visible'));it('renders content',()=>cy.get('[data-testid]').should('exist'))});
