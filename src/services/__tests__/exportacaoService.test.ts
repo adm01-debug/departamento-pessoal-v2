@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('exportacaoService',()=>{it('should execute operations',()=>expect(1).toBe(1));it('should handle errors',()=>expect(null).toBeNull());it('should validate data',()=>expect(true).toBeTruthy())});
