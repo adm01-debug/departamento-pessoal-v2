@@ -1,7 +1,8 @@
-// V18-BUILD: useDepartamentos Hook - Usando departamentoService
+// V18-BUILD: useDepartamentos Hook - Com contexto de empresa
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { departamentoService } from '@/services';
 import { useToast } from '@/hooks/useToast';
+import { useEmpresa } from '@/contexts';
 
 export interface Departamento {
   id: string;
@@ -21,18 +22,22 @@ export interface Departamento {
 export function useDepartamentos() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { empresaAtual } = useEmpresa();
+  const empresaId = empresaAtual?.id;
 
   const query = useQuery<Departamento[]>({
-    queryKey: ['departamentos'],
+    queryKey: ['departamentos', empresaId],
     queryFn: async () => {
-      return departamentoService.getAll();
+      if (!empresaId) return [];
+      return departamentoService.getAll(empresaId);
     },
+    enabled: !!empresaId,
     staleTime: 5 * 60 * 1000,
   });
 
   const create = useMutation({
     mutationFn: async (departamento: Omit<Departamento, 'id' | 'total_colaboradores' | 'gestor_nome'>) => {
-      return departamentoService.create(departamento);
+      return departamentoService.create({ ...departamento, empresa_id: empresaId! });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departamentos'] });
