@@ -1,4 +1,6 @@
-// V19-QA: UI Components Index
+// V18-BUILD: UI Components Index - Completo
+
+// shadcn/ui core
 export * from './button';
 export * from './input';
 export * from './label';
@@ -13,7 +15,6 @@ export * from './dialog';
 export * from './dropdown-menu';
 export * from './tabs';
 export * from './alert-dialog';
-export * from './data-table';
 export * from './toaster';
 export * from './toast';
 export * from './tooltip';
@@ -36,5 +37,12 @@ export * from './progress';
 export * from './skeleton';
 export * from './avatar';
 export * from './alert';
+
+// Custom UI components
 export * from './stat-card';
 export * from './spinner';
+export * from './empty-state';
+export * from './status-badge';
+export * from './data-table';
+export * from './data-table-toolbar';
+export * from './pagination';
