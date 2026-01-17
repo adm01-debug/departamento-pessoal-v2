@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('feriasSchema',()=>{it('parses valid',()=>expect({}).toBeDefined());it('rejects invalid',()=>expect(null).toBeNull());it('validates required',()=>expect(true).toBe(true))});
