@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('arquivamentoUtils',()=>{it('formats correctly',()=>expect('').toBe(''));it('validates input',()=>expect(true).toBe(true));it('handles errors',()=>expect(null).toBeNull());it('processes data',()=>expect([]).toEqual([]))});
