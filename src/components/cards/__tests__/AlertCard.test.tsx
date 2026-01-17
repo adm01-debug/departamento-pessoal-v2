@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('AlertCard',()=>{it('renders correctly',()=>expect(true).toBe(true));it('handles click',()=>expect({}).toBeDefined());it('displays data',()=>expect([]).toEqual([]))});
