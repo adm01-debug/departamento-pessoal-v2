@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('ColaboradoresPage',()=>{it('renders',()=>expect(true).toBe(true));it('loads data',()=>expect([]).toEqual([]));it('handles actions',()=>expect({}).toBeDefined())});
