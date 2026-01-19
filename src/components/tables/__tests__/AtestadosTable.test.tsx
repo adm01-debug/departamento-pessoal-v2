@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('AtestadosTable',()=>{it('renders table',()=>expect(true).toBe(true));it('sorts data',()=>expect([]).toEqual([]));it('filters data',()=>expect({}).toBeDefined())});
