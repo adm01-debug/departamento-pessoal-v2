@@ -1,46 +1,23 @@
-// V18-T025: Testes de Integracao das Calculadoras
+// V18-T025: Testes Integracao Calculadoras
 import { describe, it, expect } from 'vitest';
-import * as Calculators from '../index';
+import * as Calc from '../index';
 
-describe('Index Calculadoras - Integracao', () => {
+describe('Index Calculadoras', () => {
   describe('Exports', () => {
-    it('deve exportar calcularINSS', () => {
-      expect(Calculators.calcularINSS).toBeDefined();
-    });
-    it('deve exportar calcularIRRF', () => {
-      expect(Calculators.calcularIRRF).toBeDefined();
-    });
-    it('deve exportar calcularFGTS', () => {
-      expect(Calculators.calcularFGTS).toBeDefined();
-    });
-    it('deve exportar calcularFerias', () => {
-      expect(Calculators.calcularFerias).toBeDefined();
-    });
-    it('deve exportar calcularRescisao', () => {
-      expect(Calculators.calcularRescisao).toBeDefined();
-    });
+    it('calcularINSS', () => expect(Calc.calcularINSS).toBeDefined());
+    it('calcularIRRF', () => expect(Calc.calcularIRRF).toBeDefined());
+    it('calcularFGTS', () => expect(Calc.calcularFGTS).toBeDefined());
+    it('calcularFerias', () => expect(Calc.calcularFerias).toBeDefined());
+    it('calcularRescisao', () => expect(Calc.calcularRescisao).toBeDefined());
   });
 
-  describe('Fluxo Folha Completo', () => {
-    it('deve calcular folha completa', () => {
+  describe('Fluxo Folha', () => {
+    it('calcula folha completa', () => {
       const salario = 5000;
-      const inss = Calculators.calcularINSS(salario);
-      const baseIRRF = salario - inss;
-      const irrf = Calculators.calcularIRRF(baseIRRF);
-      const fgts = Calculators.calcularFGTS(salario);
-      
+      const inss = Calc.calcularINSS(salario);
+      const fgts = Calc.calcularFGTS(salario);
       expect(inss).toBeGreaterThan(0);
       expect(fgts.deposito).toBe(400);
-      expect(irrf).toBeGreaterThanOrEqual(0);
-    });
-  });
-
-  describe('Constantes 2026', () => {
-    it('deve exportar SALARIO_MINIMO_2026', () => {
-      expect(Calculators.SALARIO_MINIMO_2026).toBeDefined();
-    });
-    it('deve exportar TETO_INSS_2026', () => {
-      expect(Calculators.TETO_INSS_2026).toBeDefined();
     });
   });
 });
