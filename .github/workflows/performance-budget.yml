@@ -1,0 +1,41 @@
+name: Performance Budget
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  bundle-size:
+    name: Check Bundle Size
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Check Bundle Size
+        run: |
+          MAIN_BUNDLE=$(du -b dist/assets/*.js | sort -rn | head -1 | cut -f1)
+          MAX_SIZE=524288  # 512KB
+          
+          echo "📦 Main bundle size: $(($MAIN_BUNDLE / 1024))KB"
+          echo "🎯 Max allowed: $(($MAX_SIZE / 1024))KB"
+          
+          if [ $MAIN_BUNDLE -gt $MAX_SIZE ]; then
+            echo "❌ Bundle size exceeds budget!"
+            exit 1
+          else
+            echo "✅ Bundle size within budget"
+          fi
