@@ -1,0 +1,40 @@
+# Build
+dist
+build
+.next
+out
+
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Testing
+coverage
+.nyc_output
+**/*.test.ts
+**/*.test.tsx
+**/*.test.js
+**/*.test.jsx
+**/*.spec.ts
+**/*.spec.tsx
+**/*.spec.js
+**/*.spec.jsx
+**/__tests__/**
+**/__mocks__/**
+**/__snapshots__/**
+**/tests/**
+**/test/**
+cypress
+e2e
+
+# Generated
+*.min.js
+*.min.css
+*.bundle.js
+
+# Config
+.env
+.env.*
+!.env.example
