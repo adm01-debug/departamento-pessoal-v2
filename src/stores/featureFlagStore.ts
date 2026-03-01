@@ -32,13 +32,9 @@ export const useFeatureFlags = create<FeatureFlagState>((set, get) => ({
   loadFlags: (flags) => set({ flags: Object.fromEntries(flags.map(f => [f.name, f])) }),
 }));
 
-// HOC para Feature Flag
-export function withFeatureFlag<P extends object>(Component: React.ComponentType<P>, flagName: string) {
-  return function FeatureFlaggedComponent(props: P) {
-    const isEnabled = useFeatureFlags((s) => s.isEnabled(flagName));
-    if (!isEnabled) return null;
-    return <Component {...props} />;
-  };
+// Helper para verificar feature flag
+export function isFeatureEnabled(flagName: string): boolean {
+  return useFeatureFlags.getState().isEnabled(flagName);
 }
 
 export default useFeatureFlags;
