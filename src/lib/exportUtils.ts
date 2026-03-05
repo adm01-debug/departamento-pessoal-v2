@@ -1,4 +1,5 @@
 // @ts-nocheck
+/**
  * @fileoverview Utilitários de exportação
  * @module lib/exportUtils
  */
