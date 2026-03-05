@@ -43,6 +43,8 @@
     "src/hooks/useAvaliacao.ts",
     "src/hooks/useBackupExport.ts",
     "src/hooks/useBeneficio.ts",
+    "src/hooks/useBeneficios.ts",
+    "src/hooks/useBitrix24Sync.ts",
     "src/hooks/useFerias.ts",
     "src/hooks/useDashboard.ts",
     "src/hooks/useFeriasMelhorado.ts",
@@ -74,6 +76,7 @@
     "src/components/modals/PontoModal.tsx",
     "src/components/forms/BeneficioForm.tsx",
     "src/components/forms/CargoForm.tsx",
+    "src/components/forms/MaskedInput.tsx",
     "src/components/ui/accordion.tsx",
     "src/components/ui/aspect-ratio.tsx",
     "src/components/ui/carousel.tsx",
@@ -96,8 +99,6 @@
     "src/components/ui/toggle-group.tsx",
     "src/components/ui/resizable.tsx",
     "src/components/ui/masked-input.tsx",
-    "src/components/ui/use-toast.ts",
-    "src/hooks/useBeneficios.ts",
-    "src/hooks/useBitrix24Sync.ts"
+    "src/components/ui/use-toast.ts"
   ]
 }
