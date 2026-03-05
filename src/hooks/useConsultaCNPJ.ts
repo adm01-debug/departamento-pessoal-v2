@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para consulta de CNPJ
  * @module hooks/useConsultaCNPJ

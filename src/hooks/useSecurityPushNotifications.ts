@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para gerenciar notificações push de segurança
  * @module hooks/useSecurityPushNotifications

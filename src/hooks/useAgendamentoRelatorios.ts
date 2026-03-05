@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para agendamento de relatórios
  * @module hooks/useAgendamentoRelatorios

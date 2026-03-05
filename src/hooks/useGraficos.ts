@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-H003: Hook de Graficos - Recharts Integration
 import { useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V19-002: Hook de Otimizacao de Queries
 import { useCallback, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';

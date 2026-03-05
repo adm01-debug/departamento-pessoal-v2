@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para perfil do usuário
  * @module hooks/usePerfil

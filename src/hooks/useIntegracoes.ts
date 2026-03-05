@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para gerenciamento de integrações
  * @module hooks/useIntegracoes

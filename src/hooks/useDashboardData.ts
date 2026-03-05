@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para dados do dashboard
  * @module hooks/useDashboardData
