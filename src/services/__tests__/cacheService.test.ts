@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('cacheService',()=>{it('exec',async()=>{const r={data:[],error:null};expect(r.data).toBeDefined()});it('error',()=>expect(new Error('t').message).toBe('t'));it('validate',()=>expect({id:'1'}).toBeDefined());it('format',()=>expect({success:true}).toBeTruthy())});
