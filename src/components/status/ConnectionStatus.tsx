@@ -1,15 +1,21 @@
-import { useNavigator } from '@/hooks/useNavigator';
-import { Wifi, WifiOff } from 'lucide-react';
-
-function useIsOffline() {
-  if (typeof navigator !== 'undefined') {
-    return !navigator.onLine;
-  }
-  return false;
-}
+import { useState, useEffect } from 'react';
+import { WifiOff } from 'lucide-react';
 
 export function ConnectionStatus() {
-  const isOffline = useIsOffline();
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    setIsOffline(!navigator.onLine);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   if (!isOffline) return null;
   return (
     <div className="fixed bottom-4 left-4 flex items-center gap-2 bg-destructive text-destructive-foreground px-4 py-2 rounded-full shadow-lg z-50">

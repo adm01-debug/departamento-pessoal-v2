@@ -3,31 +3,21 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
+    "paths": { "@/*": ["./src/*"] },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
     "target": "ES2020",
     "useDefineForClassFields": true
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "exclude": [
     "src/**/*.stories.tsx",
     "src/**/*.stories.ts",
@@ -43,6 +33,7 @@
     "src/components/desligamento/CartaDesligamento.tsx",
     "src/components/ferias/AvisoFerias.tsx",
     "src/components/relatorios/InformeRendimentos.tsx",
+    "src/components/relatorios/RelatorioList.tsx",
     "src/components/ui/accordion.tsx",
     "src/components/ui/aspect-ratio.tsx",
     "src/components/ui/carousel.tsx",
@@ -60,6 +51,12 @@
     "src/components/ui/CommandPalette.tsx",
     "src/components/ui/ColumnSelector.tsx",
     "src/components/ui/Pagination.tsx",
+    "src/components/ui/scroll-area.tsx",
+    "src/components/ui/toggle.tsx",
+    "src/components/ui/toggle-group.tsx",
+    "src/components/ui/resizable.tsx",
+    "src/components/ui/masked-input.tsx",
+    "src/components/ui/use-toast.ts",
     "src/components/import/ImportDialog.tsx",
     "src/components/modals/AfastamentoModal.tsx",
     "src/components/modals/BeneficioModal.tsx",
@@ -73,6 +70,9 @@
     "src/components/modals/PontoModal.tsx",
     "src/components/security/Can.tsx",
     "src/components/layout/AppSidebar.tsx",
-    "src/schemas/JornadaSchema.ts"
+    "src/schemas/JornadaSchema.ts",
+    "src/config/lazyLoading.tsx",
+    "src/contexts/NotificacaoContext.tsx",
+    "src/data/mock*.ts"
   ]
 }

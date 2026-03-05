@@ -1,4 +1,4 @@
-// UI Components Index - only export installed packages
+// UI Components Index - only installed packages
 export * from './button';
 export * from './input';
 export * from './label';
@@ -24,7 +24,6 @@ export * from './progress';
 export * from './skeleton';
 export * from './avatar';
 export * from './alert';
-export * from './scroll-area';
 
 // Custom UI
 export * from './stat-card';
