@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { DateRangePicker as DatePickerWithRange } from "@/components/ui/date-range-picker";
 
 const auditoriaSchema = z.object({
   tipo: z.string().min(1, "Selecione o tipo"),
