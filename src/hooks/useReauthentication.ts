@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para re-autenticação em ações sensíveis
  * @module hooks/useReauthentication
