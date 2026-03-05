@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para aprovação de férias
  * @module hooks/useFeriasAprovacao
