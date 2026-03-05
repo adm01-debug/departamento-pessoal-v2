@@ -218,6 +218,23 @@
     "src/schemas/schemas*.ts",
     "src/providers/**",
     "src/transformers/**",
-    "src/integrations/supabase/database.types.ts"
+    "src/integrations/supabase/database.types.ts",
+    "src/validators/**",
+    "src/components/DataImporter.tsx",
+    "src/components/afastamentos/AfastamentosToolbar.tsx",
+    "src/components/beneficio/BeneficioCard.tsx",
+    "src/components/beneficios/BeneficiosToolbar.tsx",
+    "src/components/cargos/CargosToolbar.tsx",
+    "src/components/colaborador/ColaboradorFilters.tsx",
+    "src/components/colaboradores/ColaboradoresToolbar.tsx",
+    "src/components/departamentos/DepartamentosToolbar.tsx",
+    "src/components/documento/DocumentoList.tsx",
+    "src/components/documentos/DocumentosToolbar.tsx",
+    "src/components/ferias/FeriasToolbar.tsx",
+    "src/components/folha/FolhaItemTable.tsx",
+    "src/components/folha/FolhaResumo.tsx",
+    "src/components/folha/FolhaToolbar.tsx",
+    "src/components/ponto/PontoHistorico.tsx",
+    "src/components/ponto/PontoToolbar.tsx"
   ]
 }
