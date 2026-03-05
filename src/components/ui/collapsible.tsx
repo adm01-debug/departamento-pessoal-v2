@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-458
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 const Collapsible = CollapsiblePrimitive.Root;

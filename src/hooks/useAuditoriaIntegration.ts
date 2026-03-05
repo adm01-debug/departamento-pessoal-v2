@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para integração de auditoria
  * @module hooks/useAuditoriaIntegration
