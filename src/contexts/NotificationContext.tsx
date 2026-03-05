@@ -1,4 +1,4 @@
-// V15-218: src/contexts/NotificationContext.tsx
+// NotificationContext
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface Notification {
@@ -11,6 +11,7 @@ interface Notification {
 
 interface NotificationContextType {
   notifications: Notification[];
+  unreadCount: number;
   addNotification: (notification: Omit<Notification, 'id'>) => void;
   removeNotification: (id: string) => void;
   success: (title: string, message?: string) => void;
@@ -39,8 +40,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const warning = useCallback((title: string, message?: string) => addNotification({ type: 'warning', title, message }), [addNotification]);
   const info = useCallback((title: string, message?: string) => addNotification({ type: 'info', title, message }), [addNotification]);
 
+  const unreadCount = notifications.length;
+
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification, success, error, warning, info }}>
+    <NotificationContext.Provider value={{ notifications, unreadCount, addNotification, removeNotification, success, error, warning, info }}>
       {children}
     </NotificationContext.Provider>
   );
@@ -51,3 +54,6 @@ export function useNotification() {
   if (!context) throw new Error('useNotification must be used within NotificationProvider');
   return context;
 }
+
+// Alias
+export const useNotifications = useNotification;

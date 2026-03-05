@@ -1,11 +1,8 @@
-/**
- * @fileoverview Tabela de dados genérica
- * @module components/common/DataTable
- */
+// DataTable with inline NoResults
 import { memo, type ReactNode } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { NoResults } from './EmptyState';
+import { SearchX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Column<T> {
@@ -46,7 +43,13 @@ function DataTableComponent<T extends Record<string, unknown>>({
   }
 
   if (data.length === 0) {
-    return <NoResults title={emptyMessage || 'Nenhum resultado encontrado'} description="Tente ajustar os filtros ou adicionar novos itens." />;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <SearchX className="w-12 h-12 text-muted-foreground opacity-50 mb-4" />
+        <h3 className="text-lg font-medium">{emptyMessage || 'Nenhum resultado encontrado'}</h3>
+        <p className="text-sm text-muted-foreground mt-1">Tente ajustar os filtros ou adicionar novos itens.</p>
+      </div>
+    );
   }
 
   return (
