@@ -96,6 +96,8 @@
     "src/components/ui/toggle-group.tsx",
     "src/components/ui/resizable.tsx",
     "src/components/ui/masked-input.tsx",
-    "src/components/ui/use-toast.ts"
+    "src/components/ui/use-toast.ts",
+    "src/hooks/useBeneficios.ts",
+    "src/hooks/useBitrix24Sync.ts"
   ]
 }
