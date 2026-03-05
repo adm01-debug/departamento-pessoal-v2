@@ -4,3 +4,4 @@ export * from "./cpf";
 export * from "./cnpj";
 export * from "./pis";
 export * from "./email";
+export * from "./colaboradorValidator";

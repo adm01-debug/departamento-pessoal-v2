@@ -12,13 +12,13 @@ export { default as contabilizacaoService } from './contabilizacaoService';
 export { default as simulacaoService } from './simulacaoService';
 export { default as auditLogService } from './auditLogService';
 
-// Stub services for pages that need them
-export const beneficioService = { listar: async () => [], criar: async (d: any) => d, atualizar: async (id: string, d: any) => d, excluir: async (id: string) => {} };
-export const colaboradorService = { listar: async () => [], buscarPorId: async (id: string) => null, criar: async (d: any) => d, atualizar: async (id: string, d: any) => d, excluir: async (id: string) => {} };
-export const empresaService = { listar: async () => [], buscarPorId: async (id: string) => null, criar: async (d: any) => d, atualizar: async (id: string, d: any) => d, excluir: async (id: string) => {} };
-export const feriasService = { listar: async () => [], aprovar: async (id: string) => {}, rejeitar: async (id: string) => {} };
-export const folhaService = { listar: async () => [], buscarPorId: async (id: string) => null };
-export const pontoService = { registrar: async (tipo: string) => ({}) };
+// Stub services for pages
+export const beneficioService = { list: async () => [], listar: async () => [], criar: async (d: any) => d, atualizar: async (id: string, d: any) => d, excluir: async (id: string) => {} };
+export const colaboradorService = { list: async () => [], listar: async () => [], buscarPorId: async (id: string) => null, getById: async (id: string) => null, criar: async (d: any) => d, create: async (d: any) => d, atualizar: async (id: string, d: any) => d, update: async (id: string, d: any) => d, excluir: async (id: string) => {} };
+export const empresaService = { list: async () => [], listar: async () => [], buscarPorId: async (id: string) => null, criar: async (d: any) => d, atualizar: async (id: string, d: any) => d, excluir: async (id: string) => {} };
+export const feriasService = { listSolicitacoes: async () => [], listar: async () => [], aprovar: async (id: string) => {}, rejeitar: async (id: string) => {} };
+export const folhaService = { list: async () => [], listar: async () => [], buscarPorId: async (id: string) => null };
+export const pontoService = { registrar: async (tipo: string, ...args: any[]) => ({}) };
 export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 
 // Types re-exports
