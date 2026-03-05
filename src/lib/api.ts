@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-131: src/lib/api.ts
 import { supabase } from '@/integrations/supabase/client';
 

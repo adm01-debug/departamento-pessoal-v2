@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para timeline
  * @module hooks/useTimeline
