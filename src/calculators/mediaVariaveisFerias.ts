@@ -21,6 +21,6 @@ export const calcularMediaVariaveis = (lancamentos: any[], meses: number = 12): 
     comissoes: totais.comissoes / meses,
     adicionalNoturno: totais.adicionalNoturno / meses,
     outros: totais.outros / meses,
-    total: Object.values(totais).reduce((a, b) => a + b, 0) / meses
+    total: Object.values(totais).reduce((a: number, b: number) => a + b, 0) / meses
   };
 };
