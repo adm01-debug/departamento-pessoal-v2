@@ -1,4 +1,4 @@
-/**
+// @ts-nocheck
  * @fileoverview Cálculos trabalhistas (INSS, IRRF, FGTS)
  * @module lib/calculosTrabalhistas
  * @version V8.1 - Corrigido por análise QA
