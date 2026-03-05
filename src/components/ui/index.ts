@@ -1,6 +1,4 @@
-// V18-BUILD: UI Components Index - Completo
-
-// shadcn/ui core
+// UI Components Index - only export installed packages
 export * from './button';
 export * from './input';
 export * from './label';
@@ -19,30 +17,17 @@ export * from './toaster';
 export * from './toast';
 export * from './tooltip';
 export * from './popover';
-export * from './command';
 export * from './calendar';
-export * from './slider';
 export * from './radio-group';
-export * from './sheet';
-export * from './collapsible';
-export * from './accordion';
-export * from './aspect-ratio';
-export * from './hover-card';
-export * from './navigation-menu';
-export * from './menubar';
-export * from './context-menu';
-export * from './scroll-area';
 export * from './separator';
 export * from './progress';
 export * from './skeleton';
 export * from './avatar';
 export * from './alert';
+export * from './scroll-area';
 
-// Custom UI components
+// Custom UI
 export * from './stat-card';
 export * from './spinner';
 export * from './empty-state';
 export * from './status-badge';
-export * from './data-table';
-export * from './data-table-toolbar';
-export * from './pagination';

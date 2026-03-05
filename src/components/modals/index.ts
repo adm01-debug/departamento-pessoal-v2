@@ -1,4 +1,4 @@
-// V15-420: Modals index - only export existing modals
+// V15-420: Modals index - only export existing/working modals
 export { FormModal } from './FormModal';
 export { ConfirmModal } from './ConfirmModal';
 export { DeleteModal } from './DeleteModal';
