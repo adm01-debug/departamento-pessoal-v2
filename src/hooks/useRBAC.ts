@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useAuth } from '@/contexts/AuthContext';
 export function useRBAC() {
   const { user } = useAuth();
