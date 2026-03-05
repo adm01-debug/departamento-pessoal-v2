@@ -1,5 +1,29 @@
-// V15-420
-export { ColaboradorModal } from './ColaboradorModal';
-export { FeriasModal } from './FeriasModal';
-export { DepartamentoModal } from './DepartamentoModal';
-export { CargoModal } from './CargoModal';
+// V15-420: Modals index - only export existing/working modals
+export { FormModal } from './FormModal';
+export { ConfirmModal } from './ConfirmModal';
+export { DeleteModal } from './DeleteModal';
+export { AlertModal } from './AlertModal';
+export { CreateModal } from './CreateModal';
+export { EditModal } from './EditModal';
+export { ViewModal } from './ViewModal';
+export { PreviewModal } from './PreviewModal';
+export { FilterModal } from './FilterModal';
+export { ExportModal } from './ExportModal';
+export { ImportModal } from './ImportModal';
+export { SearchModal } from './SearchModal';
+export { SettingsModal } from './SettingsModal';
+export { HelpModal } from './HelpModal';
+export { ShareModal } from './ShareModal';
+export { PrintModal } from './PrintModal';
+export { UploadModal } from './UploadModal';
+export { ProfileModal } from './ProfileModal';
+export { NotificationModal } from './NotificationModal';
+export { FeriasProgramacaoModal } from './FeriasProgramacaoModal';
+export { LancamentoFolhaModal } from './LancamentoFolhaModal';
+export { TratamentoPontoModal } from './TratamentoPontoModal';
+export { AdmissaoModal } from './AdmissaoModal';
+export { DemissaoModal } from './DemissaoModal';
+export { ContratoModal } from './ContratoModal';
+export { DocumentoModal } from './DocumentoModal';
+export { EmpresaModal } from './EmpresaModal';
+export { FolhaModal } from './FolhaModal';

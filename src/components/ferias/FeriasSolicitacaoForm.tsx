@@ -1,4 +1,3 @@
-// V15-255: src/components/ferias/FeriasSolicitacaoForm.tsx
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { differenceInDays } from 'date-fns';
 
 const schema = z.object({
-  data_inicio: z.date({ required_error: 'Data obrigatória' }),
-  data_fim: z.date({ required_error: 'Data obrigatória' }),
+  data_inicio: z.date({ message: 'Data obrigatória' }),
+  data_fim: z.date({ message: 'Data obrigatória' }),
   abono_pecuniario: z.boolean().default(false),
   dias_abono: z.number().min(0).max(10).optional(),
   adiantamento_13: z.boolean().default(false),

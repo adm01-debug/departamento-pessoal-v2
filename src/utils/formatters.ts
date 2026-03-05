@@ -2,7 +2,6 @@ export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// Alias for backward compatibility
 export const formatMoeda = formatCurrency;
 export const moeda = formatCurrency;
 
@@ -34,6 +33,8 @@ export function formatPhone(phone: string): string {
   return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
 }
 
+export const formatTelefone = formatPhone;
+
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -61,7 +62,6 @@ export function formatHours(minutes: number): string {
   return `${hours}h${mins > 0 ? ` ${mins}min` : ''}`;
 }
 
-// Formatters object for backward compatibility
 export const formatters = {
   currency: formatCurrency,
   moeda: formatCurrency,
@@ -70,6 +70,7 @@ export const formatters = {
   cpf: formatCPF,
   cnpj: formatCNPJ,
   phone: formatPhone,
+  telefone: formatPhone,
   bytes: formatBytes,
   percentage: formatPercentage,
   month: formatMonth,
