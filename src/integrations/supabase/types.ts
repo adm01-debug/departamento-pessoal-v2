@@ -417,12 +417,12 @@ export type Database = {
           created_at: string
           created_by: string | null
           data: string
-          horas: unknown
+          horas: string
           id: string
           motivo: string | null
           registro_ponto_id: string | null
-          saldo_anterior: unknown
-          saldo_atual: unknown
+          saldo_anterior: string | null
+          saldo_atual: string | null
           tipo: string
         }
         Insert: {
@@ -430,12 +430,12 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data: string
-          horas: unknown
+          horas: string
           id?: string
           motivo?: string | null
           registro_ponto_id?: string | null
-          saldo_anterior?: unknown
-          saldo_atual?: unknown
+          saldo_anterior?: string | null
+          saldo_atual?: string | null
           tipo: string
         }
         Update: {
@@ -443,12 +443,12 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data?: string
-          horas?: unknown
+          horas?: string
           id?: string
           motivo?: string | null
           registro_ponto_id?: string | null
-          saldo_anterior?: unknown
-          saldo_atual?: unknown
+          saldo_anterior?: string | null
+          saldo_atual?: string | null
           tipo?: string
         }
         Relationships: [
@@ -2958,9 +2958,9 @@ export type Database = {
           entrada_1: string | null
           entrada_2: string | null
           entrada_3: string | null
-          horas_extras: unknown
-          horas_falta: unknown
-          horas_trabalhadas: unknown
+          horas_extras: string | null
+          horas_falta: string | null
+          horas_trabalhadas: string | null
           id: string
           justificativa: string | null
           observacoes: string | null
@@ -2982,9 +2982,9 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
-          horas_extras?: unknown
-          horas_falta?: unknown
-          horas_trabalhadas?: unknown
+          horas_extras?: string | null
+          horas_falta?: string | null
+          horas_trabalhadas?: string | null
           id?: string
           justificativa?: string | null
           observacoes?: string | null
@@ -3006,9 +3006,9 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
-          horas_extras?: unknown
-          horas_falta?: unknown
-          horas_trabalhadas?: unknown
+          horas_extras?: string | null
+          horas_falta?: string | null
+          horas_trabalhadas?: string | null
           id?: string
           justificativa?: string | null
           observacoes?: string | null
@@ -3491,7 +3491,7 @@ export type Database = {
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
       calculate_lockout_duration: {
         Args: { attempts: number }
-        Returns: unknown
+        Returns: string
       }
       check_brute_force: {
         Args: { check_email: string; check_ip: string }
