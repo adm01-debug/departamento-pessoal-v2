@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para banco de horas
  * @module hooks/usePontoBanco

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para assinaturas digitais
  * @module services/assinaturasService

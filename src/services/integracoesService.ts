@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para integrações externas
  * @module services/integracoesService

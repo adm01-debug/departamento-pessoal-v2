@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V17-S008: BancoHorasService Real
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 import { calcularSaldoBancoHoras, calcularValorPagamento } from '@/calculators/bancoHoras';

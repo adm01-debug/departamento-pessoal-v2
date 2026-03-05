@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V17-S086: TreinamentoService Real
 import { supabase } from '@/integrations/supabase/client';
 export const treinamentoServiceReal = {

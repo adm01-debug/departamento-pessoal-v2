@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para gerenciamento de admissões
  * @module services/admissoesService

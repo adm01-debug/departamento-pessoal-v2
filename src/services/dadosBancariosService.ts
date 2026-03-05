@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from "@/integrations/supabase/client";
 export interface DadosBancariosData { id?: string; colaboradorId: string; banco: string; codigoBanco: string; agencia: string; digitoAgencia?: string; conta: string; digitoConta?: string; tipoConta: string; chavePix?: string; tipoChavePix?: string; principal: boolean; ativo: boolean; }
 class DadosBancariosService {

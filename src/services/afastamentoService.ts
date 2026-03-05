@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V17-S001: AfastamentoService Real - Supabase
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 

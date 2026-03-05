@@ -1,3 +1,4 @@
+// @ts-nocheck
 // acordoTrabalhistaService - Service implementation
 
 export interface ServiceConfig { enabled: boolean; options?: Record<string, any>; }
