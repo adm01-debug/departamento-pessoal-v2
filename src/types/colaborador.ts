@@ -101,6 +101,8 @@ export interface Colaborador {
   endereco?: string;
   created_at: string;
   updated_at: string;
+  // Allow additional DB fields
+  [key: string]: any;
 }
 
 export interface ColaboradorFormData extends Omit<Colaborador, 'id' | 'created_at' | 'updated_at'> {}
