@@ -182,6 +182,16 @@
     "src/integrations/ticket/**",
     "src/integrations/totvs/**",
     "src/integrations/vrBeneficios/**",
-    "src/integrations/whatsapp/**"
+    "src/integrations/whatsapp/**",
+    "src/layouts/**",
+    "src/lib/calculosTrabalhistas.ts",
+    "src/lib/csvImporter.ts",
+    "src/lib/documentosPDF.ts",
+    "src/lib/excelImporter.ts",
+    "src/lib/exportUtils.ts",
+    "src/lib/lazyRoutes.tsx",
+    "src/pages/**",
+    "src/services/**",
+    "src/queries/**"
   ]
 }
