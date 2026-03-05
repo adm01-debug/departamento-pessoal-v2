@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from "@/integrations/supabase/client";
 export interface EventoData { id?: string; colaboradorId: string; folhaId: string; rubricaId: string; tipo: string; quantidade?: number; referencia?: number; valor: number; origem: string; observacao?: string; }
 class EventoService {

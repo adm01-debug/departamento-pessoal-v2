@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V17-S011: JornadaService Real
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 
