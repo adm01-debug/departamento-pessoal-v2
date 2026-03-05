@@ -1,9 +1,11 @@
-// V15-014: src/components/documentos/index.ts
-export { DocumentoForm } from './DocumentoForm';
+// src/components/documentos/index.ts
 export { DocumentoList } from './DocumentoList';
 export { DocumentoUpload } from './DocumentoUpload';
 export { DocumentoViewer } from './DocumentoViewer';
 export { DocumentoPreview } from './DocumentoPreview';
 export { DocumentoDownload } from './DocumentoDownload';
-export { useDocumentos } from './hooks/useDocumentos';
-export type { Documento, TipoDocumento } from './types';
+export { DocumentoCard } from './DocumentoCard';
+export { DocumentoDetails } from './DocumentoDetails';
+export { DocumentoFilter } from './DocumentoFilter';
+export { DocumentoFilters } from './DocumentoFilters';
+export { DocumentoTemplate } from './DocumentoTemplate';
