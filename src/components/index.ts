@@ -1,6 +1,5 @@
-// V15-500 - Main Components Export
+// Main Components Export
 export * from './ui';
-export * from './forms';
 export * from './charts';
 export * from './layout';
 export * from './loading';

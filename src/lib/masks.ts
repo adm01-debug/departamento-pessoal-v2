@@ -1,4 +1,4 @@
-// V15-128: src/lib/masks.ts
+// src/lib/masks.ts
 export function maskCPF(value: string): string {
   return value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})/, '$1-$2').slice(0, 14);
 }
@@ -43,6 +43,14 @@ export function maskRG(value: string): string {
 export function maskCTPS(value: string): string {
   return value.replace(/\D/g, '').replace(/(\d{7})(\d)/, '$1/$2').slice(0, 12);
 }
+
+// Aliases - formatarXXX
+export const formatarCPF = maskCPF;
+export const formatarCNPJ = maskCNPJ;
+export const formatarTelefone = maskPhone;
+export const formatarCEP = maskCEP;
+export const formatarPIS = maskPIS;
+export const formatarRG = maskRG;
 
 // Validators
 export function validateCPF(cpf: string): boolean {

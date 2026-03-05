@@ -1,10 +1,8 @@
-// V15-018: src/components/filters/index.ts
-export { FilterBar } from './FilterBar';
-export { FilterPanel } from './FilterPanel';
-export { FilterChip } from './FilterChip';
-export { FilterGroup } from './FilterGroup';
+// src/components/filters/index.ts
+export { ColaboradorFilter } from './ColaboradorFilter';
 export { DateFilter } from './DateFilter';
-export { StatusFilter } from './StatusFilter';
+export { DateRangeFilter } from './DateRangeFilter';
+export { RangeFilter } from './RangeFilter';
 export { SearchFilter } from './SearchFilter';
-export { useFilters } from './hooks/useFilters';
-export type { FilterConfig, FilterValue } from './types';
+export { SelectFilter } from './SelectFilter';
+export { StatusFilter } from './StatusFilter';
