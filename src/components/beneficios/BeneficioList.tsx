@@ -110,9 +110,7 @@ export const BeneficioList = memo(function BeneficioList({
               {filteredBeneficios.map(beneficio => (
                 <BeneficioCard
                   key={beneficio.id}
-                  {...beneficio}
-                  onToggle={onToggle}
-                  onConfigurar={onConfigurar}
+                  beneficio={beneficio as any}
                 />
               ))}
             </div>
