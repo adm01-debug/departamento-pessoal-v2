@@ -1,9 +1,8 @@
-// V15-007: src/components/configuracoes/index.ts
-export { ConfigForm } from './ConfigForm';
-export { ConfigPanel } from './ConfigPanel';
+// src/components/configuracoes/index.ts
+export { ConfigCard } from './ConfigCard';
 export { ConfigSection } from './ConfigSection';
 export { ConfigToggle } from './ConfigToggle';
-export { SystemConfig } from './SystemConfig';
-export { EmpresaConfig } from './EmpresaConfig';
-export { useConfig } from './hooks/useConfig';
-export type { ConfigData, ConfigOption } from './types';
+export { ConfiguracaoSection } from './ConfiguracaoSection';
+export { ConfiguracoesESocial } from './ConfiguracoesESocial';
+export { ConfiguracoesEmpresa } from './ConfiguracoesEmpresa';
+export { ConfiguracoesGerais } from './ConfiguracoesGerais';
