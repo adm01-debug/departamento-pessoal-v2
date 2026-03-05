@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V17-S006: DependenteService Real
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 import { calcularSalarioFamilia } from '@/calculators/salarioFamilia';

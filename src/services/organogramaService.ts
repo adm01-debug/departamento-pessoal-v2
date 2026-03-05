@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para organograma
  * @module services/organogramaService

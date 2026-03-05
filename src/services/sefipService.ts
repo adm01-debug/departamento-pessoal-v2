@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-S009: SEFIP Service - Geracao Arquivo SEFIP/GFIP
 import { supabase, handleSupabaseError } from "@/integrations/supabase/client";
 

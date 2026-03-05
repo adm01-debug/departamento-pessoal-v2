@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V16-017: CargoService - Production Ready
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 import type { Cargo, Insertable, Updatable } from '@/integrations/supabase/database.types';

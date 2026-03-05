@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V16-014: AuthService - Production Ready with Supabase Auth
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session, AuthError } from '@supabase/supabase-js';

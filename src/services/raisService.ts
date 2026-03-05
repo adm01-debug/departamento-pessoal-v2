@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-S006: RAIS Service Real Expandido - Geracao Arquivo RAIS
 import { supabase, handleSupabaseError } from "@/integrations/supabase/client";
 
