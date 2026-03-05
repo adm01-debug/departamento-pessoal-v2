@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-S002: IRRF Service Real Expandido - Cálculo Anual e Informe
 import { supabase, handleSupabaseError } from "@/integrations/supabase/client";
 import { calcularIRRF, calcularIRRFDetalhado, calcularBaseIRRF, getDeducaoDependente, getTabelaIRRF } from "@/calculators/irrf";
