@@ -1,8 +1,8 @@
-// V16-049: Language Selector Component
-import { useTranslation } from 'react-i18next';
+// Language Selector - Simplified without react-i18next
 import { Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useState } from 'react';
 
 const languages = [
   { code: 'pt-BR', name: 'Português (BR)', flag: '🇧🇷' },
@@ -11,8 +11,7 @@ const languages = [
 ];
 
 export function LanguageSelector() {
-  const { i18n } = useTranslation();
-  const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
+  const [currentLang, setCurrentLang] = useState(languages[0]);
 
   return (
     <DropdownMenu>
@@ -26,8 +25,8 @@ export function LanguageSelector() {
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => i18n.changeLanguage(lang.code)}
-            className={i18n.language === lang.code ? 'bg-accent' : ''}
+            onClick={() => setCurrentLang(lang)}
+            className={currentLang.code === lang.code ? 'bg-accent' : ''}
           >
             <span className="mr-2">{lang.flag}</span>
             {lang.name}
