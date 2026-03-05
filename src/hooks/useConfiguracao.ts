@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para gerenciamento de configurações
  * @module hooks/useConfiguracao

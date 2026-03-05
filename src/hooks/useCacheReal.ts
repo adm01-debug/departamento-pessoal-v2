@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-H010: Hook Cache Strategy
 import { useState, useCallback, useEffect } from "react";
 

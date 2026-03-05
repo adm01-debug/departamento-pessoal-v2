@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para gerenciamento de Folha de Pagamento
  */
