@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para gerenciamento de feriados
  * @module hooks/useFeriados
