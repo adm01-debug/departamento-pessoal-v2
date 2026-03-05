@@ -33,6 +33,14 @@
     "src/**/*.stories.ts",
     "src/**/*.test.tsx",
     "src/**/*.test.ts",
-    "src/**/__tests__/**"
+    "src/**/__tests__/**",
+    "src/components/colaboradores/ColaboradorFormCompleto.tsx",
+    "src/components/colaboradores/ColaboradorFormModal.tsx",
+    "src/components/esocial/S*.tsx",
+    "src/components/esocial/EventoList.tsx",
+    "src/components/dashboard/DashboardCustomizer.tsx",
+    "src/components/beneficios/ReciboValeTransporte.tsx",
+    "src/components/desligamento/CartaDesligamento.tsx",
+    "src/components/ferias/AvisoFerias.tsx"
   ]
 }
