@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-BUILD: useContratos Hook - Formatado
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';

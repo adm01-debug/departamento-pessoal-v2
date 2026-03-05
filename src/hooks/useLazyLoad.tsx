@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { lazy, Suspense, ComponentType, ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 

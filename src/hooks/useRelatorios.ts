@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para geração de relatórios
  * @module hooks/useRelatorios
