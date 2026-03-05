@@ -31,6 +31,14 @@
     "src/guards/index.ts",
     "src/hoc/index.ts",
     "src/schemas/JornadaSchema.ts",
+    "src/hooks/useAdmissao.ts",
+    "src/hooks/useAdmissoes.ts",
+    "src/hooks/useAfastamentos.ts",
+    "src/hooks/useAssinaturaDigital.ts",
+    "src/hooks/useAuditLog.ts",
+    "src/hooks/useAuditoria.ts",
+    "src/hooks/useFerias.ts",
+    "src/hooks/useDashboard.ts",
     "src/components/colaboradores/ColaboradorFormCompleto.tsx",
     "src/components/colaboradores/ColaboradorFormModal.tsx",
     "src/components/esocial/S*.tsx",
@@ -54,6 +62,8 @@
     "src/components/modals/FeriasModal.tsx",
     "src/components/modals/RubricaModal.tsx",
     "src/components/modals/PontoModal.tsx",
+    "src/components/forms/BeneficioForm.tsx",
+    "src/components/forms/CargoForm.tsx",
     "src/components/ui/accordion.tsx",
     "src/components/ui/aspect-ratio.tsx",
     "src/components/ui/carousel.tsx",
@@ -76,11 +86,6 @@
     "src/components/ui/toggle-group.tsx",
     "src/components/ui/resizable.tsx",
     "src/components/ui/masked-input.tsx",
-    "src/components/ui/use-toast.ts",
-    "src/components/forms/BeneficioForm.tsx",
-    "src/components/forms/CargoForm.tsx",
-    "src/hooks/useAdmissao.ts",
-    "src/hooks/useAdmissoes.ts",
-    "src/hooks/useAfastamentos.ts"
+    "src/components/ui/use-toast.ts"
   ]
 }

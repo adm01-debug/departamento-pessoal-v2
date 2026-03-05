@@ -1,5 +1,4 @@
-// V19: Index de Hooks - Limpo e Funcional
-// Apenas exports que existem
+// Hooks Index - Clean exports only
 
 // Hooks utilitários base
 export { useDebounce } from "./useDebounce";
@@ -8,20 +7,16 @@ export { useMediaQuery } from "./useMediaQuery";
 export { usePagination } from "./usePagination";
 export { useToast } from "./useToast";
 
-// Auth e Contexto  
+// Auth
 export { useAuth } from "./useAuth";
 
 // Core hooks
-export { useAdmissao } from "./useAdmissao";
-export { useAfastamentos } from "./useAfastamentos";
 export { useColaboradores } from "./useColaboradores";
 export { useEmpresas } from "./useEmpresas";
-export { useFolha } from "./useFolha";
-export { useFerias } from "./useFerias";
-export { usePonto } from "./usePonto";
+export { useFolhas } from "./useFolha";
+export { usePontos } from "./usePonto";
 export { useBeneficios } from "./useBeneficios";
 export { useRelatorios } from "./useRelatorios";
-export { useDashboard } from "./useDashboard";
 
 // Departamentos e Cargos
 export { useDepartamentos } from "./useDepartamentos";
