@@ -47,7 +47,7 @@
     "sonner": "^1.4.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.3.5",
+    "zod": "^3.22.4",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
@@ -55,7 +55,7 @@
     "@testing-library/react": "^14.2.0",
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
-    "@types/react-dom": "^19.2.3",
+    "@types/react-dom": "^18.2.48",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.23",
     "msw": "^2.1.5",
