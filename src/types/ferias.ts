@@ -45,7 +45,7 @@ export interface SolicitacaoFerias {
   abono_pecuniario: boolean;
   dias_abono: number;
   adiantamento_13: boolean;
-  status: StatusSolicitacao;
+  status: StatusSolicitacao | StatusFerias;
   aprovador_id?: string;
   aprovador_nome?: string;
   data_aprovacao?: string;
@@ -72,7 +72,6 @@ export interface FeriasWithColaborador extends SolicitacaoFerias {
     cargo?: string;
     departamento?: string;
   };
-  // Support camelCase aliases
   dataInicio?: string;
   dataFim?: string;
   dias?: number;
@@ -85,7 +84,6 @@ export interface FeriasWithColaborador extends SolicitacaoFerias {
   status: StatusFerias;
 }
 
-// Alias for backward compatibility
 export type FeriasComColaborador = FeriasWithColaborador;
 
 export interface CalculoFerias {

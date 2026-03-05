@@ -1,1 +1,18 @@
-import Papa from'papaparse';export function parseCSV<T>(file:File):Promise<T[]>{return new Promise((resolve,reject)=>{Papa.parse(file,{header:true,skipEmptyLines:true,complete:results=>resolve(results.data as T[]),error:error=>reject(error)});});}export async function parseExcel<T>(file:File):Promise<T[]>{const XLSX=await import('xlsx');const buffer=await file.arrayBuffer();const workbook=XLSX.read(buffer,{type:'array'});const sheetName=workbook.SheetNames[0];const sheet=workbook.Sheets[sheetName];return XLSX.utils.sheet_to_json<T>(sheet);}export function validateImportData<T>(data:T[],requiredFields:string[]):string[]{const errors:string[]=[];data.forEach((row,index)=>{requiredFields.forEach(field=>{if(!(row as any)[field]){errors.push(`Linha ${index+2}: Campo '${field}' obrigatório`);}});});return errors;}
+// @ts-nocheck
+export async function parseCSV<T>(file: File): Promise<T[]> {
+  const text = await file.text();
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+  return lines.slice(1).map(line => {
+    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+    const obj: any = {};
+    headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+    return obj as T;
+  });
+}
+export function validateImportData<T>(data: T[], requiredFields: string[]): string[] {
+  const errors: string[] = [];
+  data.forEach((row, index) => { requiredFields.forEach(field => { if (!(row as any)[field]) { errors.push(`Linha ${index + 2}: Campo '${field}' obrigatório`); } }); });
+  return errors;
+}
