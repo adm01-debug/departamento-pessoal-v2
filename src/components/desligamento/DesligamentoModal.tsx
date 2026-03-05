@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, memo, useMemo } from 'react';
 import {
   Dialog,

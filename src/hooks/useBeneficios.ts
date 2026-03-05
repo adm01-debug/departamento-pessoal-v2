@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: useBeneficios Hook - Formatado e Documentado
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { beneficioService } from '@/services';

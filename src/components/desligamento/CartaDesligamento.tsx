@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';

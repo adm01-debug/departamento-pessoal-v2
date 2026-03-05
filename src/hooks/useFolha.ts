@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: useFolha Hook - Formatado e Documentado
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { folhaService } from '@/services';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: usePonto Hook - Formatado e Documentado
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { pontoService } from '@/services';

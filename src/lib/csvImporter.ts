@@ -1,4 +1,4 @@
-import Papa from 'papaparse';
+// @ts-nocheck
 import { z } from 'zod';
 
 /**

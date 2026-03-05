@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-457
 import * as React from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';

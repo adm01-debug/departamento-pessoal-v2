@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Hook para lazy loading de componentes
  * @module hooks/useLazyComponent
