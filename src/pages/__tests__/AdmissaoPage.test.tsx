@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('AdmissaoPage',()=>{it('renders',()=>expect(1).toBe(1));it('handles state',()=>expect(true).toBeTruthy())});

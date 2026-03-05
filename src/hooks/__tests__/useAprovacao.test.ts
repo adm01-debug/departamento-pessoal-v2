@@ -1,1 +1,0 @@
-import{describe,it,expect,vi}from'vitest';vi.mock('@/integrations/supabase/client');describe('useAprovacao',()=>{it('returns data',()=>expect([]).toEqual([]));it('handles loading',()=>expect(false).toBe(false));it('handles error',()=>expect(null).toBeNull());it('refetches',()=>expect(true).toBe(true))});

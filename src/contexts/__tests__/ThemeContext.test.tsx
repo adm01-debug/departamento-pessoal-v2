@@ -1,1 +1,0 @@
-import{describe,it,expect}from'vitest';describe('ThemeContext',()=>{it('provides context',()=>expect(true).toBe(true));it('updates state',()=>expect({}).toBeDefined());it('handles errors',()=>expect(null).toBeNull())});
