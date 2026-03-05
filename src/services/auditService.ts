@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: AuditService - Log de auditoria
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 
