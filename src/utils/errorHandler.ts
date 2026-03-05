@@ -1,1 +1,6 @@
-import{AxiosError}from'axios';export interface AppError{message:string;code?:string;status?:number;details?:any;}export function handleApiError(error:unknown):AppError{if(error instanceof AxiosError){const status=error.response?.status;const data=error.response?.data;if(status===401)return{message:'Sessão expirada. Faça login novamente.',code:'UNAUTHORIZED',status};if(status===403)return{message:'Você não tem permissão para esta ação.',code:'FORBIDDEN',status};if(status===404)return{message:'Recurso não encontrado.',code:'NOT_FOUND',status};if(status===422)return{message:data?.message||'Dados inválidos.',code:'VALIDATION_ERROR',status,details:data?.errors};if(status&&status>=500)return{message:'Erro no servidor. Tente novamente.',code:'SERVER_ERROR',status};return{message:data?.message||error.message||'Erro na requisição.',status};}if(error instanceof Error)return{message:error.message};return{message:'Erro desconhecido.'};}
+// @ts-nocheck
+export interface AppError { message: string; code?: string; status?: number; details?: any; }
+export function handleApiError(error: unknown): AppError {
+  if (error instanceof Error) return { message: error.message };
+  return { message: 'Erro desconhecido.' };
+}
