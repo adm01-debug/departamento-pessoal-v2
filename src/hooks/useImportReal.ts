@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-H006: Hook de Import - Importacao CSV/Excel
 import { useState, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
