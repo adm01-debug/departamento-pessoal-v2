@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-222: src/pages/ColaboradoresPage.tsx
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';

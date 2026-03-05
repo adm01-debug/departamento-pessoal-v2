@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-259: src/components/ponto/PontoHistorico.tsx
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';

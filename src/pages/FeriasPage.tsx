@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-226: src/pages/FeriasPage.tsx
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';

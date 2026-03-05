@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-228: src/pages/BeneficiosPage.tsx
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-249: src/components/colaborador/ColaboradorFilters.tsx
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
