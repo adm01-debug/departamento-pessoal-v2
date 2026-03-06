@@ -1,20 +1,13 @@
-// V22: Services Index - Real Supabase implementations
+// V23: Services Index - Clean & Active
 import { supabase } from '@/integrations/supabase/client';
 
-// Re-export specialized services
+// Re-export active services
 export { default as inssService } from './inssService';
 export { default as irrfService } from './irrfService';
 export { default as esocialService } from './esocialService';
-export { default as reciboService } from './reciboService';
-export { default as guiaService } from './guiaService';
-export { default as encargosService } from './encargosService';
-export { default as provisoesService } from './provisoesService';
-export { default as cnab240Service } from './cnab240Service';
-export { default as contabilizacaoService } from './contabilizacaoService';
-export { default as simulacaoService } from './simulacaoService';
 export { default as auditLogService } from './auditLogService';
 
-// Real services replacing stubs
+// Real services
 export const beneficioService = {
   async list(empresaId?: string) {
     let query = supabase.from('beneficios').select('*').order('nome');
@@ -88,7 +81,6 @@ export const pontoService = {
     const hora = now.toTimeString().split(' ')[0].substring(0, 5);
     const campo = tipo === 'entrada' ? 'entrada_1' : tipo === 'intervalo_saida' ? 'saida_intervalo' : tipo === 'intervalo_retorno' ? 'retorno_intervalo' : 'saida_1';
     
-    // Try to find existing record for today
     const { data: existing } = await supabase.from('registros_ponto').select('id').eq('data', data).eq('colaborador_id', colaboradorId || '').maybeSingle();
     
     if (existing) {
@@ -143,9 +135,3 @@ export const admissaoService = {
   async concluir(id: string) { return admissaoService.atualizar(id, { etapa: 'concluida' }); },
   async cancelar(id: string) { return admissaoService.atualizar(id, { etapa: 'cancelada' }); },
 };
-
-// Types re-exports
-export type { DadosRecibo, ReciboGerado } from './reciboService';
-export type { TipoGuia, DadosGuia, GuiaGerada } from './guiaService';
-export type { EncargosResult, EncargosParams } from './encargosService';
-export type { SimulacaoParams, SimulacaoResult } from './simulacaoService';
