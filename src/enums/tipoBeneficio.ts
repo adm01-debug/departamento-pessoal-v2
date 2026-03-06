@@ -1,1 +1,0 @@
-export enum TipoBeneficio{VALE_REFEICAO='vale_refeicao',VALE_ALIMENTACAO='vale_alimentacao',VALE_TRANSPORTE='vale_transporte',PLANO_SAUDE='plano_saude',PLANO_ODONTO='plano_odonto',SEGURO_VIDA='seguro_vida',GYMPASS='gympass',AUXILIO_CRECHE='auxilio_creche',PLR='plr',OUTRO='outro'}

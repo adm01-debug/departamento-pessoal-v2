@@ -1,1 +1,0 @@
-export{mockColaboradores}from'./mockColaboradores';export{mockFerias}from'./mockFerias';export{mockFolha}from'./mockFolha';export{mockPonto}from'./mockPonto';export{mockDepartamentos}from'./mockDepartamentos';export{mockCargos}from'./mockCargos';export{mockBeneficios}from'./mockBeneficios';export{mockUsuarios}from'./mockUsuarios';
