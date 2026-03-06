@@ -1,23 +1,11 @@
 import { z } from 'zod';
 
 export const usuarioSchema = z.object({
-  nome: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-  email: z.string().email('E-mail inválido'),
-  senha: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres').optional(),
-  confirmarSenha: z.string().optional(),
-  perfil: z.enum(['admin', 'gestor', 'operador', 'visualizador']),
+  nome: z.string().min(3, 'Nome é obrigatório'),
+  email: z.string().email('Email inválido'),
   perfilId: z.string().optional(),
-  permissoes: z.array(z.string()).optional(),
-  ativo: z.boolean(),
-}).refine(data => {
-  if (data.senha && data.confirmarSenha) return data.senha === data.confirmarSenha;
-  return true;
-}, { message: 'Senhas não conferem', path: ['confirmarSenha'] });
-
-export const loginSchema = z.object({
-  email: z.string().email('E-mail inválido'),
-  senha: z.string().min(1, 'Senha obrigatória'),
+  senha: z.string().min(6, 'Mínimo 6 caracteres').optional(),
+  ativo: z.boolean().default(true),
 });
 
 export type UsuarioFormData = z.infer<typeof usuarioSchema>;
-export type LoginFormData = z.infer<typeof loginSchema>;

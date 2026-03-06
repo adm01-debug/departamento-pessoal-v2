@@ -1,18 +1,14 @@
 import { z } from 'zod';
 
 export const colaboradorSchema = z.object({
-  nome: z.string().min(3),
-  cpf: z.string().min(11),
-  email: z.string().email().optional().or(z.literal('')),
+  nome: z.string().min(3, 'Nome é obrigatório'),
+  cpf: z.string().min(11, 'CPF inválido'),
+  email: z.string().email('Email inválido'),
   telefone: z.string().optional(),
-  data_nascimento: z.string().optional(),
-  dataAdmissao: z.string().min(1),
-  salario: z.number().positive(),
-  cargoId: z.string().optional(),
-  departamentoId: z.string().optional(),
-  tipo_contrato: z.enum(['clt', 'pj', 'estagio', 'temporario', 'autonomo']).default('clt'),
-  status: z.enum(['ativo', 'inativo', 'ferias', 'afastado', 'demitido']).default('ativo'),
+  cargoId: z.string().min(1, 'Cargo é obrigatório'),
+  departamentoId: z.string().min(1, 'Departamento é obrigatório'),
+  dataAdmissao: z.string().min(1, 'Data de admissão é obrigatória'),
+  salario: z.number().min(0, 'Salário deve ser positivo'),
 });
 
-export type ColaboradorSchema = z.infer<typeof colaboradorSchema>;
 export type ColaboradorFormData = z.infer<typeof colaboradorSchema>;

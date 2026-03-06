@@ -1,4 +1,0 @@
-import { z } from "zod";
-export const avaliacaoSchema = z.object({ id: z.string().uuid().optional(), colaboradorId: z.string().uuid(), avaliadorId: z.string().uuid(), periodo: z.string(), tipo: z.enum(["90_DIAS", "ANUAL", "SEMESTRAL", "PROMOCAO", "FEEDBACK"]), status: z.enum(["PENDENTE", "AUTOAVALIACAO", "AVALIACAO_GESTOR", "FEEDBACK", "CONCLUIDA"]).default("PENDENTE"), dataInicio: z.date(), dataFim: z.date().optional(), notaFinal: z.number().min(0).max(10).optional(), metas: z.array(z.object({ descricao: z.string(), peso: z.number(), atingido: z.number() })).optional(), competencias: z.array(z.object({ nome: z.string(), nota: z.number() })).optional(), comentarioColaborador: z.string().optional(), comentarioGestor: z.string().optional() });
-export type AvaliacaoInput = z.infer<typeof avaliacaoSchema>;
-export default avaliacaoSchema;
