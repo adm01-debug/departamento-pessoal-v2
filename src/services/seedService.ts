@@ -35,7 +35,7 @@ export const seedService = {
   },
 
   async clearAll() {
-    await supabase.from('folha_pagamento').delete().neq('id', '');
+    await supabase.from('folhas_pagamento').delete().neq('id', '');
     await supabase.from('ferias').delete().neq('id', '');
     await supabase.from('colaboradores').delete().neq('id', '');
     await supabase.from('empresas').delete().neq('id', '');

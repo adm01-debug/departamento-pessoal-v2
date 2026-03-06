@@ -47,8 +47,8 @@ function useFolhaResumo(competencia: string) {
       const [mes, ano] = competencia.split("/");
       const competenciaDB = `${ano}-${mes}`;
 
-      const { data: folhaData } = await supabase.from("folha_pagamento").select("*").eq("competencia", competenciaDB);
-      const { data: statusData } = await supabase.from("folha_status").select("*").eq("competencia", competenciaDB).single();
+      const { data: folhaData } = await supabase.from("folhas_pagamento").select("*").eq("competencia", competenciaDB);
+      const { data: statusData } = await supabase.from("folhas_pagamento").select("*").eq("competencia", competenciaDB).maybeSingle();
 
       const colaboradores = folhaData?.length || 0;
       const totalProventos = folhaData?.reduce((acc, f) => acc + (f.total_proventos || 0), 0) || 0;
