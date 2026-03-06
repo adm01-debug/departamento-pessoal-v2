@@ -90,9 +90,6 @@ function usePendencias() {
     queryKey: ["dashboard-pendencias"],
     queryFn: async () => {
       const pendencias: Pendencia[] = [];
-
-      const hoje = new Date();
-      const em30Dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
       // Férias pendentes de aprovação
       const { count: feriasPendentes } = await supabase
         .from("ferias")
