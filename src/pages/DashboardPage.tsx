@@ -44,12 +44,12 @@ function useDashboardStats() {
 
       const mesAtual = new Date().toISOString().slice(0, 7);
       const { data: folhaData } = await supabase
-        .from("folha_pagamento")
-        .select("valor_liquido")
+        .from("folhas_pagamento")
+        .select("total_liquido")
         .eq("competencia", mesAtual);
 
       const folhaMensal =
-        folhaData?.reduce((acc, f) => acc + (f.valor_liquido || 0), 0) || 0;
+        folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
 
       const hoje = new Date();
       const em30Dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -62,10 +62,14 @@ function useDashboardStats() {
 
       const { data: bancoData } = await supabase
         .from("banco_horas")
-        .select("saldo_minutos");
+        .select("horas, tipo");
 
       const bancoHoras =
-        bancoData?.reduce((acc, b) => acc + (b.saldo_minutos || 0), 0) || 0;
+        bancoData?.reduce((acc, b) => {
+          const [h, m] = (b.horas || '00:00').split(':').map(Number);
+          const mins = (h * 60) + (m || 0);
+          return acc + (b.tipo === 'credito' ? mins : -mins);
+        }, 0) || 0;
 
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
@@ -89,44 +93,45 @@ function usePendencias() {
 
       const hoje = new Date();
       const em30Dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
-      const { count: feriasVencendo } = await supabase
+      // Férias pendentes de aprovação
+      const { count: feriasPendentes } = await supabase
         .from("ferias")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pendente")
-        .lte("data_limite", em30Dias.toISOString());
-
-      if (feriasVencendo && feriasVencendo > 0) {
-        pendencias.push({
-          tipo: "ferias",
-          descricao: `${feriasVencendo} férias vencendo em 30 dias`,
-          quantidade: feriasVencendo,
-        });
-      }
-
-      const { count: semDocs } = await supabase
-        .from("colaboradores")
-        .select("*", { count: "exact", head: true })
-        .eq("documentacao_completa", false)
-        .eq("status", "ativo");
-
-      if (semDocs && semDocs > 0) {
-        pendencias.push({
-          tipo: "documentos",
-          descricao: `${semDocs} colaboradores sem documentação`,
-          quantidade: semDocs,
-        });
-      }
-
-      const { count: atestados } = await supabase
-        .from("atestados")
         .select("*", { count: "exact", head: true })
         .eq("status", "pendente");
 
-      if (atestados && atestados > 0) {
+      if (feriasPendentes && feriasPendentes > 0) {
         pendencias.push({
-          tipo: "atestados",
-          descricao: `${atestados} atestados pendentes de lançamento`,
-          quantidade: atestados,
+          tipo: "ferias",
+          descricao: `${feriasPendentes} férias pendentes de aprovação`,
+          quantidade: feriasPendentes,
+        });
+      }
+
+      // Afastamentos em andamento
+      const { count: afastamentosAtivos } = await supabase
+        .from("afastamentos")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "ativo");
+
+      if (afastamentosAtivos && afastamentosAtivos > 0) {
+        pendencias.push({
+          tipo: "afastamentos",
+          descricao: `${afastamentosAtivos} afastamentos em andamento`,
+          quantidade: afastamentosAtivos,
+        });
+      }
+
+      // Admissões em andamento
+      const { count: admissoesPendentes } = await supabase
+        .from("admissoes")
+        .select("*", { count: "exact", head: true })
+        .neq("etapa", "concluida");
+
+      if (admissoesPendentes && admissoesPendentes > 0) {
+        pendencias.push({
+          tipo: "admissoes",
+          descricao: `${admissoesPendentes} admissões em andamento`,
+          quantidade: admissoesPendentes,
         });
       }
 
