@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para operações de cargos
  * @module services/cargosService

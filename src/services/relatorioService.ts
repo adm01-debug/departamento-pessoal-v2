@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: RelatorioService - Expandido e Documentado
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 

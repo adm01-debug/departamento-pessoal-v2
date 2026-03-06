@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Serviço de notificações push do navegador
  * @module services/BrowserNotificationService

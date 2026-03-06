@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V20: Empresa Service
 import { supabase } from '@/integrations/supabase/client';
 

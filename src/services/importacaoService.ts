@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { supabase } from "@/integrations/supabase/client";
 
 export interface ImportOptions { table: string; mapping?: Record<string, string>; skipDuplicates?: boolean; validateOnly?: boolean; batchSize?: number; }

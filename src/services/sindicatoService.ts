@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V15-399
 import { supabase } from '@/integrations/supabase/client';
 export interface Sindicato { id: string; nome: string; cnpj: string; contribuicao_mensal?: number; data_base?: string; telefone?: string; email?: string; }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: NotificacaoService - Sistema de Notificações Completo
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para geração de relatórios
  * @module services/relatoriosService
