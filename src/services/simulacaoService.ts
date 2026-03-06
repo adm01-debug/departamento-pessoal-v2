@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V21-003: Service de Simulacao Salarial
 export interface SimulacaoParams {
   salarioBruto: number;

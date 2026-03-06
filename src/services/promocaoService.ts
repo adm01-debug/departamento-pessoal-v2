@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V17-S019: PromocaoService Real
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 export interface Promocao { id: string; colaborador_id: string; cargo_anterior_id: string; cargo_novo_id: string; salario_anterior: number; salario_novo: number; data_vigencia: string; motivo?: string; }

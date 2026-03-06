@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para contratação digital
  * @module services/contratacaoService

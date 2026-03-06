@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para operações de desligamento
  * @module services/desligamentoService

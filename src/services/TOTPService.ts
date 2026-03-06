@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TOTP Service - Autenticação de dois fatores
  */

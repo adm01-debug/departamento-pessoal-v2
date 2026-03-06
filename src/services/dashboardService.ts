@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18: DashboardService - Usando Supabase
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
 

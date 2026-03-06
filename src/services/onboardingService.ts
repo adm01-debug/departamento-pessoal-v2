@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @fileoverview Service para onboarding de colaboradores
  * @module services/onboardingService

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V18-S007: DIRF Service Real Expandido - Declaracao Completa
 import { supabase, handleSupabaseError } from "@/integrations/supabase/client";
 

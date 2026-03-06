@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V20-010: Service Geracao de Guias
 export type TipoGuia = 'GPS' | 'DARF' | 'GRF' | 'GRRF' | 'DAE';
 

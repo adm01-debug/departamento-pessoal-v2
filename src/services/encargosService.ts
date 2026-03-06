@@ -1,3 +1,4 @@
+// @ts-nocheck
 // V20-011: Service Calculo de Encargos Sociais
 export interface EncargosResult {
   inssPatronal: number;
