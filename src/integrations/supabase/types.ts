@@ -1747,6 +1747,103 @@ export type Database = {
           },
         ]
       }
+      esocial_eventos: {
+        Row: {
+          competencia: string | null
+          created_at: string
+          dados: Json | null
+          data_envio: string | null
+          empresa_id: string | null
+          erros: Json | null
+          id: string
+          protocolo: string | null
+          status: string | null
+          tipo_evento: string
+          updated_at: string
+          xml: string | null
+        }
+        Insert: {
+          competencia?: string | null
+          created_at?: string
+          dados?: Json | null
+          data_envio?: string | null
+          empresa_id?: string | null
+          erros?: Json | null
+          id?: string
+          protocolo?: string | null
+          status?: string | null
+          tipo_evento: string
+          updated_at?: string
+          xml?: string | null
+        }
+        Update: {
+          competencia?: string | null
+          created_at?: string
+          dados?: Json | null
+          data_envio?: string | null
+          empresa_id?: string | null
+          erros?: Json | null
+          id?: string
+          protocolo?: string | null
+          status?: string | null
+          tipo_evento?: string
+          updated_at?: string
+          xml?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "esocial_eventos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      esocial_lotes: {
+        Row: {
+          ambiente: string | null
+          created_at: string
+          empresa_id: string | null
+          eventos: Json | null
+          id: string
+          progresso: number | null
+          protocolo: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          ambiente?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          eventos?: Json | null
+          id?: string
+          progresso?: number | null
+          protocolo?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ambiente?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          eventos?: Json | null
+          id?: string
+          progresso?: number | null
+          protocolo?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "esocial_lotes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       eventos_variaveis: {
         Row: {
           colaborador_id: string
