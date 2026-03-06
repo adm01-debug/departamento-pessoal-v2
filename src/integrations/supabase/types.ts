@@ -1823,6 +1823,56 @@ export type Database = {
           },
         ]
       }
+      documentos: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string
+          data_validade: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          tipo: string
+          updated_at: string
+          url: string | null
+          validado: boolean | null
+          validado_por: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_validade?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          tipo: string
+          updated_at?: string
+          url?: string | null
+          validado?: boolean | null
+          validado_por?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_validade?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          tipo?: string
+          updated_at?: string
+          url?: string | null
+          validado?: boolean | null
+          validado_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_admissao: {
         Row: {
           admissao_id: string
