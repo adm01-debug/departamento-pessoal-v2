@@ -16,5 +16,5 @@ export { useDepartamentos } from "./useDepartamentos";
 export { useCargos } from "./useCargos";
 export { useDocumentos } from "./useDocumentos";
 export { useContratos } from "./useContratos";
-export { useConfig } from "./useConfig";
+export { useConfiguracao as useConfig } from "./useConfiguracao";
 export { useNotificacoes } from "./useNotificacoes";
