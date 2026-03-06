@@ -42,7 +42,7 @@ class ValeAlimentacaoService {
   }
 
   async buscarPorId(id: string): Promise<ValeAlimentacao | null> {
-    const { data, error } = await supabase.from("vales_alimentacao").select("*").eq("id", id).single();
+    const { data, error } = await supabase.from("vales_alimentacao").select("*").eq("id", id).maybeSingle();
     if (error) throw new Error(`Erro: ${error.message}`);
     return data;
   }
@@ -79,7 +79,7 @@ class ValeAlimentacaoService {
     const recargas: RecargaVA[] = [];
 
     for (const va of vas) {
-      const { data, error } = await supabase.from("recargas_va").insert([{
+      const { data, error } = await supabase.from("recargas_vale").insert([{
         vale_alimentacao_id: va.id,
         colaborador_id: va.colaborador_id,
         competencia,
@@ -95,7 +95,7 @@ class ValeAlimentacaoService {
   }
 
   async processarRecargas(competencia: string): Promise<void> {
-    await supabase.from("recargas_va").update({ status: "processada" }).eq("competencia", competencia).eq("status", "pendente");
+    await supabase.from("recargas_vale").update({ status: "processada" }).eq("competencia", competencia).eq("status", "pendente");
   }
 
   async calcularDescontoFolha(colaboradorId: string): Promise<number> {

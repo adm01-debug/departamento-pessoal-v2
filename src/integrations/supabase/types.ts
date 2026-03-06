@@ -513,6 +513,72 @@ export type Database = {
           },
         ]
       }
+      beneficios: {
+        Row: {
+          ativo: boolean | null
+          colaborador_id: string | null
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          status: string | null
+          tipo: string | null
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          status?: string | null
+          tipo?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          status?: string | null
+          tipo?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficios_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficios_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficios_colaborador: {
         Row: {
           ativo: boolean | null
@@ -755,6 +821,42 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      colaborador_beneficios: {
+        Row: {
+          beneficio_id: string
+          colaborador_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          beneficio_id: string
+          colaborador_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          beneficio_id?: string
+          colaborador_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaborador_beneficios_beneficio_id_fkey"
+            columns: ["beneficio_id"]
+            isOneToOne: false
+            referencedRelation: "beneficios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaborador_beneficios_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
         ]
@@ -1591,6 +1693,156 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      escalas: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          dias_folga: number | null
+          dias_trabalho: number | null
+          empresa_id: string | null
+          horario_entrada: string | null
+          horario_saida: string | null
+          id: string
+          intervalo_minutos: number | null
+          nome: string
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          dias_folga?: number | null
+          dias_trabalho?: number | null
+          empresa_id?: string | null
+          horario_entrada?: string | null
+          horario_saida?: string | null
+          id?: string
+          intervalo_minutos?: number | null
+          nome: string
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          dias_folga?: number | null
+          dias_trabalho?: number | null
+          empresa_id?: string | null
+          horario_entrada?: string | null
+          horario_saida?: string | null
+          id?: string
+          intervalo_minutos?: number | null
+          nome?: string
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escalas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      esocial_eventos: {
+        Row: {
+          competencia: string | null
+          created_at: string
+          dados: Json | null
+          data_envio: string | null
+          empresa_id: string | null
+          erros: Json | null
+          id: string
+          protocolo: string | null
+          status: string | null
+          tipo_evento: string
+          updated_at: string
+          xml: string | null
+        }
+        Insert: {
+          competencia?: string | null
+          created_at?: string
+          dados?: Json | null
+          data_envio?: string | null
+          empresa_id?: string | null
+          erros?: Json | null
+          id?: string
+          protocolo?: string | null
+          status?: string | null
+          tipo_evento: string
+          updated_at?: string
+          xml?: string | null
+        }
+        Update: {
+          competencia?: string | null
+          created_at?: string
+          dados?: Json | null
+          data_envio?: string | null
+          empresa_id?: string | null
+          erros?: Json | null
+          id?: string
+          protocolo?: string | null
+          status?: string | null
+          tipo_evento?: string
+          updated_at?: string
+          xml?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "esocial_eventos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      esocial_lotes: {
+        Row: {
+          ambiente: string | null
+          created_at: string
+          empresa_id: string | null
+          eventos: Json | null
+          id: string
+          progresso: number | null
+          protocolo: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          ambiente?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          eventos?: Json | null
+          id?: string
+          progresso?: number | null
+          protocolo?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ambiente?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          eventos?: Json | null
+          id?: string
+          progresso?: number | null
+          protocolo?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "esocial_lotes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       eventos_variaveis: {
         Row: {
@@ -3079,6 +3331,51 @@ export type Database = {
         }
         Relationships: []
       }
+      recargas_vale: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string
+          data_recarga: string | null
+          id: string
+          status: string | null
+          vale_id: string | null
+          valor: number
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_recarga?: string | null
+          id?: string
+          status?: string | null
+          vale_id?: string | null
+          valor: number
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_recarga?: string | null
+          id?: string
+          status?: string | null
+          vale_id?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recargas_vale_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recargas_vale_vale_id_fkey"
+            columns: ["vale_id"]
+            isOneToOne: false
+            referencedRelation: "vales_alimentacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registros_ponto: {
         Row: {
           aprovado: boolean | null
@@ -3300,6 +3597,39 @@ export type Database = {
           incide_inss?: boolean | null
           incide_irrf?: boolean | null
           tipo?: Database["public"]["Enums"]["tipo_evento_folha"]
+        }
+        Relationships: []
+      }
+      saved_filters: {
+        Row: {
+          created_at: string
+          entity_type: string
+          filters: Json | null
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_type: string
+          filters?: Json | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_type?: string
+          filters?: Json | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3699,6 +4029,66 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vales_alimentacao: {
+        Row: {
+          ativo: boolean | null
+          colaborador_id: string | null
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          dias_uteis: number | null
+          empresa_id: string | null
+          id: string
+          tipo: string | null
+          updated_at: string
+          valor_mensal: number | null
+          valor_por_dia: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          dias_uteis?: number | null
+          empresa_id?: string | null
+          id?: string
+          tipo?: string | null
+          updated_at?: string
+          valor_mensal?: number | null
+          valor_por_dia?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          dias_uteis?: number | null
+          empresa_id?: string | null
+          id?: string
+          tipo?: string | null
+          updated_at?: string
+          valor_mensal?: number | null
+          valor_por_dia?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vales_alimentacao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vales_alimentacao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       verification_tokens: {
         Row: {
