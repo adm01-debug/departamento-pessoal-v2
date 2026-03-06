@@ -1,9 +1,9 @@
 // @ts-nocheck
-// V21-012: Index de Exports Services - Clean
+// V21-012: Index de Exports Services
 export { default as inssService } from './inssService';
 export { default as irrfService } from './irrfService';
-export { default as fgtsService } from './fgtsService';
 export { default as esocialService } from './esocialService';
+export { default as reciboService } from './reciboService';
 export { default as guiaService } from './guiaService';
 export { default as encargosService } from './encargosService';
 export { default as provisoesService } from './provisoesService';
@@ -19,6 +19,7 @@ export const empresaService = { list: async () => [], listar: async () => [], bu
 export const feriasService = { listSolicitacoes: async () => [], listar: async () => [], aprovar: async (id: string) => {}, rejeitar: async (id: string) => {} };
 export const folhaService = { list: async () => [], listar: async () => [], buscarPorId: async (id: string) => null };
 export const pontoService = { registrar: async (tipo: string, ...args: any[]) => ({}) };
+export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 
 // Types re-exports
 export type { DadosRecibo, ReciboGerado } from './reciboService';
