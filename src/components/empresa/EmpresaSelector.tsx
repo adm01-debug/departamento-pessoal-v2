@@ -18,9 +18,9 @@ export const EmpresaSelector = memo(function EmpresaSelector() {
 
   if (!userEmpresas || userEmpresas.length === 0) {
     return (
-      <Button variant="outline" size="sm" onClick={() => setModalOpen(true)}>
+      <Button variant="outline" size="sm" disabled>
         <Building2 className="h-4 w-4 mr-2" />
-        Configurar Empresa
+        Sem Empresa
       </Button>
     );
   }
