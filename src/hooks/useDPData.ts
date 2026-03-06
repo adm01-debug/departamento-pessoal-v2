@@ -146,7 +146,7 @@ export function usePontos(colaboradorId?: string, mes?: string) {
   return useQuery({
     queryKey: ['pontos', colaboradorId, mes],
     queryFn: async () => {
-      let query = supabase.from('pontos').select('*, colaborador:colaboradores(nome)').order('data', { ascending: false });
+      let query = supabase.from('registros_ponto').select('*, colaborador:colaboradores(nome_completo)').order('data', { ascending: false });
       if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
       if (mes) query = query.gte('data', `${mes}-01`).lte('data', `${mes}-31`);
       const { data, error } = await query;
@@ -160,7 +160,7 @@ export function useFolha(mes: string) {
   return useQuery({
     queryKey: ['folha', mes],
     queryFn: async () => {
-      const { data, error } = await supabase.from('folhas').select('*, colaborador:colaboradores(nome, cargo)').eq('mes_referencia', mes);
+      const { data, error } = await supabase.from('folhas_pagamento').select('*').eq('competencia', mes);
       if (error) throw error;
       return data as Folha[];
     },
@@ -195,7 +195,7 @@ export function useRegistrarPonto() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (ponto: Omit<Ponto, 'id'>) => {
-      const { data, error } = await supabase.from('pontos').insert(ponto).select().single();
+      const { data, error } = await supabase.from('registros_ponto').insert(ponto).select().single();
       if (error) throw error;
       return data;
     },
