@@ -8,7 +8,7 @@ export class AutoBackupService {
     const resultado: BackupResult = { id: `BKP${Date.now()}`, dataInicio: inicio, dataFim: new Date(), tamanho: 0, status: "SUCESSO", arquivos: 0 };
     try {
       // Simula backup de tabelas
-      const tabelas = ["colaboradores", "folha_pagamento", "ferias", "ponto", "beneficios", "documentos"];
+      const tabelas = ["colaboradores", "folhas_pagamento", "ferias", "registros_ponto", "beneficios_colaborador", "documentos_colaborador"];
       resultado.arquivos = tabelas.length;
       resultado.tamanho = Math.random() * 1000000000;
       resultado.dataFim = new Date();
