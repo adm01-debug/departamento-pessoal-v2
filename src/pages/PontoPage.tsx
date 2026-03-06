@@ -21,7 +21,7 @@ export default function PontoPage() {
         ).catch(() => null);
         if (pos) coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       }
-      await pontoService.registrar('user-id', tipo, coords);
+      await pontoService.registrar(tipo, 'user-id');
       success('Ponto registrado!', `${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
     } catch (err: any) {
       error('Erro ao registrar ponto', err.message);
