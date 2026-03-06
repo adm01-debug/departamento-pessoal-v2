@@ -133,8 +133,15 @@ export const admissaoService = {
     if (error) throw error;
     return data || [];
   },
+  async getAll(empresaId?: string) { return admissaoService.listar(empresaId); },
+  async getById(id: string) { const { data, error } = await supabase.from('admissoes').select('*').eq('id', id).maybeSingle(); if (error) throw error; return data; },
+  async buscarPorId(id: string) { return admissaoService.getById(id); },
   async criar(d: any) { const { data, error } = await supabase.from('admissoes').insert(d).select().single(); if (error) throw error; return data; },
+  async create(d: any) { return admissaoService.criar(d); },
   async atualizar(id: string, d: any) { const { data, error } = await supabase.from('admissoes').update(d).eq('id', id).select().single(); if (error) throw error; return data; },
+  async update(id: string, d: any) { return admissaoService.atualizar(id, d); },
+  async concluir(id: string) { return admissaoService.atualizar(id, { etapa: 'concluida' }); },
+  async cancelar(id: string) { return admissaoService.atualizar(id, { etapa: 'cancelada' }); },
 };
 
 // Types re-exports
