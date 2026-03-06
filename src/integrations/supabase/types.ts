@@ -369,6 +369,48 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity: string
+          entity_id: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       auditoria: {
         Row: {
           acao: string
@@ -509,6 +551,66 @@ export type Database = {
             columns: ["registro_ponto_id"]
             isOneToOne: false
             referencedRelation: "registros_ponto"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficiarios_plano: {
+        Row: {
+          colaborador_id: string | null
+          cpf: string | null
+          created_at: string
+          data_carencia: string | null
+          data_exclusao: string | null
+          data_inclusao: string | null
+          id: string
+          nome: string | null
+          parentesco: string | null
+          plano_saude_id: string | null
+          status: string | null
+          tipo: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_carencia?: string | null
+          data_exclusao?: string | null
+          data_inclusao?: string | null
+          id?: string
+          nome?: string | null
+          parentesco?: string | null
+          plano_saude_id?: string | null
+          status?: string | null
+          tipo?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_carencia?: string | null
+          data_exclusao?: string | null
+          data_inclusao?: string | null
+          id?: string
+          nome?: string | null
+          parentesco?: string | null
+          plano_saude_id?: string | null
+          status?: string | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiarios_plano_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiarios_plano_plano_saude_id_fkey"
+            columns: ["plano_saude_id"]
+            isOneToOne: false
+            referencedRelation: "planos_saude"
             referencedColumns: ["id"]
           },
         ]
@@ -3034,6 +3136,44 @@ export type Database = {
           },
         ]
       }
+      linhas_transporte: {
+        Row: {
+          created_at: string
+          id: string
+          ida_volta: boolean | null
+          nome: string
+          tipo: string | null
+          vale_transporte_id: string | null
+          valor: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ida_volta?: boolean | null
+          nome: string
+          tipo?: string | null
+          vale_transporte_id?: string | null
+          valor?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ida_volta?: boolean | null
+          nome?: string
+          tipo?: string | null
+          vale_transporte_id?: string | null
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linhas_transporte_vale_transporte_id_fkey"
+            columns: ["vale_transporte_id"]
+            isOneToOne: false
+            referencedRelation: "vales_transporte"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       log_envio_relatorios: {
         Row: {
           agendamento_id: string | null
@@ -5042,6 +5182,56 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vales_transporte: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string
+          desconto: number | null
+          dias_uteis: number | null
+          id: string
+          optante: boolean | null
+          percentual_desconto: number | null
+          updated_at: string
+          valor_diario: number | null
+          valor_liquido: number | null
+          valor_mensal: number | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string
+          desconto?: number | null
+          dias_uteis?: number | null
+          id?: string
+          optante?: boolean | null
+          percentual_desconto?: number | null
+          updated_at?: string
+          valor_diario?: number | null
+          valor_liquido?: number | null
+          valor_mensal?: number | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string
+          desconto?: number | null
+          dias_uteis?: number | null
+          id?: string
+          optante?: boolean | null
+          percentual_desconto?: number | null
+          updated_at?: string
+          valor_diario?: number | null
+          valor_liquido?: number | null
+          valor_mensal?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vales_transporte_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
         ]
