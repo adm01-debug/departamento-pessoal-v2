@@ -20,7 +20,7 @@ export const empresaService = { list: async () => [], listar: async () => [], bu
 export const feriasService = { listSolicitacoes: async () => [], listar: async () => [], aprovar: async (id: string) => {}, rejeitar: async (id: string) => {} };
 export const folhaService = { list: async () => [], listar: async () => [], buscarPorId: async (id: string) => null };
 export const pontoService = { registrar: async (tipo: string, ...args: any[]) => ({}) };
-
+export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 // Types re-exports
 export type { DadosRecibo, ReciboGerado } from './reciboService';
 export type { TipoGuia, DadosGuia, GuiaGerada } from './guiaService';
