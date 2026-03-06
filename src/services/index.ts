@@ -106,13 +106,7 @@ export const documentoService = {
   async excluir(id: string) { const { error } = await supabase.from('documentos').delete().eq('id', id); if (error) throw error; },
 };
 
-export const authService = {
-  async resetPassword(email: string) {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) throw error;
-    return { success: true };
-  },
-};
+// authService is exported from ./authService above
 
 export const admissaoService = {
   async listar(empresaId?: string) {
