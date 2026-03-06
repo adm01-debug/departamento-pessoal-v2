@@ -62,7 +62,7 @@ export const relatorioServiceReal = {
         
       case 'folha':
         const { data: folha } = await supabase
-          .from('folha_pagamento')
+          .from('folhas_pagamento')
           .select('*, colaborador:colaboradores(nome, cpf)')
           .eq('empresa_id', empresaId)
           .eq('competencia', params.competencia || new Date().toISOString().slice(0, 7));
