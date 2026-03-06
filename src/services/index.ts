@@ -1,11 +1,8 @@
-// V23: Services Index - Clean & Active
+// V24: Services Index - Clean & Active
 import { supabase } from '@/integrations/supabase/client';
 
-// Re-export active services
-export { default as inssService } from './inssService';
-export { default as irrfService } from './irrfService';
-export { default as esocialService } from './esocialService';
-export { default as auditLogService } from './auditLogService';
+// Auth service
+export { authService } from './authService';
 
 // Real services
 export const beneficioService = {
