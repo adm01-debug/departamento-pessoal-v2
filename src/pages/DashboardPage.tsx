@@ -121,11 +121,11 @@ function usePendencias() {
         });
       }
 
-      // Admissões em andamento
+      // Admissões em andamento (não finalizadas no eSocial)
       const { count: admissoesPendentes } = await supabase
         .from("admissoes")
         .select("*", { count: "exact", head: true })
-        .neq("etapa", "concluida");
+        .neq("etapa", "esocial");
 
       if (admissoesPendentes && admissoesPendentes > 0) {
         pendencias.push({
