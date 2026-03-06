@@ -1,8 +1,3 @@
-/**
- * Exportações de componentes de segurança
- */
-
-export { ReauthenticationModal } from './ReauthenticationModal';
 export { SessionManager } from './SessionManager';
 export { NotificationPermissionBanner } from './NotificationPermissionBanner';
 export { NotificationPreferencesCard } from './NotificationPreferencesCard';
@@ -17,7 +12,6 @@ export { PasswordStrengthIndicator, usePasswordStrength, useLeakedPasswordCheck 
 export { Can, withPermission } from './Can';
 export { PasskeyManager } from '@/components/auth/PasskeyManager';
 export { PasskeyLoginButton } from '@/components/auth/PasskeyLoginButton';
-export { MFASetup } from '@/components/auth/MFASetup';
 export { MFAVerification } from '@/components/auth/MFAVerification';
 export { LoginLockoutAlert } from './LoginLockoutAlert';
 export { useLoginRateLimit } from '@/hooks/useLoginRateLimit';
