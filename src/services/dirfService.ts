@@ -92,7 +92,7 @@ export const dirfServiceReal = {
   },
 
   async buscarBeneficiarios(empresaId: string, anoCalendario: number): Promise<BeneficiarioDIRF[]> {
-    const { data } = await supabase.from("folha_pagamento")
+    const { data } = await supabase.from("folhas_pagamento")
       .select("colaborador:colaboradores(cpf, nome), valor_bruto, inss, irrf, decimo13")
       .eq("empresa_id", empresaId)
       .gte("competencia", `${anoCalendario}-01`)
@@ -207,7 +207,7 @@ export const dirfServiceReal = {
 
   // Informe de Rendimentos
   async gerarInformeRendimentos(empresaId: string, colaboradorId: string, ano: number): Promise<string> {
-    const { data } = await supabase.from("folha_pagamento")
+    const { data } = await supabase.from("folhas_pagamento")
       .select("*")
       .eq("empresa_id", empresaId)
       .eq("colaborador_id", colaboradorId)
