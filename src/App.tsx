@@ -37,6 +37,7 @@ export default function App() {
         <Route path="ferias" element={<FeriasPage />} />
         <Route path="ponto" element={<PontoPage />} />
         <Route path="beneficios" element={<BeneficiosPage />} />
+        <Route path="beneficios/novo" element={<BeneficioFormPage />} />
         <Route path="relatorios" element={<RelatoriosPage />} />
         <Route path="esocial" element={<ESocialPage />} />
         <Route path="configuracoes" element={<ConfiguracoesPage />} />
