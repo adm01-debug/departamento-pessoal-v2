@@ -1,5 +1,0 @@
-export const pensaoTransformer = {
-  toAPI: (data: any) => ({ colaborador_id: data.colaboradorId, beneficiario: data.beneficiario, cpf_beneficiario: data.cpfBeneficiario, tipo_calculo: data.tipoCalculo, percentual: data.percentual, valor_fixo: data.valorFixo, base_calculo: data.baseCalculo, banco: data.banco, agencia: data.agencia, conta: data.conta, numero_processo: data.numeroProcesso, vara: data.vara, data_inicio: data.dataInicio, data_fim: data.dataFim, ativo: data.ativo }),
-  fromAPI: (data: any) => ({ id: data.id, colaboradorId: data.colaborador_id, beneficiario: data.beneficiario, cpfBeneficiario: data.cpf_beneficiario, tipoCalculo: data.tipo_calculo, percentual: data.percentual, valorFixo: data.valor_fixo, baseCalculo: data.base_calculo, banco: data.banco, agencia: data.agencia, conta: data.conta, numeroProcesso: data.numero_processo, vara: data.vara, dataInicio: new Date(data.data_inicio), dataFim: data.data_fim ? new Date(data.data_fim) : undefined, ativo: data.ativo }),
-};
-export default pensaoTransformer;

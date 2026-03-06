@@ -1,1 +1,0 @@
-export async function buscarCNPJ(cnpj:string):Promise<any>{const cnpjLimpo=cnpj.replace(/\D/g,'');if(cnpjLimpo.length!==14)return null;try{const response=await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`);if(!response.ok)return null;return await response.json();}catch{return null;}}

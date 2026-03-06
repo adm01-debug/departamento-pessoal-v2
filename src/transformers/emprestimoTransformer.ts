@@ -1,7 +1,0 @@
-import { Emprestimo } from "@/types/emprestimo.types";
-export const emprestimoTransformer = {
-  toAPI(data: Partial<Emprestimo>): Record<string, any> { return { colaborador_id: data.colaboradorId, tipo: data.tipo, banco_id: data.bancoId, contrato: data.contrato, valor_total: data.valorTotal, taxa_juros: data.taxaJuros, quantidade_parcelas: data.quantidadeParcelas, valor_parcela: data.valorParcela, parcelas_pagas: data.parcelasPagas, data_inicio: data.dataInicio, data_fim: data.dataFim, dia_desconto: data.diaDesconto, margem_utilizada: data.margemUtilizada, situacao: data.situacao, observacao: data.observacao }; },
-  fromAPI(data: Record<string, any>): Emprestimo { return { id: data.id, colaboradorId: data.colaborador_id, tipo: data.tipo, bancoId: data.banco_id, contrato: data.contrato, valorTotal: data.valor_total, taxaJuros: data.taxa_juros, quantidadeParcelas: data.quantidade_parcelas, valorParcela: data.valor_parcela, parcelasPagas: data.parcelas_pagas, dataInicio: new Date(data.data_inicio), dataFim: data.data_fim ? new Date(data.data_fim) : undefined, diaDesconto: data.dia_desconto, margemUtilizada: data.margem_utilizada, situacao: data.situacao, observacao: data.observacao }; },
-  toExport: (emprestimos: Emprestimo[]) => emprestimos.map(e => ({ Tipo: e.tipo, "Valor Total": e.valorTotal, Parcelas: `${e.parcelasPagas}/${e.quantidadeParcelas}`, "Valor Parcela": e.valorParcela, Situação: e.situacao })),
-};
-export default emprestimoTransformer;

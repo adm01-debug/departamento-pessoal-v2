@@ -1,1 +1,0 @@
-export function validarEmailCompleto(email:string):boolean{const regex=/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$/;return regex.test(email);}export function validarDominio(email:string,dominiosPermitidos:string[]):boolean{const dominio=email.split('@')[1];return dominiosPermitidos.includes(dominio);}
