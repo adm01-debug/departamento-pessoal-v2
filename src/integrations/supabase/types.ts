@@ -369,6 +369,51 @@ export type Database = {
         }
         Relationships: []
       }
+      auditoria: {
+        Row: {
+          acao: string
+          created_at: string
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          descricao: string | null
+          empresa_id: string | null
+          entidade: string | null
+          entidade_id: string | null
+          id: string
+          ip_address: string | null
+          usuario_id: string | null
+          usuario_nome: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          descricao?: string | null
+          empresa_id?: string | null
+          entidade?: string | null
+          entidade_id?: string | null
+          id?: string
+          ip_address?: string | null
+          usuario_id?: string | null
+          usuario_nome?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          descricao?: string | null
+          empresa_id?: string | null
+          entidade?: string | null
+          entidade_id?: string | null
+          id?: string
+          ip_address?: string | null
+          usuario_id?: string | null
+          usuario_nome?: string | null
+        }
+        Relationships: []
+      }
       auditoria_logs: {
         Row: {
           acao: string
@@ -662,6 +707,57 @@ export type Database = {
           reason?: string | null
         }
         Relationships: []
+      }
+      cargos: {
+        Row: {
+          ativo: boolean | null
+          cbo: string | null
+          created_at: string
+          departamento_id: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          salario_base: number | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          cbo?: string | null
+          created_at?: string
+          departamento_id?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          salario_base?: number | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          cbo?: string | null
+          created_at?: string
+          departamento_id?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          salario_base?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cargos_departamento_id_fkey"
+            columns: ["departamento_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cargos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       colaboradores: {
         Row: {
@@ -985,6 +1081,44 @@ export type Database = {
           valor?: Json | null
         }
         Relationships: []
+      }
+      departamentos: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          empresa_id: string | null
+          gestor_id: string | null
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          empresa_id?: string | null
+          gestor_id?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          empresa_id?: string | null
+          gestor_id?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "departamentos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dependentes: {
         Row: {
@@ -3208,6 +3342,56 @@ export type Database = {
         }
         Relationships: []
       }
+      sefip_arquivos: {
+        Row: {
+          competencia: string
+          conteudo: string | null
+          created_at: string
+          empresa_id: string | null
+          id: string
+          modalidade: number | null
+          status: string | null
+          total_colaboradores: number | null
+          total_fgts: number | null
+          total_remuneracao: number | null
+          updated_at: string
+        }
+        Insert: {
+          competencia: string
+          conteudo?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          modalidade?: number | null
+          status?: string | null
+          total_colaboradores?: number | null
+          total_fgts?: number | null
+          total_remuneracao?: number | null
+          updated_at?: string
+        }
+        Update: {
+          competencia?: string
+          conteudo?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          modalidade?: number | null
+          status?: string | null
+          total_colaboradores?: number | null
+          total_fgts?: number | null
+          total_remuneracao?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sefip_arquivos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tipos_beneficio: {
         Row: {
           ativo: boolean | null
@@ -3246,6 +3430,135 @@ export type Database = {
           valor_padrao?: number | null
         }
         Relationships: []
+      }
+      transferencias: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          data_vigencia: string
+          departamento_anterior_id: string | null
+          departamento_novo_id: string | null
+          id: string
+          motivo: string | null
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          data_vigencia: string
+          departamento_anterior_id?: string | null
+          departamento_novo_id?: string | null
+          id?: string
+          motivo?: string | null
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          data_vigencia?: string
+          departamento_anterior_id?: string | null
+          departamento_novo_id?: string | null
+          id?: string
+          motivo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transferencias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transferencias_departamento_anterior_id_fkey"
+            columns: ["departamento_anterior_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transferencias_departamento_novo_id_fkey"
+            columns: ["departamento_novo_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treinamento_participantes: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          id: string
+          presente: boolean | null
+          treinamento_id: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          id?: string
+          presente?: boolean | null
+          treinamento_id: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          id?: string
+          presente?: boolean | null
+          treinamento_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinamento_participantes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_participantes_treinamento_id_fkey"
+            columns: ["treinamento_id"]
+            isOneToOne: false
+            referencedRelation: "treinamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treinamentos: {
+        Row: {
+          carga_horaria: number | null
+          created_at: string
+          data: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          carga_horaria?: number | null
+          created_at?: string
+          data?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          carga_horaria?: number | null
+          created_at?: string
+          data?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinamentos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_empresas: {
         Row: {
@@ -3416,6 +3729,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vinculos: {
+        Row: {
+          categoria: string | null
+          colaborador_id: string
+          created_at: string
+          data_fim: string | null
+          data_inicio: string
+          id: string
+          matricula: string | null
+          status: string | null
+          tipo: string
+        }
+        Insert: {
+          categoria?: string | null
+          colaborador_id: string
+          created_at?: string
+          data_fim?: string | null
+          data_inicio: string
+          id?: string
+          matricula?: string | null
+          status?: string | null
+          tipo: string
+        }
+        Update: {
+          categoria?: string | null
+          colaborador_id?: string
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          id?: string
+          matricula?: string | null
+          status?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vinculos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webauthn_challenges: {
         Row: {
