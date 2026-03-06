@@ -29,7 +29,10 @@ export default function App() {
         <Route path="colaboradores/novo" element={<ColaboradorFormPage />} />
         <Route path="colaboradores/:id/editar" element={<ColaboradorFormPage />} />
         <Route path="empresas" element={<EmpresasPage />} />
+        <Route path="empresas/nova" element={<EmpresaFormPage />} />
+        <Route path="empresas/:id/editar" element={<EmpresaFormPage />} />
         <Route path="folha" element={<FolhaPage />} />
+        <Route path="folha/calcular" element={<FolhaPagamentoPage />} />
         <Route path="ferias" element={<FeriasPage />} />
         <Route path="ponto" element={<PontoPage />} />
         <Route path="beneficios" element={<BeneficiosPage />} />
