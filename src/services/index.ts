@@ -4,7 +4,6 @@ export { default as inssService } from './inssService';
 export { default as irrfService } from './irrfService';
 export { default as esocialService } from './esocialService';
 export { default as reciboService } from './reciboService';
-export { default as reciboService } from './reciboService';
 export { default as guiaService } from './guiaService';
 export { default as encargosService } from './encargosService';
 export { default as provisoesService } from './provisoesService';
