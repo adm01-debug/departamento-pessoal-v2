@@ -3058,6 +3058,42 @@ export type Database = {
           },
         ]
       }
+      integracoes: {
+        Row: {
+          ativa: boolean | null
+          configuracao: Json | null
+          created_at: string
+          id: string
+          nome: string
+          status: string | null
+          tipo: string
+          ultima_sincronizacao: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativa?: boolean | null
+          configuracao?: Json | null
+          created_at?: string
+          id?: string
+          nome: string
+          status?: string | null
+          tipo: string
+          ultima_sincronizacao?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativa?: boolean | null
+          configuracao?: Json | null
+          created_at?: string
+          id?: string
+          nome?: string
+          status?: string | null
+          tipo?: string
+          ultima_sincronizacao?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ip_whitelist: {
         Row: {
           added_by: string | null
@@ -3324,6 +3360,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      logs_integracoes: {
+        Row: {
+          created_at: string
+          detalhes: Json | null
+          id: string
+          integracao_id: string | null
+          mensagem: string | null
+          status: string | null
+          tipo: string | null
+        }
+        Insert: {
+          created_at?: string
+          detalhes?: Json | null
+          id?: string
+          integracao_id?: string | null
+          mensagem?: string | null
+          status?: string | null
+          tipo?: string | null
+        }
+        Update: {
+          created_at?: string
+          detalhes?: Json | null
+          id?: string
+          integracao_id?: string | null
+          mensagem?: string | null
+          status?: string | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_integracoes_integracao_id_fkey"
+            columns: ["integracao_id"]
+            isOneToOne: false
+            referencedRelation: "integracoes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lotacoes: {
         Row: {
