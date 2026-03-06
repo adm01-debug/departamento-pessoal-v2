@@ -1,6 +1,5 @@
-// V18: Types Index - Exportações Centralizadas
+// V23: Types Index - Active exports only
 export type { Colaborador, StatusColaborador, TipoContrato } from './colaborador';
-export type { Empresa } from './empresa';
 export type { Ferias, SolicitacaoFerias, FeriasWithColaborador, FeriasFormData, CalculoFerias, StatusFerias, StatusPeriodo, StatusSolicitacao } from './ferias';
 export * from './common';
 export type { Database, Json } from './database';
@@ -12,3 +11,4 @@ export interface Documento { id: string; nome: string; tipo: string; url: string
 export interface ItemFolha { id: string; descricao: string; tipo: string; valor: number; referencia?: number; }
 export interface FolhaPagamento { id: string; competencia: string; status: string; total_proventos: number; total_descontos: number; total_liquido: number; }
 export interface RegistroPonto { id: string; colaborador_id: string; data: string; entrada?: string; saida_almoco?: string; retorno_almoco?: string; saida?: string; }
+export interface Empresa { id: string; nome: string; cnpj: string; razao_social?: string; }
