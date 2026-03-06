@@ -17,10 +17,10 @@ import { useNotification } from '@/contexts';
 export default function EmpresaFormPage() {
   const { id } = useParams(); const navigate = useNavigate(); const qc = useQueryClient(); const { success, error } = useNotification();
   const isEditing = !!id;
-  const { data: empresa, isLoading } = useQuery({ queryKey: ['empresa', id], queryFn: () => empresaService.getById(id!), enabled: isEditing });
+  const { data: empresa, isLoading } = useQuery({ queryKey: ['empresa', id], queryFn: () => empresaService.buscarPorId(id!), enabled: isEditing });
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<EmpresaSchema>({ resolver: zodResolver(empresaSchema), defaultValues: empresa });
   const mutation = useMutation({
-    mutationFn: (data: EmpresaSchema) => isEditing ? empresaService.update(id!, data as any) : empresaService.create(data as any),
+    mutationFn: (data: EmpresaSchema) => isEditing ? empresaService.atualizar(id!, data as any) : empresaService.criar(data as any),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['empresas'] }); success(isEditing ? 'Empresa atualizada!' : 'Empresa criada!'); navigate('/empresas'); },
     onError: (err: any) => error('Erro', err.message),
   });
