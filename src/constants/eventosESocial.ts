@@ -1,1 +1,0 @@
-export const EVENTOS_ESOCIAL = [{ codigo: 'S-1000', descricao: 'Informações do Empregador' }, { codigo: 'S-1200', descricao: 'Remuneração do Trabalhador' }, { codigo: 'S-2200', descricao: 'Admissão de Trabalhador' }, { codigo: 'S-2206', descricao: 'Alteração de Contrato' }, { codigo: 'S-2299', descricao: 'Desligamento' }];

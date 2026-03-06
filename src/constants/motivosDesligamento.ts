@@ -1,1 +1,0 @@
-export const MOTIVOS_DESLIGAMENTO = [{ codigo: 1, descricao: 'Demissão sem justa causa' }, { codigo: 2, descricao: 'Demissão com justa causa' }, { codigo: 3, descricao: 'Pedido de demissão' }, { codigo: 4, descricao: 'Acordo mútuo' }, { codigo: 5, descricao: 'Término de contrato' }, { codigo: 6, descricao: 'Aposentadoria' }, { codigo: 7, descricao: 'Falecimento' }];

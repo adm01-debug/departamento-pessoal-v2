@@ -1,4 +1,0 @@
-// V15-286
-export const STATUS_COLABORADOR = { ativo: { label: 'Ativo', color: 'green', bg: 'bg-green-100' }, inativo: { label: 'Inativo', color: 'gray', bg: 'bg-gray-100' }, ferias: { label: 'Férias', color: 'blue', bg: 'bg-blue-100' }, afastado: { label: 'Afastado', color: 'yellow', bg: 'bg-yellow-100' }, demitido: { label: 'Demitido', color: 'red', bg: 'bg-red-100' } } as const;
-export const STATUS_FOLHA = { rascunho: { label: 'Rascunho', color: 'gray' }, calculada: { label: 'Calculada', color: 'blue' }, conferida: { label: 'Conferida', color: 'yellow' }, fechada: { label: 'Fechada', color: 'green' }, paga: { label: 'Paga', color: 'green' } } as const;
-export const STATUS_FERIAS = { pendente: { label: 'Pendente', color: 'yellow' }, aprovada: { label: 'Aprovada', color: 'green' }, recusada: { label: 'Recusada', color: 'red' }, em_gozo: { label: 'Em Gozo', color: 'blue' }, concluida: { label: 'Concluída', color: 'gray' } } as const;
