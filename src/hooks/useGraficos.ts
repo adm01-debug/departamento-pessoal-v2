@@ -23,7 +23,7 @@ export function useGraficos(empresaId: string) {
   const { data: folhaMensal, isLoading: loadingFolha } = useQuery({
     queryKey: ["graficos-folha", empresaId],
     queryFn: async () => {
-      const { data } = await supabase.from("folha_pagamento")
+      const { data } = await supabase.from("folhas_pagamento")
         .select("competencia, valor_bruto, inss, irrf, fgts")
         .eq("empresa_id", empresaId)
         .order("competencia", { ascending: true })

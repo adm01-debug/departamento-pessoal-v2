@@ -65,7 +65,7 @@ export const backupServiceReal = {
     // Folha de Pagamento
     if (defaultConfig.incluirFolha) {
       const { data } = await supabase
-        .from('folha_pagamento')
+        .from('folhas_pagamento')
         .select('*')
         .eq('empresa_id', empresaId);
       dados.folha_pagamento = data || [];

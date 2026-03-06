@@ -1,7 +1,6 @@
 // @ts-nocheck
 // V18-BUILD: FolhaService - Production Ready with Supabase
 import { supabase, handleSupabaseError } from '@/integrations/supabase/client';
-import type { FolhaPagamento, Insertable, Updatable } from '@/integrations/supabase/database.types';
 
 export interface FolhaItem {
   id: string;
@@ -15,10 +14,6 @@ export interface FolhaItem {
   rubrica?: { codigo: string; nome: string };
 }
 
-export interface FolhaWithItems extends FolhaPagamento {
-  itens?: FolhaItem[];
-}
-
 export interface FolhaFilters {
   empresa_id?: string;
   competencia?: string;
@@ -27,9 +22,9 @@ export interface FolhaFilters {
 }
 
 export const folhaServiceReal = {
-  async getAll(filters: FolhaFilters = {}): Promise<FolhaPagamento[]> {
+  async getAll(filters: FolhaFilters = {}) {
     let query = supabase
-      .from('folha_pagamento')
+      .from('folhas_pagamento')
       .select('*')
       .order('competencia', { ascending: false });
 
@@ -43,36 +38,25 @@ export const folhaServiceReal = {
     return data || [];
   },
 
-  // Alias para compatibilidade
-  async list(filters?: FolhaFilters): Promise<FolhaPagamento[]> {
+  async list(filters?: FolhaFilters) {
     return this.getAll(filters || {});
   },
 
-  async getById(id: string): Promise<FolhaWithItems | null> {
+  async getById(id: string) {
     const { data, error } = await supabase
-      .from('folha_pagamento')
-      .select(`*, itens:folha_itens(*, colaborador:colaboradores(nome, cpf), rubrica:rubricas(codigo, nome))`)
+      .from('folhas_pagamento')
+      .select('*')
       .eq('id', id)
       .single();
 
     if (error?.code === 'PGRST116') return null;
     if (error) throw new Error(handleSupabaseError(error));
-    return data as FolhaWithItems;
+    return data;
   },
 
-  async getItens(folhaId: string): Promise<FolhaItem[]> {
+  async getByCompetencia(empresaId: string, competencia: string) {
     const { data, error } = await supabase
-      .from('folha_itens')
-      .select(`*, colaborador:colaboradores(nome, cpf), rubrica:rubricas(codigo, nome)`)
-      .eq('folha_id', folhaId);
-
-    if (error) throw new Error(handleSupabaseError(error));
-    return data || [];
-  },
-
-  async getByCompetencia(empresaId: string, competencia: string): Promise<FolhaPagamento | null> {
-    const { data, error } = await supabase
-      .from('folha_pagamento')
+      .from('folhas_pagamento')
       .select('*')
       .eq('empresa_id', empresaId)
       .eq('competencia', competencia)
@@ -84,9 +68,9 @@ export const folhaServiceReal = {
     return data;
   },
 
-  async create(folha: Insertable<'folha_pagamento'>): Promise<FolhaPagamento> {
+  async create(folha: any) {
     const { data, error } = await supabase
-      .from('folha_pagamento')
+      .from('folhas_pagamento')
       .insert(folha)
       .select()
       .single();
@@ -95,9 +79,9 @@ export const folhaServiceReal = {
     return data;
   },
 
-  async update(id: string, folha: Updatable<'folha_pagamento'>): Promise<FolhaPagamento> {
+  async update(id: string, folha: any) {
     const { data, error } = await supabase
-      .from('folha_pagamento')
+      .from('folhas_pagamento')
       .update({ ...folha, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -107,48 +91,30 @@ export const folhaServiceReal = {
     return data;
   },
 
-  async addItem(item: Insertable<'folha_itens'>): Promise<FolhaItem> {
-    const { data, error } = await supabase
-      .from('folha_itens')
-      .insert(item)
-      .select()
-      .single();
-
-    if (error) throw new Error(handleSupabaseError(error));
-    return data;
-  },
-
-  async calcular(id: string): Promise<FolhaPagamento> {
+  async calcular(id: string) {
     const folha = await this.getById(id);
     if (!folha) throw new Error('Folha não encontrada');
 
-    // Calcular totais (simplificado)
-    const itens = folha.itens || [];
-    const totalProventos = itens.filter(i => i.tipo === 'provento').reduce((a, b) => a + b.valor, 0);
-    const totalDescontos = itens.filter(i => i.tipo === 'desconto').reduce((a, b) => a + b.valor, 0);
-
     return this.update(id, {
-      total_proventos: totalProventos,
-      total_descontos: totalDescontos,
-      total_liquido: totalProventos - totalDescontos,
       status: 'calculada',
+      data_calculo: new Date().toISOString(),
     });
   },
 
-  async fechar(id: string): Promise<FolhaPagamento> {
-    return this.update(id, { status: 'fechada' });
+  async fechar(id: string) {
+    return this.update(id, { status: 'fechada', data_fechamento: new Date().toISOString() });
   },
 
-  async reabrir(id: string): Promise<FolhaPagamento> {
+  async reabrir(id: string) {
     return this.update(id, { status: 'aberta' });
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string) {
     const folha = await this.getById(id);
     if (folha?.status === 'fechada') {
       throw new Error('Não é possível excluir folha fechada');
     }
-    const { error } = await supabase.from('folha_pagamento').delete().eq('id', id);
+    const { error } = await supabase.from('folhas_pagamento').delete().eq('id', id);
     if (error) throw new Error(handleSupabaseError(error));
   },
 };

@@ -8,21 +8,19 @@ import { logger } from '@/lib/logger';
 
 export interface Usuario {
   id: string;
-  email: string;
+  user_id: string;
+  email?: string;
   nome: string;
-  papel: 'admin' | 'gestor' | 'usuario';
-  ativo: boolean;
+  cargo?: string;
+  role_display?: string;
   avatar_url?: string;
-  ultimo_acesso?: string;
   created_at: string;
 }
-
-const USUARIO_FIELDS = 'id, email, nome, papel, ativo, avatar_url, ultimo_acesso, created_at';
 
 export const usuariosService = {
   async listar(): Promise<Usuario[]> {
     try {
-      const { data, error } = await supabase.from('usuarios').select('id, email, nome, papel, ativo, avatar_url').order('nome');
+      const { data, error } = await supabase.from('profiles').select('*').order('nome');
       if (error) throw error;
       return data ?? [];
     } catch (error) {
@@ -33,7 +31,7 @@ export const usuariosService = {
 
   async buscarPorId(id: string): Promise<Usuario | null> {
     try {
-      const { data, error } = await supabase.from('usuarios').select(USUARIO_FIELDS).eq('id', id).single();
+      const { data, error } = await supabase.from('profiles').select('*').eq('user_id', id).single();
       if (error) throw error;
       return data;
     } catch (error) {
@@ -44,31 +42,11 @@ export const usuariosService = {
 
   async atualizar(id: string, dados: Partial<Usuario>): Promise<Usuario> {
     try {
-      const { data, error } = await supabase.from('usuarios').update(dados).eq('id', id).select().single();
+      const { data, error } = await supabase.from('profiles').update(dados).eq('user_id', id).select().single();
       if (error) throw error;
       return data;
     } catch (error) {
       logger.error('Erro ao atualizar usuário:', error);
-      throw error;
-    }
-  },
-
-  async desativar(id: string): Promise<void> {
-    try {
-      const { error } = await supabase.from('usuarios').update({ ativo: false }).eq('id', id);
-      if (error) throw error;
-    } catch (error) {
-      logger.error('Erro ao desativar usuário:', error);
-      throw error;
-    }
-  },
-
-  async ativar(id: string): Promise<void> {
-    try {
-      const { error } = await supabase.from('usuarios').update({ ativo: true }).eq('id', id);
-      if (error) throw error;
-    } catch (error) {
-      logger.error('Erro ao ativar usuário:', error);
       throw error;
     }
   },

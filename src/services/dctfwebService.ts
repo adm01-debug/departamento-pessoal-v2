@@ -61,7 +61,7 @@ export const dctfwebServiceReal = {
   },
 
   async calcularDebitos(empresaId: string, competencia: string): Promise<DebitoDCTF[]> {
-    const { data: folhas } = await supabase.from("folha_pagamento")
+    const { data: folhas } = await supabase.from("folhas_pagamento")
       .select("*").eq("empresa_id", empresaId).eq("competencia", competencia);
     
     const totalINSS = (folhas || []).reduce((acc, f) => acc + (f.inss || 0), 0);
