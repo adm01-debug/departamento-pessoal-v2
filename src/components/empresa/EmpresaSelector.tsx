@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { Badge } from "@/components/ui/badge";
-import { EmpresaModal } from "./EmpresaModal";
+
 
 export const EmpresaSelector = memo(function EmpresaSelector() {
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
-  const [modalOpen, setModalOpen] = useState(false);
+  
 
   if (!userEmpresas || userEmpresas.length === 0) {
     return (
@@ -71,15 +71,8 @@ export const EmpresaSelector = memo(function EmpresaSelector() {
               )}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setModalOpen(true)}>
-            <Settings className="h-4 w-4 mr-2" />
-            Gerenciar Empresas
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <EmpresaModal open={modalOpen} onOpenChange={setModalOpen} />
     </>
   );
 });
