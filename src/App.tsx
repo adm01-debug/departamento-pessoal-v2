@@ -13,6 +13,7 @@ import FolhaPagamentoPage from '@/pages/FolhaPagamentoPage';
 import FeriasPage from '@/pages/FeriasPage';
 import PontoPage from '@/pages/PontoPage';
 import BeneficiosPage from '@/pages/BeneficiosPage';
+import BeneficioFormPage from '@/pages/BeneficioFormPage';
 import RelatoriosPage from '@/pages/RelatoriosPage';
 import ESocialPage from '@/pages/ESocialPage';
 import ConfiguracoesPage from '@/pages/ConfiguracoesPage';
