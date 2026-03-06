@@ -1,1 +1,0 @@
-export interface FilterConfig{field:string;label:string;type:'text'|'select'|'date'|'dateRange'|'number'|'checkbox';options?:{value:string;label:string}[];placeholder?:string;}export interface ActiveFilter{field:string;value:any;operator?:'eq'|'ne'|'gt'|'lt'|'gte'|'lte'|'contains'|'between';}export interface FilterState{filters:ActiveFilter[];search:string;}
