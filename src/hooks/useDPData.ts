@@ -106,8 +106,8 @@ export function useKPIs() {
         supabase.from('colaboradores').select('status'),
         supabase.from('ferias').select('id').eq('status', 'em_andamento').gte('data_inicio', hoje).lte('data_fim', hoje),
         supabase.from('colaboradores').select('id').eq('status', 'afastado'),
-        supabase.from('pontos').select('id').eq('data', hoje).is('entrada', null),
-        supabase.from('folhas').select('liquido').eq('mes_referencia', mesAtual),
+        supabase.from('registros_ponto').select('id').eq('data', hoje).is('entrada_1', null),
+        supabase.from('folhas_pagamento').select('valor_liquido').eq('competencia', mesAtual),
       ]);
       
       const total = colaboradores.data?.length || 0;
