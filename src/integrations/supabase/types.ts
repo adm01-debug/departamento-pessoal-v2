@@ -2455,6 +2455,112 @@ export type Database = {
         }
         Relationships: []
       }
+      guias_fgts: {
+        Row: {
+          codigo_barras: string | null
+          competencia: string
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          empresa_id: string | null
+          id: string
+          status: string | null
+          tipo: string | null
+          valor_multa: number | null
+          valor_total: number | null
+          valor_total_recolher: number | null
+        }
+        Insert: {
+          codigo_barras?: string | null
+          competencia: string
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          empresa_id?: string | null
+          id?: string
+          status?: string | null
+          tipo?: string | null
+          valor_multa?: number | null
+          valor_total?: number | null
+          valor_total_recolher?: number | null
+        }
+        Update: {
+          codigo_barras?: string | null
+          competencia?: string
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          empresa_id?: string | null
+          id?: string
+          status?: string | null
+          tipo?: string | null
+          valor_multa?: number | null
+          valor_total?: number | null
+          valor_total_recolher?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guias_fgts_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guias_inss: {
+        Row: {
+          codigo_barras: string | null
+          competencia: string
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          empresa_id: string | null
+          id: string
+          status: string | null
+          tipo: string | null
+          valor_empresa: number | null
+          valor_segurados: number | null
+          valor_total: number | null
+        }
+        Insert: {
+          codigo_barras?: string | null
+          competencia: string
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          empresa_id?: string | null
+          id?: string
+          status?: string | null
+          tipo?: string | null
+          valor_empresa?: number | null
+          valor_segurados?: number | null
+          valor_total?: number | null
+        }
+        Update: {
+          codigo_barras?: string | null
+          competencia?: string
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          empresa_id?: string | null
+          id?: string
+          status?: string | null
+          tipo?: string | null
+          valor_empresa?: number | null
+          valor_segurados?: number | null
+          valor_total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guias_inss_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_alertas: {
         Row: {
           created_at: string
@@ -4314,6 +4420,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sindicatos: {
+        Row: {
+          cnpj: string | null
+          contribuicao_mensal: number | null
+          created_at: string
+          data_base: string | null
+          email: string | null
+          id: string
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          cnpj?: string | null
+          contribuicao_mensal?: number | null
+          created_at?: string
+          data_base?: string | null
+          email?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+        }
+        Update: {
+          cnpj?: string | null
+          contribuicao_mensal?: number | null
+          created_at?: string
+          data_base?: string | null
+          email?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: []
       }
       tipos_beneficio: {
         Row: {
