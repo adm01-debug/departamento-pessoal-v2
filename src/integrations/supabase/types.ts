@@ -513,6 +513,57 @@ export type Database = {
           },
         ]
       }
+      beneficiarios_seguro: {
+        Row: {
+          colaborador_id: string | null
+          cpf: string | null
+          created_at: string
+          id: string
+          nome: string
+          parentesco: string | null
+          percentual: number | null
+          seguro_vida_id: string | null
+          status: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+          parentesco?: string | null
+          percentual?: number | null
+          seguro_vida_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          parentesco?: string | null
+          percentual?: number | null
+          seguro_vida_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiarios_seguro_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiarios_seguro_seguro_vida_id_fkey"
+            columns: ["seguro_vida_id"]
+            isOneToOne: false
+            referencedRelation: "seguros_vida"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficios: {
         Row: {
           ativo: boolean | null
@@ -4447,6 +4498,48 @@ export type Database = {
           },
         ]
       }
+      seguros_colaboradores: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string
+          data_adesao: string | null
+          id: string
+          seguro_vida_id: string | null
+          status: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_adesao?: string | null
+          id?: string
+          seguro_vida_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_adesao?: string | null
+          id?: string
+          seguro_vida_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seguros_colaboradores_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seguros_colaboradores_seguro_vida_id_fkey"
+            columns: ["seguro_vida_id"]
+            isOneToOne: false
+            referencedRelation: "seguros_vida"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seguros_vida: {
         Row: {
           ativo: boolean | null
@@ -4536,6 +4629,54 @@ export type Database = {
           telefone?: string | null
         }
         Relationships: []
+      }
+      sinistros_seguro: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string
+          data_sinistro: string | null
+          descricao: string | null
+          id: string
+          seguro_vida_id: string | null
+          status: string | null
+          tipo: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_sinistro?: string | null
+          descricao?: string | null
+          id?: string
+          seguro_vida_id?: string | null
+          status?: string | null
+          tipo?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string
+          data_sinistro?: string | null
+          descricao?: string | null
+          id?: string
+          seguro_vida_id?: string | null
+          status?: string | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sinistros_seguro_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sinistros_seguro_seguro_vida_id_fkey"
+            columns: ["seguro_vida_id"]
+            isOneToOne: false
+            referencedRelation: "seguros_vida"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tipos_beneficio: {
         Row: {
