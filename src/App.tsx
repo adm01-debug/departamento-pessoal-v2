@@ -7,10 +7,13 @@ import DashboardPage from '@/pages/DashboardPage';
 import ColaboradoresPage from '@/pages/ColaboradoresPage';
 import ColaboradorFormPage from '@/pages/ColaboradorFormPage';
 import EmpresasPage from '@/pages/EmpresasPage';
+import EmpresaFormPage from '@/pages/EmpresaFormPage';
 import FolhaPage from '@/pages/FolhaPage';
+import FolhaPagamentoPage from '@/pages/FolhaPagamentoPage';
 import FeriasPage from '@/pages/FeriasPage';
 import PontoPage from '@/pages/PontoPage';
 import BeneficiosPage from '@/pages/BeneficiosPage';
+import BeneficioFormPage from '@/pages/BeneficioFormPage';
 import RelatoriosPage from '@/pages/RelatoriosPage';
 import ESocialPage from '@/pages/ESocialPage';
 import ConfiguracoesPage from '@/pages/ConfiguracoesPage';
@@ -27,10 +30,14 @@ export default function App() {
         <Route path="colaboradores/novo" element={<ColaboradorFormPage />} />
         <Route path="colaboradores/:id/editar" element={<ColaboradorFormPage />} />
         <Route path="empresas" element={<EmpresasPage />} />
+        <Route path="empresas/nova" element={<EmpresaFormPage />} />
+        <Route path="empresas/:id/editar" element={<EmpresaFormPage />} />
         <Route path="folha" element={<FolhaPage />} />
+        <Route path="folha/calcular" element={<FolhaPagamentoPage />} />
         <Route path="ferias" element={<FeriasPage />} />
         <Route path="ponto" element={<PontoPage />} />
         <Route path="beneficios" element={<BeneficiosPage />} />
+        <Route path="beneficios/novo" element={<BeneficioFormPage />} />
         <Route path="relatorios" element={<RelatoriosPage />} />
         <Route path="esocial" element={<ESocialPage />} />
         <Route path="configuracoes" element={<ConfiguracoesPage />} />
