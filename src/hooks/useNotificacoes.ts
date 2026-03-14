@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @fileoverview Hook para gerenciamento de notificações
  * @module hooks/useNotificacoes
@@ -6,9 +5,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { useEffect } from 'react';
-import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 
 // Tipo para colaborador vindo de relacionamento
