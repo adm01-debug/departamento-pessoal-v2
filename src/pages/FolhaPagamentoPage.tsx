@@ -93,15 +93,29 @@ export default function FolhaPagamentoPage() {
     mutationFn: async (comp: string) => {
       const [mes, ano] = comp.split('/');
       const competenciaDB = `${ano}-${mes}`;
-      // Insert a folha record instead of calling non-existent RPC
-      const { data, error } = await supabase.from('folhas_pagamento').insert({
-        competencia: competenciaDB,
-        tipo: 'mensal',
-        status: 'rascunho',
-        total_proventos: 0,
-        total_descontos: 0,
-        total_liquido: 0,
-      }).select().single();
+      // Upsert folha record for the competência
+      const { data: existing } = await supabase
+        .from('folhas_pagamento')
+        .select('id')
+        .eq('competencia', competenciaDB)
+        .maybeSingle();
+
+      if (existing) {
+        const { data, error } = await supabase
+          .from('folhas_pagamento')
+          .update({ status: 'calculada' as const, data_calculo: new Date().toISOString() })
+          .eq('id', existing.id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      }
+
+      const { data, error } = await supabase
+        .from('folhas_pagamento')
+        .insert({ competencia: competenciaDB, tipo: 'mensal' })
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
