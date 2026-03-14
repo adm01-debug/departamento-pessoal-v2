@@ -420,7 +420,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
                     )}
                   >
                     <span className="text-xs font-semibold text-primary">
-                      {profile?.nome ? getInitials(profile.nome) : '??'}
+                      {user?.name ? getInitials(user.name) : '??'}
                     </span>
                   </NavLink>
                 </TooltipTrigger>
