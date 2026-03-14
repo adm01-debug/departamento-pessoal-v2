@@ -170,8 +170,8 @@ export function useNotificacoes() {
       // 2. Verificar contratos temporários vencendo
       const { data: colaboradores } = await supabase
         .from('colaboradores')
-        .select('id, titulo, mensagem, lida, created_at, tipo')
-        .in('tipo_contrato', ['temporario', 'estagiario', 'aprendiz'])
+        .select('id, nome_completo, tipo_contrato, data_admissao')
+        .in('tipo_contrato', ['temporario', 'estagio', 'aprendiz'])
         .eq('status', 'ativo');
 
       if (colaboradores) {
