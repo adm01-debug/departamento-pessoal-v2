@@ -233,7 +233,7 @@ export function useNotificacoes() {
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'documento_vencendo',
                 titulo: 'CNH Vencendo',
                 mensagem: `A CNH de ${colab.nome_completo} vence em ${diasRestantes} dias (${format(dataValidade, "dd/MM/yyyy")}).`,
