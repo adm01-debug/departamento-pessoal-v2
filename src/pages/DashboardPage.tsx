@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
 import { MiniSparkline } from "@/components/dashboard/MiniSparkline";
 import { DonutChart } from "@/components/dashboard/DonutChart";
@@ -43,9 +44,10 @@ interface Pendencia {
   icone: 'ferias' | 'afastamentos' | 'admissoes';
 }
 
-function useDashboardStats() {
+function useDashboardStats(enabled: boolean) {
   return useQuery<DashboardStats>({
     queryKey: ["dashboard-stats"],
+    enabled,
     queryFn: async () => {
       const { count: colaboradoresAtivos } = await supabase
         .from("colaboradores")
@@ -122,9 +124,10 @@ function useDashboardStats() {
   });
 }
 
-function usePendencias() {
+function usePendencias(enabled: boolean) {
   return useQuery<Pendencia[]>({
     queryKey: ["dashboard-pendencias"],
+    enabled,
     queryFn: async () => {
       const pendencias: Pendencia[] = [];
       const { count: feriasPendentes } = await supabase
@@ -485,8 +488,10 @@ function OnboardingWizard() {
 
 /* ─── Main Dashboard ─── */
 export default function DashboardPage() {
-  const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useDashboardStats();
-  const { data: pendencias, isLoading: loadingPendencias } = usePendencias();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useDashboardStats(isAuthenticated);
+  const { data: pendencias, isLoading: loadingPendencias } = usePendencias(isAuthenticated);
   const navigate = useNavigate();
 
   const hoje = new Date();
