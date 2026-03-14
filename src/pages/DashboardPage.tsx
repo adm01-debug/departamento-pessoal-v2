@@ -1,4 +1,4 @@
-// DashboardPage - Task Gifts Design System
+// DashboardPage - Task Gifts Design System (Premium)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -8,7 +8,7 @@ import {
   UserPlus, UserMinus, Activity, CheckCircle2,
   AlertTriangle, ChevronRight, Zap,
   Building2, FileText, Gift, Plus,
-  ArrowRight, Sparkles,
+  ArrowRight, Sparkles, PieChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +16,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
+import { MiniSparkline } from "@/components/dashboard/MiniSparkline";
+import { DonutChart } from "@/components/dashboard/DonutChart";
 
 interface DashboardStats {
   colaboradoresAtivos: number;
@@ -27,6 +30,7 @@ interface DashboardStats {
   headcount: number;
   admissoesMes: number;
   demissoesMes: number;
+  departamentos: { nome: string; count: number }[];
 }
 
 interface Pendencia {
@@ -51,8 +55,7 @@ function useDashboardStats() {
         .select("total_liquido")
         .eq("competencia", mesAtual);
 
-      const folhaMensal =
-        folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
+      const folhaMensal = folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
 
       const hoje = new Date();
       const em30Dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -67,12 +70,11 @@ function useDashboardStats() {
         .from("banco_horas")
         .select("horas, tipo");
 
-      const bancoHoras =
-        bancoData?.reduce((acc, b) => {
-          const [h, m] = (b.horas || "00:00").split(":").map(Number);
-          const mins = h * 60 + (m || 0);
-          return acc + (b.tipo === "credito" ? mins : -mins);
-        }, 0) || 0;
+      const bancoHoras = bancoData?.reduce((acc, b) => {
+        const [h, m] = (b.horas || "00:00").split(":").map(Number);
+        const mins = h * 60 + (m || 0);
+        return acc + (b.tipo === "credito" ? mins : -mins);
+      }, 0) || 0;
 
       const inicioMes = `${mesAtual}-01`;
       const { count: admissoesMes } = await supabase
@@ -85,6 +87,21 @@ function useDashboardStats() {
         .select("*", { count: "exact", head: true })
         .gte("data_desligamento", inicioMes);
 
+      // Departamento distribution
+      const { data: deptData } = await supabase
+        .from("colaboradores")
+        .select("departamento")
+        .eq("status", "ativo");
+
+      const deptMap: Record<string, number> = {};
+      deptData?.forEach(c => {
+        deptMap[c.departamento] = (deptMap[c.departamento] || 0) + 1;
+      });
+      const departamentos = Object.entries(deptMap)
+        .map(([nome, count]) => ({ nome, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
         folhaMensal,
@@ -95,6 +112,7 @@ function useDashboardStats() {
         headcount: colaboradoresAtivos || 0,
         admissoesMes: admissoesMes || 0,
         demissoesMes: demissoesMes || 0,
+        departamentos,
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -152,16 +170,35 @@ const cardVariants = {
   }),
 };
 
+// Fake sparkline data for trend (would come from real historical data)
+const sparklineData: Record<string, number[]> = {
+  colaboradores: [120, 125, 122, 128, 130, 135, 132, 140, 145, 142, 148, 150],
+  folha: [85000, 87000, 86500, 88000, 89000, 87500, 90000, 92000, 91000, 93000, 94500, 95000],
+  ferias: [3, 5, 2, 8, 4, 6, 3, 7, 5, 2, 4, 3],
+  banco: [40, 35, 42, 38, 45, 50, 48, 55, 52, 60, 58, 56],
+};
+
+const donutColors = [
+  'hsl(var(--primary))',
+  'hsl(var(--info))',
+  'hsl(var(--success))',
+  'hsl(var(--warning))',
+  'hsl(var(--xp))',
+  'hsl(var(--streak))',
+];
+
 /* ─── Premium Metric Card ─── */
 function MetricCard({
-  title, value, icon: Icon, trend, description, gradient, index = 0,
+  title, value, rawValue, icon: Icon, trend, description, gradient, sparkline, index = 0,
 }: {
   title: string;
   value: string | number;
+  rawValue?: number;
   icon: React.ElementType;
   trend?: { value: number; label: string };
   description?: string;
   gradient: string;
+  sparkline?: number[];
   index?: number;
 }) {
   const isPositive = trend && trend.value >= 0;
@@ -177,16 +214,25 @@ function MetricCard({
       <div className={cn("absolute inset-0 opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-500 bg-gradient-to-br", gradient)} />
       <div className={cn("absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r", gradient)} />
 
-      <CardContent className="relative p-5">
+      <CardContent className="relative p-card-space">
         <div className="flex items-start justify-between">
           <div className="space-y-2 flex-1">
-            <p className="text-xs font-body font-medium text-muted-foreground uppercase tracking-wider">{title}</p>
-            <p className="text-3xl font-display font-bold tracking-tight">{value}</p>
+            <p className="text-overline text-muted-foreground">{title}</p>
+            <div className="text-display font-display font-bold tracking-tight">
+              {rawValue !== undefined ? (
+                <AnimatedNumber
+                  value={rawValue}
+                  format={typeof value === 'string' && value.includes('R$') ? (n) => formatCurrency(n) : undefined}
+                />
+              ) : (
+                value
+              )}
+            </div>
             {(description || trend) && (
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex items-center gap-1.5 text-caption">
                 {trend && (
                   <span className={cn(
-                    "inline-flex items-center gap-0.5 font-semibold px-2 py-0.5 rounded-full text-[11px]",
+                    "inline-flex items-center gap-0.5 font-semibold px-2 py-0.5 rounded-full",
                     isPositive ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
                   )}>
                     {isPositive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
@@ -197,11 +243,16 @@ function MetricCard({
               </div>
             )}
           </div>
-          <div className={cn(
-            "p-3 rounded-2xl bg-gradient-to-br shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow",
-            gradient
-          )}>
-            <Icon className="h-5 w-5 text-primary-foreground" />
+          <div className="flex flex-col items-end gap-2">
+            <div className={cn(
+              "p-3 rounded-2xl bg-gradient-to-br shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-glow",
+              gradient
+            )}>
+              <Icon className="h-5 w-5 text-primary-foreground" />
+            </div>
+            {sparkline && sparkline.length > 0 && (
+              <MiniSparkline data={sparkline} className="opacity-60 group-hover:opacity-100 transition-opacity" />
+            )}
           </div>
         </div>
       </CardContent>
@@ -223,8 +274,8 @@ function IndicatorRow({ label, value, maxValue = 10, suffix = "%" }: {
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-body font-medium">{label}</span>
-        <span className="text-sm font-display font-bold tabular-nums">{value.toFixed(1)}{suffix}</span>
+        <span className="text-body font-body font-medium">{label}</span>
+        <span className="text-body font-display font-bold">{value.toFixed(1)}{suffix}</span>
       </div>
       <div className="h-2.5 bg-muted/80 rounded-full overflow-hidden">
         <motion.div
@@ -261,10 +312,10 @@ function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: numb
         <Icon className="h-4 w-4 text-primary-foreground" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-body font-medium truncate">{pendencia.descricao}</p>
+        <p className="text-body font-body font-medium truncate">{pendencia.descricao}</p>
       </div>
       <div className="flex items-center gap-1.5">
-        <span className="text-xs font-bold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{pendencia.quantidade}</span>
+        <span className="text-caption font-bold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{pendencia.quantidade}</span>
         <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
       </div>
     </motion.div>
@@ -286,8 +337,10 @@ function QuickStat({ label, value, icon: Icon, gradient, index = 0 }: {
         <Icon className="h-4 w-4 text-primary-foreground" />
       </div>
       <div>
-        <p className="text-xl font-display font-bold">{value}</p>
-        <p className="text-xs text-muted-foreground font-body">{label}</p>
+        <p className="text-h2 font-display font-bold">
+          <AnimatedNumber value={value} />
+        </p>
+        <p className="text-caption text-muted-foreground font-body">{label}</p>
       </div>
     </motion.div>
   );
@@ -312,16 +365,22 @@ function QuickAction({ label, icon: Icon, gradient, path, index = 0 }: {
         <Icon className="h-4 w-4 text-primary-foreground" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-body font-medium">{label}</p>
+        <p className="text-body font-body font-medium">{label}</p>
       </div>
       <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
     </motion.button>
   );
 }
 
-/* ─── Empty State ─── */
-function EmptyState() {
+/* ─── Onboarding Wizard ─── */
+function OnboardingWizard() {
   const navigate = useNavigate();
+
+  const steps = [
+    { step: 1, title: 'Cadastrar Empresa', desc: 'Configure os dados da sua empresa', icon: Building2, path: '/empresas/nova', gradient: 'from-xp to-tasks', done: false },
+    { step: 2, title: 'Adicionar Colaboradores', desc: 'Cadastre seus primeiros funcionários', icon: UserPlus, path: '/colaboradores/novo', gradient: 'from-success to-finance', done: false },
+    { step: 3, title: 'Processar Folha', desc: 'Execute o primeiro cálculo de folha', icon: DollarSign, path: '/folha', gradient: 'from-info to-level', done: false },
+  ];
 
   return (
     <motion.div
@@ -331,12 +390,11 @@ function EmptyState() {
       className="col-span-full"
     >
       <Card className="border border-dashed border-border/50 bg-gradient-to-br from-card to-accent/20 rounded-2xl overflow-hidden relative">
-        {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-info/5 to-transparent rounded-full translate-y-1/2 -translate-x-1/2" />
 
-        <CardContent className="relative p-8 md:p-12">
-          <div className="max-w-lg mx-auto text-center">
+        <CardContent className="relative p-section md:p-8 lg:p-12">
+          <div className="max-w-2xl mx-auto text-center mb-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -345,30 +403,54 @@ function EmptyState() {
             >
               <Sparkles className="h-10 w-10 text-primary" />
             </motion.div>
-
-            <h2 className="text-2xl font-display font-bold mb-2">
-              Comece configurando seu sistema!
+            <h2 className="text-display font-display font-bold mb-2">
+              Bem-vindo ao Sistema DP!
             </h2>
-            <p className="text-muted-foreground font-body mb-8 max-w-md mx-auto">
-              Cadastre sua empresa e seus primeiros colaboradores para começar a usar todas as funcionalidades.
+            <p className="text-body text-muted-foreground font-body max-w-md mx-auto">
+              Siga os 3 passos abaixo para configurar seu departamento pessoal
             </p>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
-              <Button
-                onClick={() => navigate('/empresas/nova')}
-                className="gap-2 h-12 rounded-xl bg-gradient-to-r from-xp to-tasks hover:opacity-90 transition-opacity font-body"
+          {/* Stepper */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            {steps.map((s, i) => (
+              <motion.button
+                key={s.step}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + i * 0.15 }}
+                whileHover={{ scale: 1.03, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate(s.path)}
+                className="relative flex flex-col items-center text-center p-6 rounded-2xl glass border border-border/30 hover:border-primary/40 hover:shadow-glow transition-all group"
               >
-                <Building2 className="h-4 w-4" />
-                Cadastrar Empresa
-              </Button>
-              <Button
-                onClick={() => navigate('/colaboradores/novo')}
-                variant="outline"
-                className="gap-2 h-12 rounded-xl border-border/50 hover:border-primary/30 hover:bg-primary/5 font-body"
-              >
-                <UserPlus className="h-4 w-4" />
-                Novo Colaborador
-              </Button>
+                {/* Step number */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className={cn(
+                    "inline-flex items-center justify-center h-6 w-6 rounded-full text-overline font-bold bg-gradient-to-br text-primary-foreground shadow-lg",
+                    s.gradient
+                  )}>
+                    {s.step}
+                  </span>
+                </div>
+
+                <div className={cn("p-4 rounded-2xl bg-gradient-to-br mb-4 shadow-lg group-hover:scale-110 transition-transform", s.gradient)}>
+                  <s.icon className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <h3 className="text-h3 font-display font-semibold mb-1">{s.title}</h3>
+                <p className="text-caption text-muted-foreground font-body">{s.desc}</p>
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Progress connector (desktop) */}
+          <div className="hidden md:flex items-center justify-center mt-6">
+            <div className="flex items-center gap-2">
+              <div className="h-1 w-16 rounded-full bg-muted" />
+              <div className="h-2 w-2 rounded-full bg-primary/30" />
+              <div className="h-1 w-16 rounded-full bg-muted" />
+              <div className="h-2 w-2 rounded-full bg-primary/30" />
+              <div className="h-1 w-16 rounded-full bg-muted" />
             </div>
           </div>
         </CardContent>
@@ -389,7 +471,7 @@ export default function DashboardPage() {
   const isEmptySystem = !loadingStats && stats?.colaboradoresAtivos === 0 && stats?.folhaMensal === 0;
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto">
+    <div className="space-y-section max-w-[1400px] mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -397,10 +479,10 @@ export default function DashboardPage() {
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-display-xl sm:text-display font-display font-bold tracking-tight flex items-center gap-2">
             {greeting}! <span className="inline-block animate-fade-in">👋</span>
           </h1>
-          <p className="text-muted-foreground font-body mt-1">
+          <p className="text-body text-muted-foreground font-body mt-1">
             Aqui está o resumo do seu departamento pessoal
           </p>
         </div>
@@ -420,20 +502,55 @@ export default function DashboardPage() {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {loadingStats ? (
           Array(4).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-[140px] rounded-2xl" />
+            <Skeleton key={i} className="h-[160px] rounded-2xl" />
           ))
         ) : (
           <>
-            <MetricCard title="Colaboradores Ativos" value={stats?.colaboradoresAtivos || 0} icon={Users} trend={{ value: 2.5, label: "vs mês anterior" }} gradient="from-primary to-primary-glow" index={0} />
-            <MetricCard title="Folha Mensal" value={formatCurrency(stats?.folhaMensal || 0)} icon={DollarSign} trend={{ value: -1.2, label: "vs mês anterior" }} gradient="from-info to-level" index={1} />
-            <MetricCard title="Férias Pendentes" value={stats?.feriasPendentes || 0} icon={Calendar} description="Próximos 30 dias" gradient="from-warning to-coins" index={2} />
-            <MetricCard title="Banco de Horas" value={`${stats?.bancoHoras && stats.bancoHoras > 0 ? "+" : ""}${stats?.bancoHoras || 0}h`} icon={Clock} description="Saldo total" gradient="from-success to-finance" index={3} />
+            <MetricCard
+              title="Colaboradores Ativos"
+              value={stats?.colaboradoresAtivos || 0}
+              rawValue={stats?.colaboradoresAtivos || 0}
+              icon={Users}
+              trend={{ value: 2.5, label: "vs mês anterior" }}
+              gradient="from-primary to-primary-glow"
+              sparkline={sparklineData.colaboradores}
+              index={0}
+            />
+            <MetricCard
+              title="Folha Mensal"
+              value={formatCurrency(stats?.folhaMensal || 0)}
+              rawValue={stats?.folhaMensal || 0}
+              icon={DollarSign}
+              trend={{ value: -1.2, label: "vs mês anterior" }}
+              gradient="from-info to-level"
+              sparkline={sparklineData.folha}
+              index={1}
+            />
+            <MetricCard
+              title="Férias Pendentes"
+              value={stats?.feriasPendentes || 0}
+              rawValue={stats?.feriasPendentes || 0}
+              icon={Calendar}
+              description="Próximos 30 dias"
+              gradient="from-warning to-coins"
+              sparkline={sparklineData.ferias}
+              index={2}
+            />
+            <MetricCard
+              title="Banco de Horas"
+              value={`${stats?.bancoHoras && stats.bancoHoras > 0 ? "+" : ""}${stats?.bancoHoras || 0}h`}
+              icon={Clock}
+              description="Saldo total"
+              gradient="from-success to-finance"
+              sparkline={sparklineData.banco}
+              index={3}
+            />
           </>
         )}
       </div>
 
-      {/* Empty State CTA */}
-      {isEmptySystem && <EmptyState />}
+      {/* Onboarding Wizard (empty system) */}
+      {isEmptySystem && <OnboardingWizard />}
 
       {/* Quick Actions */}
       <motion.div
@@ -449,7 +566,7 @@ export default function DashboardPage() {
           className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden"
         >
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2.5 text-base font-display">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
                 <Zap className="h-4 w-4 text-primary-foreground" />
               </div>
@@ -468,15 +585,15 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Second Row */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-4">
         {/* Movimentação */}
         <MotionCard custom={4} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2.5 text-base font-display">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-xp to-tasks">
                 <Activity className="h-4 w-4 text-primary-foreground" />
               </div>
-              Movimentação do Mês
+              Movimentação
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -496,10 +613,45 @@ export default function DashboardPage() {
           </CardContent>
         </MotionCard>
 
+        {/* Distribuição por Departamento (Donut) */}
+        <MotionCard custom={4.5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-info">
+                <PieChart className="h-4 w-4 text-primary-foreground" />
+              </div>
+              Departamentos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingStats ? (
+              <Skeleton className="h-48 rounded-xl" />
+            ) : stats?.departamentos && stats.departamentos.length > 0 ? (
+              <DonutChart
+                segments={stats.departamentos.map((d, i) => ({
+                  label: d.nome,
+                  value: d.count,
+                  color: donutColors[i % donutColors.length],
+                }))}
+                size={130}
+                strokeWidth={14}
+                className="flex flex-col items-center"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="p-4 rounded-2xl bg-muted/50 mb-3">
+                  <PieChart className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p className="text-caption text-muted-foreground font-body">Nenhum departamento cadastrado</p>
+              </div>
+            )}
+          </CardContent>
+        </MotionCard>
+
         {/* Indicadores */}
         <MotionCard custom={5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2.5 text-base font-display">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-level">
                 <TrendingUp className="h-4 w-4 text-primary-foreground" />
               </div>
@@ -526,7 +678,7 @@ export default function DashboardPage() {
         {/* Pendências */}
         <MotionCard custom={6} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2.5 text-base font-display">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-coins">
                 <AlertCircle className="h-4 w-4 text-primary-foreground" />
               </div>
@@ -555,7 +707,7 @@ export default function DashboardPage() {
                   <CheckCircle2 className="h-8 w-8 text-success" />
                 </div>
                 <p className="font-display font-semibold">Tudo em dia!</p>
-                <p className="text-sm text-muted-foreground font-body mt-1">Nenhuma pendência encontrada</p>
+                <p className="text-caption text-muted-foreground font-body mt-1">Nenhuma pendência encontrada</p>
               </motion.div>
             )}
           </CardContent>
