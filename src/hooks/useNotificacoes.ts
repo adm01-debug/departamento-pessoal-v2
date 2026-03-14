@@ -156,7 +156,7 @@ export function useNotificacoes() {
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'periodo_aquisitivo',
                 titulo: 'Período de Férias Vencendo',
                 mensagem: `O colaborador ${colaborador.nome_completo} tem férias vencendo em ${diasRestantes} dias (${format(dataFimConcessivo, "dd/MM/yyyy")}).`,
