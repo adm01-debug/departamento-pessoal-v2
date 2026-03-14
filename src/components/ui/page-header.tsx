@@ -9,6 +9,7 @@ interface PageHeaderProps {
   description?: string;
   backUrl?: string;
   actions?: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
