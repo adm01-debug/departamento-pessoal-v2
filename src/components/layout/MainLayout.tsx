@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { MobileBottomNav } from './MobileBottomNav';
 import { CommandPalette } from '@/components/ui/command-palette';
 
 interface MainLayoutProps {
@@ -19,13 +20,13 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Command Palette (global) */}
       <CommandPalette />
 
-      <div className={cn('hidden lg:block transition-all', sidebarOpen ? 'w-64' : 'w-16')}>
+      <div className={cn('hidden lg:block transition-all duration-300', sidebarOpen ? 'w-64' : 'w-16')}>
         <Sidebar collapsed={!sidebarOpen} />
       </div>
 
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setMobileSidebarOpen(false)}>
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="absolute left-0 top-0 h-full w-64" onClick={(e) => e.stopPropagation()}>
             <Sidebar />
           </div>
@@ -37,10 +38,13 @@ export function MainLayout({ children }: MainLayoutProps) {
           onMenuClick={() => setMobileSidebarOpen(true)}
           user={{ name: 'Admin', email: 'admin@empresa.com' }}
         />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
           {children || <Outlet />}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 }
