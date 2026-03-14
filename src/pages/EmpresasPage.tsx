@@ -22,7 +22,7 @@ export default function EmpresasPage() {
   });
 
   const filtered = empresas?.filter(e =>
-    !search || e.razao_social.toLowerCase().includes(search.toLowerCase()) || e.cnpj.includes(search)
+    !search || e.razao_social.toLowerCase().includes(search.toLowerCase()) || (e.cnpj && e.cnpj.includes(search))
   );
 
   return (

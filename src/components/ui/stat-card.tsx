@@ -25,8 +25,8 @@ export function StatCard({ title, value, description, icon: Icon, trend, classNa
         {(description || trend) && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
             {trend && (
-              <span className={cn('flex items-center', isPositive ? 'text-green-600' : 'text-red-600')}>
-                {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            <span className={cn('flex items-center', isPositive ? 'text-success' : 'text-destructive')}>
+              {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                 {Math.abs(trend.value)}%
               </span>
             )}

@@ -9,10 +9,11 @@ interface PageHeaderProps {
   description?: string;
   backUrl?: string;
   actions?: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
-export function PageHeader({ title, description, backUrl, actions, className }: PageHeaderProps) {
+export function PageHeader({ title, description, backUrl, actions, children, className }: PageHeaderProps) {
   const navigate = useNavigate();
   return (
     <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6', className)}>
@@ -27,7 +28,7 @@ export function PageHeader({ title, description, backUrl, actions, className }: 
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {(actions || children) && <div className="flex items-center gap-2">{children || actions}</div>}
     </div>
   );
 }
