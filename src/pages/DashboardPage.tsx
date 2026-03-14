@@ -14,77 +14,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: "pending" | "in_progress" | "completed";
-  priority: "low" | "medium" | "high";
-  due_date: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Gift {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  price: number;
-  stock: number;
-  created_at: string;
-  updated_at: string;
-}
-
-interface UserProfile {
-  id: string;
-  full_name: string;
-  avatar_url: string;
-  email: string;
-  tasks_completed: number;
-  xp: number;
-  level: number;
-  coins: number;
-  streak: number;
-  created_at: string;
-  updated_at: string;
-}
-
-function useTasks() {
-  return useQuery<Task[]>({
-    queryKey: ["tasks"],
-    queryFn: async () => {
-      const { data } = await supabase.from("tasks").select("*");
-      return data || [];
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-  });
-}
-
-function useGifts() {
-  return useQuery<Gift[]>({
-    queryKey: ["gifts"],
-    queryFn: async () => {
-      const { data } = await supabase.from("gifts").select("*");
-      return data || [];
-    },
-    staleTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false,
-  });
-}
-
-function useUserProfiles() {
-  return useQuery<UserProfile[]>({
-    queryKey: ["user-profiles"],
-    queryFn: async () => {
-      const { data } = await supabase.from("user_profiles").select("*");
-      return data || [];
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-  });
-}
 interface DashboardStats {
   colaboradoresAtivos: number;
   folhaMensal: number;
@@ -216,7 +145,7 @@ const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { delay: i * 0.08, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { delay: i * 0.08, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
   }),
 };
 
@@ -303,7 +232,7 @@ function IndicatorRow({ label, value, maxValue = 10, suffix = "%" }: {
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] as const, delay: 0.3 }}
           className={cn("h-full rounded-full bg-gradient-to-r shadow-sm", getColor())}
         />
       </div>

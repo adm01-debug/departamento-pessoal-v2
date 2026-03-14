@@ -1,22 +1,29 @@
-// V15-227: src/pages/PontoPage.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, LogIn, Coffee, LogOut } from 'lucide-react';
 import { pontoService } from '@/services';
 import { useNotification } from '@/contexts';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [time, setTime] = useState(new Date());
   const { success, error } = useNotification();
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     setLoading(tipo);
     try {
       let coords: { lat: number; lng: number } | undefined;
       if (navigator.geolocation) {
-        const pos = await new Promise<GeolocationPosition>((resolve, reject) => 
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
           navigator.geolocation.getCurrentPosition(resolve, reject)
         ).catch(() => null);
         if (pos) coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -31,40 +38,71 @@ export default function PontoPage() {
   };
 
   const buttons = [
-    { tipo: 'entrada' as const, label: 'Entrada', icon: LogIn, color: 'bg-green-600 hover:bg-green-700' },
-    { tipo: 'saida_almoco' as const, label: 'Saída Almoço', icon: Coffee, color: 'bg-yellow-600 hover:bg-yellow-700' },
-    { tipo: 'retorno_almoco' as const, label: 'Retorno Almoço', icon: Coffee, color: 'bg-blue-600 hover:bg-blue-700' },
-    { tipo: 'saida' as const, label: 'Saída', icon: LogOut, color: 'bg-red-600 hover:bg-red-700' },
+    { tipo: 'entrada' as const, label: 'Entrada', icon: LogIn, gradient: 'from-success to-finance' },
+    { tipo: 'saida_almoco' as const, label: 'Saída Almoço', icon: Coffee, gradient: 'from-warning to-coins' },
+    { tipo: 'retorno_almoco' as const, label: 'Retorno Almoço', icon: Coffee, gradient: 'from-info to-level' },
+    { tipo: 'saida' as const, label: 'Saída', icon: LogOut, gradient: 'from-destructive to-streak' },
   ];
 
   return (
-    <PageLayout title="Ponto Eletrônico" description="Registre sua jornada de trabalho">
+    <PageLayout
+      title="Ponto Eletrônico"
+      description="Registre sua jornada de trabalho"
+      icon={<Clock className="h-5 w-5 text-white" />}
+      gradient="from-streak to-warning"
+    >
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Registrar Ponto
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-center mb-6">{new Date().toLocaleTimeString('pt-BR')}</div>
-            <div className="grid grid-cols-2 gap-4">
-              {buttons.map(({ tipo, label, icon: Icon, color }) => (
-                <Button key={tipo} onClick={() => registrar(tipo)} disabled={loading !== null} className={`${color} text-white`}>
-                  <Icon className="h-4 w-4 mr-2" />
-                  {loading === tipo ? 'Registrando...' : label}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader><CardTitle>Registros de Hoje</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Nenhum registro encontrado</p>
-          </CardContent>
-        </Card>
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-streak to-warning" />
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2.5 font-display">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-streak to-warning">
+                  <Clock className="h-4 w-4 text-white" />
+                </div>
+                Registrar Ponto
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-5xl font-display font-bold text-center mb-8 tabular-nums bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                {time.toLocaleTimeString('pt-BR')}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {buttons.map(({ tipo, label, icon: Icon, gradient }) => (
+                  <Button
+                    key={tipo}
+                    onClick={() => registrar(tipo)}
+                    disabled={loading !== null}
+                    className={cn(
+                      'h-12 rounded-xl bg-gradient-to-r text-white hover:opacity-90 shadow-lg transition-all font-body font-medium',
+                      gradient
+                    )}
+                  >
+                    <Icon className="h-4 w-4 mr-2" />
+                    {loading === tipo ? 'Registrando...' : label}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-info to-level" />
+            <CardHeader>
+              <CardTitle className="font-display">Registros de Hoje</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                  <Clock className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p className="text-sm text-muted-foreground font-body">Nenhum registro encontrado</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </PageLayout>
   );

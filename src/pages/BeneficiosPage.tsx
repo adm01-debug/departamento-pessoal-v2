@@ -1,5 +1,4 @@
 // @ts-nocheck
-// V15-228: src/pages/BeneficiosPage.tsx
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -11,8 +10,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { beneficioService } from '@/services';
 import { useEmpresa } from '@/contexts';
-import { Edit, Users } from 'lucide-react';
+import { Edit, Users, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function BeneficiosPage() {
   const [search, setSearch] = useState('');
@@ -34,7 +34,17 @@ export default function BeneficiosPage() {
   };
 
   return (
-    <PageLayout title="Benefícios" description="Gestão de benefícios" actions={<Button onClick={() => navigate('/beneficios/novo')}>Novo Benefício</Button>}>
+    <PageLayout
+      title="Benefícios"
+      description="Gestão de benefícios"
+      icon={<Gift className="h-5 w-5 text-white" />}
+      gradient="from-xp to-store"
+      actions={
+        <Button onClick={() => navigate('/beneficios/novo')} className="rounded-xl bg-gradient-to-r from-xp to-store hover:opacity-90 shadow-lg font-body">
+          Novo Benefício
+        </Button>
+      }
+    >
       <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar benefício..." />
 
       {isLoading ? (
@@ -42,35 +52,41 @@ export default function BeneficiosPage() {
       ) : !filtered?.length ? (
         <EmptyList entityName="benefício" onCreate={() => navigate('/beneficios/novo')} />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Valor Empresa</TableHead>
-              <TableHead>Valor Colaborador</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[100px]">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((b) => (
-              <TableRow key={b.id}>
-                <TableCell className="font-medium">{b.nome}</TableCell>
-                <TableCell>{tipoLabels[b.tipo] || b.tipo}</TableCell>
-                <TableCell>{formatCurrency(b.valor_empresa)}</TableCell>
-                <TableCell>{formatCurrency(b.valor_colaborador)}</TableCell>
-                <TableCell><Badge variant={b.ativo ? 'default' : 'secondary'}>{b.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon"><Users className="h-4 w-4" /></Button>
-                  </div>
-                </TableCell>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="font-display font-semibold">Nome</TableHead>
+                <TableHead className="font-display font-semibold">Tipo</TableHead>
+                <TableHead className="font-display font-semibold">Valor Empresa</TableHead>
+                <TableHead className="font-display font-semibold">Valor Colaborador</TableHead>
+                <TableHead className="font-display font-semibold">Status</TableHead>
+                <TableHead className="w-[100px] font-display font-semibold">Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((b) => (
+                <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
+                  <TableCell className="font-body font-medium">{b.nome}</TableCell>
+                  <TableCell className="font-body">{tipoLabels[b.tipo] || b.tipo}</TableCell>
+                  <TableCell className="font-body text-success font-semibold">{formatCurrency(b.valor_empresa)}</TableCell>
+                  <TableCell className="font-body">{formatCurrency(b.valor_colaborador)}</TableCell>
+                  <TableCell>
+                    <Badge className={b.ativo ? 'bg-success/15 text-success border-0' : 'bg-muted text-muted-foreground border-0'}>
+                      {b.ativo ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-xp/10"><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10"><Users className="h-4 w-4" /></Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </motion.div>
       )}
     </PageLayout>
   );
