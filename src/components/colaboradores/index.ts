@@ -1,1 +1,0 @@
-export{ColaboradorCard}from'./ColaboradorCard';export{ColaboradorAvatar}from'./ColaboradorAvatar';export{ColaboradorStatus}from'./ColaboradorStatus';export{ColaboradorInfo}from'./ColaboradorInfo';export{ColaboradorFilters}from'./ColaboradorFilters';
