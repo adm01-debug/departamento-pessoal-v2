@@ -1,6 +1,6 @@
-// V16: src/contexts/EmpresaContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthContext';
 
 interface Empresa {
   id: string;
@@ -26,8 +26,16 @@ export function EmpresaProvider({ children }: { children: ReactNode }) {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [empresaAtual, setEmpresaAtual] = useState<Empresa | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user, isReady } = useAuth();
 
   const refresh = async () => {
+    if (!user) {
+      setEmpresas([]);
+      setEmpresaAtual(null);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -35,12 +43,12 @@ export function EmpresaProvider({ children }: { children: ReactNode }) {
         .select('id, razao_social, nome_fantasia, cnpj, email, telefone, ativa')
         .eq('ativa', true)
         .order('razao_social');
-      
+
       if (error) throw error;
-      
+
       const fetchedEmpresas = data || [];
       setEmpresas(fetchedEmpresas);
-      
+
       if (!empresaAtual && fetchedEmpresas.length > 0) {
         setEmpresaAtual(fetchedEmpresas[0]);
       }
@@ -52,9 +60,12 @@ export function EmpresaProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => { 
-    refresh(); 
-  }, []);
+  // Only fetch empresas after auth is ready AND user is logged in
+  useEffect(() => {
+    if (isReady) {
+      refresh();
+    }
+  }, [isReady, user?.id]);
 
   return (
     <EmpresaContext.Provider value={{ empresas, empresaAtual, loading, setEmpresaAtual, refresh }}>
