@@ -34,6 +34,23 @@
     --input: 214 32% 91%;
     --ring: 217 91% 60%;
     --radius: 0.75rem;
+
+    /* ─── SPACING TOKENS ─── */
+    --space-page: 1.5rem;
+    --space-section: 1.5rem;
+    --space-card: 1.25rem;
+    --space-element: 0.75rem;
+    --space-compact: 0.5rem;
+
+    /* ─── TYPOGRAPHY SCALE ─── */
+    --text-display-xl: 2.25rem;
+    --text-display: 1.875rem;
+    --text-h1: 1.5rem;
+    --text-h2: 1.25rem;
+    --text-h3: 1.125rem;
+    --text-body: 0.875rem;
+    --text-caption: 0.75rem;
+    --text-overline: 0.625rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
