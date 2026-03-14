@@ -28,7 +28,7 @@ export function PageHeader({ title, description, backUrl, actions, children, cla
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {(actions || children) && <div className="flex items-center gap-2">{children || actions}</div>}
     </div>
   );
 }
