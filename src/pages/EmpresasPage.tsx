@@ -72,7 +72,7 @@ export default function EmpresasPage() {
                       <Users className="h-4 w-4" />
                       <span>0 colaboradores</span>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/empresas/${empresa.id}`)} className="rounded-xl hover:bg-xp/10 font-body">
+                    <Button variant="ghost" size="sm" onClick={() => navigate(`/empresas/${empresa.id}/editar`)} className="rounded-xl hover:bg-xp/10 font-body">
                       <Edit className="h-4 w-4 mr-1" />Editar
                     </Button>
                   </div>

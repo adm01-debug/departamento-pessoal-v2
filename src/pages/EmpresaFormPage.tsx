@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PageLayout } from '@/components/layout';
-import { FormField, FormSelect } from '@/components/forms';
+import { FormField } from '@/components/forms';
 import { FormSection, FormActions } from '@/components/forms/FormSection';
 import { CNPJInput } from '@/components/ui/cnpj-input';
 import { CEPInput } from '@/components/ui/cep-input';
@@ -28,17 +28,17 @@ export default function EmpresaFormPage() {
     enabled: isEditing,
   });
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<EmpresaSchema>({
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<EmpresaSchema>({
     resolver: zodResolver(empresaSchema),
+    defaultValues: { ativa: true },
   });
 
-  // Populate form when data arrives
   useEffect(() => {
     if (empresa) {
       reset({
         razao_social: empresa.razao_social,
         nome_fantasia: empresa.nome_fantasia || '',
-        cnpj: empresa.cnpj,
+        cnpj: empresa.cnpj || '',
         inscricao_estadual: empresa.inscricao_estadual || '',
         email: empresa.email || '',
         telefone: empresa.telefone || '',
@@ -48,8 +48,7 @@ export default function EmpresaFormPage() {
         bairro: empresa.bairro || '',
         cidade: empresa.cidade || '',
         uf: empresa.uf || '',
-        regime_tributario: empresa.regime_tributario as any,
-        status: (empresa.ativa ? 'ativa' : 'inativa') as any,
+        ativa: empresa.ativa ?? true,
       });
     }
   }, [empresa, reset]);
@@ -66,12 +65,6 @@ export default function EmpresaFormPage() {
 
   if (isLoading) return <div className="flex justify-center p-8"><Spinner size="lg" /></div>;
 
-  const regimeOptions = [
-    { value: 'simples_nacional', label: 'Simples Nacional' },
-    { value: 'lucro_presumido', label: 'Lucro Presumido' },
-    { value: 'lucro_real', label: 'Lucro Real' },
-  ];
-
   return (
     <PageLayout title={isEditing ? 'Editar Empresa' : 'Nova Empresa'}>
       <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
@@ -83,12 +76,6 @@ export default function EmpresaFormPage() {
             <CNPJInput onChange={(v) => setValue('cnpj', v)} />
           </div>
           <FormField label="Inscrição Estadual" {...register('inscricao_estadual')} />
-          <FormSelect
-            label="Regime Tributário"
-            options={regimeOptions}
-            value={watch('regime_tributario')}
-            onChange={(v) => setValue('regime_tributario', v as any)}
-          />
         </FormSection>
         <FormSection title="Contato">
           <FormField label="Email" type="email" {...register('email')} />

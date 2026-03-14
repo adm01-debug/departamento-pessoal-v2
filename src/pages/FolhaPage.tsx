@@ -21,7 +21,7 @@ export default function FolhaPage() {
     queryFn: () => folhaService.list(competencia || undefined),
   });
 
-  const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatCurrency = (value: number | null) => (value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
     <PageLayout
@@ -59,7 +59,7 @@ export default function FolhaPage() {
               {folhas.map((f) => (
                 <TableRow key={f.id} className="hover:bg-accent/30 transition-colors">
                   <TableCell className="font-body font-medium">{f.competencia}</TableCell>
-                  <TableCell className="capitalize font-body">{f.tipo.replace('_', ' ')}</TableCell>
+                  <TableCell className="capitalize font-body">{(f.tipo || '').replace('_', ' ')}</TableCell>
                   <TableCell className="text-success font-body font-semibold">{formatCurrency(f.total_proventos)}</TableCell>
                   <TableCell className="text-destructive font-body font-semibold">{formatCurrency(f.total_descontos)}</TableCell>
                   <TableCell className="font-display font-bold">{formatCurrency(f.total_liquido)}</TableCell>

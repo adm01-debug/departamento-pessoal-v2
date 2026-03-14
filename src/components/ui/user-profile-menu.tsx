@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Settings, LogOut, Moon, Sun, Shield, HelpCircle } from 'lucide-react';
+import { User, Settings, LogOut, Shield, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
@@ -15,15 +15,8 @@ interface UserProfileMenuProps {
 
 export function UserProfileMenu({ user }: UserProfileMenuProps) {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const initials = user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'US';
-
-  let signOut: (() => void) | undefined;
-  try {
-    const auth = useAuth();
-    signOut = auth?.signOut;
-  } catch {
-    // AuthContext not available
-  }
 
   return (
     <DropdownMenu>
@@ -61,7 +54,6 @@ export function UserProfileMenu({ user }: UserProfileMenuProps) {
           </div>
           <div className="mt-2.5 flex items-center gap-1.5">
             <span className="px-2 py-0.5 rounded-full bg-success/15 text-success text-[10px] font-bold uppercase tracking-wider">Online</span>
-            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">Admin</span>
           </div>
         </div>
 
@@ -102,7 +94,7 @@ export function UserProfileMenu({ user }: UserProfileMenuProps) {
         <DropdownMenuSeparator className="bg-border/30" />
 
         <DropdownMenuItem
-          onClick={() => signOut?.()}
+          onClick={() => signOut()}
           className="gap-3 py-2.5 rounded-lg cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
         >
           <div className="p-1.5 rounded-lg bg-destructive/10"><LogOut className="h-3.5 w-3.5" /></div>
