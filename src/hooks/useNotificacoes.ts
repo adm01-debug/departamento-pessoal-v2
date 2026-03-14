@@ -226,7 +226,7 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'documento_vencendo')
               .eq('entidade_id', colab.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
