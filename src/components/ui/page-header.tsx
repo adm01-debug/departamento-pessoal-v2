@@ -13,7 +13,7 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({ title, description, backUrl, actions, className }: PageHeaderProps) {
+export function PageHeader({ title, description, backUrl, actions, children, className }: PageHeaderProps) {
   const navigate = useNavigate();
   return (
     <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6', className)}>
