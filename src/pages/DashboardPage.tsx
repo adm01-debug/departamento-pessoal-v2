@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
 import { MiniSparkline } from "@/components/dashboard/MiniSparkline";
 import { DonutChart } from "@/components/dashboard/DonutChart";
