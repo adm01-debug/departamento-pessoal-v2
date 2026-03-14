@@ -188,7 +188,7 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'contrato_vencendo')
               .eq('entidade_id', colab.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
