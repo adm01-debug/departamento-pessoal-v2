@@ -34,6 +34,23 @@
     --input: 214 32% 91%;
     --ring: 217 91% 60%;
     --radius: 0.75rem;
+
+    /* ─── SPACING TOKENS ─── */
+    --space-page: 1.5rem;
+    --space-section: 1.5rem;
+    --space-card: 1.25rem;
+    --space-element: 0.75rem;
+    --space-compact: 0.5rem;
+
+    /* ─── TYPOGRAPHY SCALE ─── */
+    --text-display-xl: 2.25rem;
+    --text-display: 1.875rem;
+    --text-h1: 1.5rem;
+    --text-h2: 1.25rem;
+    --text-h3: 1.125rem;
+    --text-body: 0.875rem;
+    --text-caption: 0.75rem;
+    --text-overline: 0.625rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -136,11 +153,23 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "Plus Jakarta Sans", sans-serif;
+    font-variant-numeric: tabular-nums;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: "Outfit", sans-serif;
+    letter-spacing: -0.025em;
   }
+
+  /* Typography hierarchy */
+  .text-display-xl { font-size: var(--text-display-xl); line-height: 1.1; font-family: "Outfit", sans-serif; font-weight: 700; letter-spacing: -0.03em; }
+  .text-display { font-size: var(--text-display); line-height: 1.2; font-family: "Outfit", sans-serif; font-weight: 700; letter-spacing: -0.025em; }
+  .text-h1 { font-size: var(--text-h1); line-height: 1.3; font-family: "Outfit", sans-serif; font-weight: 600; }
+  .text-h2 { font-size: var(--text-h2); line-height: 1.35; font-family: "Outfit", sans-serif; font-weight: 600; }
+  .text-h3 { font-size: var(--text-h3); line-height: 1.4; font-family: "Outfit", sans-serif; font-weight: 500; }
+  .text-body { font-size: var(--text-body); line-height: 1.5; font-family: "Plus Jakarta Sans", sans-serif; }
+  .text-caption { font-size: var(--text-caption); line-height: 1.4; font-family: "Plus Jakarta Sans", sans-serif; }
+  .text-overline { font-size: var(--text-overline); line-height: 1.4; font-family: "Plus Jakarta Sans", sans-serif; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
 
   /* Focus ring - accessible */
   :focus-visible {

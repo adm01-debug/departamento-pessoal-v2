@@ -138,6 +138,27 @@ export default {
         },
       },
 
+      // === SPACING SEMÂNTICO ===
+      spacing: {
+        'page': 'var(--space-page)',
+        'section': 'var(--space-section)',
+        'card-space': 'var(--space-card)',
+        'element': 'var(--space-element)',
+        'compact': 'var(--space-compact)',
+      },
+
+      // === FONT SIZE ===
+      fontSize: {
+        'display-xl': ['var(--text-display-xl)', { lineHeight: '1.1', letterSpacing: '-0.03em' }],
+        'display': ['var(--text-display)', { lineHeight: '1.2', letterSpacing: '-0.025em' }],
+        'h1': ['var(--text-h1)', { lineHeight: '1.3' }],
+        'h2': ['var(--text-h2)', { lineHeight: '1.35' }],
+        'h3': ['var(--text-h3)', { lineHeight: '1.4' }],
+        'body': ['var(--text-body)', { lineHeight: '1.5' }],
+        'caption': ['var(--text-caption)', { lineHeight: '1.4' }],
+        'overline': ['var(--text-overline)', { lineHeight: '1.4', letterSpacing: '0.1em' }],
+      },
+
       // === BORDER RADIUS ===
       borderRadius: {
         lg: "var(--radius)",
