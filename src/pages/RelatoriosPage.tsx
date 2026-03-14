@@ -35,7 +35,7 @@ export default function RelatoriosPage() {
           >
             <Card
               className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 cursor-pointer rounded-2xl overflow-hidden"
-              onClick={() => navigate(`/relatorios/${id}`)}
+              onClick={() => { /* TODO: implementar geração de relatório */ }}
             >
               <div className={cn("h-[2px] bg-gradient-to-r opacity-60 group-hover:opacity-100 transition-opacity", gradient)} />
               <CardHeader className="flex flex-row items-center gap-4">

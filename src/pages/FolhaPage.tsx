@@ -65,7 +65,7 @@ export default function FolhaPage() {
                   <TableCell className="font-display font-bold">{formatCurrency(f.total_liquido)}</TableCell>
                   <TableCell><FolhaStatus status={f.status} /></TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" className="rounded-xl hover:bg-finance/10" onClick={() => navigate(`/folha/${f.id}`)}><Eye className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="rounded-xl hover:bg-finance/10" onClick={() => navigate('/folha/calcular')}><Eye className="h-4 w-4" /></Button>
                   </TableCell>
                 </TableRow>
               ))}
