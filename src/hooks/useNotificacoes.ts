@@ -122,6 +122,9 @@ export function useNotificacoes() {
   // Gerar notificações automáticas
   const gerarNotificacoesAutomaticas = useMutation({
     mutationFn: async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('Sessão expirada. Faça login novamente.');
+
       const hoje = new Date();
       const notificacoesParaCriar: Omit<Notificacao, 'id' | 'created_at'>[] = [];
 
