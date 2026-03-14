@@ -1,4 +1,4 @@
-// UI Components Index - only installed packages
+// UI Components Index - shadcn primitives + active custom components
 export * from './button';
 export * from './input';
 export * from './label';
@@ -25,7 +25,7 @@ export * from './skeleton';
 export * from './avatar';
 export * from './alert';
 
-// Custom UI
+// Custom UI (active)
 export * from './stat-card';
 export * from './spinner';
 export * from './empty-state';
