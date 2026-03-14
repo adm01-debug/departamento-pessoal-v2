@@ -284,12 +284,12 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
     toast.success('Logout realizado com sucesso');
-    navigate('/auth');
+    navigate('/login');
   };
 
   const toggleGroup = useCallback((groupId: string) => {

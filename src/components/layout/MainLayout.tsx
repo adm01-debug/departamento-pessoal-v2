@@ -8,6 +8,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { PageTransition } from './PageTransition';
 import { CommandPalette } from '@/components/ui/command-palette';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -16,6 +17,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <div className="flex h-screen bg-background">
@@ -41,7 +43,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="flex-1 flex flex-col min-w-0">
         <Header
           onMenuClick={() => setMobileSidebarOpen(true)}
-          user={{ name: 'Admin', email: 'admin@empresa.com' }}
+          user={{ name: user?.name || user?.email || 'Usuário', email: user?.email || '' }}
         />
         <main className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
           <PageTransition>
