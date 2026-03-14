@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -19,7 +18,7 @@ export default function FolhaPage() {
 
   const { data: folhas, isLoading } = useQuery({
     queryKey: ['folhas', competencia],
-    queryFn: () => folhaService.list({ competencia: competencia || undefined }),
+    queryFn: () => folhaService.list(competencia || undefined),
   });
 
   const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

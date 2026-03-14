@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -10,7 +9,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { beneficioService } from '@/services';
 import { useEmpresa } from '@/contexts';
-import { Edit, Users, Gift } from 'lucide-react';
+import { Edit, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -21,17 +20,12 @@ export default function BeneficiosPage() {
 
   const { data: beneficios, isLoading } = useQuery({
     queryKey: ['beneficios', empresaAtual?.id],
-    queryFn: () => beneficioService.list(empresaAtual?.id || ''),
+    queryFn: () => beneficioService.list(empresaAtual?.id),
     enabled: !!empresaAtual?.id,
   });
 
   const filtered = beneficios?.filter(b => !search || b.nome.toLowerCase().includes(search.toLowerCase()));
-  const formatCurrency = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-  const tipoLabels: Record<string, string> = {
-    vale_transporte: 'Vale Transporte', vale_refeicao: 'Vale Refeição', vale_alimentacao: 'Vale Alimentação',
-    plano_saude: 'Plano de Saúde', plano_odontologico: 'Plano Odontológico', seguro_vida: 'Seguro de Vida',
-  };
+  const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
     <PageLayout
@@ -58,29 +52,24 @@ export default function BeneficiosPage() {
               <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead className="font-display font-semibold">Nome</TableHead>
                 <TableHead className="font-display font-semibold">Tipo</TableHead>
-                <TableHead className="font-display font-semibold">Valor Empresa</TableHead>
-                <TableHead className="font-display font-semibold">Valor Colaborador</TableHead>
+                <TableHead className="font-display font-semibold">Valor</TableHead>
                 <TableHead className="font-display font-semibold">Status</TableHead>
-                <TableHead className="w-[100px] font-display font-semibold">Ações</TableHead>
+                <TableHead className="w-[80px] font-display font-semibold">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((b) => (
                 <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
                   <TableCell className="font-body font-medium">{b.nome}</TableCell>
-                  <TableCell className="font-body">{tipoLabels[b.tipo] || b.tipo}</TableCell>
-                  <TableCell className="font-body text-success font-semibold">{formatCurrency(b.valor_empresa)}</TableCell>
-                  <TableCell className="font-body">{formatCurrency(b.valor_colaborador)}</TableCell>
+                  <TableCell className="font-body capitalize">{b.tipo || '-'}</TableCell>
+                  <TableCell className="font-body text-success font-semibold">{formatCurrency(b.valor)}</TableCell>
                   <TableCell>
                     <Badge className={b.ativo ? 'bg-success/15 text-success border-0' : 'bg-muted text-muted-foreground border-0'}>
                       {b.ativo ? 'Ativo' : 'Inativo'}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-xp/10"><Edit className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10"><Users className="h-4 w-4" /></Button>
-                    </div>
+                    <Button variant="ghost" size="icon" className="rounded-xl hover:bg-xp/10"><Edit className="h-4 w-4" /></Button>
                   </TableCell>
                 </TableRow>
               ))}

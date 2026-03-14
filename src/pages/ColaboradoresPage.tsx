@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -11,16 +10,19 @@ import { Button } from '@/components/ui/button';
 import { colaboradorService } from '@/services';
 import { Eye, Edit, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEmpresa } from '@/contexts';
 import { motion } from 'framer-motion';
 
 export default function ColaboradoresPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const navigate = useNavigate();
+  const { empresaAtual } = useEmpresa();
 
   const { data: colaboradores, isLoading } = useQuery({
-    queryKey: ['colaboradores', search, statusFilter],
-    queryFn: () => colaboradorService.list({ search, status: statusFilter as any }),
+    queryKey: ['colaboradores', empresaAtual?.id],
+    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const statusOptions = [
@@ -29,6 +31,12 @@ export default function ColaboradoresPage() {
     { value: 'ferias', label: 'Férias' },
     { value: 'afastado', label: 'Afastado' },
   ];
+
+  const filtered = colaboradores?.filter((c) => {
+    const matchSearch = !search || c.nome_completo.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = !statusFilter || c.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
   return (
     <PageLayout
@@ -50,12 +58,11 @@ export default function ColaboradoresPage() {
         onSearchChange={setSearch}
         searchPlaceholder="Buscar colaborador..."
         filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter }]}
-        onExport={() => {}}
       />
 
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
-      ) : !colaboradores?.length ? (
+      ) : !filtered?.length ? (
         <EmptyList entityName="colaborador" onCreate={() => navigate('/colaboradores/novo')} />
       ) : (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated">
@@ -70,9 +77,9 @@ export default function ColaboradoresPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {colaboradores.map((c) => (
+              {filtered.map((c) => (
                 <TableRow key={c.id} className="hover:bg-accent/30 transition-colors">
-                  <TableCell className="font-body font-medium">{c.nome}</TableCell>
+                  <TableCell className="font-body font-medium">{c.nome_completo}</TableCell>
                   <TableCell className="font-body">{c.cpf}</TableCell>
                   <TableCell className="font-body">{c.cargo}</TableCell>
                   <TableCell><ColaboradorStatus status={c.status} /></TableCell>
