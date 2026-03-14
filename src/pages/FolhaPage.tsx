@@ -21,7 +21,7 @@ export default function FolhaPage() {
     queryFn: () => folhaService.list(competencia || undefined),
   });
 
-  const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatCurrency = (value: number | null) => (value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
     <PageLayout
