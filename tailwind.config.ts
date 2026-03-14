@@ -16,7 +16,9 @@ export default {
       // === FONTES ===
       fontFamily: {
         display: ["Outfit", "sans-serif"],
+        body: ["Plus Jakarta Sans", "sans-serif"],
         sans: ["Plus Jakarta Sans", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
 
       // === CORES ===
@@ -143,6 +145,44 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
 
+      // === BOX SHADOW (COMPLETO) ===
+      boxShadow: {
+        // Base
+        glow: "0 0 20px hsl(var(--primary) / 0.3)",
+        "glow-sm": "0 0 10px hsl(var(--primary) / 0.2)",
+        "glow-lg": "0 0 40px hsl(var(--primary) / 0.4)",
+        elegant: "0 10px 40px -10px hsl(0 0% 0% / 0.5)",
+        // Semantic
+        elevated: "0 4px 24px -4px hsl(0 0% 0% / 0.12), 0 1px 4px -1px hsl(0 0% 0% / 0.08)",
+        glass: "0 8px 32px 0 hsl(0 0% 0% / 0.06)",
+        card: "0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1)",
+        float: "0 20px 60px -15px hsl(0 0% 0% / 0.2)",
+        // Gamification glows
+        "glow-xp": "0 0 16px hsl(var(--xp) / 0.4)",
+        "glow-coins": "0 0 16px hsl(var(--coins) / 0.4)",
+        "glow-streak": "0 0 16px hsl(var(--streak) / 0.4)",
+        "glow-success": "0 0 16px hsl(var(--success) / 0.4)",
+        "glow-info": "0 0 16px hsl(var(--info) / 0.4)",
+        "glow-warning": "0 0 16px hsl(var(--warning) / 0.4)",
+      },
+
+      // === TRANSITION DURATION ===
+      transitionDuration: {
+        fast: "150ms",
+        normal: "250ms",
+        slow: "400ms",
+      },
+
+      // === Z-INDEX SCALE ===
+      zIndex: {
+        dropdown: "50",
+        sticky: "40",
+        modal: "100",
+        overlay: "90",
+        toast: "110",
+        tooltip: "120",
+      },
+
       // === KEYFRAMES ===
       keyframes: {
         "accordion-down": {
@@ -183,6 +223,10 @@ export default {
           "0%, 100%": { boxShadow: "0 0 10px hsl(var(--primary) / 0.2)" },
           "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.4)" },
         },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
         "level-up": {
           "0%": { transform: "scale(0.5) rotate(-10deg)", opacity: "0" },
           "50%": { transform: "scale(1.2) rotate(5deg)" },
@@ -198,6 +242,10 @@ export default {
           "25%": { transform: "rotate(-5deg)" },
           "75%": { transform: "rotate(5deg)" },
         },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
 
       // === ANIMAÇÕES ===
@@ -211,17 +259,11 @@ export default {
         float: "float 3s ease-in-out infinite",
         shimmer: "shimmer 2s linear infinite",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "level-up": "level-up 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards",
         pop: "pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
         wiggle: "wiggle 0.5s ease-in-out",
-      },
-
-      // === BOX SHADOW ===
-      boxShadow: {
-        glow: "0 0 20px hsl(var(--primary) / 0.3)",
-        "glow-sm": "0 0 10px hsl(var(--primary) / 0.2)",
-        "glow-lg": "0 0 40px hsl(var(--primary) / 0.4)",
-        elegant: "0 10px 40px -10px hsl(0 0% 0% / 0.5)",
+        "spin-slow": "spin-slow 3s linear infinite",
       },
     },
   },
