@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -7,13 +6,21 @@ import { FormField } from '@/components/forms';
 import { FormSection, FormActions } from '@/components/forms/FormSection';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/useToast';
+import { toast } from 'sonner';
+
+interface BeneficioFormData {
+  colaborador_id: string;
+  tipo_beneficio_id: string;
+  valor: string;
+  desconto: string;
+  data_inicio: string;
+  observacoes: string;
+}
 
 export default function BeneficioFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit } = useForm<BeneficioFormData>();
 
   const { data: tipos } = useQuery({
     queryKey: ['tipos_beneficio'],
@@ -32,7 +39,7 @@ export default function BeneficioFormPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (formData: any) => {
+    mutationFn: async (formData: BeneficioFormData) => {
       const { error } = await supabase.from('beneficios_colaborador').insert({
         colaborador_id: formData.colaborador_id,
         tipo_beneficio_id: formData.tipo_beneficio_id,
@@ -45,10 +52,10 @@ export default function BeneficioFormPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios'] });
-      toast({ title: 'Benefício cadastrado com sucesso!' });
+      toast.success('Benefício cadastrado com sucesso!');
       navigate('/beneficios');
     },
-    onError: (err: any) => toast({ title: 'Erro ao cadastrar', description: err.message, variant: 'destructive' }),
+    onError: (err: Error) => toast.error(`Erro ao cadastrar: ${err.message}`),
   });
 
   return (
