@@ -1,4 +1,4 @@
-// V23: Hooks Index - Only verified exports
+// V24: Hooks Index - Active exports only
 export { useDebounce } from "./useDebounce";
 export { useLocalStorage } from "./useLocalStorage";
 export { useMediaQuery } from "./useMediaQuery";
@@ -12,6 +12,5 @@ export { useRelatorios } from "./useRelatorios";
 export { useDepartamentos } from "./useDepartamentos";
 export { useCargos } from "./useCargos";
 export { useDocumentos } from "./useDocumentos";
-export { useContratos } from "./useContratos";
 export { useConfiguracao as useConfig } from "./useConfiguracao";
 export { useNotificacoes } from "./useNotificacoes";
