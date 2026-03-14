@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @fileoverview Hook para gerenciamento de notificações
  * @module hooks/useNotificacoes
@@ -6,9 +5,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { useEffect } from 'react';
-import { useAuditoriaIntegration } from './useAuditoriaIntegration';
 
 
 // Tipo para colaborador vindo de relacionamento
@@ -39,13 +35,6 @@ interface AlertaConfig {
   tipo: TipoNotificacao;
   diasAntecedencia: number;
 }
-
-const ALERTAS_CONFIG: AlertaConfig[] = [
-  { tipo: 'ferias_vencendo', diasAntecedencia: 60 },
-  { tipo: 'contrato_vencendo', diasAntecedencia: 30 },
-  { tipo: 'documento_vencendo', diasAntecedencia: 30 },
-  { tipo: 'periodo_aquisitivo', diasAntecedencia: 60 },
-];
 
 export function useNotificacoes() {
   const queryClient = useQueryClient();
@@ -133,17 +122,22 @@ export function useNotificacoes() {
   // Gerar notificações automáticas
   const gerarNotificacoesAutomaticas = useMutation({
     mutationFn: async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('Sessão expirada. Faça login novamente.');
+
       const hoje = new Date();
       const notificacoesParaCriar: Omit<Notificacao, 'id' | 'created_at'>[] = [];
 
       // 1. Verificar férias vencendo (períodos aquisitivos)
-      const { data: periodos } = await supabase
+      const { data: periodos, error: periodosError } = await supabase
         .from('periodos_aquisitivos')
         .select(`
           *,
           colaboradores:colaborador_id (id, nome_completo, status)
         `)
         .eq('status', 'adquirido');
+
+      if (periodosError) throw periodosError;
 
       if (periodos) {
         for (const periodo of periodos) {
@@ -160,11 +154,11 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'periodo_aquisitivo')
               .eq('entidade_id', periodo.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'periodo_aquisitivo',
                 titulo: 'Período de Férias Vencendo',
                 mensagem: `O colaborador ${colaborador.nome_completo} tem férias vencendo em ${diasRestantes} dias (${format(dataFimConcessivo, "dd/MM/yyyy")}).`,
@@ -179,11 +173,13 @@ export function useNotificacoes() {
       }
 
       // 2. Verificar contratos temporários vencendo
-      const { data: colaboradores } = await supabase
+      const { data: colaboradores, error: colaboradoresError } = await supabase
         .from('colaboradores')
-        .select('id, titulo, mensagem, lida, created_at, tipo')
+        .select('id, nome_completo, tipo_contrato, data_admissao')
         .in('tipo_contrato', ['temporario', 'estagiario', 'aprendiz'])
         .eq('status', 'ativo');
+
+      if (colaboradoresError) throw colaboradoresError;
 
       if (colaboradores) {
         for (const colab of colaboradores) {
@@ -199,11 +195,11 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'contrato_vencendo')
               .eq('entidade_id', colab.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'contrato_vencendo',
                 titulo: 'Contrato Vencendo',
                 mensagem: `O contrato ${colab.tipo_contrato} de ${colab.nome_completo} vence em ${diasRestantes} dias (${format(dataFimContrato, "dd/MM/yyyy")}).`,
@@ -218,11 +214,13 @@ export function useNotificacoes() {
       }
 
       // 3. Verificar documentos com validade próxima (CNH)
-      const { data: colaboradoresDoc } = await supabase
+      const { data: colaboradoresDoc, error: colaboradoresDocError } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, cnh_validade')
         .not('cnh_validade', 'is', null)
         .eq('status', 'ativo');
+
+      if (colaboradoresDocError) throw colaboradoresDocError;
 
       if (colaboradoresDoc) {
         for (const colab of colaboradoresDoc) {
@@ -237,11 +235,11 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'documento_vencendo')
               .eq('entidade_id', colab.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'documento_vencendo',
                 titulo: 'CNH Vencendo',
                 mensagem: `A CNH de ${colab.nome_completo} vence em ${diasRestantes} dias (${format(dataValidade, "dd/MM/yyyy")}).`,
@@ -256,13 +254,15 @@ export function useNotificacoes() {
       }
 
       // 4. Verificar férias programadas próximas
-      const { data: feriasProgramadas } = await supabase
+      const { data: feriasProgramadas, error: feriasError } = await supabase
         .from('ferias')
         .select(`
           *,
           colaboradores:colaborador_id (id, nome_completo)
         `)
         .eq('status', 'aprovada');
+
+      if (feriasError) throw feriasError;
 
       if (feriasProgramadas) {
         for (const ferias of feriasProgramadas) {
@@ -278,11 +278,11 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'ferias_vencendo')
               .eq('entidade_id', ferias.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'ferias_vencendo',
                 titulo: 'Férias Próximas',
                 mensagem: `As férias de ${colaborador.nome_completo} começam em ${diasAteInicio} dias (${format(dataInicio, "dd/MM/yyyy")}).`,

@@ -28,21 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Restore session from storage first
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      if (initialSession?.user) {
-        setUser({
-          id: initialSession.user.id,
-          email: initialSession.user.email!,
-          name: initialSession.user.user_metadata?.name,
-        });
-        setSession(initialSession);
-      }
-      setLoading(false);
-      setIsReady(true);
-    });
-
-    // Handle subsequent auth changes (sign in/out, token refresh)
+    // Subscribe first to avoid missing auth events during session restoration
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (newSession?.user) {
         setUser({
@@ -55,6 +41,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setSession(null);
       }
+    });
+
+    // Restore session from storage
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      if (initialSession?.user) {
+        setUser({
+          id: initialSession.user.id,
+          email: initialSession.user.email!,
+          name: initialSession.user.user_metadata?.name,
+        });
+        setSession(initialSession);
+      }
+      setLoading(false);
+      setIsReady(true);
     });
 
     return () => subscription.unsubscribe();
