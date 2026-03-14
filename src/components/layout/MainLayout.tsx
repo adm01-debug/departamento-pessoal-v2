@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
+import { PageTransition } from './PageTransition';
 import { CommandPalette } from '@/components/ui/command-palette';
 
 interface MainLayoutProps {
@@ -39,7 +40,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           user={{ name: 'Admin', email: 'admin@empresa.com' }}
         />
         <main className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
-          {children || <Outlet />}
+          <PageTransition>
+            {children || <Outlet />}
+          </PageTransition>
         </main>
       </div>
 
