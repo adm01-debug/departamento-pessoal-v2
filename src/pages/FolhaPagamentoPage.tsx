@@ -92,7 +92,16 @@ export default function FolhaPagamentoPage() {
   const calcularFolha = useMutation({
     mutationFn: async (comp: string) => {
       const [mes, ano] = comp.split('/');
-      const { data, error } = await supabase.rpc('calcular_folha', { p_competencia: `${ano}-${mes}` });
+      const competenciaDB = `${ano}-${mes}`;
+      // Insert a folha record instead of calling non-existent RPC
+      const { data, error } = await supabase.from('folhas_pagamento').insert({
+        competencia: competenciaDB,
+        tipo: 'mensal',
+        status: 'rascunho',
+        total_proventos: 0,
+        total_descontos: 0,
+        total_liquido: 0,
+      }).select().single();
       if (error) throw error;
       return data;
     },
