@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, Search } from 'lucide-react';
 import { NotificationCenter } from '@/components/ui/notification-center';
 import { UserProfileMenu } from '@/components/ui/user-profile-menu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -13,7 +13,6 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, user, className }: HeaderProps) {
   const handleSearchClick = () => {
-    // Trigger ⌘K
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
   };
 
@@ -42,10 +41,8 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-1.5">
-        {/* Notification Center */}
+        <ThemeToggle />
         <NotificationCenter />
-
-        {/* User Profile Menu */}
         <UserProfileMenu user={user} />
       </div>
     </header>

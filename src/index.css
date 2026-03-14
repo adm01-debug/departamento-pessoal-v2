@@ -6,33 +6,34 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* ─── LIGHT MODE (Premium Blue) ─── */
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 222.2 47.4% 20%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 217 91% 72%;
+    --secondary: 214 32% 95%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 214 32% 95%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
     --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
-    --warning-foreground: 222.2 47.4% 11.2%;
+    --warning-foreground: 222 47% 11%;
     --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --info-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -41,29 +42,29 @@
 
     /* Module colors */
     --tasks: 262 83% 58%;
-    --tasks-foreground: 210 40% 98%;
+    --tasks-foreground: 0 0% 100%;
     --gravacoes: 0 84% 60%;
-    --gravacoes-foreground: 210 40% 98%;
+    --gravacoes-foreground: 0 0% 100%;
     --finance: 142 76% 36%;
-    --finance-foreground: 210 40% 98%;
+    --finance-foreground: 0 0% 100%;
     --sales: 38 92% 50%;
-    --sales-foreground: 222.2 47.4% 11.2%;
+    --sales-foreground: 222 47% 11%;
     --store: 262 83% 58%;
-    --store-foreground: 210 40% 98%;
+    --store-foreground: 0 0% 100%;
     --zapp: 142 70% 45%;
-    --zapp-foreground: 210 40% 98%;
+    --zapp-foreground: 0 0% 100%;
     --loggi: 24 95% 53%;
-    --loggi-foreground: 210 40% 98%;
+    --loggi-foreground: 0 0% 100%;
 
     /* Gamification */
     --xp: 262 83% 58%;
-    --xp-foreground: 210 40% 98%;
+    --xp-foreground: 0 0% 100%;
     --coins: 45 93% 47%;
-    --coins-foreground: 222.2 47.4% 11.2%;
+    --coins-foreground: 222 47% 11%;
     --streak: 24 95% 53%;
-    --streak-foreground: 210 40% 98%;
+    --streak-foreground: 0 0% 100%;
     --level: 199 89% 48%;
-    --level-foreground: 210 40% 98%;
+    --level-foreground: 0 0% 100%;
 
     /* Ranks */
     --rank-gold: 45 93% 47%;
@@ -71,43 +72,44 @@
     --rank-bronze: 30 50% 50%;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 210 20% 97%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 32% 95%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* ─── DARK MODE (Deep Space) ─── */
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --primary-glow: 210 40% 80%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 217 91% 72%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     --success: 142 76% 36%;
     --success-foreground: 210 40% 98%;
     --warning: 38 92% 50%;
-    --warning-foreground: 222.2 47.4% 11.2%;
+    --warning-foreground: 222 47% 11%;
     --info: 199 89% 48%;
     --info-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -115,14 +117,14 @@
     --chart-5: 340 75% 55%;
 
     /* Sidebar dark */
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 217 33% 14%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -138,6 +140,11 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: "Outfit", sans-serif;
+  }
+
+  /* Focus ring - accessible */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
@@ -186,6 +193,14 @@
     background: linear-gradient(135deg, hsl(var(--coins)), hsl(var(--streak)));
   }
 
+  .gradient-success {
+    background: linear-gradient(135deg, hsl(var(--success)), hsl(var(--finance)));
+  }
+
+  .gradient-info {
+    background: linear-gradient(135deg, hsl(var(--info)), hsl(var(--level)));
+  }
+
   /* Hover effects */
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-105;
@@ -193,5 +208,9 @@
 
   .hover-glow {
     @apply transition-shadow duration-300 hover:shadow-glow;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevated;
   }
 }
