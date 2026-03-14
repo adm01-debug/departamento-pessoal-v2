@@ -36,13 +36,6 @@ interface AlertaConfig {
   diasAntecedencia: number;
 }
 
-const ALERTAS_CONFIG: AlertaConfig[] = [
-  { tipo: 'ferias_vencendo', diasAntecedencia: 60 },
-  { tipo: 'contrato_vencendo', diasAntecedencia: 30 },
-  { tipo: 'documento_vencendo', diasAntecedencia: 30 },
-  { tipo: 'periodo_aquisitivo', diasAntecedencia: 60 },
-];
-
 export function useNotificacoes() {
   const queryClient = useQueryClient();
 
