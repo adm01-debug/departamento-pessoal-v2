@@ -64,10 +64,10 @@ export interface UseEmpresasReturn {
   empresaAtualId: string | null;
   loadingEmpresas: boolean;
   loadingTodas: boolean;
-  criarEmpresa: (empresa: Omit<Empresa, "id" | "created_at" | "updated_at">) => void;
-  atualizarEmpresa: (params: { id: string; dados: Partial<Empresa> }) => void;
-  associarUsuario: (params: { userId: string; empresaId: string }) => void;
-  definirEmpresaPadrao: (params: { userEmpresaId: string; empresaId: string }) => void;
+  criarEmpresa: ReturnType<typeof useMutation>;
+  atualizarEmpresa: ReturnType<typeof useMutation>;
+  associarUsuario: ReturnType<typeof useMutation>;
+  definirEmpresaPadrao: ReturnType<typeof useMutation>;
   trocarEmpresa: (empresaId: string) => void;
   temMultiplasEmpresas: boolean;
 }
