@@ -17,6 +17,7 @@ import BeneficioFormPage from '@/pages/BeneficioFormPage';
 import RelatoriosPage from '@/pages/RelatoriosPage';
 import ESocialPage from '@/pages/ESocialPage';
 import ConfiguracoesPage from '@/pages/ConfiguracoesPage';
+import DesignSystemPage from '@/pages/DesignSystemPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 export default function App() {
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="relatorios" element={<RelatoriosPage />} />
         <Route path="esocial" element={<ESocialPage />} />
         <Route path="configuracoes" element={<ConfiguracoesPage />} />
+        <Route path="design-system" element={<DesignSystemPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
