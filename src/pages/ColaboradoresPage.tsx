@@ -85,7 +85,7 @@ export default function ColaboradoresPage() {
                   <TableCell><ColaboradorStatus status={c.status} /></TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10" onClick={() => navigate(`/colaboradores/${c.id}`)}><Eye className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10" onClick={() => navigate(`/colaboradores/${c.id}/editar`)}><Eye className="h-4 w-4" /></Button>
                       <Button variant="ghost" size="icon" className="rounded-xl hover:bg-warning/10" onClick={() => navigate(`/colaboradores/${c.id}/editar`)}><Edit className="h-4 w-4" /></Button>
                     </div>
                   </TableCell>
