@@ -461,10 +461,10 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {profile?.nome || 'Carregando...'}
+                    {user?.name || user?.email || 'Carregando...'}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {profile?.cargo || 'Usuário'}
+                    Usuário
                   </p>
                 </div>
               </NavLink>
