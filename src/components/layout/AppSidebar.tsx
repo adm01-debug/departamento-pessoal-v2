@@ -456,7 +456,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
               >
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center ring-2 ring-primary/20">
                   <span className="text-xs font-semibold text-primary">
-                    {profile?.nome ? getInitials(profile.nome) : '??'}
+                    {user?.name ? getInitials(user.name) : '??'}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
