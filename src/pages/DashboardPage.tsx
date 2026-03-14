@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
-
+interface DashboardStats {
   colaboradoresAtivos: number;
   folhaMensal: number;
   feriasPendentes: number;
