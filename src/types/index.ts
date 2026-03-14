@@ -1,10 +1,4 @@
-// V23: Types Index - Active exports only
-export type { Colaborador, StatusColaborador, TipoContrato } from './colaborador';
-export type { Ferias, SolicitacaoFerias, FeriasWithColaborador, FeriasFormData, CalculoFerias, StatusFerias, StatusPeriodo, StatusSolicitacao } from './ferias';
-export * from './common';
-export type { Database, Json } from './database';
-
-// Additional type stubs for components
+// V25: Types Index - Active exports only
 export interface Beneficio { id: string; nome: string; tipo: string; valor: number; ativo: boolean; }
 export interface ColaboradorFilters { search?: string; status?: string; departamento?: string; cargo?: string; }
 export interface Documento { id: string; nome: string; tipo: string; url: string; colaborador_id: string; created_at: string; }
