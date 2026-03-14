@@ -284,12 +284,12 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
     toast.success('Logout realizado com sucesso');
-    navigate('/auth');
+    navigate('/login');
   };
 
   const toggleGroup = useCallback((groupId: string) => {
@@ -420,12 +420,12 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
                     )}
                   >
                     <span className="text-xs font-semibold text-primary">
-                      {profile?.nome ? getInitials(profile.nome) : '??'}
+                      {user?.name ? getInitials(user.name) : '??'}
                     </span>
                   </NavLink>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  {profile?.nome || 'Perfil'}
+                  {user?.name || user?.email || 'Perfil'}
                 </TooltipContent>
               </Tooltip>
               
@@ -456,15 +456,15 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
               >
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center ring-2 ring-primary/20">
                   <span className="text-xs font-semibold text-primary">
-                    {profile?.nome ? getInitials(profile.nome) : '??'}
+                    {user?.name ? getInitials(user.name) : '??'}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {profile?.nome || 'Carregando...'}
+                    {user?.name || user?.email || 'Carregando...'}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {profile?.cargo || 'Usuário'}
+                    Usuário
                   </p>
                 </div>
               </NavLink>
