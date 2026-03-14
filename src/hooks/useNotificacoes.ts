@@ -214,11 +214,13 @@ export function useNotificacoes() {
       }
 
       // 3. Verificar documentos com validade próxima (CNH)
-      const { data: colaboradoresDoc } = await supabase
+      const { data: colaboradoresDoc, error: colaboradoresDocError } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, cnh_validade')
         .not('cnh_validade', 'is', null)
         .eq('status', 'ativo');
+
+      if (colaboradoresDocError) throw colaboradoresDocError;
 
       if (colaboradoresDoc) {
         for (const colab of colaboradoresDoc) {
