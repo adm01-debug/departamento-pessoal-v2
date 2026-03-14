@@ -1,2 +1,0 @@
-// V15-352
-export const APP_CONFIG = { name: 'Sistema DP', version: '1.0.0', description: 'Sistema de Departamento Pessoal', company: 'Sua Empresa', supportEmail: 'suporte@empresa.com', api: { baseUrl: import.meta.env.VITE_API_URL || '/api', timeout: 30000 }, pagination: { defaultPageSize: 10, pageSizeOptions: [10, 25, 50, 100] }, dateFormat: 'dd/MM/yyyy', timeFormat: 'HH:mm', dateTimeFormat: 'dd/MM/yyyy HH:mm', currency: 'BRL', locale: 'pt-BR' } as const;

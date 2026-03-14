@@ -29,7 +29,7 @@ import {
   FileText,
   LucideIcon
 } from 'lucide-react';
-import { NotificacoesDropdown } from '@/components/NotificacoesDropdown';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, memo, useCallback } from 'react';
@@ -334,7 +334,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
               </div>
             )}
             <div className="flex items-center gap-0.5">
-              {!collapsed && <NotificacoesDropdown />}
+              {!collapsed && <NotificationBell />}
               {!collapsed && <ThemeToggle />}
               <Button 
                 variant="ghost" 
