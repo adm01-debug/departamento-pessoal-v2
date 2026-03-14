@@ -129,13 +129,15 @@ export function useNotificacoes() {
       const notificacoesParaCriar: Omit<Notificacao, 'id' | 'created_at'>[] = [];
 
       // 1. Verificar férias vencendo (períodos aquisitivos)
-      const { data: periodos } = await supabase
+      const { data: periodos, error: periodosError } = await supabase
         .from('periodos_aquisitivos')
         .select(`
           *,
           colaboradores:colaborador_id (id, nome_completo, status)
         `)
         .eq('status', 'adquirido');
+
+      if (periodosError) throw periodosError;
 
       if (periodos) {
         for (const periodo of periodos) {
