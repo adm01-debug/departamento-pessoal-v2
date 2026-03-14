@@ -1,5 +1,4 @@
 // @ts-nocheck
-// V15-222: src/pages/ColaboradoresPage.tsx
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -10,8 +9,9 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { colaboradorService } from '@/services';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function ColaboradoresPage() {
   const [search, setSearch] = useState('');
@@ -31,7 +31,20 @@ export default function ColaboradoresPage() {
   ];
 
   return (
-    <PageLayout title="Colaboradores" description="Gestão de colaboradores" actions={<Button onClick={() => navigate('/colaboradores/novo')}>Novo Colaborador</Button>}>
+    <PageLayout
+      title="Colaboradores"
+      description="Gestão de colaboradores"
+      icon={<Users className="h-5 w-5 text-white" />}
+      gradient="from-info to-level"
+      actions={
+        <Button
+          onClick={() => navigate('/colaboradores/novo')}
+          className="rounded-xl bg-gradient-to-r from-info to-level hover:opacity-90 shadow-lg font-body"
+        >
+          Novo Colaborador
+        </Button>
+      }
+    >
       <DataTableToolbar
         search={search}
         onSearchChange={setSearch}
@@ -45,33 +58,35 @@ export default function ColaboradoresPage() {
       ) : !colaboradores?.length ? (
         <EmptyList entityName="colaborador" onCreate={() => navigate('/colaboradores/novo')} />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>CPF</TableHead>
-              <TableHead>Cargo</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[100px]">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {colaboradores.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell className="font-medium">{c.nome}</TableCell>
-                <TableCell>{c.cpf}</TableCell>
-                <TableCell>{c.cargo}</TableCell>
-                <TableCell><ColaboradorStatus status={c.status} /></TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => navigate(`/colaboradores/${c.id}`)}><Eye className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => navigate(`/colaboradores/${c.id}/editar`)}><Edit className="h-4 w-4" /></Button>
-                  </div>
-                </TableCell>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="font-display font-semibold">Nome</TableHead>
+                <TableHead className="font-display font-semibold">CPF</TableHead>
+                <TableHead className="font-display font-semibold">Cargo</TableHead>
+                <TableHead className="font-display font-semibold">Status</TableHead>
+                <TableHead className="w-[100px] font-display font-semibold">Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {colaboradores.map((c) => (
+                <TableRow key={c.id} className="hover:bg-accent/30 transition-colors">
+                  <TableCell className="font-body font-medium">{c.nome}</TableCell>
+                  <TableCell className="font-body">{c.cpf}</TableCell>
+                  <TableCell className="font-body">{c.cargo}</TableCell>
+                  <TableCell><ColaboradorStatus status={c.status} /></TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10" onClick={() => navigate(`/colaboradores/${c.id}`)}><Eye className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-warning/10" onClick={() => navigate(`/colaboradores/${c.id}/editar`)}><Edit className="h-4 w-4" /></Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </motion.div>
       )}
     </PageLayout>
   );
