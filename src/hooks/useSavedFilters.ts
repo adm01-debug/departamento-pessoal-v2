@@ -5,15 +5,17 @@ export interface SavedFilter {
   id: string;
   name: string;
   filters: Record<string, any>;
+  is_default?: boolean;
   isDefault?: boolean;
 }
 
 export function useSavedFilters(entityType: string) {
   const [filters, setFilters] = useLocalStorage<SavedFilter[]>(`saved-filters-${entityType}`, []);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const isLoading = false;
 
-  const saveFilter = useCallback((name: string, filterValues: Record<string, any>) => {
-    const newFilter: SavedFilter = { id: Date.now().toString(), name, filters: filterValues };
+  const saveFilter = useCallback((data: { name: string; filters: Record<string, any>; is_default?: boolean }) => {
+    const newFilter: SavedFilter = { id: Date.now().toString(), name: data.name, filters: data.filters, is_default: data.is_default };
     setFilters(prev => [...(prev || []), newFilter]);
   }, [setFilters]);
 
@@ -21,9 +23,9 @@ export function useSavedFilters(entityType: string) {
     setFilters(prev => (prev || []).filter(f => f.id !== id));
   }, [setFilters]);
 
-  const setDefaultFilter = useCallback((id: string) => {
-    setFilters(prev => (prev || []).map(f => ({ ...f, isDefault: f.id === id })));
+  const setDefault = useCallback((id: string) => {
+    setFilters(prev => (prev || []).map(f => ({ ...f, is_default: f.id === id })));
   }, [setFilters]);
 
-  return { filters: filters || [], isLoading, saveFilter, deleteFilter, setDefaultFilter };
+  return { filters: filters || [], isLoading, isSaving, saveFilter, deleteFilter, setDefault };
 }
