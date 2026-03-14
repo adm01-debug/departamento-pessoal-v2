@@ -315,7 +315,7 @@ export const NovaAdmissaoModal = memo(function NovaAdmissaoModal({ open, onOpenC
                 <Label htmlFor="telefone">Telefone</Label>
                 <MaskedInput
                   id="telefone"
-                  mask="phone"
+                  mask="telefone"
                   placeholder="(00) 00000-0000"
                   value={formData.telefone ?? ''}
                   onChange={(e) => {
