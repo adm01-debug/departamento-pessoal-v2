@@ -254,13 +254,15 @@ export function useNotificacoes() {
       }
 
       // 4. Verificar férias programadas próximas
-      const { data: feriasProgramadas } = await supabase
+      const { data: feriasProgramadas, error: feriasError } = await supabase
         .from('ferias')
         .select(`
           *,
           colaboradores:colaborador_id (id, nome_completo)
         `)
         .eq('status', 'aprovada');
+
+      if (feriasError) throw feriasError;
 
       if (feriasProgramadas) {
         for (const ferias of feriasProgramadas) {
