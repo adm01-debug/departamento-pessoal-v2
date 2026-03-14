@@ -1,1 +1,0 @@
-import React from "react";import { Button } from "@/components/ui/button";interface CancelButtonProps { onClick: () => void; className?: string; }export function CancelButton({ onClick, className }: CancelButtonProps) { return (<Button variant="outline" onClick={onClick} className={className}>Cancelar</Button>); } export default CancelButton;
