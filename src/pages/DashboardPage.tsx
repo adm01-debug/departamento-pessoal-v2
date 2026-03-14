@@ -488,8 +488,10 @@ function OnboardingWizard() {
 
 /* ─── Main Dashboard ─── */
 export default function DashboardPage() {
-  const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useDashboardStats();
-  const { data: pendencias, isLoading: loadingPendencias } = usePendencias();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useDashboardStats(isAuthenticated);
+  const { data: pendencias, isLoading: loadingPendencias } = usePendencias(isAuthenticated);
   const navigate = useNavigate();
 
   const hoje = new Date();
