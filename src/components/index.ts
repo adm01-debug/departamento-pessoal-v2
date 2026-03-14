@@ -1,8 +1,4 @@
-// Main Components Export - avoid re-export conflicts
+// V25: Components Export - active modules only
 export * from './ui';
-export * from './charts';
 export * from './layout';
-export * from './loading';
-export * from './feedback';
-export * from './data-display';
 export * from './widgets';
