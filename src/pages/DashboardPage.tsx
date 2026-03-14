@@ -44,9 +44,10 @@ interface Pendencia {
   icone: 'ferias' | 'afastamentos' | 'admissoes';
 }
 
-function useDashboardStats() {
+function useDashboardStats(enabled: boolean) {
   return useQuery<DashboardStats>({
     queryKey: ["dashboard-stats"],
+    enabled,
     queryFn: async () => {
       const { count: colaboradoresAtivos } = await supabase
         .from("colaboradores")
