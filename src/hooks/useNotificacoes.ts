@@ -149,7 +149,7 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'periodo_aquisitivo')
               .eq('entidade_id', periodo.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
