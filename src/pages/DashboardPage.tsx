@@ -232,7 +232,7 @@ function IndicatorRow({ label, value, maxValue = 10, suffix = "%" }: {
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] as const, delay: 0.3 }}
           className={cn("h-full rounded-full bg-gradient-to-r shadow-sm", getColor())}
         />
       </div>
