@@ -1,1 +1,0 @@
-import React from'react';import{Button}from'@/components/ui/button';import{Printer}from'lucide-react';interface Props{className?:string;}export function PrintButton({className}:Props){const handlePrint=()=>{window.print();};return(<Button variant="outline"onClick={handlePrint}className={className}><Printer className="w-4 h-4 mr-2"/>Imprimir</Button>);}
