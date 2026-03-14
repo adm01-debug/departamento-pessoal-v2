@@ -76,7 +76,13 @@ export const pontoService = {
     const now = new Date();
     const data = now.toISOString().split('T')[0];
     const hora = now.toTimeString().split(' ')[0].substring(0, 5);
-    const campo = tipo === 'entrada' ? 'entrada_1' : tipo === 'intervalo_saida' ? 'saida_intervalo' : tipo === 'intervalo_retorno' ? 'retorno_intervalo' : 'saida_1';
+    const campo = tipo === 'entrada'
+      ? 'entrada_1'
+      : (tipo === 'intervalo_saida' || tipo === 'saida_almoco')
+        ? 'saida_intervalo'
+        : (tipo === 'intervalo_retorno' || tipo === 'retorno_almoco')
+          ? 'retorno_intervalo'
+          : 'saida_1';
     
     const { data: existing } = await supabase.from('registros_ponto').select('id').eq('data', data).eq('colaborador_id', colaboradorId || '').maybeSingle();
     

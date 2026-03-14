@@ -267,7 +267,7 @@ export function useNotificacoes() {
               .select('id')
               .eq('tipo', 'ferias_vencendo')
               .eq('entidade_id', ferias.id)
-              .single();
+              .maybeSingle();
 
             if (!existente) {
               notificacoesParaCriar.push({
