@@ -1,6 +1,5 @@
-// DashboardPage - Task Gifts Design System (Premium)
+// DashboardPage - Task Gifts Design System (Premium) + Analytics
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Users, DollarSign, Calendar, Clock,
   TrendingUp, AlertCircle, RefreshCw,
@@ -8,7 +7,7 @@ import {
   UserPlus, UserMinus, Activity, CheckCircle2,
   AlertTriangle, ChevronRight, Zap,
   Building2, FileText, Gift, Plus,
-  ArrowRight, Sparkles, PieChart,
+  ArrowRight, Sparkles, PieChart, Timer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +18,10 @@ import { useNavigate } from "react-router-dom";
 import { AnimatedNumber } from "@/components/dashboard/AnimatedNumber";
 import { MiniSparkline } from "@/components/dashboard/MiniSparkline";
 import { DonutChart } from "@/components/dashboard/DonutChart";
+import { BarChartWidget } from "@/components/dashboard/BarChartWidget";
+import { EventTimeline, type TimelineEvent } from "@/components/dashboard/EventTimeline";
+import { ExpiringItemsWidget, type ExpiringItem } from "@/components/dashboard/ExpiringItemsWidget";
+import { KPICardSkeleton, CardSkeleton } from "@/components/ui/module-skeleton";
 
 interface DashboardStats {
   colaboradoresAtivos: number;
@@ -87,7 +90,6 @@ function useDashboardStats() {
         .select("*", { count: "exact", head: true })
         .gte("data_desligamento", inicioMes);
 
-      // Departamento distribution
       const { data: deptData } = await supabase
         .from("colaboradores")
         .select("departamento")
@@ -170,7 +172,6 @@ const cardVariants = {
   }),
 };
 
-// Fake sparkline data for trend (would come from real historical data)
 const sparklineData: Record<string, number[]> = {
   colaboradores: [120, 125, 122, 128, 130, 135, 132, 140, 145, 142, 148, 150],
   folha: [85000, 87000, 86500, 88000, 89000, 87500, 90000, 92000, 91000, 93000, 94500, 95000],
@@ -185,6 +186,31 @@ const donutColors = [
   'hsl(var(--warning))',
   'hsl(var(--xp))',
   'hsl(var(--streak))',
+];
+
+// Mock data for new widgets
+const monthlyBarData = [
+  { label: 'Jan', value: 142, color: 'bg-gradient-to-t from-primary/60 to-primary' },
+  { label: 'Fev', value: 138, color: 'bg-gradient-to-t from-primary/60 to-primary' },
+  { label: 'Mar', value: 145, color: 'bg-gradient-to-t from-primary/60 to-primary' },
+  { label: 'Abr', value: 148, color: 'bg-gradient-to-t from-primary/60 to-primary' },
+  { label: 'Mai', value: 150, color: 'bg-gradient-to-t from-primary/60 to-primary' },
+  { label: 'Jun', value: 152, color: 'bg-gradient-to-t from-primary to-primary-glow' },
+];
+
+const mockTimeline: TimelineEvent[] = [
+  { id: '1', title: 'Nova admissão registrada', description: 'João Silva - Desenvolvedor', time: 'Há 2h', type: 'admissao' },
+  { id: '2', title: 'Férias aprovadas', description: 'Maria Santos - 30 dias', time: 'Há 4h', type: 'ferias' },
+  { id: '3', title: 'Folha processada', description: 'Competência 03/2026', time: 'Ontem', type: 'folha' },
+  { id: '4', title: 'Desligamento concluído', description: 'Pedro Lima - Sem justa causa', time: 'Há 2 dias', type: 'demissao' },
+  { id: '5', title: 'Ponto ajustado', description: 'Ana Oliveira - Entrada corrigida', time: 'Há 3 dias', type: 'ponto' },
+];
+
+const mockExpiring: ExpiringItem[] = [
+  { id: '1', label: 'ASO - Carlos Mendes', detail: 'Exame periódico', daysLeft: 5, type: 'aso' },
+  { id: '2', label: 'Contrato - Ana Lima', detail: 'Experiência 90 dias', daysLeft: 12, type: 'contrato' },
+  { id: '3', label: 'CNH - Roberto Silva', detail: 'Documento vencendo', daysLeft: 22, type: 'documento' },
+  { id: '4', label: 'Férias - Paulo Costa', detail: 'Período aquisitivo', daysLeft: 45, type: 'ferias' },
 ];
 
 /* ─── Premium Metric Card ─── */
@@ -209,9 +235,10 @@ function MetricCard({
       variants={cardVariants}
       initial="hidden"
       animate="visible"
-      className="group relative overflow-hidden border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-500 rounded-2xl"
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      className="group relative overflow-hidden border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-float transition-all duration-500 rounded-2xl"
     >
-      <div className={cn("absolute inset-0 opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-500 bg-gradient-to-br", gradient)} />
+      <div className={cn("absolute inset-0 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500 bg-gradient-to-br", gradient)} />
       <div className={cn("absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r", gradient)} />
 
       <CardContent className="relative p-card-space">
@@ -411,7 +438,6 @@ function OnboardingWizard() {
             </p>
           </div>
 
-          {/* Stepper */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             {steps.map((s, i) => (
               <motion.button
@@ -424,7 +450,6 @@ function OnboardingWizard() {
                 onClick={() => navigate(s.path)}
                 className="relative flex flex-col items-center text-center p-6 rounded-2xl glass border border-border/30 hover:border-primary/40 hover:shadow-glow transition-all group"
               >
-                {/* Step number */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className={cn(
                     "inline-flex items-center justify-center h-6 w-6 rounded-full text-overline font-bold bg-gradient-to-br text-primary-foreground shadow-lg",
@@ -443,7 +468,6 @@ function OnboardingWizard() {
             ))}
           </div>
 
-          {/* Progress connector (desktop) */}
           <div className="hidden md:flex items-center justify-center mt-6">
             <div className="flex items-center gap-2">
               <div className="h-1 w-16 rounded-full bg-muted" />
@@ -502,7 +526,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {loadingStats ? (
           Array(4).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-[160px] rounded-2xl" />
+            <KPICardSkeleton key={i} index={i} />
           ))
         ) : (
           <>
@@ -553,11 +577,7 @@ export default function DashboardPage() {
       {isEmptySystem && <OnboardingWizard />}
 
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
         <MotionCard
           custom={3.5}
           variants={cardVariants}
@@ -584,10 +604,58 @@ export default function DashboardPage() {
         </MotionCard>
       </motion.div>
 
-      {/* Second Row */}
+      {/* Analytics Row — NEW */}
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+        {/* Monthly Headcount Chart */}
+        <MotionCard custom={3.8} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
+                <TrendingUp className="h-4 w-4 text-primary-foreground" />
+              </div>
+              Evolução Headcount
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BarChartWidget data={monthlyBarData} height={140} />
+          </CardContent>
+        </MotionCard>
+
+        {/* Event Timeline */}
+        <MotionCard custom={4} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-level">
+                <Activity className="h-4 w-4 text-primary-foreground" />
+              </div>
+              Eventos Recentes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EventTimeline events={mockTimeline} />
+          </CardContent>
+        </MotionCard>
+
+        {/* Expiring Items */}
+        <MotionCard custom={4.2} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-coins">
+                <Timer className="h-4 w-4 text-primary-foreground" />
+              </div>
+              Próximos Vencimentos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ExpiringItemsWidget items={mockExpiring} />
+          </CardContent>
+        </MotionCard>
+      </div>
+
+      {/* Third Row — existing cards */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-4">
         {/* Movimentação */}
-        <MotionCard custom={4} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+        <MotionCard custom={5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-xp to-tasks">
@@ -599,9 +667,7 @@ export default function DashboardPage() {
           <CardContent className="space-y-3">
             {loadingStats ? (
               <div className="space-y-3">
-                <Skeleton className="h-16 rounded-xl" />
-                <Skeleton className="h-16 rounded-xl" />
-                <Skeleton className="h-16 rounded-xl" />
+                {Array(3).fill(0).map((_, i) => <CardSkeleton key={i} className="h-16" />)}
               </div>
             ) : (
               <>
@@ -613,8 +679,8 @@ export default function DashboardPage() {
           </CardContent>
         </MotionCard>
 
-        {/* Distribuição por Departamento (Donut) */}
-        <MotionCard custom={4.5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+        {/* Departamentos */}
+        <MotionCard custom={5.5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-info">
@@ -625,7 +691,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {loadingStats ? (
-              <Skeleton className="h-48 rounded-xl" />
+              <CardSkeleton className="h-48 border-0 p-0" />
             ) : stats?.departamentos && stats.departamentos.length > 0 ? (
               <DonutChart
                 segments={stats.departamentos.map((d, i) => ({
@@ -649,7 +715,7 @@ export default function DashboardPage() {
         </MotionCard>
 
         {/* Indicadores */}
-        <MotionCard custom={5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+        <MotionCard custom={6} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-level">
@@ -661,9 +727,7 @@ export default function DashboardPage() {
           <CardContent>
             {loadingStats ? (
               <div className="space-y-6">
-                <Skeleton className="h-14 rounded-xl" />
-                <Skeleton className="h-14 rounded-xl" />
-                <Skeleton className="h-14 rounded-xl" />
+                {Array(3).fill(0).map((_, i) => <CardSkeleton key={i} className="h-14 border-0 p-0" />)}
               </div>
             ) : (
               <div className="space-y-5">
@@ -676,7 +740,7 @@ export default function DashboardPage() {
         </MotionCard>
 
         {/* Pendências */}
-        <MotionCard custom={6} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+        <MotionCard custom={6.5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-coins">
@@ -688,8 +752,7 @@ export default function DashboardPage() {
           <CardContent>
             {loadingPendencias ? (
               <div className="space-y-3">
-                <Skeleton className="h-14 rounded-xl" />
-                <Skeleton className="h-14 rounded-xl" />
+                {Array(2).fill(0).map((_, i) => <CardSkeleton key={i} className="h-14 border-0 p-0" />)}
               </div>
             ) : pendencias && pendencias.length > 0 ? (
               <div className="space-y-2">

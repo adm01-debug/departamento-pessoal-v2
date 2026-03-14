@@ -7,6 +7,7 @@ import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
 import { PageTransition } from './PageTransition';
 import { CommandPalette } from '@/components/ui/command-palette';
+import { GuidedTour } from '@/components/onboarding/GuidedTour';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -20,6 +21,9 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="flex h-screen bg-background">
       {/* Command Palette (global) */}
       <CommandPalette />
+
+      {/* Guided Tour (first visit) */}
+      <GuidedTour />
 
       <div className={cn('hidden lg:block transition-all duration-300', sidebarOpen ? 'w-64' : 'w-16')}>
         <Sidebar collapsed={!sidebarOpen} />
