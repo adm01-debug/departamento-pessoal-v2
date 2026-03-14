@@ -36,4 +36,4 @@ export const SortableTable = memo(function SortableTable<T extends { id: string 
       </TableBody>
     </Table>
   );
-}) as <T extends { id: string }>(props: SortableTableProps<T>) => JSX.Element;
+}) as <T extends { id: string }>(props: SortableTableProps<T>) => React.ReactElement;

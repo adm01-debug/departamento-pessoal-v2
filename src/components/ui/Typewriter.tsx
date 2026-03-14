@@ -21,7 +21,7 @@ export function Typewriter({ text, speed = 50, deleteSpeed = 30, delay = 1500, l
 
   useEffect(() => {
     const currentText = texts[index % texts.length];
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (!isDeleting && displayText === currentText) {
       if (loop || index < texts.length - 1) {
@@ -48,4 +48,5 @@ export function Typewriter({ text, speed = 50, deleteSpeed = 30, delay = 1500, l
     </span>
   );
 }
+
 export default Typewriter;

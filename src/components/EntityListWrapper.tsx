@@ -108,6 +108,6 @@ export const EntityListWrapper = memo(function EntityListWrapper<T extends { id:
       </CardContent>
     </Card>
   );
-}) as <T extends { id: string }>(props: EntityListWrapperProps<T>) => JSX.Element;
+}) as <T extends { id: string }>(props: EntityListWrapperProps<T>) => React.ReactElement;
 
 export default EntityListWrapper;

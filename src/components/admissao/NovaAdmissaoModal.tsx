@@ -239,7 +239,7 @@ export const NovaAdmissaoModal = memo(function NovaAdmissaoModal({ open, onOpenC
                       }}
                       locale={ptBR}
                       disabled={(date) => date > new Date()}
-                      captionLayout="dropdown-buttons"
+                      captionLayout="dropdown"
                       fromYear={1950}
                       toYear={new Date().getFullYear()}
                     />
