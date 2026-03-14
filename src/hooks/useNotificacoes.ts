@@ -195,7 +195,7 @@ export function useNotificacoes() {
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'contrato_vencendo',
                 titulo: 'Contrato Vencendo',
                 mensagem: `O contrato ${colab.tipo_contrato} de ${colab.nome_completo} vence em ${diasRestantes} dias (${format(dataFimContrato, "dd/MM/yyyy")}).`,
