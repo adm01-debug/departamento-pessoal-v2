@@ -1,4 +1,3 @@
-// V15-134: src/hooks/useDebounce.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 export function useDebounce<T>(value: T, delay: number): T {
@@ -16,7 +15,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
   delay: number
 ): T & { cancel: () => void; flush: () => void } {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const callbackRef = useRef(callback);
   const argsRef = useRef<any[]>([]);
 

@@ -75,6 +75,6 @@ export const DataTableSelectable = memo(function DataTableSelectable<T extends {
       </Table>
     </div>
   );
-}) as <T extends { id: string }>(props: DataTableSelectableProps<T>) => JSX.Element;
+}) as <T extends { id: string }>(props: DataTableSelectableProps<T>) => React.ReactElement;
 
 export default DataTableSelectable;

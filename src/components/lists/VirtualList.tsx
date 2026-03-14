@@ -13,4 +13,4 @@ export const VirtualList = memo(function VirtualList<T>({ items, height, renderI
       <div className="space-y-1">{items.map((item, idx) => <div key={idx}>{renderItem(item, idx)}</div>)}</div>
     </ScrollArea>
   );
-}) as <T>(props: VirtualListProps<T>) => JSX.Element;
+}) as <T>(props: VirtualListProps<T>) => React.ReactElement;

@@ -29,7 +29,7 @@ export function SearchInput({ className, placeholder = "Buscar...", value: contr
   const [isFocused, setIsFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (controlledValue !== undefined) setValue(controlledValue);

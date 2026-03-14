@@ -1,14 +1,32 @@
-import { useState, useEffect, useRef } from 'react';
-import { Search, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-interface SearchInputProps { value?: string; onChange?: (value: string) => void; onSearch?: (value: string) => void; placeholder?: string; debounce?: number; className?: string; }
-export function SearchInput({ value: controlledValue, onChange, onSearch, placeholder = 'Buscar...', debounce = 300, className }: SearchInputProps) {
-  const [value, setValue] = useState(controlledValue || '');
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  useEffect(() => { if (controlledValue !== undefined) setValue(controlledValue); }, [controlledValue]);
-  const handleChange = (v: string) => { setValue(v); onChange?.(v); if (timeoutRef.current) clearTimeout(timeoutRef.current); timeoutRef.current = setTimeout(() => onSearch?.(v), debounce); };
-  const handleClear = () => { setValue(''); onChange?.(''); onSearch?.(''); };
-  return (<div className={cn('relative', className)}><Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /><Input placeholder={placeholder} value={value} onChange={e => handleChange(e.target.value)} className="pl-8 pr-8" />{value && <Button variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-2" onClick={handleClear}><X className="h-4 w-4" /></Button>}</div>);
+import React from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  value?: string;
+  onSearch?: (value: string) => void;
+  onClear?: () => void;
+  showClear?: boolean;
+  className?: string;
 }
+
+export function SearchInput({ value = "", onSearch, onClear, showClear = true, className, ...props }: SearchInputProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => onSearch?.(e.target.value);
+  const handleClear = () => { onSearch?.(""); onClear?.(); };
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Escape") handleClear(); };
+  return (
+    <div className={cn("relative", className)}>
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Input {...props} value={value} onChange={handleChange} onKeyDown={handleKeyDown} className="pl-9 pr-9" />
+      {showClear && value && (
+        <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={handleClear}>
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  );
+}
+
+export default SearchInput;

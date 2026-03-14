@@ -13,4 +13,4 @@ export const DataGrid = memo(function DataGrid<T>({ data, columns, renderItem, g
       {data.map((item, idx) => renderItem(item, idx))}
     </div>
   );
-}) as <T>(props: DataGridProps<T>) => JSX.Element;
+}) as <T>(props: DataGridProps<T>) => React.ReactElement;

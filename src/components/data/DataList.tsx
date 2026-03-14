@@ -11,4 +11,4 @@ interface DataListProps<T> { data: T[]; renderItem: (item: T, index: number) => 
 export const DataList = memo(function DataList<T>({ data, renderItem, emptyMessage, className }: DataListProps<T>) {
   if (data.length === 0) return <DataEmpty titulo={emptyMessage} />;
   return <div className={cn('space-y-2', className)}>{data.map((item, idx) => renderItem(item, idx))}</div>;
-}) as <T>(props: DataListProps<T>) => JSX.Element;
+}) as <T>(props: DataListProps<T>) => React.ReactElement;

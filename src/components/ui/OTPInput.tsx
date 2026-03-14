@@ -45,7 +45,7 @@ export function OTPInput({ length = 6, value = "", onChange, onComplete, classNa
   return (
     <div className={cn("flex gap-2", className)}>
       {Array.from({ length }, (_, i) => (
-        <Input key={i} ref={(el) => (inputRefs.current[i] = el)} type={type === "number" ? "tel" : "text"} inputMode={type === "number" ? "numeric" : "text"} pattern={type === "number" ? "[0-9]*" : undefined} maxLength={1} value={otp[i] || ""} onChange={(e) => handleChange(i, e.target.value)} onKeyDown={(e) => handleKeyDown(i, e)} onPaste={handlePaste} disabled={disabled} className="w-12 h-12 text-center text-xl font-bold" />
+        <Input key={i} ref={(el: HTMLInputElement | null) => { inputRefs.current[i] = el; }} type={type === "number" ? "tel" : "text"} inputMode={type === "number" ? "numeric" : "text"} pattern={type === "number" ? "[0-9]*" : undefined} maxLength={1} value={otp[i] || ""} onChange={(e) => handleChange(i, e.target.value)} onKeyDown={(e) => handleKeyDown(i, e)} onPaste={handlePaste} disabled={disabled} className="w-12 h-12 text-center text-xl font-bold" />
       ))}
     </div>
   );
