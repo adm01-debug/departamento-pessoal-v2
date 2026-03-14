@@ -171,7 +171,7 @@ export function useNotificacoes() {
       const { data: colaboradores } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, tipo_contrato, data_admissao')
-        .in('tipo_contrato', ['temporario', 'estagio', 'aprendiz'])
+        .in('tipo_contrato', ['temporario', 'estagiario', 'aprendiz'])
         .eq('status', 'ativo');
 
       if (colaboradores) {
