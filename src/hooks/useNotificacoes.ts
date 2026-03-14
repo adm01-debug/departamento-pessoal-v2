@@ -274,7 +274,7 @@ export function useNotificacoes() {
 
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: null,
+                user_id: currentUser.id,
                 tipo: 'ferias_vencendo',
                 titulo: 'Férias Próximas',
                 mensagem: `As férias de ${colaborador.nome_completo} começam em ${diasAteInicio} dias (${format(dataInicio, "dd/MM/yyyy")}).`,
