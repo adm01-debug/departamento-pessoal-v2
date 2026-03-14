@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { CommandPalette } from '@/components/ui/command-palette';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -15,6 +16,9 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="flex h-screen bg-background">
+      {/* Command Palette (global) */}
+      <CommandPalette />
+
       <div className={cn('hidden lg:block transition-all', sidebarOpen ? 'w-64' : 'w-16')}>
         <Sidebar collapsed={!sidebarOpen} />
       </div>
