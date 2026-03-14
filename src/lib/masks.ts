@@ -112,3 +112,28 @@ export function validateCNPJ(cnpj: string): boolean {
   rest = sum % 11 < 2 ? 0 : 11 - (sum % 11);
   return rest === parseInt(cleaned.charAt(13));
 }
+
+// Masks object for MaskedInput component
+export const masks = {
+  cpf: maskCPF,
+  cnpj: maskCNPJ,
+  telefone: maskPhone,
+  cep: maskCEP,
+  moeda: maskCurrency,
+  data: maskDate,
+  hora: (v: string) => v.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1:$2').slice(0, 5),
+  pis: maskPIS,
+};
+
+export const placeholders: Record<string, string> = {
+  cpf: '000.000.000-00',
+  cnpj: '00.000.000/0000-00',
+  telefone: '(00) 00000-0000',
+  cep: '00000-000',
+  moeda: 'R$ 0,00',
+  data: 'dd/mm/aaaa',
+  hora: '00:00',
+  pis: '000.00000.00-0',
+};
+
+export type MaskType = keyof typeof masks;

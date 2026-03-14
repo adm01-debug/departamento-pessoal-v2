@@ -1,8 +1,7 @@
-// V22: Utils Index - Exportações Centralizadas
+// V23: Utils Index - Exportações Centralizadas
 
 // Core Utils
 export { cn } from './cn';
-export { storage } from './storage';
 
 // Formatters
 export * from './formatters';

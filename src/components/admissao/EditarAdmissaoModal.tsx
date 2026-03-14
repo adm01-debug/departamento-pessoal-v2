@@ -323,7 +323,7 @@ export const EditarAdmissaoModal = memo(function EditarAdmissaoModal({ open, onO
                 <Label htmlFor="telefone">Telefone</Label>
                 <MaskedInput
                   id="telefone"
-                  mask="phone"
+                  mask="telefone"
                   value={formData.telefone}
                   onChange={(e) => {
                     setFormData({ ...formData, telefone: e.target.value });

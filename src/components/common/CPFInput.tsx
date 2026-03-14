@@ -1,1 +1,24 @@
-import React from'react';import{Input}from'@/components/ui/input';import{maskCPF}from'@/utils/masks';interface Props{value:string;onChange:(value:string)=>void;disabled?:boolean;error?:string;}export function CPFInput({value,onChange,disabled,error}:Props){const handleChange=(e:React.ChangeEvent<HTMLInputElement>)=>{const masked=maskCPF(e.target.value);onChange(masked);};return(<div><Input value={value}onChange={handleChange}disabled={disabled}placeholder="000.000.000-00"maxLength={14}className={error?'border-red-500':''}/>{error&&<span className="text-sm text-red-500">{error}</span>}</div>);}
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { maskCPF } from '@/lib/masks';
+
+interface Props {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  error?: string;
+}
+
+export function CPFInput({ value, onChange, disabled, error }: Props) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const masked = maskCPF(e.target.value);
+    onChange(masked);
+  };
+
+  return (
+    <div>
+      <Input value={value} onChange={handleChange} disabled={disabled} placeholder="000.000.000-00" maxLength={14} className={error ? 'border-destructive' : ''} />
+      {error && <span className="text-sm text-destructive">{error}</span>}
+    </div>
+  );
+}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2 } from 'lucide-react';
-import { maskCEP } from '@/utils/masks';
+import { maskCEP } from '@/lib/masks';
 
 interface Props {
   value: string;
