@@ -124,9 +124,10 @@ function useDashboardStats(enabled: boolean) {
   });
 }
 
-function usePendencias() {
+function usePendencias(enabled: boolean) {
   return useQuery<Pendencia[]>({
     queryKey: ["dashboard-pendencias"],
+    enabled,
     queryFn: async () => {
       const pendencias: Pendencia[] = [];
       const { count: feriasPendentes } = await supabase
