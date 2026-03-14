@@ -1,1 +1,0 @@
-import React from'react';import{CheckCircle}from'lucide-react';interface Props{message?:string;}export function SuccessAnimation({message='Sucesso!'}:Props){return(<div className="flex flex-col items-center gap-4 p-8"><div className="animate-bounce"><CheckCircle className="w-16 h-16 text-green-500"/></div><p className="text-xl font-medium text-green-600">{message}</p></div>);}
