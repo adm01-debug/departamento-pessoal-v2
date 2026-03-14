@@ -425,7 +425,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
                   </NavLink>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  {profile?.nome || 'Perfil'}
+                  {user?.name || user?.email || 'Perfil'}
                 </TooltipContent>
               </Tooltip>
               
