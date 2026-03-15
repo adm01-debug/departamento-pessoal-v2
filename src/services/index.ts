@@ -23,6 +23,7 @@ export { despesaService } from './despesaService';
 export { controleAcessoService } from './controleAcessoService';
 export { lgpdService } from './lgpdService';
 export { catalogoCursoService } from './catalogoCursoService';
+export { avaliacaoService } from './avaliacaoService';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
