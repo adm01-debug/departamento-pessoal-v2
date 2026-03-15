@@ -176,7 +176,7 @@ export async function salvarDeficiencia(colaboradorId: string, dados: Record<str
     .from('deficiencias' as any)
     .upsert({ ...dados, colaborador_id: colaboradorId }, { onConflict: 'colaborador_id' })
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
