@@ -11,10 +11,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Check, X, Trash2 } from 'lucide-react';
 
-const statusColor: Record<string, string> = {
-  pendente: 'bg-yellow-100 text-yellow-800',
-  aprovada: 'bg-green-100 text-green-800',
-  rejeitada: 'bg-red-100 text-red-800',
+const statusVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
+  pendente: 'secondary',
+  aprovada: 'default',
+  rejeitada: 'destructive',
 };
 
 export default function HorasExtrasPage() {
