@@ -31,6 +31,7 @@ export default function ComunicacaoInternaPage() {
   const { data: comunicados = [], isLoading: loadCom } = useQuery({
     queryKey: ['comunicados', empresaAtual?.id],
     queryFn: () => comunicacaoService.listarComunicados(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const { data: denuncias = [], isLoading: loadEtica } = useQuery({
