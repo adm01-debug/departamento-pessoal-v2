@@ -175,7 +175,7 @@ export async function criarFeriasAprovacao(aprovacao: Record<string, unknown>) {
     .from('ferias_aprovacoes' as any)
     .insert([aprovacao])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
