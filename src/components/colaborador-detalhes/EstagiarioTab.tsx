@@ -34,7 +34,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
   }, [data]);
 
   const handleSave = async () => {
-    if (!form.instituicao_ensino.trim()) { toast.error('Instituição de ensino é obrigatória'); return; }
+    if (!form.instituicao_nome.trim()) { toast.error('Instituição de ensino é obrigatória'); return; }
     try {
       const payload = {
         ...form,
