@@ -128,9 +128,8 @@ export default function OnboardingPage(): React.ReactElement {
   return (
     <PageLayout
       title="Onboarding"
-      subtitle="Acompanhe a integração de novos colaboradores"
-      icon={UserPlus}
-      iconColor="text-success"
+      description="Acompanhe a integração de novos colaboradores"
+      icon={<UserPlus className="w-6 h-6 text-success" />}
       actions={<Button><UserPlus className="w-4 h-4 mr-2" /> Novo Onboarding</Button>}
     >
       {/* Stats */}

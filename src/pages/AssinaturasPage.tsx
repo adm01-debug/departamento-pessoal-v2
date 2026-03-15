@@ -53,9 +53,8 @@ export default function AssinaturasPage(): React.ReactElement {
   return (
     <PageLayout
       title="Assinaturas Digitais"
-      subtitle="Gerencie documentos para assinatura eletrônica"
-      icon={PenTool}
-      iconColor="text-primary"
+      description="Gerencie documentos para assinatura eletrônica"
+      icon={<PenTool className="w-6 h-6 text-primary" />}
       actions={<Button><Send className="w-4 h-4 mr-2" /> Enviar para Assinatura</Button>}
     >
       {/* Stats */}
