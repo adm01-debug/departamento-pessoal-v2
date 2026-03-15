@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { comunicacaoService } from '@/services/comunicacaoService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, Megaphone, Shield, MessageSquare, AlertTriangle, Trash2, Pin } from 'lucide-react';
+import { Plus, Megaphone, Shield, AlertTriangle, Trash2, Pin } from 'lucide-react';
 
 const prioridadeColors: Record<string, string> = { baixa: 'secondary', normal: 'outline', alta: 'default', urgente: 'destructive' };
 const statusEticaColors: Record<string, string> = { aberto: 'default', em_analise: 'secondary', resolvido: 'outline', arquivado: 'outline' };
