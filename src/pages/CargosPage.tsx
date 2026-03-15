@@ -1,52 +1,67 @@
+import { useState } from 'react';
 import { useCargos } from '@/hooks/useCargos';
-import { Card, CardContent } from '@/components/ui/card';
+import { PageLayout } from '@/components/layout';
+import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Briefcase } from 'lucide-react';
+import { EmptyList } from '@/components/ui/empty-state';
+import { Spinner } from '@/components/ui/spinner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Briefcase, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function CargosPage() {
+  const [search, setSearch] = useState('');
   const { cargos, isLoading } = useCargos();
 
+  const filtered = cargos.filter((c: any) => !search || c.nome.toLowerCase().includes(search.toLowerCase()));
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Cargos</h1>
-        <p className="text-muted-foreground">Gestão de cargos e funções</p>
-      </div>
+    <PageLayout
+      title="Cargos"
+      description="Gestão de cargos e funções"
+      icon={<Briefcase className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-warning to-info"
+      actions={
+        <Button className="rounded-xl bg-gradient-to-r from-warning to-info hover:opacity-90 shadow-lg font-body">
+          <Plus className="h-4 w-4 mr-2" />Novo Cargo
+        </Button>
+      }
+    >
+      <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar cargo..." />
 
       {isLoading ? (
-        <Skeleton className="h-64" />
-      ) : cargos.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Briefcase className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Nenhum cargo cadastrado</p>
-          </CardContent>
-        </Card>
+        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+      ) : !filtered.length ? (
+        <EmptyList entityName="cargo" />
       ) : (
-        <Card>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>CBO</TableHead>
-                <TableHead>Salário Base</TableHead>
-                <TableHead>Status</TableHead>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="font-display font-semibold">Nome</TableHead>
+                <TableHead className="font-display font-semibold">CBO</TableHead>
+                <TableHead className="font-display font-semibold">Salário Base</TableHead>
+                <TableHead className="font-display font-semibold">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cargos.map((cargo: any) => (
-                <TableRow key={cargo.id}>
-                  <TableCell className="font-medium">{cargo.nome}</TableCell>
-                  <TableCell>{cargo.cbo || '-'}</TableCell>
-                  <TableCell>{cargo.salario_base ? Number(cargo.salario_base).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</TableCell>
-                  <TableCell>{cargo.ativo ? '✅ Ativo' : '❌ Inativo'}</TableCell>
+              {filtered.map((cargo: any) => (
+                <TableRow key={cargo.id} className="hover:bg-accent/30 transition-colors">
+                  <TableCell className="font-body font-medium">{cargo.nome}</TableCell>
+                  <TableCell className="font-body">{cargo.cbo || '-'}</TableCell>
+                  <TableCell className="font-body text-success font-semibold">{cargo.salario_base ? Number(cargo.salario_base).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</TableCell>
+                  <TableCell>
+                    <Badge className={cargo.ativo !== false ? 'bg-success/15 text-success border-0' : 'bg-muted text-muted-foreground border-0'}>
+                      {cargo.ativo !== false ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </Card>
+        </motion.div>
       )}
-    </div>
+    </PageLayout>
   );
 }

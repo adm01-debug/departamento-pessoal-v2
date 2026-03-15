@@ -1,8 +1,13 @@
 import { useAdmissoes } from '@/hooks/useAdmissoes';
+import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { EmptyList } from '@/components/ui/empty-state';
+import { UserPlus, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const etapaLabels: Record<string, string> = {
   documentos_pendentes: 'Docs Pendentes',
@@ -12,62 +17,63 @@ const etapaLabels: Record<string, string> = {
   contrato_gerado: 'Contrato Gerado',
   concluida: 'Concluída',
   cancelada: 'Cancelada',
+  esocial: 'eSocial',
 };
 
-const etapaColors: Record<string, string> = {
-  documentos_pendentes: 'bg-yellow-100 text-yellow-800',
-  aguardando_exame: 'bg-orange-100 text-orange-800',
-  aguardando_aprovacao: 'bg-blue-100 text-blue-800',
-  aprovada: 'bg-green-100 text-green-800',
-  concluida: 'bg-emerald-100 text-emerald-800',
-  cancelada: 'bg-red-100 text-red-800',
+const etapaGradients: Record<string, string> = {
+  documentos_pendentes: 'bg-warning/15 text-warning border-0',
+  aguardando_exame: 'bg-warning/15 text-warning border-0',
+  aguardando_aprovacao: 'bg-info/15 text-info border-0',
+  aprovada: 'bg-success/15 text-success border-0',
+  concluida: 'bg-success/15 text-success border-0',
+  cancelada: 'bg-destructive/15 text-destructive border-0',
+  esocial: 'bg-primary/15 text-primary border-0',
 };
 
 export default function AdmissoesPage() {
   const { admissoes, isLoading } = useAdmissoes();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Admissões</h1>
-          <p className="text-muted-foreground">Gerencie o processo de admissão de colaboradores</p>
-        </div>
-      </div>
-
+    <PageLayout
+      title="Admissões"
+      description="Gerencie o processo de admissão de colaboradores"
+      icon={<UserPlus className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-success to-info"
+      actions={
+        <Button className="rounded-xl bg-gradient-to-r from-success to-info hover:opacity-90 shadow-lg font-body">
+          <Plus className="h-4 w-4 mr-2" />Nova Admissão
+        </Button>
+      }
+    >
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-40" />)}
-        </div>
+        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
       ) : admissoes.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <UserPlus className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Nenhuma admissão em andamento</p>
-          </CardContent>
-        </Card>
+        <EmptyList entityName="admissão" />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {admissoes.map((admissao: any) => (
-            <Card key={admissao.id}>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{admissao.nome}</CardTitle>
-                  <Badge className={etapaColors[admissao.etapa] || 'bg-muted text-muted-foreground'}>
-                    {etapaLabels[admissao.etapa] || admissao.etapa}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Cargo:</strong> {admissao.cargo}</p>
-                <p><strong>Departamento:</strong> {admissao.departamento}</p>
-                <p><strong>Data prevista:</strong> {new Date(admissao.data_prevista).toLocaleDateString('pt-BR')}</p>
-                <p><strong>Salário:</strong> {Number(admissao.salario_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              </CardContent>
-            </Card>
+          {admissoes.map((admissao: any, i: number) => (
+            <motion.div key={admissao.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+              <Card className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 rounded-2xl overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-success to-info opacity-60 group-hover:opacity-100 transition-opacity" />
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base font-display">{admissao.nome}</CardTitle>
+                    <Badge className={etapaGradients[admissao.etapa] || 'bg-muted text-muted-foreground border-0'}>
+                      {etapaLabels[admissao.etapa] || admissao.etapa}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground space-y-1 font-body">
+                  <p><strong className="text-foreground">Cargo:</strong> {admissao.cargo}</p>
+                  <p><strong className="text-foreground">Departamento:</strong> {admissao.departamento}</p>
+                  <p><strong className="text-foreground">Data prevista:</strong> {new Date(admissao.data_prevista).toLocaleDateString('pt-BR')}</p>
+                  <p><strong className="text-foreground">Salário:</strong> {Number(admissao.salario_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 }
