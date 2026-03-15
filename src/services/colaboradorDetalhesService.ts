@@ -392,7 +392,7 @@ export async function salvarValorCampoCustomizado(campoId: string, colaboradorId
       { onConflict: 'campo_customizado_id,colaborador_id' }
     )
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
