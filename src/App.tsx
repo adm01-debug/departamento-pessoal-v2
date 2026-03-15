@@ -48,6 +48,14 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
 const HorasExtrasPage = lazy(() => import('@/pages/HorasExtrasPage'));
 const LocaisTrabalhoPage = lazy(() => import('@/pages/LocaisTrabalhoPage'));
+const PesquisasClimaPage = lazy(() => import('@/pages/PesquisasClimaPage'));
+const WorkflowsPage = lazy(() => import('@/pages/WorkflowsPage'));
+const TurnosPage = lazy(() => import('@/pages/TurnosPage'));
+const ComunicacaoInternaPage = lazy(() => import('@/pages/ComunicacaoInternaPage'));
+const DespesasPage = lazy(() => import('@/pages/DespesasPage'));
+const ControleAcessoPage = lazy(() => import('@/pages/ControleAcessoPage'));
+const LGPDPage = lazy(() => import('@/pages/LGPDPage'));
+const BancoHorasPage = lazy(() => import('@/pages/BancoHorasPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
