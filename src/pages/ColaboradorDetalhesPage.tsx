@@ -61,6 +61,7 @@ export default function ColaboradorDetalhesPage() {
           <TabsTrigger value="pcd" className="text-xs"><Accessibility className="mr-1 h-3 w-3" />PCD</TabsTrigger>
           <TabsTrigger value="estagiario" className="text-xs"><BookOpen className="mr-1 h-3 w-3" />Estagiário</TabsTrigger>
           <TabsTrigger value="aquisitivos" className="text-xs"><Calendar className="mr-1 h-3 w-3" />Per. Aquisitivos</TabsTrigger>
+          <TabsTrigger value="contratos" className="text-xs"><FileStack className="mr-1 h-3 w-3" />Hist. Contratos</TabsTrigger>
           <TabsTrigger value="anotacoes" className="text-xs"><StickyNote className="mr-1 h-3 w-3" />Anotações</TabsTrigger>
         </TabsList>
 
