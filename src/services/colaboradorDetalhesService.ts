@@ -234,7 +234,7 @@ export async function criarAnotacao(anotacao: Record<string, unknown>) {
     .from('anotacoes_colaborador' as any)
     .insert([anotacao])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
