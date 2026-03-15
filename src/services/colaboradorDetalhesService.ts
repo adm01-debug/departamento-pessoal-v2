@@ -273,7 +273,7 @@ export async function criarTime(time: Record<string, unknown>) {
     .from('times' as any)
     .insert([time])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
