@@ -17,7 +17,6 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow } from 'lucide-react';
 
-const statusIcons: Record<string, any> = { pendente: Clock, em_andamento: Play, aprovado: CheckCircle, rejeitado: XCircle };
 const statusColors: Record<string, string> = { pendente: 'secondary', em_andamento: 'default', aprovado: 'default', rejeitado: 'destructive', cancelado: 'outline' };
 
 export default function WorkflowsPage() {
