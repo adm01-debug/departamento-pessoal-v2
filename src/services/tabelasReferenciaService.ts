@@ -79,7 +79,7 @@ export async function criarContaBancaria(conta: Record<string, unknown>) {
     .from('contas_bancarias' as any)
     .insert([conta])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
