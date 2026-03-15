@@ -4,13 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
-  Zap, ChevronDown,
+  Zap, ChevronDown, UserPlus, UserMinus, Briefcase,
+  FolderOpen, CalendarDays, Bell, Plug, Database,
+  Network, Shield, UserCog,
 } from 'lucide-react';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useState } from 'react';
 
@@ -39,22 +38,39 @@ const menuGroups: MenuGroup[] = [
   {
     label: 'Operações',
     items: [
+      { path: '/admissoes', label: 'Admissões', icon: UserPlus, color: 'from-success to-finance' },
+      { path: '/desligamentos', label: 'Desligamentos', icon: UserMinus, color: 'from-destructive to-destructive' },
       { path: '/folha', label: 'Folha', icon: FileText, color: 'from-finance to-success' },
-      { path: '/ferias', label: 'Férias', icon: Calendar, color: 'from-warning to-coins', badge: 0 },
+      { path: '/ferias', label: 'Férias', icon: Calendar, color: 'from-warning to-coins' },
       { path: '/ponto', label: 'Ponto', icon: Clock, color: 'from-streak to-warning' },
+      { path: '/afastamentos', label: 'Afastamentos', icon: Shield, color: 'from-info to-primary' },
     ],
   },
   {
     label: 'Gestão',
     items: [
       { path: '/beneficios', label: 'Benefícios', icon: Gift, color: 'from-xp to-store' },
+      { path: '/cargos', label: 'Cargos', icon: Briefcase, color: 'from-streak to-warning' },
+      { path: '/departamentos', label: 'Departamentos', icon: Building2, color: 'from-info to-level' },
+      { path: '/documentos', label: 'Documentos', icon: FolderOpen, color: 'from-finance to-success' },
+      { path: '/feriados', label: 'Feriados', icon: CalendarDays, color: 'from-warning to-coins' },
+      { path: '/organograma', label: 'Organograma', icon: Network, color: 'from-xp to-tasks' },
+    ],
+  },
+  {
+    label: 'Relatórios & eSocial',
+    items: [
       { path: '/relatorios', label: 'Relatórios', icon: BarChart3, color: 'from-info to-primary' },
       { path: '/esocial', label: 'eSocial', icon: FileCheck, color: 'from-success to-finance' },
+      { path: '/auditoria', label: 'Auditoria', icon: Shield, color: 'from-primary to-primary-glow' },
     ],
   },
   {
     label: 'Sistema',
     items: [
+      { path: '/usuarios', label: 'Usuários', icon: UserCog, color: 'from-primary to-primary-glow' },
+      { path: '/integracoes', label: 'Integrações', icon: Plug, color: 'from-xp to-tasks' },
+      { path: '/backup', label: 'Backup', icon: Database, color: 'from-finance to-success' },
       { path: '/configuracoes', label: 'Configurações', icon: Settings, color: 'from-muted-foreground to-foreground' },
     ],
   },
@@ -75,7 +91,6 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
     setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
-  // Merge pending counts into badges
   const getBadge = (path: string): number | undefined => {
     if (pendingCounts) return pendingCounts[path];
     return undefined;
@@ -106,9 +121,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                 <h1 className="font-display font-bold text-lg tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                   Dept. Pessoal
                 </h1>
-                <p className="text-overline text-muted-foreground">
-                  Sistema DP
-                </p>
+                <p className="text-overline text-muted-foreground">Sistema DP</p>
               </div>
             )}
           </div>
@@ -121,7 +134,6 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
 
             return (
               <div key={group.label} className={cn(gi > 0 && 'mt-2')}>
-                {/* Group header */}
                 {!collapsed ? (
                   <button
                     onClick={() => toggleGroup(group.label)}
@@ -139,7 +151,6 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                   gi > 0 && <div className="h-px bg-border/30 mx-2 my-2" />
                 )}
 
-                {/* Group items */}
                 <AnimatePresence initial={false}>
                   {!isGroupCollapsed && (
                     <motion.div
@@ -165,42 +176,21 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                               collapsed && 'justify-center px-0'
                             )}
                           >
-                            {/* Active background gradient */}
                             {isActive && (
-                              <div className={cn(
-                                'absolute inset-0 rounded-xl bg-gradient-to-r opacity-90',
-                                color
-                              )} />
+                              <div className={cn('absolute inset-0 rounded-xl bg-gradient-to-r opacity-90', color)} />
                             )}
-
-                            {/* Icon */}
-                            <div className={cn(
-                              'relative z-10 flex items-center justify-center',
-                              isActive ? '' : 'group-hover:scale-110 transition-transform duration-200'
-                            )}>
+                            <div className={cn('relative z-10 flex items-center justify-center', isActive ? '' : 'group-hover:scale-110 transition-transform duration-200')}>
                               <Icon className="h-[18px] w-[18px]" />
                             </div>
-
-                            {/* Label */}
-                            {!collapsed && (
-                              <span className="relative z-10 font-medium flex-1">
-                                {label}
-                              </span>
-                            )}
-
-                            {/* Badge */}
+                            {!collapsed && <span className="relative z-10 font-medium flex-1">{label}</span>}
                             {!collapsed && badge !== undefined && badge > 0 && (
                               <span className="relative z-10 min-w-[20px] h-5 flex items-center justify-center px-1.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
                                 {badge > 99 ? '99+' : badge}
                               </span>
                             )}
-
-                            {/* Collapsed badge dot */}
                             {collapsed && badge !== undefined && badge > 0 && (
                               <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive z-10" />
                             )}
-
-                            {/* Hover glow effect */}
                             {!isActive && (
                               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all duration-300" />
                             )}
@@ -210,9 +200,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                         if (collapsed) {
                           return (
                             <Tooltip key={path}>
-                              <TooltipTrigger asChild>
-                                {linkContent}
-                              </TooltipTrigger>
+                              <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
                               <TooltipContent side="right" className="font-body">
                                 <p>{label}</p>
                                 {badge !== undefined && badge > 0 && (
