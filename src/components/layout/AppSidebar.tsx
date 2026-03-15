@@ -45,6 +45,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Target, label: 'Avaliação', path: '/avaliacao', color: 'text-warning' },
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
       { icon: UserSearch, label: 'Recrutamento', path: '/recrutamento', color: 'text-success' },
+      { icon: ClipboardList, label: 'Pesquisas Clima', path: '/pesquisas-clima', color: 'text-info' },
     ]
   },
   {
