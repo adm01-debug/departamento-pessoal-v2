@@ -72,13 +72,13 @@ export async function criarEvento(evento: {
 }) {
   const { data, error } = await supabase
     .from('esocial_eventos')
-    .insert({
+    .insert([{
       empresa_id: evento.empresa_id,
       tipo_evento: evento.tipo_evento,
       competencia: evento.competencia || new Date().toISOString().slice(0, 7),
-      dados: evento.dados || {},
+      dados: (evento.dados || {}) as Record<string, unknown>,
       status: 'pendente',
-    })
+    }])
     .select()
     .single();
 
