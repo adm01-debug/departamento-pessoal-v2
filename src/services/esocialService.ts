@@ -76,7 +76,7 @@ export async function criarEvento(evento: {
       empresa_id: evento.empresa_id,
       tipo_evento: evento.tipo_evento,
       competencia: evento.competencia || new Date().toISOString().slice(0, 7),
-      dados: (evento.dados || {}) as Record<string, unknown>,
+      dados: (evento.dados || {}) as any,
       status: 'pendente',
     }])
     .select()
