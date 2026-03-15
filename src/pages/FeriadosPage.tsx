@@ -108,7 +108,7 @@ export default function FeriadosPage() {
               {feriados.map((f: any) => (
                 <TableRow key={f.id} className="hover:bg-accent/30 transition-colors">
                   <TableCell className="font-body">{new Date(f.data + 'T12:00:00').toLocaleDateString('pt-BR')}</TableCell>
-                  <TableCell className="font-body font-medium">{f.nome}</TableCell>
+                  <TableCell className="font-body font-medium">{f.descricao}</TableCell>
                   <TableCell><Badge variant="outline" className={tipoColor[f.tipo] || ''}>{f.tipo}</Badge></TableCell>
                 </TableRow>
               ))}
