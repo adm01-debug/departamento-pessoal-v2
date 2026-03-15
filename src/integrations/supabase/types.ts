@@ -1128,6 +1128,56 @@ export type Database = {
           },
         ]
       }
+      canal_etica: {
+        Row: {
+          anonimo: boolean | null
+          categoria: string
+          created_at: string | null
+          descricao: string
+          empresa_id: string | null
+          id: string
+          prioridade: string | null
+          protocolo: string
+          resposta: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          anonimo?: boolean | null
+          categoria: string
+          created_at?: string | null
+          descricao: string
+          empresa_id?: string | null
+          id?: string
+          prioridade?: string | null
+          protocolo?: string
+          resposta?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          anonimo?: boolean | null
+          categoria?: string
+          created_at?: string | null
+          descricao?: string
+          empresa_id?: string | null
+          id?: string
+          prioridade?: string | null
+          protocolo?: string
+          resposta?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "canal_etica_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cargos: {
         Row: {
           ativo: boolean | null
@@ -1172,6 +1222,59 @@ export type Database = {
           },
           {
             foreignKeyName: "cargos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catalogo_cursos: {
+        Row: {
+          ativo: boolean | null
+          carga_horaria: number | null
+          categoria: string | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          modalidade: string | null
+          nome: string
+          nr_relacionada: string | null
+          obrigatorio: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          carga_horaria?: number | null
+          categoria?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          modalidade?: string | null
+          nome: string
+          nr_relacionada?: string | null
+          obrigatorio?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          carga_horaria?: number | null
+          categoria?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          modalidade?: string | null
+          nome?: string
+          nr_relacionada?: string | null
+          obrigatorio?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogo_cursos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
@@ -1722,6 +1825,35 @@ export type Database = {
           },
         ]
       }
+      comunicados_leituras: {
+        Row: {
+          comunicado_id: string
+          id: string
+          lido_em: string | null
+          usuario_id: string
+        }
+        Insert: {
+          comunicado_id: string
+          id?: string
+          lido_em?: string | null
+          usuario_id: string
+        }
+        Update: {
+          comunicado_id?: string
+          id?: string
+          lido_em?: string | null
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comunicados_leituras_comunicado_id_fkey"
+            columns: ["comunicado_id"]
+            isOneToOne: false
+            referencedRelation: "comunicados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       condicoes_ingresso: {
         Row: {
           created_at: string | null
@@ -2053,6 +2185,66 @@ export type Database = {
           },
           {
             foreignKeyName: "contratos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      controle_acesso: {
+        Row: {
+          area: string | null
+          colaborador_id: string
+          created_at: string | null
+          dispositivo: string | null
+          empresa_id: string | null
+          id: string
+          ip_address: string | null
+          latitude: number | null
+          local: string | null
+          longitude: number | null
+          metodo: string | null
+          tipo: string
+        }
+        Insert: {
+          area?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          dispositivo?: string | null
+          empresa_id?: string | null
+          id?: string
+          ip_address?: string | null
+          latitude?: number | null
+          local?: string | null
+          longitude?: number | null
+          metodo?: string | null
+          tipo: string
+        }
+        Update: {
+          area?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          dispositivo?: string | null
+          empresa_id?: string | null
+          id?: string
+          ip_address?: string | null
+          latitude?: number | null
+          local?: string | null
+          longitude?: number | null
+          metodo?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "controle_acesso_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "controle_acesso_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
@@ -2799,6 +2991,75 @@ export type Database = {
           },
         ]
       }
+      despesas: {
+        Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          categoria: string
+          colaborador_id: string
+          comprovante_url: string | null
+          created_at: string | null
+          data_despesa: string
+          descricao: string
+          empresa_id: string | null
+          id: string
+          observacoes: string | null
+          observacoes_aprovador: string | null
+          status: string | null
+          updated_at: string | null
+          valor: number
+        }
+        Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          categoria: string
+          colaborador_id: string
+          comprovante_url?: string | null
+          created_at?: string | null
+          data_despesa: string
+          descricao: string
+          empresa_id?: string | null
+          id?: string
+          observacoes?: string | null
+          observacoes_aprovador?: string | null
+          status?: string | null
+          updated_at?: string | null
+          valor: number
+        }
+        Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          categoria?: string
+          colaborador_id?: string
+          comprovante_url?: string | null
+          created_at?: string | null
+          data_despesa?: string
+          descricao?: string
+          empresa_id?: string | null
+          id?: string
+          observacoes?: string | null
+          observacoes_aprovador?: string | null
+          status?: string | null
+          updated_at?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "despesas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "despesas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documento_templates: {
         Row: {
           ativo: boolean | null
@@ -3265,6 +3526,64 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      escalas_trabalho: {
+        Row: {
+          colaborador_id: string
+          created_at: string | null
+          created_by: string | null
+          data: string
+          empresa_id: string | null
+          id: string
+          observacoes: string | null
+          status: string | null
+          turno_id: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string | null
+          created_by?: string | null
+          data: string
+          empresa_id?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: string | null
+          turno_id: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          data?: string
+          empresa_id?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: string | null
+          turno_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escalas_trabalho_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escalas_trabalho_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escalas_trabalho_turno_id_fkey"
+            columns: ["turno_id"]
+            isOneToOne: false
+            referencedRelation: "turnos"
             referencedColumns: ["id"]
           },
         ]
@@ -4535,6 +4854,70 @@ export type Database = {
         }
         Relationships: []
       }
+      inscricoes_cursos: {
+        Row: {
+          certificado_url: string | null
+          colaborador_id: string
+          created_at: string | null
+          curso_id: string
+          data_conclusao: string | null
+          data_inicio: string | null
+          empresa_id: string | null
+          id: string
+          nota: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          certificado_url?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          curso_id: string
+          data_conclusao?: string | null
+          data_inicio?: string | null
+          empresa_id?: string | null
+          id?: string
+          nota?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          certificado_url?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          curso_id?: string
+          data_conclusao?: string | null
+          data_inicio?: string | null
+          empresa_id?: string | null
+          id?: string
+          nota?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inscricoes_cursos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inscricoes_cursos_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "catalogo_cursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inscricoes_cursos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integracoes: {
         Row: {
           ativa: boolean | null
@@ -4695,6 +5078,123 @@ export type Database = {
             columns: ["rubrica_id"]
             isOneToOne: false
             referencedRelation: "rubricas_folha"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lgpd_consentimentos: {
+        Row: {
+          aceito: boolean | null
+          aceito_em: string | null
+          colaborador_id: string
+          created_at: string | null
+          empresa_id: string | null
+          id: string
+          ip_address: string | null
+          revogado_em: string | null
+          tipo: string
+          updated_at: string | null
+          versao: string | null
+        }
+        Insert: {
+          aceito?: boolean | null
+          aceito_em?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          ip_address?: string | null
+          revogado_em?: string | null
+          tipo: string
+          updated_at?: string | null
+          versao?: string | null
+        }
+        Update: {
+          aceito?: boolean | null
+          aceito_em?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          ip_address?: string | null
+          revogado_em?: string | null
+          tipo?: string
+          updated_at?: string | null
+          versao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lgpd_consentimentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lgpd_consentimentos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lgpd_solicitacoes: {
+        Row: {
+          colaborador_id: string | null
+          concluida_em: string | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          prazo_legal: string | null
+          responsavel_id: string | null
+          resposta: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          concluida_em?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          prazo_legal?: string | null
+          responsavel_id?: string | null
+          resposta?: string | null
+          status?: string | null
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          concluida_em?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          prazo_legal?: string | null
+          responsavel_id?: string | null
+          resposta?: string | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lgpd_solicitacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lgpd_solicitacoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
@@ -5740,6 +6240,152 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
+      }
+      pesquisas: {
+        Row: {
+          anonima: boolean | null
+          created_at: string | null
+          created_by: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          status: string | null
+          tipo: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          anonima?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          status?: string | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          anonima?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          status?: string | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pesquisas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pesquisas_perguntas: {
+        Row: {
+          created_at: string | null
+          id: string
+          obrigatoria: boolean | null
+          opcoes: Json | null
+          ordem: number | null
+          pesquisa_id: string
+          texto: string
+          tipo: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          obrigatoria?: boolean | null
+          opcoes?: Json | null
+          ordem?: number | null
+          pesquisa_id: string
+          texto: string
+          tipo?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          obrigatoria?: boolean | null
+          opcoes?: Json | null
+          ordem?: number | null
+          pesquisa_id?: string
+          texto?: string
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pesquisas_perguntas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "pesquisas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pesquisas_respostas: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string | null
+          id: string
+          pergunta_id: string
+          pesquisa_id: string
+          valor_numerico: number | null
+          valor_texto: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          id?: string
+          pergunta_id: string
+          pesquisa_id: string
+          valor_numerico?: number | null
+          valor_texto?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          id?: string
+          pergunta_id?: string
+          pesquisa_id?: string
+          valor_numerico?: number | null
+          valor_texto?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pesquisas_respostas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pesquisas_respostas_pergunta_id_fkey"
+            columns: ["pergunta_id"]
+            isOneToOne: false
+            referencedRelation: "pesquisas_perguntas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pesquisas_respostas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "pesquisas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       planos_saude: {
         Row: {
@@ -7093,6 +7739,133 @@ export type Database = {
           },
         ]
       }
+      trilhas_aprendizado: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nivel: string | null
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nivel?: string | null
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nivel?: string | null
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trilhas_aprendizado_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trilhas_cursos: {
+        Row: {
+          curso_id: string
+          id: string
+          obrigatorio: boolean | null
+          ordem: number | null
+          trilha_id: string
+        }
+        Insert: {
+          curso_id: string
+          id?: string
+          obrigatorio?: boolean | null
+          ordem?: number | null
+          trilha_id: string
+        }
+        Update: {
+          curso_id?: string
+          id?: string
+          obrigatorio?: boolean | null
+          ordem?: number | null
+          trilha_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trilhas_cursos_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "catalogo_cursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trilhas_cursos_trilha_id_fkey"
+            columns: ["trilha_id"]
+            isOneToOne: false
+            referencedRelation: "trilhas_aprendizado"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      turnos: {
+        Row: {
+          ativo: boolean | null
+          cor: string | null
+          created_at: string | null
+          empresa_id: string | null
+          horario_fim: string
+          horario_inicio: string
+          id: string
+          intervalo_minutos: number | null
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          cor?: string | null
+          created_at?: string | null
+          empresa_id?: string | null
+          horario_fim: string
+          horario_inicio: string
+          id?: string
+          intervalo_minutos?: number | null
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          cor?: string | null
+          created_at?: string | null
+          empresa_id?: string | null
+          horario_fim?: string
+          horario_inicio?: string
+          id?: string
+          intervalo_minutos?: number | null
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turnos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_empresas: {
         Row: {
           created_at: string
@@ -7721,6 +8494,203 @@ export type Database = {
             columns: ["webhook_id"]
             isOneToOne: false
             referencedRelation: "webhooks_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows_definicoes: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          created_by: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflows_definicoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows_etapas: {
+        Row: {
+          aprovador_id: string | null
+          aprovador_tipo: string | null
+          config: Json | null
+          created_at: string | null
+          id: string
+          nome: string
+          ordem: number
+          tipo: string | null
+          workflow_id: string
+        }
+        Insert: {
+          aprovador_id?: string | null
+          aprovador_tipo?: string | null
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          nome: string
+          ordem: number
+          tipo?: string | null
+          workflow_id: string
+        }
+        Update: {
+          aprovador_id?: string | null
+          aprovador_tipo?: string | null
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+          tipo?: string | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflows_etapas_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows_definicoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows_execucoes: {
+        Row: {
+          created_at: string | null
+          dados: Json | null
+          empresa_id: string | null
+          entidade_id: string
+          entidade_tipo: string
+          etapa_atual_id: string | null
+          id: string
+          solicitante_id: string | null
+          status: string | null
+          updated_at: string | null
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          dados?: Json | null
+          empresa_id?: string | null
+          entidade_id: string
+          entidade_tipo: string
+          etapa_atual_id?: string | null
+          id?: string
+          solicitante_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string | null
+          dados?: Json | null
+          empresa_id?: string | null
+          entidade_id?: string
+          entidade_tipo?: string
+          etapa_atual_id?: string | null
+          id?: string
+          solicitante_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflows_execucoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflows_execucoes_etapa_atual_id_fkey"
+            columns: ["etapa_atual_id"]
+            isOneToOne: false
+            referencedRelation: "workflows_etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflows_execucoes_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows_definicoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows_historico: {
+        Row: {
+          acao: string
+          created_at: string | null
+          etapa_id: string | null
+          execucao_id: string
+          id: string
+          observacoes: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          etapa_id?: string | null
+          execucao_id: string
+          id?: string
+          observacoes?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          etapa_id?: string | null
+          execucao_id?: string
+          id?: string
+          observacoes?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflows_historico_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "workflows_etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflows_historico_execucao_id_fkey"
+            columns: ["execucao_id"]
+            isOneToOne: false
+            referencedRelation: "workflows_execucoes"
             referencedColumns: ["id"]
           },
         ]
