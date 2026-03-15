@@ -30,9 +30,9 @@ export default function PontoPage() {
         if (pos) coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       }
       await pontoService.registrar(tipo, user?.id);
-      success('Ponto registrado!', `${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+      toast.success(`Ponto registrado: ${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
     } catch (err: any) {
-      error('Erro ao registrar ponto', err.message);
+      toast.error(`Erro ao registrar ponto: ${err.message}`);
     } finally {
       setLoading(null);
     }

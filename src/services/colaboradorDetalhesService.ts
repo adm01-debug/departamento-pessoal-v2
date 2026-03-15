@@ -18,7 +18,7 @@ export async function criarDependente(dependente: Record<string, unknown>) {
     .from('dependentes')
     .insert([dependente as any])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
