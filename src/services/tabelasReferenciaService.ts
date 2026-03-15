@@ -147,7 +147,7 @@ export async function criarDocumentoPessoal(doc: Record<string, unknown>) {
     .from('documentos_pessoais_arquivos' as any)
     .insert([doc])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
