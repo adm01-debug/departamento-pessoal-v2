@@ -153,7 +153,7 @@ export async function salvarDadosEstrangeiro(colaboradorId: string, dados: Recor
     .from('dados_estrangeiro' as any)
     .upsert({ ...dados, colaborador_id: colaboradorId }, { onConflict: 'colaborador_id' })
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
