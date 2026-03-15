@@ -203,7 +203,7 @@ export async function criarFeriasArquivo(arquivo: Record<string, unknown>) {
     .from('ferias_arquivos' as any)
     .insert([arquivo])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
