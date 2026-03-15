@@ -42,6 +42,9 @@ const PortalPage = lazy(() => import('@/pages/PortalPage'));
 const AvaliacaoPage = lazy(() => import('@/pages/AvaliacaoPage'));
 const TreinamentosPage = lazy(() => import('@/pages/TreinamentosPage'));
 const RecrutamentoPage = lazy(() => import('@/pages/RecrutamentoPage'));
+const ContratacaoPage = lazy(() => import('@/pages/ContratacaoPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
