@@ -202,7 +202,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Rec
       .update(dados)
       .eq('id', (existing as any).id)
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   } else {
