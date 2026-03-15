@@ -97,6 +97,7 @@ const menuGroups: MenuGroup[] = [
       { icon: PenTool, label: 'Assinaturas', path: '/assinaturas', color: 'text-primary' },
       { icon: FileCheck, label: 'eSocial', path: '/esocial', color: 'text-success' },
       { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
+      { icon: ShieldCheck, label: 'LGPD', path: '/lgpd', color: 'text-primary' },
     ]
   },
   {
