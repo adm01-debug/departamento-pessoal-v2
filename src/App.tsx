@@ -48,6 +48,14 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
 const HorasExtrasPage = lazy(() => import('@/pages/HorasExtrasPage'));
 const LocaisTrabalhoPage = lazy(() => import('@/pages/LocaisTrabalhoPage'));
+const PesquisasClimaPage = lazy(() => import('@/pages/PesquisasClimaPage'));
+const WorkflowsPage = lazy(() => import('@/pages/WorkflowsPage'));
+const TurnosPage = lazy(() => import('@/pages/TurnosPage'));
+const ComunicacaoInternaPage = lazy(() => import('@/pages/ComunicacaoInternaPage'));
+const DespesasPage = lazy(() => import('@/pages/DespesasPage'));
+const ControleAcessoPage = lazy(() => import('@/pages/ControleAcessoPage'));
+const LGPDPage = lazy(() => import('@/pages/LGPDPage'));
+const BancoHorasPage = lazy(() => import('@/pages/BancoHorasPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -103,6 +111,14 @@ export default function App() {
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
         <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
+        <Route path="pesquisas-clima" element={<LazyPage Component={PesquisasClimaPage} />} />
+        <Route path="workflows" element={<LazyPage Component={WorkflowsPage} />} />
+        <Route path="turnos" element={<LazyPage Component={TurnosPage} />} />
+        <Route path="comunicacao" element={<LazyPage Component={ComunicacaoInternaPage} />} />
+        <Route path="despesas" element={<LazyPage Component={DespesasPage} />} />
+        <Route path="controle-acesso" element={<LazyPage Component={ControleAcessoPage} />} />
+        <Route path="lgpd" element={<LazyPage Component={LGPDPage} />} />
+        <Route path="banco-horas" element={<LazyPage Component={BancoHorasPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

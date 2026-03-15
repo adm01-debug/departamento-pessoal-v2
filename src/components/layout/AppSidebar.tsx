@@ -3,7 +3,8 @@ import {
   UserMinus, BarChart3, ChevronLeft, ChevronRight, ChevronDown, Search,
   LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
-  FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer
+  FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
+  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale
 } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -44,6 +45,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Target, label: 'Avaliação', path: '/avaliacao', color: 'text-warning' },
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
       { icon: UserSearch, label: 'Recrutamento', path: '/recrutamento', color: 'text-success' },
+      { icon: ClipboardList, label: 'Pesquisas Clima', path: '/pesquisas-clima', color: 'text-info' },
     ]
   },
   {
@@ -54,9 +56,12 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: Clock, label: 'Ponto', path: '/ponto', color: 'text-info' },
       { icon: Timer, label: 'Horas Extras', path: '/horas-extras', color: 'text-warning' },
+      { icon: Scale, label: 'Banco de Horas', path: '/banco-horas', color: 'text-info' },
+      { icon: CalendarClock, label: 'Turnos & Escalas', path: '/turnos', color: 'text-primary' },
       { icon: Umbrella, label: 'Férias', path: '/ferias', color: 'text-warning' },
       { icon: Heart, label: 'Afastamentos', path: '/afastamentos', color: 'text-destructive' },
       { icon: Calendar, label: 'Feriados', path: '/feriados', color: 'text-warning' },
+      { icon: Fingerprint, label: 'Controle Acesso', path: '/controle-acesso', color: 'text-primary' },
     ]
   },
   {
@@ -67,6 +72,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: Wallet, label: 'Folha de Pagamento', path: '/folha', color: 'text-success' },
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
+      { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
     ]
   },
   {
@@ -91,6 +97,7 @@ const menuGroups: MenuGroup[] = [
       { icon: PenTool, label: 'Assinaturas', path: '/assinaturas', color: 'text-primary' },
       { icon: FileCheck, label: 'eSocial', path: '/esocial', color: 'text-success' },
       { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
+      { icon: ShieldCheck, label: 'LGPD', path: '/lgpd', color: 'text-primary' },
     ]
   },
   {
@@ -100,6 +107,8 @@ const menuGroups: MenuGroup[] = [
     color: 'text-muted-foreground',
     items: [
       { icon: BarChart3, label: 'Relatórios', path: '/relatorios', color: 'text-info' },
+      { icon: GitBranch, label: 'Workflows', path: '/workflows', color: 'text-info' },
+      { icon: Megaphone, label: 'Comunicação', path: '/comunicacao', color: 'text-warning' },
       { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
       { icon: Settings, label: 'Configurações', path: '/configuracoes', color: 'text-muted-foreground' },
       { icon: ClipboardList, label: 'Integrações', path: '/integracoes', color: 'text-info' },
