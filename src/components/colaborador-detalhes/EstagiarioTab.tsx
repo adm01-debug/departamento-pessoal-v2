@@ -13,7 +13,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
   const salvar = useSalvarDadosEstagiario();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    instituicao_ensino: '', cnpj_instituicao: '', curso: '', nivel: '',
+    instituicao_nome: '', instituicao_cnpj: '', curso: '', nivel: '',
     supervisor_nome: '', supervisor_cargo: '',
     data_inicio: '', data_fim: '', carga_horaria_semanal: '',
     valor_bolsa: '', numero_apolice: ''
@@ -23,7 +23,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
     if (data) {
       const d = data as any;
       setForm({
-        instituicao_ensino: d.instituicao_ensino || '', cnpj_instituicao: d.cnpj_instituicao || '',
+        instituicao_nome: d.instituicao_nome || '', instituicao_cnpj: d.instituicao_cnpj || '',
         curso: d.curso || '', nivel: d.nivel || '',
         supervisor_nome: d.supervisor_nome || '', supervisor_cargo: d.supervisor_cargo || '',
         data_inicio: d.data_inicio || '', data_fim: d.data_fim || '',
@@ -34,7 +34,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
   }, [data]);
 
   const handleSave = async () => {
-    if (!form.instituicao_ensino.trim()) { toast.error('Instituição de ensino é obrigatória'); return; }
+    if (!form.instituicao_nome.trim()) { toast.error('Instituição de ensino é obrigatória'); return; }
     try {
       const payload = {
         ...form,
@@ -64,8 +64,8 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
       <CardContent>
         {!showForm && data ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div><Label className="text-xs text-muted-foreground">Instituição</Label><p className="font-medium">{(data as any).instituicao_ensino}</p></div>
-            <div><Label className="text-xs text-muted-foreground">CNPJ Instituição</Label><p className="font-medium">{(data as any).cnpj_instituicao || '-'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Instituição</Label><p className="font-medium">{(data as any).instituicao_nome}</p></div>
+            <div><Label className="text-xs text-muted-foreground">CNPJ Instituição</Label><p className="font-medium">{(data as any).instituicao_cnpj || '-'}</p></div>
             <div><Label className="text-xs text-muted-foreground">Curso</Label><p className="font-medium">{(data as any).curso || '-'}</p></div>
             <div><Label className="text-xs text-muted-foreground">Nível</Label><p className="font-medium">{(data as any).nivel || '-'}</p></div>
             <div><Label className="text-xs text-muted-foreground">Supervisor</Label><p className="font-medium">{(data as any).supervisor_nome || '-'}</p></div>
@@ -77,8 +77,8 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
           <div className="grid gap-3 max-w-lg">
             {!data && <p className="text-sm text-muted-foreground mb-2">Nenhum dado cadastrado.</p>}
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Instituição de Ensino *</Label><Input value={form.instituicao_ensino} onChange={e => setForm(f => ({ ...f, instituicao_ensino: e.target.value }))} /></div>
-              <div><Label>CNPJ Instituição</Label><Input value={form.cnpj_instituicao} onChange={e => setForm(f => ({ ...f, cnpj_instituicao: e.target.value }))} /></div>
+              <div><Label>Instituição de Ensino *</Label><Input value={form.instituicao_nome} onChange={e => setForm(f => ({ ...f, instituicao_nome: e.target.value }))} /></div>
+              <div><Label>CNPJ Instituição</Label><Input value={form.instituicao_cnpj} onChange={e => setForm(f => ({ ...f, instituicao_cnpj: e.target.value }))} /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Curso</Label><Input value={form.curso} onChange={e => setForm(f => ({ ...f, curso: e.target.value }))} /></div>

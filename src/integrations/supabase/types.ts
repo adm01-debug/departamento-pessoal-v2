@@ -2026,9 +2026,11 @@ export type Database = {
       dados_estagiario: {
         Row: {
           area_atuacao: string | null
+          carga_horaria_semanal: number | null
           categoria_estagio: string | null
           colaborador_id: string
           created_at: string | null
+          curso: string | null
           data_fim: string | null
           data_inicio: string | null
           empresa_id: string | null
@@ -2042,15 +2044,22 @@ export type Database = {
           instituicao_nome: string | null
           instituicao_numero: string | null
           instituicao_uf: string | null
+          nivel: string | null
+          numero_apolice: string | null
           obrigatorio: boolean | null
+          supervisor_cargo: string | null
           supervisor_id: string | null
+          supervisor_nome: string | null
           updated_at: string | null
+          valor_bolsa: number | null
         }
         Insert: {
           area_atuacao?: string | null
+          carga_horaria_semanal?: number | null
           categoria_estagio?: string | null
           colaborador_id: string
           created_at?: string | null
+          curso?: string | null
           data_fim?: string | null
           data_inicio?: string | null
           empresa_id?: string | null
@@ -2064,15 +2073,22 @@ export type Database = {
           instituicao_nome?: string | null
           instituicao_numero?: string | null
           instituicao_uf?: string | null
+          nivel?: string | null
+          numero_apolice?: string | null
           obrigatorio?: boolean | null
+          supervisor_cargo?: string | null
           supervisor_id?: string | null
+          supervisor_nome?: string | null
           updated_at?: string | null
+          valor_bolsa?: number | null
         }
         Update: {
           area_atuacao?: string | null
+          carga_horaria_semanal?: number | null
           categoria_estagio?: string | null
           colaborador_id?: string
           created_at?: string | null
+          curso?: string | null
           data_fim?: string | null
           data_inicio?: string | null
           empresa_id?: string | null
@@ -2086,9 +2102,14 @@ export type Database = {
           instituicao_nome?: string | null
           instituicao_numero?: string | null
           instituicao_uf?: string | null
+          nivel?: string | null
+          numero_apolice?: string | null
           obrigatorio?: boolean | null
+          supervisor_cargo?: string | null
           supervisor_id?: string | null
+          supervisor_nome?: string | null
           updated_at?: string | null
+          valor_bolsa?: number | null
         }
         Relationships: [
           {
@@ -2961,7 +2982,11 @@ export type Database = {
           colaborador_id: string
           created_at: string | null
           created_by: string | null
+          data_emissao: string | null
+          data_validade: string | null
           id: string
+          numero: string | null
+          orgao_emissor: string | null
           tipo_documento: string
           updated_at: string | null
         }
@@ -2972,7 +2997,11 @@ export type Database = {
           colaborador_id: string
           created_at?: string | null
           created_by?: string | null
+          data_emissao?: string | null
+          data_validade?: string | null
           id?: string
+          numero?: string | null
+          orgao_emissor?: string | null
           tipo_documento: string
           updated_at?: string | null
         }
@@ -2983,7 +3012,11 @@ export type Database = {
           colaborador_id?: string
           created_at?: string | null
           created_by?: string | null
+          data_emissao?: string | null
+          data_validade?: string | null
           id?: string
+          numero?: string | null
+          orgao_emissor?: string | null
           tipo_documento?: string
           updated_at?: string | null
         }
