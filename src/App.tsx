@@ -42,6 +42,9 @@ const PortalPage = lazy(() => import('@/pages/PortalPage'));
 const AvaliacaoPage = lazy(() => import('@/pages/AvaliacaoPage'));
 const TreinamentosPage = lazy(() => import('@/pages/TreinamentosPage'));
 const RecrutamentoPage = lazy(() => import('@/pages/RecrutamentoPage'));
+const ContratacaoPage = lazy(() => import('@/pages/ContratacaoPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -91,9 +94,13 @@ export default function App() {
         <Route path="avaliacao" element={<LazyPage Component={AvaliacaoPage} />} />
         <Route path="treinamentos" element={<LazyPage Component={TreinamentosPage} />} />
         <Route path="recrutamento" element={<LazyPage Component={RecrutamentoPage} />} />
+        <Route path="onboarding" element={<LazyPage Component={OnboardingPage} />} />
+        <Route path="assinaturas" element={<LazyPage Component={AssinaturasPage} />} />
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+      {/* Public route - no auth required */}
+      <Route path="/contratacao" element={<Suspense fallback={<PageLoader />}><ContratacaoPage /></Suspense>} />
     </Routes>
   );
 }

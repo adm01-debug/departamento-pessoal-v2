@@ -33,3 +33,6 @@ export { default as PortalPage } from './PortalPage';
 export { default as AvaliacaoPage } from './AvaliacaoPage';
 export { default as TreinamentosPage } from './TreinamentosPage';
 export { default as RecrutamentoPage } from './RecrutamentoPage';
+export { default as ContratacaoPage } from './ContratacaoPage';
+export { default as OnboardingPage } from './OnboardingPage';
+export { default as AssinaturasPage } from './AssinaturasPage';
