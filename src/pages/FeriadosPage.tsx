@@ -38,9 +38,11 @@ export default function FeriadosPage() {
 
   const criarFeriado = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('feriados').insert({
-        nome, data, tipo, empresa_id: tipo === 'empresa' ? empresaAtual?.id : null,
-      });
+      const insertData: any = {
+        descricao: nome, data, tipo,
+        empresa_id: tipo === 'empresa' ? empresaAtual?.id : null,
+      };
+      const { error } = await supabase.from('feriados').insert(insertData);
       if (error) throw error;
     },
     onSuccess: () => {
