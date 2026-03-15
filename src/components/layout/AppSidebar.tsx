@@ -78,6 +78,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Building2, label: 'Empresas', path: '/empresas', color: 'text-info' },
       { icon: Briefcase, label: 'Cargos', path: '/cargos', color: 'text-warning' },
       { icon: Building2, label: 'Departamentos', path: '/departamentos', color: 'text-info' },
+      { icon: MapPin, label: 'Locais de Trabalho', path: '/locais-trabalho', color: 'text-success' },
     ]
   },
   {
