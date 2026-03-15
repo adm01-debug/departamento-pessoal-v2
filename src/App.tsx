@@ -46,6 +46,8 @@ const RecrutamentoPage = lazy(() => import('@/pages/RecrutamentoPage'));
 const ContratacaoPage = lazy(() => import('@/pages/ContratacaoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
+const HorasExtrasPage = lazy(() => import('@/pages/HorasExtrasPage'));
+const LocaisTrabalhoPage = lazy(() => import('@/pages/LocaisTrabalhoPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
