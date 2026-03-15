@@ -33,7 +33,7 @@ export default function LGPDPage() {
 
   const criarSol = useMutation({
     mutationFn: () => lgpdService.criarSolicitacao({ ...formSol, empresa_id: empresaAtual?.id, prazo_legal: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['lgpd_solicitacoes'] }); setOpenSol(false); toast.success('Solicitação LGPD registrada!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['lgpd_solicitacoes'] }); setOpenSol(false); toast.success('Solicitação LGPD registrada!'); setFormSol({ colaborador_id: '', tipo: 'acesso', descricao: '' }); },
     onError: () => toast.error('Erro ao registrar'),
   });
 
