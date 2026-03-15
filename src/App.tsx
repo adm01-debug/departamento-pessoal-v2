@@ -12,6 +12,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 // Lazy-loaded pages
 const ColaboradoresPage = lazy(() => import('@/pages/ColaboradoresPage'));
 const ColaboradorFormPage = lazy(() => import('@/pages/ColaboradorFormPage'));
+const ColaboradorDetalhesPage = lazy(() => import('@/pages/ColaboradorDetalhesPage'));
 const EmpresasPage = lazy(() => import('@/pages/EmpresasPage'));
 const EmpresaFormPage = lazy(() => import('@/pages/EmpresaFormPage'));
 const FolhaPage = lazy(() => import('@/pages/FolhaPage'));
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="colaboradores" element={<LazyPage Component={ColaboradoresPage} />} />
         <Route path="colaboradores/novo" element={<LazyPage Component={ColaboradorFormPage} />} />
         <Route path="colaboradores/:id/editar" element={<LazyPage Component={ColaboradorFormPage} />} />
+        <Route path="colaboradores/:id/detalhes" element={<LazyPage Component={ColaboradorDetalhesPage} />} />
         <Route path="empresas" element={<LazyPage Component={EmpresasPage} />} />
         <Route path="empresas/nova" element={<LazyPage Component={EmpresaFormPage} />} />
         <Route path="empresas/:id/editar" element={<LazyPage Component={EmpresaFormPage} />} />
