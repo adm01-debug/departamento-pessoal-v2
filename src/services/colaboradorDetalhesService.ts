@@ -321,7 +321,7 @@ export async function criarWebhook(webhook: Record<string, unknown>) {
     .from('webhooks_config' as any)
     .insert([webhook])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
