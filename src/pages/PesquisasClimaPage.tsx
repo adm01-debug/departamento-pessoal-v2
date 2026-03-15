@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Progress } from '@/components/ui/progress';
+
 import { pesquisaService } from '@/services/pesquisaService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
