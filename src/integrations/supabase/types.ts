@@ -786,12 +786,16 @@ export type Database = {
           descricao: string | null
           empresa_id: string | null
           id: string
+          metodo_pagamento: string | null
           nome: string
           observacoes: string | null
+          operadora: string | null
           status: string | null
           tipo: string | null
           updated_at: string
           valor: number | null
+          valor_colaborador: number | null
+          valor_empresa: number | null
         }
         Insert: {
           ativo?: boolean | null
@@ -802,12 +806,16 @@ export type Database = {
           descricao?: string | null
           empresa_id?: string | null
           id?: string
+          metodo_pagamento?: string | null
           nome: string
           observacoes?: string | null
+          operadora?: string | null
           status?: string | null
           tipo?: string | null
           updated_at?: string
           valor?: number | null
+          valor_colaborador?: number | null
+          valor_empresa?: number | null
         }
         Update: {
           ativo?: boolean | null
@@ -818,12 +826,16 @@ export type Database = {
           descricao?: string | null
           empresa_id?: string | null
           id?: string
+          metodo_pagamento?: string | null
           nome?: string
           observacoes?: string | null
+          operadora?: string | null
           status?: string | null
           tipo?: string | null
           updated_at?: string
           valor?: number | null
+          valor_colaborador?: number | null
+          valor_empresa?: number | null
         }
         Relationships: [
           {
@@ -1138,6 +1150,68 @@ export type Database = {
           },
         ]
       }
+      categorias_trabalhador: {
+        Row: {
+          codigo_esocial: string | null
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      centros_custo: {
+        Row: {
+          ativo: boolean | null
+          codigo: string | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          codigo?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          codigo?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "centros_custo_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaborador_beneficios: {
         Row: {
           beneficio_id: string
@@ -1187,9 +1261,11 @@ export type Database = {
           cargo: string
           cargo_confianca: boolean | null
           categoria_trabalhador: string | null
+          categoria_trabalhador_id: number | null
           cbo: string | null
           celular: string | null
           centro_custo: string | null
+          centro_custo_id: string | null
           cep: string | null
           certificado_reservista: string | null
           cidade: string | null
@@ -1221,6 +1297,7 @@ export type Database = {
           etnia: string | null
           formacao: string | null
           foto_url: string | null
+          genero_documento_id: number | null
           horario_entrada: string | null
           horario_saida: string | null
           id: string
@@ -1232,6 +1309,7 @@ export type Database = {
           logradouro: string | null
           matricula: string | null
           nacionalidade: string | null
+          nacionalidade_id: number | null
           naturalidade_cidade: string | null
           naturalidade_uf: string | null
           nome_completo: string
@@ -1260,7 +1338,9 @@ export type Database = {
           tipo_contrato: Database["public"]["Enums"]["tipo_contrato"]
           tipo_estabilidade: string | null
           tipo_pagamento: string | null
+          tipo_pagamento_id: number | null
           tipo_salario: string | null
+          tipo_salario_id: number | null
           titulo_eleitor: string | null
           titulo_secao: string | null
           titulo_zona: string | null
@@ -1279,9 +1359,11 @@ export type Database = {
           cargo: string
           cargo_confianca?: boolean | null
           categoria_trabalhador?: string | null
+          categoria_trabalhador_id?: number | null
           cbo?: string | null
           celular?: string | null
           centro_custo?: string | null
+          centro_custo_id?: string | null
           cep?: string | null
           certificado_reservista?: string | null
           cidade?: string | null
@@ -1313,6 +1395,7 @@ export type Database = {
           etnia?: string | null
           formacao?: string | null
           foto_url?: string | null
+          genero_documento_id?: number | null
           horario_entrada?: string | null
           horario_saida?: string | null
           id?: string
@@ -1324,6 +1407,7 @@ export type Database = {
           logradouro?: string | null
           matricula?: string | null
           nacionalidade?: string | null
+          nacionalidade_id?: number | null
           naturalidade_cidade?: string | null
           naturalidade_uf?: string | null
           nome_completo: string
@@ -1352,7 +1436,9 @@ export type Database = {
           tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"]
           tipo_estabilidade?: string | null
           tipo_pagamento?: string | null
+          tipo_pagamento_id?: number | null
           tipo_salario?: string | null
+          tipo_salario_id?: number | null
           titulo_eleitor?: string | null
           titulo_secao?: string | null
           titulo_zona?: string | null
@@ -1371,9 +1457,11 @@ export type Database = {
           cargo?: string
           cargo_confianca?: boolean | null
           categoria_trabalhador?: string | null
+          categoria_trabalhador_id?: number | null
           cbo?: string | null
           celular?: string | null
           centro_custo?: string | null
+          centro_custo_id?: string | null
           cep?: string | null
           certificado_reservista?: string | null
           cidade?: string | null
@@ -1405,6 +1493,7 @@ export type Database = {
           etnia?: string | null
           formacao?: string | null
           foto_url?: string | null
+          genero_documento_id?: number | null
           horario_entrada?: string | null
           horario_saida?: string | null
           id?: string
@@ -1416,6 +1505,7 @@ export type Database = {
           logradouro?: string | null
           matricula?: string | null
           nacionalidade?: string | null
+          nacionalidade_id?: number | null
           naturalidade_cidade?: string | null
           naturalidade_uf?: string | null
           nome_completo?: string
@@ -1444,7 +1534,9 @@ export type Database = {
           tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"]
           tipo_estabilidade?: string | null
           tipo_pagamento?: string | null
+          tipo_pagamento_id?: number | null
           tipo_salario?: string | null
+          tipo_salario_id?: number | null
           titulo_eleitor?: string | null
           titulo_secao?: string | null
           titulo_zona?: string | null
@@ -1453,6 +1545,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "colaboradores_categoria_trabalhador_id_fkey"
+            columns: ["categoria_trabalhador_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_trabalhador"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_centro_custo_id_fkey"
+            columns: ["centro_custo_id"]
+            isOneToOne: false
+            referencedRelation: "centros_custo"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "colaboradores_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -1460,10 +1566,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "colaboradores_genero_documento_id_fkey"
+            columns: ["genero_documento_id"]
+            isOneToOne: false
+            referencedRelation: "generos_documento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_nacionalidade_id_fkey"
+            columns: ["nacionalidade_id"]
+            isOneToOne: false
+            referencedRelation: "nacionalidades"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "colaboradores_supervisor_id_fkey"
             columns: ["supervisor_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_tipo_pagamento_id_fkey"
+            columns: ["tipo_pagamento_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_pagamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_tipo_salario_id_fkey"
+            columns: ["tipo_salario_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_salario"
             referencedColumns: ["id"]
           },
         ]
@@ -1517,6 +1651,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      condicoes_ingresso: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
       }
       config_afastamentos: {
         Row: {
@@ -1605,6 +1757,78 @@ export type Database = {
         }
         Relationships: []
       }
+      contas_bancarias: {
+        Row: {
+          agencia: string | null
+          ativo: boolean | null
+          banco_codigo: string | null
+          banco_nome: string | null
+          colaborador_id: string
+          conta: string | null
+          created_at: string | null
+          digito: string | null
+          empresa_id: string | null
+          id: string
+          modalidade: string | null
+          pix_chave: string | null
+          pix_tipo: string | null
+          principal: boolean | null
+          tipo_conta: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agencia?: string | null
+          ativo?: boolean | null
+          banco_codigo?: string | null
+          banco_nome?: string | null
+          colaborador_id: string
+          conta?: string | null
+          created_at?: string | null
+          digito?: string | null
+          empresa_id?: string | null
+          id?: string
+          modalidade?: string | null
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          principal?: boolean | null
+          tipo_conta?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agencia?: string | null
+          ativo?: boolean | null
+          banco_codigo?: string | null
+          banco_nome?: string | null
+          colaborador_id?: string
+          conta?: string | null
+          created_at?: string | null
+          digito?: string | null
+          empresa_id?: string | null
+          id?: string
+          modalidade?: string | null
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          principal?: boolean | null
+          tipo_conta?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_bancarias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contas_bancarias_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contatos_emergencia: {
         Row: {
           celular: string | null
@@ -1614,6 +1838,7 @@ export type Database = {
           id: string
           nome: string
           parentesco: string | null
+          relacionamento_id: number | null
           telefone: string | null
           telefone_trabalho: string | null
           updated_at: string
@@ -1626,6 +1851,7 @@ export type Database = {
           id?: string
           nome: string
           parentesco?: string | null
+          relacionamento_id?: number | null
           telefone?: string | null
           telefone_trabalho?: string | null
           updated_at?: string
@@ -1638,6 +1864,7 @@ export type Database = {
           id?: string
           nome?: string
           parentesco?: string | null
+          relacionamento_id?: number | null
           telefone?: string | null
           telefone_trabalho?: string | null
           updated_at?: string
@@ -1648,6 +1875,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contatos_emergencia_relacionamento_id_fkey"
+            columns: ["relacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "relacionamentos_contato_emergencia"
             referencedColumns: ["id"]
           },
         ]
@@ -1789,53 +2023,159 @@ export type Database = {
           },
         ]
       }
+      dados_estagiario: {
+        Row: {
+          area_atuacao: string | null
+          categoria_estagio: string | null
+          colaborador_id: string
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          empresa_id: string | null
+          id: string
+          instituicao_bairro: string | null
+          instituicao_cep: string | null
+          instituicao_cidade: string | null
+          instituicao_cnpj: string | null
+          instituicao_complemento: string | null
+          instituicao_endereco: string | null
+          instituicao_nome: string | null
+          instituicao_numero: string | null
+          instituicao_uf: string | null
+          obrigatorio: boolean | null
+          supervisor_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          area_atuacao?: string | null
+          categoria_estagio?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_id?: string | null
+          id?: string
+          instituicao_bairro?: string | null
+          instituicao_cep?: string | null
+          instituicao_cidade?: string | null
+          instituicao_cnpj?: string | null
+          instituicao_complemento?: string | null
+          instituicao_endereco?: string | null
+          instituicao_nome?: string | null
+          instituicao_numero?: string | null
+          instituicao_uf?: string | null
+          obrigatorio?: boolean | null
+          supervisor_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          area_atuacao?: string | null
+          categoria_estagio?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          empresa_id?: string | null
+          id?: string
+          instituicao_bairro?: string | null
+          instituicao_cep?: string | null
+          instituicao_cidade?: string | null
+          instituicao_cnpj?: string | null
+          instituicao_complemento?: string | null
+          instituicao_endereco?: string | null
+          instituicao_nome?: string | null
+          instituicao_numero?: string | null
+          instituicao_uf?: string | null
+          obrigatorio?: boolean | null
+          supervisor_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dados_estagiario_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estagiario_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estagiario_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dados_estrangeiro: {
         Row: {
           casado_brasileiro: boolean | null
           colaborador_id: string
           condicao_ingresso: string | null
+          condicao_ingresso_id: number | null
           created_at: string
           data_chegada: string | null
           data_naturalizacao: string | null
+          descricao_logradouro_id: number | null
           endereco_exterior: string | null
           filho_brasileiro: boolean | null
           id: string
+          pais_id: number | null
           pais_origem: string | null
           reside_brasil: boolean | null
           tempo_residencia: string | null
+          tempo_residencia_id: number | null
           tipo_visto: string | null
+          tipo_visto_id: number | null
           updated_at: string
         }
         Insert: {
           casado_brasileiro?: boolean | null
           colaborador_id: string
           condicao_ingresso?: string | null
+          condicao_ingresso_id?: number | null
           created_at?: string
           data_chegada?: string | null
           data_naturalizacao?: string | null
+          descricao_logradouro_id?: number | null
           endereco_exterior?: string | null
           filho_brasileiro?: boolean | null
           id?: string
+          pais_id?: number | null
           pais_origem?: string | null
           reside_brasil?: boolean | null
           tempo_residencia?: string | null
+          tempo_residencia_id?: number | null
           tipo_visto?: string | null
+          tipo_visto_id?: number | null
           updated_at?: string
         }
         Update: {
           casado_brasileiro?: boolean | null
           colaborador_id?: string
           condicao_ingresso?: string | null
+          condicao_ingresso_id?: number | null
           created_at?: string
           data_chegada?: string | null
           data_naturalizacao?: string | null
+          descricao_logradouro_id?: number | null
           endereco_exterior?: string | null
           filho_brasileiro?: boolean | null
           id?: string
+          pais_id?: number | null
           pais_origem?: string | null
           reside_brasil?: boolean | null
           tempo_residencia?: string | null
+          tempo_residencia_id?: number | null
           tipo_visto?: string | null
+          tipo_visto_id?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -1844,6 +2184,41 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: true
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estrangeiro_condicao_ingresso_id_fkey"
+            columns: ["condicao_ingresso_id"]
+            isOneToOne: false
+            referencedRelation: "condicoes_ingresso"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estrangeiro_descricao_logradouro_id_fkey"
+            columns: ["descricao_logradouro_id"]
+            isOneToOne: false
+            referencedRelation: "descricoes_logradouro"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estrangeiro_pais_id_fkey"
+            columns: ["pais_id"]
+            isOneToOne: false
+            referencedRelation: "paises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estrangeiro_tempo_residencia_id_fkey"
+            columns: ["tempo_residencia_id"]
+            isOneToOne: false
+            referencedRelation: "tempos_residencia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_estrangeiro_tipo_visto_id_fkey"
+            columns: ["tipo_visto_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_visto"
             referencedColumns: ["id"]
           },
         ]
@@ -1989,36 +2364,57 @@ export type Database = {
           cpf: string | null
           created_at: string
           data_nascimento: string
+          deficiente: boolean | null
+          escolaridade: string | null
+          estrangeiro: boolean | null
+          genero_documento_id: number | null
           id: string
+          ir: boolean | null
           nome: string
           para_irrf: boolean | null
           para_plano_saude: boolean | null
           para_salario_familia: boolean | null
           parentesco: string
+          relacionamento_id: number | null
+          salario_familia: boolean | null
         }
         Insert: {
           colaborador_id: string
           cpf?: string | null
           created_at?: string
           data_nascimento: string
+          deficiente?: boolean | null
+          escolaridade?: string | null
+          estrangeiro?: boolean | null
+          genero_documento_id?: number | null
           id?: string
+          ir?: boolean | null
           nome: string
           para_irrf?: boolean | null
           para_plano_saude?: boolean | null
           para_salario_familia?: boolean | null
           parentesco: string
+          relacionamento_id?: number | null
+          salario_familia?: boolean | null
         }
         Update: {
           colaborador_id?: string
           cpf?: string | null
           created_at?: string
           data_nascimento?: string
+          deficiente?: boolean | null
+          escolaridade?: string | null
+          estrangeiro?: boolean | null
+          genero_documento_id?: number | null
           id?: string
+          ir?: boolean | null
           nome?: string
           para_irrf?: boolean | null
           para_plano_saude?: boolean | null
           para_salario_familia?: boolean | null
           parentesco?: string
+          relacionamento_id?: number | null
+          salario_familia?: boolean | null
         }
         Relationships: [
           {
@@ -2028,7 +2424,84 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dependentes_genero_documento_id_fkey"
+            columns: ["genero_documento_id"]
+            isOneToOne: false
+            referencedRelation: "generos_documento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dependentes_relacionamento_id_fkey"
+            columns: ["relacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "relacionamentos_dependentes"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      dependentes_beneficios: {
+        Row: {
+          ativo: boolean | null
+          beneficio_id: string
+          created_at: string | null
+          dependente_id: string
+          id: string
+          valor_dependente: number | null
+          valor_empresa: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          beneficio_id: string
+          created_at?: string | null
+          dependente_id: string
+          id?: string
+          valor_dependente?: number | null
+          valor_empresa?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          beneficio_id?: string
+          created_at?: string | null
+          dependente_id?: string
+          id?: string
+          valor_dependente?: number | null
+          valor_empresa?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dependentes_beneficios_beneficio_id_fkey"
+            columns: ["beneficio_id"]
+            isOneToOne: false
+            referencedRelation: "beneficios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dependentes_beneficios_dependente_id_fkey"
+            columns: ["dependente_id"]
+            isOneToOne: false
+            referencedRelation: "dependentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      descricoes_logradouro: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
       }
       desligamentos: {
         Row: {
@@ -2045,19 +2518,28 @@ export type Database = {
           created_at: string
           created_by: string | null
           data_aviso: string | null
+          data_aviso_previo: string | null
+          data_contabilidade: string | null
           data_desligamento: string
+          data_remocao_acesso: string | null
           decimo_terceiro: number | null
           empresa_id: string | null
+          etapa: string | null
           ferias_proporcionais: number | null
           ferias_vencidas: number | null
           id: string
           motivo: string | null
           multa_fgts: number | null
+          novo_supervisor_id: string | null
+          quebra_contrato: boolean | null
+          remover_beneficios: boolean | null
           salario_base: number
           saldo_salario: number | null
           status: string
           terco_constitucional: number | null
           tipo: Database["public"]["Enums"]["tipo_desligamento"]
+          tipo_aviso_previo_id: number | null
+          tipo_desligamento_id: number | null
           total_descontos: number | null
           total_proventos: number | null
           updated_at: string
@@ -2077,19 +2559,28 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data_aviso?: string | null
+          data_aviso_previo?: string | null
+          data_contabilidade?: string | null
           data_desligamento: string
+          data_remocao_acesso?: string | null
           decimo_terceiro?: number | null
           empresa_id?: string | null
+          etapa?: string | null
           ferias_proporcionais?: number | null
           ferias_vencidas?: number | null
           id?: string
           motivo?: string | null
           multa_fgts?: number | null
+          novo_supervisor_id?: string | null
+          quebra_contrato?: boolean | null
+          remover_beneficios?: boolean | null
           salario_base?: number
           saldo_salario?: number | null
           status?: string
           terco_constitucional?: number | null
           tipo: Database["public"]["Enums"]["tipo_desligamento"]
+          tipo_aviso_previo_id?: number | null
+          tipo_desligamento_id?: number | null
           total_descontos?: number | null
           total_proventos?: number | null
           updated_at?: string
@@ -2109,19 +2600,28 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data_aviso?: string | null
+          data_aviso_previo?: string | null
+          data_contabilidade?: string | null
           data_desligamento?: string
+          data_remocao_acesso?: string | null
           decimo_terceiro?: number | null
           empresa_id?: string | null
+          etapa?: string | null
           ferias_proporcionais?: number | null
           ferias_vencidas?: number | null
           id?: string
           motivo?: string | null
           multa_fgts?: number | null
+          novo_supervisor_id?: string | null
+          quebra_contrato?: boolean | null
+          remover_beneficios?: boolean | null
           salario_base?: number
           saldo_salario?: number | null
           status?: string
           terco_constitucional?: number | null
           tipo?: Database["public"]["Enums"]["tipo_desligamento"]
+          tipo_aviso_previo_id?: number | null
+          tipo_desligamento_id?: number | null
           total_descontos?: number | null
           total_proventos?: number | null
           updated_at?: string
@@ -2140,6 +2640,20 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "desligamentos_tipo_aviso_previo_id_fkey"
+            columns: ["tipo_aviso_previo_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_aviso_previo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "desligamentos_tipo_desligamento_id_fkey"
+            columns: ["tipo_desligamento_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_desligamento"
             referencedColumns: ["id"]
           },
         ]
@@ -2432,6 +2946,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "documentos_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos_pessoais_arquivos: {
+        Row: {
+          arquivo_nome: string | null
+          arquivo_tamanho: number | null
+          arquivo_url: string | null
+          colaborador_id: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          tipo_documento: string
+          updated_at: string | null
+        }
+        Insert: {
+          arquivo_nome?: string | null
+          arquivo_tamanho?: number | null
+          arquivo_url?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          tipo_documento: string
+          updated_at?: string | null
+        }
+        Update: {
+          arquivo_nome?: string | null
+          arquivo_tamanho?: number | null
+          arquivo_url?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          tipo_documento?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_pessoais_arquivos_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
@@ -2830,10 +3388,14 @@ export type Database = {
           dias_abono: number | null
           dias_gozo: number
           empresa_id: string | null
+          enviado_contabilidade: boolean | null
+          ferias_coletiva_id: string | null
           id: string
+          justificativa: string | null
           observacoes: string | null
           periodo_aquisitivo_id: string | null
           salario_base: number
+          saldo_gasto: number | null
           status: string | null
           updated_at: string
           valor_abono: number | null
@@ -2858,10 +3420,14 @@ export type Database = {
           dias_abono?: number | null
           dias_gozo: number
           empresa_id?: string | null
+          enviado_contabilidade?: boolean | null
+          ferias_coletiva_id?: string | null
           id?: string
+          justificativa?: string | null
           observacoes?: string | null
           periodo_aquisitivo_id?: string | null
           salario_base: number
+          saldo_gasto?: number | null
           status?: string | null
           updated_at?: string
           valor_abono?: number | null
@@ -2886,10 +3452,14 @@ export type Database = {
           dias_abono?: number | null
           dias_gozo?: number
           empresa_id?: string | null
+          enviado_contabilidade?: boolean | null
+          ferias_coletiva_id?: string | null
           id?: string
+          justificativa?: string | null
           observacoes?: string | null
           periodo_aquisitivo_id?: string | null
           salario_base?: number
+          saldo_gasto?: number | null
           status?: string | null
           updated_at?: string
           valor_abono?: number | null
@@ -2920,6 +3490,88 @@ export type Database = {
             columns: ["periodo_aquisitivo_id"]
             isOneToOne: false
             referencedRelation: "periodos_aquisitivos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferias_aprovacoes: {
+        Row: {
+          aprovador_id: string | null
+          created_at: string | null
+          data_acao: string | null
+          ferias_id: string
+          id: string
+          observacoes: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          aprovador_id?: string | null
+          created_at?: string | null
+          data_acao?: string | null
+          ferias_id: string
+          id?: string
+          observacoes?: string | null
+          status?: string | null
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          aprovador_id?: string | null
+          created_at?: string | null
+          data_acao?: string | null
+          ferias_id?: string
+          id?: string
+          observacoes?: string | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferias_arquivos: {
+        Row: {
+          arquivo_url: string | null
+          assinavel: boolean | null
+          created_at: string | null
+          ferias_id: string
+          id: string
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          assinavel?: boolean | null
+          created_at?: string | null
+          ferias_id: string
+          id?: string
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          assinavel?: boolean | null
+          created_at?: string | null
+          ferias_id?: string
+          id?: string
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_arquivos_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
             referencedColumns: ["id"]
           },
         ]
@@ -3151,6 +3803,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      generos_documento: {
+        Row: {
+          codigo_esocial: string | null
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
       }
       geo_allowed_countries: {
         Row: {
@@ -4032,6 +4705,48 @@ export type Database = {
           },
         ]
       }
+      motivos_afastamento: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+          tipo: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+          tipo?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+          tipo?: string | null
+        }
+        Relationships: []
+      }
+      nacionalidades: {
+        Row: {
+          codigo_esocial: string | null
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
       notificacoes: {
         Row: {
           created_at: string
@@ -4327,6 +5042,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      paises: {
+        Row: {
+          codigo_iso: string | null
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_iso?: string | null
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_iso?: string | null
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
       }
       parametros_fiscais: {
         Row: {
@@ -5138,6 +5874,48 @@ export type Database = {
           },
         ]
       }
+      relacionamentos_contato_emergencia: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      relacionamentos_dependentes: {
+        Row: {
+          codigo_esocial: string | null
+          created_at: string | null
+          descricao: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
       relatorios_agendados: {
         Row: {
           ativo: boolean | null
@@ -5574,6 +6352,24 @@ export type Database = {
           },
         ]
       }
+      tempos_residencia: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
       times: {
         Row: {
           ativo: boolean | null
@@ -5653,6 +6449,24 @@ export type Database = {
         }
         Relationships: []
       }
+      tipos_aviso_previo: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
       tipos_beneficio: {
         Row: {
           ativo: boolean | null
@@ -5692,6 +6506,45 @@ export type Database = {
         }
         Relationships: []
       }
+      tipos_deficiencia: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      tipos_desligamento: {
+        Row: {
+          codigo_esocial: string | null
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
       tipos_estabilidade: {
         Row: {
           created_at: string
@@ -5712,6 +6565,63 @@ export type Database = {
           descricao?: string | null
           duracao_meses?: number | null
           id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      tipos_pagamento: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      tipos_salario: {
+        Row: {
+          codigo_esocial: string | null
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          codigo_esocial?: string | null
+          created_at?: string | null
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      tipos_visto: {
+        Row: {
+          created_at: string | null
+          id: number
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
           nome?: string
         }
         Relationships: []
