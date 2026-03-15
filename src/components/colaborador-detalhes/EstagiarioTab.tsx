@@ -13,7 +13,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
   const salvar = useSalvarDadosEstagiario();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    instituicao_ensino: '', cnpj_instituicao: '', curso: '', nivel: '',
+    instituicao_nome: '', instituicao_cnpj: '', curso: '', nivel: '',
     supervisor_nome: '', supervisor_cargo: '',
     data_inicio: '', data_fim: '', carga_horaria_semanal: '',
     valor_bolsa: '', numero_apolice: ''
