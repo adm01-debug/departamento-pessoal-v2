@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { comunicacaoService } from '@/services/comunicacaoService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, Megaphone, Shield, MessageSquare, AlertTriangle, Trash2, Pin } from 'lucide-react';
+import { Plus, Megaphone, Shield, AlertTriangle, Trash2, Pin } from 'lucide-react';
 
 const prioridadeColors: Record<string, string> = { baixa: 'secondary', normal: 'outline', alta: 'default', urgente: 'destructive' };
 const statusEticaColors: Record<string, string> = { aberto: 'default', em_analise: 'secondary', resolvido: 'outline', arquivado: 'outline' };
@@ -31,22 +31,24 @@ export default function ComunicacaoInternaPage() {
   const { data: comunicados = [], isLoading: loadCom } = useQuery({
     queryKey: ['comunicados', empresaAtual?.id],
     queryFn: () => comunicacaoService.listarComunicados(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const { data: denuncias = [], isLoading: loadEtica } = useQuery({
     queryKey: ['canal_etica', empresaAtual?.id],
     queryFn: () => comunicacaoService.listarDenuncias(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const criarCom = useMutation({
     mutationFn: () => comunicacaoService.criarComunicado({ ...formCom, empresa_id: empresaAtual?.id, ativo: true }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['comunicados'] }); setOpenCom(false); toast.success('Comunicado publicado!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['comunicados'] }); setOpenCom(false); toast.success('Comunicado publicado!'); setFormCom({ titulo: '', conteudo: '', tipo: 'aviso', prioridade: 1 }); },
     onError: () => toast.error('Erro ao publicar'),
   });
 
   const criarEtica = useMutation({
     mutationFn: () => comunicacaoService.criarDenuncia({ ...formEtica, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['canal_etica'] }); setOpenEtica(false); toast.success('Relato registrado!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['canal_etica'] }); setOpenEtica(false); toast.success('Relato registrado!'); setFormEtica({ categoria: 'outro', descricao: '', anonimo: true }); },
     onError: () => toast.error('Erro ao registrar'),
   });
 

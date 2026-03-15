@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Progress } from '@/components/ui/progress';
+
 import { pesquisaService } from '@/services/pesquisaService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
@@ -29,6 +29,7 @@ export default function PesquisasClimaPage() {
   const { data: pesquisas = [], isLoading } = useQuery({
     queryKey: ['pesquisas', empresaAtual?.id],
     queryFn: () => pesquisaService.listar(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const criar = useMutation({
@@ -43,7 +44,7 @@ export default function PesquisasClimaPage() {
   });
 
   const ativar = useMutation({
-    mutationFn: (id: string) => pesquisaService.atualizar(id, { status: 'ativa', data_publicacao: new Date().toISOString() }),
+    mutationFn: (id: string) => pesquisaService.atualizar(id, { status: 'ativa' }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['pesquisas'] }); toast.success('Pesquisa ativada!'); },
   });
 

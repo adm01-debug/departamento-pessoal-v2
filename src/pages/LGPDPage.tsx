@@ -27,9 +27,9 @@ export default function LGPDPage() {
   const [openSol, setOpenSol] = useState(false);
   const [formSol, setFormSol] = useState({ colaborador_id: '', tipo: 'acesso', descricao: '' });
 
-  const { data: consentimentos = [], isLoading: loadCons } = useQuery({ queryKey: ['lgpd_consentimentos', empresaAtual?.id], queryFn: () => lgpdService.listarConsentimentos(empresaAtual?.id) });
-  const { data: solicitacoes = [], isLoading: loadSol } = useQuery({ queryKey: ['lgpd_solicitacoes', empresaAtual?.id], queryFn: () => lgpdService.listarSolicitacoes(empresaAtual?.id) });
-  const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id) });
+  const { data: consentimentos = [], isLoading: loadCons } = useQuery({ queryKey: ['lgpd_consentimentos', empresaAtual?.id], queryFn: () => lgpdService.listarConsentimentos(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: solicitacoes = [], isLoading: loadSol } = useQuery({ queryKey: ['lgpd_solicitacoes', empresaAtual?.id], queryFn: () => lgpdService.listarSolicitacoes(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   const criarSol = useMutation({
     mutationFn: () => lgpdService.criarSolicitacao({ ...formSol, empresa_id: empresaAtual?.id, prazo_legal: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }),

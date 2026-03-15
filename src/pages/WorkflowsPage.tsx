@@ -17,7 +17,6 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow } from 'lucide-react';
 
-const statusIcons: Record<string, any> = { pendente: Clock, em_andamento: Play, aprovado: CheckCircle, rejeitado: XCircle };
 const statusColors: Record<string, string> = { pendente: 'secondary', em_andamento: 'default', aprovado: 'default', rejeitado: 'destructive', cancelado: 'outline' };
 
 export default function WorkflowsPage() {
@@ -29,11 +28,13 @@ export default function WorkflowsPage() {
   const { data: definicoes = [], isLoading: loadDef } = useQuery({
     queryKey: ['workflows_def', empresaAtual?.id],
     queryFn: () => workflowService.listarDefinicoes(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const { data: execucoes = [], isLoading: loadExec } = useQuery({
     queryKey: ['workflows_exec', empresaAtual?.id],
     queryFn: () => workflowService.listarExecucoes(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const criar = useMutation({
