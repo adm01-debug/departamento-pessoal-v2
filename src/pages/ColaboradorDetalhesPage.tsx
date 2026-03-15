@@ -77,6 +77,7 @@ export default function ColaboradorDetalhesPage() {
         <TabsContent value="pcd"><PCDTab colaboradorId={id!} /></TabsContent>
         <TabsContent value="estagiario"><EstagiarioTab colaboradorId={id!} /></TabsContent>
         <TabsContent value="aquisitivos"><AquisitivosTab colaboradorId={id!} /></TabsContent>
+        <TabsContent value="contratos"><HistoricoContratosTab colaboradorId={id!} /></TabsContent>
         <TabsContent value="anotacoes"><AnotacoesTab colaboradorId={id!} /></TabsContent>
       </Tabs>
     </PageLayout>
