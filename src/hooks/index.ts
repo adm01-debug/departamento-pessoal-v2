@@ -21,3 +21,38 @@ export { useDocumentos } from "./useDocumentos";
 export { useFeriados } from "./useFeriados";
 export { usePDFExport } from "./usePDFExport";
 export { useExcelExport } from "./useExcelExport";
+
+// Colaborador Detalhes
+export {
+  useDependentes, useCriarDependente, useExcluirDependente, useAtualizarDependente,
+  useContatosEmergencia, useCriarContatoEmergencia, useExcluirContatoEmergencia,
+  useHistoricoSalarial, useCriarRegistroSalarial,
+  useASOs, useCriarASO,
+  useFormacoes, useCriarFormacao, useExcluirFormacao,
+  useDadosEstrangeiro, useSalvarDadosEstrangeiro,
+  useDeficiencia, useSalvarDeficiencia,
+  usePeriodoExperiencia, useSalvarPeriodoExperiencia,
+  useAnotacoes, useCriarAnotacao, useExcluirAnotacao,
+  usePeriodosAquisitivos,
+  useEtnias, useIdentidadesGenero, useTiposAdmissao, useTiposEstabilidade,
+  useTimes, useWebhooks, useCriarWebhook,
+  useFeriasColetivas, useCriarFeriasColetivas,
+  useCamposCustomizados,
+} from "./useColaboradorDetalhes";
+
+// Tabelas de Referência
+export {
+  useNacionalidades, useTiposDesligamento, useTiposAvisoPrevio,
+  useTiposDeficiencia, useTiposPagamento, useTiposSalario,
+  useRelacionamentosDependentes, useGenerosDocumento,
+  useTiposVisto, useCondicoesIngresso, useTemposResidencia,
+  useDescricoesLogradouro, usePaises, useCategoriasTrabalhador,
+  useRelacionamentosContatoEmergencia, useMotivosAfastamento,
+  useCentrosCusto, useCriarCentroCusto, useAtualizarCentroCusto, useExcluirCentroCusto,
+  useContasBancarias, useCriarContaBancaria, useAtualizarContaBancaria, useExcluirContaBancaria,
+  useDadosEstagiario, useSalvarDadosEstagiario,
+  useDocumentosPessoais, useCriarDocumentoPessoal, useExcluirDocumentoPessoal,
+  useFeriasAprovacoes, useCriarFeriasAprovacao, useAtualizarFeriasAprovacao,
+  useFeriasArquivos, useCriarFeriasArquivo,
+  useDependentesBeneficios, useVincularDependenteBeneficio, useDesvincularDependenteBeneficio,
+} from "./useTabelasReferencia";

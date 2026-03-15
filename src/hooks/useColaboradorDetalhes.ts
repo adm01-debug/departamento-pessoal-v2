@@ -18,6 +18,15 @@ export function useCriarDependente() {
   });
 }
 
+export function useAtualizarDependente() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, dados }: { id: string; dados: Record<string, unknown> }) =>
+      service.atualizarDependente(id, dados),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes'] }),
+  });
+}
+
 export function useExcluirDependente(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
@@ -40,6 +49,14 @@ export function useCriarContatoEmergencia() {
   return useMutation({
     mutationFn: service.criarContatoEmergencia,
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['contatos-emergencia', vars.colaborador_id] }),
+  });
+}
+
+export function useExcluirContatoEmergencia(colaboradorId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: service.excluirContatoEmergencia,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['contatos-emergencia', colaboradorId] }),
   });
 }
 
@@ -91,6 +108,14 @@ export function useCriarFormacao() {
   return useMutation({
     mutationFn: service.criarFormacao,
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['formacoes', vars.colaborador_id] }),
+  });
+}
+
+export function useExcluirFormacao(colaboradorId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: service.excluirFormacao,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['formacoes', colaboradorId] }),
   });
 }
 
@@ -162,6 +187,14 @@ export function useCriarAnotacao() {
   return useMutation({
     mutationFn: service.criarAnotacao,
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['anotacoes', vars.colaborador_id] }),
+  });
+}
+
+export function useExcluirAnotacao(colaboradorId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: service.excluirAnotacao,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['anotacoes', colaboradorId] }),
   });
 }
 
