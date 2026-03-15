@@ -65,6 +65,7 @@ export default function App() {
         <Route path="colaboradores" element={<LazyPage Component={ColaboradoresPage} />} />
         <Route path="colaboradores/novo" element={<LazyPage Component={ColaboradorFormPage} />} />
         <Route path="colaboradores/:id/editar" element={<LazyPage Component={ColaboradorFormPage} />} />
+        <Route path="colaboradores/:id/detalhes" element={<LazyPage Component={ColaboradorDetalhesPage} />} />
         <Route path="empresas" element={<LazyPage Component={EmpresasPage} />} />
         <Route path="empresas/nova" element={<LazyPage Component={EmpresaFormPage} />} />
         <Route path="empresas/:id/editar" element={<LazyPage Component={EmpresaFormPage} />} />
