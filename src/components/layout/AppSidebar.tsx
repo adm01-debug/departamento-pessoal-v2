@@ -86,6 +86,7 @@ const menuGroups: MenuGroup[] = [
     color: 'text-warning',
     items: [
       { icon: FileCheck, label: 'Documentos', path: '/documentos', color: 'text-warning' },
+      { icon: PenTool, label: 'Assinaturas', path: '/assinaturas', color: 'text-primary' },
       { icon: FileCheck, label: 'eSocial', path: '/esocial', color: 'text-success' },
       { icon: History, label: 'Auditoria', path: '/auditoria', color: 'text-primary' },
     ]
