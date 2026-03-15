@@ -62,6 +62,11 @@ const handler = async (req: Request): Promise<Response> => {
           }),
         });
 
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Falha ao enviar relatório (${response.status}): ${errorText}`);
+        }
+
         const resultado = await response.json();
 
         // Calcular próximo envio
