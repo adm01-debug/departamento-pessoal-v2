@@ -1354,6 +1354,53 @@ export type Database = {
           },
         ]
       }
+      ciclos_avaliacao: {
+        Row: {
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          status: string
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          status?: string
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          status?: string
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ciclos_avaliacao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaborador_beneficios: {
         Row: {
           beneficio_id: string
@@ -1781,6 +1828,50 @@ export type Database = {
             columns: ["local_trabalho_id"]
             isOneToOne: false
             referencedRelation: "locais_trabalho"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competencias_matriz: {
+        Row: {
+          ativo: boolean | null
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nivel_esperado: number | null
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nivel_esperado?: number | null
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nivel_esperado?: number | null
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competencias_matriz_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
@@ -3814,6 +3905,83 @@ export type Database = {
           },
         ]
       }
+      feedbacks_360: {
+        Row: {
+          avaliado_id: string | null
+          avaliador_id: string | null
+          ciclo_id: string | null
+          comentarios: string | null
+          created_at: string
+          empresa_id: string | null
+          id: string
+          nota_geral: number | null
+          pontos_fortes: string | null
+          pontos_melhoria: string | null
+          status: string | null
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          avaliado_id?: string | null
+          avaliador_id?: string | null
+          ciclo_id?: string | null
+          comentarios?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          nota_geral?: number | null
+          pontos_fortes?: string | null
+          pontos_melhoria?: string | null
+          status?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avaliado_id?: string | null
+          avaliador_id?: string | null
+          ciclo_id?: string | null
+          comentarios?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          nota_geral?: number | null
+          pontos_fortes?: string | null
+          pontos_melhoria?: string | null
+          status?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_360_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_avaliador_id_fkey"
+            columns: ["avaliador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_ciclo_id_fkey"
+            columns: ["ciclo_id"]
+            isOneToOne: false
+            referencedRelation: "ciclos_avaliacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feriados: {
         Row: {
           cidade: string | null
@@ -5490,6 +5658,79 @@ export type Database = {
           },
         ]
       }
+      metas_okrs: {
+        Row: {
+          ciclo_id: string | null
+          colaborador_id: string | null
+          created_at: string
+          data_limite: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          meta_valor: number | null
+          progresso: number | null
+          status: string | null
+          tipo: string | null
+          titulo: string
+          updated_at: string
+          valor_atual: number | null
+        }
+        Insert: {
+          ciclo_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_limite?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          meta_valor?: number | null
+          progresso?: number | null
+          status?: string | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string
+          valor_atual?: number | null
+        }
+        Update: {
+          ciclo_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_limite?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          meta_valor?: number | null
+          progresso?: number | null
+          status?: string | null
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string
+          valor_atual?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metas_okrs_ciclo_id_fkey"
+            columns: ["ciclo_id"]
+            isOneToOne: false
+            referencedRelation: "ciclos_avaliacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metas_okrs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metas_okrs_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       motivos_afastamento: {
         Row: {
           created_at: string | null
@@ -6040,6 +6281,66 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pdis: {
+        Row: {
+          acao: string | null
+          colaborador_id: string | null
+          competencia: string | null
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          prazo: string | null
+          progresso: number | null
+          status: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          acao?: string | null
+          colaborador_id?: string | null
+          competencia?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          prazo?: string | null
+          progresso?: number | null
+          status?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          acao?: string | null
+          colaborador_id?: string | null
+          competencia?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          prazo?: string | null
+          progresso?: number | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdis_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdis_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pensoes: {
         Row: {
