@@ -102,7 +102,7 @@ export async function criarASO(aso: Record<string, unknown>) {
     .from('asos' as any)
     .insert([aso])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
