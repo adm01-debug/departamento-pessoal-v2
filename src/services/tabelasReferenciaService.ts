@@ -123,7 +123,7 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: Record
       .from('dados_estagiario' as any)
       .insert([{ ...dados, colaborador_id: colaboradorId }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
