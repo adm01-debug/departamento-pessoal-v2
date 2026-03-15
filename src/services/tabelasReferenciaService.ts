@@ -46,7 +46,7 @@ export async function criarCentroCusto(centro: Record<string, unknown>) {
     .from('centros_custo' as any)
     .insert([centro])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
