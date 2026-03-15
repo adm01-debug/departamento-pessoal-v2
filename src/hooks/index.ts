@@ -21,6 +21,7 @@ export { useDocumentos } from "./useDocumentos";
 export { useFeriados } from "./useFeriados";
 export { usePDFExport } from "./usePDFExport";
 export { useExcelExport } from "./useExcelExport";
+export { useESocial } from "./useESocial";
 
 // Colaborador Detalhes
 export {
