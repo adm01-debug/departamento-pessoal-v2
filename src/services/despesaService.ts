@@ -15,13 +15,27 @@ export const despesaService = {
     if (error) throw error;
     return ensure(data, 'despesa');
   },
-  async aprovar(id: string, aprovadoPor: string, obs?: string) {
-    const { data, error } = await supabase.from('despesas').update({ status: 'aprovada', aprovado_por: aprovadoPor, aprovado_em: new Date().toISOString(), observacoes_aprovador: obs }).eq('id', id).select().maybeSingle();
+  async aprovar(id: string, aprovadoPor?: string | null, obs?: string) {
+    const { data: authData } = await supabase.auth.getUser();
+    const aprovadorId = aprovadoPor || authData.user?.id || null;
+    const { data, error } = await supabase
+      .from('despesas')
+      .update({ status: 'aprovada', aprovado_por: aprovadorId, aprovado_em: new Date().toISOString(), observacoes_aprovador: obs })
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return ensure(data, 'despesa');
   },
-  async rejeitar(id: string, aprovadoPor: string, obs?: string) {
-    const { data, error } = await supabase.from('despesas').update({ status: 'rejeitada', aprovado_por: aprovadoPor, aprovado_em: new Date().toISOString(), observacoes_aprovador: obs }).eq('id', id).select().maybeSingle();
+  async rejeitar(id: string, aprovadoPor?: string | null, obs?: string) {
+    const { data: authData } = await supabase.auth.getUser();
+    const aprovadorId = aprovadoPor || authData.user?.id || null;
+    const { data, error } = await supabase
+      .from('despesas')
+      .update({ status: 'rejeitada', aprovado_por: aprovadorId, aprovado_em: new Date().toISOString(), observacoes_aprovador: obs })
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return ensure(data, 'despesa');
   },
