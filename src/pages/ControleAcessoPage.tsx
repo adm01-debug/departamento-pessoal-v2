@@ -27,7 +27,7 @@ export default function ControleAcessoPage() {
 
   const registrar = useMutation({
     mutationFn: () => controleAcessoService.registrar({ ...form, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['controle_acesso'] }); setOpen(false); toast.success('Acesso registrado!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['controle_acesso'] }); setOpen(false); toast.success('Acesso registrado!'); setForm({ colaborador_id: '', tipo: 'entrada', metodo: 'manual', local: '', area: '' }); },
     onError: () => toast.error('Erro ao registrar'),
   });
 
