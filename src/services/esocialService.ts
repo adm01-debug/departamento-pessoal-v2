@@ -80,7 +80,7 @@ export async function criarEvento(evento: {
       status: 'pendente',
     }])
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return data as ESocialEvento;
