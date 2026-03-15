@@ -94,9 +94,13 @@ export default function App() {
         <Route path="avaliacao" element={<LazyPage Component={AvaliacaoPage} />} />
         <Route path="treinamentos" element={<LazyPage Component={TreinamentosPage} />} />
         <Route path="recrutamento" element={<LazyPage Component={RecrutamentoPage} />} />
+        <Route path="onboarding" element={<LazyPage Component={OnboardingPage} />} />
+        <Route path="assinaturas" element={<LazyPage Component={AssinaturasPage} />} />
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+      {/* Public route - no auth required */}
+      <Route path="/contratacao" element={<Suspense fallback={<PageLoader />}><ContratacaoPage /></Suspense>} />
     </Routes>
   );
 }
