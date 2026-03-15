@@ -20,10 +20,13 @@ export function useFeriados() {
 
   const criarFeriado = useMutation({
     mutationFn: async (feriado: { nome: string; data: string; tipo: string }) => {
-      const { error } = await supabase.from('feriados').insert({
-        ...feriado,
+      const insertData: any = {
+        data: feriado.data,
+        descricao: feriado.nome,
+        tipo: feriado.tipo,
         empresa_id: feriado.tipo === 'empresa' ? empresaAtual?.id : null,
-      });
+      };
+      const { error } = await supabase.from('feriados').insert(insertData);
       if (error) throw error;
     },
     onSuccess: () => {
