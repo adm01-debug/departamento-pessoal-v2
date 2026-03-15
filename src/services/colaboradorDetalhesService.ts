@@ -370,7 +370,7 @@ export async function criarCampoCustomizado(campo: Record<string, unknown>) {
     .from('campos_customizados' as any)
     .insert([campo])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
