@@ -1,2 +1,11 @@
-// V25: Schemas Index - Active exports only
 export * from './empresa';
+export * from './colaborador';
+export * from './admissao';
+export * from './ferias';
+export * from './cargo';
+export * from './departamento';
+export * from './afastamento';
+export * from './documento';
+export * from './ponto';
+export * from './folha';
+export * from './beneficio';
