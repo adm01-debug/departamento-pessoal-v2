@@ -125,7 +125,7 @@ export async function criarFormacao(formacao: Record<string, unknown>) {
     .from('formacoes_academicas' as any)
     .insert([formacao])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
