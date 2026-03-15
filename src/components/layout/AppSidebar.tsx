@@ -39,6 +39,7 @@ const menuGroups: MenuGroup[] = [
     color: 'text-success',
     items: [
       { icon: UserPlus, label: 'Admissões', path: '/admissoes', color: 'text-success' },
+      { icon: UserPlus, label: 'Onboarding', path: '/onboarding', color: 'text-info' },
       { icon: UserMinus, label: 'Desligamentos', path: '/desligamentos', color: 'text-destructive' },
       { icon: Target, label: 'Avaliação', path: '/avaliacao', color: 'text-warning' },
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
