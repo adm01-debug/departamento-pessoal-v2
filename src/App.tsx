@@ -38,6 +38,10 @@ const NotificacoesPage = lazy(() => import('@/pages/NotificacoesPage'));
 const IntegracoesPage = lazy(() => import('@/pages/IntegracoesPage'));
 const BackupPage = lazy(() => import('@/pages/BackupPage'));
 const OrganogramaPage = lazy(() => import('@/pages/OrganogramaPage'));
+const PortalPage = lazy(() => import('@/pages/PortalPage'));
+const AvaliacaoPage = lazy(() => import('@/pages/AvaliacaoPage'));
+const TreinamentosPage = lazy(() => import('@/pages/TreinamentosPage'));
+const RecrutamentoPage = lazy(() => import('@/pages/RecrutamentoPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -83,6 +87,10 @@ export default function App() {
         <Route path="integracoes" element={<LazyPage Component={IntegracoesPage} />} />
         <Route path="backup" element={<LazyPage Component={BackupPage} />} />
         <Route path="organograma" element={<LazyPage Component={OrganogramaPage} />} />
+        <Route path="portal" element={<LazyPage Component={PortalPage} />} />
+        <Route path="avaliacao" element={<LazyPage Component={AvaliacaoPage} />} />
+        <Route path="treinamentos" element={<LazyPage Component={TreinamentosPage} />} />
+        <Route path="recrutamento" element={<LazyPage Component={RecrutamentoPage} />} />
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

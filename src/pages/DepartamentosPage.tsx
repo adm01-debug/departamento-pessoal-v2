@@ -1,48 +1,63 @@
+import { useState } from 'react';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
-import { Card, CardContent } from '@/components/ui/card';
+import { PageLayout } from '@/components/layout';
+import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Building2 } from 'lucide-react';
+import { EmptyList } from '@/components/ui/empty-state';
+import { Spinner } from '@/components/ui/spinner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Building2, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function DepartamentosPage() {
+  const [search, setSearch] = useState('');
   const { departamentos, isLoading } = useDepartamentos();
 
+  const filtered = departamentos.filter((d: any) => !search || d.nome.toLowerCase().includes(search.toLowerCase()));
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Departamentos</h1>
-        <p className="text-muted-foreground">Gestão de departamentos da empresa</p>
-      </div>
+    <PageLayout
+      title="Departamentos"
+      description="Gestão de departamentos da empresa"
+      icon={<Building2 className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-info to-primary"
+      actions={
+        <Button className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-body">
+          <Plus className="h-4 w-4 mr-2" />Novo Departamento
+        </Button>
+      }
+    >
+      <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar departamento..." />
 
       {isLoading ? (
-        <Skeleton className="h-64" />
-      ) : departamentos.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Nenhum departamento cadastrado</p>
-          </CardContent>
-        </Card>
+        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+      ) : !filtered.length ? (
+        <EmptyList entityName="departamento" />
       ) : (
-        <Card>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Status</TableHead>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="font-display font-semibold">Nome</TableHead>
+                <TableHead className="font-display font-semibold">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {departamentos.map((dept: any) => (
-                <TableRow key={dept.id}>
-                  <TableCell className="font-medium">{dept.nome}</TableCell>
-                  <TableCell>{dept.ativo !== false ? '✅ Ativo' : '❌ Inativo'}</TableCell>
+              {filtered.map((dept: any) => (
+                <TableRow key={dept.id} className="hover:bg-accent/30 transition-colors">
+                  <TableCell className="font-body font-medium">{dept.nome}</TableCell>
+                  <TableCell>
+                    <Badge className={dept.ativo !== false ? 'bg-success/15 text-success border-0' : 'bg-muted text-muted-foreground border-0'}>
+                      {dept.ativo !== false ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </Card>
+        </motion.div>
       )}
-    </div>
+    </PageLayout>
   );
 }

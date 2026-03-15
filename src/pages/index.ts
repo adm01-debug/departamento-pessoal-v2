@@ -29,3 +29,7 @@ export { default as NotificacoesPage } from './NotificacoesPage';
 export { default as IntegracoesPage } from './IntegracoesPage';
 export { default as BackupPage } from './BackupPage';
 export { default as OrganogramaPage } from './OrganogramaPage';
+export { default as PortalPage } from './PortalPage';
+export { default as AvaliacaoPage } from './AvaliacaoPage';
+export { default as TreinamentosPage } from './TreinamentosPage';
+export { default as RecrutamentoPage } from './RecrutamentoPage';
