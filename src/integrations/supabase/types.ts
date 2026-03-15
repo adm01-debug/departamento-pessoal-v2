@@ -176,6 +176,8 @@ export type Database = {
       }
       afastamentos: {
         Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
           atestado_numero: string | null
           cid: string | null
           cid_descricao: string | null
@@ -193,13 +195,18 @@ export type Database = {
           id: string
           medico_crm: string | null
           medico_nome: string | null
+          motivo_rejeicao: string | null
           numero_beneficio: string | null
           observacoes: string | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
           status: Database["public"]["Enums"]["status_afastamento"] | null
           tipo: Database["public"]["Enums"]["tipo_afastamento"]
           updated_at: string
         }
         Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           atestado_numero?: string | null
           cid?: string | null
           cid_descricao?: string | null
@@ -217,13 +224,18 @@ export type Database = {
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
+          motivo_rejeicao?: string | null
           numero_beneficio?: string | null
           observacoes?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: Database["public"]["Enums"]["status_afastamento"] | null
           tipo: Database["public"]["Enums"]["tipo_afastamento"]
           updated_at?: string
         }
         Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           atestado_numero?: string | null
           cid?: string | null
           cid_descricao?: string | null
@@ -241,8 +253,11 @@ export type Database = {
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
+          motivo_rejeicao?: string | null
           numero_beneficio?: string | null
           observacoes?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: Database["public"]["Enums"]["status_afastamento"] | null
           tipo?: Database["public"]["Enums"]["tipo_afastamento"]
           updated_at?: string
@@ -313,6 +328,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ajustes_ponto_registro_ponto_id_fkey"
+            columns: ["registro_ponto_id"]
+            isOneToOne: false
+            referencedRelation: "pontos_abertos"
             referencedColumns: ["id"]
           },
           {
@@ -654,6 +676,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_registro_ponto_id_fkey"
+            columns: ["registro_ponto_id"]
+            isOneToOne: false
+            referencedRelation: "pontos_abertos"
             referencedColumns: ["id"]
           },
           {
@@ -1288,6 +1317,7 @@ export type Database = {
           data_desligamento: string | null
           data_exame_admissional: string | null
           data_nascimento: string
+          data_senioridade: string | null
           departamento: string
           email: string | null
           email_corporativo: string | null
@@ -1298,14 +1328,18 @@ export type Database = {
           formacao: string | null
           foto_url: string | null
           genero_documento_id: number | null
+          gestor_ferias_id: string | null
           horario_entrada: string | null
           horario_saida: string | null
           id: string
           identidade_genero: string | null
+          identificador_tipo: string | null
+          identificador_validade: string | null
           inscricao_orgao_classe: string | null
           intervalo_minutos: number | null
           jornada_semanal: number | null
           local_trabalho: string | null
+          local_trabalho_id: string | null
           logradouro: string | null
           matricula: string | null
           nacionalidade: string | null
@@ -1314,16 +1348,20 @@ export type Database = {
           naturalidade_uf: string | null
           nome_completo: string
           nome_mae: string
+          nome_nascimento: string | null
           nome_pai: string | null
           nome_social: string | null
           numero: string | null
           observacoes: string | null
+          pais_nascimento: string | null
           pis_pasep: string | null
           pix_chave: string | null
           pix_tipo: string | null
           primeiro_emprego: boolean | null
+          pronomes: string | null
           rg: string | null
           rg_data_emissao: string | null
+          rg_data_validade: string | null
           rg_orgao_emissor: string | null
           rg_uf: string | null
           salario_base: number
@@ -1386,6 +1424,7 @@ export type Database = {
           data_desligamento?: string | null
           data_exame_admissional?: string | null
           data_nascimento: string
+          data_senioridade?: string | null
           departamento: string
           email?: string | null
           email_corporativo?: string | null
@@ -1396,14 +1435,18 @@ export type Database = {
           formacao?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
+          gestor_ferias_id?: string | null
           horario_entrada?: string | null
           horario_saida?: string | null
           id?: string
           identidade_genero?: string | null
+          identificador_tipo?: string | null
+          identificador_validade?: string | null
           inscricao_orgao_classe?: string | null
           intervalo_minutos?: number | null
           jornada_semanal?: number | null
           local_trabalho?: string | null
+          local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
           nacionalidade?: string | null
@@ -1412,16 +1455,20 @@ export type Database = {
           naturalidade_uf?: string | null
           nome_completo: string
           nome_mae: string
+          nome_nascimento?: string | null
           nome_pai?: string | null
           nome_social?: string | null
           numero?: string | null
           observacoes?: string | null
+          pais_nascimento?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
+          pronomes?: string | null
           rg?: string | null
           rg_data_emissao?: string | null
+          rg_data_validade?: string | null
           rg_orgao_emissor?: string | null
           rg_uf?: string | null
           salario_base: number
@@ -1484,6 +1531,7 @@ export type Database = {
           data_desligamento?: string | null
           data_exame_admissional?: string | null
           data_nascimento?: string
+          data_senioridade?: string | null
           departamento?: string
           email?: string | null
           email_corporativo?: string | null
@@ -1494,14 +1542,18 @@ export type Database = {
           formacao?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
+          gestor_ferias_id?: string | null
           horario_entrada?: string | null
           horario_saida?: string | null
           id?: string
           identidade_genero?: string | null
+          identificador_tipo?: string | null
+          identificador_validade?: string | null
           inscricao_orgao_classe?: string | null
           intervalo_minutos?: number | null
           jornada_semanal?: number | null
           local_trabalho?: string | null
+          local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
           nacionalidade?: string | null
@@ -1510,16 +1562,20 @@ export type Database = {
           naturalidade_uf?: string | null
           nome_completo?: string
           nome_mae?: string
+          nome_nascimento?: string | null
           nome_pai?: string | null
           nome_social?: string | null
           numero?: string | null
           observacoes?: string | null
+          pais_nascimento?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
+          pronomes?: string | null
           rg?: string | null
           rg_data_emissao?: string | null
+          rg_data_validade?: string | null
           rg_orgao_emissor?: string | null
           rg_uf?: string | null
           salario_base?: number
@@ -1573,6 +1629,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "colaboradores_gestor_ferias_id_fkey"
+            columns: ["gestor_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "colaboradores_nacionalidade_id_fkey"
             columns: ["nacionalidade_id"]
             isOneToOne: false
@@ -1598,6 +1661,13 @@ export type Database = {
             columns: ["tipo_salario_id"]
             isOneToOne: false
             referencedRelation: "tipos_salario"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_colaboradores_local_trabalho"
+            columns: ["local_trabalho_id"]
+            isOneToOne: false
+            referencedRelation: "locais_trabalho"
             referencedColumns: ["id"]
           },
         ]
@@ -1756,6 +1826,56 @@ export type Database = {
           valor?: Json | null
         }
         Relationships: []
+      }
+      configuracoes_intervalo: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          duracao_minutos: number
+          empresa_id: string | null
+          horario_fim_permitido: string | null
+          horario_inicio_permitido: string | null
+          id: string
+          nome: string
+          obrigatorio: boolean | null
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          duracao_minutos?: number
+          empresa_id?: string | null
+          horario_fim_permitido?: string | null
+          horario_inicio_permitido?: string | null
+          id?: string
+          nome: string
+          obrigatorio?: boolean | null
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          duracao_minutos?: number
+          empresa_id?: string | null
+          horario_fim_permitido?: string | null
+          horario_inicio_permitido?: string | null
+          id?: string
+          nome?: string
+          obrigatorio?: boolean | null
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_intervalo_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contas_bancarias: {
         Row: {
@@ -4122,6 +4242,75 @@ export type Database = {
           },
         ]
       }
+      historico_contratos: {
+        Row: {
+          carga_horaria_semanal: number | null
+          cargo: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_fim: string | null
+          data_inicio: string
+          departamento: string | null
+          empresa_id: string | null
+          id: string
+          motivo_alteracao: string | null
+          observacoes: string | null
+          salario: number | null
+          tipo_contrato: string | null
+          updated_at: string
+        }
+        Insert: {
+          carga_horaria_semanal?: number | null
+          cargo?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio: string
+          departamento?: string | null
+          empresa_id?: string | null
+          id?: string
+          motivo_alteracao?: string | null
+          observacoes?: string | null
+          salario?: number | null
+          tipo_contrato?: string | null
+          updated_at?: string
+        }
+        Update: {
+          carga_horaria_semanal?: number | null
+          cargo?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string
+          departamento?: string | null
+          empresa_id?: string | null
+          id?: string
+          motivo_alteracao?: string | null
+          observacoes?: string | null
+          salario?: number | null
+          tipo_contrato?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_contratos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_contratos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_ferias: {
         Row: {
           created_at: string
@@ -4544,6 +4733,59 @@ export type Database = {
             columns: ["vale_transporte_id"]
             isOneToOne: false
             referencedRelation: "vales_transporte"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locais_trabalho: {
+        Row: {
+          ativo: boolean | null
+          cep: string | null
+          cidade: string | null
+          created_at: string
+          empresa_id: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          pais: string | null
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          cep?: string | null
+          cidade?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          pais?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean | null
+          cep?: string | null
+          cidade?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          pais?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locais_trabalho_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
@@ -6385,6 +6627,69 @@ export type Database = {
           },
         ]
       }
+      solicitacoes_hora_extra: {
+        Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data: string
+          empresa_id: string | null
+          horas_solicitadas: number
+          id: string
+          motivo: string
+          observacoes_aprovador: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          data: string
+          empresa_id?: string | null
+          horas_solicitadas: number
+          id?: string
+          motivo: string
+          observacoes_aprovador?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          empresa_id?: string | null
+          horas_solicitadas?: number
+          id?: string
+          motivo?: string
+          observacoes_aprovador?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitacoes_hora_extra_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_hora_extra_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tempos_residencia: {
         Row: {
           created_at: string | null
@@ -7220,6 +7525,121 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          duracao_ms: number | null
+          erro: string | null
+          evento: string
+          id: string
+          payload: Json | null
+          resposta: string | null
+          status_code: number | null
+          tentativa: number | null
+          webhook_id: string
+        }
+        Insert: {
+          created_at?: string
+          duracao_ms?: number | null
+          erro?: string | null
+          evento: string
+          id?: string
+          payload?: Json | null
+          resposta?: string | null
+          status_code?: number | null
+          tentativa?: number | null
+          webhook_id: string
+        }
+        Update: {
+          created_at?: string
+          duracao_ms?: number | null
+          erro?: string | null
+          evento?: string
+          id?: string
+          payload?: Json | null
+          resposta?: string | null
+          status_code?: number | null
+          tentativa?: number | null
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhooks: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          empresa_id: string | null
+          eventos: string[] | null
+          id: string
+          max_tentativas: number | null
+          nome: string
+          retry_intervalo_segundos: number | null
+          secret: string | null
+          timeout_segundos: number | null
+          total_falha: number | null
+          total_sucesso: number | null
+          ultima_execucao: string | null
+          ultimo_erro: string | null
+          ultimo_status: number | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          empresa_id?: string | null
+          eventos?: string[] | null
+          id?: string
+          max_tentativas?: number | null
+          nome: string
+          retry_intervalo_segundos?: number | null
+          secret?: string | null
+          timeout_segundos?: number | null
+          total_falha?: number | null
+          total_sucesso?: number | null
+          ultima_execucao?: string | null
+          ultimo_erro?: string | null
+          ultimo_status?: number | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          empresa_id?: string | null
+          eventos?: string[] | null
+          id?: string
+          max_tentativas?: number | null
+          nome?: string
+          retry_intervalo_segundos?: number | null
+          secret?: string | null
+          timeout_segundos?: number | null
+          total_falha?: number | null
+          total_sucesso?: number | null
+          ultima_execucao?: string | null
+          ultimo_erro?: string | null
+          ultimo_status?: number | null
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhooks_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       webhooks_config: {
         Row: {
           ativo: boolean | null
@@ -7307,7 +7727,35 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      pontos_abertos: {
+        Row: {
+          colaborador_id: string | null
+          data: string | null
+          empresa_id: string | null
+          entrada_1: string | null
+          entrada_2: string | null
+          id: string | null
+          nome_completo: string | null
+          saida_1: string | null
+          saida_2: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }

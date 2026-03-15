@@ -3,7 +3,7 @@ import {
   UserMinus, BarChart3, ChevronLeft, ChevronRight, ChevronDown, Search,
   LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
-  FileText, GraduationCap, Target, UserSearch, LucideIcon
+  FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer
 } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -53,6 +53,7 @@ const menuGroups: MenuGroup[] = [
     color: 'text-info',
     items: [
       { icon: Clock, label: 'Ponto', path: '/ponto', color: 'text-info' },
+      { icon: Timer, label: 'Horas Extras', path: '/horas-extras', color: 'text-warning' },
       { icon: Umbrella, label: 'Férias', path: '/ferias', color: 'text-warning' },
       { icon: Heart, label: 'Afastamentos', path: '/afastamentos', color: 'text-destructive' },
       { icon: Calendar, label: 'Feriados', path: '/feriados', color: 'text-warning' },
@@ -77,6 +78,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Building2, label: 'Empresas', path: '/empresas', color: 'text-info' },
       { icon: Briefcase, label: 'Cargos', path: '/cargos', color: 'text-warning' },
       { icon: Building2, label: 'Departamentos', path: '/departamentos', color: 'text-info' },
+      { icon: MapPin, label: 'Locais de Trabalho', path: '/locais-trabalho', color: 'text-success' },
     ]
   },
   {

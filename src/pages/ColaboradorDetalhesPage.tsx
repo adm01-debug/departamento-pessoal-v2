@@ -9,12 +9,12 @@ import { colaboradorService } from '@/services';
 import {
   ArrowLeft, Users, Phone, DollarSign, Stethoscope,
   GraduationCap, Globe, Accessibility, Calendar, StickyNote,
-  Landmark, FileText, BookOpen
+  Landmark, FileText, BookOpen, FileStack
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
   ASOTab, FormacaoTab, EstrangeiroTab, PCDTab, AquisitivosTab, AnotacoesTab,
-  ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab,
+  ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab, HistoricoContratosTab,
 } from '@/components/colaborador-detalhes';
 
 export default function ColaboradorDetalhesPage() {
@@ -61,6 +61,7 @@ export default function ColaboradorDetalhesPage() {
           <TabsTrigger value="pcd" className="text-xs"><Accessibility className="mr-1 h-3 w-3" />PCD</TabsTrigger>
           <TabsTrigger value="estagiario" className="text-xs"><BookOpen className="mr-1 h-3 w-3" />Estagiário</TabsTrigger>
           <TabsTrigger value="aquisitivos" className="text-xs"><Calendar className="mr-1 h-3 w-3" />Per. Aquisitivos</TabsTrigger>
+          <TabsTrigger value="contratos" className="text-xs"><FileStack className="mr-1 h-3 w-3" />Hist. Contratos</TabsTrigger>
           <TabsTrigger value="anotacoes" className="text-xs"><StickyNote className="mr-1 h-3 w-3" />Anotações</TabsTrigger>
         </TabsList>
 
@@ -76,6 +77,7 @@ export default function ColaboradorDetalhesPage() {
         <TabsContent value="pcd"><PCDTab colaboradorId={id!} /></TabsContent>
         <TabsContent value="estagiario"><EstagiarioTab colaboradorId={id!} /></TabsContent>
         <TabsContent value="aquisitivos"><AquisitivosTab colaboradorId={id!} /></TabsContent>
+        <TabsContent value="contratos"><HistoricoContratosTab colaboradorId={id!} /></TabsContent>
         <TabsContent value="anotacoes"><AnotacoesTab colaboradorId={id!} /></TabsContent>
       </Tabs>
     </PageLayout>

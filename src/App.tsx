@@ -46,6 +46,8 @@ const RecrutamentoPage = lazy(() => import('@/pages/RecrutamentoPage'));
 const ContratacaoPage = lazy(() => import('@/pages/ContratacaoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
+const HorasExtrasPage = lazy(() => import('@/pages/HorasExtrasPage'));
+const LocaisTrabalhoPage = lazy(() => import('@/pages/LocaisTrabalhoPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -99,6 +101,8 @@ export default function App() {
         <Route path="onboarding" element={<LazyPage Component={OnboardingPage} />} />
         <Route path="assinaturas" element={<LazyPage Component={AssinaturasPage} />} />
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
+        <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
+        <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

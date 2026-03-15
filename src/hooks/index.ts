@@ -22,6 +22,12 @@ export { useFeriados } from "./useFeriados";
 export { usePDFExport } from "./usePDFExport";
 export { useExcelExport } from "./useExcelExport";
 export { useESocial } from "./useESocial";
+export { useLocaisTrabalho } from "./useLocaisTrabalho";
+export { useHistoricoContratos } from "./useHistoricoContratos";
+export { useHorasExtras } from "./useHorasExtras";
+export { useConfiguracoesIntervalo } from "./useConfiguracoesIntervalo";
+export { useWebhooksAvancados, useWebhookLogs } from "./useWebhooksAvancados";
+export { usePontosAbertos } from "./usePontosAbertos";
 
 // Colaborador Detalhes
 export {
