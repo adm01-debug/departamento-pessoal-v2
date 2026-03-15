@@ -101,6 +101,8 @@ export default function App() {
         <Route path="onboarding" element={<LazyPage Component={OnboardingPage} />} />
         <Route path="assinaturas" element={<LazyPage Component={AssinaturasPage} />} />
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
+        <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
+        <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}
