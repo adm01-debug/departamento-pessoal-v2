@@ -9,6 +9,12 @@ export { contratoService } from './contratoService';
 export { bancoHorasService } from './bancoHorasService';
 export { desligamentoService } from './desligamentoService';
 export { auditoriaService, notificacaoService } from './auditoriaService';
+export { localTrabalhoService } from './localTrabalhoService';
+export { historicoContratoService } from './historicoContratoService';
+export { horaExtraService } from './horaExtraService';
+export { intervaloService } from './intervaloService';
+export { webhookService } from './webhookService';
+export { pontoAbertoService } from './pontoAbertoService';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
