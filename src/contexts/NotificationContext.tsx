@@ -1,19 +1,13 @@
-// NotificationContext
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-
-interface Notification {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  title: string;
-  message?: string;
-  duration?: number;
-}
+// NotificationContext - connected to database via useNotificacoes + toast helpers
+import React, { createContext, useContext, useCallback, ReactNode } from 'react';
+import { useNotificacoes, Notificacao } from '@/hooks/useNotificacoes';
+import { toast } from 'sonner';
 
 interface NotificationContextType {
-  notifications: Notification[];
+  notifications: Notificacao[];
   unreadCount: number;
-  addNotification: (notification: Omit<Notification, 'id'>) => void;
-  removeNotification: (id: string) => void;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
   success: (title: string, message?: string) => void;
   error: (title: string, message?: string) => void;
   warning: (title: string, message?: string) => void;
@@ -23,27 +17,24 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { notificacoes, naoLidas, marcarComoLida, marcarTodasComoLidas } = useNotificacoes();
 
-  const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
-    const id = crypto.randomUUID();
-    setNotifications(prev => [...prev, { ...notification, id }]);
-    setTimeout(() => removeNotification(id), notification.duration || 5000);
-  }, []);
-
-  const removeNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  }, []);
-
-  const success = useCallback((title: string, message?: string) => addNotification({ type: 'success', title, message }), [addNotification]);
-  const error = useCallback((title: string, message?: string) => addNotification({ type: 'error', title, message }), [addNotification]);
-  const warning = useCallback((title: string, message?: string) => addNotification({ type: 'warning', title, message }), [addNotification]);
-  const info = useCallback((title: string, message?: string) => addNotification({ type: 'info', title, message }), [addNotification]);
-
-  const unreadCount = notifications.length;
+  const success = useCallback((title: string, message?: string) => toast.success(message ? `${title}: ${message}` : title), []);
+  const error = useCallback((title: string, message?: string) => toast.error(message ? `${title}: ${message}` : title), []);
+  const warning = useCallback((title: string, message?: string) => toast.warning(message ? `${title}: ${message}` : title), []);
+  const info = useCallback((title: string, message?: string) => toast.info(message ? `${title}: ${message}` : title), []);
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, addNotification, removeNotification, success, error, warning, info }}>
+    <NotificationContext.Provider value={{
+      notifications: notificacoes,
+      unreadCount: naoLidas,
+      markAsRead: marcarComoLida,
+      markAllAsRead: marcarTodasComoLidas,
+      success,
+      error,
+      warning,
+      info,
+    }}>
       {children}
     </NotificationContext.Provider>
   );
@@ -55,5 +46,4 @@ export function useNotification() {
   return context;
 }
 
-// Alias
 export const useNotifications = useNotification;
