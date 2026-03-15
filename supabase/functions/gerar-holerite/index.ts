@@ -6,38 +6,136 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+// Tabelas INSS 2026
+const calcularINSS = (base: number): number => {
+  let inss = 0;
+  if (base <= 1518) inss = base * 0.075;
+  else if (base <= 2793.88) inss = 113.85 + (base - 1518) * 0.09;
+  else if (base <= 5563.80) inss = 228.64 + (base - 2793.88) * 0.12;
+  else inss = 560.83 + (Math.min(base, 7786.93) - 5563.80) * 0.14;
+  return Number(Math.min(inss, 872.15).toFixed(2));
+};
+
+const calcularIRRF = (base: number, dependentes: number = 0): number => {
+  const baseCalculo = base - (dependentes * 189.59);
+  if (baseCalculo <= 2259.20) return 0;
+  if (baseCalculo <= 2826.65) return Number(Math.max(0, baseCalculo * 0.075 - 169.44).toFixed(2));
+  if (baseCalculo <= 3751.05) return Number(Math.max(0, baseCalculo * 0.15 - 381.44).toFixed(2));
+  if (baseCalculo <= 4664.68) return Number(Math.max(0, baseCalculo * 0.225 - 662.77).toFixed(2));
+  return Number(Math.max(0, baseCalculo * 0.275 - 896.00).toFixed(2));
+};
+
+interface HoleriteRequest {
+  colaboradorId: string;
+  competencia: string; // "2026-03"
+}
+
+serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { data: payload } = await req.json();
-    
-    console.log('gerar-holerite - Processing:', payload);
-    
-    // Lógica específica da função
-    const result = {
-      success: true,
-      function: 'gerar-holerite',
-      timestamp: new Date().toISOString(),
-      data: payload,
+    const { colaboradorId, competencia }: HoleriteRequest = await req.json();
+
+    if (!colaboradorId || !competencia) {
+      throw new Error('Campos obrigatórios: colaboradorId, competencia');
+    }
+
+    // Buscar dados do colaborador
+    const { data: colaborador, error: colError } = await supabase
+      .from('colaboradores')
+      .select('nome_completo, cpf, cargo, departamento, salario_base, data_admissao, banco_nome, agencia, conta')
+      .eq('id', colaboradorId)
+      .maybeSingle();
+
+    if (colError || !colaborador) {
+      throw new Error('Colaborador não encontrado');
+    }
+
+    // Buscar registros de ponto do mês
+    const [ano, mes] = competencia.split('-').map(Number);
+    const primeiroDia = `${competencia}-01`;
+    const ultimoDia = new Date(ano, mes, 0).toISOString().split('T')[0];
+
+    const { data: registrosPonto } = await supabase
+      .from('registros_ponto')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .gte('data', primeiroDia)
+      .lte('data', ultimoDia);
+
+    // Buscar benefícios ativos
+    const { data: beneficios } = await supabase
+      .from('beneficios_colaborador')
+      .select('*, tipo:tipo_beneficio_id(nome)')
+      .eq('colaborador_id', colaboradorId)
+      .eq('ativo', true);
+
+    // Calcular proventos
+    const salarioBase = colaborador.salario_base;
+    const diasTrabalhados = registrosPonto?.length || 30;
+    const salarioProporcional = Number(((salarioBase / 30) * diasTrabalhados).toFixed(2));
+
+    // Calcular descontos
+    const inss = calcularINSS(salarioProporcional);
+    const irrf = calcularIRRF(salarioProporcional - inss);
+    const fgts = Number((salarioProporcional * 0.08).toFixed(2));
+
+    // Descontos de benefícios
+    const totalDescontosBeneficios = (beneficios || []).reduce((acc: number, b: any) => acc + (b.desconto || 0), 0);
+
+    const totalProventos = salarioProporcional;
+    const totalDescontos = Number((inss + irrf + totalDescontosBeneficios).toFixed(2));
+    const liquido = Number((totalProventos - totalDescontos).toFixed(2));
+
+    const holerite = {
+      colaborador: {
+        nome: colaborador.nome_completo,
+        cpf: colaborador.cpf,
+        cargo: colaborador.cargo,
+        departamento: colaborador.departamento,
+        dataAdmissao: colaborador.data_admissao,
+        banco: colaborador.banco_nome,
+        agencia: colaborador.agencia,
+        conta: colaborador.conta,
+      },
+      competencia,
+      proventos: [
+        { codigo: '001', descricao: 'Salário Base', referencia: diasTrabalhados, valor: salarioProporcional },
+      ],
+      descontos: [
+        { codigo: '101', descricao: 'INSS', referencia: null, valor: inss },
+        { codigo: '102', descricao: 'IRRF', referencia: null, valor: irrf },
+        ...(beneficios || []).filter((b: any) => b.desconto > 0).map((b: any, i: number) => ({
+          codigo: `1${10 + i}`, descricao: b.tipo?.nome || 'Benefício', referencia: null, valor: b.desconto,
+        })),
+      ],
+      totais: {
+        totalProventos,
+        totalDescontos,
+        liquido,
+        fgts,
+        baseINSS: salarioProporcional,
+        baseIRRF: Number((salarioProporcional - inss).toFixed(2)),
+        baseFGTS: salarioProporcional,
+      },
+      geradoEm: new Date().toISOString(),
     };
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({ success: true, holerite }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    });
+    const message = error instanceof Error ? error.message : 'Erro desconhecido';
+    return new Response(
+      JSON.stringify({ success: false, error: message }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+    );
   }
 });
