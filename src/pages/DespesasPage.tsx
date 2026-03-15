@@ -73,7 +73,7 @@ export default function DespesasPage() {
                 <div><Label>Valor (R$)</Label><Input type="number" step="0.01" value={form.valor} onChange={e => setForm(p => ({ ...p, valor: e.target.value }))} /></div>
                 <div><Label>Data</Label><Input type="date" value={form.data_despesa} onChange={e => setForm(p => ({ ...p, data_despesa: e.target.value }))} /></div>
               </div>
-              <Button className="w-full" onClick={() => criar.mutate()} disabled={!form.colaborador_id || !form.valor || criar.isPending}>{criar.isPending ? 'Registrando...' : 'Registrar'}</Button>
+              <Button className="w-full" onClick={() => criar.mutate()} disabled={!form.colaborador_id || !form.valor || !form.descricao || !form.data_despesa || criar.isPending}>{criar.isPending ? 'Registrando...' : 'Registrar'}</Button>
             </div>
           </DialogContent>
         </Dialog>
