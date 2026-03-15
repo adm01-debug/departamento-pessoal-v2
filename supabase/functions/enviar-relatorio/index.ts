@@ -70,20 +70,27 @@ const handler = async (req: Request): Promise<Response> => {
         dadosRelatorio = { afastamentos, total: afastamentos?.length || 0 };
         break;
         
-      case "indicadores_dp":
-        const { data: totalColabs } = await supabase
+      case "indicadores_dp": {
+        const { count: totalColaboradores, error: totalColaboradoresError } = await supabase
           .from("colaboradores")
-          .select("id", { count: "exact" })
+          .select("id", { count: "exact", head: true })
           .eq("status", "ativo");
-        const { data: afastados } = await supabase
+
+        if (totalColaboradoresError) throw totalColaboradoresError;
+
+        const { count: totalAfastados, error: totalAfastadosError } = await supabase
           .from("colaboradores")
-          .select("id", { count: "exact" })
+          .select("id", { count: "exact", head: true })
           .eq("status", "afastado");
-        dadosRelatorio = { 
-          total_colaboradores: totalColabs?.length || 0,
-          total_afastados: afastados?.length || 0
+
+        if (totalAfastadosError) throw totalAfastadosError;
+
+        dadosRelatorio = {
+          total_colaboradores: totalColaboradores ?? 0,
+          total_afastados: totalAfastados ?? 0,
         };
         break;
+      }
         
       default:
         dadosRelatorio = { mensagem: "Tipo de relatório não implementado" };

@@ -2,6 +2,7 @@
  * @fileoverview Hook para gerenciamento de empresas
  * @module hooks/useEmpresas
  */
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -72,6 +73,13 @@ export interface UseEmpresasReturn {
   temMultiplasEmpresas: boolean;
 }
 
+const ensureSingleResult = <T>(data: T | null, entity: string): T => {
+  if (!data) {
+    throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
+  }
+  return data;
+};
+
 export function useEmpresas(): UseEmpresasReturn {
   const queryClient = useQueryClient();
   const { empresaAtualId, setEmpresaAtual } = useEmpresaStore();
@@ -99,13 +107,17 @@ export function useEmpresas(): UseEmpresasReturn {
   });
 
   // Empresa atual
-  const empresaAtual = userEmpresas?.find(
-    (ue) => ue.empresa_id === empresaAtualId
-  )?.empresa;
+  const empresaAtual = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId)?.empresa;
 
   // Se não há empresa selecionada, usar a padrão
   const empresaDefault = userEmpresas?.find((ue) => ue.is_default)?.empresa;
   const empresaEfetiva = empresaAtual || empresaDefault || userEmpresas?.[0]?.empresa;
+
+  useEffect(() => {
+    if (empresaEfetiva?.id && empresaAtualId !== empresaEfetiva.id) {
+      setEmpresaAtual(empresaEfetiva.id);
+    }
+  }, [empresaEfetiva?.id, empresaAtualId, setEmpresaAtual]);
 
   // Listar todas as empresas (para admin)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
@@ -113,12 +125,14 @@ export function useEmpresas(): UseEmpresasReturn {
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("empresas")
-        .select("*")
-        .order("razao_social");
+      const { data, error } = await supabase.from("empresas").select("*").order("razao_social");
 
-      if (error) throw error;
+      if (error) {
+        // Usuários sem permissão de listagem global não devem quebrar a UI.
+        if (error.code === "42501") return [];
+        throw error;
+      }
+
       return data as Empresa[];
     },
   });
@@ -144,22 +158,18 @@ export function useEmpresas(): UseEmpresasReturn {
         logo_url: empresa.logo_url,
         ativa: empresa.ativa ?? true,
       };
-      
-      const { data, error } = await supabase
-        .from("empresas")
-        .insert(insertData)
-        .select()
-        .single();
+
+      const { data, error } = await supabase.from("empresas").insert(insertData).select().maybeSingle();
 
       if (error) throw error;
-      return data;
+      return ensureSingleResult(data, "empresa");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todas-empresas"] });
       queryClient.invalidateQueries({ queryKey: ["user-empresas"] });
       toast.success("Empresa criada com sucesso!");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(`Erro ao criar empresa: ${error.message}`);
     },
   });
@@ -167,22 +177,17 @@ export function useEmpresas(): UseEmpresasReturn {
   // Atualizar empresa
   const atualizarEmpresa = useMutation({
     mutationFn: async ({ id, ...dados }: Partial<Empresa> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("empresas")
-        .update(dados)
-        .eq("id", id)
-        .select()
-        .single();
+      const { data, error } = await supabase.from("empresas").update(dados).eq("id", id).select().maybeSingle();
 
       if (error) throw error;
-      return data;
+      return ensureSingleResult(data, "empresa");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todas-empresas"] });
       queryClient.invalidateQueries({ queryKey: ["user-empresas"] });
       toast.success("Empresa atualizada!");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(`Erro ao atualizar: ${error.message}`);
     },
   });
@@ -206,16 +211,16 @@ export function useEmpresas(): UseEmpresasReturn {
           is_default: isDefault,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return ensureSingleResult(data, "vínculo de usuário/empresa");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-empresas"] });
       toast.success("Usuário associado à empresa!");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(`Erro: ${error.message}`);
     },
   });
@@ -227,10 +232,12 @@ export function useEmpresas(): UseEmpresasReturn {
       if (!userData.user) throw new Error("Usuário não autenticado");
 
       // Remover padrão de todas
-      await supabase
+      const { error: clearError } = await supabase
         .from("user_empresas")
         .update({ is_default: false })
         .eq("user_id", userData.user.id);
+
+      if (clearError) throw clearError;
 
       // Definir nova padrão
       const { error } = await supabase
@@ -250,7 +257,9 @@ export function useEmpresas(): UseEmpresasReturn {
   // Trocar empresa atual
   const trocarEmpresa = (empresaId: string) => {
     setEmpresaAtual(empresaId);
-    queryClient.invalidateQueries(); // Invalida todas as queries para recarregar com nova empresa
+    queryClient.invalidateQueries({ queryKey: ["user-empresas"] });
+    queryClient.invalidateQueries({ queryKey: ["colaboradores"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     toast.success("Empresa alterada!");
   };
 
@@ -269,9 +278,3 @@ export function useEmpresas(): UseEmpresasReturn {
     temMultiplasEmpresas: (userEmpresas?.length ?? 0) > 1,
   };
 }
-
-
-
-
-
-
