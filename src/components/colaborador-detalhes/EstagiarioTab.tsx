@@ -64,8 +64,8 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
       <CardContent>
         {!showForm && data ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div><Label className="text-xs text-muted-foreground">Instituição</Label><p className="font-medium">{(data as any).instituicao_ensino}</p></div>
-            <div><Label className="text-xs text-muted-foreground">CNPJ Instituição</Label><p className="font-medium">{(data as any).cnpj_instituicao || '-'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Instituição</Label><p className="font-medium">{(data as any).instituicao_nome}</p></div>
+            <div><Label className="text-xs text-muted-foreground">CNPJ Instituição</Label><p className="font-medium">{(data as any).instituicao_cnpj || '-'}</p></div>
             <div><Label className="text-xs text-muted-foreground">Curso</Label><p className="font-medium">{(data as any).curso || '-'}</p></div>
             <div><Label className="text-xs text-muted-foreground">Nível</Label><p className="font-medium">{(data as any).nivel || '-'}</p></div>
             <div><Label className="text-xs text-muted-foreground">Supervisor</Label><p className="font-medium">{(data as any).supervisor_nome || '-'}</p></div>
