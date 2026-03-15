@@ -42,7 +42,7 @@ export default function ComunicacaoInternaPage() {
 
   const criarCom = useMutation({
     mutationFn: () => comunicacaoService.criarComunicado({ ...formCom, empresa_id: empresaAtual?.id, ativo: true }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['comunicados'] }); setOpenCom(false); toast.success('Comunicado publicado!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['comunicados'] }); setOpenCom(false); toast.success('Comunicado publicado!'); setFormCom({ titulo: '', conteudo: '', tipo: 'aviso', prioridade: 1 }); },
     onError: () => toast.error('Erro ao publicar'),
   });
 
