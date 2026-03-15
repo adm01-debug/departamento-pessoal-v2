@@ -46,10 +46,7 @@ export default function ColaboradorDetalhesPage() {
   if (!colaborador) return <div className="p-6">Colaborador não encontrado</div>;
 
   return (
-    <PageLayout
-      title={colaborador.nome_completo}
-      subtitle={`${colaborador.cargo} · ${colaborador.departamento}`}
-    >
+    <PageLayout title={`${colaborador.nome_completo} — ${colaborador.cargo} · ${colaborador.departamento}`}>
       <Button variant="ghost" size="sm" onClick={() => navigate('/colaboradores')} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
       </Button>
