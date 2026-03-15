@@ -1,13 +1,17 @@
-// V25: Services Index - Hardened error handling and safer single-row queries
+// Services Index - Complete
 import { supabase } from '@/integrations/supabase/client';
 
-// Auth service
 export { authService } from './authService';
+export { afastamentoService } from './afastamentoService';
+export { cargoService } from './cargoService';
+export { departamentoService } from './departamentoService';
+export { contratoService } from './contratoService';
+export { bancoHorasService } from './bancoHorasService';
+export { desligamentoService } from './desligamentoService';
+export { auditoriaService, notificacaoService } from './auditoriaService';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
-  if (!data) {
-    throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
-  }
+  if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
   return data;
 };
 
@@ -50,25 +54,19 @@ export const colaboradorService = {
     if (error) throw error;
     return data;
   },
-  async getById(id: string) {
-    return colaboradorService.buscarPorId(id);
-  },
+  async getById(id: string) { return colaboradorService.buscarPorId(id); },
   async criar(d: any) {
     const { data, error } = await supabase.from('colaboradores').insert(d).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'colaborador');
   },
-  async create(d: any) {
-    return colaboradorService.criar(d);
-  },
+  async create(d: any) { return colaboradorService.criar(d); },
   async atualizar(id: string, d: any) {
     const { data, error } = await supabase.from('colaboradores').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'colaborador');
   },
-  async update(id: string, d: any) {
-    return colaboradorService.atualizar(id, d);
-  },
+  async update(id: string, d: any) { return colaboradorService.atualizar(id, d); },
   async excluir(id: string) {
     const { error } = await supabase.from('colaboradores').delete().eq('id', id);
     if (error) throw error;
@@ -143,47 +141,26 @@ export const folhaService = {
 
 export const pontoService = {
   async registrar(tipo: string, colaboradorId?: string) {
-    if (!colaboradorId) {
-      throw new Error('Colaborador é obrigatório para registrar ponto.');
-    }
-
+    if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
     const now = new Date();
     const data = now.toISOString().split('T')[0];
     const hora = now.toTimeString().split(' ')[0].substring(0, 5);
-    const campo =
-      tipo === 'entrada'
-        ? 'entrada_1'
-        : tipo === 'intervalo_saida' || tipo === 'saida_almoco'
-          ? 'saida_intervalo'
-          : tipo === 'intervalo_retorno' || tipo === 'retorno_almoco'
-            ? 'retorno_intervalo'
-            : 'saida_1';
+    const campo = tipo === 'entrada' ? 'entrada_1'
+      : tipo === 'intervalo_saida' || tipo === 'saida_almoco' ? 'saida_intervalo'
+      : tipo === 'intervalo_retorno' || tipo === 'retorno_almoco' ? 'retorno_intervalo'
+      : 'saida_1';
 
     const { data: existing, error: existingError } = await supabase
-      .from('registros_ponto')
-      .select('id')
-      .eq('data', data)
-      .eq('colaborador_id', colaboradorId)
-      .maybeSingle();
-
+      .from('registros_ponto').select('id').eq('data', data).eq('colaborador_id', colaboradorId).maybeSingle();
     if (existingError) throw existingError;
 
     if (existing) {
-      const { data: result, error } = await supabase
-        .from('registros_ponto')
-        .update({ [campo]: hora })
-        .eq('id', existing.id)
-        .select()
-        .maybeSingle();
+      const { data: result, error } = await supabase.from('registros_ponto').update({ [campo]: hora }).eq('id', existing.id).select().maybeSingle();
       if (error) throw error;
       return ensureSingleResult(result, 'registro de ponto');
     }
 
-    const { data: result, error } = await supabase
-      .from('registros_ponto')
-      .insert({ data, [campo]: hora, colaborador_id: colaboradorId })
-      .select()
-      .maybeSingle();
+    const { data: result, error } = await supabase.from('registros_ponto').insert({ data, [campo]: hora, colaborador_id: colaboradorId }).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(result, 'registro de ponto');
   },
@@ -210,8 +187,6 @@ export const documentoService = {
   },
 };
 
-// authService is exported from ./authService above
-
 export const admissaoService = {
   async listar(empresaId?: string) {
     let query = supabase.from('admissoes').select('*').order('data_prevista', { ascending: false });
@@ -220,37 +195,25 @@ export const admissaoService = {
     if (error) throw error;
     return data || [];
   },
-  async getAll(empresaId?: string) {
-    return admissaoService.listar(empresaId);
-  },
+  async getAll(empresaId?: string) { return admissaoService.listar(empresaId); },
   async getById(id: string) {
     const { data, error } = await supabase.from('admissoes').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
   },
-  async buscarPorId(id: string) {
-    return admissaoService.getById(id);
-  },
+  async buscarPorId(id: string) { return admissaoService.getById(id); },
   async criar(d: any) {
     const { data, error } = await supabase.from('admissoes').insert(d).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'admissão');
   },
-  async create(d: any) {
-    return admissaoService.criar(d);
-  },
+  async create(d: any) { return admissaoService.criar(d); },
   async atualizar(id: string, d: any) {
     const { data, error } = await supabase.from('admissoes').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'admissão');
   },
-  async update(id: string, d: any) {
-    return admissaoService.atualizar(id, d);
-  },
-  async concluir(id: string) {
-    return admissaoService.atualizar(id, { etapa: 'concluida' });
-  },
-  async cancelar(id: string) {
-    return admissaoService.atualizar(id, { etapa: 'cancelada' });
-  },
+  async update(id: string, d: any) { return admissaoService.atualizar(id, d); },
+  async concluir(id: string) { return admissaoService.atualizar(id, { etapa: 'concluida' }); },
+  async cancelar(id: string) { return admissaoService.atualizar(id, { etapa: 'cancelada' }); },
 };

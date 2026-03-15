@@ -1,4 +1,3 @@
-// V25: Hooks Index - Active exports only
 export { useDebounce } from "./useDebounce";
 export { useLocalStorage } from "./useLocalStorage";
 export { useMediaQuery } from "./useMediaQuery";
@@ -7,3 +6,13 @@ export { useAuth } from "./useAuth";
 export { useEmpresas } from "./useEmpresas";
 export { useNotificacoes } from "./useNotificacoes";
 export { useIsMobile } from "./use-mobile";
+export { useColaboradores } from "./useColaboradores";
+export { useAdmissoes } from "./useAdmissoes";
+export { useAfastamentos } from "./useAfastamentos";
+export { useCargos } from "./useCargos";
+export { useDepartamentos } from "./useDepartamentos";
+export { useFerias } from "./useFerias";
+export { useFolha } from "./useFolha";
+export { useBeneficios } from "./useBeneficios";
+export { useContratos } from "./useContratos";
+export { useDesligamentos } from "./useDesligamentos";
