@@ -15,6 +15,14 @@ export { horaExtraService } from './horaExtraService';
 export { intervaloService } from './intervaloService';
 export { webhookService } from './webhookService';
 export { pontoAbertoService } from './pontoAbertoService';
+export { pesquisaService } from './pesquisaService';
+export { workflowService } from './workflowService';
+export { turnoService } from './turnoService';
+export { comunicacaoService } from './comunicacaoService';
+export { despesaService } from './despesaService';
+export { controleAcessoService } from './controleAcessoService';
+export { lgpdService } from './lgpdService';
+export { catalogoCursoService } from './catalogoCursoService';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
