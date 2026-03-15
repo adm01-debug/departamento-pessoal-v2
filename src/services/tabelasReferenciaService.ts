@@ -225,7 +225,7 @@ export async function vincularDependenteBeneficio(vinculo: Record<string, unknow
     .from('dependentes_beneficios' as any)
     .upsert([vinculo], { onConflict: 'dependente_id,beneficio_id' })
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
