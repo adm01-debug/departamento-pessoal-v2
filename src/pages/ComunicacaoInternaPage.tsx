@@ -48,7 +48,7 @@ export default function ComunicacaoInternaPage() {
 
   const criarEtica = useMutation({
     mutationFn: () => comunicacaoService.criarDenuncia({ ...formEtica, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['canal_etica'] }); setOpenEtica(false); toast.success('Relato registrado!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['canal_etica'] }); setOpenEtica(false); toast.success('Relato registrado!'); setFormEtica({ categoria: 'outro', descricao: '', anonimo: true }); },
     onError: () => toast.error('Erro ao registrar'),
   });
 

@@ -35,7 +35,7 @@ export default function TurnosPage() {
 
   const criar = useMutation({
     mutationFn: () => turnoService.criarTurno({ ...form, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['turnos'] }); setOpen(false); toast.success('Turno criado!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['turnos'] }); setOpen(false); toast.success('Turno criado!'); setForm({ nome: '', horario_inicio: '08:00', horario_fim: '17:00', intervalo_minutos: 60, cor: '#3b82f6' }); },
     onError: () => toast.error('Erro ao criar turno'),
   });
 

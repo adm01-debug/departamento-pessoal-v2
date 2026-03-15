@@ -34,6 +34,7 @@ export default function WorkflowsPage() {
   const { data: execucoes = [], isLoading: loadExec } = useQuery({
     queryKey: ['workflows_exec', empresaAtual?.id],
     queryFn: () => workflowService.listarExecucoes(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const criar = useMutation({
