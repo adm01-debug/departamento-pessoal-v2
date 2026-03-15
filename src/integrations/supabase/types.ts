@@ -176,6 +176,8 @@ export type Database = {
       }
       afastamentos: {
         Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
           atestado_numero: string | null
           cid: string | null
           cid_descricao: string | null
@@ -193,13 +195,18 @@ export type Database = {
           id: string
           medico_crm: string | null
           medico_nome: string | null
+          motivo_rejeicao: string | null
           numero_beneficio: string | null
           observacoes: string | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
           status: Database["public"]["Enums"]["status_afastamento"] | null
           tipo: Database["public"]["Enums"]["tipo_afastamento"]
           updated_at: string
         }
         Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           atestado_numero?: string | null
           cid?: string | null
           cid_descricao?: string | null
@@ -217,13 +224,18 @@ export type Database = {
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
+          motivo_rejeicao?: string | null
           numero_beneficio?: string | null
           observacoes?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: Database["public"]["Enums"]["status_afastamento"] | null
           tipo: Database["public"]["Enums"]["tipo_afastamento"]
           updated_at?: string
         }
         Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           atestado_numero?: string | null
           cid?: string | null
           cid_descricao?: string | null
@@ -241,8 +253,11 @@ export type Database = {
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
+          motivo_rejeicao?: string | null
           numero_beneficio?: string | null
           observacoes?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: Database["public"]["Enums"]["status_afastamento"] | null
           tipo?: Database["public"]["Enums"]["tipo_afastamento"]
           updated_at?: string
@@ -313,6 +328,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ajustes_ponto_registro_ponto_id_fkey"
+            columns: ["registro_ponto_id"]
+            isOneToOne: false
+            referencedRelation: "pontos_abertos"
             referencedColumns: ["id"]
           },
           {
@@ -654,6 +676,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_registro_ponto_id_fkey"
+            columns: ["registro_ponto_id"]
+            isOneToOne: false
+            referencedRelation: "pontos_abertos"
             referencedColumns: ["id"]
           },
           {
@@ -7307,7 +7336,35 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      pontos_abertos: {
+        Row: {
+          colaborador_id: string | null
+          data: string | null
+          empresa_id: string | null
+          entrada_1: string | null
+          entrada_2: string | null
+          id: string | null
+          nome_completo: string | null
+          saida_1: string | null
+          saida_2: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
