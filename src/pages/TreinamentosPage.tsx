@@ -1,51 +1,218 @@
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, Plus, BookOpen, Award, Calendar, Users } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-
-const modules = [
-  { id: 'catalogo', title: 'Catálogo de Treinamentos', description: 'Todos os treinamentos disponíveis', icon: BookOpen, gradient: 'from-info to-info/70' },
-  { id: 'certificacoes', title: 'Certificações', description: 'Controle de certificações obrigatórias', icon: Award, gradient: 'from-success to-success/70' },
-  { id: 'cronograma', title: 'Cronograma', description: 'Agenda de treinamentos e eventos', icon: Calendar, gradient: 'from-warning to-warning/70' },
-  { id: 'participantes', title: 'Participantes', description: 'Gestão de inscrições e presença', icon: Users, gradient: 'from-primary to-primary/70' },
-];
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
+import { catalogoCursoService } from '@/services/catalogoCursoService';
+import { colaboradorService } from '@/services';
+import { useEmpresas } from '@/hooks';
+import { toast } from 'sonner';
+import { GraduationCap, Plus, BookOpen, Award, Users, Trash2 } from 'lucide-react';
 
 export default function TreinamentosPage() {
+  const { empresaAtual } = useEmpresas();
+  const qc = useQueryClient();
+  const [tab, setTab] = useState('catalogo');
+
+  // === Queries ===
+  const { data: cursos = [], isLoading: loadCursos } = useQuery({ queryKey: ['catalogo_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarCursos(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: trilhas = [], isLoading: loadTrilhas } = useQuery({ queryKey: ['trilhas', empresaAtual?.id], queryFn: () => catalogoCursoService.listarTrilhas(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
+
+  // === Cursos ===
+  const [openCurso, setOpenCurso] = useState(false);
+  const [cursoForm, setCursoForm] = useState({ nome: '', descricao: '', categoria: '', modalidade: 'presencial', carga_horaria: '', obrigatorio: false, nr_relacionada: '' });
+  const criarCurso = useMutation({
+    mutationFn: () => catalogoCursoService.criarCurso({ ...cursoForm, carga_horaria: cursoForm.carga_horaria ? Number(cursoForm.carga_horaria) : null, empresa_id: empresaAtual?.id }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['catalogo_cursos'] }); setOpenCurso(false); setCursoForm({ nome: '', descricao: '', categoria: '', modalidade: 'presencial', carga_horaria: '', obrigatorio: false, nr_relacionada: '' }); toast.success('Curso criado!'); },
+    onError: () => toast.error('Erro ao criar curso'),
+  });
+  const excluirCurso = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirCurso(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['catalogo_cursos'] }); toast.success('Curso excluído'); } });
+
+  // === Trilhas ===
+  const [openTrilha, setOpenTrilha] = useState(false);
+  const [trilhaForm, setTrilhaForm] = useState({ nome: '', descricao: '', nivel: 'basico' });
+  const criarTrilha = useMutation({
+    mutationFn: () => catalogoCursoService.criarTrilha({ ...trilhaForm, empresa_id: empresaAtual?.id }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); setOpenTrilha(false); setTrilhaForm({ nome: '', descricao: '', nivel: 'basico' }); toast.success('Trilha criada!'); },
+    onError: () => toast.error('Erro ao criar trilha'),
+  });
+  const excluirTrilha = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirTrilha(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); toast.success('Trilha excluída'); } });
+
+  // === Inscrições ===
+  const [openInsc, setOpenInsc] = useState(false);
+  const [inscForm, setInscForm] = useState({ colaborador_id: '', curso_id: '', data_inicio: '' });
+  const criarInsc = useMutation({
+    mutationFn: () => catalogoCursoService.criarInscricao({ ...inscForm, empresa_id: empresaAtual?.id, status: 'inscrito' }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['inscricoes_cursos'] }); setOpenInsc(false); setInscForm({ colaborador_id: '', curso_id: '', data_inicio: '' }); toast.success('Inscrição realizada!'); },
+    onError: () => toast.error('Erro ao inscrever'),
+  });
+
+  const isLoading = loadCursos || loadTrilhas || loadInsc;
+
   return (
-    <PageLayout
-      title="Treinamentos"
-      description="Gestão de treinamentos e desenvolvimento"
-      icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />}
-      gradient="from-info to-primary"
-      actions={
-        <Button className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-body">
-          <Plus className="h-4 w-4 mr-2" />Novo Treinamento
-        </Button>
-      }
-    >
-      <div className="grid gap-4 md:grid-cols-2">
-        {modules.map(({ id, title, description, icon: Icon, gradient }, i) => (
-          <motion.div key={id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
-            <Card className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 cursor-pointer rounded-2xl overflow-hidden">
-              <div className={cn("h-[2px] bg-gradient-to-r opacity-60 group-hover:opacity-100 transition-opacity", gradient)} />
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className={cn("p-2.5 rounded-xl bg-gradient-to-br shadow-lg group-hover:scale-110 transition-transform", gradient)}>
-                  <Icon className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-display">{title}</CardTitle>
-                  <CardDescription className="font-body">{description}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" size="sm" className="w-full rounded-xl border-border/50 hover:border-primary/30 hover:bg-primary/5 font-body">Acessar</Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+    <PageLayout title="Treinamentos" description="Gestão de treinamentos e desenvolvimento" icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <Card><CardContent className="pt-4 text-center"><BookOpen className="h-6 w-6 mx-auto text-primary mb-1" /><p className="text-2xl font-bold">{cursos.length}</p><p className="text-xs text-muted-foreground">Cursos</p></CardContent></Card>
+        <Card><CardContent className="pt-4 text-center"><Award className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{cursos.filter((c: any) => c.obrigatorio).length}</p><p className="text-xs text-muted-foreground">Obrigatórios</p></CardContent></Card>
+        <Card><CardContent className="pt-4 text-center"><GraduationCap className="h-6 w-6 mx-auto text-warning mb-1" /><p className="text-2xl font-bold">{trilhas.length}</p><p className="text-xs text-muted-foreground">Trilhas</p></CardContent></Card>
+        <Card><CardContent className="pt-4 text-center"><Users className="h-6 w-6 mx-auto text-info mb-1" /><p className="text-2xl font-bold">{inscricoes.length}</p><p className="text-xs text-muted-foreground">Inscrições</p></CardContent></Card>
       </div>
+
+      {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : (
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="catalogo">Catálogo</TabsTrigger>
+            <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
+            <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
+          </TabsList>
+
+          {/* CATÁLOGO */}
+          <TabsContent value="catalogo">
+            <div className="flex justify-end mb-4">
+              <Dialog open={openCurso} onOpenChange={setOpenCurso}>
+                <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Novo Curso</Button></DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Novo Curso</DialogTitle></DialogHeader>
+                  <div className="grid gap-3">
+                    <div><Label>Nome *</Label><Input value={cursoForm.nome} onChange={e => setCursoForm(p => ({ ...p, nome: e.target.value }))} /></div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><Label>Categoria</Label><Input value={cursoForm.categoria} onChange={e => setCursoForm(p => ({ ...p, categoria: e.target.value }))} placeholder="Ex: SST, Técnico" /></div>
+                      <div><Label>Carga Horária (h)</Label><Input type="number" value={cursoForm.carga_horaria} onChange={e => setCursoForm(p => ({ ...p, carga_horaria: e.target.value }))} /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><Label>Modalidade</Label>
+                        <Select value={cursoForm.modalidade} onValueChange={v => setCursoForm(p => ({ ...p, modalidade: v }))}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent><SelectItem value="presencial">Presencial</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="hibrido">Híbrido</SelectItem></SelectContent>
+                        </Select>
+                      </div>
+                      <div><Label>NR Relacionada</Label><Input value={cursoForm.nr_relacionada} onChange={e => setCursoForm(p => ({ ...p, nr_relacionada: e.target.value }))} placeholder="Ex: NR-35" /></div>
+                    </div>
+                    <div className="flex items-center gap-2"><Switch checked={cursoForm.obrigatorio} onCheckedChange={v => setCursoForm(p => ({ ...p, obrigatorio: v }))} /><Label>Obrigatório</Label></div>
+                    <div><Label>Descrição</Label><Textarea value={cursoForm.descricao} onChange={e => setCursoForm(p => ({ ...p, descricao: e.target.value }))} /></div>
+                    <Button onClick={() => criarCurso.mutate()} disabled={!cursoForm.nome || criarCurso.isPending}>{criarCurso.isPending ? 'Salvando...' : 'Salvar'}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <Card><CardContent className="p-0">
+              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Categoria</TableHead><TableHead>Modalidade</TableHead><TableHead>Carga Horária</TableHead><TableHead>Obrigatório</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {cursos.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum curso cadastrado</TableCell></TableRow> :
+                    cursos.map((c: any) => (
+                      <TableRow key={c.id}>
+                        <TableCell className="font-medium">{c.nome}</TableCell>
+                        <TableCell>{c.categoria || '—'}</TableCell>
+                        <TableCell>{c.modalidade || '—'}</TableCell>
+                        <TableCell>{c.carga_horaria ? `${c.carga_horaria}h` : '—'}</TableCell>
+                        <TableCell><Badge variant={c.obrigatorio ? 'default' : 'secondary'}>{c.obrigatorio ? 'Sim' : 'Não'}</Badge></TableCell>
+                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirCurso.mutate(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </CardContent></Card>
+          </TabsContent>
+
+          {/* TRILHAS */}
+          <TabsContent value="trilhas">
+            <div className="flex justify-end mb-4">
+              <Dialog open={openTrilha} onOpenChange={setOpenTrilha}>
+                <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Nova Trilha</Button></DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Nova Trilha de Aprendizado</DialogTitle></DialogHeader>
+                  <div className="grid gap-3">
+                    <div><Label>Nome *</Label><Input value={trilhaForm.nome} onChange={e => setTrilhaForm(p => ({ ...p, nome: e.target.value }))} /></div>
+                    <div><Label>Nível</Label>
+                      <Select value={trilhaForm.nivel} onValueChange={v => setTrilhaForm(p => ({ ...p, nivel: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent><SelectItem value="basico">Básico</SelectItem><SelectItem value="intermediario">Intermediário</SelectItem><SelectItem value="avancado">Avançado</SelectItem></SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label>Descrição</Label><Textarea value={trilhaForm.descricao} onChange={e => setTrilhaForm(p => ({ ...p, descricao: e.target.value }))} /></div>
+                    <Button onClick={() => criarTrilha.mutate()} disabled={!trilhaForm.nome || criarTrilha.isPending}>{criarTrilha.isPending ? 'Salvando...' : 'Salvar'}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <Card><CardContent className="p-0">
+              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Nível</TableHead><TableHead>Descrição</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {trilhas.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma trilha cadastrada</TableCell></TableRow> :
+                    trilhas.map((t: any) => (
+                      <TableRow key={t.id}>
+                        <TableCell className="font-medium">{t.nome}</TableCell>
+                        <TableCell>{t.nivel || '—'}</TableCell>
+                        <TableCell className="max-w-xs truncate">{t.descricao || '—'}</TableCell>
+                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirTrilha.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </CardContent></Card>
+          </TabsContent>
+
+          {/* INSCRIÇÕES */}
+          <TabsContent value="inscricoes">
+            <div className="flex justify-end mb-4">
+              <Dialog open={openInsc} onOpenChange={setOpenInsc}>
+                <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Nova Inscrição</Button></DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Inscrever Colaborador</DialogTitle></DialogHeader>
+                  <div className="grid gap-3">
+                    <div><Label>Colaborador *</Label>
+                      <Select value={inscForm.colaborador_id} onValueChange={v => setInscForm(p => ({ ...p, colaborador_id: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label>Curso *</Label>
+                      <Select value={inscForm.curso_id} onValueChange={v => setInscForm(p => ({ ...p, curso_id: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{cursos.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label>Data Início</Label><Input type="date" value={inscForm.data_inicio} onChange={e => setInscForm(p => ({ ...p, data_inicio: e.target.value }))} /></div>
+                    <Button onClick={() => criarInsc.mutate()} disabled={!inscForm.colaborador_id || !inscForm.curso_id || criarInsc.isPending}>{criarInsc.isPending ? 'Salvando...' : 'Inscrever'}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <Card><CardContent className="p-0">
+              <Table><TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Curso</TableHead><TableHead>Status</TableHead><TableHead>Data Início</TableHead><TableHead>Conclusão</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {inscricoes.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma inscrição registrada</TableCell></TableRow> :
+                    inscricoes.map((i: any) => (
+                      <TableRow key={i.id}>
+                        <TableCell>{i.colaborador?.nome_completo || '—'}</TableCell>
+                        <TableCell>{i.curso?.nome || '—'}</TableCell>
+                        <TableCell><Badge variant={i.status === 'concluido' ? 'default' : 'secondary'}>{i.status || 'inscrito'}</Badge></TableCell>
+                        <TableCell>{i.data_inicio || '—'}</TableCell>
+                        <TableCell>{i.data_conclusao || '—'}</TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </CardContent></Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </PageLayout>
   );
 }
