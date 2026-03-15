@@ -30,6 +30,7 @@ export default function TurnosPage() {
   const { data: escalas = [] } = useQuery({
     queryKey: ['escalas_trabalho', empresaAtual?.id],
     queryFn: () => turnoService.listarEscalas(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const criar = useMutation({
