@@ -18,7 +18,7 @@ export async function criarDependente(dependente: Record<string, unknown>) {
     .from('dependentes')
     .insert([dependente as any])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -51,7 +51,7 @@ export async function criarContatoEmergencia(contato: Record<string, unknown>) {
     .from('contatos_emergencia' as any)
     .insert([contato])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -79,7 +79,7 @@ export async function criarRegistroSalarial(registro: Record<string, unknown>) {
     .from('historico_salarial' as any)
     .insert([registro])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -102,7 +102,7 @@ export async function criarASO(aso: Record<string, unknown>) {
     .from('asos' as any)
     .insert([aso])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -125,7 +125,7 @@ export async function criarFormacao(formacao: Record<string, unknown>) {
     .from('formacoes_academicas' as any)
     .insert([formacao])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -153,7 +153,7 @@ export async function salvarDadosEstrangeiro(colaboradorId: string, dados: Recor
     .from('dados_estrangeiro' as any)
     .upsert({ ...dados, colaborador_id: colaboradorId }, { onConflict: 'colaborador_id' })
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -176,7 +176,7 @@ export async function salvarDeficiencia(colaboradorId: string, dados: Record<str
     .from('deficiencias' as any)
     .upsert({ ...dados, colaborador_id: colaboradorId }, { onConflict: 'colaborador_id' })
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -202,7 +202,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Rec
       .update(dados)
       .eq('id', (existing as any).id)
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   } else {
@@ -210,7 +210,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Rec
       .from('periodos_experiencia' as any)
       .insert([{ ...dados, colaborador_id: colaboradorId }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -234,7 +234,7 @@ export async function criarAnotacao(anotacao: Record<string, unknown>) {
     .from('anotacoes_colaborador' as any)
     .insert([anotacao])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -273,7 +273,7 @@ export async function criarTime(time: Record<string, unknown>) {
     .from('times' as any)
     .insert([time])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -321,7 +321,7 @@ export async function criarWebhook(webhook: Record<string, unknown>) {
     .from('webhooks_config' as any)
     .insert([webhook])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -349,7 +349,7 @@ export async function criarFeriasColetivas(ferias: Record<string, unknown>) {
     .from('ferias_coletivas' as any)
     .insert([ferias])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -370,7 +370,7 @@ export async function criarCampoCustomizado(campo: Record<string, unknown>) {
     .from('campos_customizados' as any)
     .insert([campo])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -392,7 +392,7 @@ export async function salvarValorCampoCustomizado(campoId: string, colaboradorId
       { onConflict: 'campo_customizado_id,colaborador_id' }
     )
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }

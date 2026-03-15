@@ -46,7 +46,7 @@ export async function criarCentroCusto(centro: Record<string, unknown>) {
     .from('centros_custo' as any)
     .insert([centro])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -79,7 +79,7 @@ export async function criarContaBancaria(conta: Record<string, unknown>) {
     .from('contas_bancarias' as any)
     .insert([conta])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -115,7 +115,7 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: Record
       .update(dados)
       .eq('id', (existing as any).id)
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   } else {
@@ -123,7 +123,7 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: Record
       .from('dados_estagiario' as any)
       .insert([{ ...dados, colaborador_id: colaboradorId }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -147,7 +147,7 @@ export async function criarDocumentoPessoal(doc: Record<string, unknown>) {
     .from('documentos_pessoais_arquivos' as any)
     .insert([doc])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -175,7 +175,7 @@ export async function criarFeriasAprovacao(aprovacao: Record<string, unknown>) {
     .from('ferias_aprovacoes' as any)
     .insert([aprovacao])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -203,7 +203,7 @@ export async function criarFeriasArquivo(arquivo: Record<string, unknown>) {
     .from('ferias_arquivos' as any)
     .insert([arquivo])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -225,7 +225,7 @@ export async function vincularDependenteBeneficio(vinculo: Record<string, unknow
     .from('dependentes_beneficios' as any)
     .upsert([vinculo], { onConflict: 'dependente_id,beneficio_id' })
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }

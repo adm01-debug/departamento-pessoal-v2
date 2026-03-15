@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, LogIn, Coffee, LogOut } from 'lucide-react';
 import { pontoService } from '@/services';
-import { useNotification, useAuth } from '@/contexts';
+import { useAuth } from '@/contexts';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [time, setTime] = useState(new Date());
-  const { success, error } = useNotification();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -30,9 +30,9 @@ export default function PontoPage() {
         if (pos) coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       }
       await pontoService.registrar(tipo, user?.id);
-      success('Ponto registrado!', `${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+      toast.success(`Ponto registrado: ${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
     } catch (err: any) {
-      error('Erro ao registrar ponto', err.message);
+      toast.error(`Erro ao registrar ponto: ${err.message}`);
     } finally {
       setLoading(null);
     }

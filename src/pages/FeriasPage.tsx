@@ -8,6 +8,7 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { feriasService } from '@/services';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { Check, X, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -16,10 +17,12 @@ import { toast } from 'sonner';
 export default function FeriasPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
 
   const { data: solicitacoes, isLoading } = useQuery({
-    queryKey: ['ferias-solicitacoes'],
-    queryFn: () => feriasService.listSolicitacoes(),
+    queryKey: ['ferias-solicitacoes', empresaAtual?.id],
+    queryFn: () => feriasService.listSolicitacoes(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const aprovarMutation = useMutation({
