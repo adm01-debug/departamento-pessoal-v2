@@ -24,6 +24,7 @@ export default function TurnosPage() {
   const { data: turnos = [], isLoading } = useQuery({
     queryKey: ['turnos', empresaAtual?.id],
     queryFn: () => turnoService.listarTurnos(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const { data: escalas = [] } = useQuery({
