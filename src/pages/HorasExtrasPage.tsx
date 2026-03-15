@@ -75,7 +75,7 @@ export default function HorasExtrasPage() {
                   <TableCell>{s.data}</TableCell>
                   <TableCell>{Number(s.horas_solicitadas).toFixed(1)}h</TableCell>
                   <TableCell>{s.motivo}</TableCell>
-                  <TableCell><Badge className={statusColor[s.status] || ''}>{s.status}</Badge></TableCell>
+                  <TableCell><Badge variant={statusVariant[s.status] || 'secondary'}>{s.status}</Badge></TableCell>
                   <TableCell className="flex gap-1">
                     {s.status === 'pendente' && (
                       <>
