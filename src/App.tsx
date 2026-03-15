@@ -12,6 +12,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 // Lazy-loaded pages
 const ColaboradoresPage = lazy(() => import('@/pages/ColaboradoresPage'));
 const ColaboradorFormPage = lazy(() => import('@/pages/ColaboradorFormPage'));
+const ColaboradorDetalhesPage = lazy(() => import('@/pages/ColaboradorDetalhesPage'));
 const EmpresasPage = lazy(() => import('@/pages/EmpresasPage'));
 const EmpresaFormPage = lazy(() => import('@/pages/EmpresaFormPage'));
 const FolhaPage = lazy(() => import('@/pages/FolhaPage'));
