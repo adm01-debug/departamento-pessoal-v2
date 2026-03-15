@@ -43,7 +43,7 @@ function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
 }
 
-function LazyPage({ Component }: { Component: React.LazyExoticComponent<() => React.JSX.Element> }) {
+function LazyPage({ Component }: { Component: React.LazyExoticComponent<() => React.ReactElement> }) {
   return <Suspense fallback={<PageLoader />}><Component /></Suspense>;
 }
 

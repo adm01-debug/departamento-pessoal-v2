@@ -23,7 +23,10 @@ export default function PerfilPage() {
     try {
       const { error } = await supabase.auth.updateUser({ data: { name: nome } });
       if (error) throw error;
-      await supabase.from('profiles').update({ nome }).eq('user_id', user.id);
+      const { data: profile } = await supabase.from('profiles').select('id').eq('user_id', user.id).maybeSingle();
+      if (profile) {
+        await supabase.from('profiles').update({ nome }).eq('id', profile.id);
+      }
       toast.success('Perfil atualizado!');
     } catch (e: any) {
       toast.error(e.message);
