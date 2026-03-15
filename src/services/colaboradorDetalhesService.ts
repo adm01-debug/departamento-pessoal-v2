@@ -210,7 +210,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Rec
       .from('periodos_experiencia' as any)
       .insert([{ ...dados, colaborador_id: colaboradorId }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
