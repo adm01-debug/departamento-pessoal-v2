@@ -23,7 +23,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
     if (data) {
       const d = data as any;
       setForm({
-        instituicao_ensino: d.instituicao_ensino || '', cnpj_instituicao: d.cnpj_instituicao || '',
+        instituicao_nome: d.instituicao_nome || '', instituicao_cnpj: d.instituicao_cnpj || '',
         curso: d.curso || '', nivel: d.nivel || '',
         supervisor_nome: d.supervisor_nome || '', supervisor_cargo: d.supervisor_cargo || '',
         data_inicio: d.data_inicio || '', data_fim: d.data_fim || '',
