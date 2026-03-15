@@ -51,7 +51,7 @@ export async function criarContatoEmergencia(contato: Record<string, unknown>) {
     .from('contatos_emergencia' as any)
     .insert([contato])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
