@@ -349,7 +349,7 @@ export async function criarFeriasColetivas(ferias: Record<string, unknown>) {
     .from('ferias_coletivas' as any)
     .insert([ferias])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
