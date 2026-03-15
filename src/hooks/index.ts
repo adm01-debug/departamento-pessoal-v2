@@ -16,3 +16,8 @@ export { useFolha } from "./useFolha";
 export { useBeneficios } from "./useBeneficios";
 export { useContratos } from "./useContratos";
 export { useDesligamentos } from "./useDesligamentos";
+export { usePonto } from "./usePonto";
+export { useDocumentos } from "./useDocumentos";
+export { useFeriados } from "./useFeriados";
+export { usePDFExport } from "./usePDFExport";
+export { useExcelExport } from "./useExcelExport";
