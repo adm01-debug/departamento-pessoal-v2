@@ -636,6 +636,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           data: string
+          empresa_id: string | null
           horas: string
           id: string
           motivo: string | null
@@ -649,6 +650,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data: string
+          empresa_id?: string | null
           horas: string
           id?: string
           motivo?: string | null
@@ -662,6 +664,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data?: string
+          empresa_id?: string | null
           horas?: string
           id?: string
           motivo?: string | null
@@ -676,6 +679,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
           {

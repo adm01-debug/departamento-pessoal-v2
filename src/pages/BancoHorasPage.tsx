@@ -14,11 +14,12 @@ export default function BancoHorasPage() {
   const { data: registros = [], isLoading } = useQuery({
     queryKey: ['banco_horas', empresaAtual?.id],
     queryFn: async () => {
-      let q = supabase.from('banco_horas').select('*, colaborador:colaboradores(nome_completo)').order('data', { ascending: false }).limit(200);
-      if (empresaAtual?.id) {
-        q = q.eq('colaborador.empresa_id', empresaAtual.id);
-      }
-      const { data, error } = await q;
+      const { data, error } = await supabase
+        .from('banco_horas')
+        .select('*, colaborador:colaboradores(nome_completo)')
+        .eq('empresa_id', empresaAtual!.id)
+        .order('data', { ascending: false })
+        .limit(200);
       if (error) throw error;
       return data || [];
     },
