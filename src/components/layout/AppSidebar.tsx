@@ -56,9 +56,12 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: Clock, label: 'Ponto', path: '/ponto', color: 'text-info' },
       { icon: Timer, label: 'Horas Extras', path: '/horas-extras', color: 'text-warning' },
+      { icon: Scale, label: 'Banco de Horas', path: '/banco-horas', color: 'text-info' },
+      { icon: CalendarClock, label: 'Turnos & Escalas', path: '/turnos', color: 'text-primary' },
       { icon: Umbrella, label: 'Férias', path: '/ferias', color: 'text-warning' },
       { icon: Heart, label: 'Afastamentos', path: '/afastamentos', color: 'text-destructive' },
       { icon: Calendar, label: 'Feriados', path: '/feriados', color: 'text-warning' },
+      { icon: Fingerprint, label: 'Controle Acesso', path: '/controle-acesso', color: 'text-primary' },
     ]
   },
   {
