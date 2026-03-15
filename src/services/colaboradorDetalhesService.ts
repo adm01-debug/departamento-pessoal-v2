@@ -79,7 +79,7 @@ export async function criarRegistroSalarial(registro: Record<string, unknown>) {
     .from('historico_salarial' as any)
     .insert([registro])
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
