@@ -43,7 +43,7 @@ export default function PesquisasClimaPage() {
   });
 
   const ativar = useMutation({
-    mutationFn: (id: string) => pesquisaService.atualizar(id, { status: 'ativa', data_publicacao: new Date().toISOString() }),
+    mutationFn: (id: string) => pesquisaService.atualizar(id, { status: 'ativa' }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['pesquisas'] }); toast.success('Pesquisa ativada!'); },
   });
 
