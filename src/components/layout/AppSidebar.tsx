@@ -3,7 +3,7 @@ import {
   UserMinus, BarChart3, ChevronLeft, ChevronRight, ChevronDown, Search,
   LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
-  FileText, GraduationCap, Target, UserSearch, LucideIcon
+  FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer
 } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
