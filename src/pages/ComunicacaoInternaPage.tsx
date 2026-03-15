@@ -37,6 +37,7 @@ export default function ComunicacaoInternaPage() {
   const { data: denuncias = [], isLoading: loadEtica } = useQuery({
     queryKey: ['canal_etica', empresaAtual?.id],
     queryFn: () => comunicacaoService.listarDenuncias(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
   });
 
   const criarCom = useMutation({
