@@ -77,8 +77,8 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
           <div className="grid gap-3 max-w-lg">
             {!data && <p className="text-sm text-muted-foreground mb-2">Nenhum dado cadastrado.</p>}
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Instituição de Ensino *</Label><Input value={form.instituicao_ensino} onChange={e => setForm(f => ({ ...f, instituicao_ensino: e.target.value }))} /></div>
-              <div><Label>CNPJ Instituição</Label><Input value={form.cnpj_instituicao} onChange={e => setForm(f => ({ ...f, cnpj_instituicao: e.target.value }))} /></div>
+              <div><Label>Instituição de Ensino *</Label><Input value={form.instituicao_nome} onChange={e => setForm(f => ({ ...f, instituicao_nome: e.target.value }))} /></div>
+              <div><Label>CNPJ Instituição</Label><Input value={form.instituicao_cnpj} onChange={e => setForm(f => ({ ...f, instituicao_cnpj: e.target.value }))} /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Curso</Label><Input value={form.curso} onChange={e => setForm(f => ({ ...f, curso: e.target.value }))} /></div>
