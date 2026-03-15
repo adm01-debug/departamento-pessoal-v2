@@ -9,12 +9,12 @@ import { colaboradorService } from '@/services';
 import {
   ArrowLeft, Users, Phone, DollarSign, Stethoscope,
   GraduationCap, Globe, Accessibility, Calendar, StickyNote,
-  Landmark, FileText, BookOpen
+  Landmark, FileText, BookOpen, FileStack
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
   ASOTab, FormacaoTab, EstrangeiroTab, PCDTab, AquisitivosTab, AnotacoesTab,
-  ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab,
+  ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab, HistoricoContratosTab,
 } from '@/components/colaborador-detalhes';
 
 export default function ColaboradorDetalhesPage() {
