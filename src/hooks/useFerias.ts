@@ -3,8 +3,8 @@ import { feriasService } from '@/services';
 import { useEmpresas } from './useEmpresas';
 
 export function useFerias() {
-  const { selectedEmpresa } = useEmpresas();
-  const empresaId = selectedEmpresa?.id;
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id;
 
   const query = useQuery({
     queryKey: ['ferias', empresaId],

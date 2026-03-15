@@ -3,8 +3,8 @@ import { desligamentoService } from '@/services/desligamentoService';
 import { useEmpresas } from './useEmpresas';
 
 export function useDesligamentos() {
-  const { selectedEmpresa } = useEmpresas();
-  const empresaId = selectedEmpresa?.id;
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id;
 
   const query = useQuery({
     queryKey: ['desligamentos', empresaId],

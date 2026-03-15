@@ -3,8 +3,8 @@ import { beneficioService } from '@/services';
 import { useEmpresas } from './useEmpresas';
 
 export function useBeneficios() {
-  const { selectedEmpresa } = useEmpresas();
-  const empresaId = selectedEmpresa?.id;
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id;
 
   const query = useQuery({
     queryKey: ['beneficios', empresaId],

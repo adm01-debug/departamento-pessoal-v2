@@ -4,9 +4,9 @@ import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
 
 export function useAdmissoes() {
-  const { selectedEmpresa } = useEmpresas();
+  const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
-  const empresaId = selectedEmpresa?.id;
+  const empresaId = empresaAtual?.id;
 
   const query = useQuery({
     queryKey: ['admissoes', empresaId],
