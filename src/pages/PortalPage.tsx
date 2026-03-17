@@ -52,7 +52,7 @@ function usePortalCompleto(userId: string | undefined) {
       const { data: feriasPendentes } = await supabase.from('ferias').select('data_inicio, data_fim, status, dias_total').in('status', ['pendente', 'aprovada']).order('data_inicio', { ascending: true }).limit(5);
 
       // Holerites recentes
-      const { data: holerites } = await supabase.from('folhas_pagamento' as any).select('competencia, total_liquido, total_bruto').order('competencia', { ascending: false }).limit(3);
+      const { data: holerites } = await supabase.from('folhas_pagamento' as any).select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3);
 
       // Benefícios ativos
       const { data: beneficios } = await supabase.from('beneficios').select('nome, tipo, valor, status').eq('status', 'ativo').limit(6);
