@@ -104,6 +104,7 @@ const menuGroups: MenuGroup[] = [
   {
     label: 'SST & Compliance',
     items: [
+      { path: '/sst', label: 'SST', icon: HardHat },
       { path: '/exames', label: 'Exames / ASOs', icon: Stethoscope },
       { path: '/epis', label: 'EPIs', icon: HardHat },
       { path: '/medidas-disciplinares', label: 'Medidas Disciplinares', icon: BadgeAlert },
