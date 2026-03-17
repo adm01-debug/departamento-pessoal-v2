@@ -99,7 +99,7 @@ export function useNotificacoes() {
       if (!empresaAtualId) throw new Error('Empresa não selecionada.');
 
       const hoje = new Date();
-      const notificacoesParaCriar: Record<string, unknown>[] = [];
+      const notificacoesParaCriar: Array<{ user_id: string; empresa_id: string; tipo: string; titulo: string; mensagem: string; entidade_tipo: string; entidade_id: string; lida: boolean; data_referencia: string }> = [];
 
       // 1. Períodos aquisitivos vencendo
       const { data: periodos } = await supabase
