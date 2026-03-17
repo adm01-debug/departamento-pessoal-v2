@@ -102,12 +102,11 @@ export function useNotificacoes() {
       const notificacoesParaCriar: Array<{ user_id: string; empresa_id: string; tipo: string; titulo: string; mensagem: string; entidade_tipo: string; entidade_id: string; lida: boolean; data_referencia: string }> = [];
 
       // 1. Períodos aquisitivos vencendo
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: periodos } = await (supabase
+      const periodosQuery: any = supabase
         .from('periodos_aquisitivos')
         .select('*, colaboradores:colaboradores!fk_periodos_aquisitivos_colaborador (id, nome_completo, status)')
-        .eq('status', 'adquirido')
-        .eq('empresa_id', empresaAtualId!) as any);
+        .eq('status', 'adquirido');
+      const { data: periodos } = await periodosQuery.eq('empresa_id', empresaAtualId!);
 
       if (periodos) {
         for (const periodo of periodos) {
