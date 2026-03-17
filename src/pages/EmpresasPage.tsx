@@ -5,7 +5,7 @@ import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EmptyList } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/ui/spinner';
+import { GridCardSkeleton } from '@/components/ui/module-skeleton';
 import { empresaService } from '@/services';
 import { Building2, Edit, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +43,9 @@ export default function EmpresasPage() {
       <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar empresa..." />
 
       {isLoading ? (
-        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => <GridCardSkeleton key={i} />)}
+        </div>
       ) : !filtered?.length ? (
         <EmptyList entityName="empresa" onCreate={() => navigate('/empresas/nova')} />
       ) : (
