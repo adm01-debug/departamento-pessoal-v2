@@ -615,6 +615,9 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* Morning Briefing - Painel de Comando Diário */}
+      {!isEmptySystem && <MorningBriefing />}
+
       {/* Onboarding Wizard (empty system) */}
       {isEmptySystem && <OnboardingWizard />}
 
