@@ -645,7 +645,7 @@ export default function DashboardPage() {
         <MotionCard custom={4.2} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-coins">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/60 to-primary/90">
                 <Timer className="h-4 w-4 text-primary-foreground" />
               </div>
               Próximos Vencimentos
