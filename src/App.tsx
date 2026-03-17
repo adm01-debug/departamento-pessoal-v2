@@ -148,6 +148,15 @@ export default function App() {
         <Route path="sindicatos" element={<LazyPage Component={SindicatosPage} />} />
         <Route path="obrigacoes-fiscais" element={<LazyPage Component={ObrigacoesFiscaisPage} />} />
         <Route path="planos-saude" element={<LazyPage Component={PlanosSaudePage} />} />
+        <Route path="canal-etica" element={<LazyPage Component={CanalEticaPage} />} />
+        <Route path="convenios" element={<LazyPage Component={ConveniosPage} />} />
+        <Route path="escalas" element={<LazyPage Component={EscalasPage} />} />
+        <Route path="seguros-vida" element={<LazyPage Component={SegurosVidaPage} />} />
+        <Route path="pensoes" element={<LazyPage Component={PensoesPage} />} />
+        <Route path="vales" element={<LazyPage Component={ValesPage} />} />
+        <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
+        <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
+        <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}
