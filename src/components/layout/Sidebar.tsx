@@ -5,14 +5,18 @@ import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
   Zap, ChevronDown, UserPlus, UserMinus, Briefcase,
-  FolderOpen, CalendarDays, Bell, Plug, Database,
-  Network, Shield, UserCog,
+  FolderOpen, CalendarDays, Plug, Database,
+  Network, Shield, UserCog, LogOut, Check, ChevronRight,
 } from 'lucide-react';
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
+/* ─── Menu Structure ─── */
 interface MenuGroup {
   label: string;
   items: MenuItem[];
@@ -30,18 +34,22 @@ const menuGroups: MenuGroup[] = [
     label: 'Principal',
     items: [
       { path: '/dashboard', label: 'Dashboard', icon: Home },
+    ],
+  },
+  {
+    label: 'Pessoas',
+    items: [
       { path: '/colaboradores', label: 'Colaboradores', icon: Users },
-      { path: '/empresas', label: 'Empresas', icon: Building2 },
+      { path: '/admissoes', label: 'Admissões', icon: UserPlus },
+      { path: '/desligamentos', label: 'Desligamentos', icon: UserMinus },
     ],
   },
   {
     label: 'Operações',
     items: [
-      { path: '/admissoes', label: 'Admissões', icon: UserPlus },
-      { path: '/desligamentos', label: 'Desligamentos', icon: UserMinus },
       { path: '/folha', label: 'Folha', icon: FileText },
-      { path: '/ferias', label: 'Férias', icon: Calendar },
       { path: '/ponto', label: 'Ponto', icon: Clock },
+      { path: '/ferias', label: 'Férias', icon: Calendar },
       { path: '/afastamentos', label: 'Afastamentos', icon: Shield },
     ],
   },
@@ -57,7 +65,7 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    label: 'Relatórios & eSocial',
+    label: 'Relatórios',
     items: [
       { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
       { path: '/esocial', label: 'eSocial', icon: FileCheck },
@@ -75,6 +83,7 @@ const menuGroups: MenuGroup[] = [
   },
 ];
 
+/* ─── Props ─── */
 interface SidebarProps {
   collapsed?: boolean;
   className?: string;
@@ -84,6 +93,9 @@ interface SidebarProps {
 export function Sidebar({ collapsed = false, className, pendingCounts }: SidebarProps) {
   const location = useLocation();
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const { user, signOut } = useAuth();
+  const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
+  const [empresaMenuOpen, setEmpresaMenuOpen] = useState(false);
 
   const toggleGroup = (label: string) => {
     if (collapsed) return;
@@ -95,6 +107,12 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
     return undefined;
   };
 
+  const userInitials = user?.name
+    ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : user?.email?.[0]?.toUpperCase() || 'U';
+
+  const empresaNome = empresaAtual?.nome_fantasia || empresaAtual?.razao_social || 'Sem empresa';
+
   return (
     <TooltipProvider delayDuration={0}>
       <aside
@@ -105,7 +123,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
           className
         )}
       >
-        {/* Logo — Bombon style */}
+        {/* ─── Logo ─── */}
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -125,24 +143,95 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
           </div>
         </div>
 
-        {/* Navigation */}
+        {/* ─── Company Switcher ─── */}
+        {!collapsed ? (
+          <div className="px-3 pt-3 pb-1">
+            <button
+              onClick={() => temMultiplasEmpresas && setEmpresaMenuOpen(!empresaMenuOpen)}
+              className={cn(
+                'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200',
+                'bg-sidebar-accent/60 hover:bg-sidebar-accent border border-border/20',
+                temMultiplasEmpresas && 'cursor-pointer'
+              )}
+            >
+              <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-4 w-4 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-xs font-body font-medium text-foreground truncate">{empresaNome}</p>
+                <p className="text-[10px] text-muted-foreground font-body">
+                  {empresaAtual?.cnpj || 'Empresa ativa'}
+                </p>
+              </div>
+              {temMultiplasEmpresas && (
+                <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/50 transition-transform', empresaMenuOpen && 'rotate-180')} />
+              )}
+            </button>
+
+            <AnimatePresence>
+              {empresaMenuOpen && temMultiplasEmpresas && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-1 rounded-xl border border-border/20 bg-sidebar-accent/40 p-1">
+                    {userEmpresas?.map((ue) => (
+                      <button
+                        key={ue.empresa_id}
+                        onClick={() => { trocarEmpresa(ue.empresa_id); setEmpresaMenuOpen(false); }}
+                        className={cn(
+                          'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
+                          ue.empresa_id === empresaAtual?.id
+                            ? 'bg-primary/10 text-primary'
+                            : 'hover:bg-sidebar-accent text-muted-foreground hover:text-foreground'
+                        )}
+                      >
+                        <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="text-xs font-body truncate flex-1">
+                          {ue.empresa?.nome_fantasia || ue.empresa?.razao_social}
+                        </span>
+                        {ue.empresa_id === empresaAtual?.id && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <div className="px-2 pt-3 pb-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="h-10 w-10 mx-auto rounded-xl bg-sidebar-accent/60 flex items-center justify-center">
+                  <Building2 className="h-4 w-4 text-primary" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right"><p>{empresaNome}</p></TooltipContent>
+            </Tooltip>
+          </div>
+        )}
+
+        {/* ─── Navigation ─── */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar">
           {menuGroups.map((group, gi) => {
             const isGroupCollapsed = collapsedGroups[group.label];
 
             return (
-              <div key={group.label} className={cn(gi > 0 && 'mt-3')}>
+              <div key={group.label} className={cn(gi > 0 && 'mt-2')}>
                 {!collapsed ? (
                   <button
                     onClick={() => toggleGroup(group.label)}
-                    className="w-full flex items-center justify-between px-3 py-1.5 mb-1 group/header"
+                    className="w-full flex items-center justify-between px-3 py-1.5 mb-0.5 group/header"
                   >
                     <span className="text-overline text-muted-foreground/50 group-hover/header:text-muted-foreground transition-colors">
                       {group.label}
                     </span>
-                    <ChevronDown className={cn(
+                    <ChevronRight className={cn(
                       'h-3 w-3 text-muted-foreground/30 transition-transform duration-200',
-                      isGroupCollapsed && '-rotate-90'
+                      !isGroupCollapsed && 'rotate-90'
                     )} />
                   </button>
                 ) : (
@@ -216,17 +305,47 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
           })}
         </nav>
 
-        {/* Bottom status */}
-        {!collapsed && (
-          <div className="p-3 border-t border-sidebar-border">
-            <div className="rounded-lg bg-sidebar-accent p-3">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-caption text-muted-foreground font-body">Sistema online</span>
+        {/* ─── User Profile Footer ─── */}
+        <div className="border-t border-sidebar-border p-3">
+          {!collapsed ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 px-2 py-2">
+                <Avatar className="h-9 w-9 ring-2 ring-border/30">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-body font-medium text-foreground truncate">
+                    {user?.name || user?.email || 'Usuário'}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-body truncate">
+                    {user?.email || ''}
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={() => signOut()}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors text-sm font-body"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sair</span>
+              </button>
             </div>
-          </div>
-        )}
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => signOut()}
+                  className="w-full flex items-center justify-center py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right"><p>Sair</p></TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </aside>
     </TooltipProvider>
   );

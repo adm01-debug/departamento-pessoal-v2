@@ -5,6 +5,7 @@ import { NotificationCenter } from '@/components/ui/notification-center';
 import { UserProfileMenu } from '@/components/ui/user-profile-menu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Breadcrumbs } from './Breadcrumbs';
+import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -31,14 +32,14 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         {/* Breadcrumbs */}
         <Breadcrumbs className="hidden md:flex" />
 
-        {/* Search trigger */}
+        {/* Compact search trigger */}
         <button
           onClick={handleSearchClick}
-          className="hidden md:flex items-center gap-2.5 px-4 py-1.5 bg-muted/50 rounded-lg border border-border/30 hover:border-primary/40 hover:bg-muted/80 transition-all group cursor-pointer"
+          className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border border-border/30 hover:border-primary/40 hover:bg-muted/80 transition-all group cursor-pointer"
           aria-label="Buscar (⌘K)"
         >
           <Search className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-body font-body text-muted-foreground/60 w-32 lg:w-52 text-left">Buscar...</span>
+          <span className="text-body font-body text-muted-foreground/60 w-28 lg:w-40 text-left">Buscar...</span>
           <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border/40 bg-muted px-1.5 text-overline font-mono text-muted-foreground">
             ⌘K
           </kbd>
@@ -46,6 +47,10 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-1.5">
+        {/* Company badge in header (mobile-visible) */}
+        <div className="lg:hidden">
+          <EmpresaSelector />
+        </div>
         <ThemeToggle />
         <NotificationCenter />
         <UserProfileMenu user={user} />
