@@ -23,6 +23,8 @@ import { BarChartWidget } from "@/components/dashboard/BarChartWidget";
 import { EventTimeline, type TimelineEvent } from "@/components/dashboard/EventTimeline";
 import { ExpiringItemsWidget, type ExpiringItem } from "@/components/dashboard/ExpiringItemsWidget";
 import { KPICardSkeleton, CardSkeleton } from "@/components/ui/module-skeleton";
+import { viewsService } from "@/services/tabelasComplementaresService";
+import { Badge } from "@/components/ui/badge";
 
 interface DashboardStats {
   colaboradoresAtivos: number;
