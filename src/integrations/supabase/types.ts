@@ -8462,6 +8462,9 @@ export type Database = {
           entrada_1: string | null
           entrada_2: string | null
           entrada_3: string | null
+          entrada_4: string | null
+          entrada_5: string | null
+          entrada_6: string | null
           entrada_esperada: string | null
           horas_extras: string | null
           horas_falta: string | null
@@ -8473,6 +8476,10 @@ export type Database = {
           saida_1: string | null
           saida_2: string | null
           saida_3: string | null
+          saida_4: string | null
+          saida_5: string | null
+          saida_6: string | null
+          saida_antecipada_minutos: number | null
           saida_esperada: string | null
           saida_intervalo: string | null
           tipo_dia: string | null
@@ -8492,6 +8499,9 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
+          entrada_4?: string | null
+          entrada_5?: string | null
+          entrada_6?: string | null
           entrada_esperada?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
@@ -8503,6 +8513,10 @@ export type Database = {
           saida_1?: string | null
           saida_2?: string | null
           saida_3?: string | null
+          saida_4?: string | null
+          saida_5?: string | null
+          saida_6?: string | null
+          saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
           tipo_dia?: string | null
@@ -8522,6 +8536,9 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
+          entrada_4?: string | null
+          entrada_5?: string | null
+          entrada_6?: string | null
           entrada_esperada?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
@@ -8533,6 +8550,10 @@ export type Database = {
           saida_1?: string | null
           saida_2?: string | null
           saida_3?: string | null
+          saida_4?: string | null
+          saida_5?: string | null
+          saida_6?: string | null
+          saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
           tipo_dia?: string | null
