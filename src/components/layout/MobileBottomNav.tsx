@@ -24,7 +24,7 @@ export function MobileBottomNav() {
             return (
               <Link
                 key={path}
-                to={path === '/more' ? '/configuracoes' : path}
+                to={path}
                 className={cn(
                   'relative flex flex-col items-center justify-center gap-1 w-16 h-full transition-colors',
                   isActive ? 'text-primary' : 'text-muted-foreground'

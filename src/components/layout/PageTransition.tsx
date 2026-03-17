@@ -30,8 +30,10 @@ const routeOrder = [
   '/dashboard',
   // Pessoas
   '/colaboradores', '/admissoes', '/desligamentos',
+  // Empresas
+  '/empresas',
   // Operações
-  '/folha', '/ponto', '/ferias', '/afastamentos',
+  '/folha', '/holerites', '/ponto', '/ferias', '/afastamentos',
   '/banco-horas', '/horas-extras', '/faltas', '/turnos', '/escalas', '/jornadas',
   // Gestão
   '/beneficios', '/cargos', '/departamentos', '/documentos', '/feriados', '/organograma',
@@ -43,13 +45,15 @@ const routeOrder = [
   // Comunicação
   '/comunicacao', '/notificacoes',
   // Relatórios
-  '/relatorios', '/esocial', '/auditoria', '/obrigacoes-fiscais', '/holerites',
+  '/relatorios', '/esocial', '/auditoria', '/obrigacoes-fiscais',
   // Recrutamento
   '/recrutamento', '/contratacao', '/onboarding', '/assinaturas',
   // Sistema
   '/usuarios', '/integracoes', '/backup', '/configuracoes',
   '/controle-acesso', '/lgpd', '/workflows', '/despesas',
-  '/locais-trabalho', '/portal', '/perfil',
+  '/locais-trabalho', '/portal', '/perfil', '/notificacoes',
+  // Dev
+  '/design-system',
 ];
 
 function getRouteIndex(path: string): number {

@@ -40,6 +40,8 @@ const menuGroups: MenuGroup[] = [
     label: 'Principal',
     items: [
       { path: '/dashboard', label: 'Dashboard', icon: Home },
+      { path: '/empresas', label: 'Empresas', icon: Building2 },
+      { path: '/portal', label: 'Portal', icon: Globe },
     ],
   },
   {
@@ -125,9 +127,11 @@ const menuGroups: MenuGroup[] = [
       { path: '/assinaturas', label: 'Assinaturas', icon: PenTool },
       { path: '/workflows', label: 'Workflows', icon: Workflow },
       { path: '/comunicacao', label: 'Comunicação', icon: Megaphone },
+      { path: '/notificacoes', label: 'Notificações', icon: Shield },
       { path: '/integracoes', label: 'Integrações', icon: Plug },
       { path: '/lgpd', label: 'LGPD', icon: ShieldCheck },
       { path: '/backup', label: 'Backup', icon: Database },
+      { path: '/perfil', label: 'Meu Perfil', icon: UserCog },
       { path: '/configuracoes', label: 'Configurações', icon: Settings },
     ],
   },
