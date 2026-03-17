@@ -16,7 +16,7 @@ const tipoIcon: Record<string, React.ElementType> = {
   info: Info, alerta: AlertTriangle, sucesso: CheckCircle, erro: AlertCircle,
 };
 const tipoGradient: Record<string, string> = {
-  info: 'from-info to-level', alerta: 'from-warning to-coins', sucesso: 'from-success to-finance', erro: 'from-destructive to-destructive',
+  info: 'from-primary to-primary-glow', alerta: 'from-primary-glow to-primary', sucesso: 'from-primary to-primary-glow', erro: 'from-destructive to-destructive/70',
 };
 
 export default function NotificacoesPage() {
@@ -52,7 +52,7 @@ export default function NotificacoesPage() {
   const naoLidas = notificacoes?.filter((n: any) => !n.lida).length || 0;
 
   return (
-    <PageLayout title="Notificações" description={`${naoLidas} não lida${naoLidas !== 1 ? 's' : ''}`} icon={<Bell className="h-5 w-5 text-white" />} gradient="from-streak to-warning"
+    <PageLayout title="Notificações" description={`${naoLidas} não lida${naoLidas !== 1 ? 's' : ''}`} icon={<Bell className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/60 to-primary/90"
       actions={naoLidas > 0 ? <Button variant="outline" onClick={() => marcarTodasLidas.mutate()} className="rounded-xl font-body"><CheckCheck className="h-4 w-4 mr-2" />Marcar todas como lidas</Button> : undefined}
     >
       {isLoading ? (

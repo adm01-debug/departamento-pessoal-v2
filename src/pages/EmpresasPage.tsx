@@ -29,12 +29,12 @@ export default function EmpresasPage() {
     <PageLayout
       title="Empresas"
       description="Gestão de empresas"
-      icon={<Building2 className="h-5 w-5 text-white" />}
-      gradient="from-xp to-tasks"
+      icon={<Building2 className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-primary/80 to-primary"
       actions={
         <Button
           onClick={() => navigate('/empresas/nova')}
-          className="rounded-xl bg-gradient-to-r from-xp to-tasks hover:opacity-90 shadow-lg font-body"
+          className="rounded-xl bg-gradient-to-r from-primary/80 to-primary hover:opacity-90 shadow-lg font-body"
         >
           Nova Empresa
         </Button>
@@ -56,10 +56,10 @@ export default function EmpresasPage() {
               transition={{ delay: i * 0.05 }}
             >
               <Card className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 rounded-2xl overflow-hidden">
-                <div className="h-[2px] bg-gradient-to-r from-xp to-tasks opacity-60 group-hover:opacity-100 transition-opacity" />
+                <div className="h-[2px] bg-gradient-to-r from-primary/80 to-primary opacity-60 group-hover:opacity-100 transition-opacity" />
                 <CardHeader className="flex flex-row items-center gap-4">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-xp to-tasks shadow-lg group-hover:scale-110 transition-transform">
-                    <Building2 className="h-5 w-5 text-white" />
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/80 to-primary shadow-lg group-hover:scale-110 transition-transform">
+                    <Building2 className="h-5 w-5 text-primary-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-base font-display truncate">{empresa.nome_fantasia || empresa.razao_social}</CardTitle>

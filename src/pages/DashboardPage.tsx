@@ -296,9 +296,9 @@ function IndicatorRow({ label, value, maxValue = 10, suffix = "%" }: {
 }) {
   const percentage = Math.min((value / maxValue) * 100, 100);
   const getColor = () => {
-    if (value >= maxValue * 0.8) return "from-destructive to-destructive/70";
-    if (value >= maxValue * 0.5) return "from-warning to-coins";
-    return "from-success to-finance";
+    if (value >= maxValue * 0.8) return "from-destructive to-destructive/70/70";
+    if (value >= maxValue * 0.5) return "from-primary-glow to-primary";
+    return "from-primary to-primary-glow";
   };
 
   return (
@@ -677,7 +677,7 @@ export default function DashboardPage() {
             ) : (
               <>
                 <QuickStat label="Admissões" value={stats?.admissoesMes || 0} icon={UserPlus} gradient="from-primary to-primary-glow" index={0} />
-                <QuickStat label="Desligamentos" value={stats?.demissoesMes || 0} icon={UserMinus} gradient="from-destructive to-destructive/70" index={1} />
+                <QuickStat label="Desligamentos" value={stats?.demissoesMes || 0} icon={UserMinus} gradient="from-destructive to-destructive/70/70" index={1} />
                 <QuickStat label="Headcount" value={stats?.headcount || 0} icon={Briefcase} gradient="from-primary/80 to-primary" index={2} />
               </>
             )}

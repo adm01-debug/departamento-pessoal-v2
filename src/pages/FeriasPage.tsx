@@ -85,8 +85,8 @@ export default function FeriasPage() {
     <PageLayout
       title="Férias"
       description="Gestão de férias com workflow de aprovação em 3 níveis"
-      icon={<Calendar className="h-5 w-5 text-white" />}
-      gradient="from-warning to-coins"
+      icon={<Calendar className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-primary-glow to-primary"
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>

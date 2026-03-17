@@ -117,7 +117,7 @@ export default function MedidasDisciplinaresPage() {
     <PageLayout
       title="Medidas Disciplinares"
       description="Advertências, suspensões e ações disciplinares com embasamento legal"
-      icon={<AlertTriangle className="h-5 w-5 text-white" />}
+      icon={<AlertTriangle className="h-5 w-5 text-primary-foreground" />}
       gradient="from-destructive to-warning"
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

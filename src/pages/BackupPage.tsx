@@ -26,9 +26,9 @@ export default function BackupPage() {
   ];
 
   return (
-    <PageLayout title="Backup" description="Gerencie backups dos dados do sistema" icon={<Database className="h-5 w-5 text-white" />} gradient="from-finance to-success"
+    <PageLayout title="Backup" description="Gerencie backups dos dados do sistema" icon={<Database className="h-5 w-5 text-primary-foreground" />} gradient="from-primary-glow to-primary"
       actions={
-        <Button onClick={handleBackup} disabled={backing} className="rounded-xl bg-gradient-to-r from-finance to-success hover:opacity-90 shadow-lg font-body">
+        <Button onClick={handleBackup} disabled={backing} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body">
           {backing ? <Clock className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
           {backing ? 'Processando...' : 'Backup Manual'}
         </Button>
@@ -37,8 +37,8 @@ export default function BackupPage() {
       <div className="grid gap-4 md:grid-cols-3 mb-6">
         {[
           { label: 'Último Backup', value: 'Hoje, 10:30', icon: Clock, gradient: 'from-primary to-primary-glow' },
-          { label: 'Total Armazenado', value: '72.9 MB', icon: HardDrive, gradient: 'from-info to-level' },
-          { label: 'Status', value: 'Saudável', icon: Shield, gradient: 'from-success to-finance' },
+          { label: 'Total Armazenado', value: '72.9 MB', icon: HardDrive, gradient: 'from-primary to-primary-glow' },
+          { label: 'Status', value: 'Saudável', icon: Shield, gradient: 'from-primary to-primary-glow' },
         ].map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
             <Card className="border border-border/30 rounded-2xl overflow-hidden relative">

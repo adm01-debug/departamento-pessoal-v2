@@ -62,11 +62,11 @@ export default function FeriadosPage() {
   };
 
   return (
-    <PageLayout title="Feriados" description="Calendário de feriados" icon={<CalendarDays className="h-5 w-5 text-white" />} gradient="from-warning to-coins"
+    <PageLayout title="Feriados" description="Calendário de feriados" icon={<CalendarDays className="h-5 w-5 text-primary-foreground" />} gradient="from-primary-glow to-primary"
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-xl bg-gradient-to-r from-warning to-coins hover:opacity-90 shadow-lg font-body"><Plus className="h-4 w-4 mr-2" />Novo Feriado</Button>
+            <Button className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body"><Plus className="h-4 w-4 mr-2" />Novo Feriado</Button>
           </DialogTrigger>
           <DialogContent className="rounded-2xl">
             <DialogHeader><DialogTitle className="font-display">Cadastrar Feriado</DialogTitle></DialogHeader>

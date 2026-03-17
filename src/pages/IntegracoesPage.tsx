@@ -16,12 +16,12 @@ interface Integracao {
 }
 
 const integracoes: Integracao[] = [
-  { id: 'bitrix', nome: 'Bitrix24', descricao: 'Sincronização de colaboradores, cargos e departamentos com o CRM', status: 'inativo', gradient: 'from-info to-level', icon: '🔗' },
-  { id: 'contabilidade', nome: 'Contabilidade', descricao: 'Exportação de dados contábeis (SPED, DIRF, RAIS)', status: 'inativo', gradient: 'from-finance to-success', icon: '📊' },
-  { id: 'esocial', nome: 'eSocial', descricao: 'Transmissão automática de eventos trabalhistas', status: 'ativo', gradient: 'from-success to-finance', icon: '🏛️' },
-  { id: 'banco', nome: 'Bancos (CNAB)', descricao: 'Geração de arquivos bancários para folha de pagamento', status: 'inativo', gradient: 'from-warning to-coins', icon: '🏦' },
-  { id: 'ponto', nome: 'Relógio de Ponto', descricao: 'Integração com REPs homologados', status: 'inativo', gradient: 'from-streak to-warning', icon: '⏰' },
-  { id: 'webhook', nome: 'Webhooks', descricao: 'Notificações HTTP para sistemas externos', status: 'inativo', gradient: 'from-xp to-tasks', icon: '🔔' },
+  { id: 'bitrix', nome: 'Bitrix24', descricao: 'Sincronização de colaboradores, cargos e departamentos com o CRM', status: 'inativo', gradient: 'from-primary to-primary-glow', icon: '🔗' },
+  { id: 'contabilidade', nome: 'Contabilidade', descricao: 'Exportação de dados contábeis (SPED, DIRF, RAIS)', status: 'inativo', gradient: 'from-primary-glow to-primary', icon: '📊' },
+  { id: 'esocial', nome: 'eSocial', descricao: 'Transmissão automática de eventos trabalhistas', status: 'ativo', gradient: 'from-primary to-primary-glow', icon: '🏛️' },
+  { id: 'banco', nome: 'Bancos (CNAB)', descricao: 'Geração de arquivos bancários para folha de pagamento', status: 'inativo', gradient: 'from-primary-glow to-primary', icon: '🏦' },
+  { id: 'ponto', nome: 'Relógio de Ponto', descricao: 'Integração com REPs homologados', status: 'inativo', gradient: 'from-primary/60 to-primary/90', icon: '⏰' },
+  { id: 'webhook', nome: 'Webhooks', descricao: 'Notificações HTTP para sistemas externos', status: 'inativo', gradient: 'from-primary/80 to-primary', icon: '🔔' },
 ];
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
@@ -32,7 +32,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.E
 
 export default function IntegracoesPage() {
   return (
-    <PageLayout title="Integrações" description="Conecte o sistema a serviços externos" icon={<Plug className="h-5 w-5 text-white" />} gradient="from-xp to-tasks">
+    <PageLayout title="Integrações" description="Conecte o sistema a serviços externos" icon={<Plug className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/80 to-primary">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {integracoes.map((integ, i) => {
           const statusInfo = statusConfig[integ.status];

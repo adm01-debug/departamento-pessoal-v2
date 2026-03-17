@@ -126,8 +126,8 @@ export default function FaltasPage() {
     <PageLayout
       title="Gestão de Faltas"
       description="Controle completo de ausências com workflow de aprovação"
-      icon={<UserX className="h-5 w-5 text-white" />}
-      gradient="from-destructive to-streak"
+      icon={<UserX className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-destructive to-destructive/70/70"
     >
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -173,7 +173,7 @@ export default function FaltasPage() {
       </div>
 
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-        <div className="h-[2px] bg-gradient-to-r from-destructive to-streak" />
+        <div className="h-[2px] bg-gradient-to-r from-destructive to-destructive/70/70" />
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row justify-between gap-3 mb-4">
             <div className="flex items-center gap-2">

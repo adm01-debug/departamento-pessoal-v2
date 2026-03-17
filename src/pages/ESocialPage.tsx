@@ -45,18 +45,18 @@ export default function ESocialPage() {
   };
 
   const statsData = [
-    { label: 'Eventos Enviados', value: String(stats.enviados), gradient: 'from-success to-finance' },
-    { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-warning to-coins' },
-    { label: 'Com Erro', value: String(stats.erros), gradient: 'from-destructive to-streak' },
-    { label: 'Conformidade', value: `${stats.conformidade}%`, gradient: 'from-info to-level' },
+    { label: 'Eventos Enviados', value: String(stats.enviados), gradient: 'from-primary to-primary-glow' },
+    { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-primary-glow to-primary' },
+    { label: 'Com Erro', value: String(stats.erros), gradient: 'from-destructive to-destructive/70/70' },
+    { label: 'Conformidade', value: `${stats.conformidade}%`, gradient: 'from-primary to-primary-glow' },
   ];
 
   return (
     <PageLayout
       title="eSocial"
       description="Gestão de eventos eSocial"
-      icon={<FileCheck className="h-5 w-5 text-white" />}
-      gradient="from-success to-finance"
+      icon={<FileCheck className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-primary to-primary-glow"
     >
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -80,17 +80,17 @@ export default function ESocialPage() {
       {/* Events */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-          <div className="h-[2px] bg-gradient-to-r from-success to-finance" />
+          <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-success to-finance">
-                <FileCheck className="h-4 w-4 text-white" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
+                <FileCheck className="h-4 w-4 text-primary-foreground" />
               </div>
               Eventos eSocial
             </CardTitle>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="rounded-xl bg-gradient-to-r from-success to-finance hover:opacity-90 text-white font-body">
+                <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-body">
                   <Plus className="h-4 w-4 mr-1" /> Novo Evento
                 </Button>
               </DialogTrigger>
@@ -109,7 +109,7 @@ export default function ESocialPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Button onClick={handleCriar} disabled={!novoTipo || !empresaAtual?.id} className="w-full rounded-xl bg-gradient-to-r from-success to-finance text-white">
+                  <Button onClick={handleCriar} disabled={!novoTipo || !empresaAtual?.id} className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow text-primary-foreground">
                     Criar Evento
                   </Button>
                 </div>
@@ -156,7 +156,7 @@ export default function ESocialPage() {
                           size="sm"
                           disabled={isSending}
                           onClick={() => enviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                          className="rounded-xl bg-gradient-to-r from-warning to-coins hover:opacity-90 text-white font-body"
+                          className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body"
                         >
                           {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
                         </Button>
@@ -166,7 +166,7 @@ export default function ESocialPage() {
                           size="sm"
                           disabled={isSending}
                           onClick={() => reenviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                          className="rounded-xl bg-gradient-to-r from-destructive to-streak hover:opacity-90 text-white font-body"
+                          className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body"
                         >
                           {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
                         </Button>

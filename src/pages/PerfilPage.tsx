@@ -96,7 +96,7 @@ export default function PerfilPage() {
   const initials = (nome || user?.email || 'U').charAt(0).toUpperCase();
 
   return (
-    <PageLayout title="Meu Perfil" description="Gerencie seus dados pessoais" icon={<User className="h-5 w-5 text-white" />} gradient="from-info to-level">
+    <PageLayout title="Meu Perfil" description="Gerencie seus dados pessoais" icon={<User className="h-5 w-5 text-primary-foreground" />} gradient="from-primary to-primary-glow">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl space-y-6">
         <Card className="border border-border/30 rounded-2xl shadow-elevated">
           <CardHeader>
@@ -117,7 +117,7 @@ export default function PerfilPage() {
                   disabled={uploadingAvatar}
                   className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                 >
-                  {uploadingAvatar ? <Loader2 className="h-5 w-5 text-white animate-spin" /> : <Camera className="h-5 w-5 text-white" />}
+                  {uploadingAvatar ? <Loader2 className="h-5 w-5 text-primary-foreground animate-spin" /> : <Camera className="h-5 w-5 text-primary-foreground" />}
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </div>

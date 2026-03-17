@@ -42,7 +42,7 @@ export default function ColaboradoresPage() {
     <PageLayout
       title="Colaboradores"
       description="Gestão de colaboradores"
-      icon={<Users className="h-5 w-5 text-white" />}
+      icon={<Users className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary to-primary-glow"
       actions={
         <Button
