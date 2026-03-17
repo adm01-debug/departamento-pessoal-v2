@@ -12,7 +12,7 @@ import {
   Wallet, HardHat, UserX, Compass, DollarSign,
   Layers, TreePine, Stethoscope, BookOpen, Landmark,
   Receipt, PenTool, Workflow, Globe, BadgeAlert,
-  CreditCard, ShieldCheck, ScrollText,
+  CreditCard, ShieldCheck, ScrollText, Bot,
 } from 'lucide-react';
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
