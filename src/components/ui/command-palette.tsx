@@ -126,29 +126,16 @@ export function CommandPalette() {
     staleTime: 10_000,
   });
 
-  // Search empresas from DB (filtered by user's empresas)
+  // Search empresas from DB (filtered by user's empresas via RLS)
   const { data: dbEmpresas } = useQuery({
-    queryKey: ['cmd-empresas', empresaAtual?.id, query],
+    queryKey: ['cmd-empresas', query],
     enabled: open && query.length >= 2,
     queryFn: async () => {
       const q = query.trim();
-      // Get user's empresa IDs first
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return [];
-
-      const { data: userEmpresaIds } = await supabase
-        .from('user_empresas')
-        .select('empresa_id')
-        .eq('user_id', userData.user.id);
-
-      const ids = userEmpresaIds?.map(ue => ue.empresa_id) || [];
-      if (ids.length === 0) return [];
-
       let queryBuilder = supabase
         .from('empresas')
         .select('id, razao_social, nome_fantasia, cnpj')
         .eq('ativa', true)
-        .in('id', ids)
         .limit(5);
 
       if (/^\d+$/.test(q)) {
