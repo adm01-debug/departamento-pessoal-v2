@@ -1,4 +1,4 @@
-// DashboardPage - Task Gifts Design System (Premium) + Analytics
+// DashboardPage - Task Gifts Design System (Premium) + Analytics + Realtime
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Users, DollarSign, Calendar, Clock,
@@ -7,7 +7,7 @@ import {
   UserPlus, UserMinus, Activity, CheckCircle2,
   AlertTriangle, ChevronRight, Zap,
   Building2, FileText, Gift, Plus,
-  ArrowRight, Sparkles, PieChart, Timer,
+  ArrowRight, Sparkles, PieChart, Timer, Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -25,6 +25,8 @@ import { ExpiringItemsWidget, type ExpiringItem } from "@/components/dashboard/E
 import { KPICardSkeleton, CardSkeleton } from "@/components/ui/module-skeleton";
 import { viewsService } from "@/services/tabelasComplementaresService";
 import { Badge } from "@/components/ui/badge";
+import { MorningBriefing } from "@/components/dashboard/MorningBriefing";
+import { useRealtimeDashboard } from "@/hooks/useRealtimeDashboard";
 
 interface DashboardStats {
   colaboradoresAtivos: number;
@@ -526,6 +528,9 @@ export default function DashboardPage() {
   const { data: pendencias, isLoading: loadingPendencias } = usePendencias(isAuthenticated);
   const navigate = useNavigate();
 
+  // Enable realtime subscriptions
+  useRealtimeDashboard();
+
   const hoje = new Date();
   const greeting = hoje.getHours() < 12 ? "Bom dia" : hoje.getHours() < 18 ? "Boa tarde" : "Boa noite";
 
@@ -610,6 +615,9 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* Morning Briefing - Painel de Comando Diário */}
+      {!isEmptySystem && <MorningBriefing />}
+
       {/* Onboarding Wizard (empty system) */}
       {isEmptySystem && <OnboardingWizard />}
 
@@ -635,7 +643,7 @@ export default function DashboardPage() {
               <QuickAction label="Novo Colaborador" icon={UserPlus} gradient="from-primary to-primary-glow" path="/colaboradores/novo" index={0} />
               <QuickAction label="Calcular Folha" icon={DollarSign} gradient="from-primary/80 to-primary" path="/folha/calcular" index={1} />
               <QuickAction label="Registrar Ponto" icon={Clock} gradient="from-primary/60 to-primary/90" path="/ponto" index={2} />
-              <QuickAction label="Nova Empresa" icon={Building2} gradient="from-primary-glow to-primary" path="/empresas/nova" index={3} />
+              <QuickAction label="Assistente IA" icon={Bot} gradient="from-primary-glow to-primary" path="/assistente-ia" index={3} />
             </div>
           </CardContent>
         </MotionCard>

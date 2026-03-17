@@ -76,6 +76,7 @@ const ValesPage = lazy(() => import('@/pages/ValesPage'));
 const ExamesPage = lazy(() => import('@/pages/ExamesPage'));
 const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
 const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
+const AssistenteIAPage = lazy(() => import('@/pages/AssistenteIAPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -162,6 +163,7 @@ export default function App() {
         <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
         <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
         <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
+        <Route path="assistente-ia" element={<LazyPage Component={AssistenteIAPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

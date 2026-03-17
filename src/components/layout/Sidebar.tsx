@@ -12,7 +12,7 @@ import {
   Wallet, HardHat, UserX, Compass, DollarSign,
   Layers, TreePine, Stethoscope, BookOpen, Landmark,
   Receipt, PenTool, Workflow, Globe, BadgeAlert,
-  CreditCard, ShieldCheck, ScrollText,
+  CreditCard, ShieldCheck, ScrollText, Bot,
 } from 'lucide-react';
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
@@ -42,6 +42,7 @@ const menuGroups: MenuGroup[] = [
       { path: '/dashboard', label: 'Dashboard', icon: Home },
       { path: '/empresas', label: 'Empresas', icon: Building2 },
       { path: '/portal', label: 'Portal', icon: Globe },
+      { path: '/assistente-ia', label: 'Assistente IA', icon: Bot },
     ],
   },
   {
