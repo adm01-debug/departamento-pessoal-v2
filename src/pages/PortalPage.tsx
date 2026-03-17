@@ -306,7 +306,7 @@ export default function PortalPage() {
                           <div className="p-2 rounded-lg bg-gradient-to-br from-success to-success/70"><DollarSign className="h-4 w-4 text-primary-foreground" /></div>
                           <div>
                             <p className="font-display font-semibold text-sm">{h.competencia}</p>
-                            <p className="text-xs text-muted-foreground font-body">Bruto: {(h.total_bruto || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                            <p className="text-xs text-muted-foreground font-body">Bruto: {(h.total_proventos || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
                           </div>
                         </div>
                         <div className="text-right">
