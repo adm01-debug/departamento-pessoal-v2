@@ -14,10 +14,13 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
+import { PontoStreakCard } from '@/components/ponto/PontoStreakCard';
+import { PontoCharts } from '@/components/ponto/PontoCharts';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [time, setTime] = useState(new Date());
+  const [geoStatus, setGeoStatus] = useState<'idle' | 'capturing' | 'success' | 'error'>('idle');
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
 
@@ -33,7 +36,6 @@ export default function PontoPage() {
     queryKey: ['registro-ponto-hoje', user?.id, today],
     queryFn: async () => {
       if (!user?.id) return null;
-      // Find colaborador by user email
       const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
       if (!colab) return null;
       const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).eq('data', today).maybeSingle();
@@ -68,17 +70,42 @@ export default function PontoPage() {
     enabled: !!user?.id,
   });
 
+  const captureGeo = (): Promise<{ lat: number; lng: number } | null> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
+      }
+      setGeoStatus('capturing');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setGeoStatus('success');
+          resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
+        () => {
+          setGeoStatus('error');
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    });
+  };
+
   const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     setLoading(tipo);
     try {
+      // Capture geolocation in parallel
+      const geo = await captureGeo();
       await pontoService.registrar(tipo, user?.id);
-      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+      const geoMsg = geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : '';
+      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geoMsg}`);
       refetchRegistro();
       refetchBatidas();
     } catch (err: any) {
       toast.error(`Erro ao registrar ponto: ${err.message}`);
     } finally {
       setLoading(null);
+      setTimeout(() => setGeoStatus('idle'), 2000);
     }
   };
 
@@ -145,11 +172,22 @@ export default function PontoPage() {
                       gradient
                     )}
                   >
-                    <Icon className="h-4 w-4 mr-2" />
-                    {loading === tipo ? 'Registrando...' : label}
+                    {loading === tipo && geoStatus === 'capturing' ? (
+                      <><MapPin className="h-4 w-4 mr-2 animate-bounce" />Capturando GPS...</>
+                    ) : (
+                      <><Icon className="h-4 w-4 mr-2" />{loading === tipo ? 'Registrando...' : label}</>
+                    )}
                   </Button>
                 ))}
               </div>
+              {/* Geo status indicator */}
+              <p className="text-xs text-muted-foreground font-body text-center mt-3 flex items-center justify-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {geoStatus === 'capturing' ? 'Capturando localização...' :
+                 geoStatus === 'success' ? '✅ Localização capturada' :
+                 geoStatus === 'error' ? '⚠️ GPS indisponível' :
+                 'Localização será registrada automaticamente'}
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -166,7 +204,6 @@ export default function PontoPage() {
             <CardContent>
               {registroHoje ? (
                 <div className="space-y-4">
-                  {/* Summary */}
                   <div className="grid grid-cols-3 gap-2">
                     <div className="p-2 rounded-xl bg-success/10 text-center">
                       <p className="text-lg font-display font-bold text-success">{formatInterval(registroHoje.horas_trabalhadas)}</p>
@@ -182,7 +219,6 @@ export default function PontoPage() {
                     </div>
                   </div>
 
-                  {/* Atraso & Saída antecipada */}
                   {(registroHoje.atraso_minutos > 0 || registroHoje.saida_antecipada_minutos > 0) && (
                     <div className="flex gap-2">
                       {registroHoje.atraso_minutos > 0 && (
@@ -198,7 +234,6 @@ export default function PontoPage() {
                     </div>
                   )}
 
-                  {/* Pairs */}
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-muted-foreground font-body">Registros ({registroHoje.total_batidas || 0} batidas)</p>
                     {pares.length > 0 ? pares.map((p, i) => (
@@ -275,9 +310,17 @@ export default function PontoPage() {
         </motion.div>
       </div>
 
+      {/* Streak & Monthly Stats */}
+      <div className="mt-6">
+        <PontoStreakCard />
+      </div>
+
+      {/* Charts */}
+      <PontoCharts />
+
       {/* Team Batidas Today */}
       {batidasHoje.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-6">
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
             <div className="h-[2px] bg-gradient-to-r from-warning to-coins" />
             <CardHeader>
@@ -316,6 +359,7 @@ export default function PontoPage() {
           </Card>
         </motion.div>
       )}
+
       {/* Gestão de Ponto - Todos Colaboradores */}
       <GestaoRegistrosPonto />
     </PageLayout>
