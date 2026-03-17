@@ -40,6 +40,7 @@ const menuGroups: MenuGroup[] = [
     label: 'Principal',
     items: [
       { path: '/dashboard', label: 'Dashboard', icon: Home },
+      { path: '/dashboard-executivo', label: 'Dashboard Executivo', icon: BarChart3 },
       { path: '/empresas', label: 'Empresas', icon: Building2 },
       { path: '/portal', label: 'Portal', icon: Globe },
       { path: '/assistente-ia', label: 'Assistente IA', icon: Bot },
@@ -103,6 +104,7 @@ const menuGroups: MenuGroup[] = [
   {
     label: 'SST & Compliance',
     items: [
+      { path: '/sst', label: 'SST', icon: HardHat },
       { path: '/exames', label: 'Exames / ASOs', icon: Stethoscope },
       { path: '/epis', label: 'EPIs', icon: HardHat },
       { path: '/medidas-disciplinares', label: 'Medidas Disciplinares', icon: BadgeAlert },
@@ -118,6 +120,7 @@ const menuGroups: MenuGroup[] = [
       { path: '/esocial', label: 'eSocial', icon: FileCheck },
       { path: '/obrigacoes-fiscais', label: 'Obrigações Fiscais', icon: ScrollText },
       { path: '/auditoria', label: 'Auditoria', icon: Shield },
+      { path: '/calculadora-rescisao', label: 'Calculadora Rescisão', icon: DollarSign },
     ],
   },
   {
@@ -126,9 +129,11 @@ const menuGroups: MenuGroup[] = [
       { path: '/usuarios', label: 'Usuários', icon: UserCog },
       { path: '/controle-acesso', label: 'Controle de Acesso', icon: Lock },
       { path: '/assinaturas', label: 'Assinaturas', icon: PenTool },
+      { path: '/gerador-documentos', label: 'Gerador Docs', icon: FileText },
       { path: '/workflows', label: 'Workflows', icon: Workflow },
       { path: '/comunicacao', label: 'Comunicação', icon: Megaphone },
       { path: '/notificacoes', label: 'Notificações', icon: Shield },
+      { path: '/importacao', label: 'Importação', icon: Database },
       { path: '/integracoes', label: 'Integrações', icon: Plug },
       { path: '/lgpd', label: 'LGPD', icon: ShieldCheck },
       { path: '/backup', label: 'Backup', icon: Database },
