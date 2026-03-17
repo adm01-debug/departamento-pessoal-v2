@@ -1,13 +1,54 @@
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FormField, FormSelect, FormSwitch } from '@/components/forms';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Spinner } from '@/components/ui/spinner';
+import { supabase } from '@/integrations/supabase/client';
+import { Settings, Plus, Trash2, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function ConfiguracoesPage() {
+  const qc = useQueryClient();
+
+  // === Config Alertas Indicadores ===
+  const [openAlerta, setOpenAlerta] = useState(false);
+  const [alertaForm, setAlertaForm] = useState({ tipo: '', limite_atencao: '', limite_critico: '' });
+
+  const { data: alertasConfig = [], isLoading: loadAlertas } = useQuery({
+    queryKey: ['config-alertas-indicadores'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('config_alertas_indicadores' as any).select('*').order('tipo');
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const criarAlerta = useMutation({
+    mutationFn: async (d: typeof alertaForm) => {
+      const { error } = await supabase.from('config_alertas_indicadores' as any).insert({
+        tipo: d.tipo,
+        limite_atencao: Number(d.limite_atencao),
+        limite_critico: Number(d.limite_critico),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['config-alertas-indicadores'] }); setOpenAlerta(false); setAlertaForm({ tipo: '', limite_atencao: '', limite_critico: '' }); toast.success('Configuração de alerta criada'); },
+    onError: () => toast.error('Erro ao criar configuração'),
+  });
+
+  const excluirAlerta = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from('config_alertas_indicadores' as any).delete().eq('id', id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['config-alertas-indicadores'] }); toast.success('Configuração removida'); },
+  });
+
   return (
     <PageLayout
       title="Configurações"
@@ -21,6 +62,7 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Folha</TabsTrigger>
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
+          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bell className="mr-1 h-3 w-3" />Alertas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
@@ -81,6 +123,55 @@ export default function ConfiguracoesPage() {
                 <FormSwitch label="Email de Folha Calculada" />
                 <FormSwitch label="Alertas de Documentos" />
                 <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body">Salvar</Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="alertas">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+              <div className="h-[2px] bg-gradient-to-r from-warning to-destructive" />
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle className="font-display">Configuração de Alertas de Indicadores</CardTitle>
+                    <CardDescription className="font-body">Defina limites para alertas automáticos de indicadores de RH</CardDescription>
+                  </div>
+                  <Dialog open={openAlerta} onOpenChange={setOpenAlerta}>
+                    <DialogTrigger asChild><Button size="sm"><Plus className="mr-1 h-4 w-4" />Novo Alerta</Button></DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader><DialogTitle>Nova Configuração de Alerta</DialogTitle></DialogHeader>
+                      <div className="space-y-4">
+                        <div><Label>Tipo de Indicador</Label><Input value={alertaForm.tipo} onChange={e => setAlertaForm(p => ({ ...p, tipo: e.target.value }))} placeholder="Ex: turnover, absenteismo, horas_extras" /></div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div><Label>Limite Atenção</Label><Input type="number" value={alertaForm.limite_atencao} onChange={e => setAlertaForm(p => ({ ...p, limite_atencao: e.target.value }))} placeholder="Ex: 10" /></div>
+                          <div><Label>Limite Crítico</Label><Input type="number" value={alertaForm.limite_critico} onChange={e => setAlertaForm(p => ({ ...p, limite_critico: e.target.value }))} placeholder="Ex: 20" /></div>
+                        </div>
+                        <Button onClick={() => criarAlerta.mutate(alertaForm)} disabled={!alertaForm.tipo || !alertaForm.limite_atencao || !alertaForm.limite_critico || criarAlerta.isPending} className="w-full">{criarAlerta.isPending ? 'Salvando...' : 'Salvar'}</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {loadAlertas ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Tipo Indicador</TableHead><TableHead>Limite Atenção</TableHead><TableHead>Limite Crítico</TableHead><TableHead>Atualizado</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      {alertasConfig.map((a: any) => (
+                        <TableRow key={a.id}>
+                          <TableCell className="font-medium capitalize">{a.tipo?.replace(/_/g, ' ')}</TableCell>
+                          <TableCell className="text-warning font-medium">{a.limite_atencao}</TableCell>
+                          <TableCell className="text-destructive font-medium">{a.limite_critico}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{new Date(a.updated_at).toLocaleDateString('pt-BR')}</TableCell>
+                          <TableCell><Button variant="ghost" size="icon" onClick={() => excluirAlerta.mutate(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                        </TableRow>
+                      ))}
+                      {alertasConfig.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma configuração de alerta</TableCell></TableRow>}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </motion.div>
