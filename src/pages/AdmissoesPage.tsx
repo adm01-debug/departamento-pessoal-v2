@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyList } from '@/components/ui/empty-state';
+import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { UserPlus, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
