@@ -50,7 +50,7 @@ export default function TimesPage() {
   if (isLoading) return <PageLayout title="Times"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Times e Equipes" subtitle="Gerencie os times da empresa">
+    <PageLayout title="Times e Equipes" description="Gerencie os times da empresa">
       <Card><CardContent className="pt-6">
         <div className="flex justify-between mb-4">
           <h3 className="text-lg font-semibold">Times ({times.length})</h3>

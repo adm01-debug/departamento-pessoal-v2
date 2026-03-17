@@ -51,7 +51,7 @@ export default function EPIsPage() {
   if (isLoading) return <PageLayout title="EPIs"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Equipamentos de Proteção Individual" subtitle="Gestão de EPIs e entregas aos colaboradores">
+    <PageLayout title="Equipamentos de Proteção Individual" description="Gestão de EPIs e entregas aos colaboradores">
       <Tabs defaultValue="epis">
         <TabsList>
           <TabsTrigger value="epis"><HardHat className="h-4 w-4 mr-1" />Catálogo EPIs ({epis.length})</TabsTrigger>

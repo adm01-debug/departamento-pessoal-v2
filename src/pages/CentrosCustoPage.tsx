@@ -54,7 +54,7 @@ export default function CentrosCustoPage() {
   if (isLoading) return <PageLayout title="Centros de Custo"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Centros de Custo" subtitle="Gerencie os centros de custo da empresa">
+    <PageLayout title="Centros de Custo" description="Gerencie os centros de custo da empresa">
       <Card>
         <CardContent className="pt-6">
           <div className="flex justify-between mb-4">

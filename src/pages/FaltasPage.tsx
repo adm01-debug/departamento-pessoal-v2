@@ -49,7 +49,7 @@ export default function FaltasPage() {
   };
 
   return (
-    <PageLayout title="Gestão de Faltas" subtitle="Controle de ausências dos colaboradores">
+    <PageLayout title="Gestão de Faltas" description="Controle de ausências dos colaboradores">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold">{stats.total}</p><p className="text-sm text-muted-foreground">Total</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold text-green-600">{stats.justificadas}</p><p className="text-sm text-muted-foreground">Justificadas</p></CardContent></Card>

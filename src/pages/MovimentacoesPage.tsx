@@ -76,7 +76,7 @@ export default function MovimentacoesPage() {
   if (isLoading) return <PageLayout title="Movimentações"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Movimentações de Pessoal" subtitle="Transferências, promoções e lotações">
+    <PageLayout title="Movimentações de Pessoal" description="Transferências, promoções e lotações">
       <Tabs defaultValue="transferencias">
         <TabsList>
           <TabsTrigger value="transferencias"><ArrowRightLeft className="h-4 w-4 mr-1" />Transferências ({transferencias.length})</TabsTrigger>

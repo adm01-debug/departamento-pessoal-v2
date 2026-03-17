@@ -73,7 +73,7 @@ export default function PlanosSaudePage() {
   if (isLoading) return <PageLayout title="Planos e Seguros"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Planos de Saúde e Seguros" subtitle="Gerencie planos de saúde e seguros de vida">
+    <PageLayout title="Planos de Saúde e Seguros" description="Gerencie planos de saúde e seguros de vida">
       <Tabs defaultValue="planos">
         <TabsList>
           <TabsTrigger value="planos"><Heart className="h-4 w-4 mr-1" />Planos de Saúde ({planos.length})</TabsTrigger>

@@ -49,7 +49,7 @@ export default function SindicatosPage() {
   if (isLoading) return <PageLayout title="Sindicatos"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Sindicatos" subtitle="Gerencie sindicatos e acordos coletivos">
+    <PageLayout title="Sindicatos" description="Gerencie sindicatos e acordos coletivos">
       <Card><CardContent className="pt-6">
         <div className="flex justify-between mb-4">
           <h3 className="text-lg font-semibold">Sindicatos ({sindicatos.length})</h3>

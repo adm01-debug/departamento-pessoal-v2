@@ -43,7 +43,7 @@ export default function MedidasDisciplinaresPage() {
   if (isLoading) return <PageLayout title="Medidas Disciplinares"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Medidas Disciplinares" subtitle="Advertências, suspensões e ações disciplinares">
+    <PageLayout title="Medidas Disciplinares" description="Advertências, suspensões e ações disciplinares">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {Object.entries(tipoLabels).map(([k, label]) => (
           <Card key={k}><CardContent className="pt-4 text-center">

@@ -58,7 +58,7 @@ export default function JornadasPage() {
   if (isLoading) return <PageLayout title="Jornadas"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Jornadas de Trabalho" subtitle="Configure as jornadas e horários dos colaboradores">
+    <PageLayout title="Jornadas de Trabalho" description="Configure as jornadas e horários dos colaboradores">
       <Card>
         <CardContent className="pt-6">
           <div className="flex justify-between mb-4">

@@ -64,7 +64,7 @@ export default function ObrigacoesFiscaisPage() {
   if (isLoading) return <PageLayout title="Obrigações Fiscais"><Spinner /></PageLayout>;
 
   return (
-    <PageLayout title="Obrigações Fiscais" subtitle="DCTFWeb, SEFIP, Guias FGTS e INSS">
+    <PageLayout title="Obrigações Fiscais" description="DCTFWeb, SEFIP, Guias FGTS e INSS">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold">{dctf.length}</p><p className="text-sm text-muted-foreground">DCTFWeb</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold">{sefip.length}</p><p className="text-sm text-muted-foreground">SEFIP</p></CardContent></Card>
