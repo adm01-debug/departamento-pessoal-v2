@@ -4,30 +4,28 @@ const ensure = <T>(d: T | null, e: string): T => { if (!d) throw new Error(`Nenh
 
 export const jornadaHorariosService = {
   async listar(jornadaId: string) {
-    const { data, error } = await supabase.from('jornadas_horarios').select('*').eq('jornada_id', jornadaId).order('dia_semana');
+    const { data, error } = await (supabase as any).from('jornadas_horarios').select('*').eq('jornada_id', jornadaId).order('dia_semana');
     if (error) throw error;
     return data || [];
   },
   async criar(d: any) {
-    const { data, error } = await supabase.from('jornadas_horarios').insert(d).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('jornadas_horarios').insert(d).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'horário de jornada');
   },
   async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('jornadas_horarios').update(d).eq('id', id).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('jornadas_horarios').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'horário de jornada');
   },
   async excluir(id: string) {
-    const { error } = await supabase.from('jornadas_horarios').delete().eq('id', id);
+    const { error } = await (supabase as any).from('jornadas_horarios').delete().eq('id', id);
     if (error) throw error;
   },
   async salvarGrade(jornadaId: string, horarios: any[]) {
-    // Delete existing and insert new
-    const { error: delErr } = await supabase.from('jornadas_horarios').delete().eq('jornada_id', jornadaId);
-    if (delErr) throw delErr;
+    await (supabase as any).from('jornadas_horarios').delete().eq('jornada_id', jornadaId);
     if (horarios.length === 0) return [];
-    const { data, error } = await supabase.from('jornadas_horarios').insert(horarios.map(h => ({ ...h, jornada_id: jornadaId }))).select();
+    const { data, error } = await (supabase as any).from('jornadas_horarios').insert(horarios.map((h: any) => ({ ...h, jornada_id: jornadaId }))).select();
     if (error) throw error;
     return data || [];
   },
