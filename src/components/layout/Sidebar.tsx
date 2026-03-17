@@ -40,6 +40,7 @@ const menuGroups: MenuGroup[] = [
     label: 'Principal',
     items: [
       { path: '/dashboard', label: 'Dashboard', icon: Home },
+      { path: '/dashboard-executivo', label: 'Dashboard Executivo', icon: BarChart3 },
       { path: '/empresas', label: 'Empresas', icon: Building2 },
       { path: '/portal', label: 'Portal', icon: Globe },
       { path: '/assistente-ia', label: 'Assistente IA', icon: Bot },
