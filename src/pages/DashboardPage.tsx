@@ -676,9 +676,9 @@ export default function DashboardPage() {
               </div>
             ) : (
               <>
-                <QuickStat label="Admissões" value={stats?.admissoesMes || 0} icon={UserPlus} gradient="from-success to-finance" index={0} />
-                <QuickStat label="Desligamentos" value={stats?.demissoesMes || 0} icon={UserMinus} gradient="from-destructive to-streak" index={1} />
-                <QuickStat label="Headcount" value={stats?.headcount || 0} icon={Briefcase} gradient="from-primary to-primary-glow" index={2} />
+                <QuickStat label="Admissões" value={stats?.admissoesMes || 0} icon={UserPlus} gradient="from-primary to-primary-glow" index={0} />
+                <QuickStat label="Desligamentos" value={stats?.demissoesMes || 0} icon={UserMinus} gradient="from-destructive to-destructive/70" index={1} />
+                <QuickStat label="Headcount" value={stats?.headcount || 0} icon={Briefcase} gradient="from-primary/80 to-primary" index={2} />
               </>
             )}
           </CardContent>
