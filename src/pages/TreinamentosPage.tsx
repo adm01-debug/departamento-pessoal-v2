@@ -13,11 +13,31 @@ import { Spinner } from '@/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
+import { supabase } from '@/integrations/supabase/client';
 import { catalogoCursoService } from '@/services/catalogoCursoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link } from 'lucide-react';
+import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link, Calendar } from 'lucide-react';
+
+// === Treinamentos Service (tabela treinamentos) ===
+const treinamentosService = {
+  listar: async (empresaId?: string) => {
+    let q = supabase.from('treinamentos').select('*').order('created_at', { ascending: false });
+    if (empresaId) q = q.eq('empresa_id', empresaId);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  },
+  criar: async (d: { nome: string; descricao?: string; data?: string; carga_horaria?: number; empresa_id?: string }) => {
+    const { error } = await supabase.from('treinamentos').insert(d);
+    if (error) throw error;
+  },
+  excluir: async (id: string) => {
+    const { error } = await supabase.from('treinamentos').delete().eq('id', id);
+    if (error) throw error;
+  },
+};
 
 // Sub-component for managing courses within a trilha
 function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: any[] }) {
@@ -81,13 +101,24 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
 export default function TreinamentosPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
-  const [tab, setTab] = useState('catalogo');
+  const [tab, setTab] = useState('treinamentos');
 
   // === Queries ===
+  const { data: treinamentos = [], isLoading: loadTrein } = useQuery({ queryKey: ['treinamentos', empresaAtual?.id], queryFn: () => treinamentosService.listar(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: cursos = [], isLoading: loadCursos } = useQuery({ queryKey: ['catalogo_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarCursos(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: trilhas = [], isLoading: loadTrilhas } = useQuery({ queryKey: ['trilhas', empresaAtual?.id], queryFn: () => catalogoCursoService.listarTrilhas(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
+
+  // === Treinamentos ===
+  const [openTrein, setOpenTrein] = useState(false);
+  const [treinForm, setTreinForm] = useState({ nome: '', descricao: '', data: '', carga_horaria: '' });
+  const criarTrein = useMutation({
+    mutationFn: () => treinamentosService.criar({ ...treinForm, carga_horaria: treinForm.carga_horaria ? Number(treinForm.carga_horaria) : undefined, empresa_id: empresaAtual?.id }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['treinamentos'] }); setOpenTrein(false); setTreinForm({ nome: '', descricao: '', data: '', carga_horaria: '' }); toast.success('Treinamento criado!'); },
+    onError: () => toast.error('Erro ao criar treinamento'),
+  });
+  const excluirTrein = useMutation({ mutationFn: (id: string) => treinamentosService.excluir(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['treinamentos'] }); toast.success('Treinamento excluído'); } });
 
   // === Cursos ===
   const [openCurso, setOpenCurso] = useState(false);
@@ -118,12 +149,13 @@ export default function TreinamentosPage() {
     onError: () => toast.error('Erro ao inscrever'),
   });
 
-  const isLoading = loadCursos || loadTrilhas || loadInsc;
+  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc;
 
   return (
     <PageLayout title="Treinamentos" description="Gestão de treinamentos e desenvolvimento" icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <Card><CardContent className="pt-4 text-center"><Calendar className="h-6 w-6 mx-auto text-accent mb-1" /><p className="text-2xl font-bold">{treinamentos.length}</p><p className="text-xs text-muted-foreground">Treinamentos</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><BookOpen className="h-6 w-6 mx-auto text-primary mb-1" /><p className="text-2xl font-bold">{cursos.length}</p><p className="text-xs text-muted-foreground">Cursos</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><Award className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{cursos.filter((c: any) => c.obrigatorio).length}</p><p className="text-xs text-muted-foreground">Obrigatórios</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><GraduationCap className="h-6 w-6 mx-auto text-warning mb-1" /><p className="text-2xl font-bold">{trilhas.length}</p><p className="text-xs text-muted-foreground">Trilhas</p></CardContent></Card>
@@ -133,10 +165,49 @@ export default function TreinamentosPage() {
       {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : (
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="mb-4">
+            <TabsTrigger value="treinamentos">Treinamentos</TabsTrigger>
             <TabsTrigger value="catalogo">Catálogo</TabsTrigger>
             <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
             <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
           </TabsList>
+
+          {/* TREINAMENTOS */}
+          <TabsContent value="treinamentos">
+            <div className="flex justify-end mb-4">
+              <Dialog open={openTrein} onOpenChange={setOpenTrein}>
+                <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Novo Treinamento</Button></DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Novo Treinamento</DialogTitle></DialogHeader>
+                  <div className="grid gap-3">
+                    <div><Label>Nome *</Label><Input value={treinForm.nome} onChange={e => setTreinForm(p => ({ ...p, nome: e.target.value }))} /></div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><Label>Data</Label><Input type="date" value={treinForm.data} onChange={e => setTreinForm(p => ({ ...p, data: e.target.value }))} /></div>
+                      <div><Label>Carga Horária (h)</Label><Input type="number" value={treinForm.carga_horaria} onChange={e => setTreinForm(p => ({ ...p, carga_horaria: e.target.value }))} /></div>
+                    </div>
+                    <div><Label>Descrição</Label><Textarea value={treinForm.descricao} onChange={e => setTreinForm(p => ({ ...p, descricao: e.target.value }))} /></div>
+                    <Button onClick={() => criarTrein.mutate()} disabled={!treinForm.nome || criarTrein.isPending}>{criarTrein.isPending ? 'Salvando...' : 'Salvar'}</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <Card><CardContent className="p-0">
+              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Data</TableHead><TableHead>Carga Horária</TableHead><TableHead>Descrição</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {treinamentos.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum treinamento cadastrado</TableCell></TableRow> :
+                    treinamentos.map((t: any) => (
+                      <TableRow key={t.id}>
+                        <TableCell className="font-medium">{t.nome}</TableCell>
+                        <TableCell>{t.data || '—'}</TableCell>
+                        <TableCell>{t.carga_horaria ? `${t.carga_horaria}h` : '—'}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">{t.descricao || '—'}</TableCell>
+                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirTrein.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </CardContent></Card>
+          </TabsContent>
 
           {/* CATÁLOGO */}
           <TabsContent value="catalogo">
