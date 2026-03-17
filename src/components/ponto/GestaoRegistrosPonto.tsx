@@ -19,10 +19,15 @@ export function GestaoRegistrosPonto() {
     queryKey: ['gestao-registros-ponto', empresaAtual?.id, filtroData],
     queryFn: async () => {
       if (!empresaAtual?.id) return [];
+      // Filter by colaboradores that belong to the current empresa
+      const { data: colabs } = await supabase.from('colaboradores').select('id').eq('empresa_id', empresaAtual!.id);
+      const colabIds = (colabs || []).map((c: any) => c.id);
+      if (colabIds.length === 0) return [];
       const { data, error } = await (supabase as any)
         .from('registros_ponto')
         .select('*, colaborador:colaboradores(nome_completo, cargo, departamento, foto_url)')
         .eq('data', filtroData)
+        .in('colaborador_id', colabIds)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
