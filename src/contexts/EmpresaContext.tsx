@@ -1,16 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './AuthContext';
-
-interface Empresa {
-  id: string;
-  razao_social: string;
-  nome_fantasia?: string | null;
-  cnpj?: string | null;
-  email?: string | null;
-  telefone?: string | null;
-  ativa?: boolean | null;
-}
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useEmpresas, type Empresa } from '@/hooks/useEmpresas';
 
 interface EmpresaContextType {
   empresas: Empresa[];
@@ -22,53 +11,42 @@ interface EmpresaContextType {
 
 const EmpresaContext = createContext<EmpresaContextType | undefined>(undefined);
 
+/**
+ * EmpresaProvider now delegates 100% to useEmpresas (Zustand + React Query).
+ * This eliminates the dual-state problem (C1/M1) — both useEmpresa() and
+ * useEmpresas() now share the same single source of truth.
+ */
 export function EmpresaProvider({ children }: { children: ReactNode }) {
-  const [empresas, setEmpresas] = useState<Empresa[]>([]);
-  const [empresaAtual, setEmpresaAtual] = useState<Empresa | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { user, isReady } = useAuth();
+  const {
+    userEmpresas,
+    empresaAtual,
+    loadingEmpresas,
+    trocarEmpresa,
+  } = useEmpresas();
 
-  const refresh = async () => {
-    if (!user) {
-      setEmpresas([]);
-      setEmpresaAtual(null);
-      setLoading(false);
-      return;
-    }
+  // Map userEmpresas to flat Empresa[] for backward compat
+  const empresas: Empresa[] = (userEmpresas || [])
+    .map(ue => ue.empresa)
+    .filter((e): e is Empresa => !!e);
 
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('empresas')
-        .select('id, razao_social, nome_fantasia, cnpj, email, telefone, ativa')
-        .eq('ativa', true)
-        .order('razao_social');
-
-      if (error) throw error;
-
-      const fetchedEmpresas = data || [];
-      setEmpresas(fetchedEmpresas);
-
-      if (!empresaAtual && fetchedEmpresas.length > 0) {
-        setEmpresaAtual(fetchedEmpresas[0]);
-      }
-    } catch (err) {
-      console.error('Erro ao carregar empresas:', err);
-      setEmpresas([]);
-    } finally {
-      setLoading(false);
-    }
+  const setEmpresaAtual = (empresa: Empresa | null) => {
+    if (empresa) trocarEmpresa(empresa.id);
   };
 
-  // Only fetch empresas after auth is ready AND user is logged in
-  useEffect(() => {
-    if (isReady) {
-      refresh();
-    }
-  }, [isReady, user?.id]);
+  const refresh = async () => {
+    // React Query handles refetching automatically via invalidateQueries
+  };
 
   return (
-    <EmpresaContext.Provider value={{ empresas, empresaAtual, loading, setEmpresaAtual, refresh }}>
+    <EmpresaContext.Provider
+      value={{
+        empresas,
+        empresaAtual: empresaAtual ?? null,
+        loading: loadingEmpresas,
+        setEmpresaAtual,
+        refresh,
+      }}
+    >
       {children}
     </EmpresaContext.Provider>
   );

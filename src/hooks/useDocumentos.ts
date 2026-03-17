@@ -1,24 +1,37 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 export function useDocumentos(colaboradorId?: string) {
   const queryClient = useQueryClient();
+  const { empresaAtualId } = useEmpresas();
 
   const { data: documentos = [], isLoading } = useQuery({
-    queryKey: ['documentos', colaboradorId],
+    queryKey: ['documentos', empresaAtualId, colaboradorId],
+    enabled: !!empresaAtualId,
     queryFn: async () => {
-      let query = supabase.from('documentos').select('*').order('created_at', { ascending: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query: any = supabase
+        .from('documentos')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(500);
+      if (empresaAtualId) query = query.eq('empresa_id', empresaAtualId);
       if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return (data ?? []) as Array<Record<string, unknown>>;
     },
   });
 
   const criarDocumento = useMutation({
-    mutationFn: async (doc: any) => {
-      const { data, error } = await supabase.from('documentos').insert(doc).select().maybeSingle();
+    mutationFn: async (doc: { nome: string; tipo: string; colaborador_id?: string; url?: string; observacoes?: string; data_validade?: string }) => {
+      const { data, error } = await supabase
+        .from('documentos')
+        .insert({ ...doc, ...(empresaAtualId ? { empresa_id: empresaAtualId } : {}) } as any)
+        .select()
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
