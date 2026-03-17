@@ -24,6 +24,12 @@ export { controleAcessoService } from './controleAcessoService';
 export { lgpdService } from './lgpdService';
 export { catalogoCursoService } from './catalogoCursoService';
 export { avaliacaoService } from './avaliacaoService';
+export { batidasPontoService } from './batidasPontoService';
+export { faltasService } from './faltasService';
+export { medidasDisciplinaresService } from './medidasDisciplinaresService';
+export { episService, episEntregasService } from './episService';
+export { jornadaHorariosService } from './jornadaHorariosService';
+export { bancoHorasConfigService } from './bancoHorasConfigService';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);

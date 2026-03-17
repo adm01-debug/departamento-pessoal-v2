@@ -29,6 +29,17 @@ export { useConfiguracoesIntervalo } from "./useConfiguracoesIntervalo";
 export { useWebhooksAvancados, useWebhookLogs } from "./useWebhooksAvancados";
 export { usePontosAbertos } from "./usePontosAbertos";
 
+// Novas tabelas (doc externo)
+export {
+  useBatidasPonto, useBatidasPontoDia, useRegistrarBatida,
+  useFaltas, useFaltasColaborador, useCriarFalta, useAtualizarFalta, useExcluirFalta,
+  useMedidasDisciplinares, useMedidasDisciplinaresColaborador, useCriarMedidaDisciplinar, useAtualizarMedidaDisciplinar,
+  useEpis, useCriarEpi, useAtualizarEpi, useExcluirEpi,
+  useEpisEntregas, useEpisEntregasColaborador, useCriarEpiEntrega, useDevolverEpi,
+  useJornadaHorarios, useSalvarGradeHorarios,
+  useBancoHorasConfig, useSalvarBancoHorasConfig,
+} from "./useNovasTabelas";
+
 // Colaborador Detalhes
 export {
   useDependentes, useCriarDependente, useExcluirDependente, useAtualizarDependente,
