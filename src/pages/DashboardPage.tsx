@@ -551,7 +551,7 @@ export default function DashboardPage() {
               rawValue={stats?.folhaMensal || 0}
               icon={DollarSign}
               trend={{ value: -1.2, label: "vs mês anterior" }}
-              gradient="from-info to-level"
+              gradient="from-primary/80 to-primary"
               sparkline={sparklineData.folha}
               index={1}
             />
@@ -561,7 +561,7 @@ export default function DashboardPage() {
               rawValue={stats?.feriasPendentes || 0}
               icon={Calendar}
               description="Próximos 30 dias"
-              gradient="from-warning to-coins"
+              gradient="from-primary/60 to-primary/90"
               sparkline={sparklineData.ferias}
               index={2}
             />
@@ -570,7 +570,7 @@ export default function DashboardPage() {
               value={`${stats?.bancoHoras && stats.bancoHoras > 0 ? "+" : ""}${stats?.bancoHoras || 0}h`}
               icon={Clock}
               description="Saldo total"
-              gradient="from-success to-finance"
+              gradient="from-primary-glow to-primary"
               sparkline={sparklineData.banco}
               index={3}
             />
