@@ -8,6 +8,7 @@ const routeLabels: Record<string, string> = {
   colaboradores: 'Colaboradores',
   novo: 'Novo',
   editar: 'Editar',
+  detalhes: 'Detalhes',
   empresas: 'Empresas',
   nova: 'Nova',
   folha: 'Folha de Pagamento',
@@ -19,20 +20,69 @@ const routeLabels: Record<string, string> = {
   esocial: 'eSocial',
   configuracoes: 'Configurações',
   'design-system': 'Design System',
+  admissoes: 'Admissões',
+  afastamentos: 'Afastamentos',
+  cargos: 'Cargos',
+  departamentos: 'Departamentos',
+  desligamentos: 'Desligamentos',
+  documentos: 'Documentos',
+  auditoria: 'Auditoria',
+  feriados: 'Feriados',
+  usuarios: 'Usuários',
+  perfil: 'Perfil',
+  notificacoes: 'Notificações',
+  integracoes: 'Integrações',
+  backup: 'Backup',
+  organograma: 'Organograma',
+  portal: 'Portal',
+  avaliacao: 'Avaliação',
+  treinamentos: 'Treinamentos',
+  recrutamento: 'Recrutamento',
+  onboarding: 'Onboarding',
+  assinaturas: 'Assinaturas',
+  'horas-extras': 'Horas Extras',
+  'locais-trabalho': 'Locais de Trabalho',
+  'pesquisas-clima': 'Pesquisas de Clima',
+  workflows: 'Workflows',
+  turnos: 'Turnos',
+  comunicacao: 'Comunicação Interna',
+  despesas: 'Despesas',
+  'controle-acesso': 'Controle de Acesso',
+  lgpd: 'LGPD',
+  'banco-horas': 'Banco de Horas',
+  epis: 'EPIs',
+  faltas: 'Faltas',
+  'medidas-disciplinares': 'Medidas Disciplinares',
+  jornadas: 'Jornadas',
+  'centros-custo': 'Centros de Custo',
+  times: 'Times',
+  movimentacoes: 'Movimentações',
+  sindicatos: 'Sindicatos',
+  'obrigacoes-fiscais': 'Obrigações Fiscais',
+  'planos-saude': 'Planos de Saúde',
+  'canal-etica': 'Canal de Ética',
+  convenios: 'Convênios',
+  escalas: 'Escalas',
+  'seguros-vida': 'Seguros de Vida',
+  pensoes: 'Pensões',
+  vales: 'Vales',
+  exames: 'Exames',
+  holerites: 'Holerites',
+  lotacoes: 'Lotações',
+  contratacao: 'Contratação',
 };
 
 export function Breadcrumbs({ className }: { className?: string }) {
   const location = useLocation();
   const segments = location.pathname.split('/').filter(Boolean);
 
-  if (segments.length <= 1) return null; // Don't show on top-level pages
+  if (segments.length <= 1) return null;
 
   const crumbs = segments.map((seg, i) => {
     const path = '/' + segments.slice(0, i + 1).join('/');
     const isLast = i === segments.length - 1;
-    // Skip UUID segments display but keep in path
     const isUuid = /^[0-9a-f]{8}-/.test(seg);
-    const label = isUuid ? '...' : routeLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1);
+    const label = isUuid ? '...' : routeLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
 
     return { path, label, isLast };
   });

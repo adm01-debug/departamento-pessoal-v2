@@ -8,7 +8,10 @@ function ShimmerBar({ className }: { className?: string }) {
       'relative overflow-hidden rounded-xl bg-muted/60',
       className
     )}>
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
+      <div
+        className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-foreground/5 to-transparent"
+        style={{ backgroundSize: '200% 100%' }}
+      />
     </div>
   );
 }

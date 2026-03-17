@@ -7,11 +7,17 @@ import {
   Zap, ChevronDown, UserPlus, UserMinus, Briefcase,
   FolderOpen, CalendarDays, Plug, Database,
   Network, Shield, UserCog, LogOut, Check, ChevronRight,
+  Timer, GraduationCap, ClipboardList, Heart,
+  Megaphone, Scale, MapPin, Lock, FileBarChart,
+  Wallet, HardHat, UserX, Compass, DollarSign,
+  Layers, TreePine, Stethoscope, BookOpen, Landmark,
+  Receipt, PenTool, Workflow, Globe, BadgeAlert,
+  CreditCard, ShieldCheck, ScrollText,
 } from 'lucide-react';
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -42,26 +48,64 @@ const menuGroups: MenuGroup[] = [
       { path: '/colaboradores', label: 'Colaboradores', icon: Users },
       { path: '/admissoes', label: 'Admissões', icon: UserPlus },
       { path: '/desligamentos', label: 'Desligamentos', icon: UserMinus },
+      { path: '/times', label: 'Times', icon: Users },
     ],
   },
   {
     label: 'Operações',
     items: [
       { path: '/folha', label: 'Folha', icon: FileText },
+      { path: '/holerites', label: 'Holerites', icon: Receipt },
       { path: '/ponto', label: 'Ponto', icon: Clock },
+      { path: '/banco-horas', label: 'Banco de Horas', icon: Timer },
+      { path: '/horas-extras', label: 'Horas Extras', icon: Clock },
       { path: '/ferias', label: 'Férias', icon: Calendar },
+      { path: '/faltas', label: 'Faltas', icon: UserX },
       { path: '/afastamentos', label: 'Afastamentos', icon: Shield },
+      { path: '/turnos', label: 'Turnos', icon: Compass },
+      { path: '/escalas', label: 'Escalas', icon: CalendarDays },
+      { path: '/jornadas', label: 'Jornadas', icon: ClipboardList },
     ],
   },
   {
     label: 'Gestão',
     items: [
       { path: '/beneficios', label: 'Benefícios', icon: Gift },
+      { path: '/planos-saude', label: 'Planos de Saúde', icon: Heart },
+      { path: '/seguros-vida', label: 'Seguros de Vida', icon: ShieldCheck },
+      { path: '/vales', label: 'Vales', icon: CreditCard },
+      { path: '/convenios', label: 'Convênios', icon: BookOpen },
       { path: '/cargos', label: 'Cargos', icon: Briefcase },
       { path: '/departamentos', label: 'Departamentos', icon: Building2 },
+      { path: '/centros-custo', label: 'Centros de Custo', icon: Layers },
+      { path: '/lotacoes', label: 'Lotações', icon: MapPin },
       { path: '/documentos', label: 'Documentos', icon: FolderOpen },
       { path: '/feriados', label: 'Feriados', icon: CalendarDays },
       { path: '/organograma', label: 'Organograma', icon: Network },
+      { path: '/movimentacoes', label: 'Movimentações', icon: FileBarChart },
+      { path: '/despesas', label: 'Despesas', icon: DollarSign },
+      { path: '/pensoes', label: 'Pensões', icon: Wallet },
+    ],
+  },
+  {
+    label: 'Desenvolvimento',
+    items: [
+      { path: '/treinamentos', label: 'Treinamentos', icon: GraduationCap },
+      { path: '/avaliacao', label: 'Avaliação', icon: ClipboardList },
+      { path: '/pesquisas-clima', label: 'Pesquisas de Clima', icon: Megaphone },
+      { path: '/recrutamento', label: 'Recrutamento', icon: UserPlus },
+      { path: '/onboarding', label: 'Onboarding', icon: Compass },
+    ],
+  },
+  {
+    label: 'SST & Compliance',
+    items: [
+      { path: '/exames', label: 'Exames / ASOs', icon: Stethoscope },
+      { path: '/epis', label: 'EPIs', icon: HardHat },
+      { path: '/medidas-disciplinares', label: 'Medidas Disciplinares', icon: BadgeAlert },
+      { path: '/sindicatos', label: 'Sindicatos', icon: Landmark },
+      { path: '/canal-etica', label: 'Canal de Ética', icon: Scale },
+      { path: '/locais-trabalho', label: 'Locais de Trabalho', icon: MapPin },
     ],
   },
   {
@@ -69,6 +113,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
       { path: '/esocial', label: 'eSocial', icon: FileCheck },
+      { path: '/obrigacoes-fiscais', label: 'Obrigações Fiscais', icon: ScrollText },
       { path: '/auditoria', label: 'Auditoria', icon: Shield },
     ],
   },
@@ -76,7 +121,12 @@ const menuGroups: MenuGroup[] = [
     label: 'Sistema',
     items: [
       { path: '/usuarios', label: 'Usuários', icon: UserCog },
+      { path: '/controle-acesso', label: 'Controle de Acesso', icon: Lock },
+      { path: '/assinaturas', label: 'Assinaturas', icon: PenTool },
+      { path: '/workflows', label: 'Workflows', icon: Workflow },
+      { path: '/comunicacao', label: 'Comunicação', icon: Megaphone },
       { path: '/integracoes', label: 'Integrações', icon: Plug },
+      { path: '/lgpd', label: 'LGPD', icon: ShieldCheck },
       { path: '/backup', label: 'Backup', icon: Database },
       { path: '/configuracoes', label: 'Configurações', icon: Settings },
     ],

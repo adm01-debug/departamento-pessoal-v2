@@ -257,9 +257,8 @@ export function useEmpresas(): UseEmpresasReturn {
   // Trocar empresa atual
   const trocarEmpresa = (empresaId: string) => {
     setEmpresaAtual(empresaId);
-    queryClient.invalidateQueries({ queryKey: ["user-empresas"] });
-    queryClient.invalidateQueries({ queryKey: ["colaboradores"] });
-    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    // Invalidate ALL tenant-scoped queries to prevent stale data
+    queryClient.invalidateQueries();
     toast.success("Empresa alterada!");
   };
 

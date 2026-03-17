@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { type ReactNode, useRef } from 'react';
 
-/* ─── Contextual page transitions ─── */
 const variants = {
   enter: (direction: number) => ({
     opacity: 0,
@@ -27,13 +26,30 @@ const transition = {
   duration: 0.22,
 };
 
-// Route hierarchy for determining direction
 const routeOrder = [
-  '/dashboard', '/colaboradores', '/admissoes', '/desligamentos',
+  '/dashboard',
+  // Pessoas
+  '/colaboradores', '/admissoes', '/desligamentos',
+  // Operações
   '/folha', '/ponto', '/ferias', '/afastamentos',
+  '/banco-horas', '/horas-extras', '/faltas', '/turnos', '/escalas', '/jornadas',
+  // Gestão
   '/beneficios', '/cargos', '/departamentos', '/documentos', '/feriados', '/organograma',
-  '/relatorios', '/esocial', '/auditoria',
+  '/planos-saude', '/seguros-vida', '/convenios', '/vales', '/epis',
+  '/treinamentos', '/avaliacao', '/pesquisas-clima',
+  '/times', '/centros-custo', '/lotacoes', '/movimentacoes',
+  '/sindicatos', '/pensoes', '/exames',
+  '/medidas-disciplinares', '/canal-etica',
+  // Comunicação
+  '/comunicacao', '/notificacoes',
+  // Relatórios
+  '/relatorios', '/esocial', '/auditoria', '/obrigacoes-fiscais', '/holerites',
+  // Recrutamento
+  '/recrutamento', '/contratacao', '/onboarding', '/assinaturas',
+  // Sistema
   '/usuarios', '/integracoes', '/backup', '/configuracoes',
+  '/controle-acesso', '/lgpd', '/workflows', '/despesas',
+  '/locais-trabalho', '/portal', '/perfil',
 ];
 
 function getRouteIndex(path: string): number {
