@@ -81,6 +81,7 @@ const GeradorDocumentosPage = lazy(() => import('@/pages/GeradorDocumentosPage')
 const SSTPage = lazy(() => import('@/pages/SSTPage'));
 const CalculadoraRescisaoPage = lazy(() => import('@/pages/CalculadoraRescisaoPage'));
 const ImportacaoPage = lazy(() => import('@/pages/ImportacaoPage'));
+const DashboardExecutivoPage = lazy(() => import('@/pages/DashboardExecutivoPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -172,6 +173,7 @@ export default function App() {
         <Route path="sst" element={<LazyPage Component={SSTPage} />} />
         <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
         <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
+        <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}
