@@ -58,4 +58,20 @@ export const catalogoCursoService = {
     if (error) throw error;
     return ensure(data, 'inscrição');
   },
+
+  // === Trilhas ↔ Cursos ===
+  async listarTrilhasCursos(trilhaId: string) {
+    const { data, error } = await supabase.from('trilhas_cursos' as any).select('*, curso:catalogo_cursos(id, nome, carga_horaria)').eq('trilha_id', trilhaId).order('ordem');
+    if (error) throw error;
+    return data || [];
+  },
+  async vincularCursoTrilha(d: { trilha_id: string; curso_id: string; ordem?: number; obrigatorio?: boolean }) {
+    const { data, error } = await supabase.from('trilhas_cursos' as any).insert(d).select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+  async desvincularCursoTrilha(id: string) {
+    const { error } = await supabase.from('trilhas_cursos' as any).delete().eq('id', id);
+    if (error) throw error;
+  },
 };

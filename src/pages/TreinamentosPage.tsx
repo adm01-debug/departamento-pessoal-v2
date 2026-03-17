@@ -17,7 +17,66 @@ import { catalogoCursoService } from '@/services/catalogoCursoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { GraduationCap, Plus, BookOpen, Award, Users, Trash2 } from 'lucide-react';
+import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link } from 'lucide-react';
+
+// Sub-component for managing courses within a trilha
+function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: any[] }) {
+  const qc = useQueryClient();
+  const [addOpen, setAddOpen] = useState(false);
+  const [selCurso, setSelCurso] = useState('');
+
+  const { data: vinculados = [] } = useQuery({
+    queryKey: ['trilhas_cursos', trilhaId],
+    queryFn: () => catalogoCursoService.listarTrilhasCursos(trilhaId),
+    enabled: !!trilhaId,
+  });
+
+  const vincular = useMutation({
+    mutationFn: () => catalogoCursoService.vincularCursoTrilha({ trilha_id: trilhaId, curso_id: selCurso, ordem: vinculados.length + 1 }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas_cursos', trilhaId] }); setAddOpen(false); setSelCurso(''); toast.success('Curso vinculado!'); },
+    onError: () => toast.error('Erro ao vincular'),
+  });
+
+  const desvincular = useMutation({
+    mutationFn: (id: string) => catalogoCursoService.desvincularCursoTrilha(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas_cursos', trilhaId] }); toast.success('Curso desvinculado'); },
+  });
+
+  const cursosDisponiveis = cursos.filter(c => !vinculados.some((v: any) => v.curso_id === c.id));
+
+  return (
+    <div className="border rounded-lg p-3 bg-muted/20">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-medium flex items-center gap-1"><Link className="h-3 w-3" /> Cursos Vinculados ({vinculados.length})</p>
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogTrigger asChild><Button variant="outline" size="sm"><Plus className="h-3 w-3 mr-1" />Vincular Curso</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Vincular Curso à Trilha</DialogTitle></DialogHeader>
+            <div className="grid gap-3">
+              <div><Label>Curso</Label>
+                <Select value={selCurso} onValueChange={setSelCurso}>
+                  <SelectTrigger><SelectValue placeholder="Selecione um curso" /></SelectTrigger>
+                  <SelectContent>{cursosDisponiveis.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <Button onClick={() => vincular.mutate()} disabled={!selCurso || vincular.isPending}>{vincular.isPending ? 'Vinculando...' : 'Vincular'}</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {vinculados.length === 0 ? <p className="text-xs text-muted-foreground">Nenhum curso vinculado</p> : (
+        <div className="space-y-1">
+          {vinculados.map((v: any, i: number) => (
+            <div key={v.id} className="flex items-center justify-between text-sm bg-card rounded px-2 py-1">
+              <span>{i + 1}. {(v as any).curso?.nome || 'Curso'} {(v as any).curso?.carga_horaria ? `(${(v as any).curso.carga_horaria}h)` : ''}</span>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => desvincular.mutate(v.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TreinamentosPage() {
   const { empresaAtual } = useEmpresas();
