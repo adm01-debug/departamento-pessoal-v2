@@ -19,7 +19,7 @@ export default function UsuariosPage() {
   });
 
   return (
-    <PageLayout title="Usuários" description="Gestão de usuários do sistema" icon={<UserCog className="h-5 w-5 text-white" />} gradient="from-primary to-primary-glow">
+    <PageLayout title="Usuários" description="Gestão de usuários do sistema" icon={<UserCog className="h-5 w-5 text-primary-foreground" />} gradient="from-primary to-primary-glow">
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
       ) : !profiles?.length ? (
