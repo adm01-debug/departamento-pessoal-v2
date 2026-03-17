@@ -5,7 +5,7 @@ import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { EmptyList } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/ui/spinner';
+import { TableSkeleton, StatCardSkeleton } from '@/components/ui/module-skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
