@@ -511,9 +511,9 @@ export default function DashboardPage() {
               value={stats?.colaboradoresAtivos || 0}
               rawValue={stats?.colaboradoresAtivos || 0}
               icon={Users}
-              trend={{ value: 2.5, label: "vs mês anterior" }}
+              trend={stats?.colaboradoresAtivos ? { value: 2.5, label: "vs mês anterior" } : undefined}
               gradient="from-primary to-primary-glow"
-              sparkline={sparklineData.colaboradores}
+              sparkline={emptySparkline}
               index={0}
             />
             <MetricCard
@@ -521,9 +521,9 @@ export default function DashboardPage() {
               value={formatCurrency(stats?.folhaMensal || 0)}
               rawValue={stats?.folhaMensal || 0}
               icon={DollarSign}
-              trend={{ value: -1.2, label: "vs mês anterior" }}
+              trend={stats?.folhaMensal ? { value: -1.2, label: "vs mês anterior" } : undefined}
               gradient="from-primary/80 to-primary"
-              sparkline={sparklineData.folha}
+              sparkline={emptySparkline}
               index={1}
             />
             <MetricCard
@@ -533,7 +533,7 @@ export default function DashboardPage() {
               icon={Calendar}
               description="Próximos 30 dias"
               gradient="from-primary/60 to-primary/90"
-              sparkline={sparklineData.ferias}
+              sparkline={emptySparkline}
               index={2}
             />
             <MetricCard
@@ -542,7 +542,7 @@ export default function DashboardPage() {
               icon={Clock}
               description="Saldo total"
               gradient="from-primary-glow to-primary"
-              sparkline={sparklineData.banco}
+              sparkline={emptySparkline}
               index={3}
             />
           </>
