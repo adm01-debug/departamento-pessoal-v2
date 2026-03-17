@@ -76,6 +76,7 @@ const ValesPage = lazy(() => import('@/pages/ValesPage'));
 const ExamesPage = lazy(() => import('@/pages/ExamesPage'));
 const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
 const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
+const AssistenteIAPage = lazy(() => import('@/pages/AssistenteIAPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
