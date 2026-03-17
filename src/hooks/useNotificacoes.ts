@@ -106,7 +106,7 @@ export function useNotificacoes() {
         .from('periodos_aquisitivos')
         .select('*, colaboradores:colaboradores!fk_periodos_aquisitivos_colaborador (id, nome_completo, status)')
         .eq('status', 'adquirido')
-        .eq('empresa_id', empresaAtualId);
+        .eq('empresa_id', empresaAtualId as string);
 
       if (periodos) {
         for (const periodo of periodos) {

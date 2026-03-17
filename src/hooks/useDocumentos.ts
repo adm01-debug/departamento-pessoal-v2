@@ -11,15 +11,19 @@ export function useDocumentos(colaboradorId?: string) {
     queryKey: ['documentos', empresaAtualId, colaboradorId],
     enabled: !!empresaAtualId,
     queryFn: async () => {
+      const filters: Record<string, string> = {};
+      if (empresaAtualId) filters.empresa_id = empresaAtualId;
+      if (colaboradorId) filters.colaborador_id = colaboradorId;
       let query = supabase
         .from('documentos')
         .select('*')
-        .order('created_at', { ascending: false });
-      if (empresaAtualId) query = query.eq('empresa_id', empresaAtualId);
-      if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
-      const { data, error } = await query.range(0, 499);
+        .order('created_at', { ascending: false })
+        .limit(500);
+      if (filters.empresa_id) query = query.eq('empresa_id', filters.empresa_id);
+      if (filters.colaborador_id) query = query.eq('colaborador_id', filters.colaborador_id);
+      const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return data ?? [];
     },
   });
 
