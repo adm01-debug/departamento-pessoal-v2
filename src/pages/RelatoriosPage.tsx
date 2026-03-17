@@ -106,7 +106,7 @@ export default function RelatoriosPage() {
     queryFn: async () => {
       const [{ data: cols }, { data: deslig }, { data: admissoes }] = await Promise.all([
         supabase.from('colaboradores').select('departamento, status, data_admissao, salario_base').eq('empresa_id', empresaAtual!.id),
-        supabase.from('desligamentos').select('data_desligamento, motivo_tipo').eq('empresa_id', empresaAtual!.id),
+        supabase.from('desligamentos').select('data_desligamento, motivo').eq('empresa_id', empresaAtual!.id),
         supabase.from('admissoes').select('data_prevista, departamento').eq('empresa_id', empresaAtual!.id),
       ]);
 
