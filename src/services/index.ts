@@ -200,24 +200,58 @@ export const pontoService = {
     const now = new Date();
     const data = now.toISOString().split('T')[0];
     const hora = now.toTimeString().split(' ')[0].substring(0, 5);
-    const campo = tipo === 'entrada' ? 'entrada_1'
-      : tipo === 'intervalo_saida' || tipo === 'saida_almoco' ? 'saida_intervalo'
-      : tipo === 'intervalo_retorno' || tipo === 'retorno_almoco' ? 'retorno_intervalo'
-      : 'saida_1';
 
-    const { data: existing, error: existingError } = await supabase
-      .from('registros_ponto').select('id').eq('data', data).eq('colaborador_id', colaboradorId).maybeSingle();
-    if (existingError) throw existingError;
-
-    if (existing) {
-      const { data: result, error } = await supabase.from('registros_ponto').update({ [campo]: hora }).eq('id', existing.id).select().maybeSingle();
+    // Get colaborador by user id (auth.users.id)
+    const { data: colab } = await supabase.from('colaboradores').select('id, empresa_id').eq('email', (await supabase.auth.getUser()).data.user?.email || '').maybeSingle();
+    if (!colab) {
+      // Fallback: register directly in registros_ponto
+      const campo = tipo === 'entrada' ? 'entrada_1'
+        : tipo === 'intervalo_saida' || tipo === 'saida_almoco' ? 'saida_intervalo'
+        : tipo === 'intervalo_retorno' || tipo === 'retorno_almoco' ? 'retorno_intervalo'
+        : 'saida_1';
+      const { data: existing } = await supabase.from('registros_ponto').select('id').eq('data', data).eq('colaborador_id', colaboradorId).maybeSingle();
+      if (existing) {
+        const { data: result, error } = await supabase.from('registros_ponto').update({ [campo]: hora }).eq('id', existing.id).select().maybeSingle();
+        if (error) throw error;
+        return ensureSingleResult(result, 'registro de ponto');
+      }
+      const { data: result, error } = await supabase.from('registros_ponto').insert({ data, [campo]: hora, colaborador_id: colaboradorId }).select().maybeSingle();
       if (error) throw error;
       return ensureSingleResult(result, 'registro de ponto');
     }
 
-    const { data: result, error } = await supabase.from('registros_ponto').insert({ data, [campo]: hora, colaborador_id: colaboradorId }).select().maybeSingle();
+    // Use batidas_ponto (triggers fn_consolidar_batidas automatically)
+    const tipoMap: Record<string, string> = { entrada: 'entrada', saida_almoco: 'saida', retorno_almoco: 'entrada', saida: 'saida' };
+    // Count existing batidas to determine order
+    const { count } = await (supabase as any).from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('colaborador_id', colab.id).eq('data', data);
+    const ordem = (count || 0) + 1;
+
+    const { data: batida, error } = await (supabase as any).from('batidas_ponto').insert({
+      colaborador_id: colab.id,
+      empresa_id: colab.empresa_id,
+      data,
+      hora,
+      ordem,
+      tipo: tipoMap[tipo] || 'entrada',
+      origem: 'web',
+    }).select().maybeSingle();
     if (error) throw error;
-    return ensureSingleResult(result, 'registro de ponto');
+    return ensureSingleResult(batida, 'batida de ponto');
+  },
+
+  async buscarRegistroHoje(colaboradorId: string) {
+    const today = new Date().toISOString().split('T')[0];
+    const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).eq('data', today).maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async buscarRegistrosSemana(colaboradorId: string) {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).gte('data', weekAgo.toISOString().split('T')[0]).order('data', { ascending: false });
+    if (error) throw error;
+    return data || [];
   },
 };
 
