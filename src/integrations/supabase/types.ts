@@ -4961,8 +4961,19 @@ export type Database = {
       }
       ferias: {
         Row: {
+          abono_pecuniario: boolean | null
+          adiantamento_13: boolean | null
           aprovado_em: string | null
+          aprovado_gestor: boolean | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
           aprovado_por: string | null
+          aprovado_rh: boolean | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          cancelado: boolean | null
+          cancelado_em: string | null
+          cancelado_por: string | null
           colaborador_id: string
           created_at: string
           created_by: string | null
@@ -4973,11 +4984,15 @@ export type Database = {
           descontos_irrf: number | null
           dias_abono: number | null
           dias_gozo: number
+          documento_url: string | null
           empresa_id: string | null
           enviado_contabilidade: boolean | null
+          enviado_contabilidade_em: string | null
+          enviado_contabilidade_por: string | null
           ferias_coletiva_id: string | null
           id: string
           justificativa: string | null
+          motivo_cancelamento: string | null
           observacoes: string | null
           periodo_aquisitivo_id: string | null
           salario_base: number
@@ -4985,6 +5000,8 @@ export type Database = {
           status: string | null
           updated_at: string
           valor_abono: number | null
+          valor_abono_pecuniario: number | null
+          valor_adiantamento_13: number | null
           valor_ferias: number
           valor_liquido: number
           valor_terco: number
@@ -4993,8 +5010,19 @@ export type Database = {
           vender_abono: boolean | null
         }
         Insert: {
+          abono_pecuniario?: boolean | null
+          adiantamento_13?: boolean | null
           aprovado_em?: string | null
+          aprovado_gestor?: boolean | null
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
           aprovado_por?: string | null
+          aprovado_rh?: boolean | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
+          cancelado?: boolean | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           colaborador_id: string
           created_at?: string
           created_by?: string | null
@@ -5005,11 +5033,15 @@ export type Database = {
           descontos_irrf?: number | null
           dias_abono?: number | null
           dias_gozo: number
+          documento_url?: string | null
           empresa_id?: string | null
           enviado_contabilidade?: boolean | null
+          enviado_contabilidade_em?: string | null
+          enviado_contabilidade_por?: string | null
           ferias_coletiva_id?: string | null
           id?: string
           justificativa?: string | null
+          motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_id?: string | null
           salario_base: number
@@ -5017,6 +5049,8 @@ export type Database = {
           status?: string | null
           updated_at?: string
           valor_abono?: number | null
+          valor_abono_pecuniario?: number | null
+          valor_adiantamento_13?: number | null
           valor_ferias: number
           valor_liquido: number
           valor_terco: number
@@ -5025,8 +5059,19 @@ export type Database = {
           vender_abono?: boolean | null
         }
         Update: {
+          abono_pecuniario?: boolean | null
+          adiantamento_13?: boolean | null
           aprovado_em?: string | null
+          aprovado_gestor?: boolean | null
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
           aprovado_por?: string | null
+          aprovado_rh?: boolean | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
+          cancelado?: boolean | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           colaborador_id?: string
           created_at?: string
           created_by?: string | null
@@ -5037,11 +5082,15 @@ export type Database = {
           descontos_irrf?: number | null
           dias_abono?: number | null
           dias_gozo?: number
+          documento_url?: string | null
           empresa_id?: string | null
           enviado_contabilidade?: boolean | null
+          enviado_contabilidade_em?: string | null
+          enviado_contabilidade_por?: string | null
           ferias_coletiva_id?: string | null
           id?: string
           justificativa?: string | null
+          motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_id?: string | null
           salario_base?: number
@@ -5049,6 +5098,8 @@ export type Database = {
           status?: string | null
           updated_at?: string
           valor_abono?: number | null
+          valor_abono_pecuniario?: number | null
+          valor_adiantamento_13?: number | null
           valor_ferias?: number
           valor_liquido?: number
           valor_terco?: number
