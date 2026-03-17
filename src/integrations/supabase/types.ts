@@ -704,6 +704,50 @@ export type Database = {
           },
         ]
       }
+      banco_horas_config: {
+        Row: {
+          acordo_tipo: string | null
+          alerta_saldo_negativo_horas: number | null
+          compensacao_automatica: boolean | null
+          created_at: string | null
+          empresa_id: string | null
+          id: string
+          prazo_meses: number | null
+          saldo_maximo_horas: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          acordo_tipo?: string | null
+          alerta_saldo_negativo_horas?: number | null
+          compensacao_automatica?: boolean | null
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          prazo_meses?: number | null
+          saldo_maximo_horas?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          acordo_tipo?: string | null
+          alerta_saldo_negativo_horas?: number | null
+          compensacao_automatica?: boolean | null
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          prazo_meses?: number | null
+          saldo_maximo_horas?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banco_horas_config_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficiarios_plano: {
         Row: {
           colaborador_id: string | null
@@ -3665,6 +3709,120 @@ export type Database = {
         }
         Relationships: []
       }
+      epis: {
+        Row: {
+          ativo: boolean | null
+          ca: string | null
+          categoria: string | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+          updated_at: string | null
+          validade_ca: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          ca?: string | null
+          categoria?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          updated_at?: string | null
+          validade_ca?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          ca?: string | null
+          categoria?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string | null
+          validade_ca?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epis_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      epis_entregas: {
+        Row: {
+          assinatura_url: string | null
+          colaborador_id: string
+          created_at: string | null
+          data_devolucao: string | null
+          data_entrega: string
+          empresa_id: string | null
+          entregue_por: string | null
+          epi_id: string
+          id: string
+          motivo: string | null
+          observacoes: string | null
+          quantidade: number | null
+        }
+        Insert: {
+          assinatura_url?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data_devolucao?: string | null
+          data_entrega: string
+          empresa_id?: string | null
+          entregue_por?: string | null
+          epi_id: string
+          id?: string
+          motivo?: string | null
+          observacoes?: string | null
+          quantidade?: number | null
+        }
+        Update: {
+          assinatura_url?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data_devolucao?: string | null
+          data_entrega?: string
+          empresa_id?: string | null
+          entregue_por?: string | null
+          epi_id?: string
+          id?: string
+          motivo?: string | null
+          observacoes?: string | null
+          quantidade?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epis_entregas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epis_entregas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epis_entregas_epi_id_fkey"
+            columns: ["epi_id"]
+            isOneToOne: false
+            referencedRelation: "epis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       escalas: {
         Row: {
           ativo: boolean | null
@@ -3988,6 +4146,94 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faltas: {
+        Row: {
+          cid: string | null
+          colaborador_id: string
+          created_at: string | null
+          created_by: string | null
+          data: string
+          data_fim: string | null
+          dias_total: number | null
+          documento_url: string | null
+          empresa_id: string | null
+          horas_falta: string | null
+          id: string
+          justificada: boolean | null
+          medico_crm: string | null
+          medico_nome: string | null
+          motivo: string | null
+          motivo_afastamento_id: number | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          cid?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          created_by?: string | null
+          data: string
+          data_fim?: string | null
+          dias_total?: number | null
+          documento_url?: string | null
+          empresa_id?: string | null
+          horas_falta?: string | null
+          id?: string
+          justificada?: boolean | null
+          medico_crm?: string | null
+          medico_nome?: string | null
+          motivo?: string | null
+          motivo_afastamento_id?: number | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Update: {
+          cid?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          data?: string
+          data_fim?: string | null
+          dias_total?: number | null
+          documento_url?: string | null
+          empresa_id?: string | null
+          horas_falta?: string | null
+          id?: string
+          justificada?: boolean | null
+          medico_crm?: string | null
+          medico_nome?: string | null
+          motivo?: string | null
+          motivo_afastamento_id?: number | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faltas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faltas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faltas_motivo_afastamento_id_fkey"
+            columns: ["motivo_afastamento_id"]
+            isOneToOne: false
+            referencedRelation: "motivos_afastamento"
             referencedColumns: ["id"]
           },
         ]
@@ -5738,6 +5984,78 @@ export type Database = {
           },
           {
             foreignKeyName: "lotacoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medidas_disciplinares: {
+        Row: {
+          aplicado_por: string | null
+          assinado_em: string | null
+          colaborador_id: string
+          created_at: string | null
+          data_ocorrencia: string
+          descricao: string
+          dias_suspensao: number | null
+          documento_url: string | null
+          empresa_id: string | null
+          id: string
+          numero_sequencial: number | null
+          status: string | null
+          testemunha_1: string | null
+          testemunha_2: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          aplicado_por?: string | null
+          assinado_em?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data_ocorrencia: string
+          descricao: string
+          dias_suspensao?: number | null
+          documento_url?: string | null
+          empresa_id?: string | null
+          id?: string
+          numero_sequencial?: number | null
+          status?: string | null
+          testemunha_1?: string | null
+          testemunha_2?: string | null
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          aplicado_por?: string | null
+          assinado_em?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data_ocorrencia?: string
+          descricao?: string
+          dias_suspensao?: number | null
+          documento_url?: string | null
+          empresa_id?: string | null
+          id?: string
+          numero_sequencial?: number | null
+          status?: string | null
+          testemunha_1?: string | null
+          testemunha_2?: string | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_disciplinares_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
