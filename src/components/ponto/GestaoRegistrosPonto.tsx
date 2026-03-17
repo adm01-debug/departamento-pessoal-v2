@@ -22,9 +22,11 @@ export function GestaoRegistrosPonto() {
       const { data, error } = await (supabase as any)
         .from('registros_ponto')
         .select('*, colaborador:colaboradores(nome_completo, cargo, departamento, foto_url)')
+        .eq('empresa_id', empresaAtual.id)
         .eq('data', filtroData)
         .order('created_at', { ascending: false });
       if (error) throw error;
+      return data || [];
       return data || [];
     },
     enabled: !!empresaAtual?.id,
