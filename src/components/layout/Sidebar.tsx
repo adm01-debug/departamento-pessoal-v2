@@ -293,7 +293,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                     onClick={() => toggleGroup(group.label)}
                     className="w-full flex items-center justify-between px-3 py-1.5 mb-0.5 group/header"
                   >
-                    <span className="text-overline text-muted-foreground/50 group-hover/header:text-muted-foreground transition-colors">
+                    <span className="text-overline text-muted-foreground/80 group-hover/header:text-foreground transition-colors font-bold tracking-wider">
                       {group.label}
                     </span>
                     <ChevronRight className={cn(
