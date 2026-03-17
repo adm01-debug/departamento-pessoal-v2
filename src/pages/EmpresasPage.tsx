@@ -43,7 +43,9 @@ export default function EmpresasPage() {
       <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar empresa..." />
 
       {isLoading ? (
-        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => <GridCardSkeleton key={i} />)}
+        </div>
       ) : !filtered?.length ? (
         <EmptyList entityName="empresa" onCreate={() => navigate('/empresas/nova')} />
       ) : (

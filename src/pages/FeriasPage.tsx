@@ -128,7 +128,7 @@ export default function FeriasPage() {
       />
 
       {isLoading ? (
-        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+        <TableSkeleton rows={6} columns={7} />
       ) : !filtered?.length ? (
         <EmptyList entityName="solicitação de férias" />
       ) : (
