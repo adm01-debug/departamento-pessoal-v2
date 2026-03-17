@@ -528,6 +528,9 @@ export default function DashboardPage() {
   const { data: pendencias, isLoading: loadingPendencias } = usePendencias(isAuthenticated);
   const navigate = useNavigate();
 
+  // Enable realtime subscriptions
+  useRealtimeDashboard();
+
   const hoje = new Date();
   const greeting = hoje.getHours() < 12 ? "Bom dia" : hoje.getHours() < 18 ? "Boa tarde" : "Boa noite";
 
