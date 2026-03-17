@@ -71,8 +71,8 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
         const mesRef = subMonths(hoje, i);
         const comp = format(mesRef, 'yyyy-MM');
         const label = format(mesRef, 'MMM/yy', { locale: ptBR });
-        const { data: fl } = await supabase.from('folhas_pagamento').select('total_bruto, total_liquido, total_descontos').eq('competencia', comp).eq('empresa_id', empresaId!);
-        const bruto = fl?.reduce((s, f) => s + (f.total_bruto || 0), 0) || 0;
+      const { data: fl } = await supabase.from('folhas_pagamento').select('total_proventos, total_liquido, total_descontos').eq('competencia', comp).eq('empresa_id', empresaId!);
+        const bruto = fl?.reduce((s, f) => s + (f.total_proventos || 0), 0) || 0;
         const liquido = fl?.reduce((s, f) => s + (f.total_liquido || 0), 0) || 0;
         const descontos = fl?.reduce((s, f) => s + (f.total_descontos || 0), 0) || 0;
         custosMensal.push({ mes: label, bruto, liquido, descontos });
