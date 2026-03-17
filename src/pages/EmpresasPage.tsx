@@ -5,7 +5,7 @@ import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EmptyList } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/ui/spinner';
+import { GridCardSkeleton } from '@/components/ui/module-skeleton';
 import { empresaService } from '@/services';
 import { Building2, Edit, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
