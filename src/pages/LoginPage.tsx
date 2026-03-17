@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Zap, Shield, Users, BarChart3 } from 'lucide-react';
+import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const features = [
-  { icon: Users, label: 'Gestão de Colaboradores' },
-  { icon: Shield, label: 'eSocial Integrado' },
-  { icon: BarChart3, label: 'Relatórios Inteligentes' },
+  { icon: Users, label: 'Gestão completa de Colaboradores', desc: 'Cadastro, documentos, benefícios e histórico' },
+  { icon: Shield, label: 'eSocial 100% Integrado', desc: 'Envio automático de eventos obrigatórios' },
+  { icon: BarChart3, label: 'Relatórios Inteligentes', desc: 'Dashboards com KPIs em tempo real' },
+  { icon: FileText, label: 'Folha de Pagamento', desc: 'Cálculos trabalhistas atualizados 2026' },
 ];
 
 export default function LoginPage() {
@@ -20,7 +21,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { signIn } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const { signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,51 +41,103 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Informe seu email');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await resetPassword(email);
+      setForgotSent(true);
+    } catch (err: any) {
+      setError(err.message || 'Erro ao enviar email de recuperação');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-background">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-info" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
+      {/* Left Panel - Dark branding */}
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-[hsl(240,24%,5%)]">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-primary/4" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/10 to-transparent rounded-full -translate-y-1/4 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-primary/6 to-transparent rounded-full translate-y-1/3 -translate-x-1/4" />
 
-        <div className="relative z-10 flex flex-col justify-center p-12 text-white">
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+          {/* Top - Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center gap-3"
+          >
+            <div className="h-11 w-11 rounded-xl bg-primary flex items-center justify-center shadow-glow-lime">
+              <Zap className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-display font-bold text-white">Sistema DP</h1>
+              <p className="text-xs text-white/40 font-body tracking-wider uppercase">Departamento Pessoal</p>
+            </div>
+          </motion.div>
+
+          {/* Center - Value prop */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="space-y-8"
           >
-            <div className="flex items-center gap-3 mb-8">
-              <div className="h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                <Zap className="h-7 w-7" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-display font-bold">Sistema DP</h1>
-                <p className="text-sm opacity-80 font-body">Departamento Pessoal</p>
-              </div>
+            <div>
+              <h2 className="text-4xl font-display font-bold text-white leading-tight mb-4">
+                Gestão completa do seu
+                <br />
+                <span className="text-primary">Departamento Pessoal</span>
+              </h2>
+              <p className="text-base text-white/50 font-body max-w-md leading-relaxed">
+                Automatize processos, reduza erros e ganhe tempo com uma plataforma inteligente e moderna.
+              </p>
             </div>
 
-            <h2 className="text-2xl font-display font-semibold mb-4 leading-tight">
-              Gestão completa do seu<br />Departamento Pessoal
-            </h2>
-            <p className="text-base opacity-80 font-body mb-10 max-w-md">
-              Automatize processos, reduza erros e ganhe tempo com uma plataforma inteligente e moderna.
-            </p>
-
-            <div className="space-y-4">
-              {features.map(({ icon: Icon, label }, i) => (
+            <div className="grid grid-cols-2 gap-4 max-w-lg">
+              {features.map(({ icon: Icon, label, desc }, i) => (
                 <motion.div
                   key={label}
-                  initial={{ opacity: 0, x: -15 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
-                  className="flex items-center gap-3"
+                  className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:border-primary/20 transition-colors"
                 >
-                  <div className="h-9 w-9 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
-                    <Icon className="h-4 w-4" />
+                  <div className="h-9 w-9 rounded-lg bg-primary/15 flex items-center justify-center mb-3">
+                    <Icon className="h-4 w-4 text-primary" />
                   </div>
-                  <span className="font-body font-medium">{label}</span>
+                  <p className="text-sm font-semibold text-white/90 font-body mb-1">{label}</p>
+                  <p className="text-xs text-white/35 font-body leading-relaxed">{desc}</p>
                 </motion.div>
               ))}
+            </div>
+          </motion.div>
+
+          {/* Bottom - Social proof */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="flex items-center gap-4"
+          >
+            <div className="flex -space-x-2">
+              {['bg-primary/60', 'bg-info/60', 'bg-success/60', 'bg-warning/60'].map((bg, i) => (
+                <div key={i} className={cn('h-8 w-8 rounded-full border-2 border-[hsl(240,24%,5%)]', bg)} />
+              ))}
+            </div>
+            <div>
+              <p className="text-sm text-white/60 font-body">
+                <span className="text-primary font-semibold">200+</span> empresas confiam no Sistema DP
+              </p>
             </div>
           </motion.div>
         </div>
@@ -97,63 +153,154 @@ export default function LoginPage() {
         >
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-glow">
+            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-glow">
               <Zap className="h-5 w-5 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-display font-bold">Sistema DP</h1>
           </div>
 
-          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-            <div className="h-[2px] bg-gradient-to-r from-primary via-info to-primary-glow" />
+          <Card className="border border-border/30 shadow-elevated rounded-xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
             <CardHeader className="text-center pb-2 pt-8">
-              <CardTitle className="text-2xl font-display">Bem-vindo de volta</CardTitle>
-              <CardDescription className="font-body">Faça login para acessar o sistema</CardDescription>
+              <CardTitle className="text-2xl font-display">
+                {forgotMode ? 'Recuperar senha' : 'Bem-vindo de volta'}
+              </CardTitle>
+              <CardDescription className="font-body">
+                {forgotMode
+                  ? 'Informe seu email para receber o link de recuperação'
+                  : 'Faça login para acessar o sistema'
+                }
+              </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pb-8">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="font-body text-sm font-medium">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    required
-                    className="h-11 rounded-xl border-border/50 focus:border-primary/50 font-body"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="font-body text-sm font-medium">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="h-11 rounded-xl border-border/50 focus:border-primary/50 font-body"
-                  />
-                </div>
-                {error && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg"
+              {forgotMode ? (
+                forgotSent ? (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center space-y-4 py-4">
+                    <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                      <Mail className="h-7 w-7 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-display font-semibold text-lg">Email enviado!</p>
+                      <p className="text-sm text-muted-foreground font-body mt-1">
+                        Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="rounded-lg font-body"
+                      onClick={() => { setForgotMode(false); setForgotSent(false); }}
+                    >
+                      Voltar ao login
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-email" className="font-body text-sm font-medium">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="forgot-email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="seu@email.com"
+                          required
+                          className="h-11 pl-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
+                        />
+                      </div>
+                    </div>
+                    {error && (
+                      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg">
+                        {error}
+                      </motion.p>
+                    )}
+                    <Button type="submit" className="w-full h-11 rounded-lg font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-glow" disabled={loading}>
+                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Enviar link de recuperação
+                    </Button>
+                    <Button type="button" variant="ghost" className="w-full font-body text-sm" onClick={() => { setForgotMode(false); setError(''); }}>
+                      Voltar ao login
+                    </Button>
+                  </form>
+                )
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="font-body text-sm font-medium">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="seu@email.com"
+                        required
+                        className="h-11 pl-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="font-body text-sm font-medium">Senha</Label>
+                      <button
+                        type="button"
+                        className="text-xs text-primary hover:underline font-body"
+                        onClick={() => { setForgotMode(true); setError(''); }}
+                      >
+                        Esqueci minha senha
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="h-11 pl-10 pr-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  {error && (
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg">
+                      {error}
+                    </motion.p>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full h-11 rounded-lg font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-glow"
+                    disabled={loading}
                   >
-                    {error}
-                  </motion.p>
-                )}
-                <Button
-                  type="submit"
-                  className="w-full h-11 rounded-xl font-body font-semibold bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity shadow-glow"
-                  disabled={loading}
-                >
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Entrar
-                </Button>
-              </form>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Entrar
+                  </Button>
+                </form>
+              )}
             </CardContent>
           </Card>
+
+          {/* Security badge */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-6 flex items-center justify-center gap-2 text-muted-foreground/50"
+          >
+            <Shield className="h-3.5 w-3.5" />
+            <span className="text-xs font-body">Protegido por criptografia ponta-a-ponta • LGPD Compliant</span>
+          </motion.div>
         </motion.div>
       </div>
     </div>
