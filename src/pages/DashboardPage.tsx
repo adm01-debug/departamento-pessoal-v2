@@ -111,28 +111,20 @@ function usePendencias(enabled: boolean) {
     queryKey: ["dashboard-pendencias"],
     enabled,
     queryFn: async () => {
+      // Parallel queries for all pendencias
+      const [
+        { count: feriasPendentes },
+        { count: afastamentosAtivos },
+        { count: admissoesPendentes },
+      ] = await Promise.all([
+        supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "pendente"),
+        supabase.from("afastamentos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+        supabase.from("admissoes").select("*", { count: "exact", head: true }).neq("etapa", "esocial"),
+      ]);
       const pendencias: Pendencia[] = [];
-      const { count: feriasPendentes } = await supabase
-        .from("ferias")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pendente");
-      if (feriasPendentes && feriasPendentes > 0) {
-        pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes de aprovação`, quantidade: feriasPendentes, icone: 'ferias' });
-      }
-      const { count: afastamentosAtivos } = await supabase
-        .from("afastamentos")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "ativo");
-      if (afastamentosAtivos && afastamentosAtivos > 0) {
-        pendencias.push({ tipo: "afastamentos", descricao: `${afastamentosAtivos} afastamentos em andamento`, quantidade: afastamentosAtivos, icone: 'afastamentos' });
-      }
-      const { count: admissoesPendentes } = await supabase
-        .from("admissoes")
-        .select("*", { count: "exact", head: true })
-        .neq("etapa", "esocial");
-      if (admissoesPendentes && admissoesPendentes > 0) {
-        pendencias.push({ tipo: "admissoes", descricao: `${admissoesPendentes} admissões em andamento`, quantidade: admissoesPendentes, icone: 'admissoes' });
-      }
+      if (feriasPendentes && feriasPendentes > 0) pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes de aprovação`, quantidade: feriasPendentes, icone: 'ferias' });
+      if (afastamentosAtivos && afastamentosAtivos > 0) pendencias.push({ tipo: "afastamentos", descricao: `${afastamentosAtivos} afastamentos em andamento`, quantidade: afastamentosAtivos, icone: 'afastamentos' });
+      if (admissoesPendentes && admissoesPendentes > 0) pendencias.push({ tipo: "admissoes", descricao: `${admissoesPendentes} admissões em andamento`, quantidade: admissoesPendentes, icone: 'admissoes' });
       return pendencias;
     },
     staleTime: 5 * 60 * 1000,
