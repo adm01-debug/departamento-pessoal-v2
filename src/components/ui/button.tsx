@@ -16,8 +16,8 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         // Premium variants
         premium: 'bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-glow-sm hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]',
-        'gradient-xp': 'bg-gradient-to-r from-xp to-tasks text-xp-foreground shadow-glow-xp hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]',
-        'gradient-success': 'bg-gradient-to-r from-success to-finance text-success-foreground shadow-glow-success hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]',
+        'gradient-xp': 'bg-gradient-to-r from-primary/80 to-primary text-xp-foreground shadow-glow-xp hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]',
+        'gradient-success': 'bg-gradient-to-r from-primary to-primary-glow text-success-foreground shadow-glow-success hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]',
         glass: 'glass hover:bg-card/80 text-foreground',
       },
       size: {

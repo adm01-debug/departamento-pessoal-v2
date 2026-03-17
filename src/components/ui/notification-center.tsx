@@ -20,10 +20,10 @@ interface Notification {
 }
 
 const mockNotifications: Notification[] = [
-  { id: '1', title: 'Férias pendentes de aprovação', description: '3 solicitações aguardam revisão', time: '5min', type: 'action', read: false, icon: Calendar, gradient: 'from-warning to-coins' },
-  { id: '2', title: 'Nova admissão registrada', description: 'João Silva - Desenvolvedor', time: '1h', type: 'success', read: false, icon: UserPlus, gradient: 'from-success to-finance' },
+  { id: '1', title: 'Férias pendentes de aprovação', description: '3 solicitações aguardam revisão', time: '5min', type: 'action', read: false, icon: Calendar, gradient: 'from-primary-glow to-primary' },
+  { id: '2', title: 'Nova admissão registrada', description: 'João Silva - Desenvolvedor', time: '1h', type: 'success', read: false, icon: UserPlus, gradient: 'from-primary to-primary-glow' },
   { id: '3', title: 'Documentos vencidos', description: '2 ASOs precisam renovação', time: '2h', type: 'warning', read: false, icon: AlertTriangle, gradient: 'from-destructive to-streak' },
-  { id: '4', title: 'Folha processada', description: 'Competência 03/2026 finalizada', time: '1d', type: 'info', read: true, icon: FileText, gradient: 'from-info to-level' },
+  { id: '4', title: 'Folha processada', description: 'Competência 03/2026 finalizada', time: '1d', type: 'info', read: true, icon: FileText, gradient: 'from-primary to-primary-glow' },
   { id: '5', title: 'Ponto ajustado', description: 'Ajuste aprovado para Maria Santos', time: '2d', type: 'success', read: true, icon: Clock, gradient: 'from-primary to-primary-glow' },
 ];
 

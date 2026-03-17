@@ -76,7 +76,7 @@ export function PontoCharts() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Weekly Trend */}
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-          <div className="h-[2px] bg-gradient-to-r from-info to-level" />
+          <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
           <CardHeader>
             <CardTitle className="font-display flex items-center gap-2 text-base">
               <TrendingUp className="h-4 w-4 text-info" /> Tendência Semanal
@@ -112,7 +112,7 @@ export function PontoCharts() {
 
         {/* Check-in Times */}
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-          <div className="h-[2px] bg-gradient-to-r from-streak to-warning" />
+          <div className="h-[2px] bg-gradient-to-r from-primary/60 to-primary/90" />
           <CardHeader>
             <CardTitle className="font-display flex items-center gap-2 text-base">
               <Clock className="h-4 w-4 text-streak" /> Horários de Entrada

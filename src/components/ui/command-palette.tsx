@@ -25,19 +25,19 @@ interface CommandItem {
 const commands: CommandItem[] = [
   // Navigation
   { id: 'dashboard', label: 'Dashboard', description: 'Visão geral do sistema', icon: Home, category: 'navigation', path: '/dashboard', gradient: 'from-primary to-primary-glow' },
-  { id: 'colaboradores', label: 'Colaboradores', description: 'Gestão de funcionários', icon: Users, category: 'navigation', path: '/colaboradores', gradient: 'from-info to-level' },
-  { id: 'empresas', label: 'Empresas', description: 'Cadastro de empresas', icon: Building2, category: 'navigation', path: '/empresas', gradient: 'from-xp to-tasks' },
-  { id: 'folha', label: 'Folha de Pagamento', description: 'Cálculos e holerites', icon: FileText, category: 'navigation', path: '/folha', gradient: 'from-finance to-success' },
-  { id: 'ferias', label: 'Férias', description: 'Programação de férias', icon: Calendar, category: 'navigation', path: '/ferias', gradient: 'from-warning to-coins' },
-  { id: 'ponto', label: 'Ponto Eletrônico', description: 'Registro e espelho', icon: Clock, category: 'navigation', path: '/ponto', gradient: 'from-streak to-warning' },
+  { id: 'colaboradores', label: 'Colaboradores', description: 'Gestão de funcionários', icon: Users, category: 'navigation', path: '/colaboradores', gradient: 'from-primary to-primary-glow' },
+  { id: 'empresas', label: 'Empresas', description: 'Cadastro de empresas', icon: Building2, category: 'navigation', path: '/empresas', gradient: 'from-primary/80 to-primary' },
+  { id: 'folha', label: 'Folha de Pagamento', description: 'Cálculos e holerites', icon: FileText, category: 'navigation', path: '/folha', gradient: 'from-primary-glow to-primary' },
+  { id: 'ferias', label: 'Férias', description: 'Programação de férias', icon: Calendar, category: 'navigation', path: '/ferias', gradient: 'from-primary-glow to-primary' },
+  { id: 'ponto', label: 'Ponto Eletrônico', description: 'Registro e espelho', icon: Clock, category: 'navigation', path: '/ponto', gradient: 'from-primary/60 to-primary/90' },
   { id: 'beneficios', label: 'Benefícios', description: 'Gestão de benefícios', icon: Gift, category: 'navigation', path: '/beneficios', gradient: 'from-xp to-store' },
   { id: 'relatorios', label: 'Relatórios', description: 'Relatórios e exportações', icon: BarChart3, category: 'navigation', path: '/relatorios', gradient: 'from-info to-primary' },
-  { id: 'esocial', label: 'eSocial', description: 'Eventos e transmissão', icon: FileCheck, category: 'navigation', path: '/esocial', gradient: 'from-success to-finance' },
+  { id: 'esocial', label: 'eSocial', description: 'Eventos e transmissão', icon: FileCheck, category: 'navigation', path: '/esocial', gradient: 'from-primary to-primary-glow' },
   { id: 'configuracoes', label: 'Configurações', description: 'Preferências do sistema', icon: Settings, category: 'navigation', path: '/configuracoes', gradient: 'from-muted-foreground to-foreground' },
   // Actions
-  { id: 'novo-colaborador', label: 'Novo Colaborador', description: 'Cadastrar funcionário', icon: UserPlus, category: 'action', path: '/colaboradores/novo', gradient: 'from-success to-finance', shortcut: 'N' },
-  { id: 'calcular-folha', label: 'Calcular Folha', description: 'Processar folha do mês', icon: Calculator, category: 'action', path: '/folha/calcular', gradient: 'from-finance to-success', shortcut: 'F' },
-  { id: 'nova-empresa', label: 'Nova Empresa', description: 'Cadastrar empresa', icon: Plus, category: 'action', path: '/empresas/nova', gradient: 'from-xp to-tasks' },
+  { id: 'novo-colaborador', label: 'Novo Colaborador', description: 'Cadastrar funcionário', icon: UserPlus, category: 'action', path: '/colaboradores/novo', gradient: 'from-primary to-primary-glow', shortcut: 'N' },
+  { id: 'calcular-folha', label: 'Calcular Folha', description: 'Processar folha do mês', icon: Calculator, category: 'action', path: '/folha/calcular', gradient: 'from-primary-glow to-primary', shortcut: 'F' },
+  { id: 'nova-empresa', label: 'Nova Empresa', description: 'Cadastrar empresa', icon: Plus, category: 'action', path: '/empresas/nova', gradient: 'from-primary/80 to-primary' },
   { id: 'novo-beneficio', label: 'Novo Benefício', description: 'Adicionar benefício', icon: Gift, category: 'action', path: '/beneficios/novo', gradient: 'from-xp to-store' },
 ];
 
