@@ -5,7 +5,7 @@ import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
   Zap, ChevronDown, UserPlus, UserMinus, Briefcase,
-  FolderOpen, CalendarDays, Plug, Database,
+  FolderOpen, CalendarDays, Plug, Database, Plus,
   Network, Shield, UserCog, LogOut, Check, ChevronRight,
   Timer, GraduationCap, ClipboardList, Heart,
   Megaphone, Scale, MapPin, Lock, FileBarChart,
