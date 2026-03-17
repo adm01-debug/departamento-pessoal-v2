@@ -663,7 +663,7 @@ export default function DashboardPage() {
         <MotionCard custom={5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-xp to-tasks">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary-glow to-primary">
                 <Activity className="h-4 w-4 text-primary-foreground" />
               </div>
               Movimentação
