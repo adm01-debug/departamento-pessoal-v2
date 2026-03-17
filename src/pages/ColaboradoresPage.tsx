@@ -43,11 +43,11 @@ export default function ColaboradoresPage() {
       title="Colaboradores"
       description="Gestão de colaboradores"
       icon={<Users className="h-5 w-5 text-white" />}
-      gradient="from-info to-level"
+      gradient="from-primary to-primary-glow"
       actions={
         <Button
           onClick={() => navigate('/colaboradores/novo')}
-          className="rounded-xl bg-gradient-to-r from-info to-level hover:opacity-90 shadow-lg font-body"
+          className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow font-body"
         >
           Novo Colaborador
         </Button>

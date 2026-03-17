@@ -325,9 +325,9 @@ function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: numb
     ferias: Calendar, afastamentos: AlertTriangle, admissoes: UserPlus,
   };
   const gradientMap: Record<string, string> = {
-    ferias: "from-info to-level",
-    afastamentos: "from-warning to-coins",
-    admissoes: "from-success to-finance",
+    ferias: "from-primary/80 to-primary",
+    afastamentos: "from-primary/60 to-primary/90",
+    admissoes: "from-primary to-primary-glow",
   };
   const Icon = iconMap[pendencia.icone] || AlertCircle;
 
