@@ -42,6 +42,7 @@ const menuGroups: MenuGroup[] = [
       { path: '/dashboard', label: 'Dashboard', icon: Home },
       { path: '/empresas', label: 'Empresas', icon: Building2 },
       { path: '/portal', label: 'Portal', icon: Globe },
+      { path: '/assistente-ia', label: 'Assistente IA', icon: Bot },
     ],
   },
   {
