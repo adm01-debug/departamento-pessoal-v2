@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -81,7 +82,11 @@ function PageLoader() {
 }
 
 function LazyPage({ Component }: { Component: React.LazyExoticComponent<() => React.ReactElement> }) {
-  return <Suspense fallback={<PageLoader />}><Component /></Suspense>;
+  return (
+    <RouteErrorBoundary>
+      <Suspense fallback={<PageLoader />}><Component /></Suspense>
+    </RouteErrorBoundary>
+  );
 }
 
 export default function App() {
