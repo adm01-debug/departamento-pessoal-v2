@@ -1460,9 +1460,15 @@ export type Database = {
           cidade: string | null
           cipa: boolean | null
           cnh_categoria: string | null
+          cnh_data_emissao: string | null
           cnh_numero: string | null
           cnh_validade: string | null
+          codigo_firebird: number | null
           complemento: string | null
+          conjuge_cpf: string | null
+          conjuge_data_nascimento: string | null
+          conjuge_nome: string | null
+          conjuge_telefone: string | null
           conselho_profissional: string | null
           conta: string | null
           cpf: string
@@ -1481,10 +1487,15 @@ export type Database = {
           departamento: string
           email: string | null
           email_corporativo: string | null
+          email_pessoal: string | null
           empresa_id: string | null
           escolaridade: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil: Database["public"]["Enums"]["estado_civil"]
           etnia: string | null
+          experiencia_fim_1: string | null
+          experiencia_fim_2: string | null
+          experiencia_tipo: string | null
+          facebook: string | null
           formacao: string | null
           foto_url: string | null
           genero_documento_id: number | null
@@ -1496,8 +1507,11 @@ export type Database = {
           identificador_tipo: string | null
           identificador_validade: string | null
           inscricao_orgao_classe: string | null
+          instagram: string | null
           intervalo_minutos: number | null
+          jornada_horas_mensais: string | null
           jornada_semanal: number | null
+          linkedin: string | null
           local_trabalho: string | null
           local_trabalho_id: string | null
           logradouro: string | null
@@ -1519,6 +1533,9 @@ export type Database = {
           pix_tipo: string | null
           primeiro_emprego: boolean | null
           pronomes: string | null
+          reservista: string | null
+          reservista_ra: string | null
+          reservista_serie: string | null
           rg: string | null
           rg_data_emissao: string | null
           rg_data_validade: string | null
@@ -1530,7 +1547,11 @@ export type Database = {
           status: Database["public"]["Enums"]["status_colaborador"]
           supervisor_id: string | null
           telefone: string | null
+          telefone_residencial: string | null
+          tiktok: string | null
           time_id: string | null
+          timeman_ultima_sync: string | null
+          timeman_ultimo_status: string | null
           tipo_admissao: string | null
           tipo_conta: Database["public"]["Enums"]["tipo_conta"] | null
           tipo_contrato: Database["public"]["Enums"]["tipo_contrato"]
@@ -1538,12 +1559,20 @@ export type Database = {
           tipo_pagamento: string | null
           tipo_pagamento_id: number | null
           tipo_salario: string | null
+          tipo_salario_descricao: string | null
           tipo_salario_id: number | null
+          tipo_sanguineo: string | null
           titulo_eleitor: string | null
+          titulo_eleitor_uf: string | null
           titulo_secao: string | null
           titulo_zona: string | null
           uf: string | null
+          unidade: string | null
+          uniforme_calca: string | null
+          uniforme_calcado: string | null
+          uniforme_camiseta: string | null
           updated_at: string
+          whatsapp: string | null
         }
         Insert: {
           agencia?: string | null
@@ -1567,9 +1596,15 @@ export type Database = {
           cidade?: string | null
           cipa?: boolean | null
           cnh_categoria?: string | null
+          cnh_data_emissao?: string | null
           cnh_numero?: string | null
           cnh_validade?: string | null
+          codigo_firebird?: number | null
           complemento?: string | null
+          conjuge_cpf?: string | null
+          conjuge_data_nascimento?: string | null
+          conjuge_nome?: string | null
+          conjuge_telefone?: string | null
           conselho_profissional?: string | null
           conta?: string | null
           cpf: string
@@ -1588,10 +1623,15 @@ export type Database = {
           departamento: string
           email?: string | null
           email_corporativo?: string | null
+          email_pessoal?: string | null
           empresa_id?: string | null
           escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil?: Database["public"]["Enums"]["estado_civil"]
           etnia?: string | null
+          experiencia_fim_1?: string | null
+          experiencia_fim_2?: string | null
+          experiencia_tipo?: string | null
+          facebook?: string | null
           formacao?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
@@ -1603,8 +1643,11 @@ export type Database = {
           identificador_tipo?: string | null
           identificador_validade?: string | null
           inscricao_orgao_classe?: string | null
+          instagram?: string | null
           intervalo_minutos?: number | null
+          jornada_horas_mensais?: string | null
           jornada_semanal?: number | null
+          linkedin?: string | null
           local_trabalho?: string | null
           local_trabalho_id?: string | null
           logradouro?: string | null
@@ -1626,6 +1669,9 @@ export type Database = {
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
           pronomes?: string | null
+          reservista?: string | null
+          reservista_ra?: string | null
+          reservista_serie?: string | null
           rg?: string | null
           rg_data_emissao?: string | null
           rg_data_validade?: string | null
@@ -1637,7 +1683,11 @@ export type Database = {
           status?: Database["public"]["Enums"]["status_colaborador"]
           supervisor_id?: string | null
           telefone?: string | null
+          telefone_residencial?: string | null
+          tiktok?: string | null
           time_id?: string | null
+          timeman_ultima_sync?: string | null
+          timeman_ultimo_status?: string | null
           tipo_admissao?: string | null
           tipo_conta?: Database["public"]["Enums"]["tipo_conta"] | null
           tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"]
@@ -1645,12 +1695,20 @@ export type Database = {
           tipo_pagamento?: string | null
           tipo_pagamento_id?: number | null
           tipo_salario?: string | null
+          tipo_salario_descricao?: string | null
           tipo_salario_id?: number | null
+          tipo_sanguineo?: string | null
           titulo_eleitor?: string | null
+          titulo_eleitor_uf?: string | null
           titulo_secao?: string | null
           titulo_zona?: string | null
           uf?: string | null
+          unidade?: string | null
+          uniforme_calca?: string | null
+          uniforme_calcado?: string | null
+          uniforme_camiseta?: string | null
           updated_at?: string
+          whatsapp?: string | null
         }
         Update: {
           agencia?: string | null
@@ -1674,9 +1732,15 @@ export type Database = {
           cidade?: string | null
           cipa?: boolean | null
           cnh_categoria?: string | null
+          cnh_data_emissao?: string | null
           cnh_numero?: string | null
           cnh_validade?: string | null
+          codigo_firebird?: number | null
           complemento?: string | null
+          conjuge_cpf?: string | null
+          conjuge_data_nascimento?: string | null
+          conjuge_nome?: string | null
+          conjuge_telefone?: string | null
           conselho_profissional?: string | null
           conta?: string | null
           cpf?: string
@@ -1695,10 +1759,15 @@ export type Database = {
           departamento?: string
           email?: string | null
           email_corporativo?: string | null
+          email_pessoal?: string | null
           empresa_id?: string | null
           escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil?: Database["public"]["Enums"]["estado_civil"]
           etnia?: string | null
+          experiencia_fim_1?: string | null
+          experiencia_fim_2?: string | null
+          experiencia_tipo?: string | null
+          facebook?: string | null
           formacao?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
@@ -1710,8 +1779,11 @@ export type Database = {
           identificador_tipo?: string | null
           identificador_validade?: string | null
           inscricao_orgao_classe?: string | null
+          instagram?: string | null
           intervalo_minutos?: number | null
+          jornada_horas_mensais?: string | null
           jornada_semanal?: number | null
+          linkedin?: string | null
           local_trabalho?: string | null
           local_trabalho_id?: string | null
           logradouro?: string | null
@@ -1733,6 +1805,9 @@ export type Database = {
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
           pronomes?: string | null
+          reservista?: string | null
+          reservista_ra?: string | null
+          reservista_serie?: string | null
           rg?: string | null
           rg_data_emissao?: string | null
           rg_data_validade?: string | null
@@ -1744,7 +1819,11 @@ export type Database = {
           status?: Database["public"]["Enums"]["status_colaborador"]
           supervisor_id?: string | null
           telefone?: string | null
+          telefone_residencial?: string | null
+          tiktok?: string | null
           time_id?: string | null
+          timeman_ultima_sync?: string | null
+          timeman_ultimo_status?: string | null
           tipo_admissao?: string | null
           tipo_conta?: Database["public"]["Enums"]["tipo_conta"] | null
           tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"]
@@ -1752,12 +1831,20 @@ export type Database = {
           tipo_pagamento?: string | null
           tipo_pagamento_id?: number | null
           tipo_salario?: string | null
+          tipo_salario_descricao?: string | null
           tipo_salario_id?: number | null
+          tipo_sanguineo?: string | null
           titulo_eleitor?: string | null
+          titulo_eleitor_uf?: string | null
           titulo_secao?: string | null
           titulo_zona?: string | null
           uf?: string | null
+          unidade?: string | null
+          uniforme_calca?: string | null
+          uniforme_calcado?: string | null
+          uniforme_camiseta?: string | null
           updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: [
           {
