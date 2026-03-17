@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyList } from '@/components/ui/empty-state';
+import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { UserPlus, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -40,9 +41,7 @@ export default function AdmissoesPage() {
       icon={<UserPlus className="h-5 w-5 text-primary-foreground" />}
       gradient="from-success to-info"
       actions={
-        <Button className="rounded-xl bg-gradient-to-r from-success to-info hover:opacity-90 shadow-lg font-body">
-          <Plus className="h-4 w-4 mr-2" />Nova Admissão
-        </Button>
+        <NovaAdmissaoDialog />
       }
     >
       {isLoading ? (
