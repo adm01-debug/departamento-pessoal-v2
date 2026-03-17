@@ -163,6 +163,7 @@ export default function App() {
         <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
         <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
         <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
+        <Route path="assistente-ia" element={<LazyPage Component={AssistenteIAPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}
