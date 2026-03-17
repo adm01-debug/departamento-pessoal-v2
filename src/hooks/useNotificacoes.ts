@@ -218,7 +218,7 @@ export function useNotificacoes() {
       }
 
       if (notificacoesParaCriar.length > 0) {
-        const { error } = await supabase.from('notificacoes').insert(notificacoesParaCriar);
+        const { error } = await supabase.from('notificacoes').insert(notificacoesParaCriar as any);
         if (error) throw error;
       }
 

@@ -16,7 +16,7 @@ export function useDocumentos(colaboradorId?: string) {
         .select('*')
         .order('created_at', { ascending: false })
         .range(0, 499);
-      if (empresaAtualId) query = query.eq('empresa_id', empresaAtualId);
+      if (empresaAtualId) query = query.eq('empresa_id', empresaAtualId) as typeof query;
       if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
       const { data, error } = await query;
       if (error) throw error;
