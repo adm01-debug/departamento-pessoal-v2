@@ -173,6 +173,7 @@ export default function App() {
         <Route path="sst" element={<LazyPage Component={SSTPage} />} />
         <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
         <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
+        <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

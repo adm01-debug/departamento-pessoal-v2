@@ -29,6 +29,7 @@ const menuGroups: MenuGroup[] = [
     color: 'text-primary',
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', color: 'text-primary' },
+      { icon: BarChart3, label: 'Dashboard Executivo', path: '/dashboard-executivo', color: 'text-success' },
       { icon: Users, label: 'Colaboradores', path: '/colaboradores', color: 'text-info' },
       { icon: Network, label: 'Organograma', path: '/organograma', color: 'text-info' },
       { icon: Bot, label: 'Assistente IA', path: '/assistente-ia', color: 'text-primary' },
