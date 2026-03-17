@@ -1,36 +1,79 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut } from 'lucide-react';
-import { pontoService } from '@/services';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Clock, LogIn, Coffee, LogOut, MapPin, Timer, TrendingUp, AlertTriangle } from 'lucide-react';
+import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
+import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [time, setTime] = useState(new Date());
   const { user } = useAuth();
+  const { empresaAtual } = useEmpresas();
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
+  const today = new Date().toISOString().split('T')[0];
+
+  // Fetch today's consolidated record
+  const { data: registroHoje, refetch: refetchRegistro } = useQuery({
+    queryKey: ['registro-ponto-hoje', user?.id, today],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      // Find colaborador by user email
+      const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
+      if (!colab) return null;
+      const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).eq('data', today).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+    refetchInterval: 30000,
+  });
+
+  // Fetch today's batidas
+  const { data: batidasHoje = [], refetch: refetchBatidas } = useQuery({
+    queryKey: ['batidas-hoje', empresaAtual?.id, today],
+    queryFn: () => batidasPontoService.listarPorData(today, empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
+    refetchInterval: 30000,
+  });
+
+  // Fetch week records for the logged user
+  const { data: registrosSemana = [] } = useQuery({
+    queryKey: ['registros-semana', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
+      if (!colab) return [];
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', weekAgo.toISOString().split('T')[0]).order('data', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
   const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     setLoading(tipo);
     try {
-      let coords: { lat: number; lng: number } | undefined;
-      if (navigator.geolocation) {
-        const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject)
-        ).catch(() => null);
-        if (pos) coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      }
       await pontoService.registrar(tipo, user?.id);
-      toast.success(`Ponto registrado: ${tipo.replace('_', ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}`);
+      refetchRegistro();
+      refetchBatidas();
     } catch (err: any) {
       toast.error(`Erro ao registrar ponto: ${err.message}`);
     } finally {
@@ -45,14 +88,33 @@ export default function PontoPage() {
     { tipo: 'saida' as const, label: 'Saída', icon: LogOut, gradient: 'from-destructive to-streak' },
   ];
 
+  const formatInterval = (val: any) => {
+    if (!val) return '00:00';
+    if (typeof val === 'string') {
+      const match = val.match(/(\d+):(\d+)/);
+      return match ? `${match[1].padStart(2, '0')}:${match[2].padStart(2, '0')}` : '00:00';
+    }
+    return '00:00';
+  };
+
+  const pares = registroHoje ? [
+    { e: registroHoje.entrada_1, s: registroHoje.saida_1 },
+    { e: registroHoje.entrada_2, s: registroHoje.saida_2 },
+    { e: registroHoje.entrada_3, s: registroHoje.saida_3 },
+    { e: registroHoje.entrada_4, s: registroHoje.saida_4 },
+    { e: registroHoje.entrada_5, s: registroHoje.saida_5 },
+    { e: registroHoje.entrada_6, s: registroHoje.saida_6 },
+  ].filter(p => p.e || p.s) : [];
+
   return (
     <PageLayout
       title="Ponto Eletrônico"
-      description="Registre sua jornada de trabalho"
+      description="Registre e acompanhe sua jornada de trabalho"
       icon={<Clock className="h-5 w-5 text-white" />}
       gradient="from-streak to-warning"
     >
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Clock & Register */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
             <div className="h-[2px] bg-gradient-to-r from-streak to-warning" />
@@ -68,6 +130,9 @@ export default function PontoPage() {
               <div className="text-5xl font-display font-bold text-center mb-8 tabular-nums bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 {time.toLocaleTimeString('pt-BR')}
               </div>
+              <p className="text-center text-sm text-muted-foreground font-body mb-4">
+                {time.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 {buttons.map(({ tipo, label, icon: Icon, gradient }) => (
                   <Button
@@ -88,23 +153,168 @@ export default function PontoPage() {
           </Card>
         </motion.div>
 
+        {/* Today's Record */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
             <div className="h-[2px] bg-gradient-to-r from-info to-level" />
             <CardHeader>
-              <CardTitle className="font-display">Registros de Hoje</CardTitle>
+              <CardTitle className="font-display flex items-center gap-2">
+                <Timer className="h-4 w-4 text-info" /> Hoje
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center justify-center py-8">
-                <div className="p-3 rounded-2xl bg-muted/50 mb-3">
-                  <Clock className="h-8 w-8 text-muted-foreground" />
+              {registroHoje ? (
+                <div className="space-y-4">
+                  {/* Summary */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="p-2 rounded-xl bg-success/10 text-center">
+                      <p className="text-lg font-display font-bold text-success">{formatInterval(registroHoje.horas_trabalhadas)}</p>
+                      <p className="text-[10px] text-muted-foreground font-body">Trabalhadas</p>
+                    </div>
+                    <div className="p-2 rounded-xl bg-info/10 text-center">
+                      <p className="text-lg font-display font-bold text-info">{formatInterval(registroHoje.horas_extras)}</p>
+                      <p className="text-[10px] text-muted-foreground font-body">Extras</p>
+                    </div>
+                    <div className="p-2 rounded-xl bg-destructive/10 text-center">
+                      <p className="text-lg font-display font-bold text-destructive">{formatInterval(registroHoje.horas_falta)}</p>
+                      <p className="text-[10px] text-muted-foreground font-body">Falta</p>
+                    </div>
+                  </div>
+
+                  {/* Atraso & Saída antecipada */}
+                  {(registroHoje.atraso_minutos > 0 || registroHoje.saida_antecipada_minutos > 0) && (
+                    <div className="flex gap-2">
+                      {registroHoje.atraso_minutos > 0 && (
+                        <Badge variant="destructive" className="text-xs gap-1">
+                          <AlertTriangle className="h-3 w-3" /> Atraso: {registroHoje.atraso_minutos}min
+                        </Badge>
+                      )}
+                      {registroHoje.saida_antecipada_minutos > 0 && (
+                        <Badge variant="outline" className="text-xs gap-1">
+                          Saída antecipada: {registroHoje.saida_antecipada_minutos}min
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Pairs */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground font-body">Registros ({registroHoje.total_batidas || 0} batidas)</p>
+                    {pares.length > 0 ? pares.map((p, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-success" />
+                          <span className="text-sm font-body font-medium">{p.e || '--:--'}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">→</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-body font-medium">{p.s || '--:--'}</span>
+                          <div className="w-2 h-2 rounded-full bg-destructive" />
+                        </div>
+                      </div>
+                    )) : (
+                      <p className="text-sm text-muted-foreground font-body text-center py-2">Aguardando registro</p>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground font-body">Nenhum registro encontrado</p>
-              </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                    <Clock className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground font-body">Nenhum registro hoje</p>
+                  <p className="text-xs text-muted-foreground/60 font-body mt-1">Registre sua entrada para começar</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Week Summary */}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-success to-finance" />
+            <CardHeader>
+              <CardTitle className="font-display flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-success" /> Últimos 7 dias
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {registrosSemana.length > 0 ? (
+                <div className="space-y-2">
+                  {registrosSemana.slice(0, 7).map((r: any) => (
+                    <div key={r.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                      <div>
+                        <p className="text-sm font-body font-medium">
+                          {new Date(r.data + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs font-body">
+                        <span className="text-success font-medium">{formatInterval(r.horas_trabalhadas)}</span>
+                        {r.horas_extras && formatInterval(r.horas_extras) !== '00:00' && (
+                          <Badge variant="outline" className="text-[10px] h-5 px-1.5 text-info">+{formatInterval(r.horas_extras)}</Badge>
+                        )}
+                        {r.atraso_minutos > 0 && (
+                          <Badge variant="destructive" className="text-[10px] h-5 px-1.5">{r.atraso_minutos}m</Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                    <TrendingUp className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground font-body">Sem registros recentes</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
       </div>
+
+      {/* Team Batidas Today */}
+      {batidasHoje.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-6">
+          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-warning to-coins" />
+            <CardHeader>
+              <CardTitle className="font-display flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-warning" /> Batidas da Equipe Hoje
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Colaborador</TableHead>
+                    <TableHead className="font-display font-semibold">Hora</TableHead>
+                    <TableHead className="font-display font-semibold">Tipo</TableHead>
+                    <TableHead className="font-display font-semibold">Ordem</TableHead>
+                    <TableHead className="font-display font-semibold">Origem</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {batidasHoje.slice(0, 20).map((b: any) => (
+                    <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
+                      <TableCell className="font-body font-medium">{b.colaborador?.nome_completo || '—'}</TableCell>
+                      <TableCell className="font-body font-mono">{b.hora}</TableCell>
+                      <TableCell>
+                        <Badge variant={b.tipo === 'entrada' ? 'default' : 'secondary'} className="text-xs">
+                          {b.tipo === 'entrada' ? '🟢 Entrada' : '🔴 Saída'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-body text-sm">{b.ordem}ª</TableCell>
+                      <TableCell className="font-body text-sm">{b.origem || 'web'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </PageLayout>
   );
 }
