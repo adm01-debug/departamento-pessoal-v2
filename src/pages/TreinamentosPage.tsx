@@ -130,7 +130,7 @@ export default function TreinamentosPage() {
 
           {/* TRILHAS */}
           <TabsContent value="trilhas">
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-end mb-4 gap-2">
               <Dialog open={openTrilha} onOpenChange={setOpenTrilha}>
                 <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Nova Trilha</Button></DialogTrigger>
                 <DialogContent>
@@ -149,22 +149,21 @@ export default function TreinamentosPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Nível</TableHead><TableHead>Descrição</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {trilhas.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma trilha cadastrada</TableCell></TableRow> :
-                    trilhas.map((t: any) => (
-                      <TableRow key={t.id}>
-                        <TableCell className="font-medium">{t.nome}</TableCell>
-                        <TableCell>{t.nivel || '—'}</TableCell>
-                        <TableCell className="max-w-xs truncate">{t.descricao || '—'}</TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirTrilha.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
-                      </TableRow>
-                    ))
-                  }
-                </TableBody>
-              </Table>
-            </CardContent></Card>
+            {trilhas.map((t: any) => (
+              <Card key={t.id} className="mb-4">
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-medium">{t.nome}</p>
+                      <p className="text-xs text-muted-foreground">{t.nivel || '—'} • {t.descricao || 'Sem descrição'}</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => excluirTrilha.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
+                  <TrilhaCursosSection trilhaId={t.id} cursos={cursos} />
+                </CardContent>
+              </Card>
+            ))}
+            {trilhas.length === 0 && <Card><CardContent className="text-center text-muted-foreground py-8">Nenhuma trilha cadastrada</CardContent></Card>}
           </TabsContent>
 
           {/* INSCRIÇÕES */}
