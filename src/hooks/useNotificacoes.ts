@@ -5,16 +5,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { differenceInDays, parseISO, addDays, format } from 'date-fns';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
-
-// Tipo para colaborador vindo de relacionamento
 interface ColaboradorRelation {
   id: string;
   nome_completo: string;
   status: string;
   email?: string;
 }
-
 
 export interface Notificacao {
   id: string;
@@ -29,26 +27,21 @@ export interface Notificacao {
   created_at: string;
 }
 
-type TipoNotificacao = 'ferias_vencendo' | 'contrato_vencendo' | 'documento_vencendo' | 'periodo_aquisitivo';
-
-interface AlertaConfig {
-  tipo: TipoNotificacao;
-  diasAntecedencia: number;
-}
-
 export function useNotificacoes() {
   const queryClient = useQueryClient();
+  const { empresaAtualId } = useEmpresas();
 
-  // Buscar notificações
   const { data: notificacoes = [], isLoading, refetch } = useQuery({
-    queryKey: ['notificacoes'],
+    queryKey: ['notificacoes', empresaAtualId],
+    enabled: !!empresaAtualId,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchInterval: 60000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('notificacoes')
-        .select('id, titulo, mensagem, lida, created_at, tipo')
+        .select('id, titulo, mensagem, lida, created_at, tipo, entidade_tipo, entidade_id, user_id, data_referencia')
+        .eq('empresa_id', empresaAtualId!)
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -57,52 +50,34 @@ export function useNotificacoes() {
     },
   });
 
-  // Marcar como lida
   const marcarComoLida = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('notificacoes')
-        .update({ lida: true })
-        .eq('id', id);
-
+      const { error } = await supabase.from('notificacoes').update({ lida: true }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
   });
 
-  // Marcar todas como lidas
   const marcarTodasComoLidas = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
         .from('notificacoes')
         .update({ lida: true })
-        .eq('lida', false);
-
+        .eq('lida', false)
+        .eq('empresa_id', empresaAtualId!);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
   });
 
-  // Excluir notificação
   const excluirNotificacao = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('notificacoes')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await supabase.from('notificacoes').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
   });
 
-  // Limpar notificações antigas (mais de 30 dias)
   const limparAntigas = useMutation({
     mutationFn: async () => {
       const dataLimite = addDays(new Date(), -30).toISOString();
@@ -110,61 +85,44 @@ export function useNotificacoes() {
         .from('notificacoes')
         .delete()
         .lt('created_at', dataLimite)
-        .eq('lida', true);
-
+        .eq('lida', true)
+        .eq('empresa_id', empresaAtualId!);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
   });
 
-  // Gerar notificações automáticas
   const gerarNotificacoesAutomaticas = useMutation({
     mutationFn: async () => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) throw new Error('Sessão expirada. Faça login novamente.');
+      if (!empresaAtualId) throw new Error('Empresa não selecionada.');
 
       const hoje = new Date();
-      const notificacoesParaCriar: Omit<Notificacao, 'id' | 'created_at'>[] = [];
+      const notificacoesParaCriar: Record<string, unknown>[] = [];
 
-      // 1. Verificar férias vencendo (períodos aquisitivos)
-      const { data: periodos, error: periodosError } = await supabase
+      // 1. Períodos aquisitivos vencendo
+      const { data: periodos } = await supabase
         .from('periodos_aquisitivos')
-        .select(`
-          *,
-          colaboradores:colaboradores!fk_periodos_aquisitivos_colaborador (id, nome_completo, status)
-        `)
-        .eq('status', 'adquirido');
-
-      if (periodosError) throw periodosError;
+        .select('*, colaboradores:colaboradores!fk_periodos_aquisitivos_colaborador (id, nome_completo, status)')
+        .eq('status', 'adquirido')
+        .eq('empresa_id', empresaAtualId);
 
       if (periodos) {
         for (const periodo of periodos) {
           const colaborador = periodo.colaboradores as ColaboradorRelation;
           if (!colaborador || colaborador.status !== 'ativo') continue;
-
           const dataFimConcessivo = addDays(parseISO(periodo.data_fim), 365);
           const diasRestantes = differenceInDays(dataFimConcessivo, hoje);
-
           if (diasRestantes <= 60 && diasRestantes > 0) {
-            // Verificar se já existe notificação para este período
             const { data: existente } = await supabase
-              .from('notificacoes')
-              .select('id')
-              .eq('tipo', 'periodo_aquisitivo')
-              .eq('entidade_id', periodo.id)
-              .maybeSingle();
-
+              .from('notificacoes').select('id').eq('tipo', 'periodo_aquisitivo').eq('entidade_id', periodo.id).maybeSingle();
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: currentUser.id,
-                tipo: 'periodo_aquisitivo',
-                titulo: 'Período de Férias Vencendo',
+                user_id: currentUser.id, empresa_id: empresaAtualId,
+                tipo: 'periodo_aquisitivo', titulo: 'Período de Férias Vencendo',
                 mensagem: `O colaborador ${colaborador.nome_completo} tem férias vencendo em ${diasRestantes} dias (${format(dataFimConcessivo, "dd/MM/yyyy")}).`,
-                entidade_tipo: 'colaborador',
-                entidade_id: colaborador.id,
-                lida: false,
+                entidade_tipo: 'colaborador', entidade_id: colaborador.id, lida: false,
                 data_referencia: format(dataFimConcessivo, 'yyyy-MM-dd'),
               });
             }
@@ -172,40 +130,28 @@ export function useNotificacoes() {
         }
       }
 
-      // 2. Verificar contratos temporários vencendo
-      const { data: colaboradores, error: colaboradoresError } = await supabase
+      // 2. Contratos temporários vencendo
+      const { data: colaboradores } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, tipo_contrato, data_admissao')
         .in('tipo_contrato', ['temporario', 'estagiario', 'aprendiz'])
-        .eq('status', 'ativo');
-
-      if (colaboradoresError) throw colaboradoresError;
+        .eq('status', 'ativo')
+        .eq('empresa_id', empresaAtualId);
 
       if (colaboradores) {
         for (const colab of colaboradores) {
-          // Assumindo contrato de 2 anos para temporários
-          const duracaoContrato = colab.tipo_contrato === 'estagiario' ? 730 : 
-                                  colab.tipo_contrato === 'aprendiz' ? 730 : 180;
+          const duracaoContrato = colab.tipo_contrato === 'estagiario' ? 730 : colab.tipo_contrato === 'aprendiz' ? 730 : 180;
           const dataFimContrato = addDays(parseISO(colab.data_admissao), duracaoContrato);
           const diasRestantes = differenceInDays(dataFimContrato, hoje);
-
           if (diasRestantes <= 30 && diasRestantes > 0) {
             const { data: existente } = await supabase
-              .from('notificacoes')
-              .select('id')
-              .eq('tipo', 'contrato_vencendo')
-              .eq('entidade_id', colab.id)
-              .maybeSingle();
-
+              .from('notificacoes').select('id').eq('tipo', 'contrato_vencendo').eq('entidade_id', colab.id).maybeSingle();
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: currentUser.id,
-                tipo: 'contrato_vencendo',
-                titulo: 'Contrato Vencendo',
+                user_id: currentUser.id, empresa_id: empresaAtualId,
+                tipo: 'contrato_vencendo', titulo: 'Contrato Vencendo',
                 mensagem: `O contrato ${colab.tipo_contrato} de ${colab.nome_completo} vence em ${diasRestantes} dias (${format(dataFimContrato, "dd/MM/yyyy")}).`,
-                entidade_tipo: 'colaborador',
-                entidade_id: colab.id,
-                lida: false,
+                entidade_tipo: 'colaborador', entidade_id: colab.id, lida: false,
                 data_referencia: format(dataFimContrato, 'yyyy-MM-dd'),
               });
             }
@@ -213,39 +159,28 @@ export function useNotificacoes() {
         }
       }
 
-      // 3. Verificar documentos com validade próxima (CNH)
-      const { data: colaboradoresDoc, error: colaboradoresDocError } = await supabase
+      // 3. CNH vencendo
+      const { data: colaboradoresDoc } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, cnh_validade')
         .not('cnh_validade', 'is', null)
-        .eq('status', 'ativo');
-
-      if (colaboradoresDocError) throw colaboradoresDocError;
+        .eq('status', 'ativo')
+        .eq('empresa_id', empresaAtualId);
 
       if (colaboradoresDoc) {
         for (const colab of colaboradoresDoc) {
           if (!colab.cnh_validade) continue;
-          
           const dataValidade = parseISO(colab.cnh_validade);
           const diasRestantes = differenceInDays(dataValidade, hoje);
-
           if (diasRestantes <= 30 && diasRestantes > 0) {
             const { data: existente } = await supabase
-              .from('notificacoes')
-              .select('id')
-              .eq('tipo', 'documento_vencendo')
-              .eq('entidade_id', colab.id)
-              .maybeSingle();
-
+              .from('notificacoes').select('id').eq('tipo', 'documento_vencendo').eq('entidade_id', colab.id).maybeSingle();
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: currentUser.id,
-                tipo: 'documento_vencendo',
-                titulo: 'CNH Vencendo',
+                user_id: currentUser.id, empresa_id: empresaAtualId,
+                tipo: 'documento_vencendo', titulo: 'CNH Vencendo',
                 mensagem: `A CNH de ${colab.nome_completo} vence em ${diasRestantes} dias (${format(dataValidade, "dd/MM/yyyy")}).`,
-                entidade_tipo: 'colaborador',
-                entidade_id: colab.id,
-                lida: false,
+                entidade_tipo: 'colaborador', entidade_id: colab.id, lida: false,
                 data_referencia: colab.cnh_validade,
               });
             }
@@ -253,42 +188,28 @@ export function useNotificacoes() {
         }
       }
 
-      // 4. Verificar férias programadas próximas
-      const { data: feriasProgramadas, error: feriasError } = await supabase
+      // 4. Férias aprovadas próximas
+      const { data: feriasProgramadas } = await supabase
         .from('ferias')
-        .select(`
-          *,
-          colaboradores:colaboradores!fk_ferias_colaborador (id, nome_completo)
-        `)
-        .eq('status', 'aprovada');
-
-      if (feriasError) throw feriasError;
+        .select('*, colaboradores:colaboradores!fk_ferias_colaborador (id, nome_completo)')
+        .eq('status', 'aprovada')
+        .eq('empresa_id', empresaAtualId);
 
       if (feriasProgramadas) {
         for (const ferias of feriasProgramadas) {
           const colaborador = ferias.colaboradores as ColaboradorRelation;
           if (!colaborador) continue;
-
           const dataInicio = parseISO(ferias.data_inicio);
           const diasAteInicio = differenceInDays(dataInicio, hoje);
-
           if (diasAteInicio <= 7 && diasAteInicio > 0) {
             const { data: existente } = await supabase
-              .from('notificacoes')
-              .select('id')
-              .eq('tipo', 'ferias_vencendo')
-              .eq('entidade_id', ferias.id)
-              .maybeSingle();
-
+              .from('notificacoes').select('id').eq('tipo', 'ferias_vencendo').eq('entidade_id', ferias.id).maybeSingle();
             if (!existente) {
               notificacoesParaCriar.push({
-                user_id: currentUser.id,
-                tipo: 'ferias_vencendo',
-                titulo: 'Férias Próximas',
+                user_id: currentUser.id, empresa_id: empresaAtualId,
+                tipo: 'ferias_vencendo', titulo: 'Férias Próximas',
                 mensagem: `As férias de ${colaborador.nome_completo} começam em ${diasAteInicio} dias (${format(dataInicio, "dd/MM/yyyy")}).`,
-                entidade_tipo: 'ferias',
-                entidade_id: ferias.id,
-                lida: false,
+                entidade_tipo: 'ferias', entidade_id: ferias.id, lida: false,
                 data_referencia: ferias.data_inicio,
               });
             }
@@ -296,23 +217,16 @@ export function useNotificacoes() {
         }
       }
 
-      // Inserir todas as notificações de uma vez
       if (notificacoesParaCriar.length > 0) {
-        const { error } = await supabase
-          .from('notificacoes')
-          .insert(notificacoesParaCriar);
-
+        const { error } = await supabase.from('notificacoes').insert(notificacoesParaCriar);
         if (error) throw error;
       }
 
       return notificacoesParaCriar.length;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
   });
 
-  // Contadores
   const naoLidas = notificacoes.filter(n => !n.lida).length;
   const porTipo = {
     ferias_vencendo: notificacoes.filter(n => n.tipo === 'ferias_vencendo' && !n.lida).length,
@@ -322,11 +236,7 @@ export function useNotificacoes() {
   };
 
   return {
-    notificacoes,
-    isLoading,
-    naoLidas,
-    porTipo,
-    refetch,
+    notificacoes, isLoading, naoLidas, porTipo, refetch,
     marcarComoLida: marcarComoLida.mutate,
     marcarTodasComoLidas: marcarTodasComoLidas.mutate,
     excluirNotificacao: excluirNotificacao.mutate,
@@ -335,12 +245,3 @@ export function useNotificacoes() {
     isGerando: gerarNotificacoesAutomaticas.isPending,
   };
 }
-
-
-
-
-
-
-
-
-
