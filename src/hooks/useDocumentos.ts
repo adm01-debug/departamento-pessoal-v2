@@ -14,9 +14,9 @@ export function useDocumentos(colaboradorId?: string) {
       let query = supabase
         .from('documentos')
         .select('*')
-        .eq('empresa_id', empresaAtualId!)
         .order('created_at', { ascending: false })
         .range(0, 499);
+      if (empresaAtualId) query = query.eq('empresa_id', empresaAtualId);
       if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
       const { data, error } = await query;
       if (error) throw error;
