@@ -407,9 +407,9 @@ function OnboardingWizard() {
   const navigate = useNavigate();
 
   const steps = [
-    { step: 1, title: 'Cadastrar Empresa', desc: 'Configure os dados da sua empresa', icon: Building2, path: '/empresas/nova', gradient: 'from-xp to-tasks', done: false },
-    { step: 2, title: 'Adicionar Colaboradores', desc: 'Cadastre seus primeiros funcionários', icon: UserPlus, path: '/colaboradores/novo', gradient: 'from-success to-finance', done: false },
-    { step: 3, title: 'Processar Folha', desc: 'Execute o primeiro cálculo de folha', icon: DollarSign, path: '/folha', gradient: 'from-info to-level', done: false },
+    { step: 1, title: 'Cadastrar Empresa', desc: 'Configure os dados da sua empresa', icon: Building2, path: '/empresas/nova', gradient: 'from-primary to-primary-glow', done: false },
+    { step: 2, title: 'Adicionar Colaboradores', desc: 'Cadastre seus primeiros funcionários', icon: UserPlus, path: '/colaboradores/novo', gradient: 'from-primary/80 to-primary', done: false },
+    { step: 3, title: 'Processar Folha', desc: 'Execute o primeiro cálculo de folha', icon: DollarSign, path: '/folha', gradient: 'from-primary/60 to-primary/90', done: false },
   ];
 
   return (
