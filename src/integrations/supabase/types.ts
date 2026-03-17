@@ -4692,13 +4692,17 @@ export type Database = {
       }
       faltas: {
         Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
           cid: string | null
           colaborador_id: string
           created_at: string | null
           created_by: string | null
           data: string
           data_fim: string | null
+          desconto_aplicado: boolean | null
           dias_total: number | null
+          documento_anexo: string | null
           documento_url: string | null
           empresa_id: string | null
           horas_falta: string | null
@@ -4708,18 +4712,25 @@ export type Database = {
           medico_nome: string | null
           motivo: string | null
           motivo_afastamento_id: number | null
+          motivo_rejeicao: string | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
           status: string | null
           tipo: string
           updated_at: string | null
         }
         Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           cid?: string | null
           colaborador_id: string
           created_at?: string | null
           created_by?: string | null
           data: string
           data_fim?: string | null
+          desconto_aplicado?: boolean | null
           dias_total?: number | null
+          documento_anexo?: string | null
           documento_url?: string | null
           empresa_id?: string | null
           horas_falta?: string | null
@@ -4729,18 +4740,25 @@ export type Database = {
           medico_nome?: string | null
           motivo?: string | null
           motivo_afastamento_id?: number | null
+          motivo_rejeicao?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: string | null
           tipo?: string
           updated_at?: string | null
         }
         Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           cid?: string | null
           colaborador_id?: string
           created_at?: string | null
           created_by?: string | null
           data?: string
           data_fim?: string | null
+          desconto_aplicado?: boolean | null
           dias_total?: number | null
+          documento_anexo?: string | null
           documento_url?: string | null
           empresa_id?: string | null
           horas_falta?: string | null
@@ -4750,6 +4768,9 @@ export type Database = {
           medico_nome?: string | null
           motivo?: string | null
           motivo_afastamento_id?: number | null
+          motivo_rejeicao?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: string | null
           tipo?: string
           updated_at?: string | null
@@ -4940,8 +4961,19 @@ export type Database = {
       }
       ferias: {
         Row: {
+          abono_pecuniario: boolean | null
+          adiantamento_13: boolean | null
           aprovado_em: string | null
+          aprovado_gestor: boolean | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
           aprovado_por: string | null
+          aprovado_rh: boolean | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          cancelado: boolean | null
+          cancelado_em: string | null
+          cancelado_por: string | null
           colaborador_id: string
           created_at: string
           created_by: string | null
@@ -4952,11 +4984,15 @@ export type Database = {
           descontos_irrf: number | null
           dias_abono: number | null
           dias_gozo: number
+          documento_url: string | null
           empresa_id: string | null
           enviado_contabilidade: boolean | null
+          enviado_contabilidade_em: string | null
+          enviado_contabilidade_por: string | null
           ferias_coletiva_id: string | null
           id: string
           justificativa: string | null
+          motivo_cancelamento: string | null
           observacoes: string | null
           periodo_aquisitivo_id: string | null
           salario_base: number
@@ -4964,6 +5000,8 @@ export type Database = {
           status: string | null
           updated_at: string
           valor_abono: number | null
+          valor_abono_pecuniario: number | null
+          valor_adiantamento_13: number | null
           valor_ferias: number
           valor_liquido: number
           valor_terco: number
@@ -4972,8 +5010,19 @@ export type Database = {
           vender_abono: boolean | null
         }
         Insert: {
+          abono_pecuniario?: boolean | null
+          adiantamento_13?: boolean | null
           aprovado_em?: string | null
+          aprovado_gestor?: boolean | null
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
           aprovado_por?: string | null
+          aprovado_rh?: boolean | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
+          cancelado?: boolean | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           colaborador_id: string
           created_at?: string
           created_by?: string | null
@@ -4984,11 +5033,15 @@ export type Database = {
           descontos_irrf?: number | null
           dias_abono?: number | null
           dias_gozo: number
+          documento_url?: string | null
           empresa_id?: string | null
           enviado_contabilidade?: boolean | null
+          enviado_contabilidade_em?: string | null
+          enviado_contabilidade_por?: string | null
           ferias_coletiva_id?: string | null
           id?: string
           justificativa?: string | null
+          motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_id?: string | null
           salario_base: number
@@ -4996,6 +5049,8 @@ export type Database = {
           status?: string | null
           updated_at?: string
           valor_abono?: number | null
+          valor_abono_pecuniario?: number | null
+          valor_adiantamento_13?: number | null
           valor_ferias: number
           valor_liquido: number
           valor_terco: number
@@ -5004,8 +5059,19 @@ export type Database = {
           vender_abono?: boolean | null
         }
         Update: {
+          abono_pecuniario?: boolean | null
+          adiantamento_13?: boolean | null
           aprovado_em?: string | null
+          aprovado_gestor?: boolean | null
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
           aprovado_por?: string | null
+          aprovado_rh?: boolean | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
+          cancelado?: boolean | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           colaborador_id?: string
           created_at?: string
           created_by?: string | null
@@ -5016,11 +5082,15 @@ export type Database = {
           descontos_irrf?: number | null
           dias_abono?: number | null
           dias_gozo?: number
+          documento_url?: string | null
           empresa_id?: string | null
           enviado_contabilidade?: boolean | null
+          enviado_contabilidade_em?: string | null
+          enviado_contabilidade_por?: string | null
           ferias_coletiva_id?: string | null
           id?: string
           justificativa?: string | null
+          motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_id?: string | null
           salario_base?: number
@@ -5028,6 +5098,8 @@ export type Database = {
           status?: string | null
           updated_at?: string
           valor_abono?: number | null
+          valor_abono_pecuniario?: number | null
+          valor_adiantamento_13?: number | null
           valor_ferias?: number
           valor_liquido?: number
           valor_terco?: number
@@ -6795,55 +6867,82 @@ export type Database = {
       medidas_disciplinares: {
         Row: {
           aplicado_por: string | null
+          artigo_clt: string | null
           assinado_em: string | null
+          colaborador_ciente: boolean | null
           colaborador_id: string
           created_at: string | null
+          data_ciencia: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
           documento_url: string | null
           empresa_id: string | null
           id: string
+          motivo_recusa: string | null
           numero_sequencial: number | null
+          recusa_assinatura: boolean | null
           status: string | null
           testemunha_1: string | null
+          testemunha_1_cpf: string | null
+          testemunha_1_nome: string | null
           testemunha_2: string | null
+          testemunha_2_cpf: string | null
+          testemunha_2_nome: string | null
           tipo: string
           updated_at: string | null
         }
         Insert: {
           aplicado_por?: string | null
+          artigo_clt?: string | null
           assinado_em?: string | null
+          colaborador_ciente?: boolean | null
           colaborador_id: string
           created_at?: string | null
+          data_ciencia?: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
           id?: string
+          motivo_recusa?: string | null
           numero_sequencial?: number | null
+          recusa_assinatura?: boolean | null
           status?: string | null
           testemunha_1?: string | null
+          testemunha_1_cpf?: string | null
+          testemunha_1_nome?: string | null
           testemunha_2?: string | null
+          testemunha_2_cpf?: string | null
+          testemunha_2_nome?: string | null
           tipo: string
           updated_at?: string | null
         }
         Update: {
           aplicado_por?: string | null
+          artigo_clt?: string | null
           assinado_em?: string | null
+          colaborador_ciente?: boolean | null
           colaborador_id?: string
           created_at?: string | null
+          data_ciencia?: string | null
           data_ocorrencia?: string
           descricao?: string
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
           id?: string
+          motivo_recusa?: string | null
           numero_sequencial?: number | null
+          recusa_assinatura?: boolean | null
           status?: string | null
           testemunha_1?: string | null
+          testemunha_1_cpf?: string | null
+          testemunha_1_nome?: string | null
           testemunha_2?: string | null
+          testemunha_2_cpf?: string | null
+          testemunha_2_nome?: string | null
           tipo?: string
           updated_at?: string | null
         }
@@ -8390,6 +8489,9 @@ export type Database = {
           entrada_1: string | null
           entrada_2: string | null
           entrada_3: string | null
+          entrada_4: string | null
+          entrada_5: string | null
+          entrada_6: string | null
           entrada_esperada: string | null
           horas_extras: string | null
           horas_falta: string | null
@@ -8401,6 +8503,10 @@ export type Database = {
           saida_1: string | null
           saida_2: string | null
           saida_3: string | null
+          saida_4: string | null
+          saida_5: string | null
+          saida_6: string | null
+          saida_antecipada_minutos: number | null
           saida_esperada: string | null
           saida_intervalo: string | null
           tipo_dia: string | null
@@ -8420,6 +8526,9 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
+          entrada_4?: string | null
+          entrada_5?: string | null
+          entrada_6?: string | null
           entrada_esperada?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
@@ -8431,6 +8540,10 @@ export type Database = {
           saida_1?: string | null
           saida_2?: string | null
           saida_3?: string | null
+          saida_4?: string | null
+          saida_5?: string | null
+          saida_6?: string | null
+          saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
           tipo_dia?: string | null
@@ -8450,6 +8563,9 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
+          entrada_4?: string | null
+          entrada_5?: string | null
+          entrada_6?: string | null
           entrada_esperada?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
@@ -8461,6 +8577,10 @@ export type Database = {
           saida_1?: string | null
           saida_2?: string | null
           saida_3?: string | null
+          saida_4?: string | null
+          saida_5?: string | null
+          saida_6?: string | null
+          saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
           tipo_dia?: string | null
