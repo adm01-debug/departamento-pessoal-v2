@@ -145,3 +145,32 @@ export function ListPageSkeleton() {
     </div>
   );
 }
+
+/* ─── Stat Card Skeleton ─── */
+export function StatCardSkeleton() {
+  return (
+    <div className="rounded-2xl border border-border/30 p-4 text-center space-y-2">
+      <ShimmerBar className="h-7 w-12 mx-auto" />
+      <ShimmerBar className="h-3 w-16 mx-auto" />
+    </div>
+  );
+}
+
+/* ─── Grid Card Skeleton (Empresas) ─── */
+export function GridCardSkeleton() {
+  return (
+    <div className="rounded-2xl border border-border/30 p-5 space-y-4">
+      <div className="flex items-center gap-4">
+        <ShimmerBar className="h-10 w-10 rounded-xl" />
+        <div className="space-y-2 flex-1">
+          <ShimmerBar className="h-4 w-3/4" />
+          <ShimmerBar className="h-3 w-1/2" />
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <ShimmerBar className="h-3 w-24" />
+        <ShimmerBar className="h-8 w-16 rounded-xl" />
+      </div>
+    </div>
+  );
+}
