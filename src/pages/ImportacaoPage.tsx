@@ -183,21 +183,22 @@ export default function ImportacaoPage() {
     for (let i = 0; i < validos.length; i++) {
       const row = validos[i];
       try {
-        const { error } = await supabase.from('colaboradores').insert({
+        const insertData: any = {
           nome_completo: row.nome_completo,
           cpf: row.cpf || null,
           email: row.email || null,
           telefone: row.telefone || null,
-          cargo: row.cargo || null,
+          cargo: row.cargo || 'A definir',
           departamento: row.departamento || null,
-          salario_base: row.salario_base || null,
-          data_admissao: row.data_admissao || null,
+          salario_base: row.salario_base || 0,
+          data_admissao: row.data_admissao || new Date().toISOString().split('T')[0],
           data_nascimento: row.data_nascimento || null,
           pis: row.pis || null,
           rg: row.rg || null,
           empresa_id: empresaAtual?.id,
           status: 'ativo',
-        });
+        };
+        const { error } = await supabase.from('colaboradores').insert(insertData as any);
         if (error) throw error;
         success++;
       } catch {
