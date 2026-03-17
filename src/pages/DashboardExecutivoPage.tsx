@@ -81,7 +81,7 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
       // Férias pendentes
       const { count: feriasPendentes } = await supabase.from('ferias').select('*', { count: 'exact', head: true }).eq('status', 'pendente').eq('empresa_id', empresaId!);
       // Afastamentos ativos
-      const { count: afastamentosAtivos } = await supabase.from('afastamentos').select('*', { count: 'exact', head: true }).in('status', ['aprovado', 'em_andamento']).eq('empresa_id', empresaId!);
+      const { count: afastamentosAtivos } = await supabase.from('afastamentos').select('*', { count: 'exact', head: true }).in('status', ['ativo', 'prorrogado']).eq('empresa_id', empresaId!);
 
       // Custo médio por colaborador
       const custoMedio = totalAtivos && totalAtivos > 0 ? totalFolhaAtual / totalAtivos : 0;
