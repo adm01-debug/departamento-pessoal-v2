@@ -100,48 +100,48 @@
   }
 
   .dark {
-    /* ─── DARK MODE (Deep Space) ─── */
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 72%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
-    --chart-1: 220 70% 50%;
+    /* ─── DARK MODE (Bombon Dark — Lime Neon) ─── */
+    --background: 240 24% 5%;
+    --foreground: 60 10% 92%;
+    --card: 240 20% 8%;
+    --card-foreground: 60 10% 92%;
+    --popover: 240 20% 8%;
+    --popover-foreground: 60 10% 92%;
+    --primary: 68 100% 48%;
+    --primary-foreground: 240 20% 6%;
+    --primary-glow: 68 100% 60%;
+    --secondary: 240 16% 14%;
+    --secondary-foreground: 60 10% 92%;
+    --muted: 240 16% 14%;
+    --muted-foreground: 240 8% 55%;
+    --accent: 240 16% 14%;
+    --accent-foreground: 60 10% 92%;
+    --destructive: 0 63% 35%;
+    --destructive-foreground: 60 10% 92%;
+    --success: 142 76% 40%;
+    --success-foreground: 60 10% 92%;
+    --warning: 38 92% 52%;
+    --warning-foreground: 240 20% 6%;
+    --info: 199 89% 50%;
+    --info-foreground: 60 10% 92%;
+    --border: 240 16% 15%;
+    --input: 240 16% 15%;
+    --ring: 68 100% 48%;
+    --chart-1: 68 100% 48%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    /* Sidebar dark */
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 14%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 217 91% 60%;
+    /* Sidebar dark — Bombon style */
+    --sidebar-background: 240 24% 6%;
+    --sidebar-foreground: 60 10% 92%;
+    --sidebar-primary: 68 100% 48%;
+    --sidebar-primary-foreground: 240 20% 6%;
+    --sidebar-accent: 240 16% 12%;
+    --sidebar-accent-foreground: 60 10% 92%;
+    --sidebar-border: 240 16% 13%;
+    --sidebar-ring: 68 100% 48%;
   }
 }
 
