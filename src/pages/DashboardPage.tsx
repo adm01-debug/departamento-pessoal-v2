@@ -580,7 +580,7 @@ export default function DashboardPage() {
         </MotionCard>
       </motion.div>
 
-      {/* Analytics Row — NEW */}
+      {/* Analytics Row — Real data or empty states */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         {/* Monthly Headcount Chart */}
         <MotionCard custom={3.8} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
@@ -593,11 +593,22 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <BarChartWidget data={monthlyBarData} height={140} />
+            {isEmptySystem ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                  <TrendingUp className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-caption text-muted-foreground font-body">Cadastre colaboradores para visualizar a evolução</p>
+              </div>
+            ) : (
+              <BarChartWidget data={[
+                { label: 'Atual', value: stats?.headcount || 0, color: 'bg-gradient-to-t from-primary to-primary-glow' },
+              ]} height={140} />
+            )}
           </CardContent>
         </MotionCard>
 
-        {/* Event Timeline */}
+        {/* Event Timeline — empty state */}
         <MotionCard custom={4} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
@@ -608,11 +619,17 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <EventTimeline events={mockTimeline} />
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                <Activity className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <p className="text-caption text-muted-foreground font-body">Nenhum evento registrado ainda</p>
+              <p className="text-[10px] text-muted-foreground/60 font-body mt-1">Admissões, férias e folhas aparecerão aqui</p>
+            </div>
           </CardContent>
         </MotionCard>
 
-        {/* Expiring Items */}
+        {/* Expiring Items — empty state */}
         <MotionCard custom={4.2} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
@@ -623,7 +640,13 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ExpiringItemsWidget items={mockExpiring} />
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-success/20 to-finance/10 mb-3">
+                <CheckCircle2 className="h-6 w-6 text-success" />
+              </div>
+              <p className="text-caption text-muted-foreground font-body">Nenhum vencimento próximo</p>
+              <p className="text-[10px] text-muted-foreground/60 font-body mt-1">ASOs, contratos e documentos aparecerão aqui</p>
+            </div>
           </CardContent>
         </MotionCard>
       </div>
