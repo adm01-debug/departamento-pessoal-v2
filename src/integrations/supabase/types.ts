@@ -6867,55 +6867,82 @@ export type Database = {
       medidas_disciplinares: {
         Row: {
           aplicado_por: string | null
+          artigo_clt: string | null
           assinado_em: string | null
+          colaborador_ciente: boolean | null
           colaborador_id: string
           created_at: string | null
+          data_ciencia: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
           documento_url: string | null
           empresa_id: string | null
           id: string
+          motivo_recusa: string | null
           numero_sequencial: number | null
+          recusa_assinatura: boolean | null
           status: string | null
           testemunha_1: string | null
+          testemunha_1_cpf: string | null
+          testemunha_1_nome: string | null
           testemunha_2: string | null
+          testemunha_2_cpf: string | null
+          testemunha_2_nome: string | null
           tipo: string
           updated_at: string | null
         }
         Insert: {
           aplicado_por?: string | null
+          artigo_clt?: string | null
           assinado_em?: string | null
+          colaborador_ciente?: boolean | null
           colaborador_id: string
           created_at?: string | null
+          data_ciencia?: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
           id?: string
+          motivo_recusa?: string | null
           numero_sequencial?: number | null
+          recusa_assinatura?: boolean | null
           status?: string | null
           testemunha_1?: string | null
+          testemunha_1_cpf?: string | null
+          testemunha_1_nome?: string | null
           testemunha_2?: string | null
+          testemunha_2_cpf?: string | null
+          testemunha_2_nome?: string | null
           tipo: string
           updated_at?: string | null
         }
         Update: {
           aplicado_por?: string | null
+          artigo_clt?: string | null
           assinado_em?: string | null
+          colaborador_ciente?: boolean | null
           colaborador_id?: string
           created_at?: string | null
+          data_ciencia?: string | null
           data_ocorrencia?: string
           descricao?: string
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
           id?: string
+          motivo_recusa?: string | null
           numero_sequencial?: number | null
+          recusa_assinatura?: boolean | null
           status?: string | null
           testemunha_1?: string | null
+          testemunha_1_cpf?: string | null
+          testemunha_1_nome?: string | null
           testemunha_2?: string | null
+          testemunha_2_cpf?: string | null
+          testemunha_2_nome?: string | null
           tipo?: string
           updated_at?: string | null
         }
