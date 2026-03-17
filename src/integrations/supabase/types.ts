@@ -4692,13 +4692,17 @@ export type Database = {
       }
       faltas: {
         Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
           cid: string | null
           colaborador_id: string
           created_at: string | null
           created_by: string | null
           data: string
           data_fim: string | null
+          desconto_aplicado: boolean | null
           dias_total: number | null
+          documento_anexo: string | null
           documento_url: string | null
           empresa_id: string | null
           horas_falta: string | null
@@ -4708,18 +4712,25 @@ export type Database = {
           medico_nome: string | null
           motivo: string | null
           motivo_afastamento_id: number | null
+          motivo_rejeicao: string | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
           status: string | null
           tipo: string
           updated_at: string | null
         }
         Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           cid?: string | null
           colaborador_id: string
           created_at?: string | null
           created_by?: string | null
           data: string
           data_fim?: string | null
+          desconto_aplicado?: boolean | null
           dias_total?: number | null
+          documento_anexo?: string | null
           documento_url?: string | null
           empresa_id?: string | null
           horas_falta?: string | null
@@ -4729,18 +4740,25 @@ export type Database = {
           medico_nome?: string | null
           motivo?: string | null
           motivo_afastamento_id?: number | null
+          motivo_rejeicao?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: string | null
           tipo?: string
           updated_at?: string | null
         }
         Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           cid?: string | null
           colaborador_id?: string
           created_at?: string | null
           created_by?: string | null
           data?: string
           data_fim?: string | null
+          desconto_aplicado?: boolean | null
           dias_total?: number | null
+          documento_anexo?: string | null
           documento_url?: string | null
           empresa_id?: string | null
           horas_falta?: string | null
@@ -4750,6 +4768,9 @@ export type Database = {
           medico_nome?: string | null
           motivo?: string | null
           motivo_afastamento_id?: number | null
+          motivo_rejeicao?: string | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: string | null
           tipo?: string
           updated_at?: string | null
