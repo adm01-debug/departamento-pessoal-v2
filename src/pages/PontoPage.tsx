@@ -316,6 +316,8 @@ export default function PontoPage() {
           </Card>
         </motion.div>
       )}
+      {/* Gestão de Ponto - Todos Colaboradores */}
+      <GestaoRegistrosPonto />
     </PageLayout>
   );
 }
