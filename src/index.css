@@ -6,33 +6,33 @@
 
 @layer base {
   :root {
-    /* ─── LIGHT MODE (Premium Blue — WCAG AA Compliant) ─── */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* ─── LIGHT MODE (Bombon Lime — Clean & Modern) ─── */
+    --background: 240 10% 96%;
+    --foreground: 240 20% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 240 20% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 217 91% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 62%;
-    --secondary: 214 32% 93%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 214 32% 93%;
-    --muted-foreground: 215 20% 42%;
-    --accent: 214 32% 93%;
-    --accent-foreground: 222 47% 11%;
+    --popover-foreground: 240 20% 10%;
+    --primary: 68 100% 48%;
+    --primary-foreground: 240 20% 6%;
+    --primary-glow: 68 100% 58%;
+    --secondary: 240 8% 92%;
+    --secondary-foreground: 240 20% 10%;
+    --muted: 240 8% 92%;
+    --muted-foreground: 240 10% 46%;
+    --accent: 240 8% 92%;
+    --accent-foreground: 240 20% 10%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 71% 32%;
+    --success: 142 71% 38%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 44%;
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 42%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 240 20% 10%;
+    --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
-    --border: 214 25% 87%;
-    --input: 214 25% 87%;
-    --ring: 217 91% 50%;
+    --border: 240 8% 87%;
+    --input: 240 8% 87%;
+    --ring: 68 100% 48%;
     --radius: 0.75rem;
 
     /* ─── SPACING TOKENS ─── */
@@ -51,97 +51,97 @@
     --text-body: 0.875rem;
     --text-caption: 0.75rem;
     --text-overline: 0.625rem;
-    --chart-1: 217 91% 50%;
-    --chart-2: 142 71% 32%;
-    --chart-3: 38 92% 44%;
-    --chart-4: 262 83% 52%;
+    --chart-1: 68 100% 48%;
+    --chart-2: 142 71% 38%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 262 83% 58%;
     --chart-5: 0 72% 51%;
 
     /* Module colors */
-    --tasks: 262 83% 52%;
+    --tasks: 262 83% 58%;
     --tasks-foreground: 0 0% 100%;
     --gravacoes: 0 72% 51%;
     --gravacoes-foreground: 0 0% 100%;
-    --finance: 142 71% 32%;
+    --finance: 142 71% 38%;
     --finance-foreground: 0 0% 100%;
-    --sales: 38 92% 44%;
-    --sales-foreground: 222 47% 11%;
-    --store: 262 83% 52%;
+    --sales: 38 92% 50%;
+    --sales-foreground: 240 20% 10%;
+    --store: 262 83% 58%;
     --store-foreground: 0 0% 100%;
-    --zapp: 142 70% 40%;
+    --zapp: 142 70% 42%;
     --zapp-foreground: 0 0% 100%;
-    --loggi: 24 95% 48%;
+    --loggi: 24 95% 52%;
     --loggi-foreground: 0 0% 100%;
 
     /* Gamification */
-    --xp: 262 83% 52%;
+    --xp: 262 83% 58%;
     --xp-foreground: 0 0% 100%;
-    --coins: 45 93% 42%;
-    --coins-foreground: 222 47% 11%;
-    --streak: 24 95% 48%;
+    --coins: 45 93% 48%;
+    --coins-foreground: 240 20% 10%;
+    --streak: 24 95% 52%;
     --streak-foreground: 0 0% 100%;
-    --level: 199 89% 42%;
+    --level: 199 89% 48%;
     --level-foreground: 0 0% 100%;
 
     /* Ranks */
-    --rank-gold: 45 93% 42%;
+    --rank-gold: 45 93% 48%;
     --rank-silver: 0 0% 65%;
     --rank-bronze: 30 50% 44%;
 
     /* Sidebar */
-    --sidebar-background: 210 20% 97%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 217 91% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 32% 93%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 25% 87%;
-    --sidebar-ring: 217 91% 50%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 20% 10%;
+    --sidebar-primary: 68 100% 48%;
+    --sidebar-primary-foreground: 240 20% 6%;
+    --sidebar-accent: 240 8% 94%;
+    --sidebar-accent-foreground: 240 20% 10%;
+    --sidebar-border: 240 8% 90%;
+    --sidebar-ring: 68 100% 48%;
   }
 
   .dark {
-    /* ─── DARK MODE (Deep Space) ─── */
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 72%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
-    --chart-1: 220 70% 50%;
+    /* ─── DARK MODE (Bombon Dark — Lime Neon) ─── */
+    --background: 240 24% 5%;
+    --foreground: 60 10% 92%;
+    --card: 240 20% 8%;
+    --card-foreground: 60 10% 92%;
+    --popover: 240 20% 8%;
+    --popover-foreground: 60 10% 92%;
+    --primary: 68 100% 48%;
+    --primary-foreground: 240 20% 6%;
+    --primary-glow: 68 100% 60%;
+    --secondary: 240 16% 14%;
+    --secondary-foreground: 60 10% 92%;
+    --muted: 240 16% 14%;
+    --muted-foreground: 240 8% 55%;
+    --accent: 240 16% 14%;
+    --accent-foreground: 60 10% 92%;
+    --destructive: 0 63% 35%;
+    --destructive-foreground: 60 10% 92%;
+    --success: 142 76% 40%;
+    --success-foreground: 60 10% 92%;
+    --warning: 38 92% 52%;
+    --warning-foreground: 240 20% 6%;
+    --info: 199 89% 50%;
+    --info-foreground: 60 10% 92%;
+    --border: 240 16% 15%;
+    --input: 240 16% 15%;
+    --ring: 68 100% 48%;
+    --chart-1: 68 100% 48%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    /* Sidebar dark */
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 14%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 217 91% 60%;
+    /* Sidebar dark — Bombon style */
+    --sidebar-background: 240 24% 6%;
+    --sidebar-foreground: 60 10% 92%;
+    --sidebar-primary: 68 100% 48%;
+    --sidebar-primary-foreground: 240 20% 6%;
+    --sidebar-accent: 240 16% 12%;
+    --sidebar-accent-foreground: 60 10% 92%;
+    --sidebar-border: 240 16% 13%;
+    --sidebar-ring: 68 100% 48%;
   }
 }
 
@@ -212,6 +212,10 @@
   /* Gradient helpers */
   .gradient-primary {
     background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  }
+
+  .gradient-lime {
+    background: linear-gradient(135deg, hsl(68 100% 48%), hsl(80 100% 55%));
   }
 
   .gradient-xp {
