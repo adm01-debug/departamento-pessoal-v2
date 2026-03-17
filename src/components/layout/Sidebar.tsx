@@ -5,7 +5,7 @@ import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
   Zap, ChevronDown, UserPlus, UserMinus, Briefcase,
-  FolderOpen, CalendarDays, Plug, Database,
+  FolderOpen, CalendarDays, Plug, Database, Plus,
   Network, Shield, UserCog, LogOut, Check, ChevronRight,
   Timer, GraduationCap, ClipboardList, Heart,
   Megaphone, Scale, MapPin, Lock, FileBarChart,
@@ -146,10 +146,23 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, className, pendingCounts }: SidebarProps) {
   const location = useLocation();
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const { user, signOut } = useAuth();
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
   const [empresaMenuOpen, setEmpresaMenuOpen] = useState(false);
+
+  // Find which group contains the active route
+  const activeGroupLabel = menuGroups.find(g =>
+    g.items.some(item => location.pathname === item.path || location.pathname.startsWith(item.path + '/'))
+  )?.label || 'Principal';
+
+  // Default: all groups collapsed EXCEPT the one with the active route
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    menuGroups.forEach(g => {
+      initial[g.label] = g.label !== activeGroupLabel;
+    });
+    return initial;
+  });
 
   const toggleGroup = (label: string) => {
     if (collapsed) return;
@@ -200,60 +213,78 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
         {/* ─── Company Switcher ─── */}
         {!collapsed ? (
           <div className="px-3 pt-3 pb-1">
-            <button
-              onClick={() => temMultiplasEmpresas && setEmpresaMenuOpen(!empresaMenuOpen)}
-              className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200',
-                'bg-sidebar-accent/60 hover:bg-sidebar-accent border border-border/20',
-                temMultiplasEmpresas && 'cursor-pointer'
-              )}
-            >
-              <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-body font-medium text-foreground truncate">{empresaNome}</p>
-                <p className="text-[10px] text-muted-foreground font-body">
-                  {empresaAtual?.cnpj || 'Empresa ativa'}
-                </p>
-              </div>
-              {temMultiplasEmpresas && (
-                <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/50 transition-transform', empresaMenuOpen && 'rotate-180')} />
-              )}
-            </button>
-
-            <AnimatePresence>
-              {empresaMenuOpen && temMultiplasEmpresas && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="overflow-hidden"
+            {!empresaAtual ? (
+              /* Empty state: no empresa linked */
+              <Link
+                to="/empresas/nova"
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200 bg-primary/10 hover:bg-primary/20 border border-dashed border-primary/40 hover:border-primary/60 group"
+              >
+                <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <Plus className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-xs font-body font-semibold text-primary">Cadastrar Empresa</p>
+                  <p className="text-[10px] text-muted-foreground font-body">Clique para começar</p>
+                </div>
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={() => temMultiplasEmpresas && setEmpresaMenuOpen(!empresaMenuOpen)}
+                  className={cn(
+                    'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200',
+                    'bg-sidebar-accent/60 hover:bg-sidebar-accent border border-border/20',
+                    temMultiplasEmpresas && 'cursor-pointer'
+                  )}
                 >
-                  <div className="mt-1 rounded-xl border border-border/20 bg-sidebar-accent/40 p-1">
-                    {userEmpresas?.map((ue) => (
-                      <button
-                        key={ue.empresa_id}
-                        onClick={() => { trocarEmpresa(ue.empresa_id); setEmpresaMenuOpen(false); }}
-                        className={cn(
-                          'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
-                          ue.empresa_id === empresaAtual?.id
-                            ? 'bg-primary/10 text-primary'
-                            : 'hover:bg-sidebar-accent text-muted-foreground hover:text-foreground'
-                        )}
-                      >
-                        <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="text-xs font-body truncate flex-1">
-                          {ue.empresa?.nome_fantasia || ue.empresa?.razao_social}
-                        </span>
-                        {ue.empresa_id === empresaAtual?.id && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
-                      </button>
-                    ))}
+                  <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="h-4 w-4 text-primary" />
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-xs font-body font-medium text-foreground truncate">{empresaNome}</p>
+                    <p className="text-[10px] text-muted-foreground font-body">
+                      {empresaAtual?.cnpj || 'Empresa ativa'}
+                    </p>
+                  </div>
+                  {temMultiplasEmpresas && (
+                    <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/50 transition-transform', empresaMenuOpen && 'rotate-180')} />
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {empresaMenuOpen && temMultiplasEmpresas && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-1 rounded-xl border border-border/20 bg-sidebar-accent/40 p-1">
+                        {userEmpresas?.map((ue) => (
+                          <button
+                            key={ue.empresa_id}
+                            onClick={() => { trocarEmpresa(ue.empresa_id); setEmpresaMenuOpen(false); }}
+                            className={cn(
+                              'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
+                              ue.empresa_id === empresaAtual?.id
+                                ? 'bg-primary/10 text-primary'
+                                : 'hover:bg-sidebar-accent text-muted-foreground hover:text-foreground'
+                            )}
+                          >
+                            <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span className="text-xs font-body truncate flex-1">
+                              {ue.empresa?.nome_fantasia || ue.empresa?.razao_social}
+                            </span>
+                            {ue.empresa_id === empresaAtual?.id && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
           </div>
         ) : (
           <div className="px-2 pt-3 pb-1">
@@ -280,7 +311,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                     onClick={() => toggleGroup(group.label)}
                     className="w-full flex items-center justify-between px-3 py-1.5 mb-0.5 group/header"
                   >
-                    <span className="text-overline text-muted-foreground/50 group-hover/header:text-muted-foreground transition-colors">
+                    <span className="text-overline text-muted-foreground/80 group-hover/header:text-foreground transition-colors font-bold tracking-wider">
                       {group.label}
                     </span>
                     <ChevronRight className={cn(

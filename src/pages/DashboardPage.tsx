@@ -175,12 +175,8 @@ const cardVariants = {
   }),
 };
 
-const sparklineData: Record<string, number[]> = {
-  colaboradores: [120, 125, 122, 128, 130, 135, 132, 140, 145, 142, 148, 150],
-  folha: [85000, 87000, 86500, 88000, 89000, 87500, 90000, 92000, 91000, 93000, 94500, 95000],
-  ferias: [3, 5, 2, 8, 4, 6, 3, 7, 5, 2, 4, 3],
-  banco: [40, 35, 42, 38, 45, 50, 48, 55, 52, 60, 58, 56],
-};
+// Sparklines will show zeros when no data — honest representation
+const emptySparkline = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 const donutColors = [
   'hsl(var(--primary))',
@@ -189,31 +185,6 @@ const donutColors = [
   'hsl(var(--warning))',
   'hsl(var(--xp))',
   'hsl(var(--streak))',
-];
-
-// Mock data for new widgets
-const monthlyBarData = [
-  { label: 'Jan', value: 142, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Fev', value: 138, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Mar', value: 145, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Abr', value: 148, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Mai', value: 150, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Jun', value: 152, color: 'bg-gradient-to-t from-primary to-primary-glow' },
-];
-
-const mockTimeline: TimelineEvent[] = [
-  { id: '1', title: 'Nova admissão registrada', description: 'João Silva - Desenvolvedor', time: 'Há 2h', type: 'admissao' },
-  { id: '2', title: 'Férias aprovadas', description: 'Maria Santos - 30 dias', time: 'Há 4h', type: 'ferias' },
-  { id: '3', title: 'Folha processada', description: 'Competência 03/2026', time: 'Ontem', type: 'folha' },
-  { id: '4', title: 'Desligamento concluído', description: 'Pedro Lima - Sem justa causa', time: 'Há 2 dias', type: 'demissao' },
-  { id: '5', title: 'Ponto ajustado', description: 'Ana Oliveira - Entrada corrigida', time: 'Há 3 dias', type: 'ponto' },
-];
-
-const mockExpiring: ExpiringItem[] = [
-  { id: '1', label: 'ASO - Carlos Mendes', detail: 'Exame periódico', daysLeft: 5, type: 'aso' },
-  { id: '2', label: 'Contrato - Ana Lima', detail: 'Experiência 90 dias', daysLeft: 12, type: 'contrato' },
-  { id: '3', label: 'CNH - Roberto Silva', detail: 'Documento vencendo', daysLeft: 22, type: 'documento' },
-  { id: '4', label: 'Férias - Paulo Costa', detail: 'Período aquisitivo', daysLeft: 45, type: 'ferias' },
 ];
 
 /* ─── Premium Metric Card ─── */
@@ -540,9 +511,9 @@ export default function DashboardPage() {
               value={stats?.colaboradoresAtivos || 0}
               rawValue={stats?.colaboradoresAtivos || 0}
               icon={Users}
-              trend={{ value: 2.5, label: "vs mês anterior" }}
+              trend={stats?.colaboradoresAtivos ? { value: 2.5, label: "vs mês anterior" } : undefined}
               gradient="from-primary to-primary-glow"
-              sparkline={sparklineData.colaboradores}
+              sparkline={emptySparkline}
               index={0}
             />
             <MetricCard
@@ -550,9 +521,9 @@ export default function DashboardPage() {
               value={formatCurrency(stats?.folhaMensal || 0)}
               rawValue={stats?.folhaMensal || 0}
               icon={DollarSign}
-              trend={{ value: -1.2, label: "vs mês anterior" }}
+              trend={stats?.folhaMensal ? { value: -1.2, label: "vs mês anterior" } : undefined}
               gradient="from-primary/80 to-primary"
-              sparkline={sparklineData.folha}
+              sparkline={emptySparkline}
               index={1}
             />
             <MetricCard
@@ -562,7 +533,7 @@ export default function DashboardPage() {
               icon={Calendar}
               description="Próximos 30 dias"
               gradient="from-primary/60 to-primary/90"
-              sparkline={sparklineData.ferias}
+              sparkline={emptySparkline}
               index={2}
             />
             <MetricCard
@@ -571,7 +542,7 @@ export default function DashboardPage() {
               icon={Clock}
               description="Saldo total"
               gradient="from-primary-glow to-primary"
-              sparkline={sparklineData.banco}
+              sparkline={emptySparkline}
               index={3}
             />
           </>
@@ -609,7 +580,7 @@ export default function DashboardPage() {
         </MotionCard>
       </motion.div>
 
-      {/* Analytics Row — NEW */}
+      {/* Analytics Row — Real data or empty states */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         {/* Monthly Headcount Chart */}
         <MotionCard custom={3.8} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
@@ -622,11 +593,22 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <BarChartWidget data={monthlyBarData} height={140} />
+            {isEmptySystem ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                  <TrendingUp className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-caption text-muted-foreground font-body">Cadastre colaboradores para visualizar a evolução</p>
+              </div>
+            ) : (
+              <BarChartWidget data={[
+                { label: 'Atual', value: stats?.headcount || 0, color: 'bg-gradient-to-t from-primary to-primary-glow' },
+              ]} height={140} />
+            )}
           </CardContent>
         </MotionCard>
 
-        {/* Event Timeline */}
+        {/* Event Timeline — empty state */}
         <MotionCard custom={4} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
@@ -637,11 +619,17 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <EventTimeline events={mockTimeline} />
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="p-3 rounded-2xl bg-muted/50 mb-3">
+                <Activity className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <p className="text-caption text-muted-foreground font-body">Nenhum evento registrado ainda</p>
+              <p className="text-[10px] text-muted-foreground/60 font-body mt-1">Admissões, férias e folhas aparecerão aqui</p>
+            </div>
           </CardContent>
         </MotionCard>
 
-        {/* Expiring Items */}
+        {/* Expiring Items — empty state */}
         <MotionCard custom={4.2} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
@@ -652,7 +640,13 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ExpiringItemsWidget items={mockExpiring} />
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-success/20 to-finance/10 mb-3">
+                <CheckCircle2 className="h-6 w-6 text-success" />
+              </div>
+              <p className="text-caption text-muted-foreground font-body">Nenhum vencimento próximo</p>
+              <p className="text-[10px] text-muted-foreground/60 font-body mt-1">ASOs, contratos e documentos aparecerão aqui</p>
+            </div>
           </CardContent>
         </MotionCard>
       </div>
