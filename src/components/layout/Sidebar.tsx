@@ -146,10 +146,23 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, className, pendingCounts }: SidebarProps) {
   const location = useLocation();
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const { user, signOut } = useAuth();
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
   const [empresaMenuOpen, setEmpresaMenuOpen] = useState(false);
+
+  // Find which group contains the active route
+  const activeGroupLabel = menuGroups.find(g =>
+    g.items.some(item => location.pathname === item.path || location.pathname.startsWith(item.path + '/'))
+  )?.label || 'Principal';
+
+  // Default: all groups collapsed EXCEPT the one with the active route
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    menuGroups.forEach(g => {
+      initial[g.label] = g.label !== activeGroupLabel;
+    });
+    return initial;
+  });
 
   const toggleGroup = (label: string) => {
     if (collapsed) return;
