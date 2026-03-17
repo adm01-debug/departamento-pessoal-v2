@@ -818,6 +818,98 @@ export type Database = {
           },
         ]
       }
+      batidas_ponto: {
+        Row: {
+          ajustado: boolean | null
+          ajustado_por: string | null
+          colaborador_id: string
+          created_at: string | null
+          data: string
+          dentro_raio: boolean | null
+          empresa_id: string | null
+          hora: string
+          id: string
+          ip_address: string | null
+          latitude: number | null
+          longitude: number | null
+          motivo_ajuste: string | null
+          ordem: number
+          origem: string | null
+          precisao_metros: number | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ajustado?: boolean | null
+          ajustado_por?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data: string
+          dentro_raio?: boolean | null
+          empresa_id?: string | null
+          hora: string
+          id?: string
+          ip_address?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          motivo_ajuste?: string | null
+          ordem: number
+          origem?: string | null
+          precisao_metros?: number | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Update: {
+          ajustado?: boolean | null
+          ajustado_por?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data?: string
+          dentro_raio?: boolean | null
+          empresa_id?: string | null
+          hora?: string
+          id?: string
+          ip_address?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          motivo_ajuste?: string | null
+          ordem?: number
+          origem?: string | null
+          precisao_metros?: number | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficiarios_plano: {
         Row: {
           colaborador_id: string | null
@@ -5023,6 +5115,13 @@ export type Database = {
             referencedRelation: "ferias"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ferias_arquivos: {
@@ -5059,6 +5158,13 @@ export type Database = {
             columns: ["ferias_id"]
             isOneToOne: false
             referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_arquivos_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
         ]
@@ -5737,6 +5843,13 @@ export type Database = {
             referencedRelation: "ferias"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "historico_ferias_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
+            referencedColumns: ["id"]
+          },
         ]
       }
       historico_salarial: {
@@ -6137,6 +6250,50 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jornadas_horarios: {
+        Row: {
+          created_at: string | null
+          dia_semana: number
+          dia_util: boolean | null
+          entrada: string | null
+          id: string
+          intervalo_fim: string | null
+          intervalo_inicio: string | null
+          jornada_id: string
+          saida: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dia_semana: number
+          dia_util?: boolean | null
+          entrada?: string | null
+          id?: string
+          intervalo_fim?: string | null
+          intervalo_inicio?: string | null
+          jornada_id: string
+          saida?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dia_semana?: number
+          dia_util?: boolean | null
+          entrada?: string | null
+          id?: string
+          intervalo_fim?: string | null
+          intervalo_inicio?: string | null
+          jornada_id?: string
+          saida?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jornadas_horarios_jornada_id_fkey"
+            columns: ["jornada_id"]
+            isOneToOne: false
+            referencedRelation: "jornadas"
             referencedColumns: ["id"]
           },
         ]
@@ -10473,6 +10630,55 @@ export type Database = {
           },
         ]
       }
+      vw_batidas_dia: {
+        Row: {
+          ajustado: boolean | null
+          colaborador_id: string | null
+          data: string | null
+          dentro_raio: boolean | null
+          departamento: string | null
+          empresa_id: string | null
+          foto_url: string | null
+          hora: string | null
+          id: string | null
+          latitude: number | null
+          longitude: number | null
+          nome_completo: string | null
+          ordem: number | null
+          origem: string | null
+          tipo: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vw_cadastro_incompleto: {
         Row: {
           campos_faltantes: string[] | null
@@ -10580,6 +10786,113 @@ export type Database = {
         }
         Relationships: []
       }
+      vw_faltas_mensal: {
+        Row: {
+          dias_total: number | null
+          empresa_id: string | null
+          injustificadas: number | null
+          justificadas: number | null
+          mes: string | null
+          tipo: string | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faltas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_ferias_resumo: {
+        Row: {
+          cargo: string | null
+          colaborador_id: string | null
+          data_admissao: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          departamento: string | null
+          dias_abono: number | null
+          dias_gozo: number | null
+          empresa_id: string | null
+          id: string | null
+          nome_completo: string | null
+          status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_folha_ponto_mensal: {
+        Row: {
+          colaborador_id: string | null
+          departamento: string | null
+          dias_completos: number | null
+          dias_trabalhados: number | null
+          empresa_id: string | null
+          mes_referencia: string | null
+          nome_completo: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vw_kpi_absenteismo: {
         Row: {
           dias_faltados: number | null
@@ -10593,6 +10906,67 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_kpi_beneficios_custo: {
+        Row: {
+          colaboradores_vinculados: number | null
+          custo_colaborador: number | null
+          custo_empresa: number | null
+          empresa_id: string | null
+          tipo: string | null
+          total_beneficios: number | null
+          valor_total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficios_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_kpi_ponto_resumo: {
+        Row: {
+          colaborador_id: string | null
+          dias_com_entrada: number | null
+          dias_com_saida: number | null
+          dias_registrados: number | null
+          empresa_id: string | null
+          mes: string | null
+          nome_completo: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
         ]
