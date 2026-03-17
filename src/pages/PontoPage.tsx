@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -315,6 +316,8 @@ export default function PontoPage() {
           </Card>
         </motion.div>
       )}
+      {/* Gestão de Ponto - Todos Colaboradores */}
+      <GestaoRegistrosPonto />
     </PageLayout>
   );
 }
