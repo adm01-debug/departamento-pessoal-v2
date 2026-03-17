@@ -39,6 +39,7 @@
     "clsx": "^2.1.0",
     "date-fns": "^4.1.0",
     "framer-motion": "12.36.0",
+    "jspdf": "4.2.1",
     "jspdf-autotable": "5.0.7",
     "lovable-tagger": "1.1.13",
     "lucide-react": "^0.562.0",
