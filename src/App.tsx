@@ -66,6 +66,15 @@ const MovimentacoesPage = lazy(() => import('@/pages/MovimentacoesPage'));
 const SindicatosPage = lazy(() => import('@/pages/SindicatosPage'));
 const ObrigacoesFiscaisPage = lazy(() => import('@/pages/ObrigacoesFiscaisPage'));
 const PlanosSaudePage = lazy(() => import('@/pages/PlanosSaudePage'));
+const CanalEticaPage = lazy(() => import('@/pages/CanalEticaPage'));
+const ConveniosPage = lazy(() => import('@/pages/ConveniosPage'));
+const EscalasPage = lazy(() => import('@/pages/EscalasPage'));
+const SegurosVidaPage = lazy(() => import('@/pages/SegurosVidaPage'));
+const PensoesPage = lazy(() => import('@/pages/PensoesPage'));
+const ValesPage = lazy(() => import('@/pages/ValesPage'));
+const ExamesPage = lazy(() => import('@/pages/ExamesPage'));
+const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
+const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -139,6 +148,15 @@ export default function App() {
         <Route path="sindicatos" element={<LazyPage Component={SindicatosPage} />} />
         <Route path="obrigacoes-fiscais" element={<LazyPage Component={ObrigacoesFiscaisPage} />} />
         <Route path="planos-saude" element={<LazyPage Component={PlanosSaudePage} />} />
+        <Route path="canal-etica" element={<LazyPage Component={CanalEticaPage} />} />
+        <Route path="convenios" element={<LazyPage Component={ConveniosPage} />} />
+        <Route path="escalas" element={<LazyPage Component={EscalasPage} />} />
+        <Route path="seguros-vida" element={<LazyPage Component={SegurosVidaPage} />} />
+        <Route path="pensoes" element={<LazyPage Component={PensoesPage} />} />
+        <Route path="vales" element={<LazyPage Component={ValesPage} />} />
+        <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
+        <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
+        <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}
