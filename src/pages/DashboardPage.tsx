@@ -1,4 +1,4 @@
-// DashboardPage - Task Gifts Design System (Premium) + Analytics
+// DashboardPage - Task Gifts Design System (Premium) + Analytics + Realtime
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Users, DollarSign, Calendar, Clock,
@@ -7,7 +7,7 @@ import {
   UserPlus, UserMinus, Activity, CheckCircle2,
   AlertTriangle, ChevronRight, Zap,
   Building2, FileText, Gift, Plus,
-  ArrowRight, Sparkles, PieChart, Timer,
+  ArrowRight, Sparkles, PieChart, Timer, Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -25,6 +25,8 @@ import { ExpiringItemsWidget, type ExpiringItem } from "@/components/dashboard/E
 import { KPICardSkeleton, CardSkeleton } from "@/components/ui/module-skeleton";
 import { viewsService } from "@/services/tabelasComplementaresService";
 import { Badge } from "@/components/ui/badge";
+import { MorningBriefing } from "@/components/dashboard/MorningBriefing";
+import { useRealtimeDashboard } from "@/hooks/useRealtimeDashboard";
 
 interface DashboardStats {
   colaboradoresAtivos: number;
