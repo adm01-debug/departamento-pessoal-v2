@@ -6,33 +6,33 @@
 
 @layer base {
   :root {
-    /* ─── LIGHT MODE (Premium Blue — WCAG AA Compliant) ─── */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* ─── LIGHT MODE (Bombon Lime — Clean & Modern) ─── */
+    --background: 240 10% 96%;
+    --foreground: 240 20% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 240 20% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 217 91% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 62%;
-    --secondary: 214 32% 93%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 214 32% 93%;
-    --muted-foreground: 215 20% 42%;
-    --accent: 214 32% 93%;
-    --accent-foreground: 222 47% 11%;
+    --popover-foreground: 240 20% 10%;
+    --primary: 68 100% 48%;
+    --primary-foreground: 240 20% 6%;
+    --primary-glow: 68 100% 58%;
+    --secondary: 240 8% 92%;
+    --secondary-foreground: 240 20% 10%;
+    --muted: 240 8% 92%;
+    --muted-foreground: 240 10% 46%;
+    --accent: 240 8% 92%;
+    --accent-foreground: 240 20% 10%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 71% 32%;
+    --success: 142 71% 38%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 44%;
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 42%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 240 20% 10%;
+    --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
-    --border: 214 25% 87%;
-    --input: 214 25% 87%;
-    --ring: 217 91% 50%;
+    --border: 240 8% 87%;
+    --input: 240 8% 87%;
+    --ring: 68 100% 48%;
     --radius: 0.75rem;
 
     /* ─── SPACING TOKENS ─── */
@@ -51,52 +51,52 @@
     --text-body: 0.875rem;
     --text-caption: 0.75rem;
     --text-overline: 0.625rem;
-    --chart-1: 217 91% 50%;
-    --chart-2: 142 71% 32%;
-    --chart-3: 38 92% 44%;
-    --chart-4: 262 83% 52%;
+    --chart-1: 68 100% 48%;
+    --chart-2: 142 71% 38%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 262 83% 58%;
     --chart-5: 0 72% 51%;
 
     /* Module colors */
-    --tasks: 262 83% 52%;
+    --tasks: 262 83% 58%;
     --tasks-foreground: 0 0% 100%;
     --gravacoes: 0 72% 51%;
     --gravacoes-foreground: 0 0% 100%;
-    --finance: 142 71% 32%;
+    --finance: 142 71% 38%;
     --finance-foreground: 0 0% 100%;
-    --sales: 38 92% 44%;
-    --sales-foreground: 222 47% 11%;
-    --store: 262 83% 52%;
+    --sales: 38 92% 50%;
+    --sales-foreground: 240 20% 10%;
+    --store: 262 83% 58%;
     --store-foreground: 0 0% 100%;
-    --zapp: 142 70% 40%;
+    --zapp: 142 70% 42%;
     --zapp-foreground: 0 0% 100%;
-    --loggi: 24 95% 48%;
+    --loggi: 24 95% 52%;
     --loggi-foreground: 0 0% 100%;
 
     /* Gamification */
-    --xp: 262 83% 52%;
+    --xp: 262 83% 58%;
     --xp-foreground: 0 0% 100%;
-    --coins: 45 93% 42%;
-    --coins-foreground: 222 47% 11%;
-    --streak: 24 95% 48%;
+    --coins: 45 93% 48%;
+    --coins-foreground: 240 20% 10%;
+    --streak: 24 95% 52%;
     --streak-foreground: 0 0% 100%;
-    --level: 199 89% 42%;
+    --level: 199 89% 48%;
     --level-foreground: 0 0% 100%;
 
     /* Ranks */
-    --rank-gold: 45 93% 42%;
+    --rank-gold: 45 93% 48%;
     --rank-silver: 0 0% 65%;
     --rank-bronze: 30 50% 44%;
 
     /* Sidebar */
-    --sidebar-background: 210 20% 97%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 217 91% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 32% 93%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 25% 87%;
-    --sidebar-ring: 217 91% 50%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 20% 10%;
+    --sidebar-primary: 68 100% 48%;
+    --sidebar-primary-foreground: 240 20% 6%;
+    --sidebar-accent: 240 8% 94%;
+    --sidebar-accent-foreground: 240 20% 10%;
+    --sidebar-border: 240 8% 90%;
+    --sidebar-ring: 68 100% 48%;
   }
 
   .dark {
