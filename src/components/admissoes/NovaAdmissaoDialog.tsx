@@ -67,7 +67,7 @@ export function NovaAdmissaoDialog({ children }: NovaAdmissaoDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <Button className="rounded-xl bg-gradient-to-r from-success to-info hover:opacity-90 shadow-lg font-body">
+          <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body text-primary-foreground">
             <Plus className="h-4 w-4 mr-2" />Nova Admissão
           </Button>
         )}
