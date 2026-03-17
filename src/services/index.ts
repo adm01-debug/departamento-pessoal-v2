@@ -179,14 +179,15 @@ export const feriasService = {
 };
 
 export const folhaService = {
-  async list(competencia?: string) {
-    let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false });
+  async list(competencia?: string, empresaId?: string) {
+    let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false }).limit(500);
+    if (empresaId) query = query.eq('empresa_id', empresaId);
     if (competencia) query = query.eq('competencia', competencia);
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
   },
-  listar: async (competencia?: string) => folhaService.list(competencia),
+  listar: async (competencia?: string, empresaId?: string) => folhaService.list(competencia, empresaId),
   async buscarPorId(id: string) {
     const { data, error } = await supabase.from('folhas_pagamento').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
