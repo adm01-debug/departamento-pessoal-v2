@@ -179,14 +179,15 @@ export const feriasService = {
 };
 
 export const folhaService = {
-  async list(competencia?: string) {
-    let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false });
+  async list(competencia?: string, empresaId?: string) {
+    let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false }).limit(500);
+    if (empresaId) query = query.eq('empresa_id', empresaId);
     if (competencia) query = query.eq('competencia', competencia);
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
   },
-  listar: async (competencia?: string) => folhaService.list(competencia),
+  listar: async (competencia?: string, empresaId?: string) => folhaService.list(competencia, empresaId),
   async buscarPorId(id: string) {
     const { data, error } = await supabase.from('folhas_pagamento').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
@@ -201,8 +202,8 @@ export const pontoService = {
     const data = now.toISOString().split('T')[0];
     const hora = now.toTimeString().split(' ')[0].substring(0, 5);
 
-    // Get colaborador by user id (auth.users.id)
-    const { data: colab } = await supabase.from('colaboradores').select('id, empresa_id').eq('email', (await supabase.auth.getUser()).data.user?.email || '').maybeSingle();
+    // Look up colaborador by ID directly (more reliable than email lookup)
+    const { data: colab } = await supabase.from('colaboradores').select('id, empresa_id').eq('id', colaboradorId).maybeSingle();
     if (!colab) {
       // Fallback: register directly in registros_ponto
       const campo = tipo === 'entrada' ? 'entrada_1'
@@ -223,10 +224,10 @@ export const pontoService = {
     // Use batidas_ponto (triggers fn_consolidar_batidas automatically)
     const tipoMap: Record<string, string> = { entrada: 'entrada', saida_almoco: 'saida', retorno_almoco: 'entrada', saida: 'saida' };
     // Count existing batidas to determine order
-    const { count } = await (supabase as any).from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('colaborador_id', colab.id).eq('data', data);
+    const { count } = await supabase.from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('colaborador_id', colab.id).eq('data', data);
     const ordem = (count || 0) + 1;
 
-    const { data: batida, error } = await (supabase as any).from('batidas_ponto').insert({
+    const { data: batida, error } = await supabase.from('batidas_ponto').insert({
       colaborador_id: colab.id,
       empresa_id: colab.empresa_id,
       data,
@@ -241,7 +242,7 @@ export const pontoService = {
 
   async buscarRegistroHoje(colaboradorId: string) {
     const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).eq('data', today).maybeSingle();
+    const { data, error } = await supabase.from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).eq('data', today).maybeSingle();
     if (error) throw error;
     return data;
   },
@@ -249,7 +250,7 @@ export const pontoService = {
   async buscarRegistrosSemana(colaboradorId: string) {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).gte('data', weekAgo.toISOString().split('T')[0]).order('data', { ascending: false });
+    const { data, error } = await supabase.from('registros_ponto').select('*').eq('colaborador_id', colaboradorId).gte('data', weekAgo.toISOString().split('T')[0]).order('data', { ascending: false });
     if (error) throw error;
     return data || [];
   },
@@ -258,8 +259,10 @@ export const pontoService = {
 export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 
 export const documentoService = {
-  async listar(colaboradorId?: string) {
-    let query = supabase.from('documentos').select('*').order('created_at', { ascending: false });
+  async listar(colaboradorId?: string, empresaId?: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query: any = supabase.from('documentos').select('*').order('created_at', { ascending: false }).limit(500);
+    if (empresaId) query = query.eq('empresa_id', empresaId);
     if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
     const { data, error } = await query;
     if (error) throw error;
