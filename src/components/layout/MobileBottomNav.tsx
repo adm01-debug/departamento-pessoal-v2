@@ -8,7 +8,7 @@ const mobileItems = [
   { path: '/colaboradores', label: 'Equipe', icon: Users, color: 'from-primary to-primary-glow' },
   { path: '/folha', label: 'Folha', icon: FileText, color: 'from-primary-glow to-primary' },
   { path: '/ferias', label: 'Férias', icon: Calendar, color: 'from-primary-glow to-primary' },
-  { path: '/more', label: 'Mais', icon: MoreHorizontal, color: 'from-muted-foreground to-foreground' },
+  { path: '/configuracoes', label: 'Mais', icon: MoreHorizontal, color: 'from-muted-foreground to-foreground' },
 ];
 
 export function MobileBottomNav() {
@@ -24,7 +24,7 @@ export function MobileBottomNav() {
             return (
               <Link
                 key={path}
-                to={path === '/more' ? '/configuracoes' : path}
+                to={path}
                 className={cn(
                   'relative flex flex-col items-center justify-center gap-1 w-16 h-full transition-colors',
                   isActive ? 'text-primary' : 'text-muted-foreground'
