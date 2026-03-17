@@ -175,12 +175,8 @@ const cardVariants = {
   }),
 };
 
-const sparklineData: Record<string, number[]> = {
-  colaboradores: [120, 125, 122, 128, 130, 135, 132, 140, 145, 142, 148, 150],
-  folha: [85000, 87000, 86500, 88000, 89000, 87500, 90000, 92000, 91000, 93000, 94500, 95000],
-  ferias: [3, 5, 2, 8, 4, 6, 3, 7, 5, 2, 4, 3],
-  banco: [40, 35, 42, 38, 45, 50, 48, 55, 52, 60, 58, 56],
-};
+// Sparklines will show zeros when no data — honest representation
+const emptySparkline = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 const donutColors = [
   'hsl(var(--primary))',
@@ -189,31 +185,6 @@ const donutColors = [
   'hsl(var(--warning))',
   'hsl(var(--xp))',
   'hsl(var(--streak))',
-];
-
-// Mock data for new widgets
-const monthlyBarData = [
-  { label: 'Jan', value: 142, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Fev', value: 138, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Mar', value: 145, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Abr', value: 148, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Mai', value: 150, color: 'bg-gradient-to-t from-primary/60 to-primary' },
-  { label: 'Jun', value: 152, color: 'bg-gradient-to-t from-primary to-primary-glow' },
-];
-
-const mockTimeline: TimelineEvent[] = [
-  { id: '1', title: 'Nova admissão registrada', description: 'João Silva - Desenvolvedor', time: 'Há 2h', type: 'admissao' },
-  { id: '2', title: 'Férias aprovadas', description: 'Maria Santos - 30 dias', time: 'Há 4h', type: 'ferias' },
-  { id: '3', title: 'Folha processada', description: 'Competência 03/2026', time: 'Ontem', type: 'folha' },
-  { id: '4', title: 'Desligamento concluído', description: 'Pedro Lima - Sem justa causa', time: 'Há 2 dias', type: 'demissao' },
-  { id: '5', title: 'Ponto ajustado', description: 'Ana Oliveira - Entrada corrigida', time: 'Há 3 dias', type: 'ponto' },
-];
-
-const mockExpiring: ExpiringItem[] = [
-  { id: '1', label: 'ASO - Carlos Mendes', detail: 'Exame periódico', daysLeft: 5, type: 'aso' },
-  { id: '2', label: 'Contrato - Ana Lima', detail: 'Experiência 90 dias', daysLeft: 12, type: 'contrato' },
-  { id: '3', label: 'CNH - Roberto Silva', detail: 'Documento vencendo', daysLeft: 22, type: 'documento' },
-  { id: '4', label: 'Férias - Paulo Costa', detail: 'Período aquisitivo', daysLeft: 45, type: 'ferias' },
 ];
 
 /* ─── Premium Metric Card ─── */
