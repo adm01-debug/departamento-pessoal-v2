@@ -27,10 +27,10 @@ export default function FolhaPage() {
     <PageLayout
       title="Folha de Pagamento"
       description="Gestão de folhas de pagamento"
-      icon={<FileText className="h-5 w-5 text-white" />}
-      gradient="from-finance to-success"
+      icon={<FileText className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-primary-glow to-primary"
       actions={
-        <Button onClick={() => navigate('/folha/calcular')} className="rounded-xl bg-gradient-to-r from-finance to-success hover:opacity-90 shadow-lg font-body">
+        <Button onClick={() => navigate('/folha/calcular')} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body">
           <Calculator className="h-4 w-4 mr-2" />Calcular Folha
         </Button>
       }

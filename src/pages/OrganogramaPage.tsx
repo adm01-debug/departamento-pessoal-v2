@@ -9,8 +9,8 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const gradients = [
-  'from-primary to-primary-glow', 'from-info to-level', 'from-success to-finance',
-  'from-warning to-coins', 'from-streak to-warning', 'from-xp to-tasks',
+  'from-primary to-primary-glow', 'from-primary to-primary-glow', 'from-primary to-primary-glow',
+  'from-primary-glow to-primary', 'from-primary/60 to-primary/90', 'from-primary/80 to-primary',
 ];
 
 export default function OrganogramaPage() {
@@ -34,7 +34,7 @@ export default function OrganogramaPage() {
   });
 
   return (
-    <PageLayout title="Organograma" description="Estrutura organizacional" icon={<Network className="h-5 w-5 text-white" />} gradient="from-xp to-tasks">
+    <PageLayout title="Organograma" description="Estrutura organizacional" icon={<Network className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/80 to-primary">
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
       ) : !departamentos?.length ? (

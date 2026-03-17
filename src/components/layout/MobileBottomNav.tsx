@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 
 const mobileItems = [
   { path: '/dashboard', label: 'Home', icon: Home, color: 'from-primary to-primary-glow' },
-  { path: '/colaboradores', label: 'Equipe', icon: Users, color: 'from-info to-level' },
-  { path: '/folha', label: 'Folha', icon: FileText, color: 'from-finance to-success' },
-  { path: '/ferias', label: 'Férias', icon: Calendar, color: 'from-warning to-coins' },
+  { path: '/colaboradores', label: 'Equipe', icon: Users, color: 'from-primary to-primary-glow' },
+  { path: '/folha', label: 'Folha', icon: FileText, color: 'from-primary-glow to-primary' },
+  { path: '/ferias', label: 'Férias', icon: Calendar, color: 'from-primary-glow to-primary' },
   { path: '/more', label: 'Mais', icon: MoreHorizontal, color: 'from-muted-foreground to-foreground' },
 ];
 

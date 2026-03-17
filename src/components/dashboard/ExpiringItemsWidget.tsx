@@ -13,9 +13,9 @@ export interface ExpiringItem {
 
 const typeConfig: Record<string, { icon: LucideIcon; gradient: string }> = {
   aso: { icon: Stethoscope, gradient: 'from-destructive to-streak' },
-  documento: { icon: FileText, gradient: 'from-warning to-coins' },
-  contrato: { icon: Calendar, gradient: 'from-info to-level' },
-  ferias: { icon: Calendar, gradient: 'from-xp to-tasks' },
+  documento: { icon: FileText, gradient: 'from-primary-glow to-primary' },
+  contrato: { icon: Calendar, gradient: 'from-primary to-primary-glow' },
+  ferias: { icon: Calendar, gradient: 'from-primary/80 to-primary' },
 };
 
 function getUrgencyClass(daysLeft: number) {

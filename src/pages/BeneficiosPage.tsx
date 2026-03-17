@@ -31,7 +31,7 @@ export default function BeneficiosPage() {
     <PageLayout
       title="Benefícios"
       description="Gestão de benefícios"
-      icon={<Gift className="h-5 w-5 text-white" />}
+      icon={<Gift className="h-5 w-5 text-primary-foreground" />}
       gradient="from-xp to-store"
       actions={
         <Button onClick={() => navigate('/beneficios/novo')} className="rounded-xl bg-gradient-to-r from-xp to-store hover:opacity-90 shadow-lg font-body">

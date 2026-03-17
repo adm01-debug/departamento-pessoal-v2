@@ -296,9 +296,9 @@ function IndicatorRow({ label, value, maxValue = 10, suffix = "%" }: {
 }) {
   const percentage = Math.min((value / maxValue) * 100, 100);
   const getColor = () => {
-    if (value >= maxValue * 0.8) return "from-destructive to-destructive/70";
-    if (value >= maxValue * 0.5) return "from-warning to-coins";
-    return "from-success to-finance";
+    if (value >= maxValue * 0.8) return "from-destructive to-destructive/70/70";
+    if (value >= maxValue * 0.5) return "from-primary-glow to-primary";
+    return "from-primary to-primary-glow";
   };
 
   return (
@@ -325,9 +325,9 @@ function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: numb
     ferias: Calendar, afastamentos: AlertTriangle, admissoes: UserPlus,
   };
   const gradientMap: Record<string, string> = {
-    ferias: "from-info to-level",
-    afastamentos: "from-warning to-coins",
-    admissoes: "from-success to-finance",
+    ferias: "from-primary/80 to-primary",
+    afastamentos: "from-primary/60 to-primary/90",
+    admissoes: "from-primary to-primary-glow",
   };
   const Icon = iconMap[pendencia.icone] || AlertCircle;
 
@@ -407,9 +407,9 @@ function OnboardingWizard() {
   const navigate = useNavigate();
 
   const steps = [
-    { step: 1, title: 'Cadastrar Empresa', desc: 'Configure os dados da sua empresa', icon: Building2, path: '/empresas/nova', gradient: 'from-xp to-tasks', done: false },
-    { step: 2, title: 'Adicionar Colaboradores', desc: 'Cadastre seus primeiros funcionários', icon: UserPlus, path: '/colaboradores/novo', gradient: 'from-success to-finance', done: false },
-    { step: 3, title: 'Processar Folha', desc: 'Execute o primeiro cálculo de folha', icon: DollarSign, path: '/folha', gradient: 'from-info to-level', done: false },
+    { step: 1, title: 'Cadastrar Empresa', desc: 'Configure os dados da sua empresa', icon: Building2, path: '/empresas/nova', gradient: 'from-primary to-primary-glow', done: false },
+    { step: 2, title: 'Adicionar Colaboradores', desc: 'Cadastre seus primeiros funcionários', icon: UserPlus, path: '/colaboradores/novo', gradient: 'from-primary/80 to-primary', done: false },
+    { step: 3, title: 'Processar Folha', desc: 'Execute o primeiro cálculo de folha', icon: DollarSign, path: '/folha', gradient: 'from-primary/60 to-primary/90', done: false },
   ];
 
   return (
@@ -551,7 +551,7 @@ export default function DashboardPage() {
               rawValue={stats?.folhaMensal || 0}
               icon={DollarSign}
               trend={{ value: -1.2, label: "vs mês anterior" }}
-              gradient="from-info to-level"
+              gradient="from-primary/80 to-primary"
               sparkline={sparklineData.folha}
               index={1}
             />
@@ -561,7 +561,7 @@ export default function DashboardPage() {
               rawValue={stats?.feriasPendentes || 0}
               icon={Calendar}
               description="Próximos 30 dias"
-              gradient="from-warning to-coins"
+              gradient="from-primary/60 to-primary/90"
               sparkline={sparklineData.ferias}
               index={2}
             />
@@ -570,7 +570,7 @@ export default function DashboardPage() {
               value={`${stats?.bancoHoras && stats.bancoHoras > 0 ? "+" : ""}${stats?.bancoHoras || 0}h`}
               icon={Clock}
               description="Saldo total"
-              gradient="from-success to-finance"
+              gradient="from-primary-glow to-primary"
               sparkline={sparklineData.banco}
               index={3}
             />
@@ -600,10 +600,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <QuickAction label="Novo Colaborador" icon={UserPlus} gradient="from-success to-finance" path="/colaboradores/novo" index={0} />
-              <QuickAction label="Calcular Folha" icon={DollarSign} gradient="from-info to-level" path="/folha/calcular" index={1} />
-              <QuickAction label="Registrar Ponto" icon={Clock} gradient="from-streak to-warning" path="/ponto" index={2} />
-              <QuickAction label="Nova Empresa" icon={Building2} gradient="from-xp to-tasks" path="/empresas/nova" index={3} />
+              <QuickAction label="Novo Colaborador" icon={UserPlus} gradient="from-primary to-primary-glow" path="/colaboradores/novo" index={0} />
+              <QuickAction label="Calcular Folha" icon={DollarSign} gradient="from-primary/80 to-primary" path="/folha/calcular" index={1} />
+              <QuickAction label="Registrar Ponto" icon={Clock} gradient="from-primary/60 to-primary/90" path="/ponto" index={2} />
+              <QuickAction label="Nova Empresa" icon={Building2} gradient="from-primary-glow to-primary" path="/empresas/nova" index={3} />
             </div>
           </CardContent>
         </MotionCard>
@@ -630,7 +630,7 @@ export default function DashboardPage() {
         <MotionCard custom={4} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-level">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/80 to-primary">
                 <Activity className="h-4 w-4 text-primary-foreground" />
               </div>
               Eventos Recentes
@@ -645,7 +645,7 @@ export default function DashboardPage() {
         <MotionCard custom={4.2} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-coins">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/60 to-primary/90">
                 <Timer className="h-4 w-4 text-primary-foreground" />
               </div>
               Próximos Vencimentos
@@ -663,7 +663,7 @@ export default function DashboardPage() {
         <MotionCard custom={5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-xp to-tasks">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary-glow to-primary">
                 <Activity className="h-4 w-4 text-primary-foreground" />
               </div>
               Movimentação
@@ -676,9 +676,9 @@ export default function DashboardPage() {
               </div>
             ) : (
               <>
-                <QuickStat label="Admissões" value={stats?.admissoesMes || 0} icon={UserPlus} gradient="from-success to-finance" index={0} />
-                <QuickStat label="Desligamentos" value={stats?.demissoesMes || 0} icon={UserMinus} gradient="from-destructive to-streak" index={1} />
-                <QuickStat label="Headcount" value={stats?.headcount || 0} icon={Briefcase} gradient="from-primary to-primary-glow" index={2} />
+                <QuickStat label="Admissões" value={stats?.admissoesMes || 0} icon={UserPlus} gradient="from-primary to-primary-glow" index={0} />
+                <QuickStat label="Desligamentos" value={stats?.demissoesMes || 0} icon={UserMinus} gradient="from-destructive to-destructive/70/70" index={1} />
+                <QuickStat label="Headcount" value={stats?.headcount || 0} icon={Briefcase} gradient="from-primary/80 to-primary" index={2} />
               </>
             )}
           </CardContent>
@@ -688,7 +688,7 @@ export default function DashboardPage() {
         <MotionCard custom={5.5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-info">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
                 <PieChart className="h-4 w-4 text-primary-foreground" />
               </div>
               Departamentos
@@ -723,7 +723,7 @@ export default function DashboardPage() {
         <MotionCard custom={6} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-level">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/80 to-primary">
                 <TrendingUp className="h-4 w-4 text-primary-foreground" />
               </div>
               Indicadores
@@ -748,7 +748,7 @@ export default function DashboardPage() {
         <MotionCard custom={6.5} variants={cardVariants} initial="hidden" animate="visible" className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-coins">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/60 to-primary/90">
                 <AlertCircle className="h-4 w-4 text-primary-foreground" />
               </div>
               Pendências

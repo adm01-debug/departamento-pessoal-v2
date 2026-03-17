@@ -110,10 +110,10 @@ export default function PontoPage() {
   };
 
   const buttons = [
-    { tipo: 'entrada' as const, label: 'Entrada', icon: LogIn, gradient: 'from-success to-finance' },
-    { tipo: 'saida_almoco' as const, label: 'Saída Almoço', icon: Coffee, gradient: 'from-warning to-coins' },
-    { tipo: 'retorno_almoco' as const, label: 'Retorno Almoço', icon: Coffee, gradient: 'from-info to-level' },
-    { tipo: 'saida' as const, label: 'Saída', icon: LogOut, gradient: 'from-destructive to-streak' },
+    { tipo: 'entrada' as const, label: 'Entrada', icon: LogIn, gradient: 'from-primary to-primary-glow' },
+    { tipo: 'saida_almoco' as const, label: 'Saída Almoço', icon: Coffee, gradient: 'from-primary-glow to-primary' },
+    { tipo: 'retorno_almoco' as const, label: 'Retorno Almoço', icon: Coffee, gradient: 'from-primary to-primary-glow' },
+    { tipo: 'saida' as const, label: 'Saída', icon: LogOut, gradient: 'from-destructive to-destructive/70/70' },
   ];
 
   const formatInterval = (val: any) => {
@@ -138,18 +138,18 @@ export default function PontoPage() {
     <PageLayout
       title="Ponto Eletrônico"
       description="Registre e acompanhe sua jornada de trabalho"
-      icon={<Clock className="h-5 w-5 text-white" />}
-      gradient="from-streak to-warning"
+      icon={<Clock className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-primary/60 to-primary/90"
     >
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Clock & Register */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-            <div className="h-[2px] bg-gradient-to-r from-streak to-warning" />
+            <div className="h-[2px] bg-gradient-to-r from-primary/60 to-primary/90" />
             <CardHeader>
               <CardTitle className="flex items-center gap-2.5 font-display">
-                <div className="p-1.5 rounded-lg bg-gradient-to-br from-streak to-warning">
-                  <Clock className="h-4 w-4 text-white" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/60 to-primary/90">
+                  <Clock className="h-4 w-4 text-primary-foreground" />
                 </div>
                 Registrar Ponto
               </CardTitle>
@@ -168,7 +168,7 @@ export default function PontoPage() {
                     onClick={() => registrar(tipo)}
                     disabled={loading !== null}
                     className={cn(
-                      'h-12 rounded-xl bg-gradient-to-r text-white hover:opacity-90 shadow-lg transition-all font-body font-medium',
+                      'h-12 rounded-xl bg-gradient-to-r text-primary-foreground hover:opacity-90 shadow-lg transition-all font-body font-medium',
                       gradient
                     )}
                   >
@@ -195,7 +195,7 @@ export default function PontoPage() {
         {/* Today's Record */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-            <div className="h-[2px] bg-gradient-to-r from-info to-level" />
+            <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
             <CardHeader>
               <CardTitle className="font-display flex items-center gap-2">
                 <Timer className="h-4 w-4 text-info" /> Hoje
@@ -269,7 +269,7 @@ export default function PontoPage() {
         {/* Week Summary */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-            <div className="h-[2px] bg-gradient-to-r from-success to-finance" />
+            <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
             <CardHeader>
               <CardTitle className="font-display flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-success" /> Últimos 7 dias
@@ -322,7 +322,7 @@ export default function PontoPage() {
       {batidasHoje.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
           <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-            <div className="h-[2px] bg-gradient-to-r from-warning to-coins" />
+            <div className="h-[2px] bg-gradient-to-r from-primary-glow to-primary" />
             <CardHeader>
               <CardTitle className="font-display flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-warning" /> Batidas da Equipe Hoje

@@ -12,10 +12,10 @@ export interface TimelineEvent {
 }
 
 const eventConfig: Record<string, { icon: LucideIcon; gradient: string }> = {
-  admissao: { icon: UserPlus, gradient: 'from-success to-finance' },
+  admissao: { icon: UserPlus, gradient: 'from-primary to-primary-glow' },
   demissao: { icon: UserMinus, gradient: 'from-destructive to-streak' },
-  ferias: { icon: Calendar, gradient: 'from-warning to-coins' },
-  folha: { icon: FileText, gradient: 'from-info to-level' },
+  ferias: { icon: Calendar, gradient: 'from-primary-glow to-primary' },
+  folha: { icon: FileText, gradient: 'from-primary to-primary-glow' },
   ponto: { icon: Clock, gradient: 'from-primary to-primary-glow' },
   alerta: { icon: AlertTriangle, gradient: 'from-warning to-destructive' },
 };

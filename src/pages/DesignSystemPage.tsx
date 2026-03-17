@@ -31,10 +31,10 @@ const gamificationColors = [
 
 const moduleGradients = [
   { name: 'Dashboard', gradient: 'from-primary to-primary-glow', icon: Zap },
-  { name: 'Colaboradores', gradient: 'from-info to-level', icon: Users },
-  { name: 'Folha', gradient: 'from-finance to-success', icon: DollarSign },
-  { name: 'Férias', gradient: 'from-warning to-coins', icon: Calendar },
-  { name: 'Ponto', gradient: 'from-streak to-warning', icon: Clock },
+  { name: 'Colaboradores', gradient: 'from-primary to-primary-glow', icon: Users },
+  { name: 'Folha', gradient: 'from-primary-glow to-primary', icon: DollarSign },
+  { name: 'Férias', gradient: 'from-primary-glow to-primary', icon: Calendar },
+  { name: 'Ponto', gradient: 'from-primary/60 to-primary/90', icon: Clock },
   { name: 'Benefícios', gradient: 'from-xp to-store', icon: Gift },
 ];
 

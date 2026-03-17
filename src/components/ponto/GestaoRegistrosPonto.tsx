@@ -59,7 +59,7 @@ export function GestaoRegistrosPonto() {
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-6">
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-        <div className="h-[2px] bg-gradient-to-r from-info to-level" />
+        <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <CardTitle className="font-display flex items-center gap-2">
