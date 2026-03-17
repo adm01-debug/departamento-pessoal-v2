@@ -33,14 +33,26 @@ function useMorningBriefing() {
       const hoje = new Date();
       const hojeStr = format(hoje, 'yyyy-MM-dd');
       const mesAtual = hoje.getMonth() + 1;
-      const diaAtual = hoje.getDate();
+      const em7Dias = format(new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
 
-      // Aniversariantes do mês
-      const { data: colabs } = await supabase
-        .from('colaboradores')
-        .select('nome_completo, data_nascimento')
-        .eq('status', 'ativo')
-        .not('data_nascimento', 'is', null);
+      // Fire ALL queries in parallel
+      const [
+        { data: colabs },
+        { data: feriasData },
+        { data: afastData },
+        { data: admData },
+        { data: asoData },
+        { count: totalAtivos },
+        { count: pontosHoje },
+      ] = await Promise.all([
+        supabase.from('colaboradores').select('nome_completo, data_nascimento').eq('status', 'ativo').not('data_nascimento', 'is', null),
+        supabase.from('ferias').select('data_inicio, data_fim, colaboradores!fk_ferias_colaborador(nome_completo)').in('status', ['aprovada', 'em_andamento']).lte('data_inicio', hojeStr).gte('data_fim', hojeStr),
+        supabase.from('afastamentos').select('tipo, colaboradores!afastamentos_colaborador_id_fkey(nome_completo)').eq('status', 'ativo').lte('data_inicio', hojeStr).gte('data_fim_prevista', hojeStr),
+        supabase.from('admissoes').select('nome, cargo').eq('data_prevista', hojeStr),
+        supabase.from('asos').select('data_validade, tipo, colaboradores!asos_colaborador_id_fkey(nome_completo)').gte('data_validade', hojeStr).lte('data_validade', em7Dias),
+        supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
+        supabase.from('registros_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
+      ]);
 
       const aniversariantes = (colabs || [])
         .filter(c => {
@@ -48,81 +60,20 @@ function useMorningBriefing() {
           const d = parseISO(c.data_nascimento);
           return d.getMonth() + 1 === mesAtual;
         })
-        .map(c => ({
-          nome: c.nome_completo,
-          dia: parseISO(c.data_nascimento!).getDate(),
-        }))
+        .map(c => ({ nome: c.nome_completo, dia: parseISO(c.data_nascimento!).getDate() }))
         .sort((a, b) => a.dia - b.dia);
 
-      // Férias ativas hoje
-      const { data: feriasData } = await supabase
-        .from('ferias')
-        .select('data_inicio, data_fim, colaboradores!fk_ferias_colaborador(nome_completo)')
-        .in('status', ['aprovada', 'em_andamento'])
-        .lte('data_inicio', hojeStr)
-        .gte('data_fim', hojeStr);
-
-      const feriasPeriodo = (feriasData || []).map((f: any) => ({
-        nome: f.colaboradores?.nome_completo || 'Colaborador',
-        inicio: f.data_inicio,
-        fim: f.data_fim,
-      }));
-
-      // Afastados hoje
-      const { data: afastData } = await supabase
-        .from('afastamentos')
-        .select('tipo, colaboradores!afastamentos_colaborador_id_fkey(nome_completo)')
-        .eq('status', 'ativo')
-        .lte('data_inicio', hojeStr)
-        .gte('data_fim_prevista', hojeStr);
-
-      const afastadosHoje = (afastData || []).map((a: any) => ({
-        nome: a.colaboradores?.nome_completo || 'Colaborador',
-        tipo: a.tipo,
-      }));
-
-      // Admissões previstas para hoje
-      const { data: admData } = await supabase
-        .from('admissoes')
-        .select('nome, cargo')
-        .eq('data_prevista', hojeStr);
-
-      const admissoesHoje = (admData || []).map(a => ({
-        nome: a.nome,
-        cargo: a.cargo,
-      }));
-
-      // ASOs vencendo hoje ou nos próximos 7 dias
-      const em7Dias = format(new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
-      const { data: asoData } = await supabase
-        .from('asos')
-        .select('data_validade, tipo, colaboradores!asos_colaborador_id_fkey(nome_completo)')
-        .gte('data_validade', hojeStr)
-        .lte('data_validade', em7Dias);
-
+      const feriasPeriodo = (feriasData || []).map((f: any) => ({ nome: f.colaboradores?.nome_completo || 'Colaborador', inicio: f.data_inicio, fim: f.data_fim }));
+      const afastadosHoje = (afastData || []).map((a: any) => ({ nome: a.colaboradores?.nome_completo || 'Colaborador', tipo: a.tipo }));
+      const admissoesHoje = (admData || []).map(a => ({ nome: a.nome, cargo: a.cargo }));
       const vencimentosHoje = (asoData || []).map((a: any) => ({
         descricao: `ASO ${a.tipo} de ${a.colaboradores?.nome_completo || 'Colaborador'} - ${format(parseISO(a.data_validade), 'dd/MM')}`,
         tipo: 'aso',
       }));
 
-      const { count: totalAtivos } = await supabase
-        .from('colaboradores')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'ativo');
-
-      const { count: pontosHoje } = await supabase
-        .from('registros_ponto')
-        .select('*', { count: 'exact', head: true })
-        .eq('data', hojeStr);
-
       return {
-        aniversariantes,
-        feriasPeriodo,
-        afastadosHoje,
-        admissoesHoje,
-        vencimentosHoje,
-        totalAtivos: totalAtivos || 0,
-        pontosRegistradosHoje: pontosHoje || 0,
+        aniversariantes, feriasPeriodo, afastadosHoje, admissoesHoje, vencimentosHoje,
+        totalAtivos: totalAtivos || 0, pontosRegistradosHoje: pontosHoje || 0,
       };
     },
   });
