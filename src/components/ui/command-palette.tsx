@@ -188,7 +188,7 @@ export function CommandPalette() {
         description: `${c.cpf || ''} · ${c.cargo || ''} · ${c.status}`,
         icon: User,
         category: 'pessoa',
-        path: `/colaboradores/${c.id}/editar`,
+        path: `/colaboradores/${c.id}/detalhes`,
         gradient: 'from-primary to-primary-glow',
         avatar: { name: c.nome_completo },
       });
