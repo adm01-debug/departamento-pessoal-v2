@@ -600,10 +600,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <QuickAction label="Novo Colaborador" icon={UserPlus} gradient="from-success to-finance" path="/colaboradores/novo" index={0} />
-              <QuickAction label="Calcular Folha" icon={DollarSign} gradient="from-info to-level" path="/folha/calcular" index={1} />
-              <QuickAction label="Registrar Ponto" icon={Clock} gradient="from-streak to-warning" path="/ponto" index={2} />
-              <QuickAction label="Nova Empresa" icon={Building2} gradient="from-xp to-tasks" path="/empresas/nova" index={3} />
+              <QuickAction label="Novo Colaborador" icon={UserPlus} gradient="from-primary to-primary-glow" path="/colaboradores/novo" index={0} />
+              <QuickAction label="Calcular Folha" icon={DollarSign} gradient="from-primary/80 to-primary" path="/folha/calcular" index={1} />
+              <QuickAction label="Registrar Ponto" icon={Clock} gradient="from-primary/60 to-primary/90" path="/ponto" index={2} />
+              <QuickAction label="Nova Empresa" icon={Building2} gradient="from-primary-glow to-primary" path="/empresas/nova" index={3} />
             </div>
           </CardContent>
         </MotionCard>
