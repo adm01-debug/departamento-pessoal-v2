@@ -17,7 +17,66 @@ import { catalogoCursoService } from '@/services/catalogoCursoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { GraduationCap, Plus, BookOpen, Award, Users, Trash2 } from 'lucide-react';
+import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link } from 'lucide-react';
+
+// Sub-component for managing courses within a trilha
+function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: any[] }) {
+  const qc = useQueryClient();
+  const [addOpen, setAddOpen] = useState(false);
+  const [selCurso, setSelCurso] = useState('');
+
+  const { data: vinculados = [] } = useQuery({
+    queryKey: ['trilhas_cursos', trilhaId],
+    queryFn: () => catalogoCursoService.listarTrilhasCursos(trilhaId),
+    enabled: !!trilhaId,
+  });
+
+  const vincular = useMutation({
+    mutationFn: () => catalogoCursoService.vincularCursoTrilha({ trilha_id: trilhaId, curso_id: selCurso, ordem: vinculados.length + 1 }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas_cursos', trilhaId] }); setAddOpen(false); setSelCurso(''); toast.success('Curso vinculado!'); },
+    onError: () => toast.error('Erro ao vincular'),
+  });
+
+  const desvincular = useMutation({
+    mutationFn: (id: string) => catalogoCursoService.desvincularCursoTrilha(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas_cursos', trilhaId] }); toast.success('Curso desvinculado'); },
+  });
+
+  const cursosDisponiveis = cursos.filter(c => !vinculados.some((v: any) => v.curso_id === c.id));
+
+  return (
+    <div className="border rounded-lg p-3 bg-muted/20">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-medium flex items-center gap-1"><Link className="h-3 w-3" /> Cursos Vinculados ({vinculados.length})</p>
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogTrigger asChild><Button variant="outline" size="sm"><Plus className="h-3 w-3 mr-1" />Vincular Curso</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Vincular Curso à Trilha</DialogTitle></DialogHeader>
+            <div className="grid gap-3">
+              <div><Label>Curso</Label>
+                <Select value={selCurso} onValueChange={setSelCurso}>
+                  <SelectTrigger><SelectValue placeholder="Selecione um curso" /></SelectTrigger>
+                  <SelectContent>{cursosDisponiveis.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <Button onClick={() => vincular.mutate()} disabled={!selCurso || vincular.isPending}>{vincular.isPending ? 'Vinculando...' : 'Vincular'}</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {vinculados.length === 0 ? <p className="text-xs text-muted-foreground">Nenhum curso vinculado</p> : (
+        <div className="space-y-1">
+          {vinculados.map((v: any, i: number) => (
+            <div key={v.id} className="flex items-center justify-between text-sm bg-card rounded px-2 py-1">
+              <span>{i + 1}. {(v as any).curso?.nome || 'Curso'} {(v as any).curso?.carga_horaria ? `(${(v as any).curso.carga_horaria}h)` : ''}</span>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => desvincular.mutate(v.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TreinamentosPage() {
   const { empresaAtual } = useEmpresas();
@@ -130,7 +189,7 @@ export default function TreinamentosPage() {
 
           {/* TRILHAS */}
           <TabsContent value="trilhas">
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-end mb-4 gap-2">
               <Dialog open={openTrilha} onOpenChange={setOpenTrilha}>
                 <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Nova Trilha</Button></DialogTrigger>
                 <DialogContent>
@@ -149,22 +208,21 @@ export default function TreinamentosPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Nível</TableHead><TableHead>Descrição</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {trilhas.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma trilha cadastrada</TableCell></TableRow> :
-                    trilhas.map((t: any) => (
-                      <TableRow key={t.id}>
-                        <TableCell className="font-medium">{t.nome}</TableCell>
-                        <TableCell>{t.nivel || '—'}</TableCell>
-                        <TableCell className="max-w-xs truncate">{t.descricao || '—'}</TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirTrilha.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
-                      </TableRow>
-                    ))
-                  }
-                </TableBody>
-              </Table>
-            </CardContent></Card>
+            {trilhas.map((t: any) => (
+              <Card key={t.id} className="mb-4">
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-medium">{t.nome}</p>
+                      <p className="text-xs text-muted-foreground">{t.nivel || '—'} • {t.descricao || 'Sem descrição'}</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => excluirTrilha.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
+                  <TrilhaCursosSection trilhaId={t.id} cursos={cursos} />
+                </CardContent>
+              </Card>
+            ))}
+            {trilhas.length === 0 && <Card><CardContent className="text-center text-muted-foreground py-8">Nenhuma trilha cadastrada</CardContent></Card>}
           </TabsContent>
 
           {/* INSCRIÇÕES */}

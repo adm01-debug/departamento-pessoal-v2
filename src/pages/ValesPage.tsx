@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
-import { UtensilsCrossed, Bus, CreditCard } from 'lucide-react';
+import { toast } from 'sonner';
+import { UtensilsCrossed, Bus, CreditCard, Plus, RefreshCw } from 'lucide-react';
 
 export default function ValesPage() {
   const { empresaAtual } = useEmpresas();
+  const qc = useQueryClient();
 
   const { data: va, isLoading: loadVA } = useQuery({
     queryKey: ['vales-alimentacao', empresaAtual?.id],
@@ -34,6 +41,45 @@ export default function ValesPage() {
     },
   });
 
+  // === Recargas ===
+  const [openRec, setOpenRec] = useState(false);
+  const [recForm, setRecForm] = useState({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '' });
+
+  const { data: colaboradores = [] } = useQuery({
+    queryKey: ['colaboradores-vale', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('colaboradores').select('id, nome_completo').eq('status', 'ativo');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id,
+  });
+
+  const { data: recargas = [], isLoading: loadRec } = useQuery({
+    queryKey: ['recargas-vale', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('recargas_vale' as any).select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false }).limit(100);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id,
+  });
+
+  const criarRecarga = useMutation({
+    mutationFn: async (d: typeof recForm) => {
+      const { error } = await supabase.from('recargas_vale' as any).insert({
+        colaborador_id: d.colaborador_id || null,
+        vale_id: d.vale_id || null,
+        valor: Number(d.valor),
+        data_recarga: d.data_recarga || new Date().toISOString().split('T')[0],
+        status: 'processado',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['recargas-vale'] }); setOpenRec(false); setRecForm({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '' }); toast.success('Recarga registrada'); },
+    onError: () => toast.error('Erro ao registrar recarga'),
+  });
+
   const fmt = (v: number | null) => v ? `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-';
 
   return (
@@ -42,6 +88,7 @@ export default function ValesPage() {
         <TabsList>
           <TabsTrigger value="alimentacao"><UtensilsCrossed className="mr-1 h-4 w-4" />VA / VR</TabsTrigger>
           <TabsTrigger value="transporte"><Bus className="mr-1 h-4 w-4" />VT</TabsTrigger>
+          <TabsTrigger value="recargas"><RefreshCw className="mr-1 h-4 w-4" />Recargas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="alimentacao">
@@ -84,6 +131,48 @@ export default function ValesPage() {
                     </TableRow>
                   ))}
                   {!vt?.length && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum VT cadastrado</TableCell></TableRow>}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent></Card>
+        </TabsContent>
+
+        <TabsContent value="recargas">
+          <div className="flex justify-end mb-4">
+            <Dialog open={openRec} onOpenChange={setOpenRec}>
+              <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />Nova Recarga</Button></DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Registrar Recarga</DialogTitle></DialogHeader>
+                <div className="space-y-4">
+                  <div><Label>Colaborador</Label>
+                    <Select value={recForm.colaborador_id} onValueChange={v => setRecForm(p => ({ ...p, colaborador_id: v }))}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><Label>Valor (R$)</Label><Input type="number" value={recForm.valor} onChange={e => setRecForm(p => ({ ...p, valor: e.target.value }))} /></div>
+                    <div><Label>Data Recarga</Label><Input type="date" value={recForm.data_recarga} onChange={e => setRecForm(p => ({ ...p, data_recarga: e.target.value }))} /></div>
+                  </div>
+                  <Button onClick={() => criarRecarga.mutate(recForm)} disabled={!recForm.valor || criarRecarga.isPending} className="w-full">{criarRecarga.isPending ? 'Salvando...' : 'Registrar'}</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <Card><CardContent className="p-0">
+            {loadRec ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+              <Table>
+                <TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Valor</TableHead><TableHead>Data Recarga</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {recargas.map((r: any) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-medium">{(r as any).colaborador?.nome_completo || '-'}</TableCell>
+                      <TableCell>{fmt(r.valor)}</TableCell>
+                      <TableCell>{r.data_recarga ? new Date(r.data_recarga).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                      <TableCell><Badge variant={r.status === 'processado' ? 'default' : 'secondary'}>{r.status || 'pendente'}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                  {recargas.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma recarga registrada</TableCell></TableRow>}
                 </TableBody>
               </Table>
             )}
