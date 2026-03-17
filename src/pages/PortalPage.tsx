@@ -42,26 +42,28 @@ function usePortalCompleto(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 3 * 60 * 1000,
     queryFn: async () => {
-      const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', userId!).maybeSingle();
-
-      const { data: notificacoes } = await supabase.from('notificacoes').select('id, titulo, mensagem, lida, created_at, tipo').eq('user_id', userId!).eq('lida', false).order('created_at', { ascending: false }).limit(8);
-
       const hoje = format(new Date(), 'yyyy-MM-dd');
-      const { data: pontoHoje } = await supabase.from('registros_ponto').select('entrada_1, saida_1, entrada_2, saida_2, horas_trabalhadas, horas_extras, atraso_minutos').eq('data', hoje).limit(1).maybeSingle();
 
-      const { data: feriasPendentes } = await supabase.from('ferias').select('data_inicio, data_fim, status, dias_total').in('status', ['pendente', 'aprovada']).order('data_inicio', { ascending: true }).limit(5);
-
-      // Holerites recentes
-      const { data: holerites } = await supabase.from('folhas_pagamento' as any).select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3);
-
-      // Benefícios ativos
-      const { data: beneficios } = await supabase.from('beneficios').select('nome, tipo, valor, status').eq('status', 'ativo').limit(6);
-
-      // Comunicados recentes
-      const { data: comunicados } = await supabase.from('comunicados' as any).select('id, titulo, tipo, created_at').eq('ativo', true).order('created_at', { ascending: false }).limit(5);
-
-      // Treinamentos pendentes
-      const { data: treinamentos } = await supabase.from('treinamentos' as any).select('id, nome, status, data_inicio').in('status', ['pendente', 'em_andamento']).limit(3);
+      // Fire ALL queries in parallel
+      const [
+        { data: profile },
+        { data: notificacoes },
+        { data: pontoHoje },
+        { data: feriasPendentes },
+        { data: holerites },
+        { data: beneficios },
+        { data: comunicados },
+        { data: treinamentos },
+      ] = await Promise.all([
+        supabase.from('profiles').select('*').eq('user_id', userId!).maybeSingle(),
+        supabase.from('notificacoes').select('id, titulo, mensagem, lida, created_at, tipo').eq('user_id', userId!).eq('lida', false).order('created_at', { ascending: false }).limit(8),
+        supabase.from('registros_ponto').select('entrada_1, saida_1, entrada_2, saida_2, horas_trabalhadas, horas_extras, atraso_minutos').eq('data', hoje).limit(1).maybeSingle(),
+        supabase.from('ferias').select('data_inicio, data_fim, status, dias_total').in('status', ['pendente', 'aprovada']).order('data_inicio', { ascending: true }).limit(5),
+        supabase.from('folhas_pagamento' as any).select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3),
+        supabase.from('beneficios').select('nome, tipo, valor, status').eq('status', 'ativo').limit(6),
+        supabase.from('comunicados' as any).select('id, titulo, tipo, created_at').eq('ativo', true).order('created_at', { ascending: false }).limit(5),
+        supabase.from('treinamentos' as any).select('id, nome, status, data_inicio').in('status', ['pendente', 'em_andamento']).limit(3),
+      ]);
 
       return {
         profile, notificacoes: notificacoes || [], pontoHoje,

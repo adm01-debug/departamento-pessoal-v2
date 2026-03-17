@@ -53,62 +53,40 @@ function useDashboardStats(enabled: boolean) {
     queryKey: ["dashboard-stats"],
     enabled,
     queryFn: async () => {
-      const { count: colaboradoresAtivos } = await supabase
-        .from("colaboradores")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "ativo");
-
       const mesAtual = new Date().toISOString().slice(0, 7);
-      const { data: folhaData } = await supabase
-        .from("folhas_pagamento")
-        .select("total_liquido")
-        .eq("competencia", mesAtual);
-
-      const folhaMensal = folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
-
       const hoje = new Date();
       const em30Dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
-      const { count: feriasPendentes } = await supabase
-        .from("ferias")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "aprovado")
-        .gte("data_inicio", hoje.toISOString())
-        .lte("data_inicio", em30Dias.toISOString());
+      const inicioMes = `${mesAtual}-01`;
 
-      const { data: bancoData } = await supabase
-        .from("banco_horas")
-        .select("horas, tipo");
+      // Run ALL queries in parallel for maximum speed
+      const [
+        { count: colaboradoresAtivos },
+        { data: folhaData },
+        { count: feriasPendentes },
+        { data: bancoData },
+        { count: admissoesMes },
+        { count: demissoesMes },
+        { data: deptData },
+      ] = await Promise.all([
+        supabase.from("colaboradores").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+        supabase.from("folhas_pagamento").select("total_liquido").eq("competencia", mesAtual),
+        supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "aprovado").gte("data_inicio", hoje.toISOString()).lte("data_inicio", em30Dias.toISOString()),
+        supabase.from("banco_horas").select("horas, tipo"),
+        supabase.from("admissoes").select("*", { count: "exact", head: true }).gte("data_prevista", inicioMes),
+        supabase.from("desligamentos").select("*", { count: "exact", head: true }).gte("data_desligamento", inicioMes),
+        supabase.from("colaboradores").select("departamento").eq("status", "ativo"),
+      ]);
 
+      const folhaMensal = folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
       const bancoHoras = bancoData?.reduce((acc, b) => {
         const [h, m] = (b.horas || "00:00").split(":").map(Number);
         const mins = h * 60 + (m || 0);
         return acc + (b.tipo === "credito" ? mins : -mins);
       }, 0) || 0;
 
-      const inicioMes = `${mesAtual}-01`;
-      const { count: admissoesMes } = await supabase
-        .from("admissoes")
-        .select("*", { count: "exact", head: true })
-        .gte("data_prevista", inicioMes);
-
-      const { count: demissoesMes } = await supabase
-        .from("desligamentos")
-        .select("*", { count: "exact", head: true })
-        .gte("data_desligamento", inicioMes);
-
-      const { data: deptData } = await supabase
-        .from("colaboradores")
-        .select("departamento")
-        .eq("status", "ativo");
-
       const deptMap: Record<string, number> = {};
-      deptData?.forEach(c => {
-        deptMap[c.departamento] = (deptMap[c.departamento] || 0) + 1;
-      });
-      const departamentos = Object.entries(deptMap)
-        .map(([nome, count]) => ({ nome, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 6);
+      deptData?.forEach(c => { deptMap[c.departamento] = (deptMap[c.departamento] || 0) + 1; });
+      const departamentos = Object.entries(deptMap).map(([nome, count]) => ({ nome, count })).sort((a, b) => b.count - a.count).slice(0, 6);
 
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
@@ -133,28 +111,20 @@ function usePendencias(enabled: boolean) {
     queryKey: ["dashboard-pendencias"],
     enabled,
     queryFn: async () => {
+      // Parallel queries for all pendencias
+      const [
+        { count: feriasPendentes },
+        { count: afastamentosAtivos },
+        { count: admissoesPendentes },
+      ] = await Promise.all([
+        supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "pendente"),
+        supabase.from("afastamentos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+        supabase.from("admissoes").select("*", { count: "exact", head: true }).neq("etapa", "esocial"),
+      ]);
       const pendencias: Pendencia[] = [];
-      const { count: feriasPendentes } = await supabase
-        .from("ferias")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pendente");
-      if (feriasPendentes && feriasPendentes > 0) {
-        pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes de aprovação`, quantidade: feriasPendentes, icone: 'ferias' });
-      }
-      const { count: afastamentosAtivos } = await supabase
-        .from("afastamentos")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "ativo");
-      if (afastamentosAtivos && afastamentosAtivos > 0) {
-        pendencias.push({ tipo: "afastamentos", descricao: `${afastamentosAtivos} afastamentos em andamento`, quantidade: afastamentosAtivos, icone: 'afastamentos' });
-      }
-      const { count: admissoesPendentes } = await supabase
-        .from("admissoes")
-        .select("*", { count: "exact", head: true })
-        .neq("etapa", "esocial");
-      if (admissoesPendentes && admissoesPendentes > 0) {
-        pendencias.push({ tipo: "admissoes", descricao: `${admissoesPendentes} admissões em andamento`, quantidade: admissoesPendentes, icone: 'admissoes' });
-      }
+      if (feriasPendentes && feriasPendentes > 0) pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes de aprovação`, quantidade: feriasPendentes, icone: 'ferias' });
+      if (afastamentosAtivos && afastamentosAtivos > 0) pendencias.push({ tipo: "afastamentos", descricao: `${afastamentosAtivos} afastamentos em andamento`, quantidade: afastamentosAtivos, icone: 'afastamentos' });
+      if (admissoesPendentes && admissoesPendentes > 0) pendencias.push({ tipo: "admissoes", descricao: `${admissoesPendentes} admissões em andamento`, quantidade: admissoesPendentes, icone: 'admissoes' });
       return pendencias;
     },
     staleTime: 5 * 60 * 1000,

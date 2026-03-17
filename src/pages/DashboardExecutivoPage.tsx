@@ -32,67 +32,76 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
     queryFn: async () => {
       const meses = parseInt(periodo);
       const hoje = new Date();
-
-      // Colaboradores ativos
-      const { count: totalAtivos } = await supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo').eq('empresa_id', empresaId!);
-
-      // Admissões e demissões por mês
-      const evolucao = [];
-      for (let i = meses - 1; i >= 0; i--) {
-        const mesRef = subMonths(hoje, i);
-        const inicio = format(startOfMonth(mesRef), 'yyyy-MM-dd');
-        const fim = format(endOfMonth(mesRef), 'yyyy-MM-dd');
-        const label = format(mesRef, 'MMM/yy', { locale: ptBR });
-
-        const { count: admissoes } = await supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data_admissao', inicio).lte('data_admissao', fim);
-        const { count: demissoes } = await supabase.from('desligamentos').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data_desligamento', inicio).lte('data_desligamento', fim);
-
-        evolucao.push({ mes: label, admissoes: admissoes || 0, demissoes: demissoes || 0, saldo: (admissoes || 0) - (demissoes || 0) });
-      }
-
-      // Distribuição por departamento
-      const { data: colabs } = await supabase.from('colaboradores').select('departamento').eq('status', 'ativo').eq('empresa_id', empresaId!);
-      const deptMap: Record<string, number> = {};
-      colabs?.forEach(c => { deptMap[c.departamento] = (deptMap[c.departamento] || 0) + 1; });
-      const departamentos = Object.entries(deptMap).map(([nome, value]) => ({ nome, value })).sort((a, b) => b.value - a.value).slice(0, 8);
-
-      // Folha mensal
       const mesAtual = format(hoje, 'yyyy-MM');
       const mesAnterior = format(subMonths(hoje, 1), 'yyyy-MM');
-      const { data: folhaAtual } = await supabase.from('folhas_pagamento').select('total_liquido').eq('competencia', mesAtual).eq('empresa_id', empresaId!);
-      const { data: folhaAnterior } = await supabase.from('folhas_pagamento').select('total_liquido').eq('competencia', mesAnterior).eq('empresa_id', empresaId!);
+      const inicioMes = format(startOfMonth(hoje), 'yyyy-MM-dd');
+
+      // Build all month ranges upfront
+      const monthRanges = Array.from({ length: meses }, (_, i) => {
+        const mesRef = subMonths(hoje, meses - 1 - i);
+        return {
+          inicio: format(startOfMonth(mesRef), 'yyyy-MM-dd'),
+          fim: format(endOfMonth(mesRef), 'yyyy-MM-dd'),
+          label: format(mesRef, 'MMM/yy', { locale: ptBR }),
+          comp: format(mesRef, 'yyyy-MM'),
+        };
+      });
+
+      // Fire ALL queries in parallel (instead of sequential loops)
+      const [
+        { count: totalAtivos },
+        { data: colabs },
+        { data: folhaAtual },
+        { data: folhaAnterior },
+        { count: feriasPendentes },
+        { count: afastamentosAtivos },
+        { count: diasFalta },
+        ...monthResults
+      ] = await Promise.all([
+        supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo').eq('empresa_id', empresaId!),
+        supabase.from('colaboradores').select('departamento').eq('status', 'ativo').eq('empresa_id', empresaId!),
+        supabase.from('folhas_pagamento').select('total_liquido').eq('competencia', mesAtual).eq('empresa_id', empresaId!),
+        supabase.from('folhas_pagamento').select('total_liquido').eq('competencia', mesAnterior).eq('empresa_id', empresaId!),
+        supabase.from('ferias').select('*', { count: 'exact', head: true }).eq('status', 'pendente').eq('empresa_id', empresaId!),
+        supabase.from('afastamentos').select('*', { count: 'exact', head: true }).in('status', ['ativo', 'prorrogado']).eq('empresa_id', empresaId!),
+        supabase.from('registros_ponto').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data', inicioMes).gt('horas_falta', '00:00:00'),
+        // Per-month queries: admissoes, demissoes, folha (3 per month)
+        ...monthRanges.flatMap(m => [
+          supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data_admissao', m.inicio).lte('data_admissao', m.fim),
+          supabase.from('desligamentos').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data_desligamento', m.inicio).lte('data_desligamento', m.fim),
+          supabase.from('folhas_pagamento').select('total_proventos, total_liquido, total_descontos').eq('competencia', m.comp).eq('empresa_id', empresaId!),
+        ]),
+      ]);
+
+      // Process evolution data from parallel results
+      const evolucao = monthRanges.map((m, i) => {
+        const admissoes = (monthResults[i * 3] as any)?.count || 0;
+        const demissoes = (monthResults[i * 3 + 1] as any)?.count || 0;
+        return { mes: m.label, admissoes, demissoes, saldo: admissoes - demissoes };
+      });
+
+      // Process cost data
+      const custosMensal = monthRanges.map((m, i) => {
+        const fl = (monthResults[i * 3 + 2] as any)?.data || [];
+        return {
+          mes: m.label,
+          bruto: fl.reduce((s: number, f: any) => s + (f.total_proventos || 0), 0),
+          liquido: fl.reduce((s: number, f: any) => s + (f.total_liquido || 0), 0),
+          descontos: fl.reduce((s: number, f: any) => s + (f.total_descontos || 0), 0),
+        };
+      });
+
+      // Department distribution
+      const deptMap: Record<string, number> = {};
+      colabs?.forEach((c: any) => { deptMap[c.departamento] = (deptMap[c.departamento] || 0) + 1; });
+      const departamentos = Object.entries(deptMap).map(([nome, value]) => ({ nome, value })).sort((a, b) => b.value - a.value).slice(0, 8);
+
       const totalFolhaAtual = folhaAtual?.reduce((s, f) => s + (f.total_liquido || 0), 0) || 0;
       const totalFolhaAnterior = folhaAnterior?.reduce((s, f) => s + (f.total_liquido || 0), 0) || 0;
       const variacaoFolha = totalFolhaAnterior > 0 ? ((totalFolhaAtual - totalFolhaAnterior) / totalFolhaAnterior * 100) : 0;
-
-      // Custos por mês
-      const custosMensal = [];
-      for (let i = meses - 1; i >= 0; i--) {
-        const mesRef = subMonths(hoje, i);
-        const comp = format(mesRef, 'yyyy-MM');
-        const label = format(mesRef, 'MMM/yy', { locale: ptBR });
-      const { data: fl } = await supabase.from('folhas_pagamento').select('total_proventos, total_liquido, total_descontos').eq('competencia', comp).eq('empresa_id', empresaId!);
-        const bruto = fl?.reduce((s, f) => s + (f.total_proventos || 0), 0) || 0;
-        const liquido = fl?.reduce((s, f) => s + (f.total_liquido || 0), 0) || 0;
-        const descontos = fl?.reduce((s, f) => s + (f.total_descontos || 0), 0) || 0;
-        custosMensal.push({ mes: label, bruto, liquido, descontos });
-      }
-
-      // Férias pendentes
-      const { count: feriasPendentes } = await supabase.from('ferias').select('*', { count: 'exact', head: true }).eq('status', 'pendente').eq('empresa_id', empresaId!);
-      // Afastamentos ativos
-      const { count: afastamentosAtivos } = await supabase.from('afastamentos').select('*', { count: 'exact', head: true }).in('status', ['ativo', 'prorrogado']).eq('empresa_id', empresaId!);
-
-      // Custo médio por colaborador
       const custoMedio = totalAtivos && totalAtivos > 0 ? totalFolhaAtual / totalAtivos : 0;
-
-      // Turnover
       const demissoesPeriodo = evolucao.reduce((s, e) => s + e.demissoes, 0);
       const turnover = totalAtivos && totalAtivos > 0 ? (demissoesPeriodo / totalAtivos * 100) : 0;
-
-      // Absenteísmo (registros com falta)
-      const inicioMes = format(startOfMonth(hoje), 'yyyy-MM-dd');
-      const { count: diasFalta } = await supabase.from('registros_ponto').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data', inicioMes).gt('horas_falta', '00:00:00');
       const absenteismo = totalAtivos && totalAtivos > 0 ? ((diasFalta || 0) / (totalAtivos * 22) * 100) : 0;
 
       return {
