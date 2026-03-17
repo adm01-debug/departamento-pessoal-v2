@@ -1,12 +1,13 @@
+import { useState, useMemo } from 'react';
 import { useAdmissoes } from '@/hooks/useAdmissoes';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { EmptyList } from '@/components/ui/empty-state';
+import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
-import { UserPlus, Plus } from 'lucide-react';
+import { UserPlus, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -31,29 +32,100 @@ const etapaGradients: Record<string, string> = {
   esocial: 'bg-primary/15 text-primary border-0',
 };
 
+const etapaFilters = ['todos', ...Object.keys(etapaLabels)] as const;
+
 export default function AdmissoesPage() {
   const { admissoes, isLoading } = useAdmissoes();
+  const [search, setSearch] = useState('');
+  const [etapaFilter, setEtapaFilter] = useState('todos');
+
+  const filtered = useMemo(() => {
+    let result = admissoes || [];
+    if (etapaFilter !== 'todos') {
+      result = result.filter((a: any) => a.etapa === etapaFilter);
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((a: any) =>
+        a.nome?.toLowerCase().includes(q) ||
+        a.cargo?.toLowerCase().includes(q) ||
+        a.departamento?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [admissoes, search, etapaFilter]);
+
+  // Count per etapa for filter badges
+  const etapaCounts = useMemo(() => {
+    const counts: Record<string, number> = { todos: admissoes?.length || 0 };
+    admissoes?.forEach((a: any) => {
+      counts[a.etapa] = (counts[a.etapa] || 0) + 1;
+    });
+    return counts;
+  }, [admissoes]);
 
   return (
     <PageLayout
       title="Admissões"
       description="Gerencie o processo de admissão de colaboradores"
       icon={<UserPlus className="h-5 w-5 text-primary-foreground" />}
-      gradient="from-success to-info"
-      actions={
-        <NovaAdmissaoDialog />
-      }
+      gradient="from-primary to-primary-glow"
+      actions={<NovaAdmissaoDialog />}
     >
+      {/* Search + Filters */}
+      <div className="space-y-3">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome, cargo ou departamento..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9 rounded-xl border-border/30 bg-card"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {etapaFilters.map(etapa => {
+            const count = etapaCounts[etapa] || 0;
+            const isActive = etapaFilter === etapa;
+            return (
+              <button
+                key={etapa}
+                onClick={() => setEtapaFilter(etapa)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-caption font-body font-medium transition-all',
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-glow-sm'
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                {etapa === 'todos' ? 'Todos' : etapaLabels[etapa] || etapa}
+                {count > 0 && (
+                  <span className={cn(
+                    'min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold',
+                    isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted-foreground/15 text-muted-foreground'
+                  )}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content */}
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
       ) : admissoes.length === 0 ? (
         <EmptyList entityName="admissão" />
+      ) : filtered.length === 0 ? (
+        <EmptySearch search={search} onClear={() => { setSearch(''); setEtapaFilter('todos'); }} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {admissoes.map((admissao: any, i: number) => (
+          {filtered.map((admissao: any, i: number) => (
             <motion.div key={admissao.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
               <Card className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 rounded-2xl overflow-hidden">
-                <div className="h-[2px] bg-gradient-to-r from-success to-info opacity-60 group-hover:opacity-100 transition-opacity" />
+                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow opacity-60 group-hover:opacity-100 transition-opacity" />
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-display">{admissao.nome}</CardTitle>
