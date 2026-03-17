@@ -8381,6 +8381,7 @@ export type Database = {
           aprovado: boolean | null
           aprovado_em: string | null
           aprovado_por: string | null
+          atraso_minutos: number | null
           colaborador_id: string
           created_at: string
           created_by: string | null
@@ -8389,22 +8390,28 @@ export type Database = {
           entrada_1: string | null
           entrada_2: string | null
           entrada_3: string | null
+          entrada_esperada: string | null
           horas_extras: string | null
           horas_falta: string | null
           horas_trabalhadas: string | null
           id: string
           justificativa: string | null
           observacoes: string | null
+          retorno_intervalo: string | null
           saida_1: string | null
           saida_2: string | null
           saida_3: string | null
+          saida_esperada: string | null
+          saida_intervalo: string | null
           tipo_dia: string | null
+          total_batidas: number | null
           updated_at: string
         }
         Insert: {
           aprovado?: boolean | null
           aprovado_em?: string | null
           aprovado_por?: string | null
+          atraso_minutos?: number | null
           colaborador_id: string
           created_at?: string
           created_by?: string | null
@@ -8413,22 +8420,28 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
+          entrada_esperada?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
           id?: string
           justificativa?: string | null
           observacoes?: string | null
+          retorno_intervalo?: string | null
           saida_1?: string | null
           saida_2?: string | null
           saida_3?: string | null
+          saida_esperada?: string | null
+          saida_intervalo?: string | null
           tipo_dia?: string | null
+          total_batidas?: number | null
           updated_at?: string
         }
         Update: {
           aprovado?: boolean | null
           aprovado_em?: string | null
           aprovado_por?: string | null
+          atraso_minutos?: number | null
           colaborador_id?: string
           created_at?: string
           created_by?: string | null
@@ -8437,16 +8450,21 @@ export type Database = {
           entrada_1?: string | null
           entrada_2?: string | null
           entrada_3?: string | null
+          entrada_esperada?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
           id?: string
           justificativa?: string | null
           observacoes?: string | null
+          retorno_intervalo?: string | null
           saida_1?: string | null
           saida_2?: string | null
           saida_3?: string | null
+          saida_esperada?: string | null
+          saida_intervalo?: string | null
           tipo_dia?: string | null
+          total_batidas?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -10579,6 +10597,45 @@ export type Database = {
           },
         ]
       }
+      vw_alertas_compensacao: {
+        Row: {
+          colaborador_id: string | null
+          empresa_id: string | null
+          nivel_alerta: string | null
+          nome_completo: string | null
+          saldo_minutos: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banco_horas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vw_alertas_rh: {
         Row: {
           colaborador_id: string | null
@@ -10647,6 +10704,48 @@ export type Database = {
           ordem: number | null
           origem: string | null
           tipo: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_batidas_resumo: {
+        Row: {
+          batidas: Json | null
+          colaborador_id: string | null
+          data: string | null
+          empresa_id: string | null
+          nome_completo: string | null
+          primeira_entrada: string | null
+          total_batidas: number | null
+          ultima_saida: string | null
         }
         Relationships: [
           {
@@ -10979,6 +11078,48 @@ export type Database = {
           taxa_turnover: number | null
         }
         Relationships: []
+      }
+      vw_saldo_compensacao_mensal: {
+        Row: {
+          colaborador_id: string | null
+          competencia: string | null
+          dias_trabalhados: number | null
+          empresa_id: string | null
+          minutos_extras: number | null
+          minutos_falta: number | null
+          nome_completo: string | null
+          total_atrasos_minutos: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
