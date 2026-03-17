@@ -13,14 +13,74 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
+import { beneficiariosSeguroService, segurosColaboradoresService } from '@/services/tabelasComplementaresService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, ShieldCheck, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, ShieldCheck, Trash2, AlertTriangle, Users, UserPlus } from 'lucide-react';
+
+// ========== Beneficiários de um Seguro ==========
+function BeneficiariosSeguroSection({ seguroId }: { seguroId: string }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ nome: '', cpf: '', parentesco: '', percentual: '' });
+
+  const { data: beneficiarios = [], isLoading } = useQuery({
+    queryKey: ['beneficiarios-seguro', seguroId],
+    queryFn: () => beneficiariosSeguroService.listar(seguroId),
+    enabled: !!seguroId,
+  });
+
+  const criar = useMutation({
+    mutationFn: () => beneficiariosSeguroService.criar({
+      seguro_vida_id: seguroId, nome: form.nome, cpf: form.cpf || null,
+      parentesco: form.parentesco || null, percentual: form.percentual ? Number(form.percentual) : null, status: 'ativo',
+    }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['beneficiarios-seguro', seguroId] }); setOpen(false); setForm({ nome: '', cpf: '', parentesco: '', percentual: '' }); toast.success('Beneficiário incluído!'); },
+    onError: () => toast.error('Erro ao incluir'),
+  });
+
+  const ativos = beneficiarios.filter((b: any) => b.status !== 'inativo');
+
+  return (
+    <div className="border rounded-lg p-3 bg-muted/20 space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium flex items-center gap-1"><Users className="h-3 w-3" /> Beneficiários ({ativos.length})</p>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild><Button size="sm" variant="outline"><Plus className="h-3 w-3 mr-1" /> Beneficiário</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Incluir Beneficiário do Seguro</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              <div><Label>Nome *</Label><Input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} /></div>
+              <div><Label>CPF</Label><Input value={form.cpf} onChange={e => setForm(p => ({ ...p, cpf: e.target.value }))} /></div>
+              <div><Label>Parentesco</Label><Input value={form.parentesco} onChange={e => setForm(p => ({ ...p, parentesco: e.target.value }))} /></div>
+              <div><Label>% do Capital</Label><Input type="number" value={form.percentual} onChange={e => setForm(p => ({ ...p, percentual: e.target.value }))} /></div>
+              <Button onClick={() => criar.mutate()} disabled={!form.nome}>Incluir</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {isLoading ? <Spinner size="sm" /> : ativos.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Nenhum beneficiário</p>
+      ) : (
+        <div className="space-y-1">
+          {ativos.map((b: any) => (
+            <div key={b.id} className="flex items-center gap-2 text-sm p-1.5 rounded bg-background">
+              <span className="flex-1">{b.nome} {b.cpf ? `(${b.cpf})` : ''}</span>
+              <Badge variant="outline" className="text-xs">{b.parentesco || '—'}</Badge>
+              {b.percentual && <span className="text-xs text-muted-foreground">{b.percentual}%</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function SegurosVidaPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [tab, setTab] = useState('seguros');
+  const [expandedSeguro, setExpandedSeguro] = useState<string | null>(null);
 
   // === Seguros ===
   const [open, setOpen] = useState(false);
@@ -74,39 +134,55 @@ export default function SegurosVidaPage() {
   const { data: sinistros = [], isLoading: loadSin } = useQuery({
     queryKey: ['sinistros-seguro', empresaAtual?.id],
     queryFn: async () => {
-      const { data: error_data, error } = await supabase.from('sinistros_seguro' as any).select('*, colaborador:colaboradores(nome_completo), seguro:seguros_vida(seguradora)').order('created_at', { ascending: false });
+      const { data: d, error } = await supabase.from('sinistros_seguro' as any).select('*, colaborador:colaboradores(nome_completo), seguro:seguros_vida(seguradora)').order('created_at', { ascending: false });
       if (error) throw error;
-      return error_data || [];
+      return d || [];
     },
     enabled: !!empresaAtual?.id,
   });
 
   const criarSinistro = useMutation({
     mutationFn: async (d: typeof sinForm) => {
-      const { error } = await supabase.from('sinistros_seguro' as any).insert({
-        seguro_vida_id: d.seguro_vida_id || null,
-        colaborador_id: d.colaborador_id || null,
-        tipo: d.tipo || null,
-        data_sinistro: d.data_sinistro || null,
-        descricao: d.descricao || null,
-        status: 'aberto',
-      });
+      const { error } = await supabase.from('sinistros_seguro' as any).insert({ seguro_vida_id: d.seguro_vida_id || null, colaborador_id: d.colaborador_id || null, tipo: d.tipo || null, data_sinistro: d.data_sinistro || null, descricao: d.descricao || null, status: 'aberto' });
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['sinistros-seguro'] }); setOpenSin(false); setSinForm({ seguro_vida_id: '', colaborador_id: '', tipo: '', data_sinistro: '', descricao: '' }); toast.success('Sinistro registrado'); },
     onError: () => toast.error('Erro ao registrar sinistro'),
   });
 
+  // === Colaboradores Vinculados ===
+  const [openVinc, setOpenVinc] = useState(false);
+  const [vincForm, setVincForm] = useState({ seguro_vida_id: '', colaborador_id: '' });
+
+  const { data: vinculados = [], isLoading: loadVinc } = useQuery({
+    queryKey: ['seguros-colaboradores', empresaAtual?.id],
+    queryFn: () => segurosColaboradoresService.listar(),
+    enabled: !!empresaAtual?.id,
+  });
+
+  const vincular = useMutation({
+    mutationFn: () => segurosColaboradoresService.vincular({ seguro_vida_id: vincForm.seguro_vida_id, colaborador_id: vincForm.colaborador_id }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['seguros-colaboradores'] }); setOpenVinc(false); setVincForm({ seguro_vida_id: '', colaborador_id: '' }); toast.success('Colaborador vinculado!'); },
+    onError: () => toast.error('Erro ao vincular'),
+  });
+
+  const desvincular = useMutation({
+    mutationFn: (id: string) => segurosColaboradoresService.desvincular(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['seguros-colaboradores'] }); toast.success('Desvinculado'); },
+  });
+
   const fmt = (v: number | null) => v ? `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-';
 
   return (
-    <PageLayout title="Seguros de Vida" description="Apólices, coberturas e sinistros" icon={<ShieldCheck className="h-5 w-5 text-primary-foreground" />}>
+    <PageLayout title="Seguros de Vida" description="Apólices, coberturas, beneficiários e sinistros" icon={<ShieldCheck className="h-5 w-5 text-primary-foreground" />}>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-4">
           <TabsTrigger value="seguros">Apólices</TabsTrigger>
+          <TabsTrigger value="colaboradores">Colaboradores</TabsTrigger>
           <TabsTrigger value="sinistros">Sinistros</TabsTrigger>
         </TabsList>
 
+        {/* ========= ABA APÓLICES ========= */}
         <TabsContent value="seguros">
           <div className="flex justify-end mb-4">
             <Dialog open={open} onOpenChange={setOpen}>
@@ -132,18 +208,27 @@ export default function SegurosVidaPage() {
           <Card><CardContent className="p-0">
             {isLoading ? <div className="p-8 flex justify-center"><Spinner /></div> : (
               <Table>
-                <TableHeader><TableRow><TableHead>Seguradora</TableHead><TableHead>Apólice</TableHead><TableHead>Capital</TableHead><TableHead>Prêmio</TableHead><TableHead>Vigência</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Seguradora</TableHead><TableHead>Apólice</TableHead><TableHead>Capital</TableHead><TableHead>Prêmio</TableHead><TableHead>Vigência</TableHead><TableHead>Beneficiários</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {data?.map(r => (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-medium">{r.seguradora}</TableCell>
-                      <TableCell>{r.numero_apolice || '-'}</TableCell>
-                      <TableCell>{fmt(r.capital_segurado)}</TableCell>
-                      <TableCell>{fmt(r.premio_mensal)}</TableCell>
-                      <TableCell>{r.data_inicio && r.data_fim ? `${new Date(r.data_inicio).toLocaleDateString('pt-BR')} - ${new Date(r.data_fim).toLocaleDateString('pt-BR')}` : '-'}</TableCell>
-                      <TableCell><Badge variant={r.ativo ? 'default' : 'secondary'}>{r.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>
-                      <TableCell><Button variant="ghost" size="icon" onClick={() => excluir.mutate(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
-                    </TableRow>
+                    <>
+                      <TableRow key={r.id} className="cursor-pointer" onClick={() => setExpandedSeguro(expandedSeguro === r.id ? null : r.id)}>
+                        <TableCell className="font-medium">{r.seguradora}</TableCell>
+                        <TableCell>{r.numero_apolice || '-'}</TableCell>
+                        <TableCell>{fmt(r.capital_segurado)}</TableCell>
+                        <TableCell>{fmt(r.premio_mensal)}</TableCell>
+                        <TableCell>{r.data_inicio && r.data_fim ? `${new Date(r.data_inicio).toLocaleDateString('pt-BR')} - ${new Date(r.data_fim).toLocaleDateString('pt-BR')}` : '-'}</TableCell>
+                        <TableCell><Button variant="ghost" size="sm"><Users className="h-4 w-4 mr-1" /> Ver</Button></TableCell>
+                        <TableCell><Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); excluir.mutate(r.id); }}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      </TableRow>
+                      {expandedSeguro === r.id && (
+                        <TableRow key={`${r.id}-ben`}>
+                          <TableCell colSpan={7} className="p-4">
+                            <BeneficiariosSeguroSection seguroId={r.id} />
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
                   ))}
                   {!data?.length && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum seguro cadastrado</TableCell></TableRow>}
                 </TableBody>
@@ -152,6 +237,51 @@ export default function SegurosVidaPage() {
           </CardContent></Card>
         </TabsContent>
 
+        {/* ========= ABA COLABORADORES ========= */}
+        <TabsContent value="colaboradores">
+          <div className="flex justify-end mb-4">
+            <Dialog open={openVinc} onOpenChange={setOpenVinc}>
+              <DialogTrigger asChild><Button><UserPlus className="mr-2 h-4 w-4" />Vincular Colaborador</Button></DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Vincular ao Seguro</DialogTitle></DialogHeader>
+                <div className="space-y-4">
+                  <div><Label>Seguro</Label>
+                    <Select value={vincForm.seguro_vida_id} onValueChange={v => setVincForm(p => ({ ...p, seguro_vida_id: v }))}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>{data?.map(s => <SelectItem key={s.id} value={s.id}>{s.seguradora} - {s.numero_apolice || 'S/N'}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div><Label>Colaborador</Label>
+                    <Select value={vincForm.colaborador_id} onValueChange={v => setVincForm(p => ({ ...p, colaborador_id: v }))}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={() => vincular.mutate()} disabled={!vincForm.seguro_vida_id || !vincForm.colaborador_id} className="w-full">Vincular</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <Card><CardContent className="p-0">
+            {loadVinc ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+              <Table>
+                <TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Seguro</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {vinculados.map((v: any) => (
+                    <TableRow key={v.id}>
+                      <TableCell className="font-medium">{v.colaborador?.nome_completo || '-'}</TableCell>
+                      <TableCell>{v.seguro_vida_id}</TableCell>
+                      <TableCell><Button variant="ghost" size="icon" onClick={() => desvincular.mutate(v.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                    </TableRow>
+                  ))}
+                  {vinculados.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-8">Nenhum colaborador vinculado</TableCell></TableRow>}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent></Card>
+        </TabsContent>
+
+        {/* ========= ABA SINISTROS ========= */}
         <TabsContent value="sinistros">
           <div className="flex justify-end mb-4">
             <Dialog open={openSin} onOpenChange={setOpenSin}>
@@ -184,7 +314,7 @@ export default function SegurosVidaPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div><Label>Data do Sinistro</Label><Input type="date" value={sinForm.data_sinistro} onChange={e => setSinForm(p => ({ ...p, data_sinistro: e.target.value }))} /></div>
+                    <div><Label>Data</Label><Input type="date" value={sinForm.data_sinistro} onChange={e => setSinForm(p => ({ ...p, data_sinistro: e.target.value }))} /></div>
                   </div>
                   <div><Label>Descrição</Label><Textarea value={sinForm.descricao} onChange={e => setSinForm(p => ({ ...p, descricao: e.target.value }))} /></div>
                   <Button onClick={() => criarSinistro.mutate(sinForm)} disabled={criarSinistro.isPending} className="w-full">{criarSinistro.isPending ? 'Salvando...' : 'Registrar'}</Button>
@@ -199,14 +329,14 @@ export default function SegurosVidaPage() {
                 <TableBody>
                   {sinistros.map((s: any) => (
                     <TableRow key={s.id}>
-                      <TableCell>{(s as any).seguro?.seguradora || '-'}</TableCell>
-                      <TableCell className="font-medium">{(s as any).colaborador?.nome_completo || '-'}</TableCell>
+                      <TableCell>{s.seguro?.seguradora || '-'}</TableCell>
+                      <TableCell className="font-medium">{s.colaborador?.nome_completo || '-'}</TableCell>
                       <TableCell className="capitalize">{s.tipo || '-'}</TableCell>
                       <TableCell>{s.data_sinistro ? new Date(s.data_sinistro).toLocaleDateString('pt-BR') : '-'}</TableCell>
                       <TableCell><Badge variant={s.status === 'aberto' ? 'destructive' : s.status === 'em_analise' ? 'secondary' : 'default'}>{s.status || 'aberto'}</Badge></TableCell>
                     </TableRow>
                   ))}
-                  {sinistros.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum sinistro registrado</TableCell></TableRow>}
+                  {sinistros.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum sinistro</TableCell></TableRow>}
                 </TableBody>
               </Table>
             )}

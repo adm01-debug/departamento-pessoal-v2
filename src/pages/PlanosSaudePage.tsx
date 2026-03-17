@@ -13,15 +13,85 @@ import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
+import { beneficiariosPlanoService } from '@/services/tabelasComplementaresService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, Heart, Shield, Trash2 } from 'lucide-react';
+import { Plus, Heart, Shield, Trash2, Users } from 'lucide-react';
+
+// ========== Beneficiários de um Plano ==========
+function BeneficiariosPlanoSection({ planoId }: { planoId: string }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ nome: '', cpf: '', parentesco: '', tipo: 'dependente' });
+
+  const { data: beneficiarios = [], isLoading } = useQuery({
+    queryKey: ['beneficiarios-plano', planoId],
+    queryFn: () => beneficiariosPlanoService.listar(planoId),
+    enabled: !!planoId,
+  });
+
+  const criar = useMutation({
+    mutationFn: () => beneficiariosPlanoService.criar({ ...form, plano_saude_id: planoId, status: 'ativo', data_inclusao: new Date().toISOString().split('T')[0] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['beneficiarios-plano', planoId] }); setOpen(false); setForm({ nome: '', cpf: '', parentesco: '', tipo: 'dependente' }); toast.success('Beneficiário incluído!'); },
+    onError: () => toast.error('Erro ao incluir beneficiário'),
+  });
+
+  const excluir = useMutation({
+    mutationFn: (id: string) => beneficiariosPlanoService.excluir(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['beneficiarios-plano', planoId] }); toast.success('Beneficiário excluído do plano'); },
+  });
+
+  const ativos = beneficiarios.filter((b: any) => b.status !== 'excluido');
+
+  return (
+    <div className="border rounded-lg p-3 bg-muted/20 space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium flex items-center gap-1"><Users className="h-3 w-3" /> Beneficiários ({ativos.length})</p>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild><Button size="sm" variant="outline"><Plus className="h-3 w-3 mr-1" /> Beneficiário</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Incluir Beneficiário</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              <div><Label>Nome</Label><Input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} /></div>
+              <div><Label>CPF</Label><Input value={form.cpf} onChange={e => setForm(p => ({ ...p, cpf: e.target.value }))} /></div>
+              <div><Label>Parentesco</Label><Input value={form.parentesco} onChange={e => setForm(p => ({ ...p, parentesco: e.target.value }))} placeholder="Ex: Cônjuge, Filho(a)" /></div>
+              <div><Label>Tipo</Label>
+                <Select value={form.tipo} onValueChange={v => setForm(p => ({ ...p, tipo: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="titular">Titular</SelectItem>
+                    <SelectItem value="dependente">Dependente</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={() => criar.mutate()} disabled={!form.nome}>Incluir</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {isLoading ? <Spinner size="sm" /> : ativos.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Nenhum beneficiário</p>
+      ) : (
+        <div className="space-y-1">
+          {ativos.map((b: any) => (
+            <div key={b.id} className="flex items-center gap-2 text-sm p-1.5 rounded bg-background">
+              <span className="flex-1">{b.nome} {b.cpf ? `(${b.cpf})` : ''}</span>
+              <Badge variant="outline" className="text-xs">{b.tipo || b.parentesco || '—'}</Badge>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => excluir.mutate(b.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function PlanosSaudePage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [openPlano, setOpenPlano] = useState(false);
   const [openSeguro, setOpenSeguro] = useState(false);
+  const [expandedPlano, setExpandedPlano] = useState<string | null>(null);
   const [formPlano, setFormPlano] = useState({ nome: '', operadora: '', tipo: 'saude', valor_mensal: '', coparticipacao: '' });
   const [formSeguro, setFormSeguro] = useState({ nome: '', seguradora: '', tipo_cobertura: 'vida', valor_mensal: '', capital_segurado: '' });
 
@@ -107,12 +177,27 @@ export default function PlanosSaudePage() {
               </Dialog>
             </div>
             <Table>
-              <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Operadora</TableHead><TableHead>Tipo</TableHead><TableHead>Valor</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Operadora</TableHead><TableHead>Tipo</TableHead><TableHead>Valor</TableHead><TableHead>Beneficiários</TableHead></TableRow></TableHeader>
               <TableBody>
                 {planos.map((p: any) => (
-                  <TableRow key={p.id}><TableCell className="font-medium">{p.nome}</TableCell><TableCell>{p.operadora || '—'}</TableCell><TableCell><Badge variant="outline">{p.tipo}</Badge></TableCell><TableCell>{p.valor_mensal ? `R$ ${Number(p.valor_mensal).toLocaleString('pt-BR')}` : '—'}</TableCell></TableRow>
+                  <>
+                    <TableRow key={p.id} className="cursor-pointer hover:bg-accent/30" onClick={() => setExpandedPlano(expandedPlano === p.id ? null : p.id)}>
+                      <TableCell className="font-medium">{p.nome}</TableCell>
+                      <TableCell>{p.operadora || '—'}</TableCell>
+                      <TableCell><Badge variant="outline">{p.tipo}</Badge></TableCell>
+                      <TableCell>{p.valor_mensal ? `R$ ${Number(p.valor_mensal).toLocaleString('pt-BR')}` : '—'}</TableCell>
+                      <TableCell><Button variant="ghost" size="sm"><Users className="h-4 w-4 mr-1" /> Ver</Button></TableCell>
+                    </TableRow>
+                    {expandedPlano === p.id && (
+                      <TableRow key={`${p.id}-ben`}>
+                        <TableCell colSpan={5} className="p-4">
+                          <BeneficiariosPlanoSection planoId={p.id} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
                 ))}
-                {planos.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Nenhum plano</TableCell></TableRow>}
+                {planos.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">Nenhum plano</TableCell></TableRow>}
               </TableBody>
             </Table>
           </CardContent></Card>
