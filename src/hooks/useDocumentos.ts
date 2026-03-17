@@ -25,10 +25,10 @@ export function useDocumentos(colaboradorId?: string) {
   });
 
   const criarDocumento = useMutation({
-    mutationFn: async (doc: Record<string, unknown>) => {
+    mutationFn: async (doc: { nome: string; tipo: string; colaborador_id?: string; url?: string; observacoes?: string; data_validade?: string }) => {
       const { data, error } = await supabase
         .from('documentos')
-        .insert({ ...doc, empresa_id: empresaAtualId })
+        .insert({ ...doc, ...(empresaAtualId ? { empresa_id: empresaAtualId } : {}) } as any)
         .select()
         .maybeSingle();
       if (error) throw error;
