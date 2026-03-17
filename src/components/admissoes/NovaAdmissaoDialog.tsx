@@ -122,7 +122,7 @@ export function NovaAdmissaoDialog({ children }: NovaAdmissaoDialogProps) {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-success to-info hover:opacity-90">
+            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground">
               {loading ? 'Salvando...' : 'Criar Admissão'}
             </Button>
           </div>
