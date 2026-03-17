@@ -643,7 +643,7 @@ export default function DashboardPage() {
               <QuickAction label="Novo Colaborador" icon={UserPlus} gradient="from-primary to-primary-glow" path="/colaboradores/novo" index={0} />
               <QuickAction label="Calcular Folha" icon={DollarSign} gradient="from-primary/80 to-primary" path="/folha/calcular" index={1} />
               <QuickAction label="Registrar Ponto" icon={Clock} gradient="from-primary/60 to-primary/90" path="/ponto" index={2} />
-              <QuickAction label="Nova Empresa" icon={Building2} gradient="from-primary-glow to-primary" path="/empresas/nova" index={3} />
+              <QuickAction label="Assistente IA" icon={Bot} gradient="from-primary-glow to-primary" path="/assistente-ia" index={3} />
             </div>
           </CardContent>
         </MotionCard>
