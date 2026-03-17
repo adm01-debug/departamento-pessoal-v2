@@ -78,6 +78,9 @@ const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
 const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
 const AssistenteIAPage = lazy(() => import('@/pages/AssistenteIAPage'));
 const GeradorDocumentosPage = lazy(() => import('@/pages/GeradorDocumentosPage'));
+const SSTPage = lazy(() => import('@/pages/SSTPage'));
+const CalculadoraRescisaoPage = lazy(() => import('@/pages/CalculadoraRescisaoPage'));
+const ImportacaoPage = lazy(() => import('@/pages/ImportacaoPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -166,6 +169,9 @@ export default function App() {
         <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
         <Route path="assistente-ia" element={<LazyPage Component={AssistenteIAPage} />} />
         <Route path="gerador-documentos" element={<LazyPage Component={GeradorDocumentosPage} />} />
+        <Route path="sst" element={<LazyPage Component={SSTPage} />} />
+        <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
+        <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

@@ -110,6 +110,9 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: BarChart3, label: 'Relatórios', path: '/relatorios', color: 'text-info' },
       { icon: GitBranch, label: 'Workflows', path: '/workflows', color: 'text-info' },
+      { icon: Shield, label: 'SST', path: '/sst', color: 'text-success' },
+      { icon: Calculator, label: 'Rescisão', path: '/calculadora-rescisao', color: 'text-warning' },
+      { icon: Users, label: 'Importação', path: '/importacao', color: 'text-info' },
       { icon: Megaphone, label: 'Comunicação', path: '/comunicacao', color: 'text-warning' },
       { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
       { icon: Settings, label: 'Configurações', path: '/configuracoes', color: 'text-muted-foreground' },
