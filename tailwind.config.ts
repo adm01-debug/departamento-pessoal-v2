@@ -168,16 +168,16 @@ export default {
 
       // === BOX SHADOW (COMPLETO) ===
       boxShadow: {
-        // Base
-        glow: "0 0 20px hsl(var(--primary) / 0.3)",
-        "glow-sm": "0 0 10px hsl(var(--primary) / 0.2)",
-        "glow-lg": "0 0 40px hsl(var(--primary) / 0.4)",
+        // Base — lime glow
+        glow: "0 0 20px hsl(68 100% 48% / 0.3)",
+        "glow-sm": "0 0 10px hsl(68 100% 48% / 0.2)",
+        "glow-lg": "0 0 40px hsl(68 100% 48% / 0.4)",
         elegant: "0 10px 40px -10px hsl(0 0% 0% / 0.5)",
         // Semantic
-        elevated: "0 4px 24px -4px hsl(0 0% 0% / 0.12), 0 1px 4px -1px hsl(0 0% 0% / 0.08)",
-        glass: "0 8px 32px 0 hsl(0 0% 0% / 0.06)",
+        elevated: "0 4px 24px -4px hsl(0 0% 0% / 0.15), 0 1px 4px -1px hsl(0 0% 0% / 0.1)",
+        glass: "0 8px 32px 0 hsl(0 0% 0% / 0.08)",
         card: "0 1px 3px 0 hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1)",
-        float: "0 20px 60px -15px hsl(0 0% 0% / 0.2)",
+        float: "0 20px 60px -15px hsl(0 0% 0% / 0.25)",
         // Gamification glows
         "glow-xp": "0 0 16px hsl(var(--xp) / 0.4)",
         "glow-coins": "0 0 16px hsl(var(--coins) / 0.4)",
@@ -185,6 +185,7 @@ export default {
         "glow-success": "0 0 16px hsl(var(--success) / 0.4)",
         "glow-info": "0 0 16px hsl(var(--info) / 0.4)",
         "glow-warning": "0 0 16px hsl(var(--warning) / 0.4)",
+        "glow-lime": "0 0 24px hsl(68 100% 48% / 0.35)",
       },
 
       // === TRANSITION DURATION ===
