@@ -78,6 +78,9 @@ const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
 const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
 const AssistenteIAPage = lazy(() => import('@/pages/AssistenteIAPage'));
 const GeradorDocumentosPage = lazy(() => import('@/pages/GeradorDocumentosPage'));
+const SSTPage = lazy(() => import('@/pages/SSTPage'));
+const CalculadoraRescisaoPage = lazy(() => import('@/pages/CalculadoraRescisaoPage'));
+const ImportacaoPage = lazy(() => import('@/pages/ImportacaoPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
