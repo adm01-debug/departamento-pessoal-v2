@@ -258,7 +258,7 @@ export function useNotificacoes() {
         .from('ferias')
         .select(`
           *,
-          colaboradores:colaborador_id (id, nome_completo)
+          colaboradores:colaboradores!fk_ferias_colaborador (id, nome_completo)
         `)
         .eq('status', 'aprovada');
 
