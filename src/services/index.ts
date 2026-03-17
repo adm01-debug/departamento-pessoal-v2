@@ -135,11 +135,45 @@ export const feriasService = {
   },
   listar: async (empresaId?: string) => feriasService.listSolicitacoes(empresaId),
   async aprovar(id: string) {
-    const { error } = await supabase.from('ferias').update({ status: 'aprovada' }).eq('id', id);
+    const { error } = await supabase.from('ferias').update({ status: 'aprovada' } as any).eq('id', id);
+    if (error) throw error;
+  },
+  async aprovarGestor(id: string, userId?: string) {
+    const { error } = await supabase.from('ferias').update({
+      aprovado_gestor: true,
+      aprovado_gestor_em: new Date().toISOString(),
+      aprovado_gestor_por: userId || null,
+    } as any).eq('id', id);
+    if (error) throw error;
+  },
+  async aprovarRH(id: string, userId?: string) {
+    const { error } = await supabase.from('ferias').update({
+      aprovado_rh: true,
+      aprovado_rh_em: new Date().toISOString(),
+      aprovado_rh_por: userId || null,
+      status: 'aprovada',
+    } as any).eq('id', id);
+    if (error) throw error;
+  },
+  async enviarContabilidade(id: string, userId?: string) {
+    const { error } = await supabase.from('ferias').update({
+      enviado_contabilidade: true,
+      enviado_contabilidade_em: new Date().toISOString(),
+      enviado_contabilidade_por: userId || null,
+    } as any).eq('id', id);
     if (error) throw error;
   },
   async rejeitar(id: string) {
-    const { error } = await supabase.from('ferias').update({ status: 'rejeitada' }).eq('id', id);
+    const { error } = await supabase.from('ferias').update({ status: 'rejeitada' } as any).eq('id', id);
+    if (error) throw error;
+  },
+  async cancelar(id: string, userId?: string) {
+    const { error } = await supabase.from('ferias').update({
+      cancelado: true,
+      cancelado_em: new Date().toISOString(),
+      cancelado_por: userId || null,
+      status: 'cancelada',
+    } as any).eq('id', id);
     if (error) throw error;
   },
 };
