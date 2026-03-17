@@ -21,4 +21,21 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     force: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-tabs', '@radix-ui/react-tooltip', '@radix-ui/react-dropdown-menu'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-charts': ['recharts'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
+          'vendor-xlsx': ['xlsx'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+        },
+      },
+    },
+  },
 }));
