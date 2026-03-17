@@ -66,6 +66,15 @@ const MovimentacoesPage = lazy(() => import('@/pages/MovimentacoesPage'));
 const SindicatosPage = lazy(() => import('@/pages/SindicatosPage'));
 const ObrigacoesFiscaisPage = lazy(() => import('@/pages/ObrigacoesFiscaisPage'));
 const PlanosSaudePage = lazy(() => import('@/pages/PlanosSaudePage'));
+const CanalEticaPage = lazy(() => import('@/pages/CanalEticaPage'));
+const ConveniosPage = lazy(() => import('@/pages/ConveniosPage'));
+const EscalasPage = lazy(() => import('@/pages/EscalasPage'));
+const SegurosVidaPage = lazy(() => import('@/pages/SegurosVidaPage'));
+const PensoesPage = lazy(() => import('@/pages/PensoesPage'));
+const ValesPage = lazy(() => import('@/pages/ValesPage'));
+const ExamesPage = lazy(() => import('@/pages/ExamesPage'));
+const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
+const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
