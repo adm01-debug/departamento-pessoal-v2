@@ -460,6 +460,64 @@ function OnboardingWizard() {
   );
 }
 
+/* ─── Alertas RH Widget (vw_alertas_rh) ─── */
+function AlertasRHWidget() {
+  const { data: alertas = [], isLoading } = useQuery({
+    queryKey: ['vw-alertas-rh'],
+    queryFn: () => viewsService.alertasRH(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) return <CardSkeleton className="h-32 border-0 p-0" />;
+  if (!alertas.length) return (
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <div className="p-3 rounded-2xl bg-muted/50 mb-3"><Activity className="h-6 w-6 text-muted-foreground" /></div>
+      <p className="text-caption text-muted-foreground font-body">Nenhum alerta de RH</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2 max-h-48 overflow-y-auto">
+      {alertas.slice(0, 5).map((a: any, i: number) => (
+        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm">
+          <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
+          <span className="flex-1 truncate text-body font-body">{a.descricao || a.tipo || 'Alerta'}</span>
+          {a.prioridade && <Badge variant="outline" className="text-[10px]">{a.prioridade}</Badge>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Cadastro Incompleto Widget (vw_cadastro_incompleto) ─── */
+function CadastroIncompletoWidget() {
+  const { data: incompletos = [], isLoading } = useQuery({
+    queryKey: ['vw-cadastro-incompleto'],
+    queryFn: () => viewsService.cadastroIncompleto(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) return <CardSkeleton className="h-32 border-0 p-0" />;
+  if (!incompletos.length) return (
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <div className="p-3 rounded-2xl bg-gradient-to-br from-success/20 to-finance/10 mb-3"><CheckCircle2 className="h-6 w-6 text-success" /></div>
+      <p className="text-caption text-muted-foreground font-body">Todos os cadastros estão completos</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2 max-h-48 overflow-y-auto">
+      {incompletos.slice(0, 5).map((c: any, i: number) => (
+        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm">
+          <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
+          <span className="flex-1 truncate font-body">{c.nome_completo || 'Colaborador'}</span>
+          <span className="text-[10px] text-muted-foreground">{c.campos_faltantes || ''}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ─── Main Dashboard ─── */
 export default function DashboardPage() {
   const { user } = useAuth();
