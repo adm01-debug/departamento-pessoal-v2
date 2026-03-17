@@ -8,7 +8,7 @@ const mobileItems = [
   { path: '/colaboradores', label: 'Equipe', icon: Users, color: 'from-primary to-primary-glow' },
   { path: '/folha', label: 'Folha', icon: FileText, color: 'from-primary-glow to-primary' },
   { path: '/ferias', label: 'Férias', icon: Calendar, color: 'from-primary-glow to-primary' },
-  { path: '/more', label: 'Mais', icon: MoreHorizontal, color: 'from-muted-foreground to-foreground' },
+  { path: '/configuracoes', label: 'Mais', icon: MoreHorizontal, color: 'from-muted-foreground to-foreground' },
 ];
 
 export function MobileBottomNav() {
