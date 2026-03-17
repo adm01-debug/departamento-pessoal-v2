@@ -51,7 +51,7 @@ const routeOrder = [
   // Sistema
   '/usuarios', '/integracoes', '/backup', '/configuracoes',
   '/controle-acesso', '/lgpd', '/workflows', '/despesas',
-  '/locais-trabalho', '/portal', '/perfil',
+  '/locais-trabalho', '/portal', '/perfil', '/assistente-ia',
   // Dev
   '/design-system',
 ];
