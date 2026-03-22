@@ -4,3 +4,4 @@ export { StatusBadge, TipoBadge } from './DesligamentoStatusBadge';
 export { DesligamentoChecklist } from './DesligamentoChecklist';
 export { DesligamentoDetailSheet } from './DesligamentoDetailSheet';
 export { NovoDesligamentoDialog } from './NovoDesligamentoDialog';
+export { TurnoverChart } from './TurnoverChart';
