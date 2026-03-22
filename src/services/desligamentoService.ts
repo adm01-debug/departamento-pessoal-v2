@@ -23,4 +23,8 @@ export const desligamentoService = {
     if (error) throw error;
     return data;
   },
+  async excluir(id: string) {
+    const { error } = await supabase.from('desligamentos').delete().eq('id', id);
+    if (error) throw error;
+  },
 };
