@@ -1,23 +1,21 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
+import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
+import { TableSkeleton } from '@/components/ui/module-skeleton';
+import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale } from '@/components/medidas-disciplinares';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { medidasDisciplinaresService } from '@/services';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, AlertTriangle, Trash2, Scale, Users, FileText } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Plus, AlertTriangle, Scale, Users } from 'lucide-react';
 
 const tipoLabels: Record<string, string> = {
   advertencia_verbal: 'Advertência Verbal',
@@ -26,12 +24,7 @@ const tipoLabels: Record<string, string> = {
   justa_causa: 'Justa Causa',
 };
 
-const gravidade: Record<string, 'secondary' | 'default' | 'destructive'> = {
-  advertencia_verbal: 'secondary',
-  advertencia_escrita: 'default',
-  suspensao: 'destructive',
-  justa_causa: 'destructive',
-};
+const tipoOptions = Object.entries(tipoLabels).map(([value, label]) => ({ value, label }));
 
 const artigosCLT = [
   { value: 'art_482_a', label: 'Art. 482, a - Ato de improbidade' },
@@ -60,12 +53,15 @@ export default function MedidasDisciplinaresPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [search, setSearch] = useState('');
+  const [tipoFilter, setTipoFilter] = useState('');
 
   const { data: medidas = [], isLoading } = useQuery({
     queryKey: ['medidas-disciplinares', empresaAtual?.id],
     queryFn: () => medidasDisciplinaresService.listar(empresaAtual?.id),
     enabled: !!empresaAtual?.id,
   });
+
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
     queryFn: () => colaboradorService.list(empresaAtual?.id),
@@ -90,7 +86,7 @@ export default function MedidasDisciplinaresPage() {
       qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] });
       setOpen(false);
       setForm(initialForm);
-      toast.success('Medida registrada!');
+      toast.success('Medida registrada com sucesso!');
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -108,173 +104,181 @@ export default function MedidasDisciplinaresPage() {
 
   const excluir = useMutation({
     mutationFn: (id: string) => medidasDisciplinaresService.excluir(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] }); toast.success('Registro excluído!'); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] });
+      toast.success('Registro excluído!');
+    },
   });
 
-  if (isLoading) return <PageLayout title="Medidas Disciplinares"><Spinner /></PageLayout>;
+  const filtered = useMemo(() => medidas.filter((m: any) => {
+    if (tipoFilter && tipoFilter !== 'all' && m.tipo !== tipoFilter) return false;
+    if (search) {
+      const nome = (m.colaborador?.nome_completo || '').toLowerCase();
+      if (!nome.includes(search.toLowerCase())) return false;
+    }
+    return true;
+  }), [medidas, tipoFilter, search]);
+
+  const stats = useMemo(() => ({
+    total: medidas.length,
+    advertenciasVerbais: medidas.filter((m: any) => m.tipo === 'advertencia_verbal').length,
+    advertenciasEscritas: medidas.filter((m: any) => m.tipo === 'advertencia_escrita').length,
+    suspensoes: medidas.filter((m: any) => m.tipo === 'suspensao').length,
+    justaCausa: medidas.filter((m: any) => m.tipo === 'justa_causa').length,
+    pendenteCiencia: medidas.filter((m: any) => !m.colaborador_ciente && !m.recusa_assinatura).length,
+    recusas: medidas.filter((m: any) => m.recusa_assinatura).length,
+    ultimosMeses: medidas.filter((m: any) => {
+      const d = new Date(m.data_ocorrencia);
+      const now = new Date();
+      return d >= new Date(now.getFullYear(), now.getMonth() - 3, 1);
+    }).length,
+  }), [medidas]);
 
   return (
     <PageLayout
       title="Medidas Disciplinares"
-      description="Advertências, suspensões e ações disciplinares com embasamento legal"
+      description="Advertências, suspensões e ações disciplinares com embasamento legal CLT"
       icon={<AlertTriangle className="h-5 w-5 text-primary-foreground" />}
       gradient="from-destructive to-warning"
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {Object.entries(tipoLabels).map(([k, label], i) => (
-          <motion.div key={k} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl">
-              <CardContent className="pt-4 text-center">
-                <p className="text-2xl font-display font-bold">{medidas.filter((m: any) => m.tipo === k).length}</p>
-                <p className="text-sm text-muted-foreground font-body">{label}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+      <MedidasKPIs stats={stats} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2">
+          <MedidasTimeline medidas={medidas} onMarcarCiencia={(id) => marcarCiencia.mutate(id)} />
+        </div>
+        <div>
+          <MedidasGravityScale medidas={medidas} />
+        </div>
       </div>
 
-      <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-        <div className="h-[2px] bg-gradient-to-r from-destructive to-warning" />
-        <CardContent className="pt-6">
-          <div className="flex justify-between mb-4">
-            <h3 className="text-lg font-display font-semibold">Registros</h3>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="rounded-xl"><Plus className="h-4 w-4 mr-1" />Nova Medida</Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-                <DialogHeader><DialogTitle className="font-display">Registrar Medida Disciplinar</DialogTitle></DialogHeader>
-                <div className="space-y-3">
-                  <div>
-                    <Label>Colaborador *</Label>
-                    <Select value={form.colaborador_id} onValueChange={v => setForm(p => ({ ...p, colaborador_id: v }))}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Tipo *</Label>
-                    <Select value={form.tipo} onValueChange={v => setForm(p => ({ ...p, tipo: v }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>{Object.entries(tipoLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div><Label>Data Ocorrência *</Label><Input type="date" value={form.data_ocorrencia} onChange={e => setForm(p => ({ ...p, data_ocorrencia: e.target.value }))} /></div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+        <DataTableToolbar
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Buscar colaborador..."
+          filters={[{ key: 'tipo', label: 'Tipo', options: tipoOptions, value: tipoFilter, onChange: setTipoFilter }]}
+          onClearFilters={() => { setTipoFilter(''); setSearch(''); }}
+        />
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="rounded-xl shrink-0">
+              <Plus className="h-4 w-4 mr-1" />Nova Medida
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-display">Registrar Medida Disciplinar</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label>Colaborador *</Label>
+                <Select value={form.colaborador_id} onValueChange={v => setForm(p => ({ ...p, colaborador_id: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o colaborador" /></SelectTrigger>
+                  <SelectContent>
+                    {colaboradores.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tipo *</Label>
+                <Select value={form.tipo} onValueChange={v => setForm(p => ({ ...p, tipo: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(tipoLabels).map(([k, v]) => (
+                      <SelectItem key={k} value={k}>{v}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Data Ocorrência *</Label>
+                <Input type="date" value={form.data_ocorrencia} onChange={e => setForm(p => ({ ...p, data_ocorrencia: e.target.value }))} />
+              </div>
 
-                  {form.tipo === 'suspensao' && (
-                    <div><Label>Dias de Suspensão</Label><Input type="number" value={form.dias_suspensao} onChange={e => setForm(p => ({ ...p, dias_suspensao: e.target.value }))} /></div>
-                  )}
-
-                  {/* Embasamento Legal */}
-                  <div className="space-y-3 p-3 rounded-xl bg-muted/50 border border-border/30">
-                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                      <Scale className="h-4 w-4" /> Embasamento Legal
-                    </div>
-                    <div>
-                      <Label>Artigo CLT</Label>
-                      <Select value={form.artigo_clt} onValueChange={v => setForm(p => ({ ...p, artigo_clt: v }))}>
-                        <SelectTrigger><SelectValue placeholder="Selecione o artigo" /></SelectTrigger>
-                        <SelectContent>
-                          {artigosCLT.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* Testemunhas */}
-                  <div className="space-y-3 p-3 rounded-xl bg-muted/50 border border-border/30">
-                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                      <Users className="h-4 w-4" /> Testemunhas
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div><Label>Nome Testemunha 1</Label><Input value={form.testemunha_1_nome} onChange={e => setForm(p => ({ ...p, testemunha_1_nome: e.target.value }))} /></div>
-                      <div><Label>CPF Testemunha 1</Label><Input value={form.testemunha_1_cpf} onChange={e => setForm(p => ({ ...p, testemunha_1_cpf: e.target.value }))} placeholder="000.000.000-00" /></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div><Label>Nome Testemunha 2</Label><Input value={form.testemunha_2_nome} onChange={e => setForm(p => ({ ...p, testemunha_2_nome: e.target.value }))} /></div>
-                      <div><Label>CPF Testemunha 2</Label><Input value={form.testemunha_2_cpf} onChange={e => setForm(p => ({ ...p, testemunha_2_cpf: e.target.value }))} placeholder="000.000.000-00" /></div>
-                    </div>
-                  </div>
-
-                  <div><Label>URL Documento Assinado</Label><Input value={form.documento_url} onChange={e => setForm(p => ({ ...p, documento_url: e.target.value }))} placeholder="https://..." /></div>
-
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      checked={form.recusa_assinatura}
-                      onCheckedChange={(c) => setForm(p => ({ ...p, recusa_assinatura: !!c }))}
-                    />
-                    <Label className="cursor-pointer">Colaborador recusou assinar</Label>
-                  </div>
-                  {form.recusa_assinatura && (
-                    <div><Label>Motivo da Recusa</Label><Textarea value={form.motivo_recusa} onChange={e => setForm(p => ({ ...p, motivo_recusa: e.target.value }))} /></div>
-                  )}
-
-                  <div><Label>Descrição *</Label><Textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} /></div>
-                  <Button className="w-full rounded-xl" onClick={() => criar.mutate(form)} disabled={!form.colaborador_id || !form.data_ocorrencia || !form.descricao}>Salvar</Button>
+              {form.tipo === 'suspensao' && (
+                <div>
+                  <Label>Dias de Suspensão (máx. 30 dias — CLT Art. 474)</Label>
+                  <Input type="number" min={1} max={30} value={form.dias_suspensao} onChange={e => setForm(p => ({ ...p, dias_suspensao: e.target.value }))} />
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/30 hover:bg-muted/30">
-                <TableHead className="font-display font-semibold">Nº</TableHead>
-                <TableHead className="font-display font-semibold">Colaborador</TableHead>
-                <TableHead className="font-display font-semibold">Tipo</TableHead>
-                <TableHead className="font-display font-semibold">Data</TableHead>
-                <TableHead className="font-display font-semibold">Artigo CLT</TableHead>
-                <TableHead className="font-display font-semibold">Testemunhas</TableHead>
-                <TableHead className="font-display font-semibold">Ciência</TableHead>
-                <TableHead className="font-display font-semibold">Descrição</TableHead>
-                <TableHead className="font-display font-semibold w-[100px]">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {medidas.map((m: any) => (
-                <TableRow key={m.id} className="hover:bg-accent/30 transition-colors">
-                  <TableCell className="font-body font-mono text-sm">#{m.numero_sequencial || '—'}</TableCell>
-                  <TableCell className="font-body font-medium">{m.colaborador?.nome_completo || '—'}</TableCell>
-                  <TableCell>
-                    <Badge variant={gravidade[m.tipo] || 'secondary'} className="text-xs">
-                      {tipoLabels[m.tipo] || m.tipo}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-body text-sm">{m.data_ocorrencia}</TableCell>
-                  <TableCell className="font-body text-xs">{m.artigo_clt ? artigosCLT.find(a => a.value === m.artigo_clt)?.label || m.artigo_clt : '—'}</TableCell>
-                  <TableCell className="font-body text-xs">
-                    {m.testemunha_1_nome ? (
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3 text-muted-foreground" />
-                        <span>{[m.testemunha_1_nome, m.testemunha_2_nome].filter(Boolean).length}</span>
-                      </div>
-                    ) : '—'}
-                  </TableCell>
-                  <TableCell>
-                    {m.colaborador_ciente ? (
-                      <Badge variant="secondary" className="text-xs gap-1"><FileText className="h-3 w-3" />Ciente</Badge>
-                    ) : m.recusa_assinatura ? (
-                      <Badge variant="destructive" className="text-xs">Recusou</Badge>
-                    ) : (
-                      <Button size="sm" variant="outline" className="h-6 text-xs rounded-lg" onClick={() => marcarCiencia.mutate(m.id)}>
-                        Registrar
-                      </Button>
-                    )}
-                  </TableCell>
-                  <TableCell className="max-w-[150px] truncate font-body text-sm">{m.descricao}</TableCell>
-                  <TableCell>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" onClick={() => excluir.mutate(m.id)}>
-                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {medidas.length === 0 && (
-                <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8 font-body">Nenhuma medida registrada</TableCell></TableRow>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+
+              <div className="space-y-3 p-3 rounded-xl bg-muted/50 border border-border/30">
+                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <Scale className="h-4 w-4" /> Embasamento Legal
+                </div>
+                <div>
+                  <Label>Artigo CLT</Label>
+                  <Select value={form.artigo_clt} onValueChange={v => setForm(p => ({ ...p, artigo_clt: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Selecione o artigo" /></SelectTrigger>
+                    <SelectContent>
+                      {artigosCLT.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-3 p-3 rounded-xl bg-muted/50 border border-border/30">
+                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <Users className="h-4 w-4" /> Testemunhas
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Nome 1</Label><Input value={form.testemunha_1_nome} onChange={e => setForm(p => ({ ...p, testemunha_1_nome: e.target.value }))} /></div>
+                  <div><Label>CPF 1</Label><Input value={form.testemunha_1_cpf} onChange={e => setForm(p => ({ ...p, testemunha_1_cpf: e.target.value }))} placeholder="000.000.000-00" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Nome 2</Label><Input value={form.testemunha_2_nome} onChange={e => setForm(p => ({ ...p, testemunha_2_nome: e.target.value }))} /></div>
+                  <div><Label>CPF 2</Label><Input value={form.testemunha_2_cpf} onChange={e => setForm(p => ({ ...p, testemunha_2_cpf: e.target.value }))} placeholder="000.000.000-00" /></div>
+                </div>
+              </div>
+
+              <div>
+                <Label>URL Documento Assinado</Label>
+                <Input value={form.documento_url} onChange={e => setForm(p => ({ ...p, documento_url: e.target.value }))} placeholder="https://..." />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={form.recusa_assinatura}
+                  onCheckedChange={(c) => setForm(p => ({ ...p, recusa_assinatura: !!c }))}
+                />
+                <Label className="cursor-pointer">Colaborador recusou assinar</Label>
+              </div>
+              {form.recusa_assinatura && (
+                <div>
+                  <Label>Motivo da Recusa *</Label>
+                  <Textarea value={form.motivo_recusa} onChange={e => setForm(p => ({ ...p, motivo_recusa: e.target.value }))} placeholder="Descreva o motivo da recusa para segurança jurídica" />
+                </div>
+              )}
+
+              <div>
+                <Label>Descrição da Ocorrência *</Label>
+                <Textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} placeholder="Descreva detalhadamente a ocorrência..." rows={4} />
+              </div>
+
+              <Button
+                className="w-full rounded-xl"
+                onClick={() => criar.mutate(form)}
+                disabled={!form.colaborador_id || !form.data_ocorrencia || !form.descricao}
+              >
+                Registrar Medida Disciplinar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {isLoading ? (
+        <TableSkeleton rows={6} columns={9} />
+      ) : (
+        <MedidasTable
+          data={filtered}
+          onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
+          onExcluir={(id) => excluir.mutate(id)}
+        />
+      )}
     </PageLayout>
   );
 }
