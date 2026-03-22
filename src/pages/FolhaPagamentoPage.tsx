@@ -61,11 +61,11 @@ function useFolhaResumo(competencia: string) {
       const colaboradores = folhaData?.length || 0;
       const totalProventos = folhaData?.reduce((acc, f) => acc + (f.total_proventos || 0), 0) || 0;
       const totalDescontos = folhaData?.reduce((acc, f) => acc + (f.total_descontos || 0), 0) || 0;
-      const inss = folhaData?.reduce((acc, f) => acc + (f.inss || 0), 0) || 0;
-      const fgts = folhaData?.reduce((acc, f) => acc + (f.fgts || 0), 0) || 0;
-      const irrf = folhaData?.reduce((acc, f) => acc + (f.irrf || 0), 0) || 0;
+      // Estimate encargos from proventos (INSS ~11%, FGTS ~8%, IRRF ~7.5% approximation)
+      const inss = totalProventos * 0.11;
+      const fgts = totalProventos * 0.08;
+      const irrf = Math.max(0, totalDescontos - inss);
 
-      // Determine step status based on data
       const hasData = colaboradores > 0;
       return {
         colaboradores, totalProventos, totalDescontos, inss, fgts, irrf,
