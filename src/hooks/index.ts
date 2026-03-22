@@ -28,6 +28,7 @@ export { useHorasExtras } from "./useHorasExtras";
 export { useConfiguracoesIntervalo } from "./useConfiguracoesIntervalo";
 export { useWebhooksAvancados, useWebhookLogs } from "./useWebhooksAvancados";
 export { usePontosAbertos } from "./usePontosAbertos";
+export { useNavigationGuard } from "./useNavigationGuard";
 
 // Novas tabelas (doc externo)
 export {
