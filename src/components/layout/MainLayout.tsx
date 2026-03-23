@@ -45,7 +45,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           onMenuClick={() => setMobileSidebarOpen(true)}
           user={{ name: user?.name || user?.email || 'Usuário', email: user?.email || '' }}
         />
-        <main className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
+        <main role="main" className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">Pular para conteúdo</a>
+          <div id="main-content">
           <PageTransition>
             {children || <Outlet />}
           </PageTransition>
