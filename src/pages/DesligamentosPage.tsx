@@ -59,7 +59,8 @@ export default function DesligamentosPage() {
       await desligamentoService.excluir(id);
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Desligamento excluído');
-    } catch {
+    } catch (err) {
+      console.error('Erro ao excluir desligamento:', err);
       toast.error('Erro ao excluir desligamento');
     }
   };

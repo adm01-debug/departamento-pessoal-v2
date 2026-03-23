@@ -202,7 +202,8 @@ export default function ImportacaoPage() {
         const { error } = await supabase.from('colaboradores').insert(insertData as any);
         if (error) throw error;
         success++;
-      } catch {
+      } catch (err) {
+        console.error('Erro ao importar registro:', err);
         errors++;
       }
       setProgress(Math.round(((i + 1) / validos.length) * 100));
