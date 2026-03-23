@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from "react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -231,6 +232,8 @@ export default function AdminTelemetriaPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Telemetria" description="Monitoramento de performance e queries" />
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -473,5 +476,6 @@ export default function AdminTelemetriaPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

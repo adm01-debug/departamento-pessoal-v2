@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -52,6 +53,8 @@ export default function PesquisasClimaPage() {
   const encerradas = pesquisas.filter((p: any) => p.status === 'encerrada').length;
 
   return (
+    <>
+    <PageTitle title="Pesquisas de Clima" description="Pesquisas de clima organizacional" />
     <PageLayout title="Pesquisas de Clima & eNPS">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 flex items-center gap-3"><ClipboardList className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">{pesquisas.length}</p><p className="text-xs text-muted-foreground">Total</p></div></CardContent></Card>
@@ -121,5 +124,6 @@ export default function PesquisasClimaPage() {
         </div>
       )}
     </PageLayout>
+    </>
   );
 }

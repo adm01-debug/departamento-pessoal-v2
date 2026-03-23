@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { PageLayout } from '@/components/layout';
 import { useHorasExtras } from '@/hooks/useHorasExtras';
@@ -31,6 +32,8 @@ export default function HorasExtrasPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Horas Extras" description="Controle de horas extras" />
     <PageLayout title="Solicitações de Hora Extra">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -92,5 +95,6 @@ export default function HorasExtrasPage() {
         </CardContent>
       </Card>
     </PageLayout>
+    </>
   );
 }

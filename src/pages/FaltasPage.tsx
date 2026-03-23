@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -123,6 +124,8 @@ export default function FaltasPage() {
   const needsMedicalInfo = ['atestado_medico', 'acidente_trabalho', 'consulta_prenatal', 'acompanhamento_filho'].includes(form.tipo);
 
   return (
+    <>
+    <PageTitle title="Faltas" description="Controle de faltas e ausências" />
     <PageLayout
       title="Gestão de Faltas"
       description="Controle completo de ausências com workflow de aprovação"
@@ -301,5 +304,6 @@ export default function FaltasPage() {
         </CardContent>
       </Card>
     </PageLayout>
+    </>
   );
 }

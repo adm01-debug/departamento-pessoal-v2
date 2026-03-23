@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -137,6 +138,8 @@ export default function DocumentosPage() {
   );
 
   return (
+    <>
+    <PageTitle title="Documentos" description="Gestão de documentos" />
     <PageLayout
       title="Documentos"
       description="Gestão de documentos dos colaboradores"
@@ -243,5 +246,6 @@ export default function DocumentosPage() {
         </DialogContent>
       </Dialog>
     </PageLayout>
+    </>
   );
 }

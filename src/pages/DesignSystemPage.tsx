@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,8 @@ function Section({ title, icon: Icon, children, delay = 0 }: {
   title: string; icon: React.ElementType; children: React.ReactNode; delay?: number;
 }) {
   return (
+    <>
+    <PageTitle title="Design System" description="Componentes e tokens do design system" />
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -57,6 +60,7 @@ function Section({ title, icon: Icon, children, delay = 0 }: {
       </h2>
       {children}
     </motion.div>
+    </>
   );
 }
 

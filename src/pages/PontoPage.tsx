@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -135,6 +136,8 @@ export default function PontoPage() {
   ].filter(p => p.e || p.s) : [];
 
   return (
+    <>
+    <PageTitle title="Registro de Ponto" description="Controle de ponto eletrônico" />
     <PageLayout
       title="Ponto Eletrônico"
       description="Registre e acompanhe sua jornada de trabalho"
@@ -363,5 +366,6 @@ export default function PontoPage() {
       {/* Gestão de Ponto - Todos Colaboradores */}
       <GestaoRegistrosPonto />
     </PageLayout>
+    </>
   );
 }

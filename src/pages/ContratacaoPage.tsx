@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,6 +48,8 @@ function TokenInput({ onValidToken }: { onValidToken: (token: string) => void })
   };
 
   return (
+    <>
+    <PageTitle title="Contratação" description="Portal de contratação" />
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
@@ -74,6 +77,7 @@ function TokenInput({ onValidToken }: { onValidToken: (token: string) => void })
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
 

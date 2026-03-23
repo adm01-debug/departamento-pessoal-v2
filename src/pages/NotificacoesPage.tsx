@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -112,6 +113,8 @@ export default function NotificacoesPage() {
   const tiposDisponiveis = [...new Set(notificacoes.map((n: any) => n.tipo))];
 
   return (
+    <>
+    <PageTitle title="Notificações" description="Central de notificações" />
     <PageLayout title="Centro de Notificações" description={`${naoLidas} não lida${naoLidas !== 1 ? 's' : ''} — Tempo real ativo`}
       icon={<Bell className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/60 to-primary/90"
       actions={
@@ -255,5 +258,6 @@ export default function NotificacoesPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

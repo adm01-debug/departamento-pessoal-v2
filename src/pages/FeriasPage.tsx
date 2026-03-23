@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -62,6 +63,8 @@ export default function FeriasPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Férias" description="Gestão de férias dos colaboradores" />
     <PageLayout
       title="Férias"
       description="Gestão de férias com workflow de aprovação em 3 níveis"
@@ -93,5 +96,6 @@ export default function FeriasPage() {
         />
       )}
     </PageLayout>
+    </>
   );
 }

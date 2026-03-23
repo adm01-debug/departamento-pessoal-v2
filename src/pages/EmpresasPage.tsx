@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -26,6 +27,8 @@ export default function EmpresasPage() {
   );
 
   return (
+    <>
+    <PageTitle title="Empresas" description="Gestão de empresas" />
     <PageLayout
       title="Empresas"
       description="Gestão de empresas"
@@ -85,5 +88,6 @@ export default function EmpresasPage() {
         </div>
       )}
     </PageLayout>
+    </>
   );
 }

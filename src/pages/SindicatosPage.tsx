@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -49,6 +50,8 @@ export default function SindicatosPage() {
   if (isLoading) return <PageLayout title="Sindicatos"><Spinner /></PageLayout>;
 
   return (
+    <>
+    <PageTitle title="Sindicatos" description="Gestão de sindicatos" />
     <PageLayout title="Sindicatos" description="Gerencie sindicatos e acordos coletivos">
       <Card><CardContent className="pt-6">
         <div className="flex justify-between mb-4">
@@ -87,5 +90,6 @@ export default function SindicatosPage() {
         </Table>
       </CardContent></Card>
     </PageLayout>
+    </>
   );
 }

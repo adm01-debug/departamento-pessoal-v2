@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,8 @@ const modules = [
 
 export default function RecrutamentoPage() {
   return (
+    <>
+    <PageTitle title="Recrutamento" description="Gestão de processos seletivos" />
     <PageLayout
       title="Recrutamento & Seleção"
       description="Gestão de vagas, candidatos e pipeline"
@@ -50,5 +53,6 @@ export default function RecrutamentoPage() {
         ))}
       </div>
     </PageLayout>
+    </>
   );
 }

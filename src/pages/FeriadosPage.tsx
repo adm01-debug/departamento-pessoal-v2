@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -62,6 +63,8 @@ export default function FeriadosPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Feriados" description="Calendário de feriados" />
     <PageLayout title="Feriados" description="Calendário de feriados" icon={<CalendarDays className="h-5 w-5 text-primary-foreground" />} gradient="from-primary-glow to-primary"
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
@@ -117,5 +120,6 @@ export default function FeriadosPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

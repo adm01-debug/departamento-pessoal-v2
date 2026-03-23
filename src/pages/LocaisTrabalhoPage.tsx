@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { PageLayout } from '@/components/layout';
 import { useLocaisTrabalho } from '@/hooks/useLocaisTrabalho';
@@ -22,6 +23,8 @@ export default function LocaisTrabalhoPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Locais de Trabalho" description="Gestão de locais e endereços" />
     <PageLayout title="Locais de Trabalho">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -69,5 +72,6 @@ export default function LocaisTrabalhoPage() {
         </CardContent>
       </Card>
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -205,6 +206,8 @@ export default function GeradorDocumentosPage() {
   const template = TEMPLATES.find(t => t.id === selectedTemplate);
 
   return (
+    <>
+    <PageTitle title="Gerador de Documentos" description="Geração automática de documentos" />
     <PageLayout
       title="Gerador de Documentos"
       description="Gere contratos, declarações e termos automaticamente"
@@ -304,5 +307,6 @@ export default function GeradorDocumentosPage() {
         </DialogContent>
       </Dialog>
     </PageLayout>
+    </>
   );
 }

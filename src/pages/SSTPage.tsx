@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -94,6 +95,8 @@ export default function SSTPage() {
   }, [asos, epis, entregas]);
 
   return (
+    <>
+    <PageTitle title="SST" description="Saúde e Segurança do Trabalho" />
     <PageLayout
       title="Saúde e Segurança do Trabalho"
       description="Gestão SST: exames, EPIs, riscos e NRs"
@@ -320,5 +323,6 @@ export default function SSTPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

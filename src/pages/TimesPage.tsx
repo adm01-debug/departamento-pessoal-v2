@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -50,6 +51,8 @@ export default function TimesPage() {
   if (isLoading) return <PageLayout title="Times"><Spinner /></PageLayout>;
 
   return (
+    <>
+    <PageTitle title="Times" description="Gestão de equipes" />
     <PageLayout title="Times e Equipes" description="Gerencie os times da empresa">
       <Card><CardContent className="pt-6">
         <div className="flex justify-between mb-4">
@@ -81,5 +84,6 @@ export default function TimesPage() {
         </Table>
       </CardContent></Card>
     </PageLayout>
+    </>
   );
 }

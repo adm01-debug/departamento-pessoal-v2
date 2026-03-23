@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -51,6 +52,8 @@ export default function LGPDPage() {
   const pendentes = solicitacoes.filter((s: any) => s.status === 'pendente').length;
 
   return (
+    <>
+    <PageTitle title="LGPD" description="Conformidade com Lei Geral de Proteção de Dados" />
     <PageLayout title="LGPD — Proteção de Dados">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 flex items-center gap-3"><ShieldCheck className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">{consentimentos.length}</p><p className="text-xs text-muted-foreground">Consentimentos</p></div></CardContent></Card>
@@ -136,5 +139,6 @@ export default function LGPDPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

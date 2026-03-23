@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -19,6 +20,8 @@ export default function UsuariosPage() {
   });
 
   return (
+    <>
+    <PageTitle title="Usuários" description="Gestão de usuários do sistema" />
     <PageLayout title="Usuários" description="Gestão de usuários do sistema" icon={<UserCog className="h-5 w-5 text-primary-foreground" />} gradient="from-primary to-primary-glow">
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
@@ -47,5 +50,6 @@ export default function UsuariosPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,8 @@ export default function ESocialPage() {
   ];
 
   return (
+    <>
+    <PageTitle title="eSocial" description="Gestão de eventos eSocial" />
     <PageLayout
       title="eSocial"
       description="Gestão de eventos eSocial"
@@ -180,5 +183,6 @@ export default function ESocialPage() {
         </Card>
       </motion.div>
     </PageLayout>
+    </>
   );
 }

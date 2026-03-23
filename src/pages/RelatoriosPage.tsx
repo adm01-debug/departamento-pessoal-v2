@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -167,6 +168,8 @@ export default function RelatoriosPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Relatórios" description="Relatórios gerenciais" />
     <PageLayout
       title="Relatórios Analíticos"
       description="Dashboards, tendências e exportações"
@@ -342,5 +345,6 @@ export default function RelatoriosPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

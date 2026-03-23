@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -86,6 +87,8 @@ export default function AvaliacaoPage() {
   const isLoading = loadCiclos || loadMetas || loadFeedbacks || loadPDIs || loadComp;
 
   return (
+    <>
+    <PageTitle title="Avaliação" description="Avaliação de desempenho" />
     <PageLayout title="Avaliação de Desempenho" description="Ciclos, metas, feedback 360° e PDI" icon={<Target className="h-5 w-5 text-primary-foreground" />} gradient="from-warning to-primary">
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -336,5 +339,6 @@ export default function AvaliacaoPage() {
         </Tabs>
       )}
     </PageLayout>
+    </>
   );
 }

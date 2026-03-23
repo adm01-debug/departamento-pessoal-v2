@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,6 +52,8 @@ export default function HoleritesPage() {
   );
 
   return (
+    <>
+    <PageTitle title="Holerites" description="Consulta e emissão de holerites" />
     <PageLayout
       title="Holerites"
       description="Demonstrativos de pagamento dos colaboradores"
@@ -188,5 +191,6 @@ export default function HoleritesPage() {
         </>
       )}
     </PageLayout>
+    </>
   );
 }

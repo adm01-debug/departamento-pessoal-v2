@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -65,6 +66,8 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
   const cursosDisponiveis = cursos.filter(c => !vinculados.some((v: any) => v.curso_id === c.id));
 
   return (
+    <>
+    <PageTitle title="Treinamentos" description="Gestão de treinamentos" />
     <div className="border rounded-lg p-3 bg-muted/20">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium flex items-center gap-1"><Link className="h-3 w-3" /> Cursos Vinculados ({vinculados.length})</p>
@@ -95,6 +98,7 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
         </div>
       )}
     </div>
+    </>
   );
 }
 

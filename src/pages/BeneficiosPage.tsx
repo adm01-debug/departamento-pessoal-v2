@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -28,6 +29,8 @@ export default function BeneficiosPage() {
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
+    <>
+    <PageTitle title="Benefícios" description="Gestão de benefícios dos colaboradores" />
     <PageLayout
       title="Benefícios"
       description="Gestão de benefícios"
@@ -78,5 +81,6 @@ export default function BeneficiosPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

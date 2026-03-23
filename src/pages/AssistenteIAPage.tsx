@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useRef, useEffect } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -95,6 +96,8 @@ export default function AssistenteIAPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Assistente IA" description="Assistente inteligente do Departamento Pessoal" />
     <PageLayout
       title="Assistente IA do DP"
       description="Tire dúvidas trabalhistas, calcule valores e consulte a legislação"
@@ -253,5 +256,6 @@ export default function AssistenteIAPage() {
         </div>
       </div>
     </PageLayout>
+    </>
   );
 }

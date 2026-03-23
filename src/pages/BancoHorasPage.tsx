@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +31,8 @@ export default function BancoHorasPage() {
   const debitos = registros.filter((r: any) => r.tipo === 'debito');
 
   return (
+    <>
+    <PageTitle title="Banco de Horas" description="Controle de banco de horas" />
     <PageLayout title="Banco de Horas">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 flex items-center gap-3"><Clock className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">{registros.length}</p><p className="text-xs text-muted-foreground">Registros</p></div></CardContent></Card>
@@ -61,5 +64,6 @@ export default function BancoHorasPage() {
         </Card>
       )}
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useDesligamentos } from '@/hooks/useDesligamentos';
 import { PageLayout } from '@/components/layout';
@@ -58,12 +59,15 @@ export default function DesligamentosPage() {
       await desligamentoService.excluir(id);
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Desligamento excluído');
-    } catch {
+    } catch (err) {
+      console.error('Erro ao excluir desligamento:', err);
       toast.error('Erro ao excluir desligamento');
     }
   };
 
   return (
+    <>
+    <PageTitle title="Desligamentos" description="Gestão de desligamentos" />
     <PageLayout
       title="Desligamentos"
       description="Controle completo de desligamentos e rescisões"
@@ -269,5 +273,6 @@ export default function DesligamentosPage() {
         onClose={() => setShowNovo(false)}
       />
     </PageLayout>
+    </>
   );
 }

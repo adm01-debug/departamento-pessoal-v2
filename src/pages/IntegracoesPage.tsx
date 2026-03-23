@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -86,6 +87,8 @@ function Bitrix24ConfigPanel() {
   if (loadConfig) return <div className="flex justify-center py-8"><Spinner /></div>;
 
   return (
+    <>
+    <PageTitle title="Integrações" description="Conectores e integrações externas" />
     <Tabs value={tab} onValueChange={setTab}>
       <TabsList className="mb-4">
         <TabsTrigger value="config"><Settings className="h-3.5 w-3.5 mr-1" />Configuração</TabsTrigger>
@@ -129,6 +132,7 @@ function Bitrix24ConfigPanel() {
         )}
       </TabsContent>
     </Tabs>
+    </>
   );
 }
 

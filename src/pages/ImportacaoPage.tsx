@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useRef, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -201,7 +202,8 @@ export default function ImportacaoPage() {
         const { error } = await supabase.from('colaboradores').insert(insertData as any);
         if (error) throw error;
         success++;
-      } catch {
+      } catch (err) {
+        console.error('Erro ao importar registro:', err);
         errors++;
       }
       setProgress(Math.round(((i + 1) / validos.length) * 100));
@@ -230,6 +232,8 @@ export default function ImportacaoPage() {
   const dupCount = rows.filter(r => r.status === 'duplicado').length;
 
   return (
+    <>
+    <PageTitle title="Importação" description="Importação de dados em massa" />
     <PageLayout
       title="Importação em Massa"
       description="Importe colaboradores via Excel ou CSV"
@@ -368,5 +372,6 @@ export default function ImportacaoPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

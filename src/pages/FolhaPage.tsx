@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -41,6 +42,8 @@ export default function FolhaPage() {
   );
 
   return (
+    <>
+    <PageTitle title="Folha de Pagamento" description="Gestão de folha de pagamento" />
     <PageLayout
       title="Folha de Pagamento"
       description="Gestão e histórico de folhas processadas"
@@ -165,5 +168,6 @@ export default function FolhaPage() {
         </>
       )}
     </PageLayout>
+    </>
   );
 }

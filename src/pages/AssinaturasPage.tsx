@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,6 +52,8 @@ export default function AssinaturasPage(): React.ReactElement {
   };
 
   return (
+    <>
+    <PageTitle title="Assinaturas" description="Gestão de assinaturas digitais" />
     <PageLayout
       title="Assinaturas Digitais"
       description="Gerencie documentos para assinatura eletrônica"
@@ -134,5 +137,6 @@ export default function AssinaturasPage(): React.ReactElement {
         </div>
       )}
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -120,6 +121,8 @@ export default function EPIsPage() {
   }, [epis, entregas]);
 
   return (
+    <>
+    <PageTitle title="EPIs" description="Controle de equipamentos de proteção individual" />
     <PageLayout
       title="Equipamentos de Proteção Individual"
       description="Gestão de EPIs, entregas e conformidade NR-6"
@@ -236,5 +239,6 @@ export default function EPIsPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }
