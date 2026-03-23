@@ -30,12 +30,12 @@ vi.mock('sonner', () => ({
 import { toast } from 'sonner';
 
 describe('exportarDesligamentosExcel', () => {
-  it('should show error toast when array is empty', () => {
-    exportarDesligamentosExcel([]);
+  it('should show error toast when array is empty', async () => {
+    await exportarDesligamentosExcel([]);
     expect(toast.error).toHaveBeenCalledWith('Nenhum desligamento para exportar');
   });
 
-  it('should export successfully with data', () => {
+  it('should export successfully with data', async () => {
     const data = [
       {
         id: '1',
@@ -55,11 +55,11 @@ describe('exportarDesligamentosExcel', () => {
         total_descontos: 3000,
       },
     ];
-    exportarDesligamentosExcel(data);
+    await exportarDesligamentosExcel(data);
     expect(toast.success).toHaveBeenCalledWith('Planilha exportada com sucesso!');
   });
 
-  it('should handle null/undefined values gracefully', () => {
+  it('should handle null/undefined values gracefully', async () => {
     const data = [
       {
         id: '2',
@@ -72,6 +72,6 @@ describe('exportarDesligamentosExcel', () => {
         valor_liquido: null,
       },
     ];
-    expect(() => exportarDesligamentosExcel(data)).not.toThrow();
+    await expect(exportarDesligamentosExcel(data)).resolves.not.toThrow();
   });
 });
