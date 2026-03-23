@@ -424,6 +424,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
               </div>
               <button
                 onClick={() => signOut()}
+                aria-label="Sair do sistema"
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors text-sm font-body"
               >
                 <LogOut className="h-4 w-4" />
