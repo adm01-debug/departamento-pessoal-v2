@@ -148,8 +148,8 @@ export default function App() {
         <Route path="turnos" element={<LazyPage Component={TurnosPage} />} />
         <Route path="comunicacao" element={<LazyPage Component={ComunicacaoInternaPage} />} />
         <Route path="despesas" element={<LazyPage Component={DespesasPage} />} />
-        <Route path="controle-acesso" element={<LazyPage Component={ControleAcessoPage} />} />
-        <Route path="lgpd" element={<LazyPage Component={LGPDPage} />} />
+        <Route path="controle-acesso" element={<AdminRoute><LazyPage Component={ControleAcessoPage} /></AdminRoute>} />
+        <Route path="lgpd" element={<AdminRoute><LazyPage Component={LGPDPage} /></AdminRoute>} />
         <Route path="banco-horas" element={<LazyPage Component={BancoHorasPage} />} />
         <Route path="epis" element={<LazyPage Component={EPIsPage} />} />
         <Route path="faltas" element={<LazyPage Component={FaltasPage} />} />
