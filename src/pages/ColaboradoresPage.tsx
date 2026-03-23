@@ -180,5 +180,6 @@ export default function ColaboradoresPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }
