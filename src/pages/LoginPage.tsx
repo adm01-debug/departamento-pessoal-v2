@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';

@@ -1,4 +1,5 @@
 // DashboardPage — Modular Executive Dashboard (V26)
+import { PageTitle } from "@/components/PageTitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, DollarSign, Calendar, Clock, Sparkles, Building2, UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
