@@ -336,6 +336,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                 <AnimatePresence initial={false}>
                   {!isGroupCollapsed && (
                     <motion.div
+                      id={`sidebar-group-${gi}`}
                       initial={false}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
