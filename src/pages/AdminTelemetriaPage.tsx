@@ -476,5 +476,6 @@ export default function AdminTelemetriaPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

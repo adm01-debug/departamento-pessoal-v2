@@ -122,8 +122,6 @@ export default function ComunicacaoInternaPage() {
     const isLido = leituras.includes(c.id);
     const Icon = tipoIcons[c.tipo] || Megaphone;
     return (
-      <>
-      <PageTitle title="Comunicação Interna" description="Comunicados e mensagens internas" />
       <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
         <Card className={cn('border border-border/30 rounded-xl transition-all hover:shadow-elevated group', !isLido && 'border-l-4 border-l-primary bg-primary/[0.02]', c.fixado && 'ring-1 ring-warning/30')}>
           <CardContent className="p-4">

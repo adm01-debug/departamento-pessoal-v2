@@ -366,5 +366,6 @@ export default function PontoPage() {
       {/* Gestão de Ponto - Todos Colaboradores */}
       <GestaoRegistrosPonto />
     </PageLayout>
+    </>
   );
 }

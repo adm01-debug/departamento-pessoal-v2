@@ -258,5 +258,6 @@ export default function NotificacoesPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }
