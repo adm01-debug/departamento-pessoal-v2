@@ -80,6 +80,8 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Login" description="Acesse o Sistema de Departamento Pessoal" />
     <div className="min-h-screen flex bg-background">
       {/* Left Panel - Dark branding */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-[hsl(240,24%,5%)]">

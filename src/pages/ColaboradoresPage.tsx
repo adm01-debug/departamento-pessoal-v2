@@ -64,6 +64,8 @@ export default function ColaboradoresPage() {
   const handleStatusChange = (v: string) => { setStatusFilter(v); setCurrentPage(1); };
 
   return (
+    <>
+    <PageTitle title="Colaboradores" description="Gestão de colaboradores do Departamento Pessoal" />
     <PageLayout
       title="Colaboradores"
       description="Gestão de colaboradores"
