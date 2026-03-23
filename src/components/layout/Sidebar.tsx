@@ -189,6 +189,8 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
   return (
     <TooltipProvider delayDuration={0}>
       <aside
+        role="navigation"
+        aria-label="Menu principal"
         className={cn(
           'flex flex-col h-full border-r border-sidebar-border',
           'bg-sidebar transition-all duration-300',
