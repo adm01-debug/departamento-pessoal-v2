@@ -295,7 +295,7 @@ export default function LoginPage() {
                     </div>
                   </div>
                   {error && (
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    <motion.p role="alert" aria-live="assertive" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg">
                       {error}
                     </motion.p>

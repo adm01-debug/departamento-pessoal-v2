@@ -257,8 +257,13 @@ export function useEmpresas(): UseEmpresasReturn {
   // Trocar empresa atual
   const trocarEmpresa = (empresaId: string) => {
     setEmpresaAtual(empresaId);
-    // Invalidate ALL tenant-scoped queries to prevent stale data
-    queryClient.invalidateQueries();
+    // Invalidate only tenant-scoped queries, preserve auth/session caches
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        const key = query.queryKey[0];
+        return key !== 'auth' && key !== 'session';
+      },
+    });
     toast.success("Empresa alterada!");
   };
 
