@@ -415,9 +415,10 @@ describe("calculateDurationBuckets", () => {
 
   it("usa buckets de 5min para 1h", () => {
     const now = Date.now();
+    const bucket = Math.floor(now / (5 * 60 * 1000)) * (5 * 60 * 1000);
     const rows = [
-      createMockRow({ duration_ms: 1000, created_at: new Date(now).toISOString() }),
-      createMockRow({ duration_ms: 2000, created_at: new Date(now - 60 * 1000).toISOString() }),
+      createMockRow({ duration_ms: 1000, created_at: new Date(bucket + 1000).toISOString() }),
+      createMockRow({ duration_ms: 2000, created_at: new Date(bucket + 2000).toISOString() }),
     ];
     const buckets = calculateDurationBuckets(rows, "1h");
     expect(buckets.length).toBe(1);
