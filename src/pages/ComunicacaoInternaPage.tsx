@@ -60,7 +60,6 @@ export default function ComunicacaoInternaPage() {
     return () => { supabase.removeChannel(channel); };
   }, [qc]);
 
-    </>
   const { data: comunicados = [], isLoading: loadCom } = useQuery({
     queryKey: ['comunicados', empresaAtual?.id],
     queryFn: () => comunicacaoService.listarComunicados(empresaAtual?.id),

@@ -64,7 +64,6 @@ export default function NotificacoesPage() {
     return () => { supabase.removeChannel(channel); };
   }, [user?.id, queryClient]);
 
-    </>
   const { data: notificacoesDB, isLoading } = useQuery({
     queryKey: ['notificacoes-db', user?.id],
     enabled: !!user?.id,
