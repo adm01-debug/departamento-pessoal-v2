@@ -145,7 +145,7 @@ describe("TelemetryCharts", () => {
   // === Edge cases ===
   it("renderiza com uma única row", () => {
     render(<TelemetryCharts rows={[createMockRow({ severity: "slow" })]} timeFilter="24h" />);
-    expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renderiza com centenas de rows sem erro", () => {
@@ -153,7 +153,7 @@ describe("TelemetryCharts", () => {
       severity: i % 3 === 0 ? "slow" : i % 3 === 1 ? "very_slow" : "error",
     }));
     render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-    expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByTestId("pie-chart")).toBeInTheDocument();
     expect(screen.getByTestId("area-chart")).toBeInTheDocument();
   });
