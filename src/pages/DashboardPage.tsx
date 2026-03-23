@@ -194,6 +194,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-section max-w-[1400px] mx-auto">
+      <PageTitle title="Dashboard" description="Painel executivo do Departamento Pessoal" />
       {/* 1. Header com saudação */}
       <DashboardHeader greeting={greeting} isLoading={loadingStats} onRefresh={() => refetchStats()} />
 
