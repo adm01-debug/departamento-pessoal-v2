@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
@@ -63,6 +64,8 @@ export default function ColaboradoresPage() {
   const handleStatusChange = (v: string) => { setStatusFilter(v); setCurrentPage(1); };
 
   return (
+    <>
+    <PageTitle title="Colaboradores" description="Gestão de colaboradores do Departamento Pessoal" />
     <PageLayout
       title="Colaboradores"
       description="Gestão de colaboradores"
@@ -177,5 +180,6 @@ export default function ColaboradoresPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

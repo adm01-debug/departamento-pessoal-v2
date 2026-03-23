@@ -1,4 +1,5 @@
 // DashboardPage — Modular Executive Dashboard (V26)
+import { PageTitle } from "@/components/PageTitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, DollarSign, Calendar, Clock, Sparkles, Building2, UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -193,6 +194,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-section max-w-[1400px] mx-auto">
+      <PageTitle title="Dashboard" description="Painel executivo do Departamento Pessoal" />
       {/* 1. Header com saudação */}
       <DashboardHeader greeting={greeting} isLoading={loadingStats} onRefresh={() => refetchStats()} />
 

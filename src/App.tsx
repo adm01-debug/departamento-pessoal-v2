@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AdminRoute } from '@/components/AdminRoute';
 import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -125,9 +126,9 @@ export default function App() {
         <Route path="departamentos" element={<LazyPage Component={DepartamentosPage} />} />
         <Route path="desligamentos" element={<LazyPage Component={DesligamentosPage} />} />
         <Route path="documentos" element={<LazyPage Component={DocumentosPage} />} />
-        <Route path="auditoria" element={<LazyPage Component={AuditoriaPage} />} />
+        <Route path="auditoria" element={<AdminRoute><LazyPage Component={AuditoriaPage} /></AdminRoute>} />
         <Route path="feriados" element={<LazyPage Component={FeriadosPage} />} />
-        <Route path="usuarios" element={<LazyPage Component={UsuariosPage} />} />
+        <Route path="usuarios" element={<AdminRoute><LazyPage Component={UsuariosPage} /></AdminRoute>} />
         <Route path="perfil" element={<LazyPage Component={PerfilPage} />} />
         <Route path="notificacoes" element={<LazyPage Component={NotificacoesPage} />} />
         <Route path="integracoes" element={<LazyPage Component={IntegracoesPage} />} />
@@ -147,8 +148,8 @@ export default function App() {
         <Route path="turnos" element={<LazyPage Component={TurnosPage} />} />
         <Route path="comunicacao" element={<LazyPage Component={ComunicacaoInternaPage} />} />
         <Route path="despesas" element={<LazyPage Component={DespesasPage} />} />
-        <Route path="controle-acesso" element={<LazyPage Component={ControleAcessoPage} />} />
-        <Route path="lgpd" element={<LazyPage Component={LGPDPage} />} />
+        <Route path="controle-acesso" element={<AdminRoute><LazyPage Component={ControleAcessoPage} /></AdminRoute>} />
+        <Route path="lgpd" element={<AdminRoute><LazyPage Component={LGPDPage} /></AdminRoute>} />
         <Route path="banco-horas" element={<LazyPage Component={BancoHorasPage} />} />
         <Route path="epis" element={<LazyPage Component={EPIsPage} />} />
         <Route path="faltas" element={<LazyPage Component={FaltasPage} />} />
@@ -175,7 +176,7 @@ export default function App() {
         <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
         <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
         <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
-        <Route path="telemetria" element={<LazyPage Component={AdminTelemetriaPage} />} />
+        <Route path="telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

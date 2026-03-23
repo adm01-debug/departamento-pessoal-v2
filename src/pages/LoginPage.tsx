@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
@@ -79,6 +80,8 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Login" description="Acesse o Sistema de Departamento Pessoal" />
     <div className="min-h-screen flex bg-background">
       {/* Left Panel - Dark branding */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-[hsl(240,24%,5%)]">
@@ -352,5 +355,6 @@ export default function LoginPage() {
         </motion.div>
       </div>
     </div>
+    </>
   );
 }
