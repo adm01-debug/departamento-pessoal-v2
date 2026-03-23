@@ -30,8 +30,8 @@ vi.mock('sonner', () => ({
 import { toast } from 'sonner';
 
 describe('exportarDesligamentosExcel', () => {
-  it('should show error toast when array is empty', () => {
-    exportarDesligamentosExcel([]);
+  it('should show error toast when array is empty', async () => {
+    await exportarDesligamentosExcel([]);
     expect(toast.error).toHaveBeenCalledWith('Nenhum desligamento para exportar');
   });
 
