@@ -303,5 +303,6 @@ export default function ComunicacaoInternaPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }
