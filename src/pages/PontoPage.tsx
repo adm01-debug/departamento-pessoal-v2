@@ -33,7 +33,6 @@ export default function PontoPage() {
   const today = new Date().toISOString().split('T')[0];
 
   // Fetch today's consolidated record
-    </>
   const { data: registroHoje, refetch: refetchRegistro } = useQuery({
     queryKey: ['registro-ponto-hoje', user?.id, today],
     queryFn: async () => {
