@@ -317,6 +317,8 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                 {!collapsed ? (
                   <button
                     onClick={() => toggleGroup(group.label)}
+                    aria-expanded={!isGroupCollapsed}
+                    aria-controls={`sidebar-group-${gi}`}
                     className="w-full flex items-center justify-between px-3 py-1.5 mb-0.5 group/header"
                   >
                     <span className="text-overline text-muted-foreground/80 group-hover/header:text-foreground transition-colors font-bold tracking-wider">
