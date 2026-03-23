@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AdminRoute } from '@/components/AdminRoute';
 import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
