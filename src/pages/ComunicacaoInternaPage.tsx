@@ -160,6 +160,8 @@ export default function ComunicacaoInternaPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Comunicação Interna" description="Comunicados e mensagens internas" />
     <PageLayout title="Comunicação Interna" description="Mural de comunicados e canal de ética"
       icon={<Megaphone className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary"
     >
