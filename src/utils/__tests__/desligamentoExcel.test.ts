@@ -59,7 +59,7 @@ describe('exportarDesligamentosExcel', () => {
     expect(toast.success).toHaveBeenCalledWith('Planilha exportada com sucesso!');
   });
 
-  it('should handle null/undefined values gracefully', () => {
+  it('should handle null/undefined values gracefully', async () => {
     const data = [
       {
         id: '2',
@@ -72,6 +72,6 @@ describe('exportarDesligamentosExcel', () => {
         valor_liquido: null,
       },
     ];
-    expect(() => exportarDesligamentosExcel(data)).not.toThrow();
+    await expect(exportarDesligamentosExcel(data)).resolves.not.toThrow();
   });
 });
