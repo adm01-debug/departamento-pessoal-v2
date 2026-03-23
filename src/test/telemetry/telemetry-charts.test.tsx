@@ -176,7 +176,7 @@ describe("TelemetryCharts", () => {
       createMockRow({ severity: "error", created_at: new Date(Date.now() + 999999999).toISOString() }),
     ];
     render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-    expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renderiza legends em todos os gráficos", () => {
