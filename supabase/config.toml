@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.processar-agendamentos]
 verify_jwt = false
+
+[functions.external-db-bridge]
+verify_jwt = false

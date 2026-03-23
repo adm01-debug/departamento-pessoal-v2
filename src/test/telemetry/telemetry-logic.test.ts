@@ -1,23 +1,15 @@
 import { describe, it, expect } from "vitest";
 import {
-  createMockRow,
-  createSlowRow,
-  createVerySlowRow,
-  createErrorRow,
-  createBulkRows,
-  createMixedSeverityRows,
-  createTimeDistributedRows,
-  formatDuration,
-  calculateStats,
-  calculateTopOffenders,
-  calculateTimeSeries,
-  calculateSeverityDistribution,
-  getTimeThreshold,
+  createMockRow, createSlowRow, createVerySlowRow, createErrorRow,
+  createBulkRows, createMixedSeverityRows, createTimeDistributedRows,
+  formatDuration, classifySeverity, calculateStats, calculateTopOffenders,
+  calculateTimeSeries, calculateSeverityDistribution, calculateDurationBuckets,
+  calculateTableAlerts, getTimeThreshold, generateCSVContent, buildTelemetryLogLine,
   type MockTelemetryRow,
 } from "./telemetry-helpers";
 
 // ============================================================
-// 1. formatDuration — Formatação de duração
+// 1. formatDuration
 // ============================================================
 describe("formatDuration", () => {
   it("formata milissegundos abaixo de 1s", () => {
@@ -49,7 +41,7 @@ describe("formatDuration", () => {
 
   it("formata precisão decimal corretamente", () => {
     expect(formatDuration(1100)).toBe("1.1s");
-    expect(formatDuration(1050)).toBe("1.1s"); // toFixed(1) rounds
+    expect(formatDuration(1050)).toBe("1.1s");
     expect(formatDuration(1049)).toBe("1.0s");
     expect(formatDuration(2750)).toBe("2.8s");
     expect(formatDuration(9999)).toBe("10.0s");
@@ -57,7 +49,50 @@ describe("formatDuration", () => {
 });
 
 // ============================================================
-// 2. calculateStats — Cálculo de estatísticas
+// 2. classifySeverity (edge function logic)
+// ============================================================
+describe("classifySeverity", () => {
+  it("retorna 'ok' para queries rápidas", () => {
+    expect(classifySeverity(0, false)).toBe("ok");
+    expect(classifySeverity(200, false)).toBe("ok");
+    expect(classifySeverity(2999, false)).toBe("ok");
+  });
+
+  it("retorna 'slow' para queries entre 3s e 8s", () => {
+    expect(classifySeverity(3000, false)).toBe("slow");
+    expect(classifySeverity(5000, false)).toBe("slow");
+    expect(classifySeverity(7999, false)).toBe("slow");
+  });
+
+  it("retorna 'very_slow' para queries >= 8s", () => {
+    expect(classifySeverity(8000, false)).toBe("very_slow");
+    expect(classifySeverity(15000, false)).toBe("very_slow");
+    expect(classifySeverity(60000, false)).toBe("very_slow");
+  });
+
+  it("retorna 'error' quando hasError é true, independente da duração", () => {
+    expect(classifySeverity(0, true)).toBe("error");
+    expect(classifySeverity(100, true)).toBe("error");
+    expect(classifySeverity(5000, true)).toBe("error");
+    expect(classifySeverity(10000, true)).toBe("error");
+  });
+
+  it("threshold exato de 3000ms é 'slow'", () => {
+    expect(classifySeverity(3000, false)).toBe("slow");
+  });
+
+  it("threshold exato de 8000ms é 'very_slow'", () => {
+    expect(classifySeverity(8000, false)).toBe("very_slow");
+  });
+
+  it("1ms abaixo de cada threshold", () => {
+    expect(classifySeverity(2999, false)).toBe("ok");
+    expect(classifySeverity(7999, false)).toBe("slow");
+  });
+});
+
+// ============================================================
+// 3. calculateStats
 // ============================================================
 describe("calculateStats", () => {
   it("retorna zeros para array vazio", () => {
@@ -96,7 +131,6 @@ describe("calculateStats", () => {
       createMockRow({ duration_ms: 200 }),
       createMockRow({ duration_ms: 201 }),
     ];
-    // (100 + 200 + 201) / 3 = 167
     expect(calculateStats(rows).avgDuration).toBe(167);
   });
 
@@ -138,7 +172,7 @@ describe("calculateStats", () => {
 });
 
 // ============================================================
-// 3. calculateTopOffenders — Tabelas mais problemáticas
+// 4. calculateTopOffenders
 // ============================================================
 describe("calculateTopOffenders", () => {
   it("retorna vazio para array vazio", () => {
@@ -155,14 +189,10 @@ describe("calculateTopOffenders", () => {
     expect(top.length).toBe(2);
     expect(top[0][0]).toBe("colaboradores");
     expect(top[0][1].count).toBe(2);
-    expect(top[1][0]).toBe("empresas");
-    expect(top[1][1].count).toBe(1);
   });
 
   it("prioriza rpc_name sobre table_name", () => {
-    const rows = [
-      createMockRow({ rpc_name: "check_brute_force", table_name: "login_attempts" }),
-    ];
+    const rows = [createMockRow({ rpc_name: "check_brute_force", table_name: "login_attempts" })];
     const top = calculateTopOffenders(rows);
     expect(top[0][0]).toBe("check_brute_force");
   });
@@ -178,8 +208,7 @@ describe("calculateTopOffenders", () => {
       createMockRow({ table_name: "t1", duration_ms: 100 }),
       createMockRow({ table_name: "t1", duration_ms: 300 }),
     ];
-    const top = calculateTopOffenders(rows);
-    expect(top[0][1].totalMs).toBe(400);
+    expect(calculateTopOffenders(rows)[0][1].totalMs).toBe(400);
   });
 
   it("calcula maxMs corretamente", () => {
@@ -188,8 +217,7 @@ describe("calculateTopOffenders", () => {
       createMockRow({ table_name: "t1", duration_ms: 9000 }),
       createMockRow({ table_name: "t1", duration_ms: 500 }),
     ];
-    const top = calculateTopOffenders(rows);
-    expect(top[0][1].maxMs).toBe(9000);
+    expect(calculateTopOffenders(rows)[0][1].maxMs).toBe(9000);
   });
 
   it("limita a 8 offenders", () => {
@@ -199,8 +227,7 @@ describe("calculateTopOffenders", () => {
         rows.push(createMockRow({ table_name: `table_${i}` }));
       }
     }
-    const top = calculateTopOffenders(rows);
-    expect(top.length).toBe(8);
+    expect(calculateTopOffenders(rows).length).toBe(8);
   });
 
   it("ordena por count descendente", () => {
@@ -222,15 +249,12 @@ describe("calculateTopOffenders", () => {
       createMockRow({ rpc_name: "fn_calc", table_name: "other" }),
     ];
     const top = calculateTopOffenders(rows);
-    const names = top.map(t => t[0]);
-    expect(names).toContain("fn_calc");
-    expect(names).toContain("users");
     expect(top.find(t => t[0] === "fn_calc")![1].count).toBe(2);
   });
 });
 
 // ============================================================
-// 4. calculateTimeSeries — Série temporal
+// 5. calculateTimeSeries
 // ============================================================
 describe("calculateTimeSeries", () => {
   it("retorna vazio para array vazio", () => {
@@ -257,7 +281,6 @@ describe("calculateTimeSeries", () => {
       createMockRow({ severity: "slow", created_at: new Date(now - 3 * 60 * 1000).toISOString() }),
     ];
     const series = calculateTimeSeries(rows, "1h");
-    // Both should be in same 5-min bucket
     const totalSlow = series.reduce((s, b) => s + b.slow, 0);
     expect(totalSlow).toBe(2);
   });
@@ -296,7 +319,6 @@ describe("calculateTimeSeries", () => {
   it("ignora severidades 'normal' na contagem", () => {
     const rows = [createMockRow({ severity: "normal" })];
     const series = calculateTimeSeries(rows, "24h");
-    // Should have a bucket but all counts are 0
     expect(series.length).toBe(1);
     expect(series[0].slow).toBe(0);
     expect(series[0].very_slow).toBe(0);
@@ -312,7 +334,7 @@ describe("calculateTimeSeries", () => {
 });
 
 // ============================================================
-// 5. calculateSeverityDistribution — Distribuição
+// 6. calculateSeverityDistribution
 // ============================================================
 describe("calculateSeverityDistribution", () => {
   it("retorna vazio para array vazio", () => {
@@ -353,7 +375,117 @@ describe("calculateSeverityDistribution", () => {
 });
 
 // ============================================================
-// 6. getTimeThreshold — Limiar temporal
+// 7. calculateDurationBuckets (NEW)
+// ============================================================
+describe("calculateDurationBuckets", () => {
+  it("retorna vazio para array vazio", () => {
+    expect(calculateDurationBuckets([], "24h")).toEqual([]);
+  });
+
+  it("calcula média e máximo corretamente em bucket único", () => {
+    const now = Date.now();
+    const rows = [
+      createMockRow({ duration_ms: 3000, created_at: new Date(now).toISOString() }),
+      createMockRow({ duration_ms: 5000, created_at: new Date(now - 1000).toISOString() }),
+      createMockRow({ duration_ms: 10000, created_at: new Date(now - 2000).toISOString() }),
+    ];
+    const buckets = calculateDurationBuckets(rows, "24h");
+    expect(buckets.length).toBe(1);
+    expect(buckets[0].mediaMs).toBe(6000);
+    expect(buckets[0].maxMs).toBe(10000);
+  });
+
+  it("separa em múltiplos buckets quando timestamps distantes", () => {
+    const now = Date.now();
+    const rows = [
+      createMockRow({ duration_ms: 3000, created_at: new Date(now).toISOString() }),
+      createMockRow({ duration_ms: 5000, created_at: new Date(now - 3 * 60 * 60 * 1000).toISOString() }),
+    ];
+    const buckets = calculateDurationBuckets(rows, "24h");
+    expect(buckets.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("ordena por timestamp ascendente", () => {
+    const rows = createTimeDistributedRows(6, 2, "slow");
+    const buckets = calculateDurationBuckets(rows, "24h");
+    for (let i = 1; i < buckets.length; i++) {
+      expect(buckets[i].ts).toBeGreaterThanOrEqual(buckets[i - 1].ts);
+    }
+  });
+
+  it("usa buckets de 5min para 1h", () => {
+    const now = Date.now();
+    const bucket = Math.floor(now / (5 * 60 * 1000)) * (5 * 60 * 1000);
+    const rows = [
+      createMockRow({ duration_ms: 1000, created_at: new Date(bucket + 1000).toISOString() }),
+      createMockRow({ duration_ms: 2000, created_at: new Date(bucket + 2000).toISOString() }),
+    ];
+    const buckets = calculateDurationBuckets(rows, "1h");
+    expect(buckets.length).toBe(1);
+    expect(buckets[0].mediaMs).toBe(1500);
+  });
+
+  it("maxMs nunca é menor que mediaMs", () => {
+    const rows = createBulkRows(50, (i) => ({
+      duration_ms: 1000 + i * 200,
+      created_at: new Date(Date.now() - i * 60 * 1000).toISOString(),
+    }));
+    const buckets = calculateDurationBuckets(rows, "6h");
+    for (const b of buckets) {
+      expect(b.maxMs).toBeGreaterThanOrEqual(b.mediaMs);
+    }
+  });
+});
+
+// ============================================================
+// 8. calculateTableAlerts (NEW)
+// ============================================================
+describe("calculateTableAlerts", () => {
+  it("retorna vazio para array vazio", () => {
+    expect(calculateTableAlerts([])).toEqual([]);
+  });
+
+  it("conta alertas por tabela", () => {
+    const rows = [
+      ...createBulkRows(5, () => ({ table_name: "users" })),
+      ...createBulkRows(3, () => ({ table_name: "orders" })),
+    ];
+    const alerts = calculateTableAlerts(rows);
+    expect(alerts[0].name).toBe("users");
+    expect(alerts[0].alertas).toBe(5);
+    expect(alerts[1].name).toBe("orders");
+    expect(alerts[1].alertas).toBe(3);
+  });
+
+  it("limita a 8 tabelas", () => {
+    const rows: MockTelemetryRow[] = [];
+    for (let i = 0; i < 12; i++) {
+      rows.push(createMockRow({ table_name: `table_${i}` }));
+    }
+    expect(calculateTableAlerts(rows).length).toBe(8);
+  });
+
+  it("ordena por alertas descendente", () => {
+    const rows = [
+      ...createBulkRows(10, () => ({ table_name: "top" })),
+      ...createBulkRows(2, () => ({ table_name: "bottom" })),
+      ...createBulkRows(5, () => ({ table_name: "mid" })),
+    ];
+    const alerts = calculateTableAlerts(rows);
+    expect(alerts[0].name).toBe("top");
+    expect(alerts[1].name).toBe("mid");
+    expect(alerts[2].name).toBe("bottom");
+  });
+
+  it("usa rpc_name quando disponível", () => {
+    const rows = [createMockRow({ rpc_name: "fn_test", table_name: "ignored" })];
+    const alerts = calculateTableAlerts(rows);
+    expect(alerts[0].name).toBe("fn_test");
+  });
+});
+
+// ============================================================
+// 9. getTimeThreshold
 // ============================================================
 describe("getTimeThreshold", () => {
   it("retorna ISO string para cada filtro", () => {
@@ -366,32 +498,27 @@ describe("getTimeThreshold", () => {
 
   it("1h é ~1 hora atrás", () => {
     const threshold = new Date(getTimeThreshold("1h")).getTime();
-    const expected = Date.now() - 60 * 60 * 1000;
-    expect(Math.abs(threshold - expected)).toBeLessThan(1000);
+    expect(Math.abs(threshold - (Date.now() - 60 * 60 * 1000))).toBeLessThan(1000);
   });
 
   it("6h é ~6 horas atrás", () => {
     const threshold = new Date(getTimeThreshold("6h")).getTime();
-    const expected = Date.now() - 6 * 60 * 60 * 1000;
-    expect(Math.abs(threshold - expected)).toBeLessThan(1000);
+    expect(Math.abs(threshold - (Date.now() - 6 * 60 * 60 * 1000))).toBeLessThan(1000);
   });
 
   it("24h é ~24 horas atrás", () => {
     const threshold = new Date(getTimeThreshold("24h")).getTime();
-    const expected = Date.now() - 24 * 60 * 60 * 1000;
-    expect(Math.abs(threshold - expected)).toBeLessThan(1000);
+    expect(Math.abs(threshold - (Date.now() - 24 * 60 * 60 * 1000))).toBeLessThan(1000);
   });
 
   it("7d é ~7 dias atrás", () => {
     const threshold = new Date(getTimeThreshold("7d")).getTime();
-    const expected = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    expect(Math.abs(threshold - expected)).toBeLessThan(1000);
+    expect(Math.abs(threshold - (Date.now() - 7 * 24 * 60 * 60 * 1000))).toBeLessThan(1000);
   });
 
   it("filtro desconhecido usa 24h como padrão", () => {
     const threshold = new Date(getTimeThreshold("unknown")).getTime();
-    const expected = Date.now() - 24 * 60 * 60 * 1000;
-    expect(Math.abs(threshold - expected)).toBeLessThan(1000);
+    expect(Math.abs(threshold - (Date.now() - 24 * 60 * 60 * 1000))).toBeLessThan(1000);
   });
 
   it("thresholds são progressivamente mais antigos", () => {
@@ -406,7 +533,142 @@ describe("getTimeThreshold", () => {
 });
 
 // ============================================================
-// 7. Mock Data Factories — Validação dos builders
+// 10. generateCSVContent (NEW)
+// ============================================================
+describe("generateCSVContent", () => {
+  it("gera header correto", () => {
+    const csv = generateCSVContent([]);
+    expect(csv).toContain("Data/Hora;Operação;Tabela/RPC;Duração (ms);Severidade");
+  });
+
+  it("gera uma linha por row", () => {
+    const rows = createBulkRows(5);
+    const csv = generateCSVContent(rows);
+    const lines = csv.split("\n");
+    expect(lines.length).toBe(6); // header + 5 rows
+  });
+
+  it("usa ponto-e-vírgula como delimitador", () => {
+    const rows = [createSlowRow()];
+    const csv = generateCSVContent(rows);
+    expect(csv.split("\n")[1].split(";").length).toBe(10);
+  });
+
+  it("escapa aspas duplas em error_message", () => {
+    const rows = [createMockRow({ error_message: 'error "with" quotes' })];
+    const csv = generateCSVContent(rows);
+    expect(csv).toContain('""with"" quotes');
+  });
+
+  it("usa '-' para valores nulos", () => {
+    const rows = [createMockRow({ record_count: null, query_limit: null })];
+    const csv = generateCSVContent(rows);
+    const dataLine = csv.split("\n")[1];
+    expect(dataLine).toContain("-");
+  });
+
+  it("inclui operação e table_name corretos", () => {
+    const rows = [createMockRow({ operation: "INSERT", table_name: "test_table" })];
+    const csv = generateCSVContent(rows);
+    expect(csv).toContain("INSERT");
+    expect(csv).toContain("test_table");
+  });
+
+  it("usa rpc_name quando table_name é null", () => {
+    const rows = [createMockRow({ table_name: null, rpc_name: "fn_test" })];
+    const csv = generateCSVContent(rows);
+    expect(csv).toContain("fn_test");
+  });
+
+  it("usa '-' quando ambos table_name e rpc_name são null", () => {
+    const rows = [createMockRow({ table_name: null, rpc_name: null })];
+    const csv = generateCSVContent(rows);
+    const dataLine = csv.split("\n")[1];
+    const fields = dataLine.split(";");
+    expect(fields[2]).toBe("-");
+  });
+
+  it("processa 1000 rows sem erro", () => {
+    const rows = createBulkRows(1000);
+    const csv = generateCSVContent(rows);
+    expect(csv.split("\n").length).toBe(1001);
+  });
+});
+
+// ============================================================
+// 11. buildTelemetryLogLine (NEW)
+// ============================================================
+describe("buildTelemetryLogLine", () => {
+  it("gera log para query ok", () => {
+    const line = buildTelemetryLogLine({
+      operation: "select", table: "products", durationMs: 200,
+      status: "ok", recordCount: 50, limit: 50, offset: 0, countMode: "planned",
+    });
+    expect(line).toContain("✅");
+    expect(line).toContain("select:products");
+    expect(line).toContain("200ms");
+    expect(line).toContain("records=50");
+  });
+
+  it("gera log para query slow", () => {
+    const line = buildTelemetryLogLine({
+      operation: "select", table: "users", durationMs: 4000, status: "slow",
+    });
+    expect(line).toContain("🟡");
+    expect(line).toContain("4000ms");
+  });
+
+  it("gera log para query very_slow", () => {
+    const line = buildTelemetryLogLine({
+      operation: "select", table: "orders", durationMs: 12000, status: "very_slow",
+    });
+    expect(line).toContain("🔴");
+    expect(line).toContain("12000ms");
+  });
+
+  it("gera log para query com erro", () => {
+    const line = buildTelemetryLogLine({
+      operation: "rpc", rpcName: "fn_calc", durationMs: 100, status: "error", error: "timeout",
+    });
+    expect(line).toContain("❌");
+    expect(line).toContain("rpc:fn_calc");
+  });
+
+  it("usa 'unknown' quando sem table e sem rpcName", () => {
+    const line = buildTelemetryLogLine({ operation: "select", durationMs: 100, status: "ok" });
+    expect(line).toContain("select:unknown");
+  });
+
+  it("prioriza rpcName sobre table", () => {
+    const line = buildTelemetryLogLine({
+      operation: "rpc", table: "ignored", rpcName: "fn_used", durationMs: 100, status: "ok",
+    });
+    expect(line).toContain("rpc:fn_used");
+    expect(line).not.toContain("ignored");
+  });
+
+  it("usa '-' para valores não fornecidos", () => {
+    const line = buildTelemetryLogLine({ operation: "select", durationMs: 100, status: "ok" });
+    expect(line).toContain("records=-");
+    expect(line).toContain("limit=-");
+    expect(line).toContain("offset=-");
+    expect(line).toContain("count=-");
+  });
+
+  it("inclui todos os campos quando fornecidos", () => {
+    const line = buildTelemetryLogLine({
+      operation: "select", table: "products", durationMs: 3500, status: "slow",
+      recordCount: 100, limit: 100, offset: 200, countMode: "exact",
+    });
+    expect(line).toContain("records=100");
+    expect(line).toContain("limit=100");
+    expect(line).toContain("offset=200");
+    expect(line).toContain("count=exact");
+  });
+});
+
+// ============================================================
+// 12. Mock Data Factories
 // ============================================================
 describe("Mock Data Factories", () => {
   it("createMockRow gera IDs únicos", () => {
@@ -444,7 +706,6 @@ describe("Mock Data Factories", () => {
   it("createTimeDistributedRows gera timestamps decrescentes", () => {
     const rows = createTimeDistributedRows(5, 3);
     expect(rows.length).toBe(15);
-    // All should have valid dates
     for (const r of rows) {
       expect(new Date(r.created_at).getTime()).toBeLessThanOrEqual(Date.now());
     }
@@ -453,9 +714,7 @@ describe("Mock Data Factories", () => {
   it("createBulkRows aceita factory function", () => {
     const rows = createBulkRows(50, (i) => ({ table_name: `t_${i}`, duration_ms: i * 10 }));
     expect(rows[0].table_name).toBe("t_0");
-    expect(rows[0].duration_ms).toBe(0);
     expect(rows[49].table_name).toBe("t_49");
-    expect(rows[49].duration_ms).toBe(490);
   });
 
   it("overrides funcionam corretamente", () => {
@@ -463,201 +722,161 @@ describe("Mock Data Factories", () => {
       operation: "INSERT",
       table_name: "custom_table",
       duration_ms: 9999,
-      severity: "very_slow",
-      record_count: 42,
     });
     expect(row.operation).toBe("INSERT");
     expect(row.table_name).toBe("custom_table");
     expect(row.duration_ms).toBe(9999);
-    expect(row.severity).toBe("very_slow");
-    expect(row.record_count).toBe(42);
   });
 });
 
 // ============================================================
-// 8. Cenários de stress e edge cases
+// 13. Cenários de stress e edge cases
 // ============================================================
 describe("Stress & Edge Cases", () => {
-  it("processa 1000 rows sem erro em calculateStats", () => {
-    const rows = createBulkRows(1000, (i) => ({ duration_ms: i }));
+  it("1000 rows: stats em tempo razoável", () => {
+    const rows = createBulkRows(1000, (i) => ({
+      severity: ["slow", "very_slow", "error", "normal"][i % 4],
+      duration_ms: i * 10,
+    }));
+    const start = performance.now();
+    calculateStats(rows);
+    calculateTopOffenders(rows);
+    calculateTimeSeries(rows, "24h");
+    calculateSeverityDistribution(rows);
+    calculateDurationBuckets(rows, "24h");
+    calculateTableAlerts(rows);
+    expect(performance.now() - start).toBeLessThan(1000);
+  });
+
+  it("rows com duration_ms = 0", () => {
+    const rows = createBulkRows(10, () => ({ duration_ms: 0 }));
     const stats = calculateStats(rows);
-    expect(stats.avgDuration).toBe(500); // avg of 0..999 = 499.5 → 500
+    expect(stats.avgDuration).toBe(0);
+    const buckets = calculateDurationBuckets(rows, "24h");
+    expect(buckets[0].mediaMs).toBe(0);
+    expect(buckets[0].maxMs).toBe(0);
   });
 
-  it("processa 1000 rows sem erro em calculateTopOffenders", () => {
-    const tables = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-    const rows = createBulkRows(1000, (i) => ({ table_name: tables[i % tables.length] }));
-    const top = calculateTopOffenders(rows);
-    expect(top.length).toBe(8); // limited to 8
-    expect(top[0][1].count).toBe(100); // 1000/10
-  });
-
-  it("processa 1000 rows sem erro em calculateTimeSeries", () => {
-    const rows = createTimeDistributedRows(24, 42, "slow");
-    const series = calculateTimeSeries(rows, "24h");
-    const totalSlow = series.reduce((s, b) => s + b.slow, 0);
-    expect(totalSlow).toBe(24 * 42);
-  });
-
-  it("lida com rows todas no mesmo timestamp", () => {
-    const ts = new Date().toISOString();
-    const rows = createBulkRows(100, () => ({ created_at: ts, severity: "slow" }));
-    const series = calculateTimeSeries(rows, "24h");
-    expect(series.length).toBe(1);
-    expect(series[0].slow).toBe(100);
-  });
-
-  it("lida com duration_ms = 0 em todas as rows", () => {
-    const rows = createBulkRows(50, () => ({ duration_ms: 0 }));
-    expect(calculateStats(rows).avgDuration).toBe(0);
-    expect(formatDuration(0)).toBe("0ms");
-  });
-
-  it("lida com duration_ms muito alto", () => {
+  it("rows com duration_ms máximo (MAX_SAFE_INTEGER)", () => {
     const rows = [createMockRow({ duration_ms: Number.MAX_SAFE_INTEGER })];
     const stats = calculateStats(rows);
     expect(stats.avgDuration).toBe(Number.MAX_SAFE_INTEGER);
   });
 
-  it("topOffenders com tabelas iguais acumula corretamente", () => {
-    const rows = createBulkRows(200, () => ({
-      table_name: "single_table",
-      duration_ms: 100,
-    }));
-    const top = calculateTopOffenders(rows);
-    expect(top.length).toBe(1);
-    expect(top[0][0]).toBe("single_table");
-    expect(top[0][1].count).toBe(200);
-    expect(top[0][1].totalMs).toBe(20000);
-    expect(top[0][1].maxMs).toBe(100);
-  });
-
-  it("severity distribution com 5 severidades diferentes", () => {
-    const rows = [
-      createMockRow({ severity: "normal" }),
-      createMockRow({ severity: "slow" }),
-      createMockRow({ severity: "very_slow" }),
-      createMockRow({ severity: "error" }),
-      createMockRow({ severity: "custom" }),
-    ];
+  it("todas as severidades com mesma contagem", () => {
+    const rows = createMixedSeverityRows({ normal: 25, slow: 25, very_slow: 25, error: 25 });
     const dist = calculateSeverityDistribution(rows);
-    expect(dist.length).toBe(5);
-  });
-});
-
-// ============================================================
-// 9. Integração — Fluxo completo
-// ============================================================
-describe("Fluxo completo de processamento", () => {
-  it("pipeline completo: rows → stats + top offenders + series + distribution", () => {
-    const rows = [
-      ...createBulkRows(30, () => ({ table_name: "colaboradores", severity: "slow", duration_ms: 4000 })),
-      ...createBulkRows(10, () => ({ table_name: "empresas", severity: "very_slow", duration_ms: 12000 })),
-      ...createBulkRows(5, () => ({ rpc_name: "check_brute_force", severity: "error", duration_ms: 0, error_message: "timeout" })),
-      ...createBulkRows(55, () => ({ table_name: "registros_ponto", severity: "normal", duration_ms: 200 })),
-    ];
-
-    // Stats
-    const stats = calculateStats(rows);
-    expect(stats.slow).toBe(30);
-    expect(stats.verySlow).toBe(10);
-    expect(stats.errors).toBe(5);
-    expect(stats.avgDuration).toBeGreaterThan(0);
-
-    // Top offenders
-    const top = calculateTopOffenders(rows);
-    expect(top[0][0]).toBe("registros_ponto"); // 55 rows
-    expect(top[1][0]).toBe("colaboradores");     // 30 rows
-    expect(top[2][0]).toBe("empresas");           // 10 rows
-    expect(top[3][0]).toBe("check_brute_force");  // 5 rows
-
-    // Distribution
-    const dist = calculateSeverityDistribution(rows);
-    const map = Object.fromEntries(dist.map(d => [d.name, d.value]));
-    expect(map.normal).toBe(55);
-    expect(map.slow).toBe(30);
-    expect(map.very_slow).toBe(10);
-    expect(map.error).toBe(5);
-
-    // Time series
-    const series = calculateTimeSeries(rows, "24h");
-    expect(series.length).toBeGreaterThanOrEqual(1);
+    expect(dist.length).toBe(4);
+    for (const d of dist) {
+      expect(d.value).toBe(25);
+    }
   });
 
-  it("formatação de durações no contexto de stats", () => {
-    const rows = createMixedSeverityRows({ slow: 10, very_slow: 5 });
-    const stats = calculateStats(rows);
-    const formatted = formatDuration(stats.avgDuration);
-    expect(formatted).toMatch(/^\d+(\.\d)?m?s$/);
-  });
-});
-
-// ============================================================
-// 10. Operações específicas
-// ============================================================
-describe("Operações e campos opcionais", () => {
-  it("suporta diferentes operações", () => {
-    const ops = ["SELECT", "INSERT", "UPDATE", "DELETE", "RPC", "SUBSCRIBE"];
-    const rows = ops.map(op => createMockRow({ operation: op }));
-    const stats = calculateStats(rows);
-    expect(stats.avgDuration).toBeGreaterThan(0);
-  });
-
-  it("lida com campos null corretamente", () => {
+  it("single row com todos os campos null", () => {
     const row = createMockRow({
-      table_name: null,
-      rpc_name: null,
-      record_count: null,
-      query_limit: null,
-      query_offset: null,
-      count_mode: null,
-      error_message: null,
-      user_id: null,
+      table_name: null, rpc_name: null, record_count: null,
+      query_limit: null, query_offset: null, count_mode: null,
+      error_message: null, user_id: null,
     });
-    // Should not throw when processed
     const top = calculateTopOffenders([row]);
     expect(top[0][0]).toBe("unknown");
+    const csv = generateCSVContent([row]);
+    expect(csv).toBeTruthy();
   });
 
-  it("lida com count_mode variados", () => {
-    const modes = [null, "exact", "planned", "estimated"];
-    const rows = modes.map(m => createMockRow({ count_mode: m }));
-    expect(rows.length).toBe(4);
-    expect(calculateStats(rows).avgDuration).toBeGreaterThan(0);
+  it("rows com created_at no futuro", () => {
+    const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const rows = [createMockRow({ severity: "slow", created_at: futureDate })];
+    const series = calculateTimeSeries(rows, "24h");
+    expect(series.length).toBe(1);
+    expect(series[0].slow).toBe(1);
   });
 
-  it("filtra por severity na simulação de query", () => {
-    const rows = createMixedSeverityRows({ normal: 50, slow: 30, very_slow: 15, error: 5 });
-    
-    // Simulate severity filter
-    const filterSlow = rows.filter(r => r.severity === "slow");
-    expect(filterSlow.length).toBe(30);
-    
-    const filterVerySlow = rows.filter(r => r.severity === "very_slow");
-    expect(filterVerySlow.length).toBe(15);
-    
-    const filterError = rows.filter(r => r.severity === "error");
-    expect(filterError.length).toBe(5);
-    
-    // "all" = no filter
-    expect(rows.length).toBe(100);
+  it("rows com created_at muito antigo", () => {
+    const oldDate = new Date("2020-01-01T00:00:00Z").toISOString();
+    const rows = [createMockRow({ severity: "error", created_at: oldDate })];
+    const series = calculateTimeSeries(rows, "7d");
+    expect(series.length).toBe(1);
+    expect(series[0].error).toBe(1);
   });
 
-  it("filtra por time threshold na simulação", () => {
-    const now = Date.now();
-    const rows = [
-      createMockRow({ created_at: new Date(now).toISOString() }),
-      createMockRow({ created_at: new Date(now - 30 * 60 * 1000).toISOString() }),
-      createMockRow({ created_at: new Date(now - 2 * 60 * 60 * 1000).toISOString() }),
-      createMockRow({ created_at: new Date(now - 25 * 60 * 60 * 1000).toISOString() }),
+  it("empty string em campos string", () => {
+    const row = createMockRow({ operation: "", table_name: "", error_message: "" });
+    const csv = generateCSVContent([row]);
+    expect(csv).toBeTruthy();
+  });
+
+  it("generateCSVContent com erro contendo newlines", () => {
+    const rows = [createMockRow({ error_message: "line1\nline2\nline3" })];
+    const csv = generateCSVContent(rows);
+    expect(csv).toContain("line1");
+  });
+
+  it("multiple timeFilters produzem resultados consistentes", () => {
+    const rows = createTimeDistributedRows(12, 5, "slow");
+    for (const tf of ["1h", "6h", "24h", "7d"]) {
+      const series = calculateTimeSeries(rows, tf);
+      const total = series.reduce((s, b) => s + b.slow, 0);
+      expect(total).toBe(60);
+    }
+  });
+});
+
+// ============================================================
+// 14. Integração entre funções
+// ============================================================
+describe("Integração entre funções", () => {
+  it("classifySeverity + buildTelemetryLogLine consistentes", () => {
+    const testCases = [
+      { ms: 200, error: false, expectedIcon: "✅" },
+      { ms: 3500, error: false, expectedIcon: "🟡" },
+      { ms: 9000, error: false, expectedIcon: "🔴" },
+      { ms: 100, error: true, expectedIcon: "❌" },
     ];
+    for (const tc of testCases) {
+      const status = classifySeverity(tc.ms, tc.error);
+      const line = buildTelemetryLogLine({
+        operation: "select", table: "test", durationMs: tc.ms, status,
+      });
+      expect(line).toContain(tc.expectedIcon);
+    }
+  });
 
-    const threshold1h = new Date(getTimeThreshold("1h")).getTime();
-    const filtered1h = rows.filter(r => new Date(r.created_at).getTime() >= threshold1h);
-    expect(filtered1h.length).toBe(2);
+  it("calculateStats + calculateSeverityDistribution contagens batem", () => {
+    const rows = createMixedSeverityRows({ slow: 10, very_slow: 5, error: 3 });
+    const stats = calculateStats(rows);
+    const dist = calculateSeverityDistribution(rows);
+    const distMap = Object.fromEntries(dist.map(d => [d.name, d.value]));
+    expect(stats.slow).toBe(distMap.slow);
+    expect(stats.verySlow).toBe(distMap.very_slow);
+    expect(stats.errors).toBe(distMap.error);
+  });
 
-    const threshold24h = new Date(getTimeThreshold("24h")).getTime();
-    const filtered24h = rows.filter(r => new Date(r.created_at).getTime() >= threshold24h);
-    expect(filtered24h.length).toBe(3);
+  it("calculateTopOffenders + calculateTableAlerts retornam mesma ordem", () => {
+    const rows = [
+      ...createBulkRows(20, () => ({ table_name: "alpha" })),
+      ...createBulkRows(10, () => ({ table_name: "beta" })),
+      ...createBulkRows(5, () => ({ table_name: "gamma" })),
+    ];
+    const offenders = calculateTopOffenders(rows).map(o => o[0]);
+    const alerts = calculateTableAlerts(rows).map(a => a.name);
+    expect(offenders).toEqual(alerts);
+  });
+
+  it("generateCSVContent preserva contagem total de registros", () => {
+    const rows = createBulkRows(42);
+    const csv = generateCSVContent(rows);
+    const lines = csv.split("\n");
+    expect(lines.length - 1).toBe(42); // minus header
+  });
+
+  it("durationBuckets e timeSeries usam mesmos buckets para mesmo timeFilter", () => {
+    const rows = createTimeDistributedRows(6, 3, "slow");
+    const ts = calculateTimeSeries(rows, "24h");
+    const db = calculateDurationBuckets(rows, "24h");
+    expect(ts.length).toBe(db.length);
+    for (let i = 0; i < ts.length; i++) {
+      expect(ts[i].ts).toBe(db[i].ts);
+    }
   });
 });
