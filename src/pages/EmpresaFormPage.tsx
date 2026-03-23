@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -66,6 +67,8 @@ export default function EmpresaFormPage() {
   if (isLoading) return <div className="flex justify-center p-8"><Spinner size="lg" /></div>;
 
   return (
+    <>
+    <PageTitle title="Cadastro de Empresa" description="Formulário de empresa" />
     <PageLayout title={isEditing ? 'Editar Empresa' : 'Nova Empresa'}>
       <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
         <FormSection title="Dados da Empresa">
@@ -101,5 +104,6 @@ export default function EmpresaFormPage() {
         </FormActions>
       </form>
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useCargos } from '@/hooks/useCargos';
 import { PageLayout } from '@/components/layout';
@@ -17,6 +18,8 @@ export default function CargosPage() {
   const filtered = cargos.filter((c: any) => !search || c.nome.toLowerCase().includes(search.toLowerCase()));
 
   return (
+    <>
+    <PageTitle title="Cargos" description="Gestão de cargos e funções" />
     <PageLayout
       title="Cargos"
       description="Gestão de cargos e funções"
@@ -63,5 +66,6 @@ export default function CargosPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

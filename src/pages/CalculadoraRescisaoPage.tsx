@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useCallback } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -40,6 +41,8 @@ export default function CalculadoraRescisaoPage() {
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
   return (
+    <>
+    <PageTitle title="Calculadora de Rescisão" description="Cálculo rescisório trabalhista" />
     <PageLayout
       title="Calculadora de Rescisão"
       description="Cálculo completo de verbas rescisórias com geração de TRCT"
@@ -168,5 +171,6 @@ export default function CalculadoraRescisaoPage() {
         </div>
       </div>
     </PageLayout>
+    </>
   );
 }

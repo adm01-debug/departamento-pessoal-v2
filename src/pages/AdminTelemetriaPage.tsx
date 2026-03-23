@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from "react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,6 +77,7 @@ export default function AdminTelemetriaPage() {
       const { data, error } = await query;
       if (error) throw error;
       return (data as unknown as TelemetryRow[]) || [];
+    </>
     },
     refetchInterval: 30000,
     staleTime: 10000,
@@ -231,6 +233,8 @@ export default function AdminTelemetriaPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Telemetria" description="Monitoramento de performance e queries" />
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">

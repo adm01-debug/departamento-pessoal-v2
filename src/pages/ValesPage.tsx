@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -83,6 +84,8 @@ export default function ValesPage() {
   const fmt = (v: number | null) => v ? `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-';
 
   return (
+    <>
+    <PageTitle title="Vales" description="Gestão de vales" />
     <PageLayout title="Vales" description="Vale Alimentação, Vale Refeição e Vale Transporte" icon={<CreditCard className="h-5 w-5 text-primary-foreground" />}>
       <Tabs defaultValue="alimentacao" className="space-y-4">
         <TabsList>
@@ -180,5 +183,6 @@ export default function ValesPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

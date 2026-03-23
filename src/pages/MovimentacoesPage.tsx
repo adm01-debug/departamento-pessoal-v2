@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -76,6 +77,8 @@ export default function MovimentacoesPage() {
   if (isLoading) return <PageLayout title="Movimentações"><Spinner /></PageLayout>;
 
   return (
+    <>
+    <PageTitle title="Movimentações" description="Histórico de movimentações" />
     <PageLayout title="Movimentações de Pessoal" description="Transferências, promoções e lotações">
       <Tabs defaultValue="transferencias">
         <TabsList>
@@ -174,5 +177,6 @@ export default function MovimentacoesPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

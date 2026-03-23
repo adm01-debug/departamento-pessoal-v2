@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -42,6 +43,8 @@ export default function DespesasPage() {
   const totalAprovado = despesas.filter((d: any) => d.status === 'aprovada' || d.status === 'reembolsada').reduce((s: number, d: any) => s + Number(d.valor), 0);
 
   return (
+    <>
+    <PageTitle title="Despesas" description="Controle de despesas" />
     <PageLayout title="Gestão de Despesas & Diárias">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 flex items-center gap-3"><Receipt className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">{despesas.length}</p><p className="text-xs text-muted-foreground">Total despesas</p></div></CardContent></Card>
@@ -110,5 +113,6 @@ export default function DespesasPage() {
         </Card>
       )}
     </PageLayout>
+    </>
   );
 }

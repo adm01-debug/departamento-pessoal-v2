@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useEffect, useRef } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -96,6 +97,8 @@ export default function PerfilPage() {
   const initials = (nome || user?.email || 'U').charAt(0).toUpperCase();
 
   return (
+    <>
+    <PageTitle title="Meu Perfil" description="Configurações do perfil do usuário" />
     <PageLayout title="Meu Perfil" description="Gerencie seus dados pessoais" icon={<User className="h-5 w-5 text-primary-foreground" />} gradient="from-primary to-primary-glow">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl space-y-6">
         <Card className="border border-border/30 rounded-2xl shadow-elevated">
@@ -158,5 +161,6 @@ export default function PerfilPage() {
         </Card>
       </motion.div>
     </PageLayout>
+    </>
   );
 }

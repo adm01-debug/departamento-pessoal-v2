@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useAdmissoes } from '@/hooks/useAdmissoes';
 import { PageLayout } from '@/components/layout';
@@ -65,6 +66,8 @@ export default function AdmissoesPage() {
   }, [admissoes]);
 
   return (
+    <>
+    <PageTitle title="Admissões" description="Gestão de processos admissionais" />
     <PageLayout
       title="Admissões"
       description="Gerencie o processo de admissão de colaboradores"
@@ -146,5 +149,6 @@ export default function AdmissoesPage() {
         </div>
       )}
     </PageLayout>
+    </>
   );
 }

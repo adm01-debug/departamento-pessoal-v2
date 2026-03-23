@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -134,6 +135,8 @@ export default function DashboardExecutivoPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Dashboard Executivo" description="Painel executivo de indicadores" />
     <PageLayout title="Dashboard Executivo" description="Indicadores estratégicos de RH"
       icon={<BarChart3 className="h-5 w-5 text-primary-foreground" />} gradient="from-primary to-primary-glow"
       actions={
@@ -279,5 +282,6 @@ export default function DashboardExecutivoPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

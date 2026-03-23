@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -31,6 +32,8 @@ export default function ColaboradorDetalhesPage() {
   if (!colaborador) return <div className="p-6">Colaborador não encontrado</div>;
 
   return (
+    <>
+    <PageTitle title="Detalhes do Colaborador" description="Perfil completo do colaborador" />
     <PageLayout title={`${colaborador.nome_completo} — ${colaborador.cargo} · ${colaborador.departamento}`}>
       <Button variant="ghost" size="sm" onClick={() => navigate('/colaboradores')} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
@@ -81,5 +84,6 @@ export default function ColaboradorDetalhesPage() {
         <TabsContent value="anotacoes"><AnotacoesTab colaboradorId={id!} /></TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
@@ -90,6 +91,8 @@ export default function AfastamentosPage() {
   };
 
   return (
+    <>
+    <PageTitle title="Afastamentos" description="Controle de afastamentos de colaboradores" />
     <PageLayout
       title="Afastamentos"
       description="Controle completo de afastamentos, licenças e prorrogações"
@@ -238,5 +241,6 @@ export default function AfastamentosPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

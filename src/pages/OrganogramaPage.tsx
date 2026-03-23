@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -29,6 +30,8 @@ function getInitials(name: string) {
 
 function ColaboradorCard({ col, compact }: { col: any; compact?: boolean }) {
   return (
+    <>
+    <PageTitle title="Organograma" description="Estrutura organizacional" />
     <div className={cn(
       "flex items-center gap-2 rounded-xl transition-colors",
       compact ? "py-1" : "p-2 bg-background/50 hover:bg-accent/30"
@@ -46,6 +49,7 @@ function ColaboradorCard({ col, compact }: { col: any; compact?: boolean }) {
         </a>
       )}
     </div>
+    </>
   );
 }
 

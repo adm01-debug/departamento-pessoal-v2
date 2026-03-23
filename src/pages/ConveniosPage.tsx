@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -95,6 +96,8 @@ export default function ConveniosPage() {
   const fmt = (v: number | null) => v ? `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-';
 
   return (
+    <>
+    <PageTitle title="Convênios" description="Gestão de convênios" />
     <PageLayout title="Convênios" description="Gestão de convênios empresariais" icon={<Handshake className="h-5 w-5 text-primary-foreground" />}>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-4">
@@ -197,5 +200,6 @@ export default function ConveniosPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

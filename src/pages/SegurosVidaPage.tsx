@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -42,6 +43,8 @@ function BeneficiariosSeguroSection({ seguroId }: { seguroId: string }) {
   const ativos = beneficiarios.filter((b: any) => b.status !== 'inativo');
 
   return (
+    <>
+    <PageTitle title="Seguros de Vida" description="Gestão de seguros de vida" />
     <div className="border rounded-lg p-3 bg-muted/20 space-y-2">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium flex items-center gap-1"><Users className="h-3 w-3" /> Beneficiários ({ativos.length})</p>
@@ -73,6 +76,7 @@ function BeneficiariosSeguroSection({ seguroId }: { seguroId: string }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 

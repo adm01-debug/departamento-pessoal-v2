@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -108,6 +109,8 @@ function PipelineStep({ step, status, index, isLast }: { step: typeof stepConfig
   const Icon = step.icon;
 
   return (
+    <>
+    <PageTitle title="Cálculo de Folha" description="Processamento de folha de pagamento" />
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -144,6 +147,7 @@ function PipelineStep({ step, status, index, isLast }: { step: typeof stepConfig
 
       {!isLast && <ChevronRight className="h-4 w-4 text-muted-foreground/30 shrink-0 hidden lg:block" />}
     </motion.div>
+    </>
   );
 }
 

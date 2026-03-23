@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -54,6 +55,8 @@ export default function CentrosCustoPage() {
   if (isLoading) return <PageLayout title="Centros de Custo"><Spinner /></PageLayout>;
 
   return (
+    <>
+    <PageTitle title="Centros de Custo" description="Gestão de centros de custo" />
     <PageLayout title="Centros de Custo" description="Gerencie os centros de custo da empresa">
       <Card>
         <CardContent className="pt-6">
@@ -90,5 +93,6 @@ export default function CentrosCustoPage() {
         </CardContent>
       </Card>
     </PageLayout>
+    </>
   );
 }

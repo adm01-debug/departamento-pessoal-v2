@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState, useRef, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -230,6 +231,8 @@ export default function ImportacaoPage() {
   const dupCount = rows.filter(r => r.status === 'duplicado').length;
 
   return (
+    <>
+    <PageTitle title="Importação" description="Importação de dados em massa" />
     <PageLayout
       title="Importação em Massa"
       description="Importe colaboradores via Excel ou CSV"
@@ -368,5 +371,6 @@ export default function ImportacaoPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

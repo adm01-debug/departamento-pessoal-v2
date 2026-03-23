@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -58,6 +59,8 @@ export default function JornadasPage() {
   if (isLoading) return <PageLayout title="Jornadas"><Spinner /></PageLayout>;
 
   return (
+    <>
+    <PageTitle title="Jornadas" description="Gestão de jornadas de trabalho" />
     <PageLayout title="Jornadas de Trabalho" description="Configure as jornadas e horários dos colaboradores">
       <Card>
         <CardContent className="pt-6">
@@ -112,5 +115,6 @@ export default function JornadasPage() {
         </CardContent>
       </Card>
     </PageLayout>
+    </>
   );
 }

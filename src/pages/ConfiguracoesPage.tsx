@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -50,6 +51,8 @@ export default function ConfiguracoesPage() {
   });
 
   return (
+    <>
+    <PageTitle title="Configurações" description="Configurações do sistema" />
     <PageLayout
       title="Configurações"
       description="Configurações do sistema"
@@ -178,5 +181,6 @@ export default function ConfiguracoesPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

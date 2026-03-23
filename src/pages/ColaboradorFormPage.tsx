@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -98,6 +99,8 @@ export default function ColaboradorFormPage() {
   ];
 
   return (
+    <>
+    <PageTitle title="Cadastro de Colaborador" description="Formulário de colaborador" />
     <PageLayout title={isEditing ? 'Editar Colaborador' : 'Novo Colaborador'}>
       <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className="space-y-6">
         <FormSection title="Dados Pessoais">
@@ -123,5 +126,6 @@ export default function ColaboradorFormPage() {
         </FormActions>
       </form>
     </PageLayout>
+    </>
   );
 }

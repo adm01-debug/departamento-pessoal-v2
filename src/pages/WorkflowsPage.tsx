@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -85,6 +86,8 @@ export default function WorkflowsPage() {
   }).length;
 
   return (
+    <>
+    <PageTitle title="Workflows" description="Automação de processos" />
     <PageLayout
       title="Workflows de Aprovação"
       description="Cadeia de aprovações com SLA e notificações"
@@ -312,5 +315,6 @@ export default function WorkflowsPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

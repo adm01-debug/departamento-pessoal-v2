@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -28,6 +29,8 @@ export default function AuditoriaPage() {
   );
 
   return (
+    <>
+    <PageTitle title="Auditoria" description="Logs e trilha de auditoria do sistema" />
     <PageLayout
       title="Auditoria"
       description="Log de auditoria do sistema"
@@ -65,5 +68,6 @@ export default function AuditoriaPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

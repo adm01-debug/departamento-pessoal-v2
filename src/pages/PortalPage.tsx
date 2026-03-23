@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -112,6 +113,8 @@ export default function PortalPage() {
   })();
 
   return (
+    <>
+    <PageTitle title="Portal" description="Portal do colaborador" />
     <PageLayout title="Meu Portal" description={`${saudacao}, ${nome}!`}
       icon={<UserCircle className="h-5 w-5 text-primary-foreground" />} gradient="from-success to-primary"
     >
@@ -432,5 +435,6 @@ export default function PortalPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout/PageLayout';
@@ -48,6 +49,8 @@ function TemplateTarefasSection({ templateId }: { templateId: string }) {
   });
 
   return (
+    <>
+    <PageTitle title="Onboarding" description="Integração de novos colaboradores" />
     <div className="border rounded-lg p-3 bg-muted/20 space-y-2">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium flex items-center gap-1"><ListChecks className="h-3 w-3" /> Tarefas do Template ({tarefas.length})</p>
@@ -88,6 +91,7 @@ function TemplateTarefasSection({ templateId }: { templateId: string }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 

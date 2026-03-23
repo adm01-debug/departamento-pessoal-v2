@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { PageLayout } from '@/components/layout';
@@ -17,6 +18,8 @@ export default function DepartamentosPage() {
   const filtered = departamentos.filter((d: any) => !search || d.nome.toLowerCase().includes(search.toLowerCase()));
 
   return (
+    <>
+    <PageTitle title="Departamentos" description="Gestão de departamentos" />
     <PageLayout
       title="Departamentos"
       description="Gestão de departamentos da empresa"
@@ -59,5 +62,6 @@ export default function DepartamentosPage() {
         </motion.div>
       )}
     </PageLayout>
+    </>
   );
 }

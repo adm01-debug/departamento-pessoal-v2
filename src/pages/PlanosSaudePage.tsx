@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -44,6 +45,8 @@ function BeneficiariosPlanoSection({ planoId }: { planoId: string }) {
   const ativos = beneficiarios.filter((b: any) => b.status !== 'excluido');
 
   return (
+    <>
+    <PageTitle title="Planos de Saúde" description="Gestão de planos de saúde" />
     <div className="border rounded-lg p-3 bg-muted/20 space-y-2">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium flex items-center gap-1"><Users className="h-3 w-3" /> Beneficiários ({ativos.length})</p>
@@ -83,6 +86,7 @@ function BeneficiariosPlanoSection({ planoId }: { planoId: string }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 

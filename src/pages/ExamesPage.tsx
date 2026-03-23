@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -93,6 +94,8 @@ export default function ExamesPage() {
   }), [exames, tipoFilter, resultadoFilter, search]);
 
   return (
+    <>
+    <PageTitle title="Exames / ASOs" description="Controle de exames ocupacionais" />
     <PageLayout
       title="Exames Ocupacionais"
       description="Controle de exames médicos obrigatórios — NR-7 / PCMSO"
@@ -133,5 +136,6 @@ export default function ExamesPage() {
         </div>
       </div>
     </PageLayout>
+    </>
   );
 }

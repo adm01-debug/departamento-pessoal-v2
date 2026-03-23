@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -59,6 +60,8 @@ export default function BeneficioFormPage() {
   });
 
   return (
+    <>
+    <PageTitle title="Novo Benefício" description="Cadastro de benefício" />
     <PageLayout title="Novo Benefício">
       <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
         <FormSection title="Dados do Benefício">
@@ -93,5 +96,6 @@ export default function BeneficioFormPage() {
         </FormActions>
       </form>
     </PageLayout>
+    </>
   );
 }

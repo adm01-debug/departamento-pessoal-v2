@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,6 +65,8 @@ export default function ObrigacoesFiscaisPage() {
   if (isLoading) return <PageLayout title="Obrigações Fiscais"><Spinner /></PageLayout>;
 
   return (
+    <>
+    <PageTitle title="Obrigações Fiscais" description="Gestão de obrigações fiscais" />
     <PageLayout title="Obrigações Fiscais" description="DCTFWeb, SEFIP, Guias FGTS e INSS">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold">{dctf.length}</p><p className="text-sm text-muted-foreground">DCTFWeb</p></CardContent></Card>
@@ -137,5 +140,6 @@ export default function ObrigacoesFiscaisPage() {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 }

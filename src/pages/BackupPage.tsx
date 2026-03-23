@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +27,8 @@ export default function BackupPage() {
   ];
 
   return (
+    <>
+    <PageTitle title="Backup" description="Gerenciamento de backups do sistema" />
     <PageLayout title="Backup" description="Gerencie backups dos dados do sistema" icon={<Database className="h-5 w-5 text-primary-foreground" />} gradient="from-primary-glow to-primary"
       actions={
         <Button onClick={handleBackup} disabled={backing} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body">
@@ -74,5 +77,6 @@ export default function BackupPage() {
         </CardContent>
       </Card>
     </PageLayout>
+    </>
   );
 }

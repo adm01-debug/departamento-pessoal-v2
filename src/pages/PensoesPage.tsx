@@ -1,3 +1,4 @@
+import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
@@ -55,6 +56,8 @@ export default function PensoesPage() {
   });
 
   return (
+    <>
+    <PageTitle title="Pensões" description="Gestão de pensões alimentícias" />
     <PageLayout title="Pensões" description="Pensões alimentícias e judiciais" icon={<Scale className="h-5 w-5 text-primary-foreground" />}>
       <div className="flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
@@ -111,5 +114,6 @@ export default function PensoesPage() {
         )}
       </CardContent></Card>
     </PageLayout>
+    </>
   );
 }
