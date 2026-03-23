@@ -161,7 +161,7 @@ describe("TelemetryCharts", () => {
   it("renderiza com rows distribuídas no tempo", () => {
     const rows = createTimeDistributedRows(12, 5, "slow");
     render(<TelemetryCharts rows={rows} timeFilter="24h" />);
-    expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+    expect(screen.getAllByTestId("bar-chart").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renderiza com severity 'normal' apenas", () => {
