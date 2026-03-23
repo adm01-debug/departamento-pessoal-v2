@@ -176,7 +176,7 @@ export default function App() {
         <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
         <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
         <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
-        <Route path="telemetria" element={<LazyPage Component={AdminTelemetriaPage} />} />
+        <Route path="telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}
