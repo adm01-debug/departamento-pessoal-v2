@@ -16,11 +16,13 @@ const STATUS_LABELS: Record<string, string> = {
   cancelado: 'Cancelado',
 };
 
-export function exportarDesligamentosExcel(desligamentos: any[]) {
+export async function exportarDesligamentosExcel(desligamentos: any[]) {
   if (desligamentos.length === 0) {
     toast.error('Nenhum desligamento para exportar');
     return;
   }
+
+  const XLSX = await import('xlsx');
 
   const rows = desligamentos.map((d: any) => ({
     'Colaborador': d.colaborador?.nome_completo || '—',
@@ -43,7 +45,6 @@ export function exportarDesligamentosExcel(desligamentos: any[]) {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Desligamentos');
 
-  // Auto-width columns
   const colWidths = Object.keys(rows[0]).map((key) => ({
     wch: Math.max(key.length, ...rows.map((r: any) => String(r[key]).length)) + 2,
   }));
