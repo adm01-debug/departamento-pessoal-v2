@@ -126,9 +126,9 @@ export default function App() {
         <Route path="departamentos" element={<LazyPage Component={DepartamentosPage} />} />
         <Route path="desligamentos" element={<LazyPage Component={DesligamentosPage} />} />
         <Route path="documentos" element={<LazyPage Component={DocumentosPage} />} />
-        <Route path="auditoria" element={<LazyPage Component={AuditoriaPage} />} />
+        <Route path="auditoria" element={<AdminRoute><LazyPage Component={AuditoriaPage} /></AdminRoute>} />
         <Route path="feriados" element={<LazyPage Component={FeriadosPage} />} />
-        <Route path="usuarios" element={<LazyPage Component={UsuariosPage} />} />
+        <Route path="usuarios" element={<AdminRoute><LazyPage Component={UsuariosPage} /></AdminRoute>} />
         <Route path="perfil" element={<LazyPage Component={PerfilPage} />} />
         <Route path="notificacoes" element={<LazyPage Component={NotificacoesPage} />} />
         <Route path="integracoes" element={<LazyPage Component={IntegracoesPage} />} />
