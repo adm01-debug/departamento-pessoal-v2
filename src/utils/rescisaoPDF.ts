@@ -1,5 +1,3 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { toast } from 'sonner';
 import { RescisaoResult, fmt } from './rescisaoCalc';
 

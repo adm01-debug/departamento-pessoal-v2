@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 
 const TIPO_LABELS: Record<string, string> = {

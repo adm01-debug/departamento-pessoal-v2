@@ -30,8 +30,7 @@ export default defineConfig(({ mode }) => ({
           'vendor-query': ['@tanstack/react-query'],
           'vendor-charts': ['recharts'],
           'vendor-supabase': ['@supabase/supabase-js'],
-          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
-          'vendor-xlsx': ['xlsx'],
+          // jspdf, jspdf-autotable, xlsx are loaded on-demand via dynamic import
           'vendor-motion': ['framer-motion'],
           'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
         },
