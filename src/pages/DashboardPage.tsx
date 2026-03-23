@@ -85,7 +85,7 @@ function useDashboardStats(enabled: boolean) {
         feriasPendentes: feriasPendentes || 0,
         bancoHoras: Math.round(bancoHoras / 60),
         turnover: colaboradoresAtivos ? ((demissoesMes || 0) / colaboradoresAtivos) * 100 : 0,
-        absenteismo: 1.8,
+        absenteismo: colaboradoresAtivos ? ((demissoesMes || 0) + (admissoesMes || 0)) / colaboradoresAtivos * 100 : 0,
         headcount: colaboradoresAtivos || 0,
         admissoesMes: admissoesMes || 0,
         demissoesMes: demissoesMes || 0,

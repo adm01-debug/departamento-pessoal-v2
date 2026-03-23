@@ -1,9 +1,10 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { toast } from 'sonner';
 import { RescisaoResult, fmt } from './rescisaoCalc';
 
-export function gerarPDFRescisao(form: any, result: RescisaoResult) {
+export async function gerarPDFRescisao(form: any, result: RescisaoResult) {
+  const { default: jsPDF } = await import('jspdf');
+  await import('jspdf-autotable');
+
   const doc = new jsPDF();
   const pw = doc.internal.pageSize.getWidth();
   let y = 20;

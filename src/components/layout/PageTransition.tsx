@@ -76,7 +76,7 @@ export function PageTransition({ children }: PageTransitionProps) {
   return (
     <AnimatePresence mode="wait" initial={false} custom={direction}>
       <motion.div
-        key={location.pathname}
+        key={location.key}
         custom={direction}
         variants={variants}
         initial="enter"
