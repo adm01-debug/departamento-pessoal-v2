@@ -4,23 +4,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
-  Zap, ChevronDown, UserPlus, UserMinus, Briefcase,
-  FolderOpen, CalendarDays, Plug, Database, Plus,
-  Network, Shield, UserCog, LogOut, Check, ChevronRight,
+  Zap, ChevronRight, UserPlus, UserMinus, Briefcase,
+  FolderOpen, CalendarDays, Plug, Database,
+  Network, Shield, UserCog, Lock,
   Timer, GraduationCap, ClipboardList, Heart,
-  Megaphone, Scale, MapPin, Lock, FileBarChart,
+  Megaphone, Scale, MapPin, FileBarChart,
   Wallet, HardHat, UserX, Compass, DollarSign,
-  Layers, TreePine, Stethoscope, BookOpen, Landmark,
+  Layers, Stethoscope, BookOpen, Landmark,
   Receipt, PenTool, Workflow, Globe, BadgeAlert,
   CreditCard, ShieldCheck, ScrollText, Bot,
 } from 'lucide-react';
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { EmpresaSelector } from './EmpresaSelector';
+import { SidebarFooter } from './SidebarFooter';
 
 /* ─── Menu Structure ─── */
 interface MenuGroup {
@@ -154,14 +155,11 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
-  const [empresaMenuOpen, setEmpresaMenuOpen] = useState(false);
 
-  // Find which group contains the active route
   const activeGroupLabel = menuGroups.find(g =>
     g.items.some(item => location.pathname === item.path || location.pathname.startsWith(item.path + '/'))
   )?.label || 'Principal';
 
-  // Default: all groups collapsed EXCEPT the one with the active route
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     menuGroups.forEach(g => {
@@ -175,16 +173,11 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
     setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const getBadge = (path: string): number | undefined => {
-    if (pendingCounts) return pendingCounts[path];
-    return undefined;
-  };
+  const getBadge = (path: string): number | undefined => pendingCounts?.[path];
 
   const userInitials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() || 'U';
-
-  const empresaNome = empresaAtual?.nome_fantasia || empresaAtual?.razao_social || 'Sem empresa';
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -219,96 +212,16 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
         </div>
 
         {/* ─── Company Switcher ─── */}
-        {!collapsed ? (
-          <div className="px-3 pt-3 pb-1">
-            {!empresaAtual ? (
-              /* Empty state: no empresa linked */
-              <Link
-                to="/empresas/nova"
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200 bg-primary/10 hover:bg-primary/20 border border-dashed border-primary/40 hover:border-primary/60 group"
-              >
-                <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Plus className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0 text-left">
-                  <p className="text-xs font-body font-semibold text-primary">Cadastrar Empresa</p>
-                  <p className="text-[10px] text-muted-foreground font-body">Clique para começar</p>
-                </div>
-              </Link>
-            ) : (
-              <>
-                <button
-                  onClick={() => temMultiplasEmpresas && setEmpresaMenuOpen(!empresaMenuOpen)}
-                  className={cn(
-                    'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200',
-                    'bg-sidebar-accent/60 hover:bg-sidebar-accent border border-border/20',
-                    temMultiplasEmpresas && 'cursor-pointer'
-                  )}
-                >
-                  <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
-                    <Building2 className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-xs font-body font-medium text-foreground truncate">{empresaNome}</p>
-                    <p className="text-[10px] text-muted-foreground font-body">
-                      {empresaAtual?.cnpj || 'Empresa ativa'}
-                    </p>
-                  </div>
-                  {temMultiplasEmpresas && (
-                    <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/50 transition-transform', empresaMenuOpen && 'rotate-180')} />
-                  )}
-                </button>
-
-                <AnimatePresence>
-                  {empresaMenuOpen && temMultiplasEmpresas && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-1 rounded-xl border border-border/20 bg-sidebar-accent/40 p-1">
-                        {userEmpresas?.map((ue) => (
-                          <button
-                            key={ue.empresa_id}
-                            onClick={() => { trocarEmpresa(ue.empresa_id); setEmpresaMenuOpen(false); }}
-                            className={cn(
-                              'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
-                              ue.empresa_id === empresaAtual?.id
-                                ? 'bg-primary/10 text-primary'
-                                : 'hover:bg-sidebar-accent text-muted-foreground hover:text-foreground'
-                            )}
-                          >
-                            <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
-                            <span className="text-xs font-body truncate flex-1">
-                              {ue.empresa?.nome_fantasia || ue.empresa?.razao_social}
-                            </span>
-                            {ue.empresa_id === empresaAtual?.id && <Check className="h-3.5 w-3.5 flex-shrink-0" />}
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="px-2 pt-3 pb-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="h-10 w-10 mx-auto rounded-xl bg-sidebar-accent/60 flex items-center justify-center">
-                  <Building2 className="h-4 w-4 text-primary" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="right"><p>{empresaNome}</p></TooltipContent>
-            </Tooltip>
-          </div>
-        )}
+        <EmpresaSelector
+          collapsed={collapsed}
+          empresaAtual={empresaAtual}
+          userEmpresas={userEmpresas}
+          temMultiplasEmpresas={temMultiplasEmpresas}
+          trocarEmpresa={trocarEmpresa}
+        />
 
         {/* ─── Navigation ─── */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar" aria-label="Módulos do sistema">
           {menuGroups.map((group, gi) => {
             const isGroupCollapsed = collapsedGroups[group.label];
 
@@ -365,7 +278,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                               'flex items-center justify-center transition-transform duration-200',
                               !isActive && 'group-hover:scale-110'
                             )}>
-                              <Icon className="h-[18px] w-[18px]" />
+                              <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                             </div>
                             {!collapsed && <span className="flex-1">{label}</span>}
                             {!collapsed && badge !== undefined && badge > 0 && (
@@ -404,47 +317,12 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
         </nav>
 
         {/* ─── User Profile Footer ─── */}
-        <div className="border-t border-sidebar-border p-3">
-          {!collapsed ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-3 px-2 py-2">
-                <Avatar className="h-9 w-9 ring-2 ring-border/30">
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs font-bold">
-                    {userInitials}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-body font-medium text-foreground truncate">
-                    {user?.name || user?.email || 'Usuário'}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground font-body truncate">
-                    {user?.email || ''}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => signOut()}
-                aria-label="Sair do sistema"
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors text-sm font-body"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Sair</span>
-              </button>
-            </div>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => signOut()}
-                  className="w-full flex items-center justify-center py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right"><p>Sair</p></TooltipContent>
-            </Tooltip>
-          )}
-        </div>
+        <SidebarFooter
+          collapsed={collapsed}
+          user={user}
+          userInitials={userInitials}
+          onSignOut={signOut}
+        />
       </aside>
     </TooltipProvider>
   );
