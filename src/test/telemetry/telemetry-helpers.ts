@@ -90,10 +90,18 @@ export function createTimeDistributedRows(
   return rows;
 }
 
-// Telemetry logic functions extracted for unit testing
+// ===== Logic functions for unit testing =====
+
 export function formatDuration(ms: number): string {
   if (ms >= 1000) return `${(ms / 1000).toFixed(1)}s`;
   return `${ms}ms`;
+}
+
+export function classifySeverity(durationMs: number, hasError: boolean): string {
+  if (hasError) return "error";
+  if (durationMs >= 8000) return "very_slow";
+  if (durationMs >= 3000) return "slow";
+  return "ok";
 }
 
 export function calculateStats(rows: MockTelemetryRow[]) {
@@ -122,19 +130,14 @@ export function calculateTopOffenders(rows: MockTelemetryRow[]) {
     .slice(0, 8);
 }
 
-export function calculateTimeSeries(
-  rows: MockTelemetryRow[],
-  timeFilter: string
-) {
+export function calculateTimeSeries(rows: MockTelemetryRow[], timeFilter: string) {
   if (rows.length === 0) return [];
-
   const bucketMs = timeFilter === "1h" ? 5 * 60 * 1000
     : timeFilter === "6h" ? 30 * 60 * 1000
     : timeFilter === "24h" ? 60 * 60 * 1000
     : 6 * 60 * 60 * 1000;
 
   const buckets = new Map<number, { slow: number; very_slow: number; error: number }>();
-
   for (const r of rows) {
     const ts = new Date(r.created_at).getTime();
     const bucket = Math.floor(ts / bucketMs) * bucketMs;
@@ -144,7 +147,6 @@ export function calculateTimeSeries(
     else if (r.severity === "error") prev.error++;
     buckets.set(bucket, prev);
   }
-
   return [...buckets.entries()]
     .sort((a, b) => a[0] - b[0])
     .map(([ts, data]) => ({ ts, ...data }));
@@ -158,6 +160,41 @@ export function calculateSeverityDistribution(rows: MockTelemetryRow[]) {
   return Object.entries(counts).map(([name, value]) => ({ name, value }));
 }
 
+export function calculateDurationBuckets(rows: MockTelemetryRow[], timeFilter: string) {
+  if (rows.length === 0) return [];
+  const bucketMs = timeFilter === "1h" ? 5 * 60 * 1000
+    : timeFilter === "6h" ? 30 * 60 * 1000
+    : timeFilter === "24h" ? 60 * 60 * 1000
+    : 6 * 60 * 60 * 1000;
+
+  const buckets = new Map<number, { total: number; count: number; max: number }>();
+  for (const r of rows) {
+    const ts = new Date(r.created_at).getTime();
+    const bucket = Math.floor(ts / bucketMs) * bucketMs;
+    const prev = buckets.get(bucket) || { total: 0, count: 0, max: 0 };
+    prev.total += r.duration_ms;
+    prev.count++;
+    prev.max = Math.max(prev.max, r.duration_ms);
+    buckets.set(bucket, prev);
+  }
+  return [...buckets.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([ts, d]) => ({ ts, mediaMs: Math.round(d.total / d.count), maxMs: d.max }));
+}
+
+export function calculateTableAlerts(rows: MockTelemetryRow[]) {
+  if (rows.length === 0) return [];
+  const stats = new Map<string, number>();
+  for (const r of rows) {
+    const key = r.rpc_name || r.table_name || "unknown";
+    stats.set(key, (stats.get(key) || 0) + 1);
+  }
+  return [...stats.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([name, alertas]) => ({ name, alertas }));
+}
+
 export function getTimeThreshold(timeFilter: string): string {
   const now = new Date();
   switch (timeFilter) {
@@ -167,4 +204,45 @@ export function getTimeThreshold(timeFilter: string): string {
     case "7d": return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     default: return new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   }
+}
+
+export function generateCSVContent(rows: MockTelemetryRow[]): string {
+  const headers = ["Data/Hora", "Operação", "Tabela/RPC", "Duração (ms)", "Severidade", "Registros", "Limit", "Offset", "Count Mode", "Erro"];
+  const csvRows = rows.map(r => [
+    new Date(r.created_at).toLocaleString("pt-BR"),
+    r.operation,
+    r.table_name || r.rpc_name || "-",
+    r.duration_ms,
+    r.severity,
+    r.record_count ?? "-",
+    r.query_limit ?? "-",
+    r.query_offset ?? "-",
+    r.count_mode ?? "-",
+    `"${(r.error_message || "").replace(/"/g, '""')}"`,
+  ]);
+  return [headers.join(";"), ...csvRows.map(r => r.join(";"))].join("\n");
+}
+
+export function buildTelemetryLogLine(meta: {
+  operation: string;
+  table?: string;
+  rpcName?: string;
+  durationMs: number;
+  recordCount?: number;
+  limit?: number;
+  offset?: number;
+  countMode?: string;
+  status: string;
+  error?: string;
+}): string {
+  const icon = meta.status === "very_slow" ? "🔴"
+    : meta.status === "slow" ? "🟡"
+    : meta.status === "error" ? "❌"
+    : "✅";
+  const target = meta.rpcName || meta.table || "unknown";
+  return `${icon} [telemetry] ${meta.operation}:${target} ${meta.durationMs}ms` +
+    ` | records=${meta.recordCount ?? "-"}` +
+    ` limit=${meta.limit ?? "-"}` +
+    ` offset=${meta.offset ?? "-"}` +
+    ` count=${meta.countMode ?? "-"}`;
 }
