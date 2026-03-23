@@ -51,12 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       if (newSession?.user) {
-        // Defer role fetch to avoid Supabase deadlock
-        setTimeout(async () => {
-          const roles = await fetchUserRoles(newSession.user.id);
-          setUser(buildUser(newSession.user, roles));
-        }, 0);
+        // Set basic user immediately to avoid null flash / redirect race
+        setUser(buildUser(newSession.user, ['user']));
         setSession(newSession);
+        // Then enrich with real roles asynchronously
+        const roles = await fetchUserRoles(newSession.user.id);
+        setUser(buildUser(newSession.user, roles));
       } else {
         setUser(null);
         setSession(null);

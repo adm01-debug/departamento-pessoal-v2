@@ -19,7 +19,7 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
   };
 
   return (
-    <header className={cn(
+    <header role="banner" className={cn(
       'flex items-center justify-between h-14 px-4 lg:px-6',
       'border-b border-border/40 bg-background/80 backdrop-blur-xl',
       className
