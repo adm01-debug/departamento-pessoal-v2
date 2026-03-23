@@ -35,7 +35,7 @@ describe('exportarDesligamentosExcel', () => {
     expect(toast.error).toHaveBeenCalledWith('Nenhum desligamento para exportar');
   });
 
-  it('should export successfully with data', () => {
+  it('should export successfully with data', async () => {
     const data = [
       {
         id: '1',
@@ -55,7 +55,7 @@ describe('exportarDesligamentosExcel', () => {
         total_descontos: 3000,
       },
     ];
-    exportarDesligamentosExcel(data);
+    await exportarDesligamentosExcel(data);
     expect(toast.success).toHaveBeenCalledWith('Planilha exportada com sucesso!');
   });
 
