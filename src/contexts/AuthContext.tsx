@@ -64,11 +64,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
-      if (initialSession?.user) {
-        const roles = await fetchUserRoles(initialSession.user.id);
-        setUser(buildUser(initialSession.user, roles));
-        setSession(initialSession);
+      try {
+        if (initialSession?.user) {
+          let roles: AppRole[] = ['user'];
+          try {
+            roles = await fetchUserRoles(initialSession.user.id);
+          } catch (e) {
+            console.warn('Failed to fetch user roles, using default:', e);
+          }
+          setUser(buildUser(initialSession.user, roles));
+          setSession(initialSession);
+        }
+      } catch (e) {
+        console.error('Auth initialization error:', e);
+      } finally {
+        setLoading(false);
+        setIsReady(true);
       }
+    }).catch((e) => {
+      console.error('Failed to get session:', e);
       setLoading(false);
       setIsReady(true);
     });
