@@ -3,6 +3,8 @@ import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
+import { useBruteForceProtection } from '@/hooks/useBruteForceProtection';
+import { LockoutMessage } from '@/components/login/LockoutMessage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
