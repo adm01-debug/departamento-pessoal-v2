@@ -305,7 +305,10 @@ export default function LoginPage() {
                       </button>
                     </div>
                   </div>
-                  {error && (
+                  {lockState.isLocked && (
+                    <LockoutMessage remainingSeconds={lockState.remainingSeconds} />
+                  )}
+                  {error && !lockState.isLocked && (
                     <motion.p role="alert" aria-live="assertive" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg">
                       {error}
@@ -314,7 +317,7 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     className="w-full h-11 rounded-lg font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-glow"
-                    disabled={loading}
+                    disabled={loading || lockState.isLocked}
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Entrar
