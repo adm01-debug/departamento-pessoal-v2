@@ -52,12 +52,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (lockState.isLocked) return;
     setLoading(true);
     setError('');
     try {
+      const isLocked = await checkLock(email);
+      if (isLocked) {
+        setLoading(false);
+        return;
+      }
       await signIn(email, password);
+      await resetAttempts(email);
       navigate('/dashboard');
     } catch (err: any) {
+      await recordFailedAttempt(email);
       setError(err.message || 'Erro ao fazer login');
     } finally {
       setLoading(false);
