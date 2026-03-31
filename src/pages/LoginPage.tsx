@@ -31,6 +31,7 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const { signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const { lockState, checkLock, recordFailedAttempt, resetAttempts } = useBruteForceProtection();
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
