@@ -3,6 +3,8 @@ import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
+import { useBruteForceProtection } from '@/hooks/useBruteForceProtection';
+import { LockoutMessage } from '@/components/login/LockoutMessage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +31,7 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const { signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const { lockState, checkLock, recordFailedAttempt, resetAttempts } = useBruteForceProtection();
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -49,12 +52,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (lockState.isLocked) return;
     setLoading(true);
     setError('');
     try {
+      const isLocked = await checkLock(email);
+      if (isLocked) {
+        setLoading(false);
+        return;
+      }
       await signIn(email, password);
+      await resetAttempts(email);
       navigate('/dashboard');
     } catch (err: any) {
+      await recordFailedAttempt(email);
       setError(err.message || 'Erro ao fazer login');
     } finally {
       setLoading(false);
@@ -294,7 +305,10 @@ export default function LoginPage() {
                       </button>
                     </div>
                   </div>
-                  {error && (
+                  {lockState.isLocked && (
+                    <LockoutMessage remainingSeconds={lockState.remainingSeconds} />
+                  )}
+                  {error && !lockState.isLocked && (
                     <motion.p role="alert" aria-live="assertive" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg">
                       {error}
@@ -303,7 +317,7 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     className="w-full h-11 rounded-lg font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-glow"
-                    disabled={loading}
+                    disabled={loading || lockState.isLocked}
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Entrar
