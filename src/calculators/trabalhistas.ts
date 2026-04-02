@@ -397,3 +397,91 @@ export function calcularBancoHoras(creditos: string[], debitos: string[]): {
   const saldoFormatado = `${saldo < 0 ? '-' : ''}${horas}:${minutos.toString().padStart(2, '0')}`;
   return { totalCreditos, totalDebitos, saldo, saldoFormatado };
 }
+
+// ===== MULTA FGTS =====
+export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | 'acordo_mutuo'): number {
+  const percentual = tipo === 'sem_justa_causa' ? 0.40 : 0.20;
+  return Math.round(saldoFGTS * percentual * 100) / 100;
+}
+
+// ===== MÉDIAS (para 13º, férias, rescisão) =====
+export function calcularMedias(valoresMensais: number[]): {
+  media: number; meses: number; total: number;
+} {
+  if (valoresMensais.length === 0) return { media: 0, meses: 0, total: 0 };
+  const total = Math.round(valoresMensais.reduce((a, b) => a + b, 0) * 100) / 100;
+  const media = Math.round((total / valoresMensais.length) * 100) / 100;
+  return { media, meses: valoresMensais.length, total };
+}
+
+// ===== ADICIONAL DE TRANSFERÊNCIA =====
+export function calcularAdicionalTransferencia(salarioBase: number, percentual: number = 25): number {
+  return Math.round(salarioBase * (percentual / 100) * 100) / 100;
+}
+
+// ===== SALÁRIO-FAMÍLIA =====
+export function calcularSalarioFamilia(salarioBruto: number, dependentes: number): number {
+  // Tabela 2026 (estimativa baseada em 2025)
+  if (salarioBruto > 1819.26) return 0;
+  const valorPorDependente = salarioBruto <= 1212.64 ? 62.04 : 43.73;
+  return Math.round(valorPorDependente * dependentes * 100) / 100;
+}
+
+// ===== CÁLCULO COMPLETO DA FOLHA =====
+export interface ParamsFolhaCompleta {
+  salarioBase: number;
+  horasExtras50?: number;
+  horasExtras100?: number;
+  horasNoturnas?: number;
+  adicionalNoturnoPerc?: number;
+  insalubridade?: GrauInsalubridade | null;
+  periculosidade?: boolean;
+  dependentes?: number;
+  valeTransporte?: number;
+  pensaoPercentual?: number;
+  outrosDescontos?: number;
+  outrosProventos?: number;
+}
+
+export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
+  const {
+    salarioBase, horasExtras50 = 0, horasExtras100 = 0,
+    horasNoturnas = 0, adicionalNoturnoPerc = 20,
+    insalubridade = null, periculosidade = false,
+    dependentes = 0, valeTransporte = 0,
+    pensaoPercentual = 0, outrosDescontos = 0, outrosProventos = 0,
+  } = params;
+
+  // Proventos
+  const he = calcularHorasExtras(salarioBase, horasExtras50, horasExtras100);
+  const adNoturno = horasNoturnas > 0 ? calcularAdicionalNoturno(salarioBase, horasNoturnas, adicionalNoturnoPerc) : 0;
+  const adInsalubridade = insalubridade ? calcularInsalubridade(insalubridade) : 0;
+  const adPericulosidade = periculosidade ? calcularPericulosidade(salarioBase) : 0;
+
+  const totalProventos = Math.round((salarioBase + he.total + adNoturno + adInsalubridade + adPericulosidade + outrosProventos) * 100) / 100;
+
+  // Descontos
+  const inss = calcularINSS(totalProventos);
+  const irrf = calcularIRRF(totalProventos, dependentes);
+  const fgts = calcularFGTS(totalProventos);
+  const descontoVT = valeTransporte > 0 ? calcularDescontoVT(salarioBase, valeTransporte) : 0;
+  
+  const salarioAposDescontosBase = totalProventos - inss - irrf - descontoVT - outrosDescontos;
+  const pensao = pensaoPercentual > 0 ? calcularPensaoAlimenticia(salarioAposDescontosBase, pensaoPercentual) : 0;
+
+  const totalDescontos = Math.round((inss + irrf + descontoVT + pensao + outrosDescontos) * 100) / 100;
+  const salarioLiquido = Math.round((totalProventos - totalDescontos) * 100) / 100;
+
+  return {
+    proventos: {
+      salarioBase, horasExtras: he.total, adicionalNoturno: adNoturno,
+      insalubridade: adInsalubridade, periculosidade: adPericulosidade,
+      outrosProventos, totalProventos,
+    },
+    descontos: {
+      inss, irrf, valeTransporte: descontoVT, pensao, outrosDescontos, totalDescontos,
+    },
+    fgts,
+    salarioLiquido,
+  };
+}
