@@ -8,7 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
-import { FileText, Search, Info, DollarSign, Users, TrendingDown } from 'lucide-react';
+import { FileText, Search, Info, DollarSign, Users, TrendingDown, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { gerarPDFHolerite } from '@/utils/holeritePDF';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
