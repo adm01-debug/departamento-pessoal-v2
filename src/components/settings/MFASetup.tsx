@@ -39,7 +39,7 @@ export function MFASetup() {
     queryKey: ['user-mfa-record', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data } = await supabase.from('user_mfa').select('*').eq('id', user!.id).maybeSingle();
+      const { data } = await supabase.from('user_mfa').select('*').eq('user_id', user!.id).maybeSingle();
       return data;
     },
   });
