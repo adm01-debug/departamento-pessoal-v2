@@ -255,6 +255,9 @@ export default function WorkflowsPage() {
                     const StatusIcon = config.icon;
                     const horasDecorridas = Math.round((Date.now() - new Date(e.created_at).getTime()) / (1000 * 60 * 60));
                     const slaExcedido = (e.status === 'pendente' || e.status === 'em_andamento') && horasDecorridas > 48;
+                    const canAct = e.status === 'pendente' || e.status === 'em_andamento';
+                    const horasDecorridas = Math.round((Date.now() - new Date(e.created_at).getTime()) / (1000 * 60 * 60));
+                    const slaExcedido = (e.status === 'pendente' || e.status === 'em_andamento') && horasDecorridas > 48;
 
                     return (
                       <TableRow key={e.id} className="hover:bg-accent/30 transition-colors">
