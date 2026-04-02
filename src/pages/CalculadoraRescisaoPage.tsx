@@ -186,9 +186,14 @@ export default function CalculadoraRescisaoPage() {
                     </div>
                   </div>
 
-                  <Button onClick={() => gerarPDFRescisao(form, result)} className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
-                    <Download className="h-4 w-4 mr-2" />Gerar TRCT (PDF)
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={() => gerarPDFRescisao(form, result)} className="flex-1 rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
+                      <Download className="h-4 w-4 mr-2" />Gerar TRCT (PDF)
+                    </Button>
+                    <Button onClick={salvarHistorico} disabled={saving} variant="outline" className="rounded-xl font-body">
+                      <Save className="h-4 w-4 mr-2" />{saving ? 'Salvando...' : 'Salvar'}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
