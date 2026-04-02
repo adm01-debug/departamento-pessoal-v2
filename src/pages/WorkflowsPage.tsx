@@ -70,6 +70,18 @@ export default function WorkflowsPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_def'] }); toast.success('Workflow excluído'); },
   });
 
+  const aprovar = useMutation({
+    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'aprovado', concluida_em: new Date().toISOString() }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_exec'] }); toast.success('Workflow aprovado!'); },
+    onError: () => toast.error('Erro ao aprovar'),
+  });
+
+  const rejeitar = useMutation({
+    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'rejeitado', concluida_em: new Date().toISOString() }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_exec'] }); toast.success('Workflow rejeitado'); },
+    onError: () => toast.error('Erro ao rejeitar'),
+  });
+
   const stats = {
     total: definicoes.length,
     andamento: execucoes.filter((e: any) => e.status === 'em_andamento').length,
