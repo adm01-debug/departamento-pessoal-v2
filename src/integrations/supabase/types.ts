@@ -7089,6 +7089,77 @@ export type Database = {
           },
         ]
       }
+      historico_rescisoes: {
+        Row: {
+          aviso_trabalhado: boolean | null
+          cargo: string | null
+          cpf: string | null
+          created_at: string
+          created_by: string | null
+          data_admissao: string
+          data_desligamento: string
+          empresa_id: string | null
+          ferias_vencidas: boolean | null
+          id: string
+          nome_colaborador: string | null
+          resultado: Json | null
+          salario: number
+          saldo_fgts: number | null
+          tipo_rescisao: string
+          total_descontos: number | null
+          total_liquido: number | null
+          total_proventos: number | null
+        }
+        Insert: {
+          aviso_trabalhado?: boolean | null
+          cargo?: string | null
+          cpf?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_admissao: string
+          data_desligamento: string
+          empresa_id?: string | null
+          ferias_vencidas?: boolean | null
+          id?: string
+          nome_colaborador?: string | null
+          resultado?: Json | null
+          salario: number
+          saldo_fgts?: number | null
+          tipo_rescisao: string
+          total_descontos?: number | null
+          total_liquido?: number | null
+          total_proventos?: number | null
+        }
+        Update: {
+          aviso_trabalhado?: boolean | null
+          cargo?: string | null
+          cpf?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_admissao?: string
+          data_desligamento?: string
+          empresa_id?: string | null
+          ferias_vencidas?: boolean | null
+          id?: string
+          nome_colaborador?: string | null
+          resultado?: Json | null
+          salario?: number
+          saldo_fgts?: number | null
+          tipo_rescisao?: string
+          total_descontos?: number | null
+          total_liquido?: number | null
+          total_proventos?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_rescisoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_salarial: {
         Row: {
           ativo: boolean | null
