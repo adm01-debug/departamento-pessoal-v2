@@ -189,6 +189,10 @@ export default function ConfiguracoesPage() {
             <MFASetup />
           </motion.div>
         </TabsContent>
+
+        <TabsContent value="campos">
+          <CamposCustomizadosTab />
+        </TabsContent>
       </Tabs>
     </PageLayout>
     </>
