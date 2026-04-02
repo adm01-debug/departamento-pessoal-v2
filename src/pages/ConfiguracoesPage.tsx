@@ -14,6 +14,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
 import { Settings, Plus, Trash2, Bell, Shield, Layers } from 'lucide-react';
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
+import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
