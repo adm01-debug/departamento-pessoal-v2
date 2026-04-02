@@ -243,6 +243,8 @@ export default function WorkflowsPage() {
                     <TableHead className="font-display">Progresso</TableHead>
                     <TableHead className="font-display">Data</TableHead>
                     <TableHead className="font-display">SLA</TableHead>
+                    <TableHead className="font-display">Ações</TableHead>
+                    <TableHead className="font-display">SLA</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
