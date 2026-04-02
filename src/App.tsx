@@ -84,6 +84,7 @@ const CalculadoraRescisaoPage = lazy(() => import('@/pages/CalculadoraRescisaoPa
 const ImportacaoPage = lazy(() => import('@/pages/ImportacaoPage'));
 const DashboardExecutivoPage = lazy(() => import('@/pages/DashboardExecutivoPage'));
 const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
+const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
