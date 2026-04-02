@@ -8,19 +8,23 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Calculator, Download } from 'lucide-react';
+import { Calculator, Download, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { calcularRescisao, fmt, type RescisaoResult } from '@/utils/rescisaoCalc';
 import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function CalculadoraRescisaoPage() {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
     avisoTrabalhado: false, feriasVencidas: false, saldoFGTS: '',
   });
   const [result, setResult] = useState<RescisaoResult | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const handleCalc = useCallback(() => {
     if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
@@ -38,6 +42,35 @@ export default function CalculadoraRescisaoPage() {
     }));
   }, [form]);
 
+  const salvarHistorico = useCallback(async () => {
+    if (!result || !user) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('historico_rescisoes' as any).insert({
+        created_by: user.id,
+        nome_colaborador: form.nomeColaborador || null,
+        cpf: form.cpf || null,
+        cargo: form.cargo || null,
+        salario: Number(form.salario),
+        data_admissao: form.dataAdmissao,
+        data_desligamento: form.dataDesligamento,
+        tipo_rescisao: form.tipo,
+        aviso_trabalhado: form.avisoTrabalhado,
+        ferias_vencidas: form.feriasVencidas,
+        saldo_fgts: Number(form.saldoFGTS || 0),
+        total_proventos: result.totalProventos,
+        total_descontos: result.totalDescontos,
+        total_liquido: result.totalLiquido,
+        resultado: result as any,
+      });
+      if (error) throw error;
+      toast.success('Cálculo salvo no histórico!');
+    } catch (err: any) {
+      toast.error(`Erro ao salvar: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }, [result, form, user]);
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
   return (
@@ -153,9 +186,14 @@ export default function CalculadoraRescisaoPage() {
                     </div>
                   </div>
 
-                  <Button onClick={() => gerarPDFRescisao(form, result)} className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
-                    <Download className="h-4 w-4 mr-2" />Gerar TRCT (PDF)
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={() => gerarPDFRescisao(form, result)} className="flex-1 rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
+                      <Download className="h-4 w-4 mr-2" />Gerar TRCT (PDF)
+                    </Button>
+                    <Button onClick={salvarHistorico} disabled={saving} variant="outline" className="rounded-xl font-body">
+                      <Save className="h-4 w-4 mr-2" />{saving ? 'Salvando...' : 'Salvar'}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

@@ -8,7 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
-import { FileText, Search, Info, DollarSign, Users, TrendingDown } from 'lucide-react';
+import { FileText, Search, Info, DollarSign, Users, TrendingDown, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { gerarPDFHolerite } from '@/utils/holeritePDF';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
@@ -139,6 +141,7 @@ export default function HoleritesPage() {
                           Líquido <Info className="h-3 w-3 text-muted-foreground/50" />
                         </TooltipTrigger><TooltipContent className="max-w-[200px] text-xs">{componenteInfo['Líquido']}</TooltipContent></Tooltip></TooltipProvider>
                       </TableHead>
+                      <TableHead className="font-display font-semibold text-center">Ação</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -151,6 +154,11 @@ export default function HoleritesPage() {
                         <TableCell className="text-right text-success font-body font-semibold tabular-nums">{formatCurrency(r.total_proventos || 0)}</TableCell>
                         <TableCell className="text-right text-destructive font-body font-semibold tabular-nums">{formatCurrency(r.total_descontos || 0)}</TableCell>
                         <TableCell className="text-right font-display font-bold tabular-nums">{formatCurrency(r.liquido || 0)}</TableCell>
+                        <TableCell className="text-center">
+                          <Button size="sm" variant="ghost" className="h-7 rounded-lg" onClick={() => gerarPDFHolerite(r as any)}>
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -183,6 +191,9 @@ export default function HoleritesPage() {
                         <p className="text-caption font-display font-bold">{formatCurrency(r.liquido || 0)}</p>
                       </div>
                     </div>
+                    <Button size="sm" variant="outline" className="w-full rounded-xl mt-2" onClick={() => gerarPDFHolerite(r as any)}>
+                      <Download className="h-3.5 w-3.5 mr-2" />Baixar PDF
+                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>

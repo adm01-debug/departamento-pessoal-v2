@@ -12,7 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Plus, Trash2, Bell, Shield } from 'lucide-react';
+import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan } from 'lucide-react';
+import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
+import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -68,6 +70,8 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
           <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bell className="mr-1 h-3 w-3" />Alertas</TabsTrigger>
           <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Shield className="mr-1 h-3 w-3" />Segurança</TabsTrigger>
+          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Layers className="mr-1 h-3 w-3" />Campos</TabsTrigger>
+          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
@@ -186,6 +190,14 @@ export default function ConfiguracoesPage() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <MFASetup />
           </motion.div>
+        </TabsContent>
+
+        <TabsContent value="campos">
+          <CamposCustomizadosTab />
+        </TabsContent>
+
+        <TabsContent value="ips">
+          <IPBlockingTab />
         </TabsContent>
       </Tabs>
     </PageLayout>
