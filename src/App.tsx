@@ -84,6 +84,7 @@ const CalculadoraRescisaoPage = lazy(() => import('@/pages/CalculadoraRescisaoPa
 const ImportacaoPage = lazy(() => import('@/pages/ImportacaoPage'));
 const DashboardExecutivoPage = lazy(() => import('@/pages/DashboardExecutivoPage'));
 const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
+const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 
 function PageLoader() {
   return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
@@ -113,6 +114,7 @@ export default function App() {
         <Route path="empresas/:id/editar" element={<LazyPage Component={EmpresaFormPage} />} />
         <Route path="folha" element={<LazyPage Component={FolhaPage} />} />
         <Route path="folha/calcular" element={<LazyPage Component={FolhaPagamentoPage} />} />
+        <Route path="folha/rubricas" element={<LazyPage Component={RubricasPage} />} />
         <Route path="ferias" element={<LazyPage Component={FeriasPage} />} />
         <Route path="ponto" element={<LazyPage Component={PontoPage} />} />
         <Route path="beneficios" element={<LazyPage Component={BeneficiosPage} />} />

@@ -70,6 +70,18 @@ export default function WorkflowsPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_def'] }); toast.success('Workflow excluído'); },
   });
 
+  const aprovar = useMutation({
+    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'aprovado', concluida_em: new Date().toISOString() }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_exec'] }); toast.success('Workflow aprovado!'); },
+    onError: () => toast.error('Erro ao aprovar'),
+  });
+
+  const rejeitar = useMutation({
+    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'rejeitado', concluida_em: new Date().toISOString() }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_exec'] }); toast.success('Workflow rejeitado'); },
+    onError: () => toast.error('Erro ao rejeitar'),
+  });
+
   const stats = {
     total: definicoes.length,
     andamento: execucoes.filter((e: any) => e.status === 'em_andamento').length,
@@ -231,6 +243,8 @@ export default function WorkflowsPage() {
                     <TableHead className="font-display">Progresso</TableHead>
                     <TableHead className="font-display">Data</TableHead>
                     <TableHead className="font-display">SLA</TableHead>
+                    <TableHead className="font-display">Ações</TableHead>
+                    <TableHead className="font-display">SLA</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -241,6 +255,7 @@ export default function WorkflowsPage() {
                     const StatusIcon = config.icon;
                     const horasDecorridas = Math.round((Date.now() - new Date(e.created_at).getTime()) / (1000 * 60 * 60));
                     const slaExcedido = (e.status === 'pendente' || e.status === 'em_andamento') && horasDecorridas > 48;
+                    const canAct = e.status === 'pendente' || e.status === 'em_andamento';
 
                     return (
                       <TableRow key={e.id} className="hover:bg-accent/30 transition-colors">
@@ -264,6 +279,18 @@ export default function WorkflowsPage() {
                             </Badge>
                           ) : (
                             <span className="text-xs text-muted-foreground font-body">{horasDecorridas}h</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {canAct && (
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="outline" className="h-7 text-xs rounded-lg text-success border-success/30 hover:bg-success/10" onClick={() => aprovar.mutate(e.id)}>
+                                <CheckCircle className="h-3 w-3 mr-1" />Aprovar
+                              </Button>
+                              <Button size="sm" variant="outline" className="h-7 text-xs rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => rejeitar.mutate(e.id)}>
+                                <XCircle className="h-3 w-3 mr-1" />Rejeitar
+                              </Button>
+                            </div>
                           )}
                         </TableCell>
                       </TableRow>
