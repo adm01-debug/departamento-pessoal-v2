@@ -141,6 +141,7 @@ export default function HoleritesPage() {
                           Líquido <Info className="h-3 w-3 text-muted-foreground/50" />
                         </TooltipTrigger><TooltipContent className="max-w-[200px] text-xs">{componenteInfo['Líquido']}</TooltipContent></Tooltip></TooltipProvider>
                       </TableHead>
+                      <TableHead className="font-display font-semibold text-center">Ação</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
