@@ -1723,6 +1723,128 @@ export type Database = {
           },
         ]
       }
+      candidatos: {
+        Row: {
+          cpf: string | null
+          created_at: string
+          curriculo_url: string | null
+          email: string | null
+          empresa_id: string | null
+          experiencia_anos: number | null
+          formacao: string | null
+          id: string
+          linkedin: string | null
+          nome: string
+          observacoes: string | null
+          origem: string | null
+          pretensao_salarial: number | null
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          cpf?: string | null
+          created_at?: string
+          curriculo_url?: string | null
+          email?: string | null
+          empresa_id?: string | null
+          experiencia_anos?: number | null
+          formacao?: string | null
+          id?: string
+          linkedin?: string | null
+          nome: string
+          observacoes?: string | null
+          origem?: string | null
+          pretensao_salarial?: number | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cpf?: string | null
+          created_at?: string
+          curriculo_url?: string | null
+          email?: string | null
+          empresa_id?: string | null
+          experiencia_anos?: number | null
+          formacao?: string | null
+          id?: string
+          linkedin?: string | null
+          nome?: string
+          observacoes?: string | null
+          origem?: string | null
+          pretensao_salarial?: number | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidatos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidaturas: {
+        Row: {
+          candidato_id: string
+          created_at: string
+          data_entrevista: string | null
+          entrevistador: string | null
+          etapa: string | null
+          feedback: string | null
+          id: string
+          motivo_rejeicao: string | null
+          nota_geral: number | null
+          status: string | null
+          updated_at: string
+          vaga_id: string
+        }
+        Insert: {
+          candidato_id: string
+          created_at?: string
+          data_entrevista?: string | null
+          entrevistador?: string | null
+          etapa?: string | null
+          feedback?: string | null
+          id?: string
+          motivo_rejeicao?: string | null
+          nota_geral?: number | null
+          status?: string | null
+          updated_at?: string
+          vaga_id: string
+        }
+        Update: {
+          candidato_id?: string
+          created_at?: string
+          data_entrevista?: string | null
+          entrevistador?: string | null
+          etapa?: string | null
+          feedback?: string | null
+          id?: string
+          motivo_rejeicao?: string | null
+          nota_geral?: number | null
+          status?: string | null
+          updated_at?: string
+          vaga_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidaturas_candidato_id_fkey"
+            columns: ["candidato_id"]
+            isOneToOne: false
+            referencedRelation: "candidatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidaturas_vaga_id_fkey"
+            columns: ["vaga_id"]
+            isOneToOne: false
+            referencedRelation: "vagas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cargos: {
         Row: {
           ativo: boolean | null
@@ -11682,6 +11804,80 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vagas: {
+        Row: {
+          beneficios_oferecidos: string | null
+          cargo: string | null
+          created_at: string
+          data_abertura: string | null
+          data_encerramento: string | null
+          departamento: string | null
+          descricao: string | null
+          empresa_id: string | null
+          faixa_salarial_max: number | null
+          faixa_salarial_min: number | null
+          id: string
+          modalidade: string | null
+          quantidade: number | null
+          requisitos: string | null
+          responsavel_id: string | null
+          status: string | null
+          tipo_contrato: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          beneficios_oferecidos?: string | null
+          cargo?: string | null
+          created_at?: string
+          data_abertura?: string | null
+          data_encerramento?: string | null
+          departamento?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          faixa_salarial_max?: number | null
+          faixa_salarial_min?: number | null
+          id?: string
+          modalidade?: string | null
+          quantidade?: number | null
+          requisitos?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+          tipo_contrato?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          beneficios_oferecidos?: string | null
+          cargo?: string | null
+          created_at?: string
+          data_abertura?: string | null
+          data_encerramento?: string | null
+          departamento?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          faixa_salarial_max?: number | null
+          faixa_salarial_min?: number | null
+          id?: string
+          modalidade?: string | null
+          quantidade?: number | null
+          requisitos?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+          tipo_contrato?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vagas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vales_alimentacao: {
         Row: {
