@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { validarEvento, getValidadoresDisponiveis, type ValidationResult } from '@/validators/esocialValidators';
 
 export interface ESocialEvento {
   id: string;
