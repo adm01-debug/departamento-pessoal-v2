@@ -194,6 +194,10 @@ export default function ConfiguracoesPage() {
         <TabsContent value="campos">
           <CamposCustomizadosTab />
         </TabsContent>
+
+        <TabsContent value="ips">
+          <IPBlockingTab />
+        </TabsContent>
       </Tabs>
     </PageLayout>
     </>
