@@ -154,6 +154,11 @@ export default function HoleritesPage() {
                         <TableCell className="text-right text-success font-body font-semibold tabular-nums">{formatCurrency(r.total_proventos || 0)}</TableCell>
                         <TableCell className="text-right text-destructive font-body font-semibold tabular-nums">{formatCurrency(r.total_descontos || 0)}</TableCell>
                         <TableCell className="text-right font-display font-bold tabular-nums">{formatCurrency(r.liquido || 0)}</TableCell>
+                        <TableCell className="text-center">
+                          <Button size="sm" variant="ghost" className="h-7 rounded-lg" onClick={() => gerarPDFHolerite(r as any)}>
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
