@@ -27,10 +27,32 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AUTH_INIT_TIMEOUT_MS = 4000;
+const USER_ROLES_TIMEOUT_MS = 2500;
+
 async function fetchUserRoles(userId: string): Promise<AppRole[]> {
   const { data, error } = await supabase.rpc('get_user_roles', { _user_id: userId });
   if (error || !data) return ['user'];
   return data as AppRole[];
+}
+
+function fetchUserRolesWithTimeout(userId: string): Promise<AppRole[]> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => {
+      console.warn('User roles fetch timed out, using default role.');
+      resolve(['user']);
+    }, USER_ROLES_TIMEOUT_MS);
+
+    fetchUserRoles(userId)
+      .then((roles) => {
+        window.clearTimeout(timeoutId);
+        resolve(roles);
+      })
+      .catch((error) => {
+        window.clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
 }
 
 function buildUser(supabaseUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }, roles: AppRole[]): User {
@@ -49,45 +71,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      if (newSession?.user) {
-        // Set basic user immediately to avoid null flash / redirect race
-        setUser(buildUser(newSession.user, ['user']));
-        setSession(newSession);
-        // Then enrich with real roles asynchronously
-        const roles = await fetchUserRoles(newSession.user.id);
-        setUser(buildUser(newSession.user, roles));
+    let isMounted = true;
+
+    const markReady = () => {
+      if (!isMounted) return;
+      setLoading(false);
+      setIsReady(true);
+    };
+
+    const applySession = (nextSession: Session | null) => {
+      if (!isMounted) return;
+
+      if (nextSession?.user) {
+        setUser(buildUser(nextSession.user, ['user']));
+        setSession(nextSession);
       } else {
         setUser(null);
         setSession(null);
       }
+
+      markReady();
+    };
+
+    const enrichUserWithRoles = async (supabaseUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
+      try {
+        const roles = await fetchUserRolesWithTimeout(supabaseUser.id);
+        if (!isMounted) return;
+        setUser(buildUser(supabaseUser, roles));
+      } catch (e) {
+        console.warn('Failed to fetch user roles, using default:', e);
+      }
+    };
+
+    const authInitTimeout = window.setTimeout(() => {
+      console.warn('Auth initialization timed out, continuing without blocking the UI.');
+      markReady();
+    }, AUTH_INIT_TIMEOUT_MS);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      applySession(newSession);
+
+      if (newSession?.user) {
+        void enrichUserWithRoles(newSession.user);
+      }
     });
 
-    supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
+    const initializeAuth = async () => {
       try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        applySession(initialSession);
+
         if (initialSession?.user) {
-          let roles: AppRole[] = ['user'];
-          try {
-            roles = await fetchUserRoles(initialSession.user.id);
-          } catch (e) {
-            console.warn('Failed to fetch user roles, using default:', e);
-          }
-          setUser(buildUser(initialSession.user, roles));
-          setSession(initialSession);
+          await enrichUserWithRoles(initialSession.user);
         }
       } catch (e) {
         console.error('Auth initialization error:', e);
+        if (!isMounted) return;
+        setUser(null);
+        setSession(null);
+        markReady();
       } finally {
-        setLoading(false);
-        setIsReady(true);
+        window.clearTimeout(authInitTimeout);
       }
-    }).catch((e) => {
-      console.error('Failed to get session:', e);
-      setLoading(false);
-      setIsReady(true);
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    void initializeAuth();
+
+    return () => {
+      isMounted = false;
+      window.clearTimeout(authInitTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
