@@ -67,6 +67,7 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
           <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bell className="mr-1 h-3 w-3" />Alertas</TabsTrigger>
+          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Shield className="mr-1 h-3 w-3" />Segurança</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
