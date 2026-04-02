@@ -42,6 +42,35 @@ export default function CalculadoraRescisaoPage() {
     }));
   }, [form]);
 
+  const salvarHistorico = useCallback(async () => {
+    if (!result || !user) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('historico_rescisoes' as any).insert({
+        created_by: user.id,
+        nome_colaborador: form.nomeColaborador || null,
+        cpf: form.cpf || null,
+        cargo: form.cargo || null,
+        salario: Number(form.salario),
+        data_admissao: form.dataAdmissao,
+        data_desligamento: form.dataDesligamento,
+        tipo_rescisao: form.tipo,
+        aviso_trabalhado: form.avisoTrabalhado,
+        ferias_vencidas: form.feriasVencidas,
+        saldo_fgts: Number(form.saldoFGTS || 0),
+        total_proventos: result.totalProventos,
+        total_descontos: result.totalDescontos,
+        total_liquido: result.totalLiquido,
+        resultado: result as any,
+      });
+      if (error) throw error;
+      toast.success('Cálculo salvo no histórico!');
+    } catch (err: any) {
+      toast.error(`Erro ao salvar: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }, [result, form, user]);
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
   return (
