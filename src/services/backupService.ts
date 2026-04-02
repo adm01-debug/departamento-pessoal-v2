@@ -25,14 +25,14 @@ const BACKUP_TABLES = [
 
 type BackupTable = typeof BACKUP_TABLES[number];
 
-async function fetchTableData(table: BackupTable) {
+async function fetchTableData(table: string) {
   const { data, error } = await supabase
-    .from(table)
+    .from(table as any)
     .select('*')
     .limit(10000);
 
   if (error) throw new Error(`Erro ao exportar ${table}: ${error.message}`);
-  return { table, data: data || [], count: data?.length || 0 };
+  return { table, data: (data as any[]) || [], count: (data as any[])?.length || 0 };
 }
 
 function formatBytes(bytes: number): string {
