@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Plus, Trash2, Bell, Shield, Layers } from 'lucide-react';
+import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan } from 'lucide-react';
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
 import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { MFASetup } from '@/components/settings/MFASetup';
