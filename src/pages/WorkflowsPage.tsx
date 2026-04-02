@@ -283,6 +283,18 @@ export default function WorkflowsPage() {
                             <span className="text-xs text-muted-foreground font-body">{horasDecorridas}h</span>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {canAct && (
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="outline" className="h-7 text-xs rounded-lg text-success border-success/30 hover:bg-success/10" onClick={() => aprovar.mutate(e.id)}>
+                                <CheckCircle className="h-3 w-3 mr-1" />Aprovar
+                              </Button>
+                              <Button size="sm" variant="outline" className="h-7 text-xs rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => rejeitar.mutate(e.id)}>
+                                <XCircle className="h-3 w-3 mr-1" />Rejeitar
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
