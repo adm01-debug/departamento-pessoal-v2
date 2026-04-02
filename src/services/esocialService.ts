@@ -87,25 +87,40 @@ export async function criarEvento(evento: {
   return data as ESocialEvento;
 }
 
+export async function validarAnteDeEnviar(tipoEvento: string, dados: Record<string, unknown>): Promise<ValidationResult> {
+  return validarEvento(tipoEvento, dados);
+}
+
+export function listarEventosValidaveis(): string[] {
+  return getValidadoresDisponiveis();
+}
+
 export async function enviarEvento(eventoId: string, empresaId: string) {
-  // Call edge function
+  // Fetch the event to validate before sending
+  const { data: evento } = await supabase.from('esocial_eventos').select('*').eq('id', eventoId).maybeSingle();
+  if (evento?.dados && evento?.tipo_evento) {
+    const validacao = validarEvento(evento.tipo_evento, evento.dados as Record<string, any>);
+    if (!validacao.valid) {
+      await supabase.from('esocial_eventos').update({
+        status: 'erro',
+        erros: { validacao: validacao.errors } as any,
+      }).eq('id', eventoId);
+      return { success: false, error: 'Falha na validação', validacao };
+    }
+  }
+
   const { data, error } = await supabase.functions.invoke('enviar-esocial', {
     body: { empresaId, eventoId },
   });
-
   if (error) throw error;
 
-  // Update local record
-  await supabase
-    .from('esocial_eventos')
-    .update({
-      status: data?.success ? 'enviado' : 'erro',
-      protocolo: data?.protocolo || null,
-      xml: data?.xml || null,
-      data_envio: data?.success ? new Date().toISOString() : null,
-      erros: data?.success ? null : { mensagem: data?.error },
-    })
-    .eq('id', eventoId);
+  await supabase.from('esocial_eventos').update({
+    status: data?.success ? 'enviado' : 'erro',
+    protocolo: data?.protocolo || null,
+    xml: data?.xml || null,
+    data_envio: data?.success ? new Date().toISOString() : null,
+    erros: data?.success ? null : { mensagem: data?.error },
+  }).eq('id', eventoId);
 
   return data;
 }
@@ -113,3 +128,5 @@ export async function enviarEvento(eventoId: string, empresaId: string) {
 export async function reenviarEvento(eventoId: string, empresaId: string) {
   return enviarEvento(eventoId, empresaId);
 }
+
+export { type ValidationResult } from '@/validators/esocialValidators';
