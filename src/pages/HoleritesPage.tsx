@@ -191,6 +191,9 @@ export default function HoleritesPage() {
                         <p className="text-caption font-display font-bold">{formatCurrency(r.liquido || 0)}</p>
                       </div>
                     </div>
+                    <Button size="sm" variant="outline" className="w-full rounded-xl mt-2" onClick={() => gerarPDFHolerite(r as any)}>
+                      <Download className="h-3.5 w-3.5 mr-2" />Baixar PDF
+                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>
