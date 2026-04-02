@@ -17,12 +17,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function CalculadoraRescisaoPage() {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
     avisoTrabalhado: false, feriasVencidas: false, saldoFGTS: '',
   });
   const [result, setResult] = useState<RescisaoResult | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const handleCalc = useCallback(() => {
     if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
