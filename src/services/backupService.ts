@@ -42,7 +42,7 @@ function formatBytes(bytes: number): string {
 }
 
 export async function exportarBackupCSV(
-  tables?: BackupTable[]
+  tables?: string[]
 ): Promise<{ blob: Blob; fileName: string; stats: { tabelas: number; registros: number; tamanho: string } }> {
   const targetTables = tables || [...BACKUP_TABLES];
   const results = await Promise.allSettled(targetTables.map(fetchTableData));
