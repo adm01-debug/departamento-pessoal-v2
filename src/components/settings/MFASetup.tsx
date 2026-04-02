@@ -111,12 +111,12 @@ export function MFASetup() {
       const { error } = await supabase.auth.mfa.unenroll({ factorId: activeFactor.id });
       if (error) throw error;
 
-      await supabase.from('user_mfa').upsert({
-        id: user!.id,
+      await supabase.from('user_mfa').upsert([{
+        user_id: user!.id,
         mfa_enabled: false,
         mfa_type: null,
         mfa_secret: null,
-      });
+      }], { onConflict: 'user_id' });
 
       toast.success('Autenticação de dois fatores desativada');
       setShowDisableDialog(false);
