@@ -96,6 +96,8 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
           <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
           <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
+          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ScrollText className="mr-1 h-3 w-3" />Logs Integ.</TabsTrigger>
+          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Database className="mr-1 h-3 w-3" />Config BD</TabsTrigger>
           <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
         </TabsList>
 
