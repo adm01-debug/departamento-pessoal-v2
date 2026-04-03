@@ -18,7 +18,6 @@ import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
 import { PontoStreakCard } from '@/components/ponto/PontoStreakCard';
 import { PontoCharts } from '@/components/ponto/PontoCharts';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
-import { Button } from '@/components/ui/button';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
