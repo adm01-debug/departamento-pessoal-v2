@@ -186,6 +186,10 @@ export default function ObrigacoesFiscaisPage() {
               <SelectTrigger className="w-[130px] rounded-xl"><SelectValue /></SelectTrigger>
               <SelectContent>{competencias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
             </Select>
+            <Button variant="outline" className="rounded-xl font-body gap-1.5" onClick={gerarGuiasServidor} disabled={gerandoServidor}>
+              {gerandoServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+              <span className="hidden sm:inline">Auto</span>
+            </Button>
             <Dialog open={openGuia} onOpenChange={setOpenGuia}>
               <DialogTrigger asChild>
                 <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
