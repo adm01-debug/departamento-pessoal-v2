@@ -93,6 +93,8 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Shield className="mr-1 h-3 w-3" />Segurança</TabsTrigger>
           <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Layers className="mr-1 h-3 w-3" />Campos</TabsTrigger>
           <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
+          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
+          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
