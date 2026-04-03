@@ -290,6 +290,14 @@ export default function ConfiguracoesPage() {
         <TabsContent value="sistema">
           <SystemHealthTab />
         </TabsContent>
+
+        <TabsContent value="logs-integ">
+          <LogsIntegracoesTab />
+        </TabsContent>
+
+        <TabsContent value="config-bd">
+          <ConfiguracoesGeraisTab />
+        </TabsContent>
       </Tabs>
     </PageLayout>
     </>
