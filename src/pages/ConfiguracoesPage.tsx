@@ -16,6 +16,8 @@ import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook,
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
 import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { SystemHealthTab } from '@/components/settings/SystemHealthTab';
+import { ConfiguracoesGeraisTab } from '@/components/settings/ConfiguracoesGeraisTab';
+import { LogsIntegracoesTab } from '@/components/settings/LogsIntegracoesTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
