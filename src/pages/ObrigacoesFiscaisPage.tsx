@@ -18,9 +18,10 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import {
   FileText, Receipt, DollarSign, Building2, Plus, Download, CheckCircle,
-  Clock, AlertTriangle, Calculator, RefreshCw, Calendar, TrendingUp, Shield
+  Clock, AlertTriangle, Calculator, RefreshCw, Calendar, TrendingUp, Shield, Loader2, Zap
 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
@@ -138,6 +139,28 @@ export default function ObrigacoesFiscaisPage() {
     },
   });
 
+  const [gerandoServidor, setGerandoServidor] = useState(false);
+
+  const gerarGuiasServidor = async () => {
+    if (!empresaAtual?.id) return;
+    setGerandoServidor(true);
+    try {
+      const [mes, ano] = competencia.split('/');
+      await edgeFunctionsService.gerarGuias({
+        empresaId: empresaAtual.id,
+        competencia: `${ano}-${mes}`,
+        tipo: 'todos',
+      });
+      qc.invalidateQueries({ queryKey: ['guias-fgts'] });
+      qc.invalidateQueries({ queryKey: ['guias-inss'] });
+      toast.success('Guias geradas automaticamente via servidor!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setGerandoServidor(false);
+    }
+  };
+
   const isLoading = l1 || l2 || l3 || l4;
   const hoje = new Date();
 
@@ -163,6 +186,10 @@ export default function ObrigacoesFiscaisPage() {
               <SelectTrigger className="w-[130px] rounded-xl"><SelectValue /></SelectTrigger>
               <SelectContent>{competencias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
             </Select>
+            <Button variant="outline" className="rounded-xl font-body gap-1.5" onClick={gerarGuiasServidor} disabled={gerandoServidor}>
+              {gerandoServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+              <span className="hidden sm:inline">Auto</span>
+            </Button>
             <Dialog open={openGuia} onOpenChange={setOpenGuia}>
               <DialogTrigger asChild>
                 <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">

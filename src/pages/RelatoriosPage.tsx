@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, Download, Loader2, PieChart, TrendingDown, ArrowUpRight, ArrowDownRight, FileSpreadsheet } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { FileText, Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, Download, Loader2, PieChart, TrendingDown, ArrowUpRight, ArrowDownRight, FileSpreadsheet, Mail, Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
@@ -17,6 +20,7 @@ import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--info))', 'hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))'];
 
@@ -99,6 +103,9 @@ export default function RelatoriosPage() {
   const { empresaAtual } = useEmpresa();
   const [generating, setGenerating] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState('csv');
+  const [emailDialog, setEmailDialog] = useState<string | null>(null);
+  const [emailTo, setEmailTo] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   // Analytics data
   const { data: analytics } = useQuery({
@@ -164,6 +171,25 @@ export default function RelatoriosPage() {
       toast.error(`Erro: ${err.message}`);
     } finally {
       setGenerating(null);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!emailDialog || !emailTo || !empresaAtual?.id) return;
+    setSendingEmail(true);
+    try {
+      await edgeFunctionsService.enviarRelatorioEmail({
+        tipo: emailDialog,
+        destinatarios: emailTo.split(',').map(e => e.trim()),
+        empresaId: empresaAtual.id,
+      });
+      toast.success('Relatório enviado por email!');
+      setEmailDialog(null);
+      setEmailTo('');
+    } catch (err: any) {
+      toast.error(`Erro ao enviar: ${err.message}`);
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -336,6 +362,14 @@ export default function RelatoriosPage() {
                         {generating === id ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
                         {generating === id ? 'Gerando...' : exportFormat === 'excel' ? 'Excel' : exportFormat === 'pdf' ? 'PDF' : 'CSV'}
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl border-border/50 hover:border-primary/30 hover:bg-primary/5 font-body"
+                        onClick={() => setEmailDialog(id)}
+                      >
+                        <Mail className="h-4 w-4" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -344,6 +378,28 @@ export default function RelatoriosPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Email Dialog */}
+      <Dialog open={!!emailDialog} onOpenChange={(o) => { if (!o) setEmailDialog(null); }}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-display"><Mail className="h-5 w-5" /> Enviar Relatório por Email</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="font-body">Destinatários (separados por vírgula)</Label>
+              <Input placeholder="email@empresa.com, rh@empresa.com" value={emailTo} onChange={e => setEmailTo(e.target.value)} className="rounded-xl" />
+            </div>
+            <p className="text-sm text-muted-foreground font-body">
+              Relatório: <span className="font-semibold text-foreground">{relatorios.find(r => r.id === emailDialog)?.title}</span>
+            </p>
+            <Button onClick={handleSendEmail} disabled={sendingEmail || !emailTo.trim()} className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
+              {sendingEmail ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+              {sendingEmail ? 'Enviando...' : 'Enviar por Email'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
     </>
   );

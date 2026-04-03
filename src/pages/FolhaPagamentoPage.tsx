@@ -5,11 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Download, Upload, Calculator, CheckCircle, AlertTriangle, Clock, RefreshCw,
   DollarSign, Users, TrendingDown, ArrowRight, FileText, Info, Shield, ChevronRight,
-  Banknote, Receipt
+  Banknote, Receipt, Gift, Loader2
 } from 'lucide-react';
+import { useCalcular13Salario } from '@/hooks/useCalcular13Salario';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { PageLayout } from '@/components/layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -235,6 +240,10 @@ export default function FolhaPagamentoPage() {
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
   const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
   const queryClient = useQueryClient();
+  const { calcular: calcular13, loading: loading13, resultado: resultado13 } = useCalcular13Salario();
+  const [open13, setOpen13] = useState(false);
+  const [form13, setForm13] = useState({ salario: '', dataAdmissao: '', parcela: '1' as '1' | '2', dependentes: '0' });
+  const [calcServidor, setCalcServidor] = useState(false);
 
   const calcularFolha = useMutation({
     mutationFn: async (comp: string) => {
@@ -259,6 +268,34 @@ export default function FolhaPagamentoPage() {
     },
     onError: (error: Error) => toast.error(`Erro: ${error.message}`),
   });
+
+  const calcularFolhaServidor = async () => {
+    setCalcServidor(true);
+    try {
+      const [mes, ano] = competencia.split('/');
+      await edgeFunctionsService.calcularFolha({ empresaId: '', competencia: `${ano}-${mes}` });
+      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
+      toast.success('Folha calculada no servidor com sucesso!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setCalcServidor(false);
+    }
+  };
+
+  const handleCalc13 = async () => {
+    await calcular13({
+      colaboradorId: 'simulacao',
+      salario: parseFloat(form13.salario) || 0,
+      mediaVariaveis: 0,
+      dataAdmissao: form13.dataAdmissao,
+      anoReferencia: new Date().getFullYear(),
+      parcela: parseInt(form13.parcela) as 1 | 2,
+      mesesAfastamento: 0,
+      dependentesIRRF: parseInt(form13.dependentes) || 0,
+      pensaoAlimenticia: 0,
+    });
+  };
 
   return (
     <PageLayout
@@ -292,6 +329,76 @@ export default function FolhaPagamentoPage() {
             <Calculator className="h-4 w-4" />
             {calcularFolha.isPending ? 'Calculando...' : 'Calcular'}
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={calcularFolhaServidor}
+            disabled={calcServidor}
+            className="rounded-xl gap-1.5 font-body"
+          >
+            {calcServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
+            <span className="hidden sm:inline">Servidor</span>
+          </Button>
+          <Dialog open={open13} onOpenChange={setOpen13}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
+                <Gift className="h-4 w-4" />
+                <span className="hidden sm:inline">13º Salário</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2"><Gift className="h-5 w-5" /> Simulador 13º Salário</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Salário Base (R$)</Label>
+                  <Input type="number" placeholder="5000.00" value={form13.salario} onChange={e => setForm13(p => ({ ...p, salario: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Admissão</Label>
+                  <Input type="date" value={form13.dataAdmissao} onChange={e => setForm13(p => ({ ...p, dataAdmissao: e.target.value }))} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Parcela</Label>
+                    <Select value={form13.parcela} onValueChange={v => setForm13(p => ({ ...p, parcela: v as '1' | '2' }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1ª Parcela</SelectItem>
+                        <SelectItem value="2">2ª Parcela</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Dependentes IRRF</Label>
+                    <Input type="number" min="0" value={form13.dependentes} onChange={e => setForm13(p => ({ ...p, dependentes: e.target.value }))} />
+                  </div>
+                </div>
+                <Button onClick={handleCalc13} disabled={loading13 || !form13.salario || !form13.dataAdmissao} className="w-full rounded-xl">
+                  {loading13 ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Calculator className="h-4 w-4 mr-2" />}
+                  Calcular 13º
+                </Button>
+                {resultado13 && (
+                  <Card className="border border-border/30 rounded-xl">
+                    <CardContent className="p-4 space-y-2 text-sm">
+                      <div className="flex justify-between"><span>Avos:</span><span className="font-bold">{resultado13.avos}/12</span></div>
+                      <div className="flex justify-between"><span>Valor Bruto:</span><span className="font-bold">{formatCurrency(resultado13.proventos.valorBruto)}</span></div>
+                      <div className="flex justify-between"><span>INSS:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.inss)}</span></div>
+                      <div className="flex justify-between"><span>IRRF:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.irrf)}</span></div>
+                      {resultado13.descontos.adiantamento1Parcela > 0 && (
+                        <div className="flex justify-between"><span>Adiant. 1ª Parcela:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.adiantamento1Parcela)}</span></div>
+                      )}
+                      <div className="border-t border-border/30 pt-2 flex justify-between text-base font-bold">
+                        <span>Líquido:</span><span className="text-primary">{formatCurrency(resultado13.liquido)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Pagamento até: {new Date(resultado13.dataLimitePagamento).toLocaleDateString('pt-BR')}</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       }
     >
