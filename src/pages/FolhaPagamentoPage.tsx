@@ -240,6 +240,10 @@ export default function FolhaPagamentoPage() {
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
   const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
   const queryClient = useQueryClient();
+  const { calcular: calcular13, loading: loading13, resultado: resultado13 } = useCalcular13Salario();
+  const [open13, setOpen13] = useState(false);
+  const [form13, setForm13] = useState({ salario: '', dataAdmissao: '', parcela: '1' as '1' | '2', dependentes: '0' });
+  const [calcServidor, setCalcServidor] = useState(false);
 
   const calcularFolha = useMutation({
     mutationFn: async (comp: string) => {
@@ -264,6 +268,34 @@ export default function FolhaPagamentoPage() {
     },
     onError: (error: Error) => toast.error(`Erro: ${error.message}`),
   });
+
+  const calcularFolhaServidor = async () => {
+    setCalcServidor(true);
+    try {
+      const [mes, ano] = competencia.split('/');
+      await edgeFunctionsService.calcularFolha({ empresaId: '', competencia: `${ano}-${mes}` });
+      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
+      toast.success('Folha calculada no servidor com sucesso!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setCalcServidor(false);
+    }
+  };
+
+  const handleCalc13 = async () => {
+    await calcular13({
+      colaboradorId: 'simulacao',
+      salario: parseFloat(form13.salario) || 0,
+      mediaVariaveis: 0,
+      dataAdmissao: form13.dataAdmissao,
+      anoReferencia: new Date().getFullYear(),
+      parcela: parseInt(form13.parcela) as 1 | 2,
+      mesesAfastamento: 0,
+      dependentesIRRF: parseInt(form13.dependentes) || 0,
+      pensaoAlimenticia: 0,
+    });
+  };
 
   return (
     <PageLayout
