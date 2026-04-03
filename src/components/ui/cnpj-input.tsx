@@ -4,7 +4,7 @@ import { Input } from './input';
 import { Button } from './button';
 import { Loader2, Search, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 
 interface CNPJData {
   cnpj: string;
