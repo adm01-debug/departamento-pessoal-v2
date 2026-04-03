@@ -278,6 +278,8 @@ export default function ConfiguracoesPage() {
             </Card>
           </motion.div>
         </TabsContent>
+
+        <TabsContent value="ips">
           <IPBlockingTab />
         </TabsContent>
       </Tabs>
