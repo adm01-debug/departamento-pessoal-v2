@@ -362,6 +362,14 @@ export default function RelatoriosPage() {
                         {generating === id ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
                         {generating === id ? 'Gerando...' : exportFormat === 'excel' ? 'Excel' : exportFormat === 'pdf' ? 'PDF' : 'CSV'}
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl border-border/50 hover:border-primary/30 hover:bg-primary/5 font-body"
+                        onClick={() => setEmailDialog(id)}
+                      >
+                        <Mail className="h-4 w-4" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
