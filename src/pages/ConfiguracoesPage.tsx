@@ -12,9 +12,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye } from 'lucide-react';
+import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye, Activity } from 'lucide-react';
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
 import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
+import { SystemHealthTab } from '@/components/settings/SystemHealthTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
@@ -95,6 +96,7 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
           <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
           <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
+          <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
@@ -281,6 +283,10 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="ips">
           <IPBlockingTab />
+        </TabsContent>
+
+        <TabsContent value="sistema">
+          <SystemHealthTab />
         </TabsContent>
       </Tabs>
     </PageLayout>

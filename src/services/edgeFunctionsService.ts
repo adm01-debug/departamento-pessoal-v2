@@ -106,4 +106,91 @@ export const edgeFunctionsService = {
     if (error) throw error;
     return data;
   },
+
+  /** Health check do sistema */
+  healthcheck: async () => {
+    const { data, error } = await supabase.functions.invoke('healthcheck', {
+      body: {},
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Limpeza de dados expirados */
+  limpezaDados: async () => {
+    const { data, error } = await supabase.functions.invoke('limpeza', {
+      body: {},
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Backup server-side */
+  backupServidor: async (empresaId?: string) => {
+    const { data, error } = await supabase.functions.invoke('backup', {
+      body: { empresaId },
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** OCR de documentos via AI */
+  ocrDocumento: async (params: {
+    fileUrl?: string;
+    bucket?: string;
+    filePath?: string;
+    documentType?: 'cpf' | 'rg' | 'ctps' | 'comprovante_endereco';
+  }) => {
+    const { data, error } = await supabase.functions.invoke('OCR', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Métricas do sistema */
+  metricas: async (empresaId: string) => {
+    const { data, error } = await supabase.functions.invoke('metricas', {
+      body: { empresaId },
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Notificações */
+  enviarNotificacao: async (params: {
+    action: 'enviar' | 'listar';
+    empresaId?: string;
+    tipo?: string;
+    destinatarios?: { user_id: string }[];
+    assunto?: string;
+    conteudo?: string;
+  }) => {
+    const { data, error } = await supabase.functions.invoke('notificacao', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Processar agendamentos de relatórios */
+  processarAgendamentos: async () => {
+    const { data, error } = await supabase.functions.invoke('processar-agendamentos', {
+      body: {},
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Gerar holerite server-side */
+  gerarHolerite: async (params: {
+    colaboradorId: string;
+    competencia: string;
+  }) => {
+    const { data, error } = await supabase.functions.invoke('gerar-holerite', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
 };

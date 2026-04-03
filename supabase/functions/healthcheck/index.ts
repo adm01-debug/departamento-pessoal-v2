@@ -1,49 +1,53 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-/**
- * Health check
- * Edge Function otimizada para baixa latência
- */
-
-interface RequestBody { data?: any; action?: string; }
-interface ResponseBody { success: boolean; data?: any; error?: string; }
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body: RequestBody = await req.json();
-    
-    // Lógica da função healthcheck
-    const result = await processhealthcheck(body, supabase);
+    const start = Date.now();
 
-    return new Response(
-      JSON.stringify({ success: true, data: result }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    // Check database connectivity
+    const { count: colabCount, error: dbError } = await supabase
+      .from('colaboradores')
+      .select('id', { count: 'exact', head: true });
+
+    const dbLatency = Date.now() - start;
+
+    // Check storage
+    const storageStart = Date.now();
+    const { error: storageError } = await supabase.storage.listBuckets();
+    const storageLatency = Date.now() - storageStart;
+
+    const totalLatency = Date.now() - start;
+    const allOk = !dbError && !storageError;
+
+    return new Response(JSON.stringify({
+      status: allOk ? 'healthy' : 'degraded',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: { status: !dbError ? 'ok' : 'error', latency_ms: dbLatency, records: colabCount || 0 },
+        storage: { status: !storageError ? 'ok' : 'error', latency_ms: storageLatency },
+      },
+      total_latency_ms: totalLatency,
+    }), {
+      status: allOk ? 200 : 503,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-    );
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ status: 'error', error: message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
+    });
   }
 });
-
-async function processhealthcheck(body: RequestBody, supabase: any) {
-  console.log('Processing healthcheck:', body);
-  return { processed: true, timestamp: new Date().toISOString() };
-}
