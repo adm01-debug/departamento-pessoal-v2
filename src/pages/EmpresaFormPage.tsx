@@ -72,12 +72,26 @@ export default function EmpresaFormPage() {
     <PageLayout title={isEditing ? 'Editar Empresa' : 'Nova Empresa'}>
       <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
         <FormSection title="Dados da Empresa">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">CNPJ <span className="text-xs text-muted-foreground">(busca automática)</span></label>
+            <CNPJInput
+              onChange={(v) => setValue('cnpj', v)}
+              onCompanyFound={(data) => {
+                setValue('razao_social', data.razao_social);
+                if (data.nome_fantasia) setValue('nome_fantasia', data.nome_fantasia);
+                if (data.email) setValue('email', data.email);
+                if (data.telefone) setValue('telefone', data.telefone);
+                if (data.cep) setValue('cep', data.cep);
+                if (data.logradouro) setValue('logradouro', data.logradouro);
+                if (data.numero) setValue('numero', data.numero);
+                if (data.bairro) setValue('bairro', data.bairro);
+                if (data.municipio) setValue('cidade', data.municipio);
+                if (data.uf) setValue('uf', data.uf);
+              }}
+            />
+          </div>
           <FormField label="Razão Social" {...register('razao_social')} error={errors.razao_social?.message} />
           <FormField label="Nome Fantasia" {...register('nome_fantasia')} />
-          <div className="space-y-2">
-            <label className="text-sm font-medium">CNPJ</label>
-            <CNPJInput onChange={(v) => setValue('cnpj', v)} />
-          </div>
           <FormField label="Inscrição Estadual" {...register('inscricao_estadual')} />
         </FormSection>
         <FormSection title="Contato">
@@ -89,8 +103,16 @@ export default function EmpresaFormPage() {
         </FormSection>
         <FormSection title="Endereço">
           <div className="space-y-2">
-            <label className="text-sm font-medium">CEP</label>
-            <CEPInput onChange={(v) => setValue('cep', v)} />
+            <label className="text-sm font-medium">CEP <span className="text-xs text-muted-foreground">(busca automática)</span></label>
+            <CEPInput
+              onChange={(v) => setValue('cep', v)}
+              onAddressFound={(addr) => {
+                setValue('logradouro', addr.logradouro);
+                setValue('bairro', addr.bairro);
+                setValue('cidade', addr.cidade);
+                setValue('uf', addr.uf);
+              }}
+            />
           </div>
           <FormField label="Logradouro" {...register('logradouro')} />
           <FormField label="Número" {...register('numero')} />
