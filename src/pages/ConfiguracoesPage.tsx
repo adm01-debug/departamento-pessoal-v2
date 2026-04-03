@@ -12,10 +12,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan } from 'lucide-react';
+import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye } from 'lucide-react';
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
 import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { MFASetup } from '@/components/settings/MFASetup';
+import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -31,6 +32,26 @@ export default function ConfiguracoesPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from('config_alertas_indicadores' as any).select('*').order('tipo');
       if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // === Integrações ===
+  const { data: integracoes = [], isLoading: loadInteg } = useQuery({
+    queryKey: ['integracoes'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('integracoes' as any).select('*').order('nome');
+      if (error) { if (error.code === '42P01') return []; throw error; }
+      return data || [];
+    },
+  });
+
+  // === Webhooks Logs ===
+  const { data: webhooksLogs = [], isLoading: loadWebhooks } = useQuery({
+    queryKey: ['webhooks-logs'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('webhooks_logs' as any).select('*').order('created_at', { ascending: false }).limit(50);
+      if (error) { if (error.code === '42P01') return []; throw error; }
       return data || [];
     },
   });
@@ -72,6 +93,8 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Shield className="mr-1 h-3 w-3" />Segurança</TabsTrigger>
           <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Layers className="mr-1 h-3 w-3" />Campos</TabsTrigger>
           <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
+          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
+          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
@@ -194,6 +217,66 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="campos">
           <CamposCustomizadosTab />
+        </TabsContent>
+
+        <TabsContent value="integracoes">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+              <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+              <CardHeader>
+                <CardTitle className="font-display flex items-center gap-2"><Plug className="h-5 w-5" /> Integrações</CardTitle>
+                <CardDescription className="font-body">Integrações configuradas no sistema</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                {loadInteg ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead>Última Sync</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      {integracoes.map((i: any) => (
+                        <TableRow key={i.id}>
+                          <TableCell className="font-medium">{i.nome}</TableCell>
+                          <TableCell className="text-muted-foreground">{i.tipo || '-'}</TableCell>
+                          <TableCell><Badge variant={i.ativo ? 'default' : 'secondary'} className="rounded-full">{i.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{i.ultima_sync ? new Date(i.ultima_sync).toLocaleString('pt-BR') : '-'}</TableCell>
+                        </TableRow>
+                      ))}
+                      {integracoes.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma integração configurada</TableCell></TableRow>}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="webhooks">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+              <div className="h-[2px] bg-gradient-to-r from-primary-glow to-primary" />
+              <CardHeader>
+                <CardTitle className="font-display flex items-center gap-2"><Webhook className="h-5 w-5" /> Logs de Webhooks</CardTitle>
+                <CardDescription className="font-body">Últimos 50 registros de webhooks</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                {loadWebhooks ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+                  <Table>
+                    <TableHeader><TableRow><TableHead>URL</TableHead><TableHead>Evento</TableHead><TableHead>Status</TableHead><TableHead>Data</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      {webhooksLogs.map((w: any) => (
+                        <TableRow key={w.id}>
+                          <TableCell className="font-mono text-xs max-w-[200px] truncate">{w.url || w.webhook_url || '-'}</TableCell>
+                          <TableCell className="text-sm">{w.evento || w.event || '-'}</TableCell>
+                          <TableCell><Badge variant={w.status_code === 200 ? 'default' : 'destructive'} className="rounded-full">{w.status_code || w.status || '-'}</Badge></TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{w.created_at ? new Date(w.created_at).toLocaleString('pt-BR') : '-'}</TableCell>
+                        </TableRow>
+                      ))}
+                      {webhooksLogs.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum log de webhook encontrado</TableCell></TableRow>}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </TabsContent>
 
         <TabsContent value="ips">

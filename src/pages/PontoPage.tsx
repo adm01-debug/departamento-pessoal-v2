@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Clock, LogIn, Coffee, LogOut, MapPin, Timer, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, Timer, TrendingUp, AlertTriangle, RefreshCw, Loader2 } from 'lucide-react';
 import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas } from '@/hooks';
@@ -17,13 +17,36 @@ import { supabase } from '@/integrations/supabase/client';
 import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
 import { PontoStreakCard } from '@/components/ponto/PontoStreakCard';
 import { PontoCharts } from '@/components/ponto/PontoCharts';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [time, setTime] = useState(new Date());
   const [geoStatus, setGeoStatus] = useState<'idle' | 'capturing' | 'success' | 'error'>('idle');
+  const [processando, setProcessando] = useState(false);
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
+
+  const processarPontoServidor = async () => {
+    if (!empresaAtual?.id) return;
+    setProcessando(true);
+    try {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      await edgeFunctionsService.processarPonto({
+        empresaId: empresaAtual.id,
+        dataInicio: weekAgo.toISOString().split('T')[0],
+        dataFim: new Date().toISOString().split('T')[0],
+      });
+      toast.success('Ponto processado no servidor com sucesso!');
+      refetchRegistro();
+      refetchBatidas();
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setProcessando(false);
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -143,6 +166,12 @@ export default function PontoPage() {
       description="Registre e acompanhe sua jornada de trabalho"
       icon={<Clock className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary/60 to-primary/90"
+      actions={
+        <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={processarPontoServidor} disabled={processando}>
+          {processando ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          <span className="hidden sm:inline">Processar Servidor</span>
+        </Button>
+      }
     >
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Clock & Register */}

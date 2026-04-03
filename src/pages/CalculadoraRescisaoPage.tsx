@@ -8,13 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Calculator, Download, Save } from 'lucide-react';
+import { Calculator, Download, Save, Shield, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { calcularRescisao, fmt, type RescisaoResult } from '@/utils/rescisaoCalc';
 import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 export default function CalculadoraRescisaoPage() {
   const { user } = useAuth();
@@ -25,6 +26,33 @@ export default function CalculadoraRescisaoPage() {
   });
   const [result, setResult] = useState<RescisaoResult | null>(null);
   const [saving, setSaving] = useState(false);
+  const [calcServidor, setCalcServidor] = useState(false);
+
+  const handleCalcServidor = async () => {
+    if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
+      toast.error('Preencha salário, data de admissão e desligamento');
+      return;
+    }
+    setCalcServidor(true);
+    try {
+      const data = await edgeFunctionsService.calcularRescisao({
+        salario_base: Number(form.salario),
+        data_admissao: form.dataAdmissao,
+        data_demissao: form.dataDesligamento,
+        tipo_rescisao: form.tipo,
+        aviso_previo: form.avisoTrabalhado ? 'trabalhado' : 'indenizado',
+        saldo_fgts: Number(form.saldoFGTS || 0),
+        ferias_vencidas: form.feriasVencidas ? 1 : 0,
+        dependentes_irrf: 0,
+      });
+      if (data?.resultado) setResult(data.resultado);
+      toast.success('Rescisão calculada no servidor!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setCalcServidor(false);
+    }
+  };
 
   const handleCalc = useCallback(() => {
     if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
@@ -116,9 +144,14 @@ export default function CalculadoraRescisaoPage() {
             <div className="flex items-center justify-between"><Label className="font-body text-xs">Aviso prévio trabalhado?</Label><Switch checked={form.avisoTrabalhado} onCheckedChange={v => set('avisoTrabalhado', v)} /></div>
             <div className="flex items-center justify-between"><Label className="font-body text-xs">Possui férias vencidas?</Label><Switch checked={form.feriasVencidas} onCheckedChange={v => set('feriasVencidas', v)} /></div>
 
-            <Button onClick={handleCalc} className="w-full rounded-xl bg-gradient-to-r from-warning to-destructive font-body">
-              <Calculator className="h-4 w-4 mr-2" />Calcular Rescisão
-            </Button>
+            <div className="grid grid-cols-2 gap-3">
+              <Button onClick={handleCalc} className="rounded-xl bg-gradient-to-r from-warning to-destructive font-body">
+                <Calculator className="h-4 w-4 mr-2" />Calcular Local
+              </Button>
+              <Button onClick={handleCalcServidor} disabled={calcServidor} variant="outline" className="rounded-xl font-body">
+                {calcServidor ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Shield className="h-4 w-4 mr-2" />}Calcular Servidor
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
