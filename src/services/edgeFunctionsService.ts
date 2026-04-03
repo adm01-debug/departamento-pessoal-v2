@@ -193,4 +193,74 @@ export const edgeFunctionsService = {
     if (error) throw error;
     return data;
   },
+
+  /** Assinatura digital */
+  assinaturaDigital: async (params: {
+    action: 'verificar' | 'assinar' | 'listar';
+    tokenId?: string;
+    admissaoId?: string;
+    assinaturaBase64?: string;
+    ipAddress?: string;
+  }) => {
+    const { data, error } = await supabase.functions.invoke('assinaturaDigital', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Cache de dados */
+  cache: async (params: {
+    action: 'get' | 'set' | 'invalidate' | 'query_cached' | 'stats';
+    key?: string;
+    ttlSeconds?: number;
+    table?: string;
+    query?: Record<string, any>;
+  }) => {
+    const { data, error } = await supabase.functions.invoke('cache', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Criptografia */
+  criptografia: async (params: {
+    action: 'encrypt' | 'decrypt' | 'hash' | 'generate_token';
+    data?: any;
+    password?: string;
+  }) => {
+    const { data, error } = await supabase.functions.invoke('criptografia', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Importação de dados */
+  importacao: async (params: {
+    action: 'validar' | 'importar' | 'template';
+    tabela: string;
+    formato?: 'csv' | 'json';
+    csvContent?: string;
+    dados?: any;
+    empresaId?: string;
+  }) => {
+    const { data, error } = await supabase.functions.invoke('importacao', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  /** Sincronizar Bitrix24 */
+  sincronizarBitrix: async (params: {
+    action: 'sync_departamentos' | 'sync_colaboradores' | 'sync_cargos' | 'sync_all' | 'status';
+  }) => {
+    const { data, error } = await supabase.functions.invoke('sincronizar-bitrix', {
+      body: params,
+    });
+    if (error) throw error;
+    return data;
+  },
 };
