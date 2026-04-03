@@ -167,6 +167,12 @@ export default function PontoPage() {
       description="Registre e acompanhe sua jornada de trabalho"
       icon={<Clock className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary/60 to-primary/90"
+      actions={
+        <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={processarPontoServidor} disabled={processando}>
+          {processando ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          <span className="hidden sm:inline">Processar Servidor</span>
+        </Button>
+      }
     >
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Clock & Register */}
