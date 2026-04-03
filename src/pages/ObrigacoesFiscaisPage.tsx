@@ -18,9 +18,10 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import {
   FileText, Receipt, DollarSign, Building2, Plus, Download, CheckCircle,
-  Clock, AlertTriangle, Calculator, RefreshCw, Calendar, TrendingUp, Shield
+  Clock, AlertTriangle, Calculator, RefreshCw, Calendar, TrendingUp, Shield, Loader2, Zap
 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
