@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, Download, Loader2, PieChart, TrendingDown, ArrowUpRight, ArrowDownRight, FileSpreadsheet } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { FileText, Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, Download, Loader2, PieChart, TrendingDown, ArrowUpRight, ArrowDownRight, FileSpreadsheet, Mail, Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
@@ -17,6 +20,7 @@ import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--info))', 'hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))'];
 
