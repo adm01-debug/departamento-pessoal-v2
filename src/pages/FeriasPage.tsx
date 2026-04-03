@@ -30,9 +30,33 @@ const statusOptions = [
 export default function FeriasPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [openCalc, setOpenCalc] = useState(false);
+  const [calcLoading, setCalcLoading] = useState(false);
+  const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
+  const [calcResult, setCalcResult] = useState<any>(null);
   const qc = useQueryClient();
   const { empresaAtual } = useEmpresas();
   const { user } = useAuth();
+
+  const handleCalcFerias = async () => {
+    setCalcLoading(true);
+    setCalcResult(null);
+    try {
+      const result = await edgeFunctionsService.calcularFerias({
+        salario_base: parseFloat(calcForm.salario) || 0,
+        dias_ferias: parseInt(calcForm.diasFerias) || 30,
+        dias_abono: parseInt(calcForm.diasAbono) || 0,
+      });
+      setCalcResult(result);
+      toast.success('Férias calculadas com sucesso!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setCalcLoading(false);
+    }
+  };
+
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const { data: solicitacoes, isLoading } = useQuery({
     queryKey: ['ferias-solicitacoes', empresaAtual?.id],
