@@ -174,6 +174,25 @@ export default function RelatoriosPage() {
     }
   };
 
+  const handleSendEmail = async () => {
+    if (!emailDialog || !emailTo || !empresaAtual?.id) return;
+    setSendingEmail(true);
+    try {
+      await edgeFunctionsService.enviarRelatorioEmail({
+        tipo: emailDialog,
+        destinatarios: emailTo.split(',').map(e => e.trim()),
+        empresaId: empresaAtual.id,
+      });
+      toast.success('Relatório enviado por email!');
+      setEmailDialog(null);
+      setEmailTo('');
+    } catch (err: any) {
+      toast.error(`Erro ao enviar: ${err.message}`);
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
   return (
     <>
     <PageTitle title="Relatórios" description="Relatórios gerenciais" />
