@@ -219,7 +219,65 @@ export default function ConfiguracoesPage() {
           <CamposCustomizadosTab />
         </TabsContent>
 
-        <TabsContent value="ips">
+        <TabsContent value="integracoes">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+              <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+              <CardHeader>
+                <CardTitle className="font-display flex items-center gap-2"><Plug className="h-5 w-5" /> Integrações</CardTitle>
+                <CardDescription className="font-body">Integrações configuradas no sistema</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                {loadInteg ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead>Última Sync</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      {integracoes.map((i: any) => (
+                        <TableRow key={i.id}>
+                          <TableCell className="font-medium">{i.nome}</TableCell>
+                          <TableCell className="text-muted-foreground">{i.tipo || '-'}</TableCell>
+                          <TableCell><Badge variant={i.ativo ? 'default' : 'secondary'} className="rounded-full">{i.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{i.ultima_sync ? new Date(i.ultima_sync).toLocaleString('pt-BR') : '-'}</TableCell>
+                        </TableRow>
+                      ))}
+                      {integracoes.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma integração configurada</TableCell></TableRow>}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="webhooks">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+              <div className="h-[2px] bg-gradient-to-r from-primary-glow to-primary" />
+              <CardHeader>
+                <CardTitle className="font-display flex items-center gap-2"><Webhook className="h-5 w-5" /> Logs de Webhooks</CardTitle>
+                <CardDescription className="font-body">Últimos 50 registros de webhooks</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                {loadWebhooks ? <div className="p-8 flex justify-center"><Spinner /></div> : (
+                  <Table>
+                    <TableHeader><TableRow><TableHead>URL</TableHead><TableHead>Evento</TableHead><TableHead>Status</TableHead><TableHead>Data</TableHead></TableRow></TableHeader>
+                    <TableBody>
+                      {webhooksLogs.map((w: any) => (
+                        <TableRow key={w.id}>
+                          <TableCell className="font-mono text-xs max-w-[200px] truncate">{w.url || w.webhook_url || '-'}</TableCell>
+                          <TableCell className="text-sm">{w.evento || w.event || '-'}</TableCell>
+                          <TableCell><Badge variant={w.status_code === 200 ? 'default' : 'destructive'} className="rounded-full">{w.status_code || w.status || '-'}</Badge></TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{w.created_at ? new Date(w.created_at).toLocaleString('pt-BR') : '-'}</TableCell>
+                        </TableRow>
+                      ))}
+                      {webhooksLogs.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum log de webhook encontrado</TableCell></TableRow>}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
           <IPBlockingTab />
         </TabsContent>
       </Tabs>
