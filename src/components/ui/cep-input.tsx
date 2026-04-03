@@ -1,9 +1,10 @@
-// V15-192: src/components/ui/cep-input.tsx
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from './input';
 import { Button } from './button';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, CheckCircle2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface CEPInputProps {
   value?: string;
@@ -13,17 +14,21 @@ interface CEPInputProps {
   disabled?: boolean;
 }
 
-interface Address {
+export interface Address {
   cep: string;
   logradouro: string;
   bairro: string;
   cidade: string;
   uf: string;
+  complemento?: string;
+  ibge?: string;
 }
 
 export function CEPInput({ value: controlledValue, onChange, onAddressFound, className, disabled }: CEPInputProps) {
   const [displayValue, setDisplayValue] = useState('');
   const [loading, setLoading] = useState(false);
+  const [found, setFound] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (controlledValue) setDisplayValue(formatCEP(controlledValue));
@@ -38,26 +43,53 @@ export function CEPInput({ value: controlledValue, onChange, onAddressFound, cla
     const cep = displayValue.replace(/\D/g, '');
     if (cep.length !== 8) return;
     setLoading(true);
+    setFound(false);
     try {
-      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await res.json();
-      if (!data.erro) {
-        onAddressFound?.({ cep: data.cep, logradouro: data.logradouro, bairro: data.bairro, cidade: data.localidade, uf: data.uf });
+      const { data, error } = await supabase.functions.invoke('consultarCEP', {
+        body: { cep },
+      });
+      if (error) throw error;
+      if (data?.error) {
+        toast({ title: 'CEP não encontrado', description: data.error, variant: 'destructive' });
+        return;
       }
-    } catch { } finally { setLoading(false); }
+      setFound(true);
+      onAddressFound?.({
+        cep: data.cep,
+        logradouro: data.logradouro,
+        bairro: data.bairro,
+        cidade: data.localidade,
+        uf: data.uf,
+        complemento: data.complemento,
+        ibge: data.ibge,
+      });
+      toast({ title: 'Endereço encontrado', description: `${data.logradouro}, ${data.localidade} - ${data.uf}` });
+    } catch {
+      toast({ title: 'Erro ao consultar CEP', description: 'Tente novamente', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCEP(e.target.value);
     setDisplayValue(formatted);
+    setFound(false);
     onChange?.(e.target.value.replace(/\D/g, ''));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      searchCEP();
+    }
   };
 
   return (
     <div className="flex gap-2">
-      <Input value={displayValue} onChange={handleChange} placeholder="00000-000" className={cn(className)} disabled={disabled} maxLength={9} />
-      <Button type="button" variant="outline" size="icon" onClick={searchCEP} disabled={disabled || loading}>
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+      <Input value={displayValue} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="00000-000" className={cn(found && 'border-green-500', className)} disabled={disabled} maxLength={9} />
+      <Button type="button" variant="outline" size="icon" onClick={searchCEP} disabled={disabled || loading || displayValue.replace(/\D/g, '').length !== 8}>
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : found ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Search className="h-4 w-4" />}
       </Button>
     </div>
   );
