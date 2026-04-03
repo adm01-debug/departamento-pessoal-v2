@@ -378,6 +378,28 @@ export default function RelatoriosPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Email Dialog */}
+      <Dialog open={!!emailDialog} onOpenChange={(o) => { if (!o) setEmailDialog(null); }}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-display"><Mail className="h-5 w-5" /> Enviar Relatório por Email</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="font-body">Destinatários (separados por vírgula)</Label>
+              <Input placeholder="email@empresa.com, rh@empresa.com" value={emailTo} onChange={e => setEmailTo(e.target.value)} className="rounded-xl" />
+            </div>
+            <p className="text-sm text-muted-foreground font-body">
+              Relatório: <span className="font-semibold text-foreground">{relatorios.find(r => r.id === emailDialog)?.title}</span>
+            </p>
+            <Button onClick={handleSendEmail} disabled={sendingEmail || !emailTo.trim()} className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
+              {sendingEmail ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+              {sendingEmail ? 'Enviando...' : 'Enviar por Email'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
     </>
   );
