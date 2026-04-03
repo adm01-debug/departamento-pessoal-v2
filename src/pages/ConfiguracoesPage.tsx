@@ -12,10 +12,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye, Activity } from 'lucide-react';
+import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye, Activity, Database, ScrollText } from 'lucide-react';
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
 import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { SystemHealthTab } from '@/components/settings/SystemHealthTab';
+import { ConfiguracoesGeraisTab } from '@/components/settings/ConfiguracoesGeraisTab';
+import { LogsIntegracoesTab } from '@/components/settings/LogsIntegracoesTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
@@ -96,6 +98,8 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
           <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
           <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
+          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ScrollText className="mr-1 h-3 w-3" />Logs Integ.</TabsTrigger>
+          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Database className="mr-1 h-3 w-3" />Config BD</TabsTrigger>
           <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
         </TabsList>
 
@@ -287,6 +291,14 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="sistema">
           <SystemHealthTab />
+        </TabsContent>
+
+        <TabsContent value="logs-integ">
+          <LogsIntegracoesTab />
+        </TabsContent>
+
+        <TabsContent value="config-bd">
+          <ConfiguracoesGeraisTab />
         </TabsContent>
       </Tabs>
     </PageLayout>
