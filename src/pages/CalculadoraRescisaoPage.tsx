@@ -8,13 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Calculator, Download, Save } from 'lucide-react';
+import { Calculator, Download, Save, Shield, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { calcularRescisao, fmt, type RescisaoResult } from '@/utils/rescisaoCalc';
 import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 export default function CalculadoraRescisaoPage() {
   const { user } = useAuth();
