@@ -26,6 +26,33 @@ export default function CalculadoraRescisaoPage() {
   });
   const [result, setResult] = useState<RescisaoResult | null>(null);
   const [saving, setSaving] = useState(false);
+  const [calcServidor, setCalcServidor] = useState(false);
+
+  const handleCalcServidor = async () => {
+    if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
+      toast.error('Preencha salário, data de admissão e desligamento');
+      return;
+    }
+    setCalcServidor(true);
+    try {
+      const data = await edgeFunctionsService.calcularRescisao({
+        salario_base: Number(form.salario),
+        data_admissao: form.dataAdmissao,
+        data_demissao: form.dataDesligamento,
+        tipo_rescisao: form.tipo,
+        aviso_previo: form.avisoTrabalhado ? 'trabalhado' : 'indenizado',
+        saldo_fgts: Number(form.saldoFGTS || 0),
+        ferias_vencidas: form.feriasVencidas ? 1 : 0,
+        dependentes_irrf: 0,
+      });
+      if (data?.resultado) setResult(data.resultado);
+      toast.success('Rescisão calculada no servidor!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setCalcServidor(false);
+    }
+  };
 
   const handleCalc = useCallback(() => {
     if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
