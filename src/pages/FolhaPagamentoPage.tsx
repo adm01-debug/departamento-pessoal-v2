@@ -329,6 +329,76 @@ export default function FolhaPagamentoPage() {
             <Calculator className="h-4 w-4" />
             {calcularFolha.isPending ? 'Calculando...' : 'Calcular'}
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={calcularFolhaServidor}
+            disabled={calcServidor}
+            className="rounded-xl gap-1.5 font-body"
+          >
+            {calcServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
+            <span className="hidden sm:inline">Servidor</span>
+          </Button>
+          <Dialog open={open13} onOpenChange={setOpen13}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
+                <Gift className="h-4 w-4" />
+                <span className="hidden sm:inline">13º Salário</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2"><Gift className="h-5 w-5" /> Simulador 13º Salário</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Salário Base (R$)</Label>
+                  <Input type="number" placeholder="5000.00" value={form13.salario} onChange={e => setForm13(p => ({ ...p, salario: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Admissão</Label>
+                  <Input type="date" value={form13.dataAdmissao} onChange={e => setForm13(p => ({ ...p, dataAdmissao: e.target.value }))} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Parcela</Label>
+                    <Select value={form13.parcela} onValueChange={v => setForm13(p => ({ ...p, parcela: v as '1' | '2' }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1ª Parcela</SelectItem>
+                        <SelectItem value="2">2ª Parcela</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Dependentes IRRF</Label>
+                    <Input type="number" min="0" value={form13.dependentes} onChange={e => setForm13(p => ({ ...p, dependentes: e.target.value }))} />
+                  </div>
+                </div>
+                <Button onClick={handleCalc13} disabled={loading13 || !form13.salario || !form13.dataAdmissao} className="w-full rounded-xl">
+                  {loading13 ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Calculator className="h-4 w-4 mr-2" />}
+                  Calcular 13º
+                </Button>
+                {resultado13 && (
+                  <Card className="border border-border/30 rounded-xl">
+                    <CardContent className="p-4 space-y-2 text-sm">
+                      <div className="flex justify-between"><span>Avos:</span><span className="font-bold">{resultado13.avos}/12</span></div>
+                      <div className="flex justify-between"><span>Valor Bruto:</span><span className="font-bold">{formatCurrency(resultado13.proventos.valorBruto)}</span></div>
+                      <div className="flex justify-between"><span>INSS:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.inss)}</span></div>
+                      <div className="flex justify-between"><span>IRRF:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.irrf)}</span></div>
+                      {resultado13.descontos.adiantamento1Parcela > 0 && (
+                        <div className="flex justify-between"><span>Adiant. 1ª Parcela:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.adiantamento1Parcela)}</span></div>
+                      )}
+                      <div className="border-t border-border/30 pt-2 flex justify-between text-base font-bold">
+                        <span>Líquido:</span><span className="text-primary">{formatCurrency(resultado13.liquido)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Pagamento até: {new Date(resultado13.dataLimitePagamento).toLocaleDateString('pt-BR')}</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       }
     >
