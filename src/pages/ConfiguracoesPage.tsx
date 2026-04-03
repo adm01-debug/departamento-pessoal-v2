@@ -36,6 +36,26 @@ export default function ConfiguracoesPage() {
     },
   });
 
+  // === Integrações ===
+  const { data: integracoes = [], isLoading: loadInteg } = useQuery({
+    queryKey: ['integracoes'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('integracoes' as any).select('*').order('nome');
+      if (error) { if (error.code === '42P01') return []; throw error; }
+      return data || [];
+    },
+  });
+
+  // === Webhooks Logs ===
+  const { data: webhooksLogs = [], isLoading: loadWebhooks } = useQuery({
+    queryKey: ['webhooks-logs'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('webhooks_logs' as any).select('*').order('created_at', { ascending: false }).limit(50);
+      if (error) { if (error.code === '42P01') return []; throw error; }
+      return data || [];
+    },
+  });
+
   const criarAlerta = useMutation({
     mutationFn: async (d: typeof alertaForm) => {
       const { error } = await supabase.from('config_alertas_indicadores' as any).insert({
