@@ -144,9 +144,14 @@ export default function CalculadoraRescisaoPage() {
             <div className="flex items-center justify-between"><Label className="font-body text-xs">Aviso prévio trabalhado?</Label><Switch checked={form.avisoTrabalhado} onCheckedChange={v => set('avisoTrabalhado', v)} /></div>
             <div className="flex items-center justify-between"><Label className="font-body text-xs">Possui férias vencidas?</Label><Switch checked={form.feriasVencidas} onCheckedChange={v => set('feriasVencidas', v)} /></div>
 
-            <Button onClick={handleCalc} className="w-full rounded-xl bg-gradient-to-r from-warning to-destructive font-body">
-              <Calculator className="h-4 w-4 mr-2" />Calcular Rescisão
-            </Button>
+            <div className="grid grid-cols-2 gap-3">
+              <Button onClick={handleCalc} className="rounded-xl bg-gradient-to-r from-warning to-destructive font-body">
+                <Calculator className="h-4 w-4 mr-2" />Calcular Local
+              </Button>
+              <Button onClick={handleCalcServidor} disabled={calcServidor} variant="outline" className="rounded-xl font-body">
+                {calcServidor ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Shield className="h-4 w-4 mr-2" />}Calcular Servidor
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
