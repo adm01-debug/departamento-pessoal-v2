@@ -284,6 +284,10 @@ export default function ConfiguracoesPage() {
         <TabsContent value="ips">
           <IPBlockingTab />
         </TabsContent>
+
+        <TabsContent value="sistema">
+          <SystemHealthTab />
+        </TabsContent>
       </Tabs>
     </PageLayout>
     </>
