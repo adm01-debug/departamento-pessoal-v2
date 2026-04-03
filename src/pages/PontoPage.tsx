@@ -24,8 +24,30 @@ export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [time, setTime] = useState(new Date());
   const [geoStatus, setGeoStatus] = useState<'idle' | 'capturing' | 'success' | 'error'>('idle');
+  const [processando, setProcessando] = useState(false);
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
+
+  const processarPontoServidor = async () => {
+    if (!empresaAtual?.id) return;
+    setProcessando(true);
+    try {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      await edgeFunctionsService.processarPonto({
+        empresaId: empresaAtual.id,
+        dataInicio: weekAgo.toISOString().split('T')[0],
+        dataFim: new Date().toISOString().split('T')[0],
+      });
+      toast.success('Ponto processado no servidor com sucesso!');
+      refetchRegistro();
+      refetchBatidas();
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setProcessando(false);
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
