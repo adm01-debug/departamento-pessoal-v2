@@ -139,6 +139,28 @@ export default function ObrigacoesFiscaisPage() {
     },
   });
 
+  const [gerandoServidor, setGerandoServidor] = useState(false);
+
+  const gerarGuiasServidor = async () => {
+    if (!empresaAtual?.id) return;
+    setGerandoServidor(true);
+    try {
+      const [mes, ano] = competencia.split('/');
+      await edgeFunctionsService.gerarGuias({
+        empresaId: empresaAtual.id,
+        competencia: `${ano}-${mes}`,
+        tipo: 'todos',
+      });
+      qc.invalidateQueries({ queryKey: ['guias-fgts'] });
+      qc.invalidateQueries({ queryKey: ['guias-inss'] });
+      toast.success('Guias geradas automaticamente via servidor!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setGerandoServidor(false);
+    }
+  };
+
   const isLoading = l1 || l2 || l3 || l4;
   const hoje = new Date();
 
