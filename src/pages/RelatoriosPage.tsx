@@ -103,6 +103,9 @@ export default function RelatoriosPage() {
   const { empresaAtual } = useEmpresa();
   const [generating, setGenerating] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState('csv');
+  const [emailDialog, setEmailDialog] = useState<string | null>(null);
+  const [emailTo, setEmailTo] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   // Analytics data
   const { data: analytics } = useQuery({
