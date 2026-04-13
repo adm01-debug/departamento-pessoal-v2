@@ -1,28 +1,15 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Download, Upload, Calculator, CheckCircle, AlertTriangle, Clock, RefreshCw,
-  DollarSign, Users, TrendingDown, ArrowRight, FileText, Info, Shield, ChevronRight,
-  Banknote, Receipt, Gift, Loader2
-} from 'lucide-react';
-import { useCalcular13Salario } from '@/hooks/useCalcular13Salario';
+import { Upload, Calculator, RefreshCw, Shield, Loader2, Banknote } from 'lucide-react';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { PageLayout } from '@/components/layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
-import { KPICardSkeleton } from '@/components/ui/module-skeleton';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog } from '@/components/folha';
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
@@ -39,10 +26,6 @@ function gerarCompetencias(): string[] {
 function getCompetenciaAtual(): string {
   const hoje = new Date();
   return `${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear()}`;
-}
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(value);
 }
 
 /* ─── Data Hook ─── */
@@ -67,11 +50,9 @@ function useFolhaResumo(competencia: string) {
       const colaboradores = folhaData?.length || 0;
       const totalProventos = folhaData?.reduce((acc, f) => acc + (f.total_proventos || 0), 0) || 0;
       const totalDescontos = folhaData?.reduce((acc, f) => acc + (f.total_descontos || 0), 0) || 0;
-      // Estimate encargos from proventos (INSS ~11%, FGTS ~8%, IRRF ~7.5% approximation)
       const inss = totalProventos * 0.11;
       const fgts = totalProventos * 0.08;
       const irrf = Math.max(0, totalDescontos - inss);
-
       const hasData = colaboradores > 0;
       return {
         colaboradores, totalProventos, totalDescontos, inss, fgts, irrf,
@@ -89,160 +70,12 @@ function useFolhaResumo(competencia: string) {
   });
 }
 
-/* ─── Pipeline Step ─── */
-const stepConfig = [
-  { key: 'ponto', label: 'Importar Ponto', desc: 'Dados do ponto eletrônico', icon: Clock },
-  { key: 'lancamentos', label: 'Lançamentos', desc: 'Eventos e variáveis', icon: FileText },
-  { key: 'calculo', label: 'Cálculo', desc: 'Processamento da folha', icon: Calculator },
-  { key: 'conferencia', label: 'Conferência', desc: 'Validação dos valores', icon: Shield },
-  { key: 'fechamento', label: 'Fechamento', desc: 'Aprovação e envio', icon: CheckCircle },
-];
-
-const statusStyles: Record<string, { dot: string; ring: string; label: string }> = {
-  pendente: { dot: 'bg-muted-foreground', ring: 'border-muted-foreground/30', label: 'Pendente' },
-  importado: { dot: 'bg-success', ring: 'border-success/30', label: 'Importado' },
-  conferido: { dot: 'bg-success', ring: 'border-success/30', label: 'Conferido' },
-  executado: { dot: 'bg-success', ring: 'border-success/30', label: 'Executado' },
-  aprovado: { dot: 'bg-success', ring: 'border-success/30', label: 'Aprovado' },
-  aberto: { dot: 'bg-warning', ring: 'border-warning/30', label: 'Aberto' },
-  fechado: { dot: 'bg-success', ring: 'border-success/30', label: 'Fechado' },
-};
-
-function PipelineStep({ step, status, index, isLast }: { step: typeof stepConfig[0]; status: string; index: number; isLast: boolean }) {
-  const st = statusStyles[status] || statusStyles.pendente;
-  const isDone = ['importado', 'conferido', 'executado', 'aprovado', 'fechado'].includes(status);
-  const Icon = step.icon;
-
-  return (
-    <>
-    <PageTitle title="Cálculo de Folha" description="Processamento de folha de pagamento" />
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08 }}
-      className="flex items-center gap-3"
-    >
-      <div className="flex flex-col items-center">
-        <div className={cn(
-          "relative p-3 rounded-2xl border-2 transition-all",
-          isDone ? "bg-success/10 border-success/30" : "bg-card border-border/30",
-          !isDone && index === 0 && "border-primary/50 shadow-glow-sm"
-        )}>
-          <Icon className={cn("h-5 w-5", isDone ? "text-success" : "text-muted-foreground")} />
-          {isDone && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-success flex items-center justify-center"
-            >
-              <CheckCircle className="h-3 w-3 text-success-foreground" />
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <p className={cn("text-body font-display font-semibold", isDone ? "text-success" : "text-foreground")}>{step.label}</p>
-        <p className="text-caption text-muted-foreground font-body">{step.desc}</p>
-      </div>
-
-      <Badge variant="outline" className={cn("text-[10px] shrink-0 rounded-full", isDone ? "bg-success/10 text-success border-success/30" : "")}>
-        {st.label}
-      </Badge>
-
-      {!isLast && <ChevronRight className="h-4 w-4 text-muted-foreground/30 shrink-0 hidden lg:block" />}
-    </motion.div>
-    </>
-  );
-}
-
-/* ─── KPI Card ─── */
-function FolhaKPI({ title, value, icon: Icon, gradient, index, tooltip }: {
-  title: string; value: number; icon: React.ElementType; gradient: string; index: number; tooltip?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06 }}
-    >
-      <Card className="border border-border/30 rounded-2xl overflow-hidden relative group hover:shadow-elevated transition-all">
-        <div className={cn("absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r", gradient)} />
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={cn("p-1.5 rounded-lg bg-gradient-to-br", gradient)}>
-              <Icon className="h-3.5 w-3.5 text-primary-foreground" />
-            </div>
-            {tooltip && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger><Info className="h-3 w-3 text-muted-foreground/50" /></TooltipTrigger>
-                  <TooltipContent className="max-w-[200px] text-xs">{tooltip}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-          <p className="text-xl font-display font-bold">
-            <AnimatedNumber value={value} format={formatCurrency} />
-          </p>
-          <p className="text-[11px] text-muted-foreground font-body mt-1">{title}</p>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-}
-
-/* ─── Validation Alerts ─── */
-function ValidationAlerts({ resumo }: { resumo: FolhaResumo }) {
-  const alerts: { type: 'warning' | 'info' | 'success'; msg: string }[] = [];
-
-  if (resumo.colaboradores === 0) {
-    alerts.push({ type: 'warning', msg: 'Nenhum colaborador processado nesta competência.' });
-  }
-  if (resumo.totalDescontos > resumo.totalProventos * 0.5) {
-    alerts.push({ type: 'warning', msg: 'Descontos representam mais de 50% dos proventos. Verifique os lançamentos.' });
-  }
-  if (resumo.liquido < 0) {
-    alerts.push({ type: 'warning', msg: 'Líquido total negativo detectado. Revise os cálculos.' });
-  }
-  if (alerts.length === 0 && resumo.colaboradores > 0) {
-    alerts.push({ type: 'success', msg: 'Todos os valores estão consistentes. Folha pronta para conferência.' });
-  }
-
-  return (
-    <div className="space-y-2">
-      {alerts.map((a, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.1 }}
-          className={cn(
-            "flex items-center gap-3 p-3 rounded-xl border text-body font-body",
-            a.type === 'warning' && "bg-warning/5 border-warning/20 text-warning",
-            a.type === 'info' && "bg-info/5 border-info/20 text-info",
-            a.type === 'success' && "bg-success/5 border-success/20 text-success",
-          )}
-        >
-          {a.type === 'warning' ? <AlertTriangle className="h-4 w-4 shrink-0" /> :
-           a.type === 'success' ? <CheckCircle className="h-4 w-4 shrink-0" /> :
-           <Info className="h-4 w-4 shrink-0" />}
-          <span>{a.msg}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 /* ─── Main Page ─── */
 export default function FolhaPagamentoPage() {
   const competencias = useMemo(() => gerarCompetencias(), []);
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
   const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
   const queryClient = useQueryClient();
-  const { calcular: calcular13, loading: loading13, resultado: resultado13 } = useCalcular13Salario();
-  const [open13, setOpen13] = useState(false);
-  const [form13, setForm13] = useState({ salario: '', dataAdmissao: '', parcela: '1' as '1' | '2', dependentes: '0' });
   const [calcServidor, setCalcServidor] = useState(false);
 
   const calcularFolha = useMutation({
@@ -283,265 +116,69 @@ export default function FolhaPagamentoPage() {
     }
   };
 
-  const handleCalc13 = async () => {
-    await calcular13({
-      colaboradorId: 'simulacao',
-      salario: parseFloat(form13.salario) || 0,
-      mediaVariaveis: 0,
-      dataAdmissao: form13.dataAdmissao,
-      anoReferencia: new Date().getFullYear(),
-      parcela: parseInt(form13.parcela) as 1 | 2,
-      mesesAfastamento: 0,
-      dependentesIRRF: parseInt(form13.dependentes) || 0,
-      pensaoAlimenticia: 0,
-    });
-  };
-
   return (
-    <PageLayout
-      title="Processamento de Folha"
-      description={`Competência ${competencia}`}
-      icon={<Banknote className="h-5 w-5 text-primary-foreground" />}
-      gradient="from-primary to-primary-glow"
-      actions={
-        <div className="flex items-center gap-2 flex-wrap">
-          <Select value={competencia} onValueChange={setCompetencia}>
-            <SelectTrigger className="w-[130px] rounded-xl" aria-label="Selecionar competência">
-              <SelectValue placeholder="Mês/Ano" />
-            </SelectTrigger>
-            <SelectContent>
-              {competencias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" onClick={() => refetch()} className="rounded-xl" aria-label="Atualizar dados">
-            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body">
-            <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">Importar Ponto</span>
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => calcularFolha.mutate(competencia)}
-            disabled={calcularFolha.isPending}
-            className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body"
-          >
-            <Calculator className="h-4 w-4" />
-            {calcularFolha.isPending ? 'Calculando...' : 'Calcular'}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={calcularFolhaServidor}
-            disabled={calcServidor}
-            className="rounded-xl gap-1.5 font-body"
-          >
-            {calcServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
-            <span className="hidden sm:inline">Servidor</span>
-          </Button>
-          <Dialog open={open13} onOpenChange={setOpen13}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
-                <Gift className="h-4 w-4" />
-                <span className="hidden sm:inline">13º Salário</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2"><Gift className="h-5 w-5" /> Simulador 13º Salário</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Salário Base (R$)</Label>
-                  <Input type="number" placeholder="5000.00" value={form13.salario} onChange={e => setForm13(p => ({ ...p, salario: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Data de Admissão</Label>
-                  <Input type="date" value={form13.dataAdmissao} onChange={e => setForm13(p => ({ ...p, dataAdmissao: e.target.value }))} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Parcela</Label>
-                    <Select value={form13.parcela} onValueChange={v => setForm13(p => ({ ...p, parcela: v as '1' | '2' }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1ª Parcela</SelectItem>
-                        <SelectItem value="2">2ª Parcela</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Dependentes IRRF</Label>
-                    <Input type="number" min="0" value={form13.dependentes} onChange={e => setForm13(p => ({ ...p, dependentes: e.target.value }))} />
-                  </div>
-                </div>
-                <Button onClick={handleCalc13} disabled={loading13 || !form13.salario || !form13.dataAdmissao} className="w-full rounded-xl">
-                  {loading13 ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Calculator className="h-4 w-4 mr-2" />}
-                  Calcular 13º
-                </Button>
-                {resultado13 && (
-                  <Card className="border border-border/30 rounded-xl">
-                    <CardContent className="p-4 space-y-2 text-sm">
-                      <div className="flex justify-between"><span>Avos:</span><span className="font-bold">{resultado13.avos}/12</span></div>
-                      <div className="flex justify-between"><span>Valor Bruto:</span><span className="font-bold">{formatCurrency(resultado13.proventos.valorBruto)}</span></div>
-                      <div className="flex justify-between"><span>INSS:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.inss)}</span></div>
-                      <div className="flex justify-between"><span>IRRF:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.irrf)}</span></div>
-                      {resultado13.descontos.adiantamento1Parcela > 0 && (
-                        <div className="flex justify-between"><span>Adiant. 1ª Parcela:</span><span className="text-destructive">-{formatCurrency(resultado13.descontos.adiantamento1Parcela)}</span></div>
-                      )}
-                      <div className="border-t border-border/30 pt-2 flex justify-between text-base font-bold">
-                        <span>Líquido:</span><span className="text-primary">{formatCurrency(resultado13.liquido)}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">Pagamento até: {new Date(resultado13.dataLimitePagamento).toLocaleDateString('pt-BR')}</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      }
-    >
-      {/* KPI Summary — financial hierarchy */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {isLoading ? Array(6).fill(0).map((_, i) => <KPICardSkeleton key={i} />) : (
-          <>
-            <FolhaKPI title="Colaboradores" value={resumo?.colaboradores || 0} icon={Users}
-              gradient="from-primary to-primary-glow" index={0}
-              tooltip="Total de colaboradores com folha processada nesta competência" />
-            <FolhaKPI title="Total Proventos" value={resumo?.totalProventos || 0} icon={TrendingDown}
-              gradient="from-success to-success/70" index={1}
-              tooltip="Soma de todos os proventos: salário base, horas extras, gratificações" />
-            <FolhaKPI title="Total Descontos" value={resumo?.totalDescontos || 0} icon={TrendingDown}
-              gradient="from-destructive to-destructive/70" index={2}
-              tooltip="INSS, IRRF, VT, VA, plano de saúde e outros descontos" />
-            <FolhaKPI title="Líquido Total" value={resumo?.liquido || 0} icon={DollarSign}
-              gradient="from-primary-glow to-primary" index={3}
-              tooltip="Valor líquido = Proventos - Descontos" />
-            <FolhaKPI title="INSS + FGTS" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
-              gradient="from-info to-info/70" index={4}
-              tooltip="Encargos patronais: INSS + FGTS sobre a folha" />
-            <FolhaKPI title="IRRF" value={resumo?.irrf || 0} icon={Receipt}
-              gradient="from-warning to-warning/70" index={5}
-              tooltip="Imposto de Renda Retido na Fonte" />
-          </>
-        )}
-      </div>
-
-      {/* Pipeline de processamento */}
-      <Card className="border border-border/30 rounded-2xl overflow-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-            <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
-              <ArrowRight className="h-4 w-4 text-primary-foreground" />
-            </div>
-            Pipeline de Processamento
-            <Badge variant="outline" className="ml-auto text-[10px] rounded-full font-body">
-              {competencia}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            {stepConfig.map((step, i) => (
-              <PipelineStep
-                key={step.key}
-                step={step}
-                status={resumo?.status[step.key] || 'pendente'}
-                index={i}
-                isLast={i === stepConfig.length - 1}
-              />
-            ))}
+    <>
+      <PageTitle title="Cálculo de Folha" description="Processamento de folha de pagamento" />
+      <PageLayout
+        title="Processamento de Folha"
+        description={`Competência ${competencia}`}
+        icon={<Banknote className="h-5 w-5 text-primary-foreground" />}
+        gradient="from-primary to-primary-glow"
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <Select value={competencia} onValueChange={setCompetencia}>
+              <SelectTrigger className="w-[130px] rounded-xl" aria-label="Selecionar competência">
+                <SelectValue placeholder="Mês/Ano" />
+              </SelectTrigger>
+              <SelectContent>
+                {competencias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="rounded-xl" aria-label="Atualizar dados">
+              <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+            </Button>
+            <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body">
+              <Upload className="h-4 w-4" />
+              <span className="hidden sm:inline">Importar Ponto</span>
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => calcularFolha.mutate(competencia)}
+              disabled={calcularFolha.isPending}
+              className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body"
+            >
+              <Calculator className="h-4 w-4" />
+              {calcularFolha.isPending ? 'Calculando...' : 'Calcular'}
+            </Button>
+            <Button
+              size="sm" variant="outline"
+              onClick={calcularFolhaServidor}
+              disabled={calcServidor}
+              className="rounded-xl gap-1.5 font-body"
+            >
+              {calcServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
+              <span className="hidden sm:inline">Servidor</span>
+            </Button>
+            <Simulador13Dialog />
           </div>
-        </CardContent>
-      </Card>
+        }
+      >
+        <FolhaKPIs resumo={resumo} isLoading={isLoading} />
 
-      {/* Validações automáticas */}
-      {!isLoading && resumo && (
-        <Card className="border border-border/30 rounded-2xl overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning/70">
-                <Shield className="h-4 w-4 text-primary-foreground" />
-              </div>
-              Validações Automáticas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ValidationAlerts resumo={resumo} />
-          </CardContent>
-        </Card>
-      )}
+        {resumo && <FolhaPipeline status={resumo.status} competencia={competencia} />}
 
-      {/* Breakdown detalhado — transparência */}
-      {!isLoading && resumo && resumo.colaboradores > 0 && (
-        <Card className="border border-border/30 rounded-2xl overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-info/70">
-                <FileText className="h-4 w-4 text-primary-foreground" />
-              </div>
-              Composição da Folha
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger><Info className="h-3.5 w-3.5 text-muted-foreground/50 ml-1" /></TooltipTrigger>
-                  <TooltipContent className="max-w-[250px] text-xs">
-                    Detalhamento dos componentes que formam o total da folha de pagamento
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {[
-                { label: 'Salário Base + Adicionais', value: resumo.totalProventos, color: 'bg-success', pct: 100 },
-                { label: 'INSS (Empregado)', value: resumo.inss, color: 'bg-info', pct: resumo.totalProventos > 0 ? (resumo.inss / resumo.totalProventos) * 100 : 0 },
-                { label: 'IRRF', value: resumo.irrf, color: 'bg-warning', pct: resumo.totalProventos > 0 ? (resumo.irrf / resumo.totalProventos) * 100 : 0 },
-                { label: 'FGTS (Patronal)', value: resumo.fgts, color: 'bg-primary', pct: resumo.totalProventos > 0 ? (resumo.fgts / resumo.totalProventos) * 100 : 0 },
-                { label: 'Outros Descontos', value: resumo.totalDescontos - resumo.inss - resumo.irrf, color: 'bg-destructive', pct: resumo.totalProventos > 0 ? ((resumo.totalDescontos - resumo.inss - resumo.irrf) / resumo.totalProventos) * 100 : 0 },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="space-y-1.5"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-body font-body">{item.label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-caption text-muted-foreground">{item.pct.toFixed(1)}%</span>
-                      <span className="text-body font-display font-bold">{formatCurrency(item.value)}</span>
-                    </div>
-                  </div>
-                  <div className="h-2 bg-muted/50 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.min(item.pct, 100)}%` }}
-                      transition={{ duration: 0.8, delay: 0.3 + i * 0.08 }}
-                      className={cn("h-full rounded-full", item.color)}
-                    />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+        {!isLoading && resumo && <FolhaValidationAlerts resumo={resumo} />}
 
-            {/* Export actions */}
-            <div className="flex gap-2 mt-6 pt-4 border-t border-border/30">
-              <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body">
-                <Download className="h-4 w-4" />Exportar PDF
-              </Button>
-              <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body">
-                <Download className="h-4 w-4" />Exportar XLSX
-              </Button>
-              <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body">
-                <FileText className="h-4 w-4" />Contabilidade
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </PageLayout>
+        {!isLoading && resumo && resumo.colaboradores > 0 && (
+          <FolhaComposicao
+            totalProventos={resumo.totalProventos}
+            inss={resumo.inss}
+            irrf={resumo.irrf}
+            fgts={resumo.fgts}
+            totalDescontos={resumo.totalDescontos}
+          />
+        )}
+      </PageLayout>
+    </>
   );
 }
