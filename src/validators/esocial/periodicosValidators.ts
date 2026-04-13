@@ -1,7 +1,7 @@
 /**
  * Validadores eSocial — Eventos Periódicos (S-1xxx)
  */
-import { ValidationResult, ValidationError, ValidationWarning, required, maxLen, cpfValido, cnpjValido, enumValido } from './helpers';
+import { ValidationResult, ValidationError, ValidationWarning, required, maxLen, cpfValido, cnpjValido, enumValido, dataValida } from './helpers';
 
 export function validarS1000(dados: Record<string, any>): ValidationResult {
   const errors: ValidationError[] = [];
