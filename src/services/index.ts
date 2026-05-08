@@ -31,6 +31,8 @@ export { episService, episEntregasService } from './episService';
 export { jornadaHorariosService } from './jornadaHorariosService';
 export { bancoHorasConfigService } from './bancoHorasConfigService';
 
+export { provisaoService } from './provisaoService';
+
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
   return data;
