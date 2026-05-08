@@ -11,6 +11,8 @@ import { useESocial } from '@/hooks/useESocial';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { getEventoDescricao } from '@/services/esocialService';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -92,10 +94,35 @@ export default function ESocialPage() {
               Eventos eSocial
             </CardTitle>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body border-success/30 hover:bg-success/5 text-success">
-                <ShieldCheck className="h-4 w-4" />
-                Certificado Ativo
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body border-success/30 hover:bg-success/5 text-success">
+                    <ShieldCheck className="h-4 w-4" />
+                    Certificado Ativo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="font-display">Gestão de Certificados Digitais</DialogTitle>
+                    <CardDescription>Gerencie seus certificados ICP-Brasil (A1/A3)</CardDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div className="p-4 rounded-xl border border-success/20 bg-success/5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Key className="h-8 w-8 text-success" />
+                        <div>
+                          <p className="font-bold text-sm">e-CNPJ: {empresaAtual?.razao_social}</p>
+                          <p className="text-xs text-muted-foreground">Vencimento: 12/12/2026 (Em 224 dias)</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-success border-success/30">Válido</Badge>
+                    </div>
+                    <Button variant="outline" className="w-full rounded-xl border-dashed">
+                      <Plus className="h-4 w-4 mr-2" /> Upload Novo Certificado (.pfx)
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-body">

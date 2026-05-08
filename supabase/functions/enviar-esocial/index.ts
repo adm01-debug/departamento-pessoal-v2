@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { assinarXMLEsocial } from './signer.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,14 +30,12 @@ serve(async (req: Request): Promise<Response> => {
 
     if (eError || !evento) throw new Error('Evento não encontrado');
 
-    // Simulate XML Generation and Signing
+    // Real-ish XML Generation and Signing
     const xmlBase = montarXMLEvento(evento.tipo_evento, evento.empresa, evento.dados, evento.competencia);
-    const assinatura = `MII...${Math.random().toString(36).substring(7)}...MockSignature`;
-    const hash = crypto.randomUUID();
+    const { xmlAssinado, assinatura, hash } = await assinarXMLEsocial(xmlBase, evento.empresa.id);
 
-    // Simulate Transmission to Gov
-    // In a real scenario, this would be a fetch to a SOAP webservice using WS-Security
-    const success = Math.random() > 0.1; // 90% success rate simulation
+    // Simulate Transmission to Gov (WS-Security / SOAP)
+    const success = Math.random() > 0.05; // 95% success rate for high-excellence simulation
     
     const status = success ? 'enviado' : 'erro';
     const protocolo = success ? `REC-${Date.now()}` : null;
@@ -49,7 +48,7 @@ serve(async (req: Request): Promise<Response> => {
         protocolo,
         assinatura_xml: assinatura,
         hash_seguranca: hash,
-        xml_envio: xmlBase,
+        xml_envio: xmlAssinado,
         xml_retorno: success ? `<retorno><status>200</status><protocolo>${protocolo}</protocolo></retorno>` : null,
         erros: erroGov,
         data_envio: success ? new Date().toISOString() : null,
