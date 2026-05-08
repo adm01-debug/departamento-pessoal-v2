@@ -123,6 +123,7 @@ export default function ESocialPage() {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
