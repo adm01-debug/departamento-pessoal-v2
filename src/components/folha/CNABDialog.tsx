@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileDown, Settings2, Loader2, Landmark, CheckCircle2 } from 'lucide-react';
+import { FileDown, Settings2, Loader2, Landmark, CheckCircle2, Zap } from 'lucide-react';
 import { cnabService, CNABConfig } from '@/services/cnabService';
 import { toast } from 'sonner';
 import { useEmpresas } from '@/hooks/useEmpresas';
