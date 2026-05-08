@@ -183,6 +183,8 @@ export default function FolhaPagamentoPage() {
             totalDescontos={resumo.totalDescontos}
           />
         )}
+        
+        <FGTSDigitalDashboard />
       </PageLayout>
     </>
   );
