@@ -157,15 +157,19 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
             </CardContent>
           </Card>
 
-          <div className="pt-2">
-            <Button onClick={handleGenerate} className="w-full rounded-xl gap-2 h-11 shadow-lg bg-gradient-to-r from-primary to-primary-glow" disabled={loading}>
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <Button onClick={handleGenerate} className="rounded-xl gap-2 h-11 shadow-lg bg-gradient-to-r from-primary to-primary-glow" disabled={loading}>
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileDown className="h-5 w-5" />}
-              Gerar Arquivo de Remessa (.rem)
+              CNAB 240
             </Button>
-            <p className="text-[10px] text-center text-muted-foreground mt-3 uppercase tracking-widest font-medium">
-              Compatível com Padrão FEBRABAN 240 v08.1
-            </p>
+            <Button onClick={handleGeneratePIX} variant="outline" className="rounded-xl gap-2 h-11 border-primary/30 hover:bg-primary/5" disabled={loading}>
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5 text-amber-500" />}
+              PIX em Lote
+            </Button>
           </div>
+          <p className="text-[10px] text-center text-muted-foreground mt-3 uppercase tracking-widest font-medium">
+            Formatos compatíveis com bancos tradicionais e fintechs
+          </p>
         </div>
       </DialogContent>
     </Dialog>
