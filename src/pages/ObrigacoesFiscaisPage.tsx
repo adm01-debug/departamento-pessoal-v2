@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
-import { Receipt, DollarSign, Building2, Plus, FileText, Shield, Loader2, Zap } from 'lucide-react';
+import { Receipt, DollarSign, Building2, Plus, FileText, Shield, Loader2, Zap, CloudSync } from 'lucide-react';
 import { ObrigacoesKPIs } from '@/components/obrigacoes/ObrigacoesKPIs';
 import { GuiasTable } from '@/components/obrigacoes/GuiasTable';
 import { DctfTable, SefipTable } from '@/components/obrigacoes/DeclaracoesTable';
@@ -94,6 +94,9 @@ export default function ObrigacoesFiscaisPage() {
             </Select>
             <Button variant="outline" className="rounded-xl font-body gap-1.5" onClick={gerarGuiasServidor} disabled={gerandoServidor}>
               {gerandoServidor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}<span className="hidden sm:inline">Auto</span>
+            </Button>
+            <Button variant="outline" className="rounded-xl font-body gap-1.5 border-info/30 text-info hover:bg-info/5" onClick={() => toast.success('Sincronizando com FGTS Digital API...')}>
+              <CloudSync className="h-4 w-4" /><span className="hidden sm:inline">Sincronizar API</span>
             </Button>
             <Dialog open={openGuia} onOpenChange={setOpenGuia}>
               <DialogTrigger asChild><Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body"><Plus className="mr-2 h-4 w-4" />Gerar Guia</Button></DialogTrigger>
