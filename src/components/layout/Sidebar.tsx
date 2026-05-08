@@ -60,6 +60,8 @@ const menuGroups: MenuGroup[] = [
     label: 'Operações',
     items: [
       { path: '/folha', label: 'Folha', icon: FileText },
+      { path: '/provisoes', label: 'Provisões', icon: Wallet },
+
       { path: '/holerites', label: 'Holerites', icon: Receipt },
       { path: '/ponto', label: 'Ponto', icon: Clock },
       { path: '/banco-horas', label: 'Banco de Horas', icon: Timer },
