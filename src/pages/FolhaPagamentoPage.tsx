@@ -56,6 +56,7 @@ function useFolhaResumo(competencia: string) {
       const irrf = Math.max(0, totalDescontos - inss);
       const hasData = colaboradores > 0;
       return {
+        id: folhaData?.[0]?.id,
         colaboradores, totalProventos, totalDescontos, inss, fgts, irrf,
         liquido: totalProventos - totalDescontos,
         status: {
