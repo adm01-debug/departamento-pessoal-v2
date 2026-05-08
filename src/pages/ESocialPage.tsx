@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -91,7 +91,12 @@ export default function ESocialPage() {
               </div>
               Eventos eSocial
             </CardTitle>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body border-success/30 hover:bg-success/5 text-success">
+                <ShieldCheck className="h-4 w-4" />
+                Certificado Ativo
+              </Button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-body">
                   <Plus className="h-4 w-4 mr-1" /> Novo Evento
@@ -118,6 +123,7 @@ export default function ESocialPage() {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (

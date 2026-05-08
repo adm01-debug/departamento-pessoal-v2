@@ -2032,6 +2032,50 @@ export type Database = {
           },
         ]
       }
+      certificados_digitais: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          empresa_id: string | null
+          id: string
+          issuer: string | null
+          subject: string | null
+          thumbprint: string | null
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          issuer?: string | null
+          subject?: string | null
+          thumbprint?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          issuer?: string | null
+          subject?: string | null
+          thumbprint?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificados_digitais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ciclos_avaliacao: {
         Row: {
           created_at: string
@@ -2079,6 +2123,59 @@ export type Database = {
           },
           {
             foreignKeyName: "fk_ciclos_avaliacao_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cnab_configuracoes: {
+        Row: {
+          agencia: string
+          agencia_digito: string | null
+          banco_codigo: string
+          codigo_empresa: string | null
+          conta: string
+          conta_digito: string
+          convenio: string
+          created_at: string | null
+          empresa_id: string | null
+          id: string
+          nome_empresa: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agencia: string
+          agencia_digito?: string | null
+          banco_codigo: string
+          codigo_empresa?: string | null
+          conta: string
+          conta_digito: string
+          convenio: string
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome_empresa?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agencia?: string
+          agencia_digito?: string | null
+          banco_codigo?: string
+          codigo_empresa?: string | null
+          conta?: string
+          conta_digito?: string
+          convenio?: string
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome_empresa?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cnab_configuracoes_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
@@ -2212,6 +2309,7 @@ export type Database = {
           escolaridade: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil: Database["public"]["Enums"]["estado_civil"]
           etnia: string | null
+          expatriado: boolean | null
           experiencia_fim_1: string | null
           experiencia_fim_2: string | null
           experiencia_tipo: string | null
@@ -2236,6 +2334,7 @@ export type Database = {
           local_trabalho_id: string | null
           logradouro: string | null
           matricula: string | null
+          moeda_base: string | null
           nacionalidade: string | null
           nacionalidade_id: number | null
           naturalidade_cidade: string | null
@@ -2248,6 +2347,7 @@ export type Database = {
           numero: string | null
           observacoes: string | null
           pais_nascimento: string | null
+          pais_origem: string | null
           pis_pasep: string | null
           pix_chave: string | null
           pix_tipo: string | null
@@ -2348,6 +2448,7 @@ export type Database = {
           escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil?: Database["public"]["Enums"]["estado_civil"]
           etnia?: string | null
+          expatriado?: boolean | null
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
@@ -2372,6 +2473,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
           naturalidade_cidade?: string | null
@@ -2384,6 +2486,7 @@ export type Database = {
           numero?: string | null
           observacoes?: string | null
           pais_nascimento?: string | null
+          pais_origem?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
@@ -2484,6 +2587,7 @@ export type Database = {
           escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil?: Database["public"]["Enums"]["estado_civil"]
           etnia?: string | null
+          expatriado?: boolean | null
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
@@ -2508,6 +2612,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
           naturalidade_cidade?: string | null
@@ -2520,6 +2625,7 @@ export type Database = {
           numero?: string | null
           observacoes?: string | null
           pais_nascimento?: string | null
+          pais_origem?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
@@ -2976,6 +3082,7 @@ export type Database = {
       contas_bancarias: {
         Row: {
           agencia: string | null
+          agencia_digito: string | null
           ativo: boolean | null
           banco_codigo: string | null
           banco_nome: string | null
@@ -2994,6 +3101,7 @@ export type Database = {
         }
         Insert: {
           agencia?: string | null
+          agencia_digito?: string | null
           ativo?: boolean | null
           banco_codigo?: string | null
           banco_nome?: string | null
@@ -3012,6 +3120,7 @@ export type Database = {
         }
         Update: {
           agencia?: string | null
+          agencia_digito?: string | null
           ativo?: boolean | null
           banco_codigo?: string | null
           banco_nome?: string | null
@@ -5361,46 +5470,58 @@ export type Database = {
       }
       esocial_eventos: {
         Row: {
+          assinatura_xml: string | null
           competencia: string | null
           created_at: string
           dados: Json | null
           data_envio: string | null
           empresa_id: string | null
           erros: Json | null
+          hash_seguranca: string | null
           id: string
           protocolo: string | null
+          recibo: string | null
           status: string | null
           tipo_evento: string
           updated_at: string
           xml: string | null
+          xml_retorno: string | null
         }
         Insert: {
+          assinatura_xml?: string | null
           competencia?: string | null
           created_at?: string
           dados?: Json | null
           data_envio?: string | null
           empresa_id?: string | null
           erros?: Json | null
+          hash_seguranca?: string | null
           id?: string
           protocolo?: string | null
+          recibo?: string | null
           status?: string | null
           tipo_evento: string
           updated_at?: string
           xml?: string | null
+          xml_retorno?: string | null
         }
         Update: {
+          assinatura_xml?: string | null
           competencia?: string | null
           created_at?: string
           dados?: Json | null
           data_envio?: string | null
           empresa_id?: string | null
           erros?: Json | null
+          hash_seguranca?: string | null
           id?: string
           protocolo?: string | null
+          recibo?: string | null
           status?: string | null
           tipo_evento?: string
           updated_at?: string
           xml?: string | null
+          xml_retorno?: string | null
         }
         Relationships: [
           {
@@ -11205,6 +11326,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      taxas_cambio: {
+        Row: {
+          created_at: string | null
+          data_referencia: string
+          id: string
+          moeda_destino: string
+          moeda_origem: string
+          taxa: number
+        }
+        Insert: {
+          created_at?: string | null
+          data_referencia: string
+          id?: string
+          moeda_destino?: string
+          moeda_origem: string
+          taxa: number
+        }
+        Update: {
+          created_at?: string | null
+          data_referencia?: string
+          id?: string
+          moeda_destino?: string
+          moeda_origem?: string
+          taxa?: number
+        }
+        Relationships: []
       }
       tempos_residencia: {
         Row: {

@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf } from '@/components/folha';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard } from '@/components/folha';
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
@@ -30,6 +30,7 @@ function getCompetenciaAtual(): string {
 
 /* ─── Data Hook ─── */
 interface FolhaResumo {
+  id?: string;
   colaboradores: number;
   totalProventos: number;
   totalDescontos: number;
@@ -55,6 +56,7 @@ function useFolhaResumo(competencia: string) {
       const irrf = Math.max(0, totalDescontos - inss);
       const hasData = colaboradores > 0;
       return {
+        id: folhaData?.[0]?.id,
         colaboradores, totalProventos, totalDescontos, inss, fgts, irrf,
         liquido: totalProventos - totalDescontos,
         status: {
@@ -161,6 +163,8 @@ export default function FolhaPagamentoPage() {
             </Button>
             <Simulador13Dialog />
             <SimuladorWhatIf />
+            {resumo?.id && <CNABDialog folhaId={resumo.id} />}
+            {resumo?.id && <RelatorioContabilDialog folhaId={resumo.id} />}
           </div>
         }
       >
@@ -179,6 +183,8 @@ export default function FolhaPagamentoPage() {
             totalDescontos={resumo.totalDescontos}
           />
         )}
+        
+        <FGTSDigitalDashboard />
       </PageLayout>
     </>
   );
