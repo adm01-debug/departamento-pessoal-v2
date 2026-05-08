@@ -91,7 +91,12 @@ export default function ESocialPage() {
               </div>
               Eventos eSocial
             </CardTitle>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body border-success/30 hover:bg-success/5 text-success">
+                <ShieldCheck className="h-4 w-4" />
+                Certificado Ativo
+              </Button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-body">
                   <Plus className="h-4 w-4 mr-1" /> Novo Evento
