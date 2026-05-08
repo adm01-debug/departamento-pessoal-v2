@@ -7,8 +7,7 @@ import { BookOpen, FileSpreadsheet, History, Download, Zap, RefreshCcw, Table as
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { contabilidadeService } from '@/services/contabilidadeService';
-import { folhaService } from '@/services/folhaService';
+import { contabilidadeService, folhaService } from '@/services';
 import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
