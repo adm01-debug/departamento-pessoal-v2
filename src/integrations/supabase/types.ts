@@ -10020,6 +10020,77 @@ export type Database = {
           },
         ]
       }
+      provisoes_mensais: {
+        Row: {
+          colaborador_id: string
+          competencia: string
+          created_at: string
+          empresa_id: string
+          encargos_fgts: number
+          encargos_inss: number
+          id: string
+          tipo: string
+          total: number | null
+          updated_at: string
+          valor_principal: number
+        }
+        Insert: {
+          colaborador_id: string
+          competencia: string
+          created_at?: string
+          empresa_id: string
+          encargos_fgts?: number
+          encargos_inss?: number
+          id?: string
+          tipo: string
+          total?: number | null
+          updated_at?: string
+          valor_principal?: number
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string
+          created_at?: string
+          empresa_id?: string
+          encargos_fgts?: number
+          encargos_inss?: number
+          id?: string
+          tipo?: string
+          total?: number | null
+          updated_at?: string
+          valor_principal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provisoes_mensais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_mensais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_mensais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_mensais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       query_telemetry: {
         Row: {
           count_mode: string | null
