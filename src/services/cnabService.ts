@@ -44,6 +44,28 @@ export const cnabService = {
     }
   },
 
+  async listRemessas(empresaId: string) {
+    const { data, error } = await supabase
+      .from('cnab_remessas')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async listPixLotes(empresaId: string) {
+    const { data, error } = await supabase
+      .from('pix_lotes')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
   async generateCNAB240(empresaId: string, folhaId: string): Promise<string> {
     const config = await this.getConfig(empresaId);
     if (!config) throw new Error('Configuração CNAB não encontrada para esta empresa.');
@@ -100,7 +122,7 @@ export const cnabService = {
     header += '1'; // Código Arquivo (1=Remessa)
     header += dateStr;
     header += timeStr;
-    header += pad(sequence++, 6, '0', 'left'); // NSA
+    header += pad(sequence, 6, '0', 'left'); // NSA
     header += '081'; // Layout
     header += '00000'; // Densidade
     header += pad('', 69); // Reservado
@@ -132,12 +154,14 @@ export const cnabService = {
 
     let totalAmount = 0;
     let detailSequence = 1;
+    const itensToInsert = [];
 
     for (const holerite of holerites) {
       const conta = (contas as any[])?.find(c => c.colaborador_id === holerite.colaborador_id);
       if (!conta) continue;
 
-      totalAmount += Number(holerite.liquido);
+      const valor = Number(holerite.liquido);
+      totalAmount += valor;
 
       // Segmento A
       let segA = pad(config.banco_codigo, 3, '0', 'left');
@@ -158,7 +182,7 @@ export const cnabService = {
       segA += dateStr; // Data Pagamento
       segA += 'BRL'; // Moeda
       segA += pad('', 15, '0'); // Quantidade
-      segA += formatAmount(Number(holerite.liquido));
+      segA += formatAmount(valor);
       segA += pad('', 20); // Nosso Numero
       segA += pad('', 8, '0'); // Data Real
       segA += pad('', 15, '0'); // Valor Real
@@ -166,6 +190,18 @@ export const cnabService = {
       segA += '00'; // Aviso
       segA += pad('', 10); // Ocorrências
       lines.push(segA.padEnd(240, ' '));
+
+      itensToInsert.push({
+        colaborador_id: holerite.colaborador_id,
+        nome_favorecido: holerite.colaborador_nome,
+        cpf_cnpj_favorecido: holerite.colaborador_cpf,
+        banco_favorecido: conta.banco_codigo,
+        agencia_favorecido: conta.agencia,
+        conta_favorecido: conta.conta,
+        valor_pagamento: valor,
+        data_pagamento: today.toISOString().split('T')[0],
+        tipo_pagamento: 'salario'
+      });
     }
 
     // Trailer Lote (Registro 5)
@@ -173,10 +209,10 @@ export const cnabService = {
     trailerLote += '0001';
     trailerLote += '5';
     trailerLote += pad('', 9);
-    trailerLote += pad(lines.length + 1 - 2, 6, '0', 'left'); // Qtd Registros (excluindo headers e trailer lote/arquivo?) - simplified
+    trailerLote += pad(lines.length + 1 - 2, 6, '0', 'left');
     trailerLote += formatAmount(totalAmount);
-    trailerLote += pad('', 18, '0'); // Qtd Moeda
-    trailerLote += pad('', 18, '0'); // Numero Aviso
+    trailerLote += pad('', 18, '0');
+    trailerLote += pad('', 18, '0');
     trailerLote += pad('', 165);
     lines.push(trailerLote.padEnd(240, ' '));
 
@@ -185,13 +221,38 @@ export const cnabService = {
     trailer += '9999';
     trailer += '9';
     trailer += pad('', 9);
-    trailer += '000001'; // Qtd Lotes
-    trailer += pad(lines.length + 1, 6, '0', 'left'); // Qtd Registros
-    trailer += pad('', 6, '0'); // Qtd Contas Conciliação
+    trailer += '000001';
+    trailer += pad(lines.length + 1, 6, '0', 'left');
+    trailer += pad('', 6, '0');
     trailer += pad('', 205);
     lines.push(trailer.padEnd(240, ' '));
 
-    return lines.join('\n');
+    const content = lines.join('\r\n'); // CNAB usually uses CRLF
+
+    // Save Remessa record
+    const { data: remessa, error: rError } = await supabase
+      .from('cnab_remessas')
+      .insert([{
+        empresa_id: empresaId,
+        banco_codigo: config.banco_codigo,
+        sequencial_arquivo: sequence,
+        total_pagamentos: detailSequence - 1,
+        valor_total: totalAmount,
+        status: 'gerado'
+      }])
+      .select()
+      .single();
+
+    if (rError) throw rError;
+
+    // Save Itens
+    const { error: iError } = await supabase
+      .from('cnab_itens')
+      .insert(itensToInsert.map(item => ({ ...item, remessa_id: remessa.id })));
+
+    if (iError) throw iError;
+
+    return content;
   },
 
   async generatePIXBatch(empresaId: string, folhaId: string): Promise<string> {
@@ -213,21 +274,55 @@ export const cnabService = {
     if (cError) throw cError;
 
     const csvLines = ['Nome;CPF/CNPJ;Chave Pix;Tipo Chave;Valor;Descricao'];
+    let totalAmount = 0;
+    const itensToInsert = [];
 
     for (const holerite of holerites) {
       const conta = (contas as any[])?.find(c => c.colaborador_id === holerite.colaborador_id);
       if (!conta || !conta.pix_chave) continue;
 
-      const valor = Number(holerite.liquido).toFixed(2).replace('.', ',');
+      const valor = Number(holerite.liquido);
+      totalAmount += valor;
+      const valorStr = valor.toFixed(2).replace('.', ',');
       const nome = holerite.colaborador_nome || '';
       const cpf = holerite.colaborador_cpf || '';
       const chave = conta.pix_chave;
       const tipo = conta.pix_tipo || 'CPF';
 
-      csvLines.push(`${nome};${cpf};${chave};${tipo};${valor};Pagamento Salarial`);
+      csvLines.push(`${nome};${cpf};${chave};${tipo};${valorStr};Pagamento Salarial`);
+      
+      itensToInsert.push({
+        colaborador_id: holerite.colaborador_id,
+        chave_pix: chave,
+        tipo_chave: tipo,
+        valor: valor,
+        descricao: 'Pagamento Salarial',
+        status: 'pendente'
+      });
     }
 
     if (csvLines.length === 1) throw new Error('Nenhum colaborador com chave PIX cadastrada nesta folha.');
+
+    // Save Lote record
+    const { data: lote, error: lError } = await supabase
+      .from('pix_lotes')
+      .insert([{
+        empresa_id: empresaId,
+        valor_total: totalAmount,
+        quantidade_pagamentos: csvLines.length - 1,
+        status: 'finalizado'
+      }])
+      .select()
+      .single();
+
+    if (lError) throw lError;
+
+    // Save Itens
+    const { error: iError } = await supabase
+      .from('pix_itens')
+      .insert(itensToInsert.map(item => ({ ...item, lote_id: lote.id })));
+
+    if (iError) throw iError;
 
     return csvLines.join('\n');
   }
