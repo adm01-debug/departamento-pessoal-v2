@@ -192,5 +192,43 @@ export const cnabService = {
     lines.push(trailer.padEnd(240, ' '));
 
     return lines.join('\n');
+  },
+
+  async generatePIXBatch(empresaId: string, folhaId: string): Promise<string> {
+    const { data: holerites, error: hError } = await supabase
+      .from('holerites')
+      .select('*, colaborador:colaboradores(id, nome_completo, cpf)')
+      .eq('folha_id', folhaId);
+    
+    if (hError) throw hError;
+    if (!holerites?.length) throw new Error('Nenhum pagamento encontrado para gerar lote PIX.');
+
+    const colaboradorIds = holerites.map(h => h.colaborador_id);
+    const { data: contas, error: cError } = await supabase
+      .from('contas_bancarias')
+      .select('*')
+      .in('colaborador_id', colaboradorIds)
+      .eq('principal', true);
+
+    if (cError) throw cError;
+
+    const csvLines = ['Nome;CPF/CNPJ;Chave Pix;Tipo Chave;Valor;Descricao'];
+
+    for (const holerite of holerites) {
+      const conta = (contas as any[])?.find(c => c.colaborador_id === holerite.colaborador_id);
+      if (!conta || !conta.pix_chave) continue;
+
+      const valor = Number(holerite.liquido).toFixed(2).replace('.', ',');
+      const nome = holerite.colaborador_nome || '';
+      const cpf = holerite.colaborador_cpf || '';
+      const chave = conta.pix_chave;
+      const tipo = conta.pix_tipo || 'CPF';
+
+      csvLines.push(`${nome};${cpf};${chave};${tipo};${valor};Pagamento Salarial`);
+    }
+
+    if (csvLines.length === 1) throw new Error('Nenhum colaborador com chave PIX cadastrada nesta folha.');
+
+    return csvLines.join('\n');
   }
 };
