@@ -34,6 +34,7 @@ export { bancoHorasConfigService } from './bancoHorasConfigService';
 export { provisaoService } from './provisaoService';
 export { cnabService } from './cnabService';
 export type { CNABConfig } from './cnabService';
+export { contabilidadeService } from './contabilidadeService';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
