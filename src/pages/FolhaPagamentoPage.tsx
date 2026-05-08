@@ -30,6 +30,7 @@ function getCompetenciaAtual(): string {
 
 /* ─── Data Hook ─── */
 interface FolhaResumo {
+  id?: string;
   colaboradores: number;
   totalProventos: number;
   totalDescontos: number;
