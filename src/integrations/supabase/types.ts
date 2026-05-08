@@ -7938,6 +7938,80 @@ export type Database = {
           },
         ]
       }
+      lancamentos_contabeis: {
+        Row: {
+          conta_credito_id: string | null
+          conta_debito_id: string | null
+          created_at: string | null
+          data_lancamento: string
+          descricao: string
+          empresa_id: string
+          folha_id: string | null
+          id: string
+          origem: string
+          status: string
+          updated_at: string | null
+          valor: number
+        }
+        Insert: {
+          conta_credito_id?: string | null
+          conta_debito_id?: string | null
+          created_at?: string | null
+          data_lancamento: string
+          descricao: string
+          empresa_id: string
+          folha_id?: string | null
+          id?: string
+          origem?: string
+          status?: string
+          updated_at?: string | null
+          valor: number
+        }
+        Update: {
+          conta_credito_id?: string | null
+          conta_debito_id?: string | null
+          created_at?: string | null
+          data_lancamento?: string
+          descricao?: string
+          empresa_id?: string
+          folha_id?: string | null
+          id?: string
+          origem?: string
+          status?: string
+          updated_at?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lancamentos_contabeis_conta_credito_id_fkey"
+            columns: ["conta_credito_id"]
+            isOneToOne: false
+            referencedRelation: "plano_contas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_contabeis_conta_debito_id_fkey"
+            columns: ["conta_debito_id"]
+            isOneToOne: false
+            referencedRelation: "plano_contas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_contabeis_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_contabeis_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lancamentos_folha: {
         Row: {
           automatico: boolean | null
@@ -10086,6 +10160,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pix_lotes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plano_contas: {
+        Row: {
+          codigo: string
+          created_at: string | null
+          empresa_id: string
+          id: string
+          natureza: string
+          nome: string
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          codigo: string
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          natureza: string
+          nome: string
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          natureza?: string
+          nome?: string
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plano_contas_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
