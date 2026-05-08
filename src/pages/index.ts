@@ -36,3 +36,5 @@ export { default as RecrutamentoPage } from './RecrutamentoPage';
 export { default as ContratacaoPage } from './ContratacaoPage';
 export { default as OnboardingPage } from './OnboardingPage';
 export { default as AssinaturasPage } from './AssinaturasPage';
+export { default as FinanceiroBancarioPage } from './FinanceiroBancarioPage';
+export { default as ProvisoesPage } from './ProvisoesPage';
