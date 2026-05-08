@@ -2183,6 +2183,133 @@ export type Database = {
           },
         ]
       }
+      cnab_itens: {
+        Row: {
+          agencia_favorecido: string | null
+          banco_favorecido: string | null
+          colaborador_id: string | null
+          conta_favorecido: string | null
+          cpf_cnpj_favorecido: string
+          created_at: string | null
+          data_pagamento: string
+          id: string
+          nome_favorecido: string
+          remessa_id: string
+          status: string | null
+          tipo_pagamento: string | null
+          valor_pagamento: number
+        }
+        Insert: {
+          agencia_favorecido?: string | null
+          banco_favorecido?: string | null
+          colaborador_id?: string | null
+          conta_favorecido?: string | null
+          cpf_cnpj_favorecido: string
+          created_at?: string | null
+          data_pagamento: string
+          id?: string
+          nome_favorecido: string
+          remessa_id: string
+          status?: string | null
+          tipo_pagamento?: string | null
+          valor_pagamento: number
+        }
+        Update: {
+          agencia_favorecido?: string | null
+          banco_favorecido?: string | null
+          colaborador_id?: string | null
+          conta_favorecido?: string | null
+          cpf_cnpj_favorecido?: string
+          created_at?: string | null
+          data_pagamento?: string
+          id?: string
+          nome_favorecido?: string
+          remessa_id?: string
+          status?: string | null
+          tipo_pagamento?: string | null
+          valor_pagamento?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cnab_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cnab_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cnab_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cnab_itens_remessa_id_fkey"
+            columns: ["remessa_id"]
+            isOneToOne: false
+            referencedRelation: "cnab_remessas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cnab_remessas: {
+        Row: {
+          arquivo_url: string | null
+          banco_codigo: string
+          created_at: string | null
+          data_geracao: string | null
+          empresa_id: string
+          id: string
+          sequencial_arquivo: number
+          status: string
+          total_pagamentos: number | null
+          updated_at: string | null
+          valor_total: number | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          banco_codigo: string
+          created_at?: string | null
+          data_geracao?: string | null
+          empresa_id: string
+          id?: string
+          sequencial_arquivo: number
+          status?: string
+          total_pagamentos?: number | null
+          updated_at?: string | null
+          valor_total?: number | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          banco_codigo?: string
+          created_at?: string | null
+          data_geracao?: string | null
+          empresa_id?: string
+          id?: string
+          sequencial_arquivo?: number
+          status?: string
+          total_pagamentos?: number | null
+          updated_at?: string | null
+          valor_total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cnab_remessas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaborador_beneficios: {
         Row: {
           beneficio_id: string
@@ -2297,9 +2424,11 @@ export type Database = {
           ctps_uf: string | null
           cursos_certificacoes: string | null
           data_admissao: string
+          data_chegada_pais: string | null
           data_desligamento: string | null
           data_exame_admissional: string | null
           data_nascimento: string
+          data_saida_pais: string | null
           data_senioridade: string | null
           departamento: string
           email: string | null
@@ -2334,6 +2463,7 @@ export type Database = {
           local_trabalho_id: string | null
           logradouro: string | null
           matricula: string | null
+          moeda: string | null
           moeda_base: string | null
           nacionalidade: string | null
           nacionalidade_id: number | null
@@ -2348,11 +2478,13 @@ export type Database = {
           observacoes: string | null
           pais_nascimento: string | null
           pais_origem: string | null
+          pais_residencia_fiscal: string | null
           pis_pasep: string | null
           pix_chave: string | null
           pix_tipo: string | null
           primeiro_emprego: boolean | null
           pronomes: string | null
+          regime_fiscal_especial: boolean | null
           reservista: string | null
           reservista_ra: string | null
           reservista_serie: string | null
@@ -2436,9 +2568,11 @@ export type Database = {
           ctps_uf?: string | null
           cursos_certificacoes?: string | null
           data_admissao: string
+          data_chegada_pais?: string | null
           data_desligamento?: string | null
           data_exame_admissional?: string | null
           data_nascimento: string
+          data_saida_pais?: string | null
           data_senioridade?: string | null
           departamento: string
           email?: string | null
@@ -2473,6 +2607,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda?: string | null
           moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
@@ -2487,11 +2622,13 @@ export type Database = {
           observacoes?: string | null
           pais_nascimento?: string | null
           pais_origem?: string | null
+          pais_residencia_fiscal?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
           pronomes?: string | null
+          regime_fiscal_especial?: boolean | null
           reservista?: string | null
           reservista_ra?: string | null
           reservista_serie?: string | null
@@ -2575,9 +2712,11 @@ export type Database = {
           ctps_uf?: string | null
           cursos_certificacoes?: string | null
           data_admissao?: string
+          data_chegada_pais?: string | null
           data_desligamento?: string | null
           data_exame_admissional?: string | null
           data_nascimento?: string
+          data_saida_pais?: string | null
           data_senioridade?: string | null
           departamento?: string
           email?: string | null
@@ -2612,6 +2751,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda?: string | null
           moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
@@ -2626,11 +2766,13 @@ export type Database = {
           observacoes?: string | null
           pais_nascimento?: string | null
           pais_origem?: string | null
+          pais_residencia_fiscal?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
           pronomes?: string | null
+          regime_fiscal_especial?: boolean | null
           reservista?: string | null
           reservista_ra?: string | null
           reservista_serie?: string | null
@@ -7811,6 +7953,80 @@ export type Database = {
           },
         ]
       }
+      lancamentos_contabeis: {
+        Row: {
+          conta_credito_id: string | null
+          conta_debito_id: string | null
+          created_at: string | null
+          data_lancamento: string
+          descricao: string
+          empresa_id: string
+          folha_id: string | null
+          id: string
+          origem: string
+          status: string
+          updated_at: string | null
+          valor: number
+        }
+        Insert: {
+          conta_credito_id?: string | null
+          conta_debito_id?: string | null
+          created_at?: string | null
+          data_lancamento: string
+          descricao: string
+          empresa_id: string
+          folha_id?: string | null
+          id?: string
+          origem?: string
+          status?: string
+          updated_at?: string | null
+          valor: number
+        }
+        Update: {
+          conta_credito_id?: string | null
+          conta_debito_id?: string | null
+          created_at?: string | null
+          data_lancamento?: string
+          descricao?: string
+          empresa_id?: string
+          folha_id?: string | null
+          id?: string
+          origem?: string
+          status?: string
+          updated_at?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lancamentos_contabeis_conta_credito_id_fkey"
+            columns: ["conta_credito_id"]
+            isOneToOne: false
+            referencedRelation: "plano_contas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_contabeis_conta_debito_id_fkey"
+            columns: ["conta_debito_id"]
+            isOneToOne: false
+            referencedRelation: "plano_contas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_contabeis_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lancamentos_contabeis_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lancamentos_folha: {
         Row: {
           automatico: boolean | null
@@ -9853,6 +10069,156 @@ export type Database = {
             columns: ["pesquisa_id"]
             isOneToOne: false
             referencedRelation: "pesquisas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pix_itens: {
+        Row: {
+          chave_pix: string
+          colaborador_id: string | null
+          created_at: string | null
+          descricao: string | null
+          end_to_end_id: string | null
+          id: string
+          lote_id: string
+          status: string | null
+          tipo_chave: string
+          valor: number
+        }
+        Insert: {
+          chave_pix: string
+          colaborador_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          end_to_end_id?: string | null
+          id?: string
+          lote_id: string
+          status?: string | null
+          tipo_chave: string
+          valor: number
+        }
+        Update: {
+          chave_pix?: string
+          colaborador_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          end_to_end_id?: string | null
+          id?: string
+          lote_id?: string
+          status?: string | null
+          tipo_chave?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pix_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pix_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pix_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pix_itens_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "pix_lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pix_lotes: {
+        Row: {
+          created_at: string | null
+          data_criacao: string | null
+          empresa_id: string
+          id: string
+          quantidade_pagamentos: number | null
+          status: string
+          updated_at: string | null
+          valor_total: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_criacao?: string | null
+          empresa_id: string
+          id?: string
+          quantidade_pagamentos?: number | null
+          status?: string
+          updated_at?: string | null
+          valor_total?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          data_criacao?: string | null
+          empresa_id?: string
+          id?: string
+          quantidade_pagamentos?: number | null
+          status?: string
+          updated_at?: string | null
+          valor_total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pix_lotes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plano_contas: {
+        Row: {
+          codigo: string
+          created_at: string | null
+          empresa_id: string
+          id: string
+          natureza: string
+          nome: string
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          codigo: string
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          natureza: string
+          nome: string
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          codigo?: string
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          natureza?: string
+          nome?: string
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plano_contas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]

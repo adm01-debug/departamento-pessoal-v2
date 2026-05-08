@@ -4,7 +4,7 @@ import {
   LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
-  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot
+  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen
 } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -75,6 +75,8 @@ const menuGroups: MenuGroup[] = [
       { icon: Wallet, label: 'Folha de Pagamento', path: '/folha', color: 'text-success' },
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
+      { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
+      { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },
     ]
   },
   {
