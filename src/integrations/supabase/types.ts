@@ -10944,6 +10944,47 @@ export type Database = {
           },
         ]
       }
+      simulacoes_fiscais: {
+        Row: {
+          configuracao: Json
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          resultado: Json
+          titulo: string
+          usuario_id: string | null
+        }
+        Insert: {
+          configuracao: Json
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          resultado: Json
+          titulo: string
+          usuario_id?: string | null
+        }
+        Update: {
+          configuracao?: Json
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          resultado?: Json
+          titulo?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulacoes_fiscais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sindicatos: {
         Row: {
           cnpj: string | null

@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog } from '@/components/folha';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf } from '@/components/folha';
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
@@ -160,6 +160,7 @@ export default function FolhaPagamentoPage() {
               <span className="hidden sm:inline">Servidor</span>
             </Button>
             <Simulador13Dialog />
+            <SimuladorWhatIf />
           </div>
         }
       >
