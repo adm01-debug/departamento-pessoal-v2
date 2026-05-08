@@ -2032,6 +2032,50 @@ export type Database = {
           },
         ]
       }
+      certificados_digitais: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          empresa_id: string | null
+          id: string
+          issuer: string | null
+          subject: string | null
+          thumbprint: string | null
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          issuer?: string | null
+          subject?: string | null
+          thumbprint?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          issuer?: string | null
+          subject?: string | null
+          thumbprint?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificados_digitais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ciclos_avaliacao: {
         Row: {
           created_at: string
@@ -5417,46 +5461,58 @@ export type Database = {
       }
       esocial_eventos: {
         Row: {
+          assinatura_xml: string | null
           competencia: string | null
           created_at: string
           dados: Json | null
           data_envio: string | null
           empresa_id: string | null
           erros: Json | null
+          hash_seguranca: string | null
           id: string
           protocolo: string | null
+          recibo: string | null
           status: string | null
           tipo_evento: string
           updated_at: string
           xml: string | null
+          xml_retorno: string | null
         }
         Insert: {
+          assinatura_xml?: string | null
           competencia?: string | null
           created_at?: string
           dados?: Json | null
           data_envio?: string | null
           empresa_id?: string | null
           erros?: Json | null
+          hash_seguranca?: string | null
           id?: string
           protocolo?: string | null
+          recibo?: string | null
           status?: string | null
           tipo_evento: string
           updated_at?: string
           xml?: string | null
+          xml_retorno?: string | null
         }
         Update: {
+          assinatura_xml?: string | null
           competencia?: string | null
           created_at?: string
           dados?: Json | null
           data_envio?: string | null
           empresa_id?: string | null
           erros?: Json | null
+          hash_seguranca?: string | null
           id?: string
           protocolo?: string | null
+          recibo?: string | null
           status?: string | null
           tipo_evento?: string
           updated_at?: string
           xml?: string | null
+          xml_retorno?: string | null
         }
         Relationships: [
           {
