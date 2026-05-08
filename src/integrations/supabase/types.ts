@@ -3029,6 +3029,7 @@ export type Database = {
       contas_bancarias: {
         Row: {
           agencia: string | null
+          agencia_digito: string | null
           ativo: boolean | null
           banco_codigo: string | null
           banco_nome: string | null
@@ -3047,6 +3048,7 @@ export type Database = {
         }
         Insert: {
           agencia?: string | null
+          agencia_digito?: string | null
           ativo?: boolean | null
           banco_codigo?: string | null
           banco_nome?: string | null
@@ -3065,6 +3067,7 @@ export type Database = {
         }
         Update: {
           agencia?: string | null
+          agencia_digito?: string | null
           ativo?: boolean | null
           banco_codigo?: string | null
           banco_nome?: string | null
