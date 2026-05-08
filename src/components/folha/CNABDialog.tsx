@@ -93,6 +93,29 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
     }
   };
 
+  const handleGeneratePIX = async () => {
+    if (!empresaAtual?.id) return;
+    setLoading(true);
+    try {
+      const content = await cnabService.generatePIXBatch(empresaAtual.id, folhaId);
+      const blob = new Blob([content], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `LOTE_PIX_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Lote PIX gerado com sucesso!');
+      setOpen(false);
+    } catch (err: any) {
+      toast.error('Erro ao gerar PIX: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
