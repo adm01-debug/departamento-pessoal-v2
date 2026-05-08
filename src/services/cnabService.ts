@@ -134,7 +134,7 @@ export const cnabService = {
     let detailSequence = 1;
 
     for (const holerite of holerites) {
-      const conta = contas?.find(c => c.colaborador_id === holerite.colaborador_id);
+      const conta = (contas as any[])?.find(c => c.colaborador_id === holerite.colaborador_id);
       if (!conta) continue;
 
       totalAmount += Number(holerite.liquido);
