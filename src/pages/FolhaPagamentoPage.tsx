@@ -160,6 +160,7 @@ export default function FolhaPagamentoPage() {
               <span className="hidden sm:inline">Servidor</span>
             </Button>
             <Simulador13Dialog />
+            <SimuladorWhatIf />
           </div>
         }
       >
