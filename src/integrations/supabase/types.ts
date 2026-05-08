@@ -2424,9 +2424,11 @@ export type Database = {
           ctps_uf: string | null
           cursos_certificacoes: string | null
           data_admissao: string
+          data_chegada_pais: string | null
           data_desligamento: string | null
           data_exame_admissional: string | null
           data_nascimento: string
+          data_saida_pais: string | null
           data_senioridade: string | null
           departamento: string
           email: string | null
@@ -2461,6 +2463,7 @@ export type Database = {
           local_trabalho_id: string | null
           logradouro: string | null
           matricula: string | null
+          moeda: string | null
           moeda_base: string | null
           nacionalidade: string | null
           nacionalidade_id: number | null
@@ -2475,11 +2478,13 @@ export type Database = {
           observacoes: string | null
           pais_nascimento: string | null
           pais_origem: string | null
+          pais_residencia_fiscal: string | null
           pis_pasep: string | null
           pix_chave: string | null
           pix_tipo: string | null
           primeiro_emprego: boolean | null
           pronomes: string | null
+          regime_fiscal_especial: boolean | null
           reservista: string | null
           reservista_ra: string | null
           reservista_serie: string | null
@@ -2563,9 +2568,11 @@ export type Database = {
           ctps_uf?: string | null
           cursos_certificacoes?: string | null
           data_admissao: string
+          data_chegada_pais?: string | null
           data_desligamento?: string | null
           data_exame_admissional?: string | null
           data_nascimento: string
+          data_saida_pais?: string | null
           data_senioridade?: string | null
           departamento: string
           email?: string | null
@@ -2600,6 +2607,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda?: string | null
           moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
@@ -2614,11 +2622,13 @@ export type Database = {
           observacoes?: string | null
           pais_nascimento?: string | null
           pais_origem?: string | null
+          pais_residencia_fiscal?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
           pronomes?: string | null
+          regime_fiscal_especial?: boolean | null
           reservista?: string | null
           reservista_ra?: string | null
           reservista_serie?: string | null
@@ -2702,9 +2712,11 @@ export type Database = {
           ctps_uf?: string | null
           cursos_certificacoes?: string | null
           data_admissao?: string
+          data_chegada_pais?: string | null
           data_desligamento?: string | null
           data_exame_admissional?: string | null
           data_nascimento?: string
+          data_saida_pais?: string | null
           data_senioridade?: string | null
           departamento?: string
           email?: string | null
@@ -2739,6 +2751,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda?: string | null
           moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
@@ -2753,11 +2766,13 @@ export type Database = {
           observacoes?: string | null
           pais_nascimento?: string | null
           pais_origem?: string | null
+          pais_residencia_fiscal?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
           primeiro_emprego?: boolean | null
           pronomes?: string | null
+          regime_fiscal_especial?: boolean | null
           reservista?: string | null
           reservista_ra?: string | null
           reservista_serie?: string | null
