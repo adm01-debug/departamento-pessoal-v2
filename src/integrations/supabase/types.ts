@@ -2309,6 +2309,7 @@ export type Database = {
           escolaridade: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil: Database["public"]["Enums"]["estado_civil"]
           etnia: string | null
+          expatriado: boolean | null
           experiencia_fim_1: string | null
           experiencia_fim_2: string | null
           experiencia_tipo: string | null
@@ -2333,6 +2334,7 @@ export type Database = {
           local_trabalho_id: string | null
           logradouro: string | null
           matricula: string | null
+          moeda_base: string | null
           nacionalidade: string | null
           nacionalidade_id: number | null
           naturalidade_cidade: string | null
@@ -2345,6 +2347,7 @@ export type Database = {
           numero: string | null
           observacoes: string | null
           pais_nascimento: string | null
+          pais_origem: string | null
           pis_pasep: string | null
           pix_chave: string | null
           pix_tipo: string | null
@@ -2445,6 +2448,7 @@ export type Database = {
           escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil?: Database["public"]["Enums"]["estado_civil"]
           etnia?: string | null
+          expatriado?: boolean | null
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
@@ -2469,6 +2473,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
           naturalidade_cidade?: string | null
@@ -2481,6 +2486,7 @@ export type Database = {
           numero?: string | null
           observacoes?: string | null
           pais_nascimento?: string | null
+          pais_origem?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
@@ -2581,6 +2587,7 @@ export type Database = {
           escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
           estado_civil?: Database["public"]["Enums"]["estado_civil"]
           etnia?: string | null
+          expatriado?: boolean | null
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
@@ -2605,6 +2612,7 @@ export type Database = {
           local_trabalho_id?: string | null
           logradouro?: string | null
           matricula?: string | null
+          moeda_base?: string | null
           nacionalidade?: string | null
           nacionalidade_id?: number | null
           naturalidade_cidade?: string | null
@@ -2617,6 +2625,7 @@ export type Database = {
           numero?: string | null
           observacoes?: string | null
           pais_nascimento?: string | null
+          pais_origem?: string | null
           pis_pasep?: string | null
           pix_chave?: string | null
           pix_tipo?: string | null
@@ -11317,6 +11326,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      taxas_cambio: {
+        Row: {
+          created_at: string | null
+          data_referencia: string
+          id: string
+          moeda_destino: string
+          moeda_origem: string
+          taxa: number
+        }
+        Insert: {
+          created_at?: string | null
+          data_referencia: string
+          id?: string
+          moeda_destino?: string
+          moeda_origem: string
+          taxa: number
+        }
+        Update: {
+          created_at?: string | null
+          data_referencia?: string
+          id?: string
+          moeda_destino?: string
+          moeda_origem?: string
+          taxa?: number
+        }
+        Relationships: []
       }
       tempos_residencia: {
         Row: {
