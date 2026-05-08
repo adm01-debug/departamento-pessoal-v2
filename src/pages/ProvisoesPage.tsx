@@ -5,7 +5,7 @@ import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
-import { EmptyList } from '@/components/ui/empty-state';
+import { EmptyList, EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { provisaoService } from '@/services';
@@ -132,12 +132,13 @@ export default function ProvisoesPage() {
         {isLoading ? (
           <div className="flex justify-center p-12"><Spinner size="lg" /></div>
         ) : !provisoes?.length ? (
-          <EmptyList 
-            entityName="provisão" 
+          <EmptyState 
+            icon={Wallet}
             title="Nenhuma provisão encontrada"
             description="Não há provisões calculadas para esta competência e empresa."
-            onCreate={handleCalcular} 
+            action={{ label: 'Calcular Provisões', onClick: handleCalcular }} 
           />
+
         ) : (
           <motion.div 
             initial={{ opacity: 0 }} 
