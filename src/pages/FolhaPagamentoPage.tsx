@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog } from '@/components/folha';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard } from '@/components/folha';
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
