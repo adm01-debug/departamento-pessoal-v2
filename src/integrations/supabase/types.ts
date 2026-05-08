@@ -2086,6 +2086,59 @@ export type Database = {
           },
         ]
       }
+      cnab_configuracoes: {
+        Row: {
+          agencia: string
+          agencia_digito: string | null
+          banco_codigo: string
+          codigo_empresa: string | null
+          conta: string
+          conta_digito: string
+          convenio: string
+          created_at: string | null
+          empresa_id: string | null
+          id: string
+          nome_empresa: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agencia: string
+          agencia_digito?: string | null
+          banco_codigo: string
+          codigo_empresa?: string | null
+          conta: string
+          conta_digito: string
+          convenio: string
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome_empresa?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agencia?: string
+          agencia_digito?: string | null
+          banco_codigo?: string
+          codigo_empresa?: string | null
+          conta?: string
+          conta_digito?: string
+          convenio?: string
+          created_at?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome_empresa?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cnab_configuracoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaborador_beneficios: {
         Row: {
           beneficio_id: string
