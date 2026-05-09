@@ -149,8 +149,19 @@ export default function ColaboradoresPage() {
       <DataTableToolbar
         search={search}
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Buscar por nome ou CPF..."
-        filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: handleStatusChange }]}
+        searchPlaceholder="Nome, CPF ou E-mail..."
+        filters={[
+          { key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: handleStatusChange },
+          { key: 'departamento', label: 'Departamento', options: departamentos.map(d => ({ value: d.nome, label: d.nome })), value: deptoFilter, onChange: (v) => { setDeptoFilter(v); setCurrentPage(1); } },
+          { key: 'cargo', label: 'Cargo', options: cargos.map(c => ({ value: c.nome, label: c.nome })), value: cargoFilter, onChange: (v) => { setCargoFilter(v); setCurrentPage(1); } }
+        ]}
+        onClearFilters={() => {
+          setStatusFilter('');
+          setDeptoFilter('');
+          setCargoFilter('');
+          setSearch('');
+          setCurrentPage(1);
+        }}
       />
 
       {isLoading ? (
