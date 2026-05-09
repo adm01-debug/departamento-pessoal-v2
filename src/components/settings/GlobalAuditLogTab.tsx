@@ -93,9 +93,10 @@ export function GlobalAuditLogTab() {
                 className="bg-transparent border-none text-xs font-body focus:ring-0 outline-none"
               >
                 <option value="todas">Todas as Entidades</option>
-                {getTabelas().map(t => (
-                  <option key={t} value={t}>{t}</option>
+                {getTabelas().map((t: any) => (
+                  <option key={String(t)} value={String(t)}>{String(t)}</option>
                 ))}
+
               </select>
             </div>
           </div>
