@@ -66,6 +66,7 @@ export default function PontoKioskPage() {
 
       setSelectedColab(colab);
       setStep('action');
+      speak(`Olá ${colab.nome_completo.split(' ')[0]}, selecione o tipo de registro.`);
     } catch (e: any) {
       toast.error(e.message);
       setPin('');
