@@ -533,10 +533,10 @@ export default function AvaliacaoPage() {
           </TabsContent>
 
           <TabsContent value="auditoria">
-             <PerformanceAuditTimeline />
+            <PerformanceAuditTimeline />
           </TabsContent>
         </Tabs>
-    </PageLayout>
+      </PageLayout>
     </>
   );
 }
