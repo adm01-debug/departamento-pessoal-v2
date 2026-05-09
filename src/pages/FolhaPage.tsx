@@ -36,11 +36,8 @@ export default function FolhaPage() {
   const navigate = useNavigate();
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
+  const { folhas, isLoading } = useFolha(competencia || undefined);
 
-  const { data: folhas, isLoading } = useQuery({
-    queryKey: ['folhas', competencia],
-    queryFn: () => folhaService.list(competencia || undefined),
-  });
 
   // Summary KPIs from loaded data
   const totais = (folhas || []).reduce(
