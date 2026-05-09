@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Spinner } from '@/components/ui/spinner';
-import { Plug, ExternalLink, RefreshCw, CheckCircle, XCircle, Settings, History } from 'lucide-react';
+import { Plug, ExternalLink, RefreshCw, CheckCircle, XCircle, Settings, History, Plus, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { bitrix24Service } from '@/services/tabelasComplementaresService';
