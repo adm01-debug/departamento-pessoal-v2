@@ -5359,6 +5359,7 @@ export type Database = {
         Row: {
           ativo: boolean | null
           ca: string | null
+          ca_validade: string | null
           categoria: string | null
           created_at: string | null
           descricao: string | null
@@ -5371,6 +5372,7 @@ export type Database = {
         Insert: {
           ativo?: boolean | null
           ca?: string | null
+          ca_validade?: string | null
           categoria?: string | null
           created_at?: string | null
           descricao?: string | null
@@ -5383,6 +5385,7 @@ export type Database = {
         Update: {
           ativo?: boolean | null
           ca?: string | null
+          ca_validade?: string | null
           categoria?: string | null
           created_at?: string | null
           descricao?: string | null
@@ -10623,6 +10626,36 @@ export type Database = {
           sla_horas?: number | null
           tipo_solicitacao?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      portal_notificacoes_settings: {
+        Row: {
+          alertar_ferias: boolean | null
+          alertar_holerite: boolean | null
+          created_at: string | null
+          email_alertas: boolean | null
+          id: string
+          push_alertas: boolean | null
+          user_id: string
+        }
+        Insert: {
+          alertar_ferias?: boolean | null
+          alertar_holerite?: boolean | null
+          created_at?: string | null
+          email_alertas?: boolean | null
+          id?: string
+          push_alertas?: boolean | null
+          user_id: string
+        }
+        Update: {
+          alertar_ferias?: boolean | null
+          alertar_holerite?: boolean | null
+          created_at?: string | null
+          email_alertas?: boolean | null
+          id?: string
+          push_alertas?: boolean | null
+          user_id?: string
         }
         Relationships: []
       }
