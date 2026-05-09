@@ -274,6 +274,10 @@ export default function ColaboradorDetalhesPage() {
               <TabsContent value="estagiario"><EstagiarioTab colaboradorId={id!} /></TabsContent>
             </Tabs>
           </TabsContent>
+
+          <TabsContent value="historico">
+            <ColaboradorHistory colaboradorId={id!} />
+          </TabsContent>
         </Tabs>
       </PageLayout>
     </>
