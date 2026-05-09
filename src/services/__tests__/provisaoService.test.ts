@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { provisaoService } from '../provisaoService';
 import { supabase } from '@/integrations/supabase/client';
+import { PostgrestResponse } from '@supabase/supabase-js';
 
 // Mock supabase
 vi.mock('@/integrations/supabase/client', () => ({
@@ -19,14 +20,16 @@ describe('provisaoService', () => {
 
   describe('list', () => {
     it('should call select with colaborador join', async () => {
-      const mockEq = vi.fn().mockResolvedValue({ data: [], error: null });
+      const mockResult = { data: [], error: null };
+      const mockEq = vi.fn().mockResolvedValue(mockResult);
       const mockOrder = vi.fn().mockReturnValue({ eq: mockEq });
       const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
       
       vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
 
-      await provisaoService.list();
+      const result = await provisaoService.list();
       expect(mockSelect).toHaveBeenCalledWith('*, colaborador:colaboradores(nome_completo, salario_base)');
+      expect(result).toEqual([]);
     });
 
     it('should filter by empresa_id when provided', async () => {
@@ -41,19 +44,14 @@ describe('provisaoService', () => {
     });
 
     it('should throw error if supabase fails', async () => {
-      const mockEq = vi.fn().mockResolvedValue({ data: null, error: new Error('DB Error') });
+      const mockError = { data: null, error: { message: 'DB Error' } };
+      const mockEq = vi.fn().mockResolvedValue(mockError);
       const mockOrder = vi.fn().mockReturnValue({ eq: mockEq });
       const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
       
       vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
 
-      try {
-        await provisaoService.list();
-        // If it doesn't throw, fail the test
-        expect(true).toBe(false);
-      } catch (e: any) {
-        expect(e.message).toBe('DB Error');
-      }
+      await expect(provisaoService.list()).rejects.toThrow('DB Error');
     });
   });
 
