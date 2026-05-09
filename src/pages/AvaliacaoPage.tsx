@@ -238,6 +238,24 @@ export default function AvaliacaoPage() {
                       </div>
                       <div><Label>Nota (0-10)</Label><Input type="number" min="0" max="10" value={fbForm.nota_geral} onChange={e => setFbForm(p => ({ ...p, nota_geral: e.target.value }))} /></div>
                     </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><Label>Performance (1-5)</Label>
+                        <Select value={fbForm.performance} onValueChange={v => setFbForm(p => ({ ...p, performance: v }))}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div><Label>Potencial (1-5)</Label>
+                        <Select value={fbForm.potencial} onValueChange={v => setFbForm(p => ({ ...p, potencial: v }))}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <div><Label>Pontos Fortes</Label><Textarea value={fbForm.pontos_fortes} onChange={e => setFbForm(p => ({ ...p, pontos_fortes: e.target.value }))} /></div>
                     <div><Label>Pontos de Melhoria</Label><Textarea value={fbForm.pontos_melhoria} onChange={e => setFbForm(p => ({ ...p, pontos_melhoria: e.target.value }))} /></div>
                     <Button onClick={() => criarFeedback.mutate()} disabled={!fbForm.avaliado_id || !fbForm.avaliador_id || criarFeedback.isPending}>{criarFeedback.isPending ? 'Salvando...' : 'Salvar'}</Button>
