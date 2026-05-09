@@ -28,7 +28,7 @@ export const edgeFunctionsService = {
   gerarGuias: async (params: {
     empresaId: string;
     competencia: string;
-    tipo: 'darf' | 'gps' | 'fgts' | 'todos';
+    tipo: 'darf' | 'gps' | 'fgts' | 'fgts_digital' | 'todos';
   }) => {
     const { data, error } = await supabase.functions.invoke('gerar-guias', {
       body: params,
