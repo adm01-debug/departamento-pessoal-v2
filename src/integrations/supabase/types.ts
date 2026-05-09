@@ -12424,6 +12424,7 @@ export type Database = {
           motivo: string
           observacoes_gestor: string | null
           rascunho: boolean | null
+          relatorio_conformidade: Json | null
           status: string | null
           tipo_ponto: string
           updated_at: string | null
@@ -12442,6 +12443,7 @@ export type Database = {
           motivo: string
           observacoes_gestor?: string | null
           rascunho?: boolean | null
+          relatorio_conformidade?: Json | null
           status?: string | null
           tipo_ponto: string
           updated_at?: string | null
@@ -12460,6 +12462,7 @@ export type Database = {
           motivo?: string
           observacoes_gestor?: string | null
           rascunho?: boolean | null
+          relatorio_conformidade?: Json | null
           status?: string | null
           tipo_ponto?: string
           updated_at?: string | null
