@@ -10,7 +10,7 @@ import { colaboradorService } from '@/services';
 import {
   ArrowLeft, Users, Briefcase, ShieldCheck,
   Landmark, FileText, Info, Edit, MoreHorizontal, History as HistoryIcon,
-  MapPin, Calendar, Stethoscope, User as UserIcon
+  MapPin, Calendar, Stethoscope, User as UserIcon, Gift
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
