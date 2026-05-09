@@ -11,13 +11,15 @@ import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { colaboradorService } from '@/services';
-import { Eye, Edit, Users, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { Eye, Edit, Users, Download, FileSpreadsheet, FileText, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEmpresa } from '@/contexts';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
+import { useDepartamentos } from '@/hooks/useDepartamentos';
+import { useCargos } from '@/hooks/useCargos';
 import {
   DropdownMenu,
   DropdownMenuContent,
