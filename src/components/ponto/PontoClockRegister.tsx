@@ -29,6 +29,9 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
   const { user } = useAuth();
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showFaceScan, setShowFaceScan] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [selectedTipo, setSelectedTipo] = useState<any>(null);
 
   useEffect(() => {
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
