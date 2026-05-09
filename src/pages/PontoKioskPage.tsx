@@ -65,8 +65,12 @@ export default function PontoKioskPage() {
       if (!colab) throw new Error('PIN/Matrícula inválida');
 
       setSelectedColab(colab);
-      setStep('action');
-      speak(`Olá ${colab.nome_completo.split(' ')[0]}, selecione o tipo de registro.`);
+      setStep('facial_scan');
+      speak(`Olá ${colab.nome_completo.split(' ')[0]}, olhe para a câmera para identificação facial.`);
+      setTimeout(() => {
+        setStep('action');
+        speak(`Identidade confirmada. Selecione o tipo de registro.`);
+      }, 3500);
     } catch (e: any) {
       toast.error(e.message);
       setPin('');
