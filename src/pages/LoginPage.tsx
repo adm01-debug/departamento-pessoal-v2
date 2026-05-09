@@ -56,7 +56,7 @@ export default function LoginPage() {
   const handleGovBrSignIn = async () => {
     setGovBrLoading(true);
     try {
-      const { data, error } = await lovable.functions.invoke('auth-gov-br', {
+      const { data, error } = await supabase.functions.invoke('auth-gov-br', {
         body: { 
           action: 'get_auth_url', 
           redirectUri: `${window.location.origin}/auth/callback` 
