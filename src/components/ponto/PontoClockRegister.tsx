@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts';
 interface PontoClockRegisterProps {
   time: Date;
   loading: string | null;
-  geoStatus: 'idle' | 'capturing' | 'success' | 'error';
+  geoStatus: 'idle' | 'capturing' | 'success' | 'error' | 'out_of_range';
   onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => void;
 }
 
