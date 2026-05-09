@@ -126,7 +126,7 @@ export const pontoService = {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         versao_app: '2.0.0-perf',
         hash_integridade: hashIntegridade,
-        audit_sha256: hashIntegridade, -- redundant field for redundancy check
+        audit_sha256: hashIntegridade,
         audit_conformidade: true,
         metadata: options?.metadata
       } as any)
