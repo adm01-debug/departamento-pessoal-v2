@@ -19,6 +19,7 @@ import { SystemHealthTab } from '@/components/settings/SystemHealthTab';
 import { ConfiguracoesGeraisTab } from '@/components/settings/ConfiguracoesGeraisTab';
 import { LogsIntegracoesTab } from '@/components/settings/LogsIntegracoesTab';
 import { MFASetup } from '@/components/settings/MFASetup';
+import { EmpresaSettingsTab } from '@/components/settings/EmpresaSettingsTab';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
