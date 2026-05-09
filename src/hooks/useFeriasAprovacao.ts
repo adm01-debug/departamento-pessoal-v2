@@ -16,8 +16,15 @@ export function useFeriasAprovacao() {
 
   const aprovarGestor = useMutation({
     mutationFn: (id: string) => feriasService.aprovarGestor(id, user?.id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       invalidate();
+      criarNotificacao({
+        tipo: 'ferias_aprovada',
+        titulo: 'Férias Aprovadas pelo Gestor',
+        mensagem: 'Uma solicitação de férias foi aprovada pelo gestor e agora aguarda o RH.',
+        entidade_tipo: 'ferias',
+        entidade_id: id
+      });
       toast.success('Aprovação do gestor registrada com sucesso');
     },
     onError: (error: any) => toast.error(`Erro ao aprovar: ${error.message}`),
@@ -25,8 +32,15 @@ export function useFeriasAprovacao() {
 
   const aprovarRH = useMutation({
     mutationFn: (id: string) => feriasService.aprovarRH(id, user?.id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       invalidate();
+      criarNotificacao({
+        tipo: 'ferias_aprovada',
+        titulo: 'Férias Confirmadas!',
+        mensagem: 'O RH aprovou as férias. O processo está concluído.',
+        entidade_tipo: 'ferias',
+        entidade_id: id
+      });
       toast.success('Aprovação do RH registrada. Férias confirmadas!');
     },
     onError: (error: any) => toast.error(`Erro ao aprovar: ${error.message}`),
@@ -43,8 +57,15 @@ export function useFeriasAprovacao() {
 
   const rejeitar = useMutation({
     mutationFn: (id: string) => feriasService.rejeitar(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       invalidate();
+      criarNotificacao({
+        tipo: 'ferias_rejeitada',
+        titulo: 'Férias Rejeitadas',
+        mensagem: 'Uma solicitação de férias foi rejeitada.',
+        entidade_tipo: 'ferias',
+        entidade_id: id
+      });
       toast.warning('Solicitação de férias rejeitada');
     },
     onError: (error: any) => toast.error(`Erro ao rejeitar: ${error.message}`),
@@ -73,4 +94,3 @@ export function useFeriasAprovacao() {
       cancelar.isPending,
   };
 }
-

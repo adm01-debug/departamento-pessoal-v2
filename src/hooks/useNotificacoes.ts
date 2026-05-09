@@ -92,6 +92,29 @@ export function useNotificacoes() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
   });
 
+  const criarNotificacao = useMutation({
+    mutationFn: async (data: {
+      tipo: string;
+      titulo: string;
+      mensagem: string;
+      entidade_tipo?: string;
+      entidade_id?: string;
+      user_id?: string;
+      empresa_id?: string;
+    }) => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const payload = {
+        ...data,
+        user_id: data.user_id || currentUser?.id,
+        empresa_id: data.empresa_id || empresaAtualId,
+        lida: false,
+      };
+      const { error } = await supabase.from('notificacoes').insert(payload as any);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notificacoes'] }),
+  });
+
   const gerarNotificacoesAutomaticas = useMutation({
     mutationFn: async () => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -242,6 +265,7 @@ export function useNotificacoes() {
     excluirNotificacao: excluirNotificacao.mutate,
     limparAntigas: limparAntigas.mutate,
     gerarNotificacoesAutomaticas: gerarNotificacoesAutomaticas.mutate,
+    criarNotificacao: criarNotificacao.mutateAsync,
     isGerando: gerarNotificacoesAutomaticas.isPending,
   };
 }
