@@ -18,7 +18,12 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGrid } from 'lucide-react';
+import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGrid, Download, History, BarChart2 } from 'lucide-react';
+import { PerformanceDashboard } from '@/components/avaliacao/PerformanceDashboard';
+import { NineBoxMatrix } from '@/components/avaliacao/NineBoxMatrix';
+import { PerformanceAuditTimeline } from '@/components/avaliacao/PerformanceAuditTimeline';
+import { gerarPDIPDF } from '@/utils/evaluationPDF';
+
 
 const statusColors: Record<string, string> = { rascunho: 'secondary', ativo: 'default', finalizado: 'outline', pendente: 'secondary', em_andamento: 'default', concluido: 'outline' };
 
@@ -126,30 +131,30 @@ export default function AvaliacaoPage() {
 
   return (
     <>
-    <PageTitle title="Avaliação" description="Avaliação de desempenho" />
-    <PageLayout title="Avaliação de Desempenho" description="Ciclos, metas, feedback 360° e PDI" icon={<Target className="h-5 w-5 text-primary-foreground" />} gradient="from-warning to-primary">
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <Card><CardContent className="pt-4 text-center"><ClipboardList className="h-6 w-6 mx-auto text-primary mb-1" /><p className="text-2xl font-bold">{ciclos.length}</p><p className="text-xs text-muted-foreground">Ciclos</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Target className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{metas.length}</p><p className="text-xs text-muted-foreground">Metas</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Users className="h-6 w-6 mx-auto text-info mb-1" /><p className="text-2xl font-bold">{feedbacks.length}</p><p className="text-xs text-muted-foreground">Feedbacks</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><TrendingUp className="h-6 w-6 mx-auto text-warning mb-1" /><p className="text-2xl font-bold">{pdis.length}</p><p className="text-xs text-muted-foreground">PDIs</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Star className="h-6 w-6 mx-auto text-destructive mb-1" /><p className="text-2xl font-bold">{competencias.length}</p><p className="text-xs text-muted-foreground">Competências</p></CardContent></Card>
-      </div>
+    <PageTitle title="Desempenho & OKRs" description="Gestão estratégica de pessoas" />
+    <PageLayout 
+      title="Avaliação de Desempenho" 
+      description="Ciclos, metas, feedback 360° e PDI" 
+      icon={<Target className="h-5 w-5 text-primary-foreground" />} 
+      gradient="from-warning to-primary"
+    >
+      <Tabs value={tab} onValueChange={setTab} className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="ciclos" className="rounded-lg gap-2"><BarChart2 className="h-4 w-4" /> Ciclos</TabsTrigger>
+          <TabsTrigger value="metas" className="rounded-lg gap-2"><Target className="h-4 w-4" /> Metas & OKRs</TabsTrigger>
+          <TabsTrigger value="feedbacks" className="rounded-lg gap-2"><Users className="h-4 w-4" /> Feedbacks</TabsTrigger>
+          <TabsTrigger value="pdis" className="rounded-lg gap-2"><TrendingUp className="h-4 w-4" /> PDI</TabsTrigger>
+          <TabsTrigger value="ninebox" className="rounded-lg gap-2"><LayoutGrid className="h-4 w-4" /> Nine-Box</TabsTrigger>
+          <TabsTrigger value="auditoria" className="rounded-lg gap-2"><History className="h-4 w-4" /> Auditoria</TabsTrigger>
+        </TabsList>
 
-      {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : (
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="ciclos">Ciclos</TabsTrigger>
-            <TabsTrigger value="metas">Metas & OKRs</TabsTrigger>
-            <TabsTrigger value="feedbacks">Feedback 360°</TabsTrigger>
-            <TabsTrigger value="pdis">PDI</TabsTrigger>
-            <TabsTrigger value="competencias">Competências</TabsTrigger>
-            <TabsTrigger value="ninebox">Matriz Nine-Box</TabsTrigger>
-          </TabsList>
+        <TabsContent value="ciclos" className="space-y-6">
+          <PerformanceDashboard 
+             stats={{ ciclos: ciclos.length, metas: metas.length, feedbacks: feedbacks.length, pdis: pdis.length, competencias: competencias.length }}
+             feedbacks={feedbacks}
+             metas={metas}
+          />
 
-          {/* CICLOS */}
-          <TabsContent value="ciclos">
             <div className="flex justify-end mb-4">
               <Dialog open={openCiclo} onOpenChange={setOpenCiclo}>
                 <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Novo Ciclo</Button></DialogTrigger>
@@ -173,23 +178,47 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead>Período</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Ciclo de Avaliação</TableHead>
+                    <TableHead className="font-display font-semibold">Tipo</TableHead>
+                    <TableHead className="font-display font-semibold">Período</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {ciclos.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum ciclo cadastrado</TableCell></TableRow> :
+                  {ciclos.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-12">Nenhum ciclo de desempenho configurado</TableCell></TableRow> :
                     ciclos.map((c: any) => (
-                      <TableRow key={c.id}>
-                        <TableCell className="font-medium">{c.nome}</TableCell>
-                        <TableCell>{c.tipo}</TableCell>
-                        <TableCell>{c.data_inicio} → {c.data_fim}</TableCell>
-                        <TableCell><Badge variant={(statusColors[c.status] || 'secondary') as any}>{c.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirCiclo.mutate(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={c.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{c.nome}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[250px]">{c.descricao}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="capitalize text-xs font-body">{c.tipo}</TableCell>
+                        <TableCell className="text-xs font-body text-muted-foreground">
+                           <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(c.data_inicio).toLocaleDateString('pt-BR')} → {new Date(c.data_fim).toLocaleDateString('pt-BR')}
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[c.status] || 'secondary') as any} className="text-[10px]">{c.status}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirCiclo.mutate(c.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* METAS */}
@@ -222,24 +251,51 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Título</TableHead><TableHead>Colaborador</TableHead><TableHead>Tipo</TableHead><TableHead>Progresso</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Meta / OKR</TableHead>
+                    <TableHead className="font-display font-semibold">Responsável</TableHead>
+                    <TableHead className="font-display font-semibold">Tipo</TableHead>
+                    <TableHead className="font-display font-semibold">Progresso</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {metas.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhuma meta cadastrada</TableCell></TableRow> :
+                  {metas.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhuma meta estratégica definida</TableCell></TableRow> :
                     metas.map((m: any) => (
-                      <TableRow key={m.id}>
-                        <TableCell className="font-medium">{m.titulo}</TableCell>
-                        <TableCell>{m.colaborador?.nome_completo || '—'}</TableCell>
-                        <TableCell>{m.tipo}</TableCell>
-                        <TableCell>{m.progresso ?? 0}%</TableCell>
-                        <TableCell><Badge variant={(statusColors[m.status] || 'secondary') as any}>{m.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirMeta.mutate(m.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={m.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{m.titulo}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[200px]">{m.descricao}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="font-body text-xs">{m.colaborador?.nome_completo || '—'}</TableCell>
+                        <TableCell><Badge variant="outline" className="capitalize text-[10px]">{m.tipo}</Badge></TableCell>
+                        <TableCell className="w-[150px]">
+                           <div className="flex items-center gap-2">
+                              <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
+                                 <div className="h-full bg-primary" style={{ width: `${m.progresso ?? 0}%` }} />
+                              </div>
+                              <span className="text-[10px] font-mono font-bold">{m.progresso ?? 0}%</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[m.status] || 'secondary') as any} className="text-[10px]">{m.status}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirMeta.mutate(m.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* FEEDBACKS */}
@@ -296,24 +352,44 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Avaliado</TableHead><TableHead>Avaliador</TableHead><TableHead>Tipo</TableHead><TableHead>Nota</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Colaborador</TableHead>
+                    <TableHead className="font-display font-semibold">Avaliador</TableHead>
+                    <TableHead className="font-display font-semibold">Relação</TableHead>
+                    <TableHead className="font-display font-semibold text-center">Nota</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {feedbacks.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum feedback registrado</TableCell></TableRow> :
+                  {feedbacks.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhum feedback registrado no período</TableCell></TableRow> :
                     feedbacks.map((f: any) => (
-                      <TableRow key={f.id}>
-                        <TableCell>{f.avaliado?.nome_completo || '—'}</TableCell>
-                        <TableCell>{f.avaliador?.nome_completo || '—'}</TableCell>
-                        <TableCell>{f.tipo}</TableCell>
-                        <TableCell>{f.nota_geral ?? '—'}</TableCell>
-                        <TableCell><Badge variant={(statusColors[f.status] || 'secondary') as any}>{f.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirFeedback.mutate(f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={f.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell className="font-body font-bold text-sm">{f.avaliado?.nome_completo || '—'}</TableCell>
+                        <TableCell className="font-body text-xs text-muted-foreground">{f.avaliador?.nome_completo || '—'}</TableCell>
+                        <TableCell><Badge variant="secondary" className="capitalize text-[9px]">{f.tipo}</Badge></TableCell>
+                        <TableCell className="text-center">
+                           <div className="flex items-center justify-center gap-1">
+                              <Star className="h-3 w-3 text-warning fill-warning" />
+                              <span className="font-mono font-bold">{f.nota_geral ?? '—'}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[f.status] || 'secondary') as any} className="text-[10px]">{f.status}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirFeedback.mutate(f.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* PDIs */}
@@ -339,24 +415,54 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Título</TableHead><TableHead>Colaborador</TableHead><TableHead>Competência</TableHead><TableHead>Progresso</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Título do PDI</TableHead>
+                    <TableHead className="font-display font-semibold">Colaborador</TableHead>
+                    <TableHead className="font-display font-semibold">Foco / Competência</TableHead>
+                    <TableHead className="font-display font-semibold text-center">Progresso</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {pdis.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum PDI cadastrado</TableCell></TableRow> :
+                  {pdis.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhum Plano de Desenvolvimento cadastrado</TableCell></TableRow> :
                     pdis.map((p: any) => (
-                      <TableRow key={p.id}>
-                        <TableCell className="font-medium">{p.titulo}</TableCell>
-                        <TableCell>{p.colaborador?.nome_completo || '—'}</TableCell>
-                        <TableCell>{p.competencia || '—'}</TableCell>
-                        <TableCell>{p.progresso ?? 0}%</TableCell>
-                        <TableCell><Badge variant={(statusColors[p.status] || 'secondary') as any}>{p.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirPDI.mutate(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={p.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{p.titulo}</span>
+                              <span className="text-[10px] text-muted-foreground italic">Prazo: {p.prazo ? new Date(p.prazo).toLocaleDateString('pt-BR') : '—'}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="font-body text-xs">{p.colaborador?.nome_completo || '—'}</TableCell>
+                        <TableCell><Badge variant="outline" className="text-[9px] uppercase">{p.competencia || 'Geral'}</Badge></TableCell>
+                        <TableCell className="w-[120px]">
+                           <div className="flex items-center gap-2">
+                              <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
+                                 <div className="h-full bg-indigo-500" style={{ width: `${p.progresso ?? 0}%` }} />
+                              </div>
+                              <span className="text-[9px] font-mono font-bold">{p.progresso ?? 0}%</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[p.status] || 'secondary') as any} className="text-[10px]">{p.status}</Badge></TableCell>
+                        <TableCell className="text-right flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 text-primary" onClick={() => gerarPDIPDF(p.colaborador?.nome_completo || 'Colaborador', p)}>
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirPDI.mutate(p.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* COMPETÊNCIAS */}
@@ -376,68 +482,58 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Categoria</TableHead><TableHead>Nível Esperado</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Competência</TableHead>
+                    <TableHead className="font-display font-semibold">Categoria</TableHead>
+                    <TableHead className="font-display font-semibold text-center">Nível Esperado</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {competencias.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma competência cadastrada</TableCell></TableRow> :
+                  {competencias.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-12">Nenhuma competência técnica ou comportamental mapeada</TableCell></TableRow> :
                     competencias.map((c: any) => (
-                      <TableRow key={c.id}>
-                        <TableCell className="font-medium">{c.nome}</TableCell>
-                        <TableCell>{c.categoria || '—'}</TableCell>
-                        <TableCell>{c.nivel_esperado}</TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirComp.mutate(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={c.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{c.nome}</span>
+                              <span className="text-[10px] text-muted-foreground">{c.descricao}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant="secondary" className="text-[9px] uppercase tracking-wider">{c.categoria || 'Geral'}</Badge></TableCell>
+                        <TableCell className="text-center">
+                           <div className="flex items-center justify-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                 <div key={i} className={`h-1.5 w-3 rounded-full ${i < c.nivel_esperado ? 'bg-primary' : 'bg-muted'}`} />
+                              ))}
+                              <span className="text-[10px] font-mono font-bold ml-1">{c.nivel_esperado}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirComp.mutate(c.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
           
           {/* NINE BOX */}
           <TabsContent value="ninebox">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-3 gap-4 h-[600px]">
-                  {[3, 2, 1].map(pot => (
-                    [1, 2, 3].map(perf => {
-                      const label = getNineBoxLabel(perf, pot);
-                      const color = getNineBoxColor(perf, pot);
-                      const items = nineBox.filter((n: any) => 
-                        classifyScore(Number(n.media_performance)) === perf && 
-                        classifyScore(Number(n.media_potencial)) === pot
-                      );
-                      
-                      return (
-                        <div key={`${perf}-${pot}`} className={`border-2 rounded-lg p-3 flex flex-col ${color} border-opacity-40 shadow-sm transition-all hover:scale-[1.02]`}>
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
-                            <Badge variant="secondary" className="text-[9px] h-4 px-1">{items.length}</Badge>
-                          </div>
-                          <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
-                            {items.map((it: any) => (
-                              <div key={it.avaliado_id} className="text-[10px] bg-white bg-opacity-60 p-1.5 rounded border border-white border-opacity-50 flex justify-between items-center group hover:bg-opacity-100 transition-all">
-                                <span className="truncate font-medium">{it.nome_completo}</span>
-                                <span className="text-[9px] opacity-60 font-mono">P{it.media_performance}/K{it.media_potencial}</span>
-                              </div>
-                            ))}
-                            {items.length === 0 && <div className="h-full flex items-center justify-center opacity-20"><LayoutGrid className="h-8 w-8" /></div>}
-                          </div>
-                        </div>
-                      );
-                    })
-                  )).flat()}
-                </div>
-                <div className="mt-8 grid grid-cols-2 gap-8 text-xs text-muted-foreground border-t pt-4">
-                  <div className="flex items-center justify-center gap-2 font-medium">
-                    <TrendingUp className="h-4 w-4 text-primary" /> Eixo Y: Potencial (Baixo 1-2, Médio 3, Alto 4-5)
-                  </div>
-                  <div className="flex items-center justify-center gap-2 font-medium">
-                    <Target className="h-4 w-4 text-primary" /> Eixo X: Performance (Baixa 1-2, Média 3, Alta 4-5)
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {loadNineBox ? <div className="p-12 flex justify-center"><Spinner /></div> : (
+              <NineBoxMatrix data={nineBox} />
+            )}
+          </TabsContent>
+
+          <TabsContent value="auditoria">
+             <PerformanceAuditTimeline />
           </TabsContent>
         </Tabs>
       )}
@@ -445,3 +541,4 @@ export default function AvaliacaoPage() {
     </>
   );
 }
+
