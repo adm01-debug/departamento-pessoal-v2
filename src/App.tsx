@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import AuthCallbackPage from '@/pages/AuthCallbackPage';
 
 // Lazy-loaded pages
 const ColaboradoresPage = lazy(() => import('@/pages/ColaboradoresPage'));
