@@ -6,14 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp } from 'lucide-react';
+import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp, Filter } from 'lucide-react';
 import { PontoInconsistencyPanel } from './PontoInconsistencyPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { GestaoPontoAnalytics } from './GestaoPontoAnalytics';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export function GestaoRegistrosPonto() {
   const { empresaAtual } = useEmpresas();
@@ -22,6 +24,7 @@ export function GestaoRegistrosPonto() {
   const [filtroFim, setFiltroFim] = useState(new Date().toISOString().split('T')[0]);
   const [tipoExcecao, setTipoExcecao] = useState('todas');
   const [busca, setBusca] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   const { data: registros = [], isLoading } = useQuery({
     queryKey: ['gestao-registros-ponto', empresaAtual?.id, filtroData, filtroFim],
@@ -35,7 +38,6 @@ export function GestaoRegistrosPonto() {
         .lte('data', filtroFim)
         .order('data', { ascending: false });
       if (error) throw error;
-      return data || [];
       return data || [];
     },
     enabled: !!empresaAtual?.id,
