@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 
 export interface Pendencia {
   id: string;
@@ -32,6 +32,7 @@ export function usePendencias(empresaId?: string) {
     },
   });
 
+  const { toast } = useToast();
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: Pendencia['status'] }) => {
       const { error } = await supabase
