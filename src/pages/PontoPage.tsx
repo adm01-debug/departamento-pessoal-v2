@@ -46,15 +46,44 @@ export default function PontoPage() {
     enabled: !!user?.id,
   });
 
-  const captureGeo = (): Promise<{ lat: number; lng: number } | null> => new Promise((resolve) => {
+  const captureGeo = (): Promise<{ lat: number; lng: number, accuracy: number } | null> => new Promise((resolve) => {
     if (!navigator.geolocation) { resolve(null); return; }
     setGeoStatus('capturing');
-    navigator.geolocation.getCurrentPosition(pos => { setGeoStatus('success'); resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); }, () => { setGeoStatus('error'); resolve(null); }, { enableHighAccuracy: true, timeout: 8000 });
+    navigator.geolocation.getCurrentPosition(
+      pos => { 
+        setGeoStatus('success'); 
+        resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }); 
+      }, 
+      () => { setGeoStatus('error'); resolve(null); }, 
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   });
 
   const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     setLoading(tipo);
-    try { const geo = await captureGeo(); await pontoService.registrar(tipo, user?.id); toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); refetchRegistro(); refetchBatidas(); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setLoading(null); setTimeout(() => setGeoStatus('idle'), 2000); }
+    try { 
+      const geo = await captureGeo(); 
+      if (!user?.id) throw new Error('Usuário não autenticado');
+      
+      const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
+      if (!colab) throw new Error('Colaborador não encontrado');
+
+      await pontoService.registrar(tipo, colab.id, {
+        latitude: geo?.lat,
+        longitude: geo?.lng,
+        precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
+        dispositivoId: navigator.userAgent
+      }); 
+      
+      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
+      refetchRegistro(); 
+      refetchBatidas(); 
+    } catch (e: any) { 
+      toast.error(`Erro: ${e.message}`); 
+    } finally { 
+      setLoading(null); 
+      setTimeout(() => setGeoStatus('idle'), 2000); 
+    }
   };
 
   const processarPontoServidor = async () => {
