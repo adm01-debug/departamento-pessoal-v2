@@ -6154,8 +6154,10 @@ export type Database = {
           empresa_id: string | null
           id: string
           nota_geral: number | null
+          performance: number | null
           pontos_fortes: string | null
           pontos_melhoria: string | null
+          potencial: number | null
           status: string | null
           tipo: string | null
           updated_at: string
@@ -6169,8 +6171,10 @@ export type Database = {
           empresa_id?: string | null
           id?: string
           nota_geral?: number | null
+          performance?: number | null
           pontos_fortes?: string | null
           pontos_melhoria?: string | null
+          potencial?: number | null
           status?: string | null
           tipo?: string | null
           updated_at?: string
@@ -6184,8 +6188,10 @@ export type Database = {
           empresa_id?: string | null
           id?: string
           nota_geral?: number | null
+          performance?: number | null
           pontos_fortes?: string | null
           pontos_melhoria?: string | null
+          potencial?: number | null
           status?: string | null
           tipo?: string | null
           updated_at?: string
@@ -14805,6 +14811,53 @@ export type Database = {
           taxa_turnover: number | null
         }
         Relationships: []
+      }
+      vw_matriz_nine_box: {
+        Row: {
+          avaliado_id: string | null
+          empresa_id: string | null
+          media_performance: number | null
+          media_potencial: number | null
+          nome_completo: string | null
+          total_avaliacoes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_360_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_feedbacks_360_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vw_saldo_compensacao_mensal: {
         Row: {
