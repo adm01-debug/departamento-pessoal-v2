@@ -6773,6 +6773,48 @@ export type Database = {
           },
         ]
       }
+      fila_notificacoes: {
+        Row: {
+          conteudo: string
+          created_at: string | null
+          erro_ultimo: string | null
+          id: string
+          metadados: Json | null
+          scheduled_for: string | null
+          status: string | null
+          tentativas: number | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string | null
+          erro_ultimo?: string | null
+          id?: string
+          metadados?: Json | null
+          scheduled_for?: string | null
+          status?: string | null
+          tentativas?: number | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string | null
+          erro_ultimo?: string | null
+          id?: string
+          metadados?: Json | null
+          scheduled_for?: string | null
+          status?: string | null
+          tentativas?: number | null
+          tipo?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       folhas_pagamento: {
         Row: {
           competencia: string
@@ -13779,6 +13821,8 @@ export type Database = {
           entidade_tipo: string
           etapa_atual_id: string | null
           id: string
+          log_execucao: Json | null
+          metadata_automacao: Json | null
           solicitante_id: string | null
           status: string | null
           updated_at: string | null
@@ -13792,6 +13836,8 @@ export type Database = {
           entidade_tipo: string
           etapa_atual_id?: string | null
           id?: string
+          log_execucao?: Json | null
+          metadata_automacao?: Json | null
           solicitante_id?: string | null
           status?: string | null
           updated_at?: string | null
@@ -13805,6 +13851,8 @@ export type Database = {
           entidade_tipo?: string
           etapa_atual_id?: string | null
           id?: string
+          log_execucao?: Json | null
+          metadata_automacao?: Json | null
           solicitante_id?: string | null
           status?: string | null
           updated_at?: string | null
