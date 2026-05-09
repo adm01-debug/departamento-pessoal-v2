@@ -24,6 +24,8 @@ import { LogsIntegracoesTab } from '@/components/settings/LogsIntegracoesTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { EmpresaSettingsTab } from '@/components/settings/EmpresaSettingsTab';
 import { UserRolesTab } from '@/components/settings/UserRolesTab';
+import { GlobalAuditLogTab } from '@/components/settings/GlobalAuditLogTab';
+
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
