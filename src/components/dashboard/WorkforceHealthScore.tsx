@@ -120,8 +120,8 @@ export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos
               <Shield className={cn("h-5 w-5", scoreInfo.color)} />
               <span className={cn("text-h3 font-display font-bold", scoreInfo.color)}>{scoreInfo.label}</span>
             </div>
-            <p className="text-caption text-muted-foreground font-body">
-              Índice composto de saúde organizacional baseado em turnover, absenteísmo, integridade cadastral e conformidade.
+            <p className="text-caption text-muted-foreground font-body leading-relaxed">
+              Resumo automatizado da conformidade do RH. Considera turnover, absenteísmo e integridade de dados.
             </p>
 
             {/* Metric breakdown */}
