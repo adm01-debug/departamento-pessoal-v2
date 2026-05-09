@@ -7,10 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send } from 'lucide-react';
+import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send, History, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEmpresa } from '@/contexts';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -19,6 +19,7 @@ import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { RelatoriosAnalyticsTab } from '@/components/relatorios/RelatoriosAnalyticsTab';
 import { RelatoriosExportTab } from '@/components/relatorios/RelatoriosExportTab';
+import { RelatoriosAgendadosTab } from '@/components/relatorios/RelatoriosAgendadosTab';
 
 const relatorios = [
   { id: 'colaboradores', title: 'Resumo Colaboradores', description: 'Colaboradores ativos com dados completos', icon: Users, gradient: 'from-info to-info/70' },
@@ -51,7 +52,7 @@ function exportCSV(title: string, rows: any[], columns: string[]) {
 }
 
 export default function RelatoriosPage() {
-  const { empresaAtual } = useEmpresa();
+  const { empresaAtual } = useEmpresas();
   const [generating, setGenerating] = useState<string | null>(null);
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
@@ -110,6 +111,7 @@ export default function RelatoriosPage() {
             <TabsList className="rounded-xl">
               <TabsTrigger value="analytics" className="rounded-lg font-body">📊 Analytics</TabsTrigger>
               <TabsTrigger value="exportar" className="rounded-lg font-body">📥 Exportar</TabsTrigger>
+              <TabsTrigger value="agendados" className="rounded-lg font-body">⏰ Agendamentos</TabsTrigger>
             </TabsList>
             <Select value={exportFormat} onValueChange={setExportFormat}>
               <SelectTrigger className="w-[130px] rounded-xl"><SelectValue /></SelectTrigger>
@@ -118,6 +120,7 @@ export default function RelatoriosPage() {
           </div>
           <TabsContent value="analytics"><RelatoriosAnalyticsTab analytics={analytics} /></TabsContent>
           <TabsContent value="exportar"><RelatoriosExportTab relatorios={relatorios} exportFormat={exportFormat} generating={generating} onExport={handleExport} onEmailOpen={setEmailDialog} /></TabsContent>
+          <TabsContent value="agendados"><RelatoriosAgendadosTab empresaId={empresaAtual?.id || ''} /></TabsContent>
         </Tabs>
         <Dialog open={!!emailDialog} onOpenChange={(o) => { if (!o) setEmailDialog(null); }}>
           <DialogContent className="max-w-md rounded-2xl">
