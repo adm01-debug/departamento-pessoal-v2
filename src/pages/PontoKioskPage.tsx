@@ -10,6 +10,7 @@ import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export default function PontoKioskPage() {
   const [time, setTime] = useState(new Date());

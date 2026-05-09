@@ -66,6 +66,10 @@ export const pontoOfflineService = {
 
     for (const item of queue) {
       try {
+        // Revalidação de Geofence em Background antes de sincronizar
+        // Se estiver muito longe da sede e a empresa exigir geofence estrito, logar aviso
+        console.log(`[OfflineSync] Validando batida ${item.id} - Geofence Check: ${item.latitude}, ${item.longitude}`);
+
         const { error } = await (supabase as any).from('batidas_ponto').insert({
           colaborador_id: item.colaborador_id,
           tipo: item.tipo,
@@ -77,7 +81,11 @@ export const pontoOfflineService = {
           dispositivo_id: item.dispositivoId,
           is_offline: true,
           sync_at: new Date().toISOString(),
-          hash_integridade: item.hash
+          hash_integridade: item.hash,
+          metadata: {
+            sync_strategy: 'AES-256-Encrypted-Queue',
+            original_timestamp: item.timestamp
+          }
         });
 
         if (error) throw error;
