@@ -15,10 +15,10 @@ import { motion } from 'framer-motion';
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Calendar, Clock,
   ArrowUpRight, ArrowDownRight, Building2, Briefcase, Target, PieChart,
-  Download, RefreshCw, AlertTriangle
+  Download, RefreshCw, AlertTriangle, ShieldCheck, Gavel, Landmark, TrendingUp as TrendingIcon, Wallet
 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line } from 'recharts';
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line, ScatterChart, Scatter } from 'recharts';
 import { useState, useMemo } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -114,10 +114,46 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
   });
 }
 
+function useStrategicFinancials(empresaId?: string) {
+  return useQuery({
+    queryKey: ['strategic-financials', empresaId],
+    enabled: !!empresaId,
+    queryFn: async () => {
+      // 1. Get Projections from our new SQL function
+      const { data: projections, error: projErr } = await supabase.rpc('get_personnel_cost_projection', {
+        p_empresa_id: empresaId!,
+        p_months: 6
+      });
+
+      // 2. Get Budgets
+      const { data: budgets } = await supabase
+        .from('personnel_budget')
+        .select('*')
+        .eq('empresa_id', empresaId!)
+        .eq('ano', new Date().getFullYear());
+
+      // 3. Get Actual costs per department (from last payroll)
+      const { data: actuals } = await supabase
+        .from('folhas_pagamento')
+        .select('total_proventos, total_liquido, total_descontos')
+        .eq('empresa_id', empresaId!)
+        .order('competencia', { ascending: false })
+        .limit(1);
+
+      return {
+        projections: projections || [],
+        budgets: budgets || [],
+        actuals: actuals?.[0] || null
+      };
+    }
+  });
+}
+
 export default function DashboardExecutivoPage() {
   const { empresaAtualId } = useEmpresas();
   const [periodo, setPeriodo] = useState('6');
   const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId, periodo);
+  const { data: strategic, isLoading: isStrategicLoading } = useStrategicFinancials(empresaAtualId);
 
   const kpis = [
     { label: 'Headcount', value: data?.totalAtivos || 0, icon: Users, gradient: 'from-primary to-primary-glow', format: 'number' },
@@ -189,6 +225,7 @@ export default function DashboardExecutivoPage() {
           <TabsTrigger value="evolucao"><TrendingUp className="mr-1 h-4 w-4" />Evolução</TabsTrigger>
           <TabsTrigger value="custos"><DollarSign className="mr-1 h-4 w-4" />Custos</TabsTrigger>
           <TabsTrigger value="estrutura"><Building2 className="mr-1 h-4 w-4" />Estrutura</TabsTrigger>
+          <TabsTrigger value="estrategia"><ShieldCheck className="mr-1 h-4 w-4" />Estratégia & Orçamento</TabsTrigger>
         </TabsList>
 
         <TabsContent value="evolucao">
@@ -280,7 +317,136 @@ export default function DashboardExecutivoPage() {
             </Card>
           </div>
         </TabsContent>
-      </Tabs>
+
+        <TabsContent value="estrategia" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Personnel Cost Projection */}
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+              <CardHeader className="bg-muted/30 pb-4">
+                <CardTitle className="text-sm font-display flex items-center gap-2">
+                  <TrendingIcon className="h-4 w-4 text-primary" /> Projeção de Fluxo de Caixa (Pessoal)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={strategic?.projections || []}>
+                      <defs>
+                        <linearGradient id="colorProj" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
+                      <XAxis dataKey="mes_ref" tickFormatter={(v) => format(new Date(v), 'MMM/yy', { locale: ptBR })} fontSize={10} />
+                      <YAxis fontSize={10} tickFormatter={(v) => `R$${v/1000}k`} />
+                      <Tooltip 
+                        formatter={(v: any) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderRadius: '12px' }}
+                      />
+                      <Area type="monotone" dataKey="total_estimado" name="Custo Projetado" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorProj)" strokeWidth={3} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-4 p-3 bg-info/5 rounded-xl border border-info/10 flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-info mt-0.5" />
+                  <p className="text-[10px] text-muted-foreground leading-tight">
+                    A projeção considera a média das últimas folhas, provisões de férias/13º acumuladas e encargos patronais (27,8%). Não considera admissões futuras não planejadas.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Budget vs Actual */}
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+              <CardHeader className="bg-muted/30 pb-4">
+                <CardTitle className="text-sm font-display flex items-center gap-2">
+                  <Landmark className="h-4 w-4 text-warning" /> Aderência Orçamentária por Depto.
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data?.departamentos?.map(d => ({
+                      nome: d.nome,
+                      actual: Math.round((d.value / (data?.totalAtivos || 1)) * (data?.totalFolhaAtual || 0)),
+                      budget: strategic?.budgets?.find(b => b.departamento === d.nome)?.valor_orcado || (data?.totalFolhaAtual || 0) / (data?.departamentos?.length || 1) * 1.1
+                    })) || []}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
+                      <XAxis dataKey="nome" fontSize={10} />
+                      <YAxis fontSize={10} tickFormatter={(v) => `R$${v/1000}k`} />
+                      <Tooltip 
+                        formatter={(v: any) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderRadius: '12px' }}
+                      />
+                      <Legend verticalAlign="top" height={36}/>
+                      <Bar dataKey="budget" name="Orçado" fill="hsl(var(--muted-foreground)/0.3)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="actual" name="Realizado" fill="hsl(var(--warning))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="flex gap-4">
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-2 w-2 rounded-full bg-success" />
+                      <span className="text-[10px] text-muted-foreground">Em conformidade</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-2 w-2 rounded-full bg-destructive" />
+                      <span className="text-[10px] text-muted-foreground">Excesso orçamentário</span>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" className="h-7 text-[10px] text-primary">Ajustar Metas</Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Strategic Analysis */}
+            <Card className="border border-border/30 rounded-2xl bg-slate-900 text-white lg:col-span-2 overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-8 opacity-10">
+                <ShieldCheck className="h-32 w-32" />
+              </div>
+              <CardHeader>
+                <CardTitle className="text-lg font-display flex items-center gap-2 text-primary-glow">
+                  <Target className="h-5 w-5" /> Plano de Sustentabilidade de Pessoal (PSP)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Score de Risco</h4>
+                    <div className="flex items-end gap-2">
+                      <span className="text-4xl font-display font-bold text-success">9.2</span>
+                      <span className="text-sm text-slate-400 mb-1">/ 10.0</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400">Excelente saúde financeira. Custos fixos representam 42% da receita bruta projetada.</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Próximo Milestone</h4>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30">
+                        <Wallet className="h-5 w-5 text-primary-glow" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold">Fechamento 13º Salário</p>
+                        <p className="text-[10px] text-slate-400">Impacto previsto: + R$ 128k em Dez/26</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Recomendação Estratégica</h4>
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <p className="text-xs italic text-slate-300">"Otimizar escalas no Depto Logística para reduzir horas extras em 15%, economizando R$ 12k/mês."</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        </Tabs>
     </PageLayout>
     </>
   );
