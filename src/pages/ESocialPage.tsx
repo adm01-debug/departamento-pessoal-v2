@@ -4,18 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { getEventoDescricao } from '@/services/esocialService';
-import { useState } from 'react';
+import { getEventoDescricao, validarAnteDeEnviar } from '@/services/esocialService';
+import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const tiposEvento = [
   'S-1000', 'S-1005', 'S-1010', 'S-1020',
@@ -29,6 +32,56 @@ export default function ESocialPage() {
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [isValidating, setIsValidating] = useState<string | null>(null);
+
+  const filteredEventos = useMemo(() => {
+    return eventos.filter(e => {
+      const matchesSearch = 
+        e.tipo_evento.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getEventoDescricao(e.tipo_evento).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (e.protocolo && e.protocolo.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesStatus = filterStatus === 'all' || (e.status || 'pendente') === filterStatus;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [eventos, searchTerm, filterStatus]);
+
+  const handleValidar = async (evento: any) => {
+    if (!evento.dados) return;
+    setIsValidating(evento.id);
+    try {
+      const result = await validarAnteDeEnviar(evento.tipo_evento, evento.dados as any);
+      if (result.valid) {
+        toast.success(`Evento ${evento.tipo_evento} válido para transmissão!`);
+      } else {
+        toast.error(`Evento ${evento.tipo_evento} possui ${result.errors.length} erro(s) de validação.`);
+      }
+    } catch (error) {
+      toast.error("Falha ao validar evento");
+    } finally {
+      setIsValidating(null);
+    }
+  };
+
+  const handleExportXML = (evento: any) => {
+    if (!evento.xml) {
+      toast.error("XML não disponível. Envie o evento primeiro.");
+      return;
+    }
+    const blob = new Blob([evento.xml], { type: 'text/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${evento.tipo_evento}_${evento.id}.xml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("XML exportado com sucesso");
+  };
 
   const statusVariant = (s: string) => s === 'enviado' ? 'success' : s === 'erro' ? 'error' : 'warning';
   const statusIcon = (s: string) => {
@@ -88,14 +141,37 @@ export default function ESocialPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2.5 font-display">
+          <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
                 <FileCheck className="h-4 w-4 text-primary-foreground" />
               </div>
-              Eventos eSocial
-            </CardTitle>
-            <div className="flex items-center gap-2">
+              <CardTitle className="font-display">Eventos eSocial</CardTitle>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Buscar evento ou protocolo..." 
+                  className="pl-9 rounded-xl h-9" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[140px] rounded-xl h-9">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Status</SelectItem>
+                  <SelectItem value="pendente">Pendentes</SelectItem>
+                  <SelectItem value="enviado">Enviados</SelectItem>
+                  <SelectItem value="erro">Com Erro</SelectItem>
+                </SelectContent>
+              </Select>
+
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body border-success/30 hover:bg-success/5 text-success">
@@ -167,19 +243,31 @@ export default function ESocialPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {eventos.map((e, i) => (
+                {filteredEventos.map((e, i) => (
                   <motion.div
                     key={e.id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 + i * 0.03 }}
-                    className="flex items-center justify-between p-3.5 rounded-xl glass hover:border-border/60 transition-all"
+                    className="flex items-center justify-between p-3.5 rounded-xl glass hover:border-border/60 transition-all group"
                   >
                     <div className="flex items-center gap-4">
                       {statusIcon(e.status || 'pendente')}
                       <div>
-                        <p className="font-body font-medium">
+                        <p className="font-body font-medium flex items-center gap-2">
                           {e.tipo_evento} - {getEventoDescricao(e.tipo_evento)}
+                          {e.status === 'erro' && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <AlertTriangle className="h-3.5 w-3.5 text-destructive animate-pulse cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-destructive text-destructive-foreground border-none">
+                                  <p className="max-w-xs text-xs">{e.erros?.mensagem || e.erros?.validacao?.[0]?.mensagem || 'Erro desconhecido na transmissão'}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                         </p>
                         <p className="text-sm text-muted-foreground font-body">
                           {formatDate(e.data_envio || e.created_at)}
@@ -190,17 +278,55 @@ export default function ESocialPage() {
                     <div className="flex items-center gap-2">
                       <StatusBadge status={e.status || 'pendente'} variant={statusVariant(e.status || 'pendente') as any} />
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setSelectedEvento(e)} title="Ver detalhes">
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <TooltipProvider>
+                          <div className="flex gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setSelectedEvento(e)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent><p>Ver Detalhes</p></TooltipContent>
+                            </Tooltip>
+
+                            {e.xml && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-primary" onClick={() => handleExportXML(e)}>
+                                    <Download className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Exportar XML</p></TooltipContent>
+                              </Tooltip>
+                            )}
+
+                            {e.status === 'pendente' && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-8 w-8 rounded-lg text-warning" 
+                                    onClick={() => handleValidar(e)}
+                                    disabled={isValidating === e.id}
+                                  >
+                                    {isValidating === e.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Validar Regras Gov.br</p></TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </TooltipProvider>
+
                         {e.status === 'pendente' && empresaAtual?.id && (
                           <Button
                             size="sm"
                             disabled={isSending}
                             onClick={() => enviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                            className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body"
+                            className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body h-8"
                           >
-                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
+                            {isSending ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
                           </Button>
                         )}
                         {e.status === 'erro' && empresaAtual?.id && (
@@ -208,9 +334,9 @@ export default function ESocialPage() {
                             size="sm"
                             disabled={isSending}
                             onClick={() => reenviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                            className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body"
+                            className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body h-8"
                           >
-                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
+                            {isSending ? <Loader2 className="h-3 w-3 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
                           </Button>
                         )}
                       </div>
@@ -279,15 +405,54 @@ export default function ESocialPage() {
 
               <div>
                 <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5 block">Dados do Evento (JSON)</Label>
-                <pre className="text-[10px] p-4 bg-muted rounded-xl border font-mono max-h-[300px] overflow-auto">
-                  {JSON.stringify(selectedEvento?.dados_evento || {}, null, 2)}
-                </pre>
+                <div className="relative group/json">
+                  <pre className="text-[10px] p-4 bg-muted rounded-xl border font-mono max-h-[300px] overflow-auto">
+                    {JSON.stringify(selectedEvento?.dados_evento || selectedEvento?.dados || {}, null, 2)}
+                  </pre>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover/json:opacity-100 transition-opacity"
+                    onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(selectedEvento?.dados_evento || selectedEvento?.dados || {}, null, 2));
+                      toast.success("JSON copiado");
+                    }}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
+
+              {selectedEvento?.xml && (
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="text-[11px] uppercase tracking-widest text-muted-foreground block">Conteúdo XML Assinado</Label>
+                    <Badge variant="outline" className="text-[9px] h-4 gap-1 border-primary/20 bg-primary/5 text-primary">
+                      <ShieldCheck className="h-2.5 w-2.5" /> SHA-256 Assinado
+                    </Badge>
+                  </div>
+                  <pre className="text-[10px] p-4 bg-primary/5 rounded-xl border border-primary/10 font-mono max-h-[300px] overflow-auto text-primary/80">
+                    {selectedEvento.xml}
+                  </pre>
+                </div>
+              )}
             </div>
           </ScrollArea>
           
-          <div className="p-4 bg-muted/20 border-t border-border/20 flex justify-end">
-            <Button variant="outline" onClick={() => setSelectedEvento(null)} className="rounded-xl">Fechar</Button>
+          <div className="p-4 bg-muted/20 border-t border-border/20 flex justify-between items-center">
+            <div className="flex gap-2">
+              {selectedEvento?.xml && (
+                <Button variant="outline" size="sm" onClick={() => handleExportXML(selectedEvento)} className="rounded-xl h-9 gap-2">
+                  <Download className="h-4 w-4" /> Exportar XML
+                </Button>
+              )}
+              {selectedEvento?.status === 'pendente' && (
+                <Button variant="outline" size="sm" onClick={() => handleValidar(selectedEvento)} className="rounded-xl h-9 gap-2">
+                  <ShieldCheck className="h-4 w-4" /> Validar Agora
+                </Button>
+              )}
+            </div>
+            <Button variant="default" onClick={() => setSelectedEvento(null)} className="rounded-xl h-9 px-6">Fechar</Button>
           </div>
         </DialogContent>
       </Dialog>
