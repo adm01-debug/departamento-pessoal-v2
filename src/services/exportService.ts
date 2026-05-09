@@ -70,3 +70,67 @@ export const exportPontoPDF = (data: any[], title = 'Relatório de Ponto', colum
     throw error;
   }
 };
+
+export const exportPortaria671PDF = (solicitacao: any) => {
+  try {
+    const doc = new jsPDF() as any;
+    const relatorio = solicitacao.relatorio_conformidade || {};
+    
+    // Header
+    doc.setFontSize(16);
+    doc.text('Relatório de Conformidade - Portaria 671', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`ID Solicitação: ${solicitacao.id}`, 14, 28);
+    doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy HH:mm:ss")}`, 14, 33);
+    
+    // Colaborador Info
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text('Informações do Ajuste', 14, 45);
+    
+    const adjustmentData = [
+      ['Colaborador', solicitacao.colaborador?.nome_completo || 'N/A'],
+      ['Data do Ponto', format(new Date(solicitacao.data_ponto), 'dd/MM/yyyy')],
+      ['Tipo', solicitacao.tipo_ponto?.toUpperCase() || 'N/A'],
+      ['Hora Original', solicitacao.hora_original || 'Original'],
+      ['Hora Sugerida', solicitacao.hora_sugerida],
+      ['Motivo', solicitacao.motivo]
+    ];
+    
+    doc.autoTable({
+      startY: 48,
+      body: adjustmentData,
+      theme: 'plain',
+      styles: { fontSize: 10 },
+      columnStyles: { 0: { fontStyle: 'bold', width: 40 } }
+    });
+    
+    // Compliance Info
+    const nextY = (doc as any).lastAutoTable.finalY + 15;
+    doc.text('Validações de Conformidade', 14, nextY);
+    
+    const complianceData = [
+      ['Timezone', relatorio.timezone || 'America/Sao_Paulo'],
+      ['Geofencing', relatorio.geofencing ? 'VÁLIDO' : 'NÃO VERIFICADO'],
+      ['Divergência', `${relatorio.divergencia_minutos || 0} minutos`],
+      ['Integridade SHA256', relatorio.sha256_integridade || 'N/A'],
+      ['Status Portaria 671', relatorio.portaria_671_conformidade ? 'CONFORME' : 'EM ANÁLISE']
+    ];
+    
+    doc.autoTable({
+      startY: nextY + 3,
+      body: complianceData,
+      theme: 'grid',
+      headStyles: { fillColor: [41, 128, 185] },
+      styles: { fontSize: 10 }
+    });
+    
+    doc.save(`conformidade-671-${solicitacao.id.slice(0, 8)}.pdf`);
+    return true;
+  } catch (error) {
+    console.error('Erro exportando conformidade:', error);
+    throw error;
+  }
+};
