@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog } from '@/components/folha';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard } from '@/components/folha';
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
@@ -143,15 +143,7 @@ export default function FolhaPagamentoPage() {
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Importar Ponto</span>
             </Button>
-            <Button
-              size="sm"
-              onClick={() => calcularFolha.mutate(competencia)}
-              disabled={calcularFolha.isPending}
-              className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body"
-            >
-              <Calculator className="h-4 w-4" />
-              {calcularFolha.isPending ? 'Calculando...' : 'Calcular'}
-            </Button>
+            <CalculoFolhaWizard competencia={competencia} />
             <Button
               size="sm" variant="outline"
               onClick={calcularFolhaServidor}

@@ -218,7 +218,7 @@ export default function ColaboradorFormPage() {
                       label="Sexo" 
                       value={watch('sexo')}
                       options={[{ value: 'masculino', label: 'Masculino' }, { value: 'feminino', label: 'Feminino' }, { value: 'outro', label: 'Outro' }]} 
-                      onValueChange={(v) => setValue('sexo', v as any)} 
+                      onChange={(v) => setValue('sexo', v as any)} 
                     />
                     <FormSelect 
                       label="Estado Civil" 
@@ -228,7 +228,7 @@ export default function ColaboradorFormPage() {
                         { value: 'divorciado', label: 'Divorciado(a)' }, { value: 'viuvo', label: 'Viúvo(a)' },
                         { value: 'uniao_estavel', label: 'União Estável' },
                       ]} 
-                      onValueChange={(v) => setValue('estado_civil', v as any)} 
+                      onChange={(v) => setValue('estado_civil', v as any)} 
                     />
                     <FormField label="Matrícula Interna" {...register('matricula')} placeholder="Ex: 0001" />
                   </div>
@@ -265,7 +265,7 @@ export default function ColaboradorFormPage() {
                         { value: 'clt', label: 'CLT (Efetivo)' }, { value: 'pj', label: 'PJ (Prestador)' },
                         { value: 'estagio', label: 'Estágio' }, { value: 'temporario', label: 'Temporário' },
                       ]} 
-                      onValueChange={(v) => setValue('tipo_contrato', v as any)} 
+                      onChange={(v) => setValue('tipo_contrato', v as any)} 
                     />
                   </div>
 
@@ -284,7 +284,7 @@ export default function ColaboradorFormPage() {
                         { value: 'ferias', label: 'Em Férias' },
                         { value: 'inativo', label: 'Desligado' },
                       ]} 
-                      onValueChange={(v) => setValue('status', v)} 
+                      onChange={(v) => setValue('status', v)} 
                     />
                   </div>
                 </CardContent>
@@ -351,7 +351,7 @@ export default function ColaboradorFormPage() {
                         { value: 'poupanca', label: 'Poupança' },
                         { value: 'salario', label: 'Conta Salário' },
                       ]} 
-                      onValueChange={(v) => setValue('tipo_conta', v)} 
+                      onChange={(v) => setValue('tipo_conta', v)} 
                     />
                   </div>
 
