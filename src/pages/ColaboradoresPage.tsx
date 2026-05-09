@@ -66,11 +66,18 @@ export default function ColaboradoresPage() {
 
   const filtered = useMemo(() => {
     return colaboradores?.filter((c) => {
-      const matchSearch = !search || c.nome_completo.toLowerCase().includes(search.toLowerCase()) || c.cpf?.includes(search);
-      const matchStatus = !statusFilter || c.status === statusFilter;
-      return matchSearch && matchStatus;
+      const matchSearch = !search || 
+        c.nome_completo.toLowerCase().includes(search.toLowerCase()) || 
+        c.cpf?.includes(search) ||
+        c.email?.toLowerCase().includes(search.toLowerCase());
+      
+      const matchStatus = !statusFilter || statusFilter === 'all' || c.status === statusFilter;
+      const matchDepto = !deptoFilter || deptoFilter === 'all' || c.departamento === deptoFilter;
+      const matchCargo = !cargoFilter || cargoFilter === 'all' || c.cargo === cargoFilter;
+      
+      return matchSearch && matchStatus && matchDepto && matchCargo;
     }) || [];
-  }, [colaboradores, search, statusFilter]);
+  }, [colaboradores, search, statusFilter, deptoFilter, cargoFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
