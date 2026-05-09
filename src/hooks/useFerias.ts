@@ -17,7 +17,7 @@ export function useFerias() {
   const createMutation = useMutation({
     mutationFn: (data: any) => feriasService.criar(data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['ferias'] });
+      qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
       toast.success('Solicitação de férias criada com sucesso');
     },
     onError: (error: any) => toast.error(`Erro ao criar: ${error.message}`),
@@ -26,7 +26,7 @@ export function useFerias() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => feriasService.atualizar(id, data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['ferias'] });
+      qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
       toast.success('Solicitação de férias atualizada');
     },
     onError: (error: any) => toast.error(`Erro ao atualizar: ${error.message}`),
@@ -35,11 +35,12 @@ export function useFerias() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => feriasService.excluir(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['ferias'] });
+      qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
       toast.success('Solicitação de férias excluída');
     },
     onError: (error: any) => toast.error(`Erro ao excluir: ${error.message}`),
   });
+
 
   return {
     ferias: query.data || [],
