@@ -123,10 +123,10 @@ export default function ProvisoesPage() {
   const { data: auditLogs } = useQuery({
     queryKey: ['provisao-logs', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await (window as any).supabase
+      const { data, error } = await supabase
         .from('provisao_logs')
         .select('*')
-        .eq('empresa_id', empresaAtual?.id)
+        .eq('empresa_id', empresaAtual?.id!)
         .order('created_at', { ascending: false })
         .limit(10);
       if (error) throw error;
@@ -134,6 +134,7 @@ export default function ProvisoesPage() {
     },
     enabled: !!empresaAtual?.id
   });
+
 
   const { data: trendData } = useQuery({
     queryKey: ['provisao-trend', empresaAtual?.id],
