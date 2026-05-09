@@ -163,6 +163,19 @@ export function GestaoRegistrosPonto() {
           </div>
         </CardHeader>
         <CardContent>
+          <Tabs defaultValue="lista" className="w-full">
+            <div className="flex items-center justify-between mb-4">
+              <TabsList className="bg-muted/50 p-1 rounded-xl">
+                <TabsTrigger value="lista" className="text-xs rounded-lg px-4">
+                  <Activity className="h-3 w-3 mr-2" /> Registros
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs rounded-lg px-4">
+                  <TrendingUp className="h-3 w-3 mr-2" /> Inteligência & Analytics
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="lista">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Clock className="h-6 w-6 animate-spin text-muted-foreground" />
