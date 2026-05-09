@@ -2,7 +2,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Calculator, RefreshCw, Shield, Loader2, Banknote } from 'lucide-react';
+import { Upload, Calculator, RefreshCw, Shield, Loader2, Banknote, Lock, History } from 'lucide-react';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { PageLayout } from '@/components/layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,7 +10,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard } from '@/components/folha';
+import { auditLogger } from '@/utils/auditLogger';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline } from '@/components/folha';
+
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
