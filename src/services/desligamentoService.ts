@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { auditLogger } from '@/utils/auditLogger';
 
 export const desligamentoService = {
   async listar(empresaId?: string) {
@@ -29,21 +30,59 @@ export const desligamentoService = {
     const sanitized = {
       ...d,
       motivo: d.motivo?.trim().slice(0, 1000) || null,
+      status: d.status || 'pendente',
+      etapa: d.etapa || 'comunicacao'
     };
 
     const { data, error } = await supabase.from('desligamentos').insert(sanitized).select().maybeSingle();
     if (error) throw error;
+
+    if (data) {
+      await auditLogger.log({
+        tabela: 'desligamentos',
+        registro_id: data.id,
+        acao: 'INSERT',
+        dados_novos: data,
+      });
+    }
+
     return data;
   },
   async atualizar(id: string, d: any) {
     if (!id) throw new Error('ID é obrigatório');
+
+    // Buscar dados anteriores para o log
+    const { data: anterior } = await supabase.from('desligamentos').select('*').eq('id', id).single();
+
     const { data, error } = await supabase.from('desligamentos').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
+
+    if (data) {
+      await auditLogger.log({
+        tabela: 'desligamentos',
+        registro_id: id,
+        acao: 'UPDATE',
+        dados_anteriores: anterior,
+        dados_novos: data,
+      });
+    }
+
     return data;
   },
   async excluir(id: string) {
     if (!id) throw new Error('ID é obrigatório');
+    
+    const { data: anterior } = await supabase.from('desligamentos').select('*').eq('id', id).single();
+
     const { error } = await supabase.from('desligamentos').delete().eq('id', id);
     if (error) throw error;
+
+    await auditLogger.log({
+      tabela: 'desligamentos',
+      registro_id: id,
+      acao: 'DELETE',
+      dados_anteriores: anterior,
+    });
   },
 };
+
