@@ -14,8 +14,9 @@ import { useEmpresa } from '@/contexts';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import { usePDFExport } from '@/hooks/usePDFExport';
 import { RelatoriosAnalyticsTab } from '@/components/relatorios/RelatoriosAnalyticsTab';
 import { RelatoriosExportTab } from '@/components/relatorios/RelatoriosExportTab';
 
@@ -37,13 +38,23 @@ async function fetchReportData(id: string) {
   }
 }
 
-function exportCSV(title: string, rows: any[], columns: string[]) { if (!rows.length) { toast.info('Sem dados'); return; } const blob = new Blob([[columns.join(';'), ...rows.map(r => columns.map(c => r[c] ?? '').join(';'))].join('\n')], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${title.replace(/\s/g, '_')}.csv`; a.click(); URL.revokeObjectURL(url); toast.success('CSV exportado!'); }
-function exportExcel(title: string, rows: any[], columns: string[]) { if (!rows.length) { toast.info('Sem dados'); return; } const ws = XLSX.utils.json_to_sheet(rows.map(r => Object.fromEntries(columns.map(c => [c, r[c] ?? ''])))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Dados'); XLSX.writeFile(wb, `${title.replace(/\s/g, '_')}.xlsx`); toast.success('Excel exportado!'); }
-function exportPDF(title: string, rows: any[], columns: string[]) { if (!rows.length) { toast.info('Sem dados'); return; } const doc = new jsPDF({ orientation: 'landscape' }); doc.setFontSize(16); doc.text(title, 14, 20); doc.setFontSize(10); doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 28); (doc as any).autoTable({ startY: 35, head: [columns], body: rows.map(r => columns.map(c => r[c] ?? '')), theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, styles: { fontSize: 8 } }); doc.save(`${title.replace(/\s/g, '_')}.pdf`); toast.success('PDF exportado!'); }
+function exportCSV(title: string, rows: any[], columns: string[]) { 
+  if (!rows.length) { toast.info('Sem dados'); return; } 
+  const blob = new Blob([[columns.join(';'), ...rows.map(r => columns.map(c => r[c] ?? '').join(';'))].join('\n')], { type: 'text/csv;charset=utf-8;' }); 
+  const url = URL.createObjectURL(blob); 
+  const a = document.createElement('a'); 
+  a.href = url; 
+  a.download = `${title.replace(/\s/g, '_')}.csv`; 
+  a.click(); 
+  URL.revokeObjectURL(url); 
+  toast.success('CSV exportado!'); 
+}
 
 export default function RelatoriosPage() {
   const { empresaAtual } = useEmpresa();
   const [generating, setGenerating] = useState<string | null>(null);
+  const { exportarExcel } = useExcelExport();
+  const { exportarPDF } = usePDFExport();
   const [exportFormat, setExportFormat] = useState('csv');
   const [emailDialog, setEmailDialog] = useState<string | null>(null);
   const [emailTo, setEmailTo] = useState('');
@@ -71,7 +82,23 @@ export default function RelatoriosPage() {
     },
   });
 
-  const handleExport = async (id: string) => { setGenerating(id); try { const r = await fetchReportData(id); exportFormat === 'excel' ? exportExcel(r.title, r.rows, r.columns) : exportFormat === 'pdf' ? exportPDF(r.title, r.rows, r.columns) : exportCSV(r.title, r.rows, r.columns); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setGenerating(null); } };
+  const handleExport = async (id: string) => { 
+    setGenerating(id); 
+    try { 
+      const r = await fetchReportData(id); 
+      if (exportFormat === 'excel') {
+        exportarExcel(r.title, r.rows, r.columns);
+      } else if (exportFormat === 'pdf') {
+        exportarPDF(r.title, r.rows, r.columns);
+      } else {
+        exportCSV(r.title, r.rows, r.columns); 
+      }
+    } catch (e: any) { 
+      toast.error(`Erro: ${e.message}`); 
+    } finally { 
+      setGenerating(null); 
+    } 
+  };
   const handleSendEmail = async () => { if (!emailDialog || !emailTo || !empresaAtual?.id) return; setSendingEmail(true); try { await edgeFunctionsService.enviarRelatorioEmail({ tipo: emailDialog, destinatarios: emailTo.split(',').map(e => e.trim()), empresaId: empresaAtual.id }); toast.success('Relatório enviado por email!'); setEmailDialog(null); setEmailTo(''); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setSendingEmail(false); } };
 
   return (

@@ -8,7 +8,8 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { auditoriaService } from '@/services/auditoriaService';
-import { Shield, Eye, Clock, User, Database, Search } from 'lucide-react';
+import { Shield, Eye, Clock, User, Database, Search, Download, FileSpreadsheet } from 'lucide-react';
+import { useExcelExport } from '@/hooks/useExcelExport';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const acaoColors: Record<string, string> = {
 export default function AuditoriaPage() {
   const [search, setSearch] = useState('');
   const [selectedLog, setSelectedLog] = useState<any>(null);
+  const { exportarExcel } = useExcelExport();
 
   const { data: logs, isLoading } = useQuery({
     queryKey: ['auditoria'],
@@ -39,7 +41,19 @@ export default function AuditoriaPage() {
     (l.user_email || '').toLowerCase().includes(search.toLowerCase()) ||
     (l.acao || '').toLowerCase().includes(search.toLowerCase())
   );
-
+  const handleExport = () => {
+    if (!filtered?.length) return;
+    exportarExcel(
+      'Log de Auditoria',
+      filtered.map(l => ({
+        ...l,
+        data: new Date(l.created_at).toLocaleString('pt-BR'),
+        dados_anteriores: JSON.stringify(l.dados_anteriores),
+        dados_novos: JSON.stringify(l.dados_novos)
+      })),
+      ['data', 'tabela', 'acao', 'user_email', 'ip_address', 'dados_anteriores', 'dados_novos']
+    );
+  };
   const renderJson = (json: any) => {
     if (!json) return <span className="text-muted-foreground italic text-xs">Sem dados</span>;
     return (
@@ -57,6 +71,12 @@ export default function AuditoriaPage() {
       description="Log de auditoria do sistema"
       icon={<Shield className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary to-info"
+      actions={
+        <Button variant="outline" size="sm" className="rounded-xl gap-2 font-body" onClick={handleExport} disabled={!filtered?.length}>
+          <FileSpreadsheet className="h-4 w-4 text-success" />
+          Exportar Logs
+        </Button>
+      }
     >
       <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por tabela ou usuário..." />
 
