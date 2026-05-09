@@ -59,18 +59,18 @@ describe('calculoFerias', () => {
     expect(result.bruto).toBe(4000);
   });
 
-  it('deve limitar o abono pecuniário a 1/3 dos dias de férias', () => {
+  it('deve limitar o abono pecuniário a no máximo 10 dias', () => {
     const params = {
       salarioBase: 3000,
       diasFerias: 15,
-      diasAbono: 10, // Tentando 10 dias de abono para 15 de férias
+      diasAbono: 15, // Tentando 15 dias de abono
       dependentesIrrf: 0
     };
 
     const result = calculoFerias.calcular(params);
 
-    // Limite é 15/3 = 5 dias
+    // Limite é 10 dias
     // Valor dia: 100
-    expect(result.valorAbono).toBe(500); 
+    expect(result.valorAbono).toBe(1000); 
   });
 });
