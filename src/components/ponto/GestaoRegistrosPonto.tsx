@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap } from 'lucide-react';
+import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp } from 'lucide-react';
 import { PontoInconsistencyPanel } from './PontoInconsistencyPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
