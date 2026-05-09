@@ -1,207 +1,240 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
-import { useState } from 'react';
-import { FileText, Search, Info, DollarSign, Users, TrendingDown, Download } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { FileText, Search, Download, Filter, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { gerarPDFHolerite } from '@/utils/holeritePDF';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
+import { toast } from 'sonner';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(value);
 }
 
-const componenteInfo: Record<string, string> = {
-  'Salário Base': 'Valor fixo mensal conforme contrato de trabalho, proporcional aos dias trabalhados.',
-  'Proventos': 'Soma de salário base, horas extras (50%/100%), gratificações, adicional noturno e outros rendimentos.',
-  'Descontos': 'INSS (7,5-14%), IRRF (tabela progressiva), Vale Transporte (6%), plano de saúde e outros.',
-  'Líquido': 'Valor final = Total Proventos - Total Descontos. É o que o colaborador recebe.',
-};
-
 export default function HoleritesPage() {
   const [busca, setBusca] = useState('');
+  const [mesFiltro, setMesFiltro] = useState(new Date().toISOString().substring(0, 7));
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['holerites'],
+  const { data: holerites, isLoading } = useQuery({
+    queryKey: ['holerites', mesFiltro],
     queryFn: async () => {
-      const { data, error } = await supabase.from('holerites').select('*').order('created_at', { ascending: false }).limit(200);
+      const { data, error } = await supabase
+        .from('folha_itens')
+        .select(`
+          *,
+          folha:folhas_pagamento(competencia, tipo),
+          colaborador:colaboradores(nome_completo, cpf, cargo)
+        `)
+        .filter('folha.competencia', 'eq', mesFiltro)
+        .order('created_at', { ascending: false });
+
       if (error) throw error;
       return data || [];
     },
   });
 
-  const filtered = data?.filter(h =>
-    h.colaborador_nome?.toLowerCase().includes(busca.toLowerCase()) ||
-    h.colaborador_cpf?.includes(busca)
-  ) || [];
+  const filtered = useMemo(() => {
+    return holerites?.filter(h => {
+      const colab = h.colaborador as any;
+      return (
+        colab?.nome_completo?.toLowerCase().includes(busca.toLowerCase()) ||
+        colab?.cpf?.includes(busca)
+      );
+    }) || [];
+  }, [holerites, busca]);
 
-  // Summary
-  const totais = filtered.reduce(
-    (acc, h) => ({
-      proventos: acc.proventos + (h.total_proventos || 0),
-      descontos: acc.descontos + (h.total_descontos || 0),
-      liquido: acc.liquido + (h.liquido || 0),
-    }),
-    { proventos: 0, descontos: 0, liquido: 0 }
-  );
+  const totals = useMemo(() => {
+    return filtered.reduce(
+      (acc, h) => ({
+        proventos: acc.proventos + (Number(h.total_proventos) || 0),
+        descontos: acc.descontos + (Number(h.total_descontos) || 0),
+        liquido: acc.liquido + (Number(h.total_liquido) || 0),
+      }),
+      { proventos: 0, descontos: 0, liquido: 0 }
+    );
+  }, [filtered]);
+
+  const handleDownload = (h: any) => {
+    try {
+      const colab = h.colaborador as any;
+      const folha = h.folha as any;
+      
+      gerarPDFHolerite({
+        colaborador_nome: colab?.nome_completo || 'N/A',
+        colaborador_cpf: colab?.cpf || 'N/A',
+        colaborador_cargo: colab?.cargo || 'N/A',
+        competencia: folha?.competencia || mesFiltro,
+        salario_base: Number(h.salario_base),
+        total_proventos: Number(h.total_proventos),
+        total_descontos: Number(h.total_descontos),
+        liquido: Number(h.total_liquido),
+        inss: Number(h.inss_mes),
+        irrf: Number(h.irrf_mes),
+        fgts: Number(h.fgts_mes),
+      });
+      toast.success('Holerite gerado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao gerar PDF do holerite.');
+    }
+  };
 
   return (
     <>
-    <PageTitle title="Holerites" description="Consulta e emissão de holerites" />
-    <PageLayout
-      title="Holerites"
-      description="Demonstrativos de pagamento dos colaboradores"
-      icon={<FileText className="h-5 w-5 text-primary-foreground" />}
-      gradient="from-primary to-primary-glow"
-    >
-      {/* Summary KPIs */}
-      {!isLoading && filtered.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Total Proventos', value: totais.proventos, color: 'text-success', gradient: 'from-success to-success/70' },
-            { label: 'Total Descontos', value: totais.descontos, color: 'text-destructive', gradient: 'from-destructive to-destructive/70' },
-            { label: 'Total Líquido', value: totais.liquido, color: 'text-foreground', gradient: 'from-primary to-primary-glow' },
-          ].map((kpi, i) => (
-            <motion.div key={kpi.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <Card className="border border-border/30 rounded-2xl overflow-hidden">
-                <div className={cn("h-[2px] bg-gradient-to-r", kpi.gradient)} />
-                <CardContent className="p-4 text-center">
-                  <p className={cn("text-lg font-display font-bold", kpi.color)}>
-                    <AnimatedNumber value={kpi.value} format={formatCurrency} />
-                  </p>
-                  <p className="text-[11px] text-muted-foreground font-body">{kpi.label}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      )}
+      <PageTitle title="Holerites Digitais" description="Consulta e emissão de demonstrativos de pagamento" />
+      <PageLayout
+        title="Holerites Digitais"
+        description="Gestão de demonstrativos de pagamento por competência"
+        icon={<FileText className="h-5 w-5 text-primary-foreground" />}
+        gradient="from-blue-600 to-indigo-600"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Filters Sidebar */}
+          <Card className="lg:col-span-1 border-border/40 shadow-sm h-fit">
+            <CardHeader className="pb-3 border-b border-border/5">
+              <CardTitle className="text-sm font-display flex items-center gap-2">
+                <Filter className="w-4 h-4 text-primary" /> Filtros
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                  <Calendar className="w-3 h-3" /> Competência
+                </label>
+                <Input 
+                  type="month" 
+                  value={mesFiltro} 
+                  onChange={(e) => setMesFiltro(e.target.value)}
+                  className="rounded-xl h-11"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                  <Search className="w-3 h-3" /> Colaborador
+                </label>
+                <Input 
+                  placeholder="Nome ou CPF..." 
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  className="rounded-xl h-11"
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar por nome ou CPF..."
-          value={busca}
-          onChange={e => setBusca(e.target.value)}
-          className="pl-10 rounded-xl"
-          aria-label="Buscar colaborador por nome ou CPF"
-        />
-      </div>
-
-      {isLoading ? (
-        <div className="flex justify-center p-8"><Spinner /></div>
-      ) : !filtered.length ? (
-        <Card className="border border-border/30 rounded-2xl">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="p-4 rounded-2xl bg-muted/50 mb-3">
-              <FileText className="h-8 w-8 text-muted-foreground" />
+          {/* Main Content */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Summary KPIs */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { label: 'Total Proventos', value: totals.proventos, gradient: 'from-emerald-500 to-teal-500' },
+                { label: 'Total Descontos', value: totals.descontos, gradient: 'from-rose-500 to-red-500' },
+                { label: 'Total Líquido', value: totals.liquido, gradient: 'from-blue-500 to-indigo-500' },
+              ].map((kpi, i) => (
+                <motion.div key={kpi.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                  <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                    <div className={cn("h-1 bg-gradient-to-r", kpi.gradient)} />
+                    <CardContent className="p-5">
+                      <p className="text-xs text-muted-foreground font-medium mb-1">{kpi.label}</p>
+                      <p className="text-2xl font-display font-bold tabular-nums">
+                        <AnimatedNumber value={kpi.value} format={formatCurrency} />
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
-            <p className="font-display font-semibold">Nenhum holerite encontrado</p>
-            <p className="text-caption text-muted-foreground font-body mt-1">Processe uma folha para gerar holerites</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          {/* Desktop Table */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hidden md:block">
-            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-elevated">
+
+            {/* Holerites List */}
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-elevated bg-card">
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/30">
-                      <TableHead className="font-display font-semibold">Colaborador</TableHead>
-                      <TableHead className="font-display font-semibold">CPF</TableHead>
-                      <TableHead className="font-display font-semibold">Cargo</TableHead>
-                      <TableHead className="font-display font-semibold text-right">
-                        <TooltipProvider><Tooltip><TooltipTrigger className="inline-flex items-center gap-1">
-                          Salário Base <Info className="h-3 w-3 text-muted-foreground/50" />
-                        </TooltipTrigger><TooltipContent className="max-w-[200px] text-xs">{componenteInfo['Salário Base']}</TooltipContent></Tooltip></TooltipProvider>
-                      </TableHead>
-                      <TableHead className="font-display font-semibold text-right">
-                        <TooltipProvider><Tooltip><TooltipTrigger className="inline-flex items-center gap-1">
-                          Proventos <Info className="h-3 w-3 text-muted-foreground/50" />
-                        </TooltipTrigger><TooltipContent className="max-w-[200px] text-xs">{componenteInfo['Proventos']}</TooltipContent></Tooltip></TooltipProvider>
-                      </TableHead>
-                      <TableHead className="font-display font-semibold text-right">
-                        <TooltipProvider><Tooltip><TooltipTrigger className="inline-flex items-center gap-1">
-                          Descontos <Info className="h-3 w-3 text-muted-foreground/50" />
-                        </TooltipTrigger><TooltipContent className="max-w-[200px] text-xs">{componenteInfo['Descontos']}</TooltipContent></Tooltip></TooltipProvider>
-                      </TableHead>
-                      <TableHead className="font-display font-semibold text-right">
-                        <TooltipProvider><Tooltip><TooltipTrigger className="inline-flex items-center gap-1">
-                          Líquido <Info className="h-3 w-3 text-muted-foreground/50" />
-                        </TooltipTrigger><TooltipContent className="max-w-[200px] text-xs">{componenteInfo['Líquido']}</TooltipContent></Tooltip></TooltipProvider>
-                      </TableHead>
-                      <TableHead className="font-display font-semibold text-center">Ação</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filtered.map(r => (
-                      <TableRow key={r.id} className="hover:bg-accent/30 transition-colors">
-                        <TableCell className="font-body font-semibold">{r.colaborador_nome}</TableCell>
-                        <TableCell className="text-muted-foreground font-body tabular-nums">{r.colaborador_cpf}</TableCell>
-                        <TableCell className="text-muted-foreground font-body">{r.colaborador_cargo}</TableCell>
-                        <TableCell className="text-right font-body tabular-nums">{formatCurrency(r.salario_base || 0)}</TableCell>
-                        <TableCell className="text-right text-success font-body font-semibold tabular-nums">{formatCurrency(r.total_proventos || 0)}</TableCell>
-                        <TableCell className="text-right text-destructive font-body font-semibold tabular-nums">{formatCurrency(r.total_descontos || 0)}</TableCell>
-                        <TableCell className="text-right font-display font-bold tabular-nums">{formatCurrency(r.liquido || 0)}</TableCell>
-                        <TableCell className="text-center">
-                          <Button size="sm" variant="ghost" className="h-7 rounded-lg" onClick={() => gerarPDFHolerite(r as any)}>
-                            <Download className="h-3.5 w-3.5" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20 gap-4">
+                    <Spinner size="lg" className="text-primary" />
+                    <p className="text-sm text-muted-foreground animate-pulse">Carregando demonstrativos...</p>
+                  </div>
+                ) : filtered.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+                    <div className="w-16 h-16 rounded-3xl bg-muted/30 flex items-center justify-center mb-4">
+                      <FileText className="w-8 h-8 text-muted-foreground/50" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg">Nenhum registro encontrado</h3>
+                    <p className="text-sm text-muted-foreground max-w-xs mt-1">
+                      Não encontramos holerites para os filtros aplicados nesta competência.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/10">
+                          <TableHead className="font-display font-bold h-12">Colaborador</TableHead>
+                          <TableHead className="font-display font-bold h-12 text-right">Proventos</TableHead>
+                          <TableHead className="font-display font-bold h-12 text-right">Descontos</TableHead>
+                          <TableHead className="font-display font-bold h-12 text-right">Líquido</TableHead>
+                          <TableHead className="w-20 text-center font-display font-bold h-12">PDF</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <AnimatePresence>
+                          {filtered.map((h, i) => {
+                            const colab = h.colaborador as any;
+                            return (
+                              <motion.tr 
+                                key={h.id} 
+                                initial={{ opacity: 0 }} 
+                                animate={{ opacity: 1 }} 
+                                transition={{ delay: i * 0.03 }}
+                                className="hover:bg-primary/5 transition-colors border-b border-border/5 group"
+                              >
+                                <TableCell className="py-4">
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-slate-800">{colab?.nome_completo || 'N/A'}</span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-tighter">
+                                      {colab?.cargo || 'CARGO N/D'} • CPF: {colab?.cpf || '---'}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right text-emerald-600 font-medium tabular-nums">
+                                  {formatCurrency(Number(h.total_proventos))}
+                                </TableCell>
+                                <TableCell className="text-right text-rose-600 font-medium tabular-nums">
+                                  {formatCurrency(Number(h.total_descontos))}
+                                </TableCell>
+                                <TableCell className="text-right font-display font-bold text-primary tabular-nums">
+                                  {formatCurrency(Number(h.total_liquido))}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-9 w-9 rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm group-hover:scale-110"
+                                    onClick={() => handleDownload(h)}
+                                    title="Baixar Holerite PDF"
+                                  >
+                                    <Download className="h-4 h-4" />
+                                  </Button>
+                                </TableCell>
+                              </motion.tr>
+                            );
+                          })}
+                        </AnimatePresence>
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
-          </motion.div>
-
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-3">
-            {filtered.map((r, i) => (
-              <motion.div key={r.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                <Card className="border border-border/30 rounded-2xl overflow-hidden">
-                  <CardContent className="p-4 space-y-3">
-                    <div>
-                      <p className="font-display font-bold truncate">{r.colaborador_nome}</p>
-                      <p className="text-caption text-muted-foreground font-body">{r.colaborador_cargo} · {r.colaborador_cpf}</p>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-center pt-2 border-t border-border/20">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground font-body uppercase">Proventos</p>
-                        <p className="text-caption font-display font-bold text-success">{formatCurrency(r.total_proventos || 0)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground font-body uppercase">Descontos</p>
-                        <p className="text-caption font-display font-bold text-destructive">{formatCurrency(r.total_descontos || 0)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground font-body uppercase">Líquido</p>
-                        <p className="text-caption font-display font-bold">{formatCurrency(r.liquido || 0)}</p>
-                      </div>
-                    </div>
-                    <Button size="sm" variant="outline" className="w-full rounded-xl mt-2" onClick={() => gerarPDFHolerite(r as any)}>
-                      <Download className="h-3.5 w-3.5 mr-2" />Baixar PDF
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
           </div>
-        </>
-      )}
-    </PageLayout>
+        </div>
+      </PageLayout>
     </>
   );
 }
