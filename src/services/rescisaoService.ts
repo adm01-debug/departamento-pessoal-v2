@@ -98,11 +98,27 @@ export const rescisaoService = {
   },
 
   async homologar(id: string) {
+    // Buscar desligamento para validar se o cálculo já foi feito
+    const { data: d, error: fetchError } = await supabase
+      .from('desligamentos')
+      .select('valor_liquido, etapa, checklist_calculo_rescisao')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) throw fetchError;
+    if (!d.valor_liquido || !d.checklist_calculo_rescisao) {
+      throw new Error('A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.');
+    }
+
     await this.validarTransicao(id, 'homologacao');
 
     const { data, error } = await supabase
       .from('desligamentos')
-      .update({ status: 'homologado', etapa: 'pagamento', checklist_homologacao: true })
+      .update({ 
+        status: 'homologado', 
+        etapa: 'pagamento', 
+        checklist_homologacao: true 
+      })
       .eq('id', id)
       .select()
       .single();
@@ -113,10 +129,16 @@ export const rescisaoService = {
       tabela: 'desligamentos',
       registro_id: id,
       acao: 'UPDATE',
-      dados_novos: { status: 'homologado', etapa: 'pagamento', evento: 'HOMOLOGACAO_CONCLUIDA' },
+      dados_novos: { 
+        status: 'homologado', 
+        etapa: 'pagamento', 
+        evento: 'HOMOLOGACAO_CONCLUIDA',
+        timestamp_assinatura: new Date().toISOString()
+      },
     });
 
     return data;
   }
+
 };
 
