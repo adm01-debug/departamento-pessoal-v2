@@ -1,6 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,15 +10,17 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { folhaService } from '@/services';
 import { Eye, Calculator, FileText, DollarSign, TrendingUp, TrendingDown, Banknote, Download, FileSpreadsheet, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FolhaAuditoriaTable } from '@/components/folha/FolhaAuditoriaTable';
+import { CalculoFolhaWizard } from '@/components/folha/CalculoFolhaWizard';
 import { motion } from 'framer-motion';
+
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
+import { useFolha } from '@/hooks/useFolha';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 function formatCurrency(value: number): string {
+
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(value);
 }
 
@@ -36,11 +38,8 @@ export default function FolhaPage() {
   const navigate = useNavigate();
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
+  const { folhas, isLoading } = useFolha(competencia || undefined);
 
-  const { data: folhas, isLoading } = useQuery({
-    queryKey: ['folhas', competencia],
-    queryFn: () => folhaService.list(competencia || undefined),
-  });
 
   // Summary KPIs from loaded data
   const totais = (folhas || []).reduce(
@@ -102,10 +101,9 @@ export default function FolhaPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={() => navigate('/folha/calcular')} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body gap-1.5">
-            <Calculator className="h-4 w-4" />Processar Folha
-          </Button>
+          <CalculoFolhaWizard competencia={new Date().toISOString().slice(0, 7)} />
         </div>
+
       }
     >
       {/* Summary Cards */}
