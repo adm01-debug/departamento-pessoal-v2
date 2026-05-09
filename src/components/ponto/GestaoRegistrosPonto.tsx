@@ -375,12 +375,16 @@ export function GestaoRegistrosPonto() {
                             {temFalta && (
                               <Badge variant="destructive" className="text-[10px] h-5 px-1.5">Falta</Badge>
                             )}
-                            {!aberto && !temAtraso && !temFalta && r.saida_1 && (
-                              <Badge className="text-[10px] h-5 px-1.5 bg-success/10 text-success border-success/30" variant="outline">✓ OK</Badge>
                             )}
                           </div>
                         </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-info/10 text-info" onClick={() => toast.info(`Visualizando auditoria de ${r.colaborador?.nome_completo}...`)}>
+                            <History className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
+
                     );
                   })}
                 </TableBody>
