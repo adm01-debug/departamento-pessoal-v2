@@ -80,6 +80,30 @@ export function SystemHealthTab() {
     }
   };
 
+  const runSincronizarBitrix = async () => {
+    setLoading('bitrix');
+    try {
+      await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
+      toast.success('Sincronização Bitrix24 iniciada!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const runLimparCache = async () => {
+    setLoading('cache');
+    try {
+      await edgeFunctionsService.cache({ action: 'invalidate' });
+      toast.success('Cache do sistema limpo com sucesso!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setLoading(null);
+    }
+  };
+
   const StatusIcon = ({ ok }: { ok: boolean }) => ok
     ? <CheckCircle className="h-4 w-4 text-green-500" />
     : <XCircle className="h-4 w-4 text-destructive" />;
