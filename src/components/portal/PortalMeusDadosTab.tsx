@@ -24,6 +24,30 @@ export function PortalMeusDadosTab({ nome, email, profile, userId, navigate }: P
   const [editForm, setEditForm] = useState({ telefone: '', endereco: '' });
   const queryClient = useQueryClient();
 
+  const { data: settings } = useQuery({
+    queryKey: ['portal-settings', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('portal_notificacoes_settings').select('*').eq('user_id', userId).maybeSingle();
+      if (error) throw error;
+      return data || { email_alertas: true, push_alertas: true, alertar_ferias: true, alertar_holerite: true };
+    },
+    enabled: !!userId
+  });
+
+  const updateSettings = useMutation({
+    mutationFn: async (newSettings: any) => {
+      const { error } = await supabase.from('portal_notificacoes_settings').upsert({
+        user_id: userId,
+        ...newSettings
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['portal-settings'] });
+      toast.success('Preferências de notificação atualizadas!');
+    }
+  });
+
   const salvarDados = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from('profiles').update({
