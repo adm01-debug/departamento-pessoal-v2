@@ -75,11 +75,19 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       const { data: colab } = await (window as any).supabase.from('colaboradores').select('id').eq('email', user.email).maybeSingle();
       if (!colab) throw new Error('Colaborador não identificado localmente');
 
-      await pontoOfflineService.queueRegistro({
+      const hash = pontoOfflineService.generateIntegrityHash({
         tipo,
         colaborador_id: colab.id,
         timestamp: new Date().toISOString(),
         dispositivoId: navigator.userAgent
+      });
+
+      await pontoOfflineService.queueRegistro({
+        tipo,
+        colaborador_id: colab.id,
+        timestamp: new Date().toISOString(),
+        dispositivoId: navigator.userAgent,
+        hash
       });
       
       toast.warning(`Ponto registrado em modo OFFLINE. Será sincronizado quando a conexão voltar.`, {

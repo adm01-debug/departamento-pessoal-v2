@@ -39,8 +39,7 @@ export const pontoOfflineService = {
       }
     }
     
-    const id = crypto.randomUUID();
-    const hash = pontoOfflineService.generateIntegrityHash(registro);
+    const hash = registro.hash || pontoOfflineService.generateIntegrityHash(registro);
     
     const newEntry: OfflineRegistro = { ...registro, id, hash };
     queue.push(newEntry);
@@ -82,7 +81,8 @@ export const pontoOfflineService = {
           precisao: item.precisao,
           dispositivo_id: item.dispositivoId,
           is_offline: true,
-          sync_at: new Date().toISOString()
+          sync_at: new Date().toISOString(),
+          hash_integridade: item.hash
         });
 
         if (error) throw error;
