@@ -3298,6 +3298,61 @@ export type Database = {
           },
         ]
       }
+      conformidade_ponto_logs: {
+        Row: {
+          batida_id: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          resolvido: boolean | null
+          severidade: string | null
+          timestamp: string | null
+          tipo_alerta: string
+        }
+        Insert: {
+          batida_id?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          resolvido?: boolean | null
+          severidade?: string | null
+          timestamp?: string | null
+          tipo_alerta: string
+        }
+        Update: {
+          batida_id?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          resolvido?: boolean | null
+          severidade?: string | null
+          timestamp?: string | null
+          tipo_alerta?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conformidade_ponto_logs_batida_id_fkey"
+            columns: ["batida_id"]
+            isOneToOne: false
+            referencedRelation: "batidas_ponto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conformidade_ponto_logs_batida_id_fkey"
+            columns: ["batida_id"]
+            isOneToOne: false
+            referencedRelation: "vw_batidas_dia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conformidade_ponto_logs_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contas_bancarias: {
         Row: {
           agencia: string | null
@@ -12309,9 +12364,11 @@ export type Database = {
       }
       solicitacoes_ajuste_ponto: {
         Row: {
+          analisado_por: string | null
           aprovado_por: string | null
           colaborador_id: string
           created_at: string | null
+          data_analise: string | null
           data_ponto: string
           empresa_id: string
           hora_original: string | null
@@ -12319,14 +12376,17 @@ export type Database = {
           id: string
           motivo: string
           observacoes_gestor: string | null
+          rascunho: boolean | null
           status: string | null
           tipo_ponto: string
           updated_at: string | null
         }
         Insert: {
+          analisado_por?: string | null
           aprovado_por?: string | null
           colaborador_id: string
           created_at?: string | null
+          data_analise?: string | null
           data_ponto: string
           empresa_id: string
           hora_original?: string | null
@@ -12334,14 +12394,17 @@ export type Database = {
           id?: string
           motivo: string
           observacoes_gestor?: string | null
+          rascunho?: boolean | null
           status?: string | null
           tipo_ponto: string
           updated_at?: string | null
         }
         Update: {
+          analisado_por?: string | null
           aprovado_por?: string | null
           colaborador_id?: string
           created_at?: string | null
+          data_analise?: string | null
           data_ponto?: string
           empresa_id?: string
           hora_original?: string | null
@@ -12349,6 +12412,7 @@ export type Database = {
           id?: string
           motivo?: string
           observacoes_gestor?: string | null
+          rascunho?: boolean | null
           status?: string | null
           tipo_ponto?: string
           updated_at?: string | null
