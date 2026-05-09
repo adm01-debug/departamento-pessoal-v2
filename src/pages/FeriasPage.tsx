@@ -1,15 +1,15 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
 import { FeriasKPIs, FeriasTable } from '@/components/ferias';
-import { feriasService } from '@/services';
+import { useFerias } from '@/hooks/useFerias';
+import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { useAuth } from '@/contexts';
-import { Calendar, Calculator, Loader2 } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -17,6 +17,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CalendarioFerias } from '@/components/ferias/CalendarioFerias';
+import { GerenciamentoPeriodos } from '@/components/ferias/GerenciamentoPeriodos';
+import { calculoFerias } from '@/utils/calculoFerias';
+
 
 const statusOptions = [
   { value: 'pendente', label: 'Pendente' },
@@ -34,23 +39,37 @@ export default function FeriasPage() {
   const [calcLoading, setCalcLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
   const [calcResult, setCalcResult] = useState<any>(null);
-  const qc = useQueryClient();
-  const { empresaAtual } = useEmpresas();
-  const { user } = useAuth();
+  
+  const { ferias, isLoading } = useFerias();
+  const { 
+    aprovarGestor, 
+    aprovarRH, 
+    enviarContabilidade, 
+    rejeitar, 
+    cancelar 
+  } = useFeriasAprovacao();
 
   const handleCalcFerias = async () => {
     setCalcLoading(true);
-    setCalcResult(null);
+    // Instant client-side calculation for better UX
+    const instant = calculoFerias.calcular({
+      salarioBase: parseFloat(calcForm.salario) || 0,
+      diasFerias: parseInt(calcForm.diasFerias) || 30,
+      diasAbono: parseInt(calcForm.diasAbono) || 0
+    });
+    setCalcResult(instant);
+    
     try {
+      // Refresh with authoritative backend calculation
       const result = await edgeFunctionsService.calcularFerias({
         salario_base: parseFloat(calcForm.salario) || 0,
         dias_ferias: parseInt(calcForm.diasFerias) || 30,
         dias_abono: parseInt(calcForm.diasAbono) || 0,
       });
       setCalcResult(result);
-      toast.success('Férias calculadas com sucesso!');
+      toast.success('Cálculo validado pelo servidor');
     } catch (err: any) {
-      toast.error(`Erro: ${err.message}`);
+      console.error('Erro no cálculo server-side:', err);
     } finally {
       setCalcLoading(false);
     }
@@ -58,23 +77,7 @@ export default function FeriasPage() {
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  const { data: solicitacoes, isLoading } = useQuery({
-    queryKey: ['ferias-solicitacoes', empresaAtual?.id],
-    queryFn: () => feriasService.listSolicitacoes(empresaAtual?.id),
-    enabled: !!empresaAtual?.id,
-  });
-
-  const mutationOpts = (msg: string) => ({
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['ferias-solicitacoes'] }); toast.success(msg); },
-  });
-
-  const aprovarGestor = useMutation({ mutationFn: (id: string) => feriasService.aprovarGestor(id, user?.id), ...mutationOpts('Aprovado pelo gestor') });
-  const aprovarRH = useMutation({ mutationFn: (id: string) => feriasService.aprovarRH(id, user?.id), ...mutationOpts('Aprovado pelo RH') });
-  const enviarContabilidade = useMutation({ mutationFn: (id: string) => feriasService.enviarContabilidade(id, user?.id), ...mutationOpts('Enviado à contabilidade') });
-  const rejeitarMutation = useMutation({ mutationFn: (id: string) => feriasService.rejeitar(id), ...mutationOpts('Férias rejeitadas') });
-  const cancelarMutation = useMutation({ mutationFn: (id: string) => feriasService.cancelar(id, user?.id), ...mutationOpts('Férias canceladas') });
-
-  const filtered = solicitacoes?.filter((s: Record<string, any>) => {
+  const filtered = ferias?.filter((s: Record<string, any>) => {
     if (statusFilter && statusFilter !== 'all' && s.status !== statusFilter) return false;
     if (search) {
       const nome = (s.colaborador?.nome_completo || '').toLowerCase();
@@ -84,13 +87,14 @@ export default function FeriasPage() {
   });
 
   const stats = {
-    total: solicitacoes?.length || 0,
-    pendentes: solicitacoes?.filter((s: any) => s.status === 'pendente').length || 0,
-    aprovadas: solicitacoes?.filter((s: any) => s.status === 'aprovada' || s.aprovado_rh).length || 0,
-    emGozo: solicitacoes?.filter((s: any) => s.status === 'em_gozo').length || 0,
-    abonoPecuniario: solicitacoes?.filter((s: any) => s.abono_pecuniario).length || 0,
-    vencidas: solicitacoes?.filter((s: any) => s.status === 'vencida').length || 0,
+    total: ferias?.length || 0,
+    pendentes: ferias?.filter((s: any) => s.status === 'pendente').length || 0,
+    aprovadas: ferias?.filter((s: any) => s.status === 'aprovada' || s.aprovado_rh).length || 0,
+    emGozo: ferias?.filter((s: any) => s.status === 'em_gozo').length || 0,
+    abonoPecuniario: ferias?.filter((s: any) => s.abono_pecuniario).length || 0,
+    vencidas: ferias?.filter((s: any) => s.status === 'vencida').length || 0,
   };
+
 
   return (
     <>
@@ -137,29 +141,64 @@ export default function FeriasPage() {
     >
       <FeriasKPIs stats={stats} />
 
-      <DataTableToolbar
-        search={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Buscar colaborador..."
-        filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter }]}
-        onClearFilters={() => { setStatusFilter(''); setSearch(''); }}
-      />
+      <Tabs defaultValue="solicitacoes" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="solicitacoes" className="rounded-lg gap-2 font-display">
+            <List className="h-4 w-4" /> Solicitações
+          </TabsTrigger>
+          <TabsTrigger value="calendario" className="rounded-lg gap-2 font-display">
+            <CalendarDays className="h-4 w-4" /> Calendário
+          </TabsTrigger>
+          <TabsTrigger value="periodos" className="rounded-lg gap-2 font-display">
+            <History className="h-4 w-4" /> Períodos Aquisitivos
+          </TabsTrigger>
+        </TabsList>
 
-      {isLoading ? (
-        <TableSkeleton rows={6} columns={7} />
-      ) : !filtered?.length ? (
-        <EmptyList entityName="solicitação de férias" />
-      ) : (
-        <FeriasTable
-          data={filtered}
-          onAprovarGestor={(id) => aprovarGestor.mutate(id)}
-          onAprovarRH={(id) => aprovarRH.mutate(id)}
-          onEnviarContabilidade={(id) => enviarContabilidade.mutate(id)}
-          onRejeitar={(id) => rejeitarMutation.mutate(id)}
-          onCancelar={(id) => cancelarMutation.mutate(id)}
-        />
-      )}
+        <TabsContent value="solicitacoes" className="space-y-6">
+          <DataTableToolbar
+            search={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Buscar colaborador..."
+            filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter }]}
+            onClearFilters={() => { setStatusFilter(''); setSearch(''); }}
+          />
+
+          {isLoading ? (
+            <TableSkeleton rows={6} columns={7} />
+          ) : !filtered?.length ? (
+            <EmptyList entityName="solicitação de férias" />
+          ) : (
+            <FeriasTable
+              data={filtered}
+              onAprovarGestor={(id) => aprovarGestor(id)}
+              onAprovarRH={(id) => aprovarRH(id)}
+              onEnviarContabilidade={(id) => enviarContabilidade(id)}
+              onRejeitar={(id) => rejeitar(id)}
+              onCancelar={(id) => cancelar(id)}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="calendario">
+          <CalendarioFerias />
+        </TabsContent>
+
+        <TabsContent value="periodos">
+          <div className="grid gap-6">
+            {/* Typically we would have a selector for collaborator here, 
+                for now we show the most recent ones or a generic list */}
+            <p className="text-sm text-muted-foreground font-body">
+              Selecione um colaborador na tabela de solicitações para ver seus períodos detalhados ou visualize o resumo geral abaixo.
+            </p>
+            {/* If we had a selectedColaboradorId state, we would pass it here */}
+            {filtered && filtered.length > 0 && (
+              <GerenciamentoPeriodos colaboradorId={filtered[0].colaborador_id} />
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </PageLayout>
+
     </>
   );
 }

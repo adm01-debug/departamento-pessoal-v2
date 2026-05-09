@@ -119,6 +119,25 @@ export const feriasService = {
     return data || [];
   },
   listar: async (empresaId?: string) => feriasService.listSolicitacoes(empresaId),
+  async buscarPorId(id: string) {
+    const { data, error } = await supabase.from('ferias').select('*, colaborador:colaboradores(nome_completo)').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+  async criar(d: any) {
+    const { data, error } = await supabase.from('ferias').insert(d).select().maybeSingle();
+    if (error) throw error;
+    return ensureSingleResult(data, 'férias');
+  },
+  async atualizar(id: string, d: any) {
+    const { data, error } = await supabase.from('ferias').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    return ensureSingleResult(data, 'férias');
+  },
+  async excluir(id: string) {
+    const { error } = await supabase.from('ferias').delete().eq('id', id);
+    if (error) throw error;
+  },
   async aprovar(id: string) {
     const { error } = await supabase.from('ferias').update({ status: 'aprovada' } as any).eq('id', id);
     if (error) throw error;
@@ -140,6 +159,16 @@ export const feriasService = {
     } as any).eq('id', id);
     if (error) throw error;
   },
+  async listPeriodosAquisitivos(colaboradorId: string) {
+    const { data, error } = await supabase
+      .from('periodos_aquisitivos')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .order('data_inicio', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
   async enviarContabilidade(id: string, userId?: string) {
     const { error } = await supabase.from('ferias').update({
       enviado_contabilidade: true,
@@ -161,6 +190,7 @@ export const feriasService = {
     } as any).eq('id', id);
     if (error) throw error;
   },
+
 };
 
 export const folhaService = {
