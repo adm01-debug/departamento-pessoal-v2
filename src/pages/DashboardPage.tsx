@@ -124,7 +124,7 @@ function usePendencias(enabled: boolean) {
       ] = await Promise.all([
         supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "pendente"),
         supabase.from("afastamentos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
-        supabase.from("admissoes").select("*", { count: "exact", head: true }).neq("etapa", "esocial"),
+        supabase.from("admissoes").select("*", { count: "exact", head: true }).filter('etapa', 'not.in', '("concluida","cancelada")'),
       ]);
       const pendencias: Pendencia[] = [];
       if (feriasPendentes && feriasPendentes > 0) pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes de aprovação`, quantidade: feriasPendentes, icone: 'ferias' });
