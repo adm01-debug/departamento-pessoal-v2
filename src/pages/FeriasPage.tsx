@@ -5,11 +5,11 @@ import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { FeriasKPIs, FeriasTable } from '@/components/ferias';
+import { FeriasKPIs, FeriasTable, FeriasDashboard } from '@/components/ferias';
 import { useFerias } from '@/hooks/useFerias';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { Calendar, Calculator, Loader2, List, CalendarDays, History } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -141,8 +141,11 @@ export default function FeriasPage() {
     >
       <FeriasKPIs stats={stats} />
 
-      <Tabs defaultValue="solicitacoes" className="space-y-6">
+      <Tabs defaultValue="dashboard" className="space-y-6">
         <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="dashboard" className="rounded-lg gap-2 font-display">
+            <LayoutDashboard className="h-4 w-4" /> Dashboard
+          </TabsTrigger>
           <TabsTrigger value="solicitacoes" className="rounded-lg gap-2 font-display">
             <List className="h-4 w-4" /> Solicitações
           </TabsTrigger>
@@ -153,6 +156,10 @@ export default function FeriasPage() {
             <History className="h-4 w-4" /> Períodos Aquisitivos
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="dashboard">
+          <FeriasDashboard data={ferias} />
+        </TabsContent>
 
         <TabsContent value="solicitacoes" className="space-y-6">
           <DataTableToolbar
