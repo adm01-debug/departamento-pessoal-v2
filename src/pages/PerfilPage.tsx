@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2 } from 'lucide-react';
+import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, ShieldCheck, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
