@@ -43,6 +43,7 @@ export const pontoService = {
       longitude?: number;
       precisao?: number;
       dispositivoId?: string;
+      metadata?: Record<string, any>;
     }
   ) {
     if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
@@ -124,8 +125,9 @@ export const pontoService = {
         dentro_raio: dentroRaio,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         versao_app: '2.0.0-perf',
-        hash_integridade: hashIntegridade
-      })
+        hash_integridade: hashIntegridade,
+        metadata: options?.metadata
+      } as any)
       .select()
       .maybeSingle();
 

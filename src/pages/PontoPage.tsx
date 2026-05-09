@@ -27,10 +27,20 @@ import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [time, setTime] = useState(new Date());
-  const [geoStatus, setGeoStatus] = useState<'idle' | 'capturing' | 'success' | 'error'>('idle');
+  const [geoStatus, setGeoStatus] = useState<'idle' | 'capturing' | 'success' | 'error' | 'out_of_range'>('idle');
   const [processando, setProcessando] = useState(false);
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
+
+  const { data: locaisTrabalho } = useQuery({
+    queryKey: ['locais-trabalho-ponto', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('locais_trabalho').select('*').eq('empresa_id', empresaAtual?.id).eq('ativo', true);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!empresaAtual?.id
+  });
 
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
   const today = new Date().toISOString().split('T')[0];
@@ -62,11 +72,39 @@ export default function PontoPage() {
     );
   });
 
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371e3; // metres
+    const φ1 = lat1 * Math.PI/180;
+    const φ2 = lat2 * Math.PI/180;
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lon2-lon1) * Math.PI/180;
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // in metres
+  };
+
   const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     setLoading(tipo);
     try { 
       const geo = await captureGeo(); 
       if (!user?.id) throw new Error('Usuário não autenticado');
+
+      // Geofencing Check
+      if (geo && locaisTrabalho && locaisTrabalho.length > 0) {
+        const isWithinRange = locaisTrabalho.some(local => {
+          if (!local.latitude || !local.longitude) return false;
+          const dist = calculateDistance(geo.lat, geo.lng, Number(local.latitude), Number(local.longitude));
+          return dist <= 500; // 500 meters radius
+        });
+
+        if (!isWithinRange) {
+          setGeoStatus('out_of_range');
+          toast.warning('Você está fora do raio permitido para registro de ponto presencial.');
+          // In a "10/10" app, we might still allow but flag it for review
+        }
+      }
       
       const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
       if (!colab) throw new Error('Colaborador não encontrado');
@@ -75,7 +113,8 @@ export default function PontoPage() {
         latitude: geo?.lat,
         longitude: geo?.lng,
         precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
-        dispositivoId: navigator.userAgent
+        dispositivoId: navigator.userAgent,
+        metadata: geoStatus === 'out_of_range' ? { out_of_range: true } : undefined
       }); 
       
       toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
@@ -85,7 +124,7 @@ export default function PontoPage() {
       toast.error(`Erro: ${e.message}`); 
     } finally { 
       setLoading(null); 
-      setTimeout(() => setGeoStatus('idle'), 2000); 
+      setTimeout(() => setGeoStatus('idle'), 3000); 
     }
   };
 

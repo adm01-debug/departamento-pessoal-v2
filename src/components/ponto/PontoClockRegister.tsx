@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts';
 interface PontoClockRegisterProps {
   time: Date;
   loading: string | null;
-  geoStatus: 'idle' | 'capturing' | 'success' | 'error';
+  geoStatus: 'idle' | 'capturing' | 'success' | 'error' | 'out_of_range';
   onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => void;
 }
 
@@ -119,6 +119,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       toast.error(`Erro no registro offline: ${e.message}`);
     }
   };
+
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
@@ -172,6 +173,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
             {geoStatus === 'capturing' ? 'Capturando localização...' :
              geoStatus === 'success' ? '✅ Localização capturada' :
              geoStatus === 'error' ? '⚠️ GPS indisponível' :
+             geoStatus === 'out_of_range' ? '📍 Fora do raio permitido' :
              'Localização será registrada automaticamente'}
           </p>
         </CardContent>
