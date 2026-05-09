@@ -22,14 +22,18 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG', 'CPF', 'CTPS', 'Comprovante', 'Outro'];
 
+import { useSearchParams } from 'react-router-dom';
+
 export default function DocumentosPage() {
+  const [searchParams] = useSearchParams();
+  const urlColaboradorId = searchParams.get('colaborador');
   const [search, setSearch] = useState('');
   const [tipoFilter, setTipoFilter] = useState('todos');
-  const [colaboradorFilter, setColaboradorFilter] = useState('todos');
+  const [colaboradorFilter, setColaboradorFilter] = useState(urlColaboradorId || 'todos');
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
-  const [colaboradorId, setColaboradorId] = useState('');
+  const [colaboradorId, setColaboradorId] = useState(urlColaboradorId || '');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
