@@ -153,9 +153,10 @@ interface SidebarProps {
   collapsed?: boolean;
   className?: string;
   pendingCounts?: Record<string, number>;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ collapsed = false, className, pendingCounts }: SidebarProps) {
+export function Sidebar({ collapsed = false, className, pendingCounts, onToggle }: SidebarProps) {
   const location = useLocation();
   const { user, signOut, isAdmin } = useAuth();
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
