@@ -1,19 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2 } from 'lucide-react';
+import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2, CloudSync, History } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { lovable } from '@/integrations/lovable/index';
+import { useEmpresas } from '@/hooks';
+import { format } from 'date-fns';
 
 export function FGTSDigitalDashboard() {
   const [loading, setLoading] = useState(false);
+  const { empresaAtual } = useEmpresas();
 
-  const syncFGTS = () => {
+  const syncFGTS = async () => {
+    if (!empresaAtual?.id) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const competencia = format(new Date(), 'yyyy-MM');
+      const { data, error } = await lovable.functions.invoke('gerar-guias', {
+        body: { 
+          empresaId: empresaAtual.id, 
+          competencia, 
+          tipo: 'FGTS_DIGITAL' 
+        },
+      });
+      if (error) throw error;
+      toast.success('Sincronizado com FGTS Digital via API Caixa!');
+    } catch (err: any) {
+      toast.error('Falha na sincronização: ' + err.message);
+    } finally {
       setLoading(false);
-      toast.success('Sincronizado com FGTS Digital (API Gov)');
-    }, 1500);
+    }
   };
 
   return (
