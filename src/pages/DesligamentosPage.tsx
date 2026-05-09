@@ -108,160 +108,178 @@ export default function DesligamentosPage() {
         </div>
       }
     >
-      <div className="space-y-6">
-        {/* KPIs */}
-        <AnimatePresence>
-          {!isLoading && desligamentos.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <DesligamentoKPIs desligamentos={desligamentos} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <Tabs defaultValue="lista" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="lista" className="rounded-lg gap-2">
+            <List className="h-4 w-4" /> Gestão de Desligamentos
+          </TabsTrigger>
+          <TabsTrigger value="auditoria" className="rounded-lg gap-2">
+            <History className="h-4 w-4" /> Trilha de Auditoria
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Turnover Chart */}
-        {!isLoading && desligamentos.length > 0 && showChart && (
-          <TurnoverChart desligamentos={desligamentos} />
-        )}
+        <TabsContent value="lista" className="space-y-6">
+          <div className="space-y-6">
+            {/* KPIs */}
+            <AnimatePresence>
+              {!isLoading && desligamentos.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                  <DesligamentoKPIs desligamentos={desligamentos} />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Filters */}
-        <DesligamentoFilters
-          search={search}
-          onSearchChange={setSearch}
-          statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
-          tipoFilter={tipoFilter}
-          onTipoChange={setTipoFilter}
-        />
+            {/* Turnover Chart */}
+            {!isLoading && desligamentos.length > 0 && showChart && (
+              <TurnoverChart desligamentos={desligamentos} />
+            )}
 
-        {/* Content */}
-        {isLoading ? (
-          <div className="flex justify-center p-8"><Spinner size="lg" /></div>
-        ) : filtered.length === 0 ? (
-          <EmptyList entityName="desligamento" onCreate={() => setShowNovo(true)} />
-        ) : (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border-border/30 rounded-2xl overflow-hidden">
-              <CardContent className="p-0">
-                {/* Desktop table */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border/30 bg-muted/30">
-                        <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Colaborador</th>
-                        <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Data</th>
-                        <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Tipo</th>
-                        <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Status</th>
-                        <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Valor Líquido</th>
-                        <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Motivo</th>
-                        <th className="text-right text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+            {/* Filters */}
+            <DesligamentoFilters
+              search={search}
+              onSearchChange={setSearch}
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
+              tipoFilter={tipoFilter}
+              onTipoChange={setTipoFilter}
+            />
+
+            {/* Content */}
+            {isLoading ? (
+              <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+            ) : filtered.length === 0 ? (
+              <EmptyList entityName="desligamento" onCreate={() => setShowNovo(true)} />
+            ) : (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <Card className="border-border/30 rounded-2xl overflow-hidden">
+                  <CardContent className="p-0">
+                    {/* Desktop table */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-border/30 bg-muted/30">
+                            <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Colaborador</th>
+                            <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Data</th>
+                            <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Tipo</th>
+                            <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Status</th>
+                            <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Valor Líquido</th>
+                            <th className="text-left text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Motivo</th>
+                            <th className="text-right text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filtered.map((d: any, i: number) => (
+                            <motion.tr
+                              key={d.id}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: i * 0.02 }}
+                              onClick={() => openDetail(d)}
+                              className="border-b border-border/20 hover:bg-muted/20 cursor-pointer transition-colors group"
+                            >
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+                                    <span className="text-xs font-display font-bold text-destructive">
+                                      {(d.colaborador?.nome_completo || 'C')[0]}
+                                    </span>
+                                  </div>
+                                  <span className="text-sm font-body font-medium">{d.colaborador?.nome_completo || '—'}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm font-body text-muted-foreground">
+                                {d.data_desligamento ? new Date(d.data_desligamento).toLocaleDateString('pt-BR') : '—'}
+                              </td>
+                              <td className="px-4 py-3"><TipoBadge tipo={d.tipo} /></td>
+                              <td className="px-4 py-3"><StatusBadge status={d.status} /></td>
+                              <td className="px-4 py-3 text-sm font-body font-medium">
+                                {d.valor_liquido ? `R$ ${d.valor_liquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}
+                              </td>
+                              <td className="px-4 py-3 text-sm font-body text-muted-foreground truncate max-w-[200px]">
+                                {d.motivo || '—'}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openDetail(d); }}>
+                                      <Eye className="h-3.5 w-3.5 mr-2" />Ver Detalhes
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate('/calculadora-rescisao'); }}>
+                                      <Calculator className="h-3.5 w-3.5 mr-2" />Calcular Rescisão
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={(e) => handleExcluir(d.id, e)} className="text-destructive focus:text-destructive">
+                                      <Trash2 className="h-3.5 w-3.5 mr-2" />Excluir
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </motion.tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mobile card list */}
+                    <div className="md:hidden divide-y divide-border/20">
                       {filtered.map((d: any, i: number) => (
-                        <motion.tr
+                        <motion.div
                           key={d.id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: i * 0.02 }}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.03 }}
                           onClick={() => openDetail(d)}
-                          className="border-b border-border/20 hover:bg-muted/20 cursor-pointer transition-colors group"
+                          className="p-4 hover:bg-muted/20 cursor-pointer transition-colors active:bg-muted/30"
                         >
-                          <td className="px-4 py-3">
+                          <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2.5">
-                              <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
-                                <span className="text-xs font-display font-bold text-destructive">
+                              <div className="h-9 w-9 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+                                <span className="text-sm font-display font-bold text-destructive">
                                   {(d.colaborador?.nome_completo || 'C')[0]}
                                 </span>
                               </div>
-                              <span className="text-sm font-body font-medium">{d.colaborador?.nome_completo || '—'}</span>
+                              <div>
+                                <p className="text-sm font-body font-semibold">{d.colaborador?.nome_completo || '—'}</p>
+                                <p className="text-[11px] font-body text-muted-foreground">
+                                  {d.data_desligamento ? new Date(d.data_desligamento).toLocaleDateString('pt-BR') : '—'}
+                                </p>
+                              </div>
                             </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm font-body text-muted-foreground">
-                            {d.data_desligamento ? new Date(d.data_desligamento).toLocaleDateString('pt-BR') : '—'}
-                          </td>
-                          <td className="px-4 py-3"><TipoBadge tipo={d.tipo} /></td>
-                          <td className="px-4 py-3"><StatusBadge status={d.status} /></td>
-                          <td className="px-4 py-3 text-sm font-body font-medium">
-                            {d.valor_liquido ? `R$ ${d.valor_liquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}
-                          </td>
-                          <td className="px-4 py-3 text-sm font-body text-muted-foreground truncate max-w-[200px]">
-                            {d.motivo || '—'}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openDetail(d); }}>
-                                  <Eye className="h-3.5 w-3.5 mr-2" />Ver Detalhes
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate('/calculadora-rescisao'); }}>
-                                  <Calculator className="h-3.5 w-3.5 mr-2" />Calcular Rescisão
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={(e) => handleExcluir(d.id, e)} className="text-destructive focus:text-destructive">
-                                  <Trash2 className="h-3.5 w-3.5 mr-2" />Excluir
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </td>
-                        </motion.tr>
+                            <div className="text-right">
+                              <p className="text-sm font-display font-bold">
+                                {d.valor_liquido ? `R$ ${d.valor_liquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <TipoBadge tipo={d.tipo} />
+                            <StatusBadge status={d.status} />
+                          </div>
+                        </motion.div>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </div>
 
-                {/* Mobile card list */}
-                <div className="md:hidden divide-y divide-border/20">
-                  {filtered.map((d: any, i: number) => (
-                    <motion.div
-                      key={d.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.03 }}
-                      onClick={() => openDetail(d)}
-                      className="p-4 hover:bg-muted/20 cursor-pointer transition-colors active:bg-muted/30"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2.5">
-                          <div className="h-9 w-9 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
-                            <span className="text-sm font-display font-bold text-destructive">
-                              {(d.colaborador?.nome_completo || 'C')[0]}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-body font-semibold">{d.colaborador?.nome_completo || '—'}</p>
-                            <p className="text-[11px] font-body text-muted-foreground">
-                              {d.data_desligamento ? new Date(d.data_desligamento).toLocaleDateString('pt-BR') : '—'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-display font-bold">
-                            {d.valor_liquido ? `R$ ${d.valor_liquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '—'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <TipoBadge tipo={d.tipo} />
-                        <StatusBadge status={d.status} />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                    {/* Pagination info */}
+                    <div className="px-4 py-3 border-t border-border/20 text-xs font-body text-muted-foreground">
+                      Exibindo {filtered.length} de {desligamentos.length} desligamentos
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </div>
+        </TabsContent>
 
-                {/* Pagination info */}
-                <div className="px-4 py-3 border-t border-border/20 text-xs font-body text-muted-foreground">
-                  Exibindo {filtered.length} de {desligamentos.length} desligamentos
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </div>
+        <TabsContent value="auditoria">
+           <PontoAuditTimeline filterTabela="desligamentos" />
+        </TabsContent>
+      </Tabs>
+
 
       {/* Detail Sheet */}
       <DesligamentoDetailSheet
