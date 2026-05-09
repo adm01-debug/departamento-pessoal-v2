@@ -8,7 +8,7 @@ import {
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
   Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
-  Download, ListChecks, CheckCircle, AlertOctagon, Bell
+  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
