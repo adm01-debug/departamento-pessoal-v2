@@ -29,6 +29,9 @@ const eventConfig: Record<string, { icon: LucideIcon; gradient: string }> = {
   folha: { icon: FileText, gradient: 'from-primary to-primary-glow' },
   ponto: { icon: Clock, gradient: 'from-primary to-primary-glow' },
   alerta: { icon: AlertTriangle, gradient: 'from-warning to-destructive' },
+  compliance: { icon: ShieldCheck, gradient: 'from-destructive to-destructive/70' },
+  geofencing: { icon: MapPin, gradient: 'from-warning to-warning/70' },
+  timezone: { icon: Globe, gradient: 'from-info to-info/70' }
 };
 
 interface EventTimelineProps {
