@@ -88,7 +88,7 @@ export default function ConfiguracoesPage() {
       icon={<Settings className="h-5 w-5 text-primary-foreground" />}
       gradient="from-muted-foreground to-foreground"
     >
-      <Tabs defaultValue="geral" className="space-y-4">
+      <Tabs defaultValue="empresa" className="space-y-4">
         <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 overflow-x-auto no-scrollbar flex-nowrap w-full h-auto">
           <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Preferências</TabsTrigger>
           <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Empresa</TabsTrigger>
