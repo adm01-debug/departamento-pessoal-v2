@@ -52,7 +52,7 @@ export const securityService = {
       .select('*')
       .order('created_at', { ascending: false });
     if (error) throw error;
-    return (data || []) as BlockedIp[];
+    return (data || []) as unknown as BlockedIp[];
   },
 
   async unblockIp(id: string) {
@@ -70,7 +70,7 @@ export const securityService = {
       .order('created_at', { ascending: false })
       .limit(100);
     if (error) throw error;
-    return (data || []) as LoginAttempt[];
+    return (data || []) as unknown as LoginAttempt[];
   },
 
   async getSecurityAlerts(): Promise<SecurityAlert[]> {
@@ -80,7 +80,7 @@ export const securityService = {
       .order('created_at', { ascending: false })
       .limit(100);
     if (error) throw error;
-    return (data || []) as SecurityAlert[];
+    return (data || []) as unknown as SecurityAlert[];
   },
 
   async getGeoBlockedAttempts(): Promise<GeoBlockedAttempt[]> {
@@ -90,9 +90,8 @@ export const securityService = {
       .order('created_at', { ascending: false })
       .limit(100);
     if (error) throw error;
-    return (data || []) as GeoBlockedAttempt[];
+    return (data || []) as unknown as GeoBlockedAttempt[];
   },
-// ... keep existing code
 
   async getRateLimitLogs() {
     const { data, error } = await supabase
