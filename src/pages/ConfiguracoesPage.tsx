@@ -123,7 +123,26 @@ export default function ConfiguracoesPage() {
             </Card>
           </motion.div>
         </TabsContent>
-
+        <TabsContent value="notificacoes">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+                <CardHeader>
+                   <CardTitle className="font-display">Central de Notificações</CardTitle>
+                   <CardDescription>Configure como e quando o sistema deve alertar os usuários</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 font-body">
+                   <FormSwitch label="Novas Admissões" description="Notificar gestores sobre novos processos" />
+                   <FormSwitch label="Férias Pendentes" description="Alertar sobre solicitações aguardando aprovação" />
+                   <FormSwitch label="Vencimento de Exames" description="Avisar 15 dias antes do vencimento de ASOs" />
+                   <FormSwitch label="Logs de Erro" description="Notificar administradores sobre falhas em integrações" />
+                   <div className="pt-2">
+                      <Button className="rounded-xl shadow-glow">Salvar Preferências</Button>
+                   </div>
+                </CardContent>
+             </Card>
+          </motion.div>
+        </TabsContent>
         <TabsContent value="folha">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
