@@ -48,7 +48,12 @@ export default function TurnosPage() {
   return (
     <>
     <PageTitle title="Turnos" description="Gestão de turnos de trabalho" />
-    <PageLayout title="Planejamento de Turnos & Escalas">
+    <PageLayout 
+      title="Turnos & Escalas" 
+      description="Planejamento de jornadas de trabalho"
+      icon={<CalendarClock className="h-5 w-5 text-primary-foreground" />}
+      gradient="from-primary to-primary-glow"
+    >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card><CardContent className="pt-4 flex items-center gap-3"><CalendarClock className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">{turnos.length}</p><p className="text-xs text-muted-foreground">Turnos cadastrados</p></div></CardContent></Card>
         <Card><CardContent className="pt-4 flex items-center gap-3"><Users className="h-8 w-8 text-info" /><div><p className="text-2xl font-bold">{escalas.length}</p><p className="text-xs text-muted-foreground">Escalas agendadas</p></div></CardContent></Card>
