@@ -32,7 +32,7 @@ export const feriasPDF = {
         ['Adiantamento 13º', solicitacao.adiantamento_13 ? 'Sim' : 'Não'],
       ],
       theme: 'striped',
-      headStyles: { fillStyle: 'F', fillColor: [52, 152, 219], textColor: [255, 255, 255] },
+      headStyles: { fillColor: [52, 152, 219], textColor: [255, 255, 255] },
     });
 
     // Texto Legal

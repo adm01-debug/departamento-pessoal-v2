@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { UserCheck, Shield, Building2, X, Ban } from 'lucide-react';
+import { UserCheck, Shield, Building2, X, Ban, FileDown } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { feriasPDF } from '@/utils/feriasPDF';
 
 interface FeriasActionsProps {
   solicitacao: Record<string, any>;
