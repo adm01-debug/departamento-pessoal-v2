@@ -206,13 +206,19 @@ export function Sidebar({ collapsed = false, className, pendingCounts, onToggle 
               <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success animate-pulse-glow" />
             </div>
             {!collapsed && (
-              <div>
+              <div className="flex-1">
                 <h1 className="font-display font-bold text-lg tracking-tight text-foreground">
                   Dept. Pessoal
                 </h1>
                 <p className="text-overline text-muted-foreground">Sistema DP</p>
               </div>
             )}
+            <button 
+              onClick={onToggle}
+              className="p-1.5 rounded-lg hover:bg-sidebar-accent text-muted-foreground hover:text-foreground transition-colors hidden lg:block"
+            >
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
           </div>
         </div>
 
