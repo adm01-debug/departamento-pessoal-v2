@@ -4,18 +4,21 @@ export const contratacaoService = {
   async gerarTemplateContrato(admissaoId: string) {
     const { data: admissao, error } = await supabase
       .from('admissoes')
-      .select('*, empresa:empresas(*)')
+      .select('*, empresa:empresas!admissoes_empresa_id_fkey(*)')
       .eq('id', admissaoId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!admissao) throw new Error('Admissão não encontrada');
+
+    const empresa: any = admissao.empresa;
 
     // Template básico de contrato
     return `
       CONTRATO INDIVIDUAL DE TRABALHO
       
-      EMPREGADOR: ${admissao.empresa?.razao_social}
-      CNPJ: ${admissao.empresa?.cnpj || '—'}
+      EMPREGADOR: ${empresa?.razao_social || '—'}
+      CNPJ: ${empresa?.cnpj || '—'}
       
       EMPREGADO: ${admissao.nome}
       CPF: ${admissao.cpf || '—'}
