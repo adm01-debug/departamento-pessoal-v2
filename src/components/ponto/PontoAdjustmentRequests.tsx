@@ -78,9 +78,8 @@ export function PontoAdjustmentRequests() {
     }
   });
 
-  const showAudit = (solicitacao: any) => {
-    const logs = auditLogs.filter((log: any) => log.ponto_id === solicitacao.id);
-    setSelectedAudit(logs);
+  const showDetails = (solicitacao: any) => {
+    setSelectedRequest(solicitacao);
   };
 
   if (isLoading) return <div>Carregando...</div>;
