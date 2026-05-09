@@ -59,7 +59,7 @@ export default function EPIsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['epis'] });
       setOpenEpi(false);
-      setFormEpi({ nome: '', ca: '', validade_meses: '', categoria: 'cabeca' });
+      setFormEpi({ nome: '', ca: '', validade_meses: '', categoria: 'cabeca', ca_validade: '' });
       toast.success('EPI cadastrado!');
     },
     onError: (e: Error) => toast.error(e.message),
