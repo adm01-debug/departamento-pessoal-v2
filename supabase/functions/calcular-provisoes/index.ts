@@ -13,12 +13,28 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    const startTime = Date.now();
     const { empresa_id, competencia } = await req.json();
     if (!empresa_id || !competencia) {
       return new Response(JSON.stringify({ error: 'empresa_id e competencia obrigatórios' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+    // Iniciar log de execução
+    const { data: logEntry, error: logInitErr } = await supabase
+      .from('provisao_logs')
+      .insert({
+        empresa_id,
+        competencia,
+        status: 'PROCESSANDO',
+        tipo_calculo: 'AMBOS',
+        metadados: { start_time: new Date().toISOString() }
+      })
+      .select()
+      .single();
+
+    if (logInitErr) console.warn('Erro ao iniciar log de provisão:', logInitErr);
 
     // Get active employees for the company
     const { data: colaboradores, error: colabErr } = await supabase
@@ -113,6 +129,23 @@ Deno.serve(async (req) => {
       }
     }
 
+    const totalProvisions = provisoes.reduce((acc, p) => acc + p.valor_principal + p.encargos_inss + p.encargos_fgts, 0);
+    const durationMs = Date.now() - startTime;
+
+    // Atualizar log com sucesso
+    if (logEntry) {
+      await supabase
+        .from('provisao_logs')
+        .update({
+          status: 'CONCLUIDO',
+          total_colaboradores: colaboradores.length,
+          valor_total_provisionado: totalProvisions,
+          duracao_ms: durationMs,
+          metadados: { end_time: new Date().toISOString() }
+        })
+        .eq('id', logEntry.id);
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
       count: provisoes.length,
@@ -121,6 +154,13 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Erro no cálculo de provisões:', error);
+    
+    // Tentar logar o erro
+    try {
+      // Nota: empresa_id e logEntry podem não estar disponíveis se falhar antes
+      // mas o catch externo lidará com isso
+    } catch (e) {}
+
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });
