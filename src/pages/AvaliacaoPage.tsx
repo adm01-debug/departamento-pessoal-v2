@@ -227,24 +227,51 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Título</TableHead><TableHead>Colaborador</TableHead><TableHead>Tipo</TableHead><TableHead>Progresso</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Meta / OKR</TableHead>
+                    <TableHead className="font-display font-semibold">Responsável</TableHead>
+                    <TableHead className="font-display font-semibold">Tipo</TableHead>
+                    <TableHead className="font-display font-semibold">Progresso</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {metas.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhuma meta cadastrada</TableCell></TableRow> :
+                  {metas.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhuma meta estratégica definida</TableCell></TableRow> :
                     metas.map((m: any) => (
-                      <TableRow key={m.id}>
-                        <TableCell className="font-medium">{m.titulo}</TableCell>
-                        <TableCell>{m.colaborador?.nome_completo || '—'}</TableCell>
-                        <TableCell>{m.tipo}</TableCell>
-                        <TableCell>{m.progresso ?? 0}%</TableCell>
-                        <TableCell><Badge variant={(statusColors[m.status] || 'secondary') as any}>{m.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirMeta.mutate(m.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={m.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{m.titulo}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[200px]">{m.descricao}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="font-body text-xs">{m.colaborador?.nome_completo || '—'}</TableCell>
+                        <TableCell><Badge variant="outline" className="capitalize text-[10px]">{m.tipo}</Badge></TableCell>
+                        <TableCell className="w-[150px]">
+                           <div className="flex items-center gap-2">
+                              <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
+                                 <div className="h-full bg-primary" style={{ width: `${m.progresso ?? 0}%` }} />
+                              </div>
+                              <span className="text-[10px] font-mono font-bold">{m.progresso ?? 0}%</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[m.status] || 'secondary') as any} className="text-[10px]">{m.status}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirMeta.mutate(m.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* FEEDBACKS */}
