@@ -3221,6 +3221,53 @@ export type Database = {
           },
         ]
       }
+      configuracoes_ponto: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          exige_geolocalizacao: boolean | null
+          exige_reconhecimento_facial: boolean | null
+          id: string
+          intervalo_minimo_minutos: number | null
+          permite_ponto_offline: boolean | null
+          raio_maximo_metros: number | null
+          tolerancia_minutos: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          exige_geolocalizacao?: boolean | null
+          exige_reconhecimento_facial?: boolean | null
+          id?: string
+          intervalo_minimo_minutos?: number | null
+          permite_ponto_offline?: boolean | null
+          raio_maximo_metros?: number | null
+          tolerancia_minutos?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          exige_geolocalizacao?: boolean | null
+          exige_reconhecimento_facial?: boolean | null
+          id?: string
+          intervalo_minimo_minutos?: number | null
+          permite_ponto_offline?: boolean | null
+          raio_maximo_metros?: number | null
+          tolerancia_minutos?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contas_bancarias: {
         Row: {
           agencia: string | null
@@ -10782,6 +10829,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           data: string
+          dispositivo_id: string | null
           empresa_id: string | null
           entrada_1: string | null
           entrada_2: string | null
@@ -10790,6 +10838,7 @@ export type Database = {
           entrada_5: string | null
           entrada_6: string | null
           entrada_esperada: string | null
+          hash_digital: string | null
           horas_extras: string | null
           horas_falta: string | null
           horas_trabalhadas: string | null
@@ -10806,9 +10855,11 @@ export type Database = {
           saida_antecipada_minutos: number | null
           saida_esperada: string | null
           saida_intervalo: string | null
+          timezone: string | null
           tipo_dia: string | null
           total_batidas: number | null
           updated_at: string
+          versao_app: string | null
         }
         Insert: {
           aprovado?: boolean | null
@@ -10819,6 +10870,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data: string
+          dispositivo_id?: string | null
           empresa_id?: string | null
           entrada_1?: string | null
           entrada_2?: string | null
@@ -10827,6 +10879,7 @@ export type Database = {
           entrada_5?: string | null
           entrada_6?: string | null
           entrada_esperada?: string | null
+          hash_digital?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
@@ -10843,9 +10896,11 @@ export type Database = {
           saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
+          timezone?: string | null
           tipo_dia?: string | null
           total_batidas?: number | null
           updated_at?: string
+          versao_app?: string | null
         }
         Update: {
           aprovado?: boolean | null
@@ -10856,6 +10911,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data?: string
+          dispositivo_id?: string | null
           empresa_id?: string | null
           entrada_1?: string | null
           entrada_2?: string | null
@@ -10864,6 +10920,7 @@ export type Database = {
           entrada_5?: string | null
           entrada_6?: string | null
           entrada_esperada?: string | null
+          hash_digital?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
@@ -10880,9 +10937,11 @@ export type Database = {
           saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
+          timezone?: string | null
           tipo_dia?: string | null
           total_batidas?: number | null
           updated_at?: string
+          versao_app?: string | null
         }
         Relationships: [
           {
