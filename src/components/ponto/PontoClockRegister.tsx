@@ -176,6 +176,62 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
           </p>
         </CardContent>
       </Card>
+
+      <Dialog open={showFaceScan} onOpenChange={setShowFaceScan}>
+        <DialogContent className="sm:max-w-md bg-slate-900 border-slate-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-center flex items-center justify-center gap-2 text-primary-glow">
+              <Scan className="h-5 w-5" /> Autenticação Biométrica Facial
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="relative w-64 h-64 rounded-full border-4 border-primary/30 overflow-hidden flex items-center justify-center bg-slate-800 shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+              {/* Fake scan line */}
+              <motion.div 
+                animate={{ top: ['0%', '100%', '0%'] }} 
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="absolute left-0 right-0 h-1 bg-primary-glow/60 shadow-[0_0_15px_rgba(34,197,94,1)] z-10" 
+              />
+              
+              <Camera className="h-20 w-20 text-slate-600" />
+              
+              {/* Progress Ring */}
+              <svg className="absolute inset-0 w-full h-full -rotate-90">
+                <circle
+                  cx="128"
+                  cy="128"
+                  r="120"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="transparent"
+                  className="text-primary/20"
+                />
+                <circle
+                  cx="128"
+                  cy="128"
+                  r="120"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="transparent"
+                  strokeDasharray={2 * Math.PI * 120}
+                  strokeDashoffset={2 * Math.PI * 120 * (1 - scanProgress / 100)}
+                  className="text-primary-glow transition-all duration-300"
+                />
+              </svg>
+            </div>
+            
+            <div className="mt-8 text-center space-y-2">
+              <p className="text-sm font-medium animate-pulse text-primary-glow">
+                {scanProgress < 100 ? 'Analisando biometria...' : '✅ Identidade Confirmada!'}
+              </p>
+              <div className="flex items-center gap-2 justify-center text-[10px] text-slate-400">
+                <ShieldCheck className="h-3 w-3" />
+                <span>Protocolo de Segurança MTP 671 Ativo</span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
