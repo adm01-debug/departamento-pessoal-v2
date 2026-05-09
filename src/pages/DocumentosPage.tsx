@@ -8,15 +8,16 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { documentoService } from '@/services';
-import { FileText, Upload, Download, Eye, Trash2, Loader2, File } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG', 'CPF', 'CTPS', 'Comprovante', 'Outro'];
@@ -28,6 +29,9 @@ export default function DocumentosPage() {
   const [tipo, setTipo] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
+  const [ocrResult, setOcrResult] = useState<any>(null);
+  const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: documentos, isLoading } = useQuery({
@@ -91,6 +95,26 @@ export default function DocumentosPage() {
       toast.error(e.message);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleOCR = async (doc: any) => {
+    setSelectedDocForOcr(doc);
+    setOcrResult(null);
+    setIsProcessingOcr(true);
+    try {
+      const path = doc.storage_path || doc.url?.split(`${BUCKET}/`).pop();
+      const result = await edgeFunctionsService.ocrDocumento({
+        bucket: BUCKET,
+        filePath: path,
+        documentType: (doc.tipo || '').toLowerCase() as any,
+      });
+      setOcrResult(result);
+      toast.success('Processamento concluído!');
+    } catch (e: any) {
+      toast.error(`Erro no OCR: ${e.message}`);
+    } finally {
+      setIsProcessingOcr(false);
     }
   };
 
@@ -181,6 +205,9 @@ export default function DocumentosPage() {
                   <TableCell className="font-body">{doc.created_at ? new Date(doc.created_at).toLocaleDateString('pt-BR') : '-'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary" onClick={() => handleOCR(doc)} title="Analisar com IA">
+                        <Sparkles className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10" onClick={() => handleView(doc)} title="Visualizar">
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -198,6 +225,64 @@ export default function DocumentosPage() {
           </Table>
         </motion.div>
       )}
+
+      {/* OCR Dialog */}
+      <Dialog open={!!selectedDocForOcr} onOpenChange={(o) => { if(!o) setSelectedDocForOcr(null); }}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <DialogTitle className="font-display">Análise de Documento (IA)</DialogTitle>
+            </div>
+            <DialogDescription>
+              Processando o arquivo <span className="font-semibold">{selectedDocForOcr?.nome || 'documento'}</span> para extração automática de dados.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-6 min-h-[200px] flex flex-col items-center justify-center border rounded-2xl bg-muted/20">
+            {isProcessingOcr ? (
+              <div className="text-center space-y-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
+                <div className="space-y-1">
+                  <p className="font-display font-bold">Extraindo dados...</p>
+                  <p className="text-xs text-muted-foreground">Isso pode levar alguns segundos</p>
+                </div>
+              </div>
+            ) : ocrResult ? (
+              <div className="w-full p-4 space-y-4">
+                <div className="flex items-center gap-2 text-success font-bold text-sm">
+                  <CheckCircle2 className="h-4 w-4" /> Dados Extraídos com Sucesso
+                </div>
+                <div className="space-y-2">
+                  {Object.entries(ocrResult.data || {}).map(([key, value]: [string, any]) => (
+                    <div key={key} className="flex justify-between border-b border-border/10 py-1.5 text-xs">
+                      <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}:</span>
+                      <span className="font-mono font-medium">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+                <Button className="w-full rounded-xl gap-2" onClick={() => {
+                  toast.info('Dados prontos para preenchimento automático!');
+                  setSelectedDocForOcr(null);
+                }}>
+                  <Languages className="h-4 w-4" /> Aplicar ao Cadastro
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground p-8">
+                <FileText className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                <p className="text-sm">Selecione um documento para análise.</p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedDocForOcr(null)} className="rounded-xl">Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Upload Dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
