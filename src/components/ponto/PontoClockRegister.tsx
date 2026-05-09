@@ -152,7 +152,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
             {buttons.map(({ tipo, label, icon: Icon, gradient }) => (
               <Button
                 key={tipo}
-                onClick={() => handleOfflineRegister(tipo)}
+                onClick={() => startScan(tipo)}
                 disabled={loading !== null}
                 className={cn(
                   'h-12 rounded-xl bg-gradient-to-r text-primary-foreground hover:opacity-90 shadow-lg transition-all font-body font-medium',
