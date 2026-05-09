@@ -18,10 +18,16 @@ export const rescisaoService = {
     const indexAtual = ORDEM_ETAPAS.indexOf(atual.etapa || 'comunicacao');
     const indexNova = ORDEM_ETAPAS.indexOf(novaEtapa);
     
-    // Bloqueia saltar etapas (não permite ir de comunicacao direto para calculado sem passar por documentacao)
+    // Bloqueia saltar etapas ou voltar etapas sem autorização explícita (Opcional, mas recomendado para consistência)
     if (indexNova > indexAtual + 1) {
-      throw new Error(`Transição inválida: A etapa '${novaEtapa}' exige que a etapa anterior '${ORDEM_ETAPAS[indexNova-1]}' esteja concluída.`);
+      throw new Error(`Transição bloqueada: Você deve concluir a etapa '${ORDEM_ETAPAS[indexAtual]}' e passar por '${ORDEM_ETAPAS[indexAtual + 1]}' antes de chegar em '${novaEtapa}'.`);
     }
+    
+    // Validação específica: Para ir de cálculo para homologação, precisa ter valor líquido
+    if (novaEtapa === 'homologacao' && atual.status !== 'calculado') {
+       throw new Error('A rescisão precisa estar com status "calculado" para prosseguir para a homologação.');
+    }
+
     
     return true;
   },
@@ -98,11 +104,27 @@ export const rescisaoService = {
   },
 
   async homologar(id: string) {
+    // Buscar desligamento para validar se o cálculo já foi feito
+    const { data: d, error: fetchError } = await supabase
+      .from('desligamentos')
+      .select('valor_liquido, etapa, checklist_calculo_rescisao')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) throw fetchError;
+    if (!d.valor_liquido || !d.checklist_calculo_rescisao) {
+      throw new Error('A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.');
+    }
+
     await this.validarTransicao(id, 'homologacao');
 
     const { data, error } = await supabase
       .from('desligamentos')
-      .update({ status: 'homologado', etapa: 'pagamento', checklist_homologacao: true })
+      .update({ 
+        status: 'homologado', 
+        etapa: 'pagamento', 
+        checklist_homologacao: true 
+      })
       .eq('id', id)
       .select()
       .single();
@@ -113,10 +135,16 @@ export const rescisaoService = {
       tabela: 'desligamentos',
       registro_id: id,
       acao: 'UPDATE',
-      dados_novos: { status: 'homologado', etapa: 'pagamento', evento: 'HOMOLOGACAO_CONCLUIDA' },
+      dados_novos: { 
+        status: 'homologado', 
+        etapa: 'pagamento', 
+        evento: 'HOMOLOGACAO_CONCLUIDA',
+        timestamp_assinatura: new Date().toISOString()
+      },
     });
 
     return data;
   }
+
 };
 

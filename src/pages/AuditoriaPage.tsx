@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
@@ -18,6 +18,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const acaoColors: Record<string, string> = {
   INSERT: 'bg-success/15 text-success border-0',
@@ -27,20 +28,32 @@ const acaoColors: Record<string, string> = {
 
 export default function AuditoriaPage() {
   const [search, setSearch] = useState('');
+  const [tabelaFilter, setTabelaFilter] = useState('todos');
+  const [acaoFilter, setAcaoFilter] = useState('todos');
   const [selectedLog, setSelectedLog] = useState<any>(null);
   const { exportarExcel } = useExcelExport();
 
   const { data: logs, isLoading } = useQuery({
     queryKey: ['auditoria'],
-    queryFn: () => auditoriaService.listar({ limite: 200 }),
+    queryFn: () => auditoriaService.listar({ limite: 500 }),
   });
 
-  const filtered = logs?.filter((l: any) =>
-    !search || 
-    (l.tabela || '').toLowerCase().includes(search.toLowerCase()) || 
-    (l.user_email || '').toLowerCase().includes(search.toLowerCase()) ||
-    (l.acao || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const uniqueTables = useMemo(() => {
+    if (!logs) return [];
+    return Array.from(new Set(logs.map((l: any) => l.tabela))).sort();
+  }, [logs]);
+
+  const filtered = useMemo(() => {
+    return logs?.filter((l: any) => {
+      const matchSearch = !search || 
+        (l.user_email || '').toLowerCase().includes(search.toLowerCase()) ||
+        (l.registro_id || '').toLowerCase().includes(search.toLowerCase());
+      const matchTabela = tabelaFilter === 'todos' || l.tabela === tabelaFilter;
+      const matchAcao = acaoFilter === 'todos' || l.acao === acaoFilter;
+      return matchSearch && matchTabela && matchAcao;
+    });
+  }, [logs, search, tabelaFilter, acaoFilter]);
+
   const handleExport = () => {
     if (!filtered?.length) return;
     exportarExcel(
@@ -78,7 +91,41 @@ export default function AuditoriaPage() {
         </Button>
       }
     >
-      <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por tabela ou usuário..." />
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <DataTableToolbar 
+            search={search} 
+            onSearchChange={setSearch} 
+            searchPlaceholder="Buscar por usuário ou ID do registro..." 
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={tabelaFilter} onValueChange={setTabelaFilter}>
+            <SelectTrigger className="w-[180px] rounded-xl">
+              <SelectValue placeholder="Tabela" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as Tabelas</SelectItem>
+              {uniqueTables.map(t => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={acaoFilter} onValueChange={setAcaoFilter}>
+            <SelectTrigger className="w-[150px] rounded-xl">
+              <SelectValue placeholder="Ação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as Ações</SelectItem>
+              <SelectItem value="INSERT">Inclusão</SelectItem>
+              <SelectItem value="UPDATE">Alteração</SelectItem>
+              <SelectItem value="DELETE">Exclusão</SelectItem>
+              <SelectItem value="EXECUTE_CALC">Cálculo</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
 
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
