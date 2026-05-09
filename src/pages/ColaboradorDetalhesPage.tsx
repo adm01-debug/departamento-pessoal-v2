@@ -8,10 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { colaboradorService } from '@/services';
 import {
-  ArrowLeft, Users, Phone, DollarSign, Stethoscope,
-  GraduationCap, Globe, Accessibility, Calendar, StickyNote,
-  Landmark, FileText, BookOpen, FileStack, Briefcase, ShieldCheck,
-  MapPin, Info, Edit, MoreHorizontal, Camera, User
+  ArrowLeft, Users, Briefcase, ShieldCheck,
+  Landmark, FileText, Info, Edit, MoreHorizontal, History as HistoryIcon,
+  MapPin, Calendar, Stethoscope, User as UserIcon
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
@@ -41,12 +40,6 @@ export default function ColaboradorDetalhesPage() {
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><Spinner /></div>;
   if (!colaborador) return <div className="p-6">Colaborador não encontrado</div>;
-
-  const sections = [
-    { id: 'pessoal', label: 'Pessoal', icon: User, tabs: ['dependentes', 'emergencia', 'pcd', 'estrangeiro'] },
-    { id: 'carreira', label: 'Carreira', icon: Briefcase, tabs: ['experiencia', 'formacao', 'aso', 'contratos', 'historico'] },
-    { id: 'administrativo', label: 'Administrativo', icon: ShieldCheck, tabs: ['contas', 'documentos', 'aquisitivos', 'anotacoes', 'estagiario'] },
-  ];
 
   return (
     <>
@@ -93,7 +86,7 @@ export default function ColaboradorDetalhesPage() {
             <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="relative group">
                 <div className="h-24 w-24 rounded-3xl bg-muted flex items-center justify-center border-2 border-border/30 overflow-hidden">
-                  <User className="h-10 w-10 text-muted-foreground/30" />
+                  <UserIcon className="h-10 w-10 text-muted-foreground/30" />
                   {colaborador.foto_url && <img src={colaborador.foto_url} alt={colaborador.nome_completo} className="h-full w-full object-cover" />}
                 </div>
                 <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-success border-2 border-card flex items-center justify-center">
@@ -146,7 +139,7 @@ export default function ColaboradorDetalhesPage() {
               <FileText className="h-4 w-4" /> Documentação
             </TabsTrigger>
             <TabsTrigger value="historico" className="rounded-lg font-body px-6 gap-2">
-              <History className="h-4 w-4" /> Histórico
+              <HistoryIcon className="h-4 w-4" /> Histórico
             </TabsTrigger>
           </TabsList>
 

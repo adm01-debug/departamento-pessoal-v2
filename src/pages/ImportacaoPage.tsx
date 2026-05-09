@@ -1,19 +1,17 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useState, useRef, useCallback } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useRef } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/integrations/supabase/client';
-import { useEmpresa } from '@/contexts';
-import { Upload, FileSpreadsheet, CheckCircle, AlertTriangle, XCircle, Download, Loader2, FileText, Users } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, FileSpreadsheet, CheckCircle, AlertTriangle, XCircle, Download, Loader2, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
+import { useImportacaoColaboradores } from '@/hooks/useImportacaoColaboradores';
 
 interface ImportRow {
   nome_completo: string;
@@ -74,146 +72,30 @@ function mapColumns(headers: string[]): Record<number, string> {
 }
 
 export default function ImportacaoPage() {
-  const { empresaAtual } = useEmpresa();
   const fileRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<'upload' | 'preview' | 'importing' | 'done'>('upload');
-  const [rows, setRows] = useState<ImportRow[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [importResult, setImportResult] = useState({ success: 0, errors: 0, duplicates: 0 });
-  const queryClient = useQueryClient();
+  const { rows, progress, isImporting, processarArquivo, importar, setRows } = useImportacaoColaboradores();
 
-  const handleFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [importResult, setImportResult] = useState({ success: 0, errors: 0, duplicates: 0 });
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    if (!['xlsx', 'xls', 'csv'].includes(ext || '')) {
-      toast.error('Formato inválido. Use Excel (.xlsx, .xls) ou CSV');
-      return;
-    }
-
     try {
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rawData = XLSX.utils.sheet_to_json<any>(sheet, { header: 1 });
-
-      if (rawData.length < 2) { toast.error('Planilha vazia ou sem dados'); return; }
-
-      const headers = rawData[0] as string[];
-      const colMap = mapColumns(headers);
-
-      if (!Object.values(colMap).includes('nome_completo')) {
-        toast.error('Coluna "Nome" não encontrada. Verifique a planilha.');
-        return;
-      }
-
-      // Check existing CPFs
-      const { data: existingCols } = await supabase.from('colaboradores').select('cpf').eq('empresa_id', empresaAtual?.id || '');
-      const existingCPFs = new Set((existingCols || []).map((c: any) => normalizarCPF(c.cpf)));
-
-      const parsed: ImportRow[] = [];
-      for (let i = 1; i < rawData.length; i++) {
-        const row = rawData[i] as any[];
-        if (!row || row.every(c => !c)) continue;
-
-        const item: any = {};
-        Object.entries(colMap).forEach(([colIdx, field]) => {
-          item[field] = row[Number(colIdx)]?.toString()?.trim() || '';
-        });
-
-        const erros: string[] = [];
-        if (!item.nome_completo) erros.push('Nome obrigatório');
-
-        const cpfClean = normalizarCPF(item.cpf || '');
-        if (cpfClean && !validarCPF(cpfClean)) erros.push('CPF inválido');
-
-        const isDuplicate = cpfClean && existingCPFs.has(cpfClean);
-        if (isDuplicate) erros.push('CPF já cadastrado');
-
-        // Parse dates
-        if (item.data_admissao) {
-          const d = parseDate(item.data_admissao);
-          item.data_admissao = d || item.data_admissao;
-        }
-        if (item.data_nascimento) {
-          const d = parseDate(item.data_nascimento);
-          item.data_nascimento = d || item.data_nascimento;
-        }
-
-        if (item.salario_base) item.salario_base = Number(String(item.salario_base).replace(/[^\d.,]/g, '').replace(',', '.'));
-
-        parsed.push({
-          ...item,
-          cpf: cpfClean,
-          status: isDuplicate ? 'duplicado' : erros.length > 0 ? 'erro' : 'valido',
-          erros,
-        });
-      }
-
-      setRows(parsed);
+      await processarArquivo(file);
       setStep('preview');
-      toast.success(`${parsed.length} registros encontrados`);
-    } catch (err: any) {
-      toast.error(`Erro ao ler arquivo: ${err.message}`);
-    }
-  }, [empresaAtual]);
-
-  function parseDate(val: any): string | null {
-    if (!val) return null;
-    // Excel date serial
-    if (typeof val === 'number') {
-      const d = new Date((val - 25569) * 86400 * 1000);
-      return d.toISOString().split('T')[0];
-    }
-    // DD/MM/YYYY
-    const parts = String(val).match(/(\d{2})\/(\d{2})\/(\d{4})/);
-    if (parts) return `${parts[3]}-${parts[2]}-${parts[1]}`;
-    // Try ISO
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
-  }
+    } catch (err) {}
+  };
 
   const handleImport = async () => {
-    const validos = rows.filter(r => r.status === 'valido');
-    if (!validos.length) { toast.error('Nenhum registro válido para importar'); return; }
-
-    setStep('importing');
-    let success = 0, errors = 0;
-
-    for (let i = 0; i < validos.length; i++) {
-      const row = validos[i];
-      try {
-        const insertData: any = {
-          nome_completo: row.nome_completo,
-          cpf: row.cpf || null,
-          email: row.email || null,
-          telefone: row.telefone || null,
-          cargo: row.cargo || 'A definir',
-          departamento: row.departamento || null,
-          salario_base: row.salario_base || 0,
-          data_admissao: row.data_admissao || new Date().toISOString().split('T')[0],
-          data_nascimento: row.data_nascimento || null,
-          pis: row.pis || null,
-          rg: row.rg || null,
-          empresa_id: empresaAtual?.id,
-          status: 'ativo',
-        };
-        const { error } = await supabase.from('colaboradores').insert(insertData as any);
-        if (error) throw error;
-        success++;
-      } catch (err) {
-        console.error('Erro ao importar registro:', err);
-        errors++;
-      }
-      setProgress(Math.round(((i + 1) / validos.length) * 100));
-    }
-
-    const duplicates = rows.filter(r => r.status === 'duplicado').length;
-    setImportResult({ success, errors, duplicates });
+    await importar();
+    // Simplified result fetch for UI consistency
+    setImportResult({ 
+        success: rows.filter(r => r.status === 'valido').length, 
+        errors: rows.filter(r => r.status === 'erro').length, 
+        duplicates: rows.filter(r => r.status === 'duplicado').length 
+    });
     setStep('done');
-    queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
-    toast.success(`${success} colaboradores importados!`);
   };
 
   const downloadTemplate = () => {
@@ -368,7 +250,7 @@ export default function ImportacaoPage() {
             <Card className="border-border/30 rounded-xl"><CardContent className="p-3"><p className="text-lg font-bold text-destructive">{importResult.errors}</p><p className="text-[10px] font-body text-muted-foreground">Erros</p></CardContent></Card>
             <Card className="border-border/30 rounded-xl"><CardContent className="p-3"><p className="text-lg font-bold text-warning">{importResult.duplicates}</p><p className="text-[10px] font-body text-muted-foreground">Duplicados</p></CardContent></Card>
           </div>
-          <Button onClick={() => { setStep('upload'); setRows([]); setProgress(0); }} className="rounded-xl font-body">Nova Importação</Button>
+          <Button onClick={() => { setStep('upload'); setRows([]); }} className="rounded-xl font-body">Nova Importação</Button>
         </motion.div>
       )}
     </PageLayout>
