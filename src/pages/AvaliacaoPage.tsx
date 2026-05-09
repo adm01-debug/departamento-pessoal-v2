@@ -22,6 +22,28 @@ import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGri
 
 const statusColors: Record<string, string> = { rascunho: 'secondary', ativo: 'default', finalizado: 'outline', pendente: 'secondary', em_andamento: 'default', concluido: 'outline' };
 
+const classifyScore = (score: number) => {
+  if (score <= 2.5) return 1;
+  if (score <= 3.5) return 2;
+  return 3;
+};
+
+const getNineBoxLabel = (perf: number, pot: number) => {
+  const labels: Record<string, string> = {
+    '1-3': 'Enigma', '2-3': 'Alto Potencial', '3-3': 'Estrela',
+    '1-2': 'Dilema', '2-2': 'Core Player', '3-2': 'Alto Profissional',
+    '1-1': 'Sub-performer', '2-1': 'Efetivo', '3-1': 'Profissional Confiável'
+  };
+  return labels[`${perf}-${pot}`];
+};
+
+const getNineBoxColor = (perf: number, pot: number) => {
+  if (perf === 3 && pot === 3) return 'bg-green-100 border-green-500 text-green-700';
+  if (perf === 1 && pot === 1) return 'bg-red-100 border-red-500 text-red-700';
+  if (pot === 3 || perf === 3) return 'bg-blue-100 border-blue-500 text-blue-700';
+  return 'bg-yellow-100 border-yellow-500 text-yellow-700';
+};
+
 export default function AvaliacaoPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
