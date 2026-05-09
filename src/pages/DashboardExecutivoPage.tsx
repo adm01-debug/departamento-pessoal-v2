@@ -336,7 +336,7 @@ export default function DashboardExecutivoPage() {
             <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
               <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-sm font-display flex items-center gap-2">
-                  <TrendingIcon className="h-4 w-4 text-primary" /> Projeção de Fluxo de Caixa (Pessoal)
+                  <TrendingUp className="h-4 w-4 text-primary" /> Projeção de Fluxo de Caixa (Pessoal)
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
