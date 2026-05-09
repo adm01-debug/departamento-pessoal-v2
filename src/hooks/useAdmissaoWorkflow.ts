@@ -41,20 +41,21 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
 
       if (execError) throw execError;
 
-      // Atualiza o status da admissão para 'em_andamento'
+      // Atualiza o status da admissão para 'documentos' (etapa inicial comum)
       if (admissaoId) {
         await supabase
           .from('admissoes')
-          .update({ status: 'em_andamento' })
+          .update({ 
+            etapa: 'documentos' as any
+          })
           .eq('id', admissaoId);
       }
 
       // Registra o início no histórico
       await supabase.from('workflows_historico').insert({
         execucao_id: execucao.id,
-        etapa_nome: 'Início do Processo',
-        status: 'concluido',
-        observacao: 'Workflow de admissão iniciado automaticamente.'
+        acao: 'Workflow iniciado',
+        observacoes: 'Workflow de admissão iniciado automaticamente.'
       });
 
       return execucao;
@@ -83,9 +84,8 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
 
       await supabase.from('workflows_historico').insert({
         execucao_id: execucaoId,
-        etapa_nome: `Etapa ${proximaEtapa}`,
-        status: 'concluido',
-        observacao: observacao || `Avanço para a etapa ${proximaEtapa}`
+        acao: `Mudança para Etapa ${proximaEtapa}`,
+        observacoes: observacao || `Avanço para a etapa ${proximaEtapa}`
       });
 
       return execucao;
