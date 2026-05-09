@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEmpresa } from '@/contexts';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
