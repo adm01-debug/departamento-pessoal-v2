@@ -115,6 +115,7 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
         totalAtivos: totalAtivos || 0, evolucao, departamentos, custosMensal,
         totalFolhaAtual, variacaoFolha, feriasPendentes: feriasPendentes || 0,
         afastamentosAtivos: afastamentosAtivos || 0, custoMedio, turnover, absenteismo,
+        pontoPendentes: pontoPendentes || 0,
       };
     },
   });
