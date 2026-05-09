@@ -56,10 +56,16 @@ export default function AvaliacaoPage() {
 
   // === Feedbacks ===
   const [openFeedback, setOpenFeedback] = useState(false);
-  const [fbForm, setFbForm] = useState({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '' });
+  const [fbForm, setFbForm] = useState({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '', performance: '3', potencial: '3' });
   const criarFeedback = useMutation({
-    mutationFn: () => avaliacaoService.criarFeedback({ ...fbForm, nota_geral: fbForm.nota_geral ? Number(fbForm.nota_geral) : null, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['feedbacks_360'] }); setOpenFeedback(false); setFbForm({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '' }); toast.success('Feedback registrado!'); },
+    mutationFn: () => avaliacaoService.criarFeedback({ 
+      ...fbForm, 
+      nota_geral: fbForm.nota_geral ? Number(fbForm.nota_geral) : null, 
+      performance: Number(fbForm.performance),
+      potencial: Number(fbForm.potencial),
+      empresa_id: empresaAtual?.id 
+    } as any),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['feedbacks_360'] }); setOpenFeedback(false); setFbForm({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '', performance: '3', potencial: '3' }); toast.success('Feedback registrado!'); },
     onError: () => toast.error('Erro ao registrar feedback'),
   });
   const excluirFeedback = useMutation({ mutationFn: (id: string) => avaliacaoService.excluirFeedback(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['feedbacks_360'] }); toast.success('Feedback excluído'); } });
