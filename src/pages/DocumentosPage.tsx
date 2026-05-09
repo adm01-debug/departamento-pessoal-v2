@@ -24,6 +24,7 @@ const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG'
 
 export default function DocumentosPage() {
   const [search, setSearch] = useState('');
+  const [tipoFilter, setTipoFilter] = useState('todos');
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
