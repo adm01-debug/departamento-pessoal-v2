@@ -20,15 +20,16 @@ export function GestaoRegistrosPonto() {
   const [busca, setBusca] = useState('');
 
   const { data: registros = [], isLoading } = useQuery({
-    queryKey: ['gestao-registros-ponto', empresaAtual?.id, filtroData],
+    queryKey: ['gestao-registros-ponto', empresaAtual?.id, filtroData, filtroFim],
     queryFn: async () => {
       if (!empresaAtual?.id) return [];
       const { data, error } = await (supabase as any)
         .from('registros_ponto')
         .select('*, colaborador:colaboradores(nome_completo, cargo, departamento, foto_url)')
         .eq('empresa_id', empresaAtual.id)
-        .eq('data', filtroData)
-        .order('created_at', { ascending: false });
+        .gte('data', filtroData)
+        .lte('data', filtroFim)
+        .order('data', { ascending: false });
       if (error) throw error;
       return data || [];
       return data || [];
@@ -49,7 +50,7 @@ export function GestaoRegistrosPonto() {
   };
 
   const filtrados = registros.filter((r: any) => {
-    if (!busca) return true;
+    const nome = r.colaborador?.nome_completo?.toLowerCase() || '';
     const nomeMatch = !busca || nome.includes(busca.toLowerCase());
     
     if (tipoExcecao === 'todas') return nomeMatch;
@@ -100,41 +101,58 @@ export function GestaoRegistrosPonto() {
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
         <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
         <CardHeader>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <CardTitle className="font-display flex items-center gap-2">
-              <Users className="h-4 w-4 text-info" /> Controle de Ponto - Todos Colaboradores
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => mudarDia(-1)}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Input
-                type="date"
-                value={filtroData}
-                onChange={(e) => setFiltroData(e.target.value)}
-                className="w-40 h-8 text-sm"
-              />
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => mudarDia(1)}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center border rounded-lg overflow-hidden ml-2 h-8">
-                <Button variant="ghost" size="sm" className="h-full px-2 text-xs gap-1 border-r rounded-none" onClick={() => exportData('csv')}>
-                  <FileJson className="h-3 w-3" /> CSV
-                </Button>
-                <Button variant="ghost" size="sm" className="h-full px-2 text-xs gap-1 rounded-none" onClick={() => exportData('pdf')}>
-                  <FileText className="h-3 w-3" /> PDF
-                </Button>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <CardTitle className="font-display flex items-center gap-2">
+                <Users className="h-4 w-4 text-info" /> Controle de Ponto - Gestão Avançada
+              </CardTitle>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border">
+                  <Input
+                    type="date"
+                    value={filtroData}
+                    onChange={(e) => setFiltroData(e.target.value)}
+                    className="w-32 h-7 text-[10px] border-none bg-transparent"
+                  />
+                  <span className="text-[10px] text-muted-foreground">até</span>
+                  <Input
+                    type="date"
+                    value={filtroFim}
+                    onChange={(e) => setFiltroFim(e.target.value)}
+                    className="w-32 h-7 text-[10px] border-none bg-transparent"
+                  />
+                </div>
+                
+                <select 
+                  value={tipoExcecao} 
+                  onChange={(e) => setTipoExcecao(e.target.value)}
+                  className="h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-sm"
+                >
+                  <option value="todas">Todas as Batidas</option>
+                  <option value="atrasos">Apenas Atrasos</option>
+                  <option value="faltas">Apenas Faltas</option>
+                  <option value="incompletos">Incompletos/Abertos</option>
+                </select>
+
+                <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm">
+                  <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-info/10" onClick={() => exportData('csv')}>
+                    <Download className="h-3 w-3" /> CSV
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 rounded-none hover:bg-destructive/10" onClick={() => exportData('pdf')}>
+                    <FileText className="h-3 w-3" /> PDF
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="relative mt-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar colaborador..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="pl-9 h-9"
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Filtrar por nome de colaborador..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="pl-9 h-9 rounded-xl border-border/40"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
