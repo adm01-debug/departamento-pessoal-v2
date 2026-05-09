@@ -301,8 +301,10 @@ export function GestaoRegistrosPonto() {
                     <TableHead className="font-display font-semibold">Trabalhadas</TableHead>
                     <TableHead className="font-display font-semibold">Extras</TableHead>
                     <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="font-display font-semibold text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {filtrados.map((r: any) => {
                     const trabalhadas = formatInterval(r.horas_trabalhadas);
