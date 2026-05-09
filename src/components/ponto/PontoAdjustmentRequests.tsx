@@ -125,9 +125,20 @@ export function PontoAdjustmentRequests() {
                   </TableCell>
                 </TableRow>
               ) : (
-                solicitacoes.map((s: any) => (
-                  <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
-                    <TableCell className="font-medium">{s.colaborador?.nome_completo}</TableCell>
+                solicitacoes
+                  .filter((s: any) => s.colaborador?.nome_completo.toLowerCase().includes(search.toLowerCase()))
+                  .map((s: any) => (
+                    <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
+                      <TableCell className="font-medium">
+                        <div className="flex flex-col">
+                          <span>{s.colaborador?.nome_completo}</span>
+                          {s.relatorio_conformidade?.portaria_671_conformidade && (
+                            <span className="text-[9px] text-success flex items-center gap-0.5 mt-0.5">
+                              <Shield className="h-2.5 w-2.5" /> Validado Portaria 671
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                     <TableCell>{new Date(s.data_ponto).toLocaleDateString('pt-BR')}</TableCell>
                     <TableCell><Badge variant="outline" className="text-[10px]">{s.tipo_ponto}</Badge></TableCell>
                     <TableCell className="font-mono text-xs">{s.hora_sugerida?.substring(0, 5)}</TableCell>
