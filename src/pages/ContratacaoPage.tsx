@@ -117,6 +117,8 @@ function ContratacaoWorkflow({ token }: { token: string }) {
     cep: '', logradouro: '', numero: '', bairro: '', cidade: '', uf: '',
   });
   const [signature, setSignature] = useState<string | null>(null);
+  const [uploadedDocs, setUploadedDocs] = useState<Record<string, { name: string, status: 'uploading' | 'success' | 'error', result?: OCRResult }>>({});
+  const { processDocument, isProcessing: isOCRProcessing } = useDocumentOCR();
 
   const { data: tokenData, isLoading } = useQuery({
     queryKey: ['contratacao-token', token],
