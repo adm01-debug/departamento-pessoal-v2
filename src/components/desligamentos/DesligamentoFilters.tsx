@@ -14,9 +14,12 @@ interface FiltersProps {
 const STATUS_OPTIONS = [
   { value: 'todos', label: 'Todos os Status' },
   { value: 'pendente', label: '⏳ Pendente' },
-  { value: 'em_andamento', label: '🔄 Em Andamento' },
-  { value: 'concluido', label: '✅ Concluído' },
-  { value: 'finalizado', label: '📋 Finalizado' },
+  { value: 'comunicado', label: '📢 Comunicado' },
+  { value: 'calculado', label: '🧮 Calculado' },
+  { value: 'homologado', label: '🤝 Homologado' },
+  { value: 'pagamento', label: '💰 Em Pagamento' },
+  { value: 'finalizado', label: '✅ Finalizado' },
+
   { value: 'cancelado', label: '❌ Cancelado' },
 ];
 
