@@ -826,27 +826,40 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
 
                         {/* Compliance & History Highlight for Ponto */}
                         {item.source === 'ponto' && item.raw && (
-                          <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-primary opacity-70" />
-                              <div className="text-[10px]">
-                                <p className="text-muted-foreground font-bold uppercase">Timezone</p>
-                                <p className="font-medium">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                          <div className="mt-2 space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-primary opacity-70" />
+                                <div className="text-[10px]">
+                                  <p className="text-muted-foreground font-bold uppercase">Timezone</p>
+                                  <p className="font-medium">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                                </div>
+                              </div>
+                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                                <History className="h-4 w-4 text-warning opacity-70" />
+                                <div className="text-[10px]">
+                                  <p className="text-muted-foreground font-bold uppercase">Original</p>
+                                  <p className="font-medium">{item.raw.hora_original?.substring(0, 5) || 'Original'}</p>
+                                </div>
+                              </div>
+                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                                <Shield className="h-4 w-4 text-success opacity-70" />
+                                <div className="text-[10px]">
+                                  <p className="text-muted-foreground font-bold uppercase">Conformidade</p>
+                                  <p className="font-medium text-success">Validado 671</p>
+                                </div>
                               </div>
                             </div>
-                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                              <History className="h-4 w-4 text-warning opacity-70" />
-                              <div className="text-[10px]">
-                                <p className="text-muted-foreground font-bold uppercase">Original</p>
-                                <p className="font-medium">{item.raw.hora_original?.substring(0, 5) || 'N/A'}</p>
-                              </div>
-                            </div>
-                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                              <Shield className="h-4 w-4 text-success opacity-70" />
-                              <div className="text-[10px]">
-                                <p className="text-muted-foreground font-bold uppercase">Conformidade 671</p>
-                                <p className="font-medium">Validado</p>
-                              </div>
+                            
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 text-[10px] gap-2 rounded-lg"
+                                onClick={() => exportPortaria671PDF(item.raw)}
+                              >
+                                <Download className="h-3 w-3" /> Exportar Conformidade (PDF)
+                              </Button>
                             </div>
                           </div>
                         )}
