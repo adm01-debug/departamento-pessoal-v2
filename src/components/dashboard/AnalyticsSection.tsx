@@ -4,8 +4,10 @@ import { cn } from '@/lib/utils';
 import {
   TrendingUp, Activity, Timer, PieChart,
   AlertCircle, UserPlus, UserMinus, Briefcase,
-  CheckCircle2, AlertTriangle, Calendar, ChevronRight
+  CheckCircle2, AlertTriangle, Calendar, ChevronRight,
+  TrendingDown, Minus
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
 import { BarChartWidget } from './BarChartWidget';
 import { DonutChart } from './DonutChart';
@@ -120,6 +122,7 @@ function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: numb
 
 /* ─── Alertas RH Widget ─── */
 function AlertasRHWidget() {
+  const navigate = useNavigate();
   const { data: alertas = [], isLoading } = useQuery({
     queryKey: ['vw-alertas-rh'],
     queryFn: () => viewsService.alertasRH(),
@@ -135,13 +138,28 @@ function AlertasRHWidget() {
   );
 
   return (
-    <div className="space-y-2 max-h-48 overflow-y-auto">
-      {alertas.slice(0, 5).map((a: any, i: number) => (
-        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm">
-          <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
-          <span className="flex-1 truncate text-body font-body">{a.descricao || a.tipo || 'Alerta'}</span>
-          {a.prioridade && <Badge variant="outline" className="text-[10px]">{a.prioridade}</Badge>}
-        </div>
+    <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+      {alertas.slice(0, 8).map((a: any, i: number) => (
+        <motion.div 
+          key={i} 
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: i * 0.05 }}
+          onClick={() => navigate('/relatorios')}
+          className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm hover:border-primary/20 cursor-pointer group transition-all"
+        >
+          <div className={cn(
+            "p-1.5 rounded-lg shrink-0",
+            a.prioridade === 'alta' ? "bg-destructive/10 text-destructive" : 
+            a.prioridade === 'media' ? "bg-warning/10 text-warning" : "bg-info/10 text-info"
+          )}>
+            <AlertTriangle className="h-3.5 w-3.5" />
+          </div>
+          <span className="flex-1 truncate text-body font-body text-xs font-medium">{a.descricao || a.tipo || 'Alerta de sistema'}</span>
+          <Badge variant="outline" className="text-[9px] uppercase font-bold tracking-tight opacity-70">
+            {a.prioridade || 'Normal'}
+          </Badge>
+        </motion.div>
       ))}
     </div>
   );
@@ -149,6 +167,7 @@ function AlertasRHWidget() {
 
 /* ─── Cadastro Incompleto Widget ─── */
 function CadastroIncompletoWidget() {
+  const navigate = useNavigate();
   const { data: incompletos = [], isLoading } = useQuery({
     queryKey: ['vw-cadastro-incompleto'],
     queryFn: () => viewsService.cadastroIncompleto(),
@@ -164,13 +183,25 @@ function CadastroIncompletoWidget() {
   );
 
   return (
-    <div className="space-y-2 max-h-48 overflow-y-auto">
-      {incompletos.slice(0, 5).map((c: any, i: number) => (
-        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm">
-          <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
-          <span className="flex-1 truncate font-body">{c.nome_completo || 'Colaborador'}</span>
-          <span className="text-[10px] text-muted-foreground">{c.campos_faltantes || ''}</span>
-        </div>
+    <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+      {incompletos.slice(0, 8).map((c: any, i: number) => (
+        <motion.div 
+          key={i} 
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: i * 0.05 }}
+          onClick={() => navigate(`/colaboradores/${c.id}/editar`)}
+          className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm hover:border-destructive/20 cursor-pointer group transition-all"
+        >
+          <div className="p-1.5 rounded-lg bg-destructive/10 text-destructive shrink-0 group-hover:bg-destructive group-hover:text-white transition-colors">
+            <AlertCircle className="h-3.5 w-3.5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-xs font-semibold font-display">{c.nome_completo || 'Colaborador'}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{c.campos_faltantes || 'Dados pendentes'}</p>
+          </div>
+          <ChevronRight className="h-3 w-3 text-muted-foreground opacity-30 group-hover:opacity-100 transition-opacity" />
+        </motion.div>
       ))}
     </div>
   );
