@@ -145,6 +145,9 @@ export default function ColaboradorDetalhesPage() {
             <TabsTrigger value="documentos" className="rounded-lg font-body px-6 gap-2">
               <FileText className="h-4 w-4" /> Documentação
             </TabsTrigger>
+            <TabsTrigger value="historico" className="rounded-lg font-body px-6 gap-2">
+              <History className="h-4 w-4" /> Histórico
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="geral">
