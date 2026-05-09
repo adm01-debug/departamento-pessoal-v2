@@ -1,6 +1,8 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export const validateExportData = (data: any[]) => {
   if (!data || data.length === 0) {
