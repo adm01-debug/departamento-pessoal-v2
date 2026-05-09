@@ -17,6 +17,7 @@ export function PontoAdjustmentRequests() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
   const [selectedAudit, setSelectedAudit] = useState<any[] | null>(null);
+  const [search, setSearch] = useState("");
 
   const { data: solicitacoes = [], isLoading } = useQuery({
     queryKey: ['solicitacoes-ajuste-ponto', empresaAtual?.id],
