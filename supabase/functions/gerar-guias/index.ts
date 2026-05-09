@@ -9,7 +9,7 @@ const corsHeaders = {
 interface GerarGuiasRequest {
   empresaId: string;
   competencia: string;
-  tipo: 'GPS' | 'DARF' | 'FGTS' | 'TODAS';
+  tipo: 'GPS' | 'DARF' | 'FGTS' | 'FGTS_DIGITAL' | 'TODAS';
 }
 
 const calcularINSS = (base: number): number => {
