@@ -3,12 +3,14 @@ import { feriasService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
+import { useNotificacoes } from './useNotificacoes';
 
 export function useFeriasAprovacao() {
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
   const qc = useQueryClient();
+  const { criarNotificacao } = useNotificacoes();
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
 
