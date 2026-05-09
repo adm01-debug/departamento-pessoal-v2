@@ -7,13 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send, History, Clock } from 'lucide-react';
+import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
@@ -174,9 +172,13 @@ export default function RelatoriosPage() {
   });
 
   const handleExport = async (id: string) => { 
+    if (!empresaAtual?.id) {
+      toast.error('Selecione uma empresa');
+      return;
+    }
     setGenerating(id); 
     try { 
-      const r = await fetchReportData(id); 
+      const r = await fetchReportData(id, empresaAtual.id); 
       if (exportFormat === 'excel') {
         exportarExcel(r.title, r.rows, r.columns);
       } else if (exportFormat === 'pdf') {
@@ -184,13 +186,42 @@ export default function RelatoriosPage() {
       } else {
         exportCSV(r.title, r.rows, r.columns); 
       }
+
+      await supabase.from('audit_log').insert({
+        tabela: 'relatorios',
+        acao: 'EXPORTACAO',
+        registro_id: id,
+        dados_novos: { 
+          formato: exportFormat, 
+          titulo: r.title,
+          registros: r.rows.length 
+        }
+      });
     } catch (e: any) { 
       toast.error(`Erro: ${e.message}`); 
     } finally { 
       setGenerating(null); 
     } 
   };
-  const handleSendEmail = async () => { if (!emailDialog || !emailTo || !empresaAtual?.id) return; setSendingEmail(true); try { await edgeFunctionsService.enviarRelatorioEmail({ tipo: emailDialog, destinatarios: emailTo.split(',').map(e => e.trim()), empresaId: empresaAtual.id }); toast.success('Relatório enviado por email!'); setEmailDialog(null); setEmailTo(''); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setSendingEmail(false); } };
+
+  const handleSendEmail = async () => { 
+    if (!emailDialog || !emailTo || !empresaAtual?.id) return; 
+    setSendingEmail(true); 
+    try { 
+      await edgeFunctionsService.enviarRelatorioEmail({ 
+        tipo: emailDialog, 
+        destinatarios: emailTo.split(',').map(e => e.trim()), 
+        empresaId: empresaAtual.id 
+      }); 
+      toast.success('Relatório enviado por email!'); 
+      setEmailDialog(null); 
+      setEmailTo(''); 
+    } catch (e: any) { 
+      toast.error(`Erro: ${e.message}`); 
+    } finally { 
+      setSendingEmail(false); 
+    } 
+  };
 
   return (
     <>
