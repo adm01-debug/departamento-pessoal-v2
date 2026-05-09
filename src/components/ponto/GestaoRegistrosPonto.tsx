@@ -305,8 +305,14 @@ export function GestaoRegistrosPonto() {
             </div>
           </>
         )}
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+            </TabsContent>
+            
+            <TabsContent value="analytics">
+              <GestaoPontoAnalytics registros={registros} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
 }
