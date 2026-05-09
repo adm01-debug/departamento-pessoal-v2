@@ -482,22 +482,47 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Categoria</TableHead><TableHead>Nível Esperado</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Competência</TableHead>
+                    <TableHead className="font-display font-semibold">Categoria</TableHead>
+                    <TableHead className="font-display font-semibold text-center">Nível Esperado</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {competencias.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma competência cadastrada</TableCell></TableRow> :
+                  {competencias.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-12">Nenhuma competência técnica ou comportamental mapeada</TableCell></TableRow> :
                     competencias.map((c: any) => (
-                      <TableRow key={c.id}>
-                        <TableCell className="font-medium">{c.nome}</TableCell>
-                        <TableCell>{c.categoria || '—'}</TableCell>
-                        <TableCell>{c.nivel_esperado}</TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirComp.mutate(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={c.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{c.nome}</span>
+                              <span className="text-[10px] text-muted-foreground">{c.descricao}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant="secondary" className="text-[9px] uppercase tracking-wider">{c.categoria || 'Geral'}</Badge></TableCell>
+                        <TableCell className="text-center">
+                           <div className="flex items-center justify-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                 <div key={i} className={`h-1.5 w-3 rounded-full ${i < c.nivel_esperado ? 'bg-primary' : 'bg-muted'}`} />
+                              ))}
+                              <span className="text-[10px] font-mono font-bold ml-1">{c.nivel_esperado}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirComp.mutate(c.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
           
           {/* NINE BOX */}
