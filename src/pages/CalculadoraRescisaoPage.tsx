@@ -110,10 +110,12 @@ export default function CalculadoraRescisaoPage() {
   }, [form]);
 
   const salvarHistorico = useCallback(async () => {
-    if (!result || !user) return;
+    if (!result || !user || !empresaAtual) return;
     setSaving(true);
     try {
-      const { error } = await supabase.from('historico_rescisoes' as any).insert({
+      // 1. Save to History
+      const { data: historico, error: histError } = await supabase.from('historico_rescisoes' as any).insert({
+        empresa_id: empresaAtual.id,
         created_by: user.id,
         nome_colaborador: form.nomeColaborador || null,
         cpf: form.cpf || null,
