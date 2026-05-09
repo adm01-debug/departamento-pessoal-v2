@@ -47,6 +47,7 @@ export default function ProvisoesPage() {
     enabled: !!empresaAtual?.id,
   });
 
+
   const { data: inconsistencias } = useQuery({
     queryKey: ['provisao-inconsistencias', empresaAtual?.id],
     queryFn: async () => {
