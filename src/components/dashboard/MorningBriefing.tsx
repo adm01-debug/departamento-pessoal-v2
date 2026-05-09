@@ -204,7 +204,7 @@ export function MorningBriefing() {
           />
           <BriefingItem
             icon={FileText}
-            label={`ASOs vencendo em 7 dias`}
+            label={`Exames vencendo em 7 dias`}
             count={data.vencimentosHoje.length}
             gradient="from-warning to-warning/70"
             onClick={() => navigate('/exames')}
