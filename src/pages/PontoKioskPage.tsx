@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Clock, User, Fingerprint, MapPin, Camera } from 'lucide-react';
+import { Clock, User, Fingerprint, MapPin, Camera, WifiOff, RefreshCw, Smartphone } from 'lucide-react';
 import { PageLayout } from '@/components/layout';
 import { toast } from 'sonner';
 import { pontoService } from '@/services/pontoService';
+import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export default function PontoKioskPage() {
   const [time, setTime] = useState(new Date());
@@ -14,6 +17,35 @@ export default function PontoKioskPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'pin' | 'action' | 'success'>('pin');
   const [selectedColab, setSelectedColab] = useState<any>(null);
+  const [offlineQueueSize, setOfflineQueueSize] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    const interval = setInterval(() => {
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+      if (navigator.onLine && !isSyncing && pontoOfflineService.getQueueSize() > 0) {
+        handleSync();
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [isSyncing]);
+
+  const handleSync = async () => {
+    if (isSyncing || !navigator.onLine) return;
+    setIsSyncing(true);
+    try {
+      const result = await pontoOfflineService.syncOfflineQueue();
+      if (result.synced > 0) {
+        toast.success(`${result.synced} registros sincronizados automaticamente.`);
+      }
+    } catch (e) {
+      console.error('Erro na sincronização do quiosque', e);
+    } finally {
+      setIsSyncing(false);
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    }
+  };
 
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
 
@@ -45,34 +77,70 @@ export default function PontoKioskPage() {
   const registrar = async (tipo: any) => {
     setLoading(true);
     try {
-      await pontoService.registrar(tipo, selectedColab.id, { 
-        dispositivoId: 'KIOSK-01',
-        latitude: -23.5505, // Simulated kiosk location
-        longitude: -46.6333
-      });
+      const geo = {
+        latitude: -23.5505, // Localização fixa do quiosque
+        longitude: -46.6333,
+        dispositivoId: 'KIOSK-01'
+      };
+
+      if (!navigator.onLine) {
+        await pontoOfflineService.queueRegistro({
+          tipo,
+          colaborador_id: selectedColab.id,
+          timestamp: new Date().toISOString(),
+          dispositivoId: geo.dispositivoId,
+          latitude: geo.latitude,
+          longitude: geo.longitude
+        });
+        toast.warning('Ponto registrado em modo OFFLINE (Quiosque).');
+      } else {
+        await pontoService.registrar(tipo, selectedColab.id, geo);
+        toast.success('Ponto registrado com sucesso!');
+      }
+
       setStep('success');
       setTimeout(() => {
         setStep('pin');
         setPin('');
         setSelectedColab(null);
       }, 3000);
-      toast.success('Ponto registrado com sucesso!');
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setLoading(false);
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }
   };
 
   return (
     <div className="min-h-screen bg-background p-6 font-body">
-      <div className="max-w-4xl mx-auto flex items-center gap-3 mb-8">
-        <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg">
-          <Fingerprint className="h-6 w-6 text-primary-foreground" />
+      <div className="max-w-4xl mx-auto flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg">
+            <Fingerprint className="h-6 w-6 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-display font-bold">Modo Quiosque</h1>
+            <p className="text-muted-foreground text-sm flex items-center gap-1.5">
+              <Smartphone className="h-3.5 w-3.5" /> Estação de Registro Compartilhada
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-display font-bold">Modo Quiosque</h1>
-          <p className="text-muted-foreground text-sm">Registro rápido para múltiplos colaboradores</p>
+
+        <div className="flex items-center gap-2">
+          {offlineQueueSize > 0 && (
+            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 px-3 py-1 gap-1.5 animate-pulse">
+              <WifiOff className="h-3.5 w-3.5" /> {offlineQueueSize} pendentes
+            </Badge>
+          )}
+          {!navigator.onLine && (
+            <Badge variant="destructive" className="gap-1.5">
+              <WifiOff className="h-3.5 w-3.5" /> Offline
+            </Badge>
+          )}
+          {navigator.onLine && isSyncing && (
+            <RefreshCw className="h-5 w-5 text-primary animate-spin" />
+          )}
         </div>
       </div>
       <div className="max-w-md mx-auto mt-12">
