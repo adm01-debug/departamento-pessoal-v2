@@ -255,16 +255,40 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const [filterType, setFilterType] = useState<string>("all");
 
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
+  const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
 
   const filteredPendencias = useMemo(() => {
-    if (!dbPendencias) return [];
-    return dbPendencias.filter(p => {
+    const list: any[] = [];
+    
+    // Add DB Pendencias
+    if (dbPendencias) {
+      dbPendencias.forEach(p => list.push({ ...p, source: 'db' }));
+    }
+    
+    // Add Ponto Solicitation as Pendencias
+    if (pontoSolicitacoes) {
+      pontoSolicitacoes.filter((s: any) => s.status === 'enviado').forEach((s: any) => {
+        list.push({
+          id: s.id,
+          tipo: 'ponto',
+          titulo: `Ajuste de Ponto: ${s.colaborador?.nome_completo || 'Colaborador'}`,
+          descricao: `Sugerido: ${s.hora_sugerida} - Motivo: ${s.motivo}`,
+          prioridade: 'media',
+          status: 'pendente',
+          criado_at: s.created_at,
+          source: 'ponto',
+          raw: s
+        });
+      });
+    }
+
+    return list.filter(p => {
       const matchesSearch = p.titulo.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            p.descricao.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesType = filterType === "all" || p.tipo === filterType;
       return matchesSearch && matchesType;
     });
-  }, [dbPendencias, searchQuery, filterType]);
+  }, [dbPendencias, pontoSolicitacoes, searchQuery, filterType]);
 
   const handleOpenDetail = (type?: string) => {
     if (type) setFilterType(type);
