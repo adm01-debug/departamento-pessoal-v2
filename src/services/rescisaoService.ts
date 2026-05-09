@@ -18,10 +18,16 @@ export const rescisaoService = {
     const indexAtual = ORDEM_ETAPAS.indexOf(atual.etapa || 'comunicacao');
     const indexNova = ORDEM_ETAPAS.indexOf(novaEtapa);
     
-    // Bloqueia saltar etapas (não permite ir de comunicacao direto para calculado sem passar por documentacao)
+    // Bloqueia saltar etapas ou voltar etapas sem autorização explícita (Opcional, mas recomendado para consistência)
     if (indexNova > indexAtual + 1) {
-      throw new Error(`Transição inválida: A etapa '${novaEtapa}' exige que a etapa anterior '${ORDEM_ETAPAS[indexNova-1]}' esteja concluída.`);
+      throw new Error(`Transição bloqueada: Você deve concluir a etapa '${ORDEM_ETAPAS[indexAtual]}' e passar por '${ORDEM_ETAPAS[indexAtual + 1]}' antes de chegar em '${novaEtapa}'.`);
     }
+    
+    // Validação específica: Para ir de cálculo para homologação, precisa ter valor líquido
+    if (novaEtapa === 'homologacao' && atual.status !== 'calculado') {
+       throw new Error('A rescisão precisa estar com status "calculado" para prosseguir para a homologação.');
+    }
+
     
     return true;
   },
