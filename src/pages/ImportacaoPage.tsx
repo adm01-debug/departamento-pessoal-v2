@@ -76,6 +76,8 @@ export default function ImportacaoPage() {
   const [step, setStep] = useState<'upload' | 'preview' | 'importing' | 'done'>('upload');
   const { rows, progress, isImporting, processarArquivo, importar, setRows } = useImportacaoColaboradores();
 
+  const [importResult, setImportResult] = useState({ success: 0, errors: 0, duplicates: 0 });
+
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -87,6 +89,12 @@ export default function ImportacaoPage() {
 
   const handleImport = async () => {
     await importar();
+    // Simplified result fetch for UI consistency
+    setImportResult({ 
+        success: rows.filter(r => r.status === 'valido').length, 
+        errors: rows.filter(r => r.status === 'erro').length, 
+        duplicates: rows.filter(r => r.status === 'duplicado').length 
+    });
     setStep('done');
   };
 
