@@ -7086,6 +7086,33 @@ export type Database = {
         }
         Relationships: []
       }
+      govbr_auth_state: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          nonce: string
+          redirect_uri: string | null
+          state: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce: string
+          redirect_uri?: string | null
+          state: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce?: string
+          redirect_uri?: string | null
+          state?: string
+        }
+        Relationships: []
+      }
       guias_fgts: {
         Row: {
           codigo_barras: string | null
@@ -7916,6 +7943,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      integracao_logs: {
+        Row: {
+          created_at: string | null
+          duracao_ms: number | null
+          erro: string | null
+          id: string
+          operacao: string
+          payload_envio: Json | null
+          payload_retorno: Json | null
+          servico: string
+          status_code: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          duracao_ms?: number | null
+          erro?: string | null
+          id?: string
+          operacao: string
+          payload_envio?: Json | null
+          payload_retorno?: Json | null
+          servico: string
+          status_code?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          duracao_ms?: number | null
+          erro?: string | null
+          id?: string
+          operacao?: string
+          payload_envio?: Json | null
+          payload_retorno?: Json | null
+          servico?: string
+          status_code?: number | null
+        }
+        Relationships: []
       }
       integracoes: {
         Row: {
@@ -10675,8 +10738,11 @@ export type Database = {
         Row: {
           avatar_url: string | null
           cargo: string | null
+          cpf_validado_govbr: boolean | null
           created_at: string
           departamento: string | null
+          govbr_nivel_autenticacao: string | null
+          govbr_uid: string | null
           id: string
           nome: string
           role_display: string | null
@@ -10687,8 +10753,11 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           cargo?: string | null
+          cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
+          govbr_nivel_autenticacao?: string | null
+          govbr_uid?: string | null
           id?: string
           nome?: string
           role_display?: string | null
@@ -10699,8 +10768,11 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           cargo?: string | null
+          cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
+          govbr_nivel_autenticacao?: string | null
+          govbr_uid?: string | null
           id?: string
           nome?: string
           role_display?: string | null
@@ -15044,6 +15116,7 @@ export type Database = {
       }
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
+      limpar_govbr_states_expirados: { Args: never; Returns: undefined }
       processar_ajuste_aprovado: {
         Args: { p_solicitacao_id: string }
         Returns: undefined
