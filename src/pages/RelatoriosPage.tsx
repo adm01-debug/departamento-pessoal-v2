@@ -120,6 +120,7 @@ export default function RelatoriosPage() {
           </div>
           <TabsContent value="analytics"><RelatoriosAnalyticsTab analytics={analytics} /></TabsContent>
           <TabsContent value="exportar"><RelatoriosExportTab relatorios={relatorios} exportFormat={exportFormat} generating={generating} onExport={handleExport} onEmailOpen={setEmailDialog} /></TabsContent>
+          <TabsContent value="agendados"><RelatoriosAgendadosTab empresaId={empresaAtual?.id || ''} /></TabsContent>
         </Tabs>
         <Dialog open={!!emailDialog} onOpenChange={(o) => { if (!o) setEmailDialog(null); }}>
           <DialogContent className="max-w-md rounded-2xl">
