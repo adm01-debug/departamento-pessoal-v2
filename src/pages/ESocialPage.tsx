@@ -32,6 +32,56 @@ export default function ESocialPage() {
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [isValidating, setIsValidating] = useState<string | null>(null);
+
+  const filteredEventos = useMemo(() => {
+    return eventos.filter(e => {
+      const matchesSearch = 
+        e.tipo_evento.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getEventoDescricao(e.tipo_evento).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (e.protocolo && e.protocolo.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesStatus = filterStatus === 'all' || (e.status || 'pendente') === filterStatus;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [eventos, searchTerm, filterStatus]);
+
+  const handleValidar = async (evento: any) => {
+    if (!evento.dados) return;
+    setIsValidating(evento.id);
+    try {
+      const result = await validarAnteDeEnviar(evento.tipo_evento, evento.dados as any);
+      if (result.valid) {
+        toast.success(`Evento ${evento.tipo_evento} válido para transmissão!`);
+      } else {
+        toast.error(`Evento ${evento.tipo_evento} possui ${result.errors.length} erro(s) de validação.`);
+      }
+    } catch (error) {
+      toast.error("Falha ao validar evento");
+    } finally {
+      setIsValidating(null);
+    }
+  };
+
+  const handleExportXML = (evento: any) => {
+    if (!evento.xml) {
+      toast.error("XML não disponível. Envie o evento primeiro.");
+      return;
+    }
+    const blob = new Blob([evento.xml], { type: 'text/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${evento.tipo_evento}_${evento.id}.xml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("XML exportado com sucesso");
+  };
 
   const statusVariant = (s: string) => s === 'enviado' ? 'success' : s === 'erro' ? 'error' : 'warning';
   const statusIcon = (s: string) => {
