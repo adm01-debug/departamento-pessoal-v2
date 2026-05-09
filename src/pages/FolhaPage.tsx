@@ -11,11 +11,19 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { folhaService } from '@/services';
-import { Eye, Calculator, FileText, DollarSign, TrendingUp, TrendingDown, Banknote } from 'lucide-react';
+import { Eye, Calculator, FileText, DollarSign, TrendingUp, TrendingDown, Banknote, Download, FileSpreadsheet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import { usePDFExport } from '@/hooks/usePDFExport';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(value);
@@ -24,6 +32,8 @@ function formatCurrency(value: number): string {
 export default function FolhaPage() {
   const [competencia, setCompetencia] = useState('');
   const navigate = useNavigate();
+  const { exportarExcel } = useExcelExport();
+  const { exportarPDF } = usePDFExport();
 
   const { data: folhas, isLoading } = useQuery({
     queryKey: ['folhas', competencia],
@@ -40,7 +50,23 @@ export default function FolhaPage() {
     }),
     { proventos: 0, descontos: 0, liquido: 0, count: 0 }
   );
+  const handleExportExcel = () => {
+    if (!folhas?.length) return;
+    exportarExcel(
+      'Histórico de Folhas',
+      folhas,
+      ['competencia', 'tipo', 'total_proventos', 'total_descontos', 'total_liquido', 'status']
+    );
+  };
 
+  const handleExportPDF = () => {
+    if (!folhas?.length) return;
+    exportarPDF(
+      'Histórico de Folhas',
+      folhas,
+      ['competencia', 'tipo', 'total_liquido', 'status']
+    );
+  };
   return (
     <>
     <PageTitle title="Folha de Pagamento" description="Gestão de folha de pagamento" />
@@ -50,9 +76,34 @@ export default function FolhaPage() {
       icon={<Banknote className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary-glow to-primary"
       actions={
-        <Button onClick={() => navigate('/folha/calcular')} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body gap-1.5">
-          <Calculator className="h-4 w-4" />Processar Folha
-        </Button>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl font-body hidden sm:flex gap-1.5"
+                disabled={!folhas?.length}
+              >
+                <Download className="h-4 w-4" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl">
+              <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4 text-success" />
+                Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF} className="gap-2 cursor-pointer">
+                <FileText className="h-4 w-4 text-destructive" />
+                PDF (.pdf)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={() => navigate('/folha/calcular')} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body gap-1.5">
+            <Calculator className="h-4 w-4" />Processar Folha
+          </Button>
+        </div>
       }
     >
       {/* Summary Cards */}

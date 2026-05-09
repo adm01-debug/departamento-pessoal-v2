@@ -14,8 +14,8 @@ const actions = [
   { label: 'Calcular Folha', icon: DollarSign, gradient: 'from-primary/80 to-primary', path: '/folha/calcular', desc: 'Processamento mensal' },
   { label: 'Registrar Ponto', icon: Clock, gradient: 'from-primary/60 to-primary/90', path: '/ponto', desc: 'Batida manual' },
   { label: 'Solicitar Férias', icon: Calendar, gradient: 'from-primary-glow to-primary', path: '/ferias', desc: 'Nova solicitação' },
-  { label: 'Dashboard Executivo', icon: BarChart3, gradient: 'from-info to-info/70', path: '/dashboard-executivo', desc: 'KPIs estratégicos' },
-  { label: 'Assistente IA', icon: Bot, gradient: 'from-primary to-primary-glow', path: '/assistente-ia', desc: 'Análises inteligentes' },
+  { label: 'Obrigações Fiscais', icon: FileText, gradient: 'from-info to-info/70', path: '/obrigacoes-fiscais', desc: 'S-1000, S-2200, etc' },
+  { label: 'Relatórios DP', icon: BarChart3, gradient: 'from-primary to-primary-glow', path: '/relatorios', desc: 'Extração de dados' },
 ];
 
 export function QuickActionsGrid() {

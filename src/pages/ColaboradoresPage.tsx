@@ -11,11 +11,19 @@ import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { colaboradorService } from '@/services';
-import { Eye, Edit, Users, Download } from 'lucide-react';
+import { Eye, Edit, Users, Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEmpresa } from '@/contexts';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import { usePDFExport } from '@/hooks/usePDFExport';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const PAGE_SIZE = 25;
 
@@ -25,6 +33,8 @@ export default function ColaboradoresPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const { empresaAtual } = useEmpresa();
+  const { exportarExcel } = useExcelExport();
+  const { exportarPDF } = usePDFExport();
 
   const { data: colaboradores, isLoading } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
@@ -63,6 +73,24 @@ export default function ColaboradoresPage() {
   const handleSearchChange = (v: string) => { setSearch(v); setCurrentPage(1); };
   const handleStatusChange = (v: string) => { setStatusFilter(v); setCurrentPage(1); };
 
+  const handleExportExcel = () => {
+    if (!filtered.length) return;
+    exportarExcel(
+      'Relatório de Colaboradores',
+      filtered,
+      ['nome_completo', 'cpf', 'cargo', 'departamento', 'status', 'data_admissao', 'email']
+    );
+  };
+
+  const handleExportPDF = () => {
+    if (!filtered.length) return;
+    exportarPDF(
+      'Relatório de Colaboradores',
+      filtered,
+      ['nome_completo', 'cpf', 'cargo', 'departamento', 'status']
+    );
+  };
+
   return (
     <>
     <PageTitle title="Colaboradores" description="Gestão de colaboradores do Departamento Pessoal" />
@@ -73,15 +101,29 @@ export default function ColaboradoresPage() {
       gradient="from-primary to-primary-glow"
       actions={
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-lg font-body hidden sm:flex gap-2"
-            onClick={() => {/* TODO: export */}}
-          >
-            <Download className="h-4 w-4" />
-            Exportar
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-lg font-body hidden sm:flex gap-2"
+                disabled={!filtered?.length}
+              >
+                <Download className="h-4 w-4" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl">
+              <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4 text-success" />
+                Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF} className="gap-2 cursor-pointer">
+                <FileText className="h-4 w-4 text-destructive" />
+                PDF (.pdf)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             onClick={() => navigate('/colaboradores/novo')}
             className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow font-body"

@@ -85,7 +85,7 @@ export function Breadcrumbs({ className }: { className?: string }) {
     const label = isUuid ? '...' : routeLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
 
     return { path, label, isLast };
-  });
+  }).filter(c => c.label);
 
   return (
     <motion.nav
