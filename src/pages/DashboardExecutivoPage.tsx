@@ -153,6 +153,7 @@ export default function DashboardExecutivoPage() {
   const { empresaAtualId } = useEmpresas();
   const [periodo, setPeriodo] = useState('6');
   const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId, periodo);
+  const { data: strategic, isLoading: isStrategicLoading } = useStrategicFinancials(empresaAtualId);
 
   const kpis = [
     { label: 'Headcount', value: data?.totalAtivos || 0, icon: Users, gradient: 'from-primary to-primary-glow', format: 'number' },
