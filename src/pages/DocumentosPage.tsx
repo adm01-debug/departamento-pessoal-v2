@@ -236,10 +236,11 @@ export default function DocumentosPage() {
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead className="font-display font-semibold">Nome</TableHead>
+                <TableHead className="font-display font-semibold">Dono</TableHead>
                 <TableHead className="font-display font-semibold">Tipo</TableHead>
                 <TableHead className="font-display font-semibold">Tamanho</TableHead>
                 <TableHead className="font-display font-semibold">Data</TableHead>
-                <TableHead className="w-[140px] font-display font-semibold">Ações</TableHead>
+                <TableHead className="w-[140px] font-display font-semibold text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
