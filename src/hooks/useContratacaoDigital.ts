@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { contratacaoService } from '@/services/contratacaoService';
 
 export function useContratacaoDigital() {
   const queryClient = useQueryClient();
@@ -26,5 +27,22 @@ export function useContratacaoDigital() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  return { atualizarEtapa };
+  const validarDocumento = useMutation({
+    mutationFn: async ({ admissaoId, docType, status, observacao }: { 
+      admissaoId: string, 
+      docType: string, 
+      status: 'validado' | 'rejeitado', 
+      observacao?: string 
+    }) => {
+      return await contratacaoService.validarDocumento(admissaoId, docType, status, observacao);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admissoes'] });
+      queryClient.invalidateQueries({ queryKey: ['contratacao-token'] });
+      toast.success('Validação do documento atualizada');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  return { atualizarEtapa, validarDocumento };
 }
