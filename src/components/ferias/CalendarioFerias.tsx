@@ -1,20 +1,23 @@
 import { useFerias } from '@/hooks/useFerias';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, User, Info, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isWithinInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { Separator } from '@/components/ui/separator';
 
 export function CalendarioFerias() {
   const { ferias } = useFerias();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -28,7 +31,17 @@ export function CalendarioFerias() {
       isWithinInterval(end, { start: monthStart, end: monthEnd }) ||
       (start < monthStart && end > monthEnd)
     );
-  });
+  }).sort((a: any, b: any) => new Date(a.data_inicio).getTime() - new Date(b.data_inicio).getTime());
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'aprovada': return 'bg-success/10 border-success/30 text-success';
+      case 'em_gozo': return 'bg-info/10 border-info/30 text-info';
+      case 'pendente': return 'bg-warning/10 border-warning/30 text-warning';
+      case 'concluida': return 'bg-muted/50 border-border/40 text-muted-foreground';
+      default: return 'bg-muted/10 border-border/20';
+    }
+  };
 
   return (
     <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
