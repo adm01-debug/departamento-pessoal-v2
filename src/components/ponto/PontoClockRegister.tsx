@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
+import { pontoMonitorService } from '@/services/pontoMonitorService';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts';
@@ -50,6 +51,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       const result = await pontoOfflineService.syncOfflineQueue();
       if (result.synced > 0) {
         toast.success(`${result.synced} registros offline sincronizados!`);
+        await pontoMonitorService.trackOfflineSync(result.synced, result.errors);
       }
     } catch (e) {
       console.error('Erro na sincronização automática', e);
