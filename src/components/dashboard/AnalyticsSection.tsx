@@ -474,7 +474,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
             </CardTitle>
             <div className="flex items-center gap-1">
               {notifications.some(n => !n.lida) && (
-                <Button variant="ghost" size="xs" onClick={markAllRead} className="text-[10px] h-7 px-2 text-primary hover:bg-primary/5">
+                <Button variant="ghost" size="sm" onClick={markAllRead} className="text-[10px] h-7 px-2 text-primary hover:bg-primary/5">
                   Lidas
                 </Button>
               )}
