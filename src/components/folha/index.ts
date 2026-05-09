@@ -10,3 +10,5 @@ export { FGTSDigitalDashboard } from './FGTSDigitalDashboard';
 export { RubricasDialog } from './RubricasDialog';
 export { CalculoFolhaWizard } from './CalculoFolhaWizard';
 export { PagamentoBancarioWizard } from './PagamentoBancarioWizard';
+export { FolhaAuditTimeline } from './FolhaAuditTimeline';
+
