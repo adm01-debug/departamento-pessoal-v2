@@ -25,9 +25,11 @@ const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG'
 export default function DocumentosPage() {
   const [search, setSearch] = useState('');
   const [tipoFilter, setTipoFilter] = useState('todos');
+  const [colaboradorFilter, setColaboradorFilter] = useState('todos');
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
+  const [colaboradorId, setColaboradorId] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
@@ -36,8 +38,13 @@ export default function DocumentosPage() {
   const queryClient = useQueryClient();
 
   const { data: documentos, isLoading } = useQuery({
-    queryKey: ['documentos'],
-    queryFn: () => documentoService.listar(),
+    queryKey: ['documentos', colaboradorFilter],
+    queryFn: () => documentoService.listar(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
+  });
+
+  const { data: colaboradores } = useQuery({
+    queryKey: ['colaboradores-simples'],
+    queryFn: () => colaboradorService.listar(),
   });
 
   const deleteMutation = useMutation({
