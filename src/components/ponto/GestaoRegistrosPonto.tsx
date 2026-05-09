@@ -261,7 +261,12 @@ export function GestaoRegistrosPonto() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="font-mono text-sm">{formatTime(r.entrada_1)}</TableCell>
+                        <TableCell className="text-[10px] text-muted-foreground whitespace-nowrap">
+                          {r.entrada_esperada ? `${r.entrada_esperada} - ${r.saida_esperada}` : 'Não def.'}
+                        </TableCell>
+                        <TableCell className={`font-mono text-sm ${temAtraso ? 'text-destructive font-bold' : ''}`}>
+                          {formatTime(r.entrada_1)}
+                        </TableCell>
                         <TableCell className="font-mono text-sm">{formatTime(r.saida_intervalo)}</TableCell>
                         <TableCell className="font-mono text-sm">{formatTime(r.retorno_intervalo)}</TableCell>
                         <TableCell className="font-mono text-sm">{formatTime(r.saida_1)}</TableCell>
