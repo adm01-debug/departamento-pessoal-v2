@@ -110,6 +110,7 @@ export default function RelatoriosPage() {
             <TabsList className="rounded-xl">
               <TabsTrigger value="analytics" className="rounded-lg font-body">📊 Analytics</TabsTrigger>
               <TabsTrigger value="exportar" className="rounded-lg font-body">📥 Exportar</TabsTrigger>
+              <TabsTrigger value="agendados" className="rounded-lg font-body">⏰ Agendamentos</TabsTrigger>
             </TabsList>
             <Select value={exportFormat} onValueChange={setExportFormat}>
               <SelectTrigger className="w-[130px] rounded-xl"><SelectValue /></SelectTrigger>
