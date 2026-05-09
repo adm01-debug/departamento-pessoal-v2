@@ -205,7 +205,7 @@ export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 export const documentoService = {
   async listar(colaboradorId?: string, empresaId?: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query: any = supabase.from('documentos').select('*').order('created_at', { ascending: false }).limit(500);
+    let query: any = supabase.from('documentos').select('*, colaborador:colaboradores(id, nome_completo, cpf)').order('created_at', { ascending: false }).limit(500);
     if (empresaId) query = query.eq('empresa_id', empresaId);
     if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
     const { data, error } = await query;
