@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { documentoService } from '@/services';
-import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2 } from 'lucide-react';
+import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
@@ -24,6 +24,7 @@ const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG'
 
 export default function DocumentosPage() {
   const [search, setSearch] = useState('');
+  const [tipoFilter, setTipoFilter] = useState('todos');
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
@@ -157,9 +158,11 @@ export default function DocumentosPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const filtered = documentos?.filter((d: any) =>
-    !search || (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = documentos?.filter((d: any) => {
+    const searchMatch = !search || (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase());
+    const tipoMatch = tipoFilter === 'todos' || d.tipo === tipoFilter;
+    return searchMatch && tipoMatch;
+  });
 
   return (
     <>
@@ -175,7 +178,32 @@ export default function DocumentosPage() {
         </Button>
       }
     >
-      <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar documento..." />
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Buscar documento pelo nome..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 rounded-xl border-border/40 focus:ring-primary/20"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground hidden sm:block" />
+          <Select value={tipoFilter} onValueChange={setTipoFilter}>
+            <SelectTrigger className="w-[180px] rounded-xl border-border/40">
+              <SelectValue placeholder="Tipo de Documento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os Tipos</SelectItem>
+              {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTipoFilter('todos'); }} className="text-xs text-muted-foreground hover:text-foreground">
+            Limpar
+          </Button>
+        </div>
+      </div>
 
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
