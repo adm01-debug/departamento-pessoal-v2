@@ -393,6 +393,52 @@ export default function AvaliacaoPage() {
               </Table>
             </CardContent></Card>
           </TabsContent>
+          
+          {/* NINE BOX */}
+          <TabsContent value="ninebox">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-3 gap-4 h-[600px]">
+                  {[3, 2, 1].map(pot => (
+                    [1, 2, 3].map(perf => {
+                      const label = getNineBoxLabel(perf, pot);
+                      const color = getNineBoxColor(perf, pot);
+                      const items = nineBox.filter((n: any) => 
+                        classifyScore(Number(n.media_performance)) === perf && 
+                        classifyScore(Number(n.media_potencial)) === pot
+                      );
+                      
+                      return (
+                        <div key={`${perf}-${pot}`} className={`border-2 rounded-lg p-3 flex flex-col ${color} border-opacity-40 shadow-sm transition-all hover:scale-[1.02]`}>
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+                            <Badge variant="secondary" className="text-[9px] h-4 px-1">{items.length}</Badge>
+                          </div>
+                          <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                            {items.map((it: any) => (
+                              <div key={it.avaliado_id} className="text-[10px] bg-white bg-opacity-60 p-1.5 rounded border border-white border-opacity-50 flex justify-between items-center group hover:bg-opacity-100 transition-all">
+                                <span className="truncate font-medium">{it.nome_completo}</span>
+                                <span className="text-[9px] opacity-60 font-mono">P{it.media_performance}/K{it.media_potencial}</span>
+                              </div>
+                            ))}
+                            {items.length === 0 && <div className="h-full flex items-center justify-center opacity-20"><LayoutGrid className="h-8 w-8" /></div>}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )).flat()}
+                </div>
+                <div className="mt-8 grid grid-cols-2 gap-8 text-xs text-muted-foreground border-t pt-4">
+                  <div className="flex items-center justify-center gap-2 font-medium">
+                    <TrendingUp className="h-4 w-4 text-primary" /> Eixo Y: Potencial (Baixo 1-2, Médio 3, Alto 4-5)
+                  </div>
+                  <div className="flex items-center justify-center gap-2 font-medium">
+                    <Target className="h-4 w-4 text-primary" /> Eixo X: Performance (Baixa 1-2, Média 3, Alta 4-5)
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       )}
     </PageLayout>
