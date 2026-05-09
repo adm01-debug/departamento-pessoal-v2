@@ -239,14 +239,45 @@ interface AnalyticsSectionProps {
     absenteismo: number;
     departamentos: { nome: string; count: number }[];
   } | undefined;
-  pendencias: Pendencia[] | undefined;
+  pendencias: PendenciaSummary[] | undefined;
   isLoadingStats: boolean;
   isLoadingPendencias: boolean;
   isEmptySystem: boolean;
+  empresaId?: string;
 }
 
-export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingPendencias, isEmptySystem }: AnalyticsSectionProps) {
+export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingPendencias, isEmptySystem, empresaId }: AnalyticsSectionProps) {
   const navigate = useNavigate();
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+
+  const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
+
+  const filteredPendencias = useMemo(() => {
+    if (!dbPendencias) return [];
+    return dbPendencias.filter(p => {
+      const matchesSearch = p.titulo.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           p.descricao.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = filterType === "all" || p.tipo === filterType;
+      return matchesSearch && matchesType;
+    });
+  }, [dbPendencias, searchQuery, filterType]);
+
+  const handleOpenDetail = (type?: string) => {
+    if (type) setFilterType(type);
+    setIsDetailOpen(true);
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'alta': return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'media': return 'text-warning bg-warning/10 border-warning/20';
+      case 'baixa': return 'text-info bg-info/10 border-info/20';
+      default: return 'text-muted-foreground bg-muted';
+    }
+  };
   return (
     <>
       {/* Row 1: 3-col analytics */}
