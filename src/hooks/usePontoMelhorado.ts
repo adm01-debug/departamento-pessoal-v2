@@ -11,7 +11,9 @@ export interface SolicitacaoAjuste {
   hora_sugerida: string;
   tipo_ponto: 'entrada' | 'saida';
   motivo: string;
-  status: 'pendente' | 'aprovado' | 'rejeitado';
+  status: 'rascunho' | 'enviado' | 'aprovado' | 'recusado';
+  rascunho?: boolean;
+  observacoes_gestor?: string;
   created_at: string;
 }
 
@@ -22,7 +24,7 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
     queryKey: ['solicitacoes-ajuste-ponto', empresaId, colaboradorId],
     enabled: !!empresaId,
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from('solicitacoes_ajuste_ponto')
         .select('*, colaborador:colaboradores(nome_completo)')
         .eq('empresa_id', empresaId!)
@@ -39,12 +41,13 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
   });
 
   const criarSolicitacao = useMutation({
-    mutationFn: async (payload: Omit<SolicitacaoAjuste, 'id' | 'status' | 'created_at'>) => {
-      const { data, error } = await supabase
+    mutationFn: async (payload: Omit<SolicitacaoAjuste, 'id' | 'status' | 'created_at'> & { status?: SolicitacaoAjuste['status'] }) => {
+      const { data, error } = await (supabase as any)
         .from('solicitacoes_ajuste_ponto')
         .insert({
           ...payload,
-          status: 'pendente'
+          status: payload.status || 'enviado',
+          rascunho: payload.status === 'rascunho'
         })
         .select()
         .single();
@@ -54,21 +57,22 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes-ajuste-ponto'] });
-      toast.success('Solicitação de ajuste enviada para aprovação.');
+      toast.success('Solicitação de ajuste processada.');
     },
     onError: (e: Error) => toast.error(`Erro ao criar solicitação: ${e.message}`),
   });
 
   const responderSolicitacao = useMutation({
-    mutationFn: async ({ id, status, observacoes }: { id: string; status: 'aprovado' | 'rejeitado'; observacoes?: string }) => {
-      const { data: user } = await supabase.auth.getUser();
+    mutationFn: async ({ id, status, observacoes }: { id: string; status: 'aprovado' | 'recusado'; observacoes?: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('solicitacoes_ajuste_ponto')
         .update({
           status,
           observacoes_gestor: observacoes,
-          aprovado_por: user.user?.id,
+          analisado_por: user?.id,
+          data_analise: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
