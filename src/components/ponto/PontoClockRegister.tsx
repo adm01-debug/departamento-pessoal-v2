@@ -65,7 +65,27 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
     }
   };
 
-  const handleOfflineRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
+  const startScan = (tipo: any) => {
+    setSelectedTipo(tipo);
+    setShowFaceScan(true);
+    setScanProgress(0);
+    
+    const interval = setInterval(() => {
+      setScanProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            setShowFaceScan(false);
+            finalizeRegister(tipo);
+          }, 500);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 150);
+  };
+
+  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     if (!user) return;
     
     // Se estiver online, usa o fluxo padrão
