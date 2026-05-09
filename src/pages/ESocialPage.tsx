@@ -1,20 +1,20 @@
 import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { getEventoDescricao } from '@/services/esocialService';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { CardDescription } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const tiposEvento = [
   'S-1000', 'S-1005', 'S-1010', 'S-1020',
@@ -27,6 +27,7 @@ export default function ESocialPage() {
   const { empresaAtual } = useEmpresas();
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedEvento, setSelectedEvento] = useState<any>(null);
 
   const statusVariant = (s: string) => s === 'enviado' ? 'success' : s === 'erro' ? 'error' : 'warning';
   const statusIcon = (s: string) => {
@@ -219,3 +220,70 @@ export default function ESocialPage() {
     </>
   );
 }
+      {/* Detalhes do Evento */}
+      <Dialog open={!!selectedEvento} onOpenChange={(o) => { if(!o) setSelectedEvento(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 border-border/30 shadow-elevated rounded-2xl">
+          <DialogHeader className="p-6 pb-2">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-primary/10 rounded-xl">
+                <FileCheck className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <DialogTitle className="font-display text-xl">{selectedEvento?.tipo_evento} - Detalhes da Transmissão</DialogTitle>
+                <DialogDescription className="font-body">
+                  Histórico de envio e retorno do eSocial
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <ScrollArea className="flex-1 p-6 pt-2">
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Card className="bg-muted/30 border-none shadow-none">
+                <CardContent className="p-4 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Status</span>
+                  <StatusBadge status={selectedEvento?.status || 'pendente'} variant={statusVariant(selectedEvento?.status || 'pendente') as any} />
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30 border-none shadow-none">
+                <CardContent className="p-4 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Data de Envio</span>
+                  <span className="text-sm font-medium">{formatDate(selectedEvento?.data_envio || selectedEvento?.created_at)}</span>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30 border-none shadow-none">
+                <CardContent className="p-4 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Recibo / Protocolo</span>
+                  <span className="text-sm font-mono">{selectedEvento?.protocolo || 'Aguardando transmissão'}</span>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30 border-none shadow-none">
+                <CardContent className="p-4 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Ambiente</span>
+                  <Badge variant="outline" className="w-fit flex gap-1 items-center"><Globe className="h-3 w-3" /> Produção</Badge>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-4">
+              {selectedEvento?.mensagem_erro && (
+                <div className="p-4 rounded-xl border border-destructive/20 bg-destructive/5 text-destructive text-sm font-body">
+                  <p className="font-bold flex items-center gap-1.5 mb-1"><AlertCircle className="h-4 w-4" /> Erro na Transmissão:</p>
+                  {selectedEvento.mensagem_erro}
+                </div>
+              )}
+
+              <div>
+                <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5 block">Dados do Evento (JSON)</Label>
+                <pre className="text-[10px] p-4 bg-muted rounded-xl border font-mono max-h-[300px] overflow-auto">
+                  {JSON.stringify(selectedEvento?.dados_evento || {}, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </ScrollArea>
+          
+          <div className="p-4 bg-muted/20 border-t border-border/20 flex justify-end">
+            <Button variant="outline" onClick={() => setSelectedEvento(null)} className="rounded-xl">Fechar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
