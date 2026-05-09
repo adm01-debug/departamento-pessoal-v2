@@ -391,32 +391,54 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Título</TableHead><TableHead>Colaborador</TableHead><TableHead>Competência</TableHead><TableHead>Progresso</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Título do PDI</TableHead>
+                    <TableHead className="font-display font-semibold">Colaborador</TableHead>
+                    <TableHead className="font-display font-semibold">Foco / Competência</TableHead>
+                    <TableHead className="font-display font-semibold text-center">Progresso</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {pdis.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum PDI cadastrado</TableCell></TableRow> :
+                  {pdis.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhum Plano de Desenvolvimento cadastrado</TableCell></TableRow> :
                     pdis.map((p: any) => (
-                      <TableRow key={p.id}>
-                        <TableCell className="font-medium">{p.titulo}</TableCell>
-                        <TableCell>{p.colaborador?.nome_completo || '—'}</TableCell>
-                        <TableCell>{p.competencia || '—'}</TableCell>
-                        <TableCell>{p.progresso ?? 0}%</TableCell>
-                        <TableCell><Badge variant={(statusColors[p.status] || 'secondary') as any}>{p.status}</Badge></TableCell>
+                      <TableRow key={p.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{p.titulo}</span>
+                              <span className="text-[10px] text-muted-foreground italic">Prazo: {p.prazo ? new Date(p.prazo).toLocaleDateString('pt-BR') : '—'}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="font-body text-xs">{p.colaborador?.nome_completo || '—'}</TableCell>
+                        <TableCell><Badge variant="outline" className="text-[9px] uppercase">{p.competencia || 'Geral'}</Badge></TableCell>
+                        <TableCell className="w-[120px]">
+                           <div className="flex items-center gap-2">
+                              <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
+                                 <div className="h-full bg-indigo-500" style={{ width: `${p.progresso ?? 0}%` }} />
+                              </div>
+                              <span className="text-[9px] font-mono font-bold">{p.progresso ?? 0}%</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[p.status] || 'secondary') as any} className="text-[10px]">{p.status}</Badge></TableCell>
                         <TableCell className="text-right flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => gerarPDIPDF(p.colaborador?.nome_completo || 'Colaborador', p)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 text-primary" onClick={() => gerarPDIPDF(p.colaborador?.nome_completo || 'Colaborador', p)}>
                             <Download className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => excluirPDI.mutate(p.id)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirPDI.mutate(p.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
-
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* COMPETÊNCIAS */}
