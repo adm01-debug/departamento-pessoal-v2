@@ -1,7 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import CryptoJS from 'crypto-js';
+import { toast } from 'sonner';
 
 const PONTO_OFFLINE_STORAGE_KEY = 'ponto_offline_queue';
+const CRYPTO_KEY = 'lovable-ponto-secure-v1'; // Em produção, viria de config segura
 
 export interface OfflineRegistro {
   id: string;
@@ -23,7 +25,19 @@ export const pontoOfflineService = {
   },
 
   queueRegistro: async (registro: Omit<OfflineRegistro, 'id' | 'hash'>) => {
-    const queue: OfflineRegistro[] = JSON.parse(localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY) || '[]');
+    // Recupera e descriptografa fila existente
+    const stored = localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY);
+    let queue: OfflineRegistro[] = [];
+    
+    if (stored) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(stored, CRYPTO_KEY);
+        queue = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      } catch (e) {
+        console.error('Falha ao descriptografar fila offline. Resetando.', e);
+        queue = [];
+      }
+    }
     
     const id = crypto.randomUUID();
     const hash = pontoOfflineService.generateIntegrityHash(registro);
@@ -31,12 +45,24 @@ export const pontoOfflineService = {
     const newEntry: OfflineRegistro = { ...registro, id, hash };
     queue.push(newEntry);
     
-    localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, JSON.stringify(queue));
+    // Criptografa antes de salvar
+    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(queue), CRYPTO_KEY).toString();
+    localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
     return newEntry;
   },
 
   syncOfflineQueue: async () => {
-    const queue: OfflineRegistro[] = JSON.parse(localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY) || '[]');
+    const stored = localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY);
+    if (!stored) return { synced: 0, errors: 0 };
+
+    let queue: OfflineRegistro[] = [];
+    try {
+      const bytes = CryptoJS.AES.decrypt(stored, CRYPTO_KEY);
+      queue = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    } catch (e) {
+      return { synced: 0, errors: 1 };
+    }
+    
     if (queue.length === 0) return { synced: 0, errors: 0 };
 
     let synced = 0;
@@ -68,12 +94,20 @@ export const pontoOfflineService = {
       }
     }
 
-    localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, JSON.stringify(remaining));
+    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(remaining), CRYPTO_KEY).toString();
+    localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
     return { synced, errors };
   },
 
   getQueueSize: () => {
-    const queue: OfflineRegistro[] = JSON.parse(localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY) || '[]');
-    return queue.length;
+    const stored = localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY);
+    if (!stored) return 0;
+    try {
+      const bytes = CryptoJS.AES.decrypt(stored, CRYPTO_KEY);
+      const queue = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      return queue.length;
+    } catch (e) {
+      return 0;
+    }
   }
 };

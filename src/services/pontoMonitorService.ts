@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const pontoMonitorService = {
   logEvent: async (eventName: string, details: any) => {
@@ -28,6 +29,9 @@ export const pontoMonitorService = {
   },
 
   trackOfflineSync: (syncedCount: number, errorCount: number) => {
+    if (errorCount > 0) {
+      toast.error(`Falha em ${errorCount} registros na sincronização offline.`);
+    }
     return pontoMonitorService.logEvent('OFFLINE_SYNC_COMPLETE', {
       syncedCount,
       errorCount,

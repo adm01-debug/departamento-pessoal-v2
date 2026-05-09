@@ -22,6 +22,7 @@ import { PontoWeekSummary } from '@/components/ponto/PontoWeekSummary';
 import { PontoAdjustmentRequests } from '@/components/ponto/PontoAdjustmentRequests';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -155,6 +156,7 @@ export default function PontoPage() {
               </Card>
             </div>
             <GestaoRegistrosPonto />
+            <PontoAuditTimeline />
           </TabsContent>
         </Tabs>
 
