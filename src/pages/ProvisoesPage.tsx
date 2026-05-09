@@ -327,10 +327,13 @@ export default function ProvisoesPage() {
                           <TableCell>{log.competencia}</TableCell>
                           <TableCell>
                             <Badge variant={log.status === 'CONCLUIDO' ? 'success' : log.status === 'ERRO' ? 'destructive' : 'secondary'} className="text-[10px] px-1.5 h-5">
+                              {log.status === 'CONCLUIDO' ? <ShieldCheck className="h-3 w-3 mr-1" /> : log.status === 'PROCESSANDO' ? <Activity className="h-3 w-3 mr-1 animate-spin" /> : <AlertCircle className="h-3 w-3 mr-1" />}
                               {log.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right font-mono">{formatCurrency(log.valor_total_provisionado || 0)}</TableCell>
+                          <TableCell className="text-muted-foreground">{log.duracao_ms ? `${log.duracao_ms}ms` : '-'}</TableCell>
+                          <TableCell className="font-medium">{log.total_colaboradores || 0}</TableCell>
+                          <TableCell className="text-right font-mono font-bold text-primary">{formatCurrency(log.valor_total_provisionado || 0)}</TableCell>
                         </TableRow>
                       ))
                     )}
