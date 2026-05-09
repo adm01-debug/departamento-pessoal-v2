@@ -188,26 +188,31 @@ export default function ESocialPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge status={e.status || 'pendente'} variant={statusVariant(e.status || 'pendente') as any} />
-                      {e.status === 'pendente' && empresaAtual?.id && (
-                        <Button
-                          size="sm"
-                          disabled={isSending}
-                          onClick={() => enviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                          className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body"
-                        >
-                          {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setSelectedEvento(e)} title="Ver detalhes">
+                          <Eye className="h-4 w-4" />
                         </Button>
-                      )}
-                      {e.status === 'erro' && empresaAtual?.id && (
-                        <Button
-                          size="sm"
-                          disabled={isSending}
-                          onClick={() => reenviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                          className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body"
-                        >
-                          {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
-                        </Button>
-                      )}
+                        {e.status === 'pendente' && empresaAtual?.id && (
+                          <Button
+                            size="sm"
+                            disabled={isSending}
+                            onClick={() => enviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
+                            className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body"
+                          >
+                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
+                          </Button>
+                        )}
+                        {e.status === 'erro' && empresaAtual?.id && (
+                          <Button
+                            size="sm"
+                            disabled={isSending}
+                            onClick={() => reenviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
+                            className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body"
+                          >
+                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 ))}
