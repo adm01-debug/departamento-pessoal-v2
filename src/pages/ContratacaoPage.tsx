@@ -22,93 +22,10 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { SignaturePad } from '@/components/admissao/SignaturePad';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDocumentOCR, OCRResult } from '@/hooks/useDocumentOCR';
+import { contratacaoService } from '@/services/contratacaoService';
 
 const STEPS = [
-  { id: 'dados', label: 'Dados', icon: User },
-  { id: 'documentos', label: 'Documentos', icon: Upload },
-  { id: 'contrato', label: 'Contrato', icon: FileText },
-  { id: 'assinatura', label: 'Assinatura', icon: PenTool },
-] as const;
-
-function TokenInput({ onValidToken }: { onValidToken: (token: string) => void }) {
-  const [token, setToken] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const { data, error: err } = await supabase
-        .from('admissao_tokens')
-        .select('*')
-        .eq('token', token)
-        .maybeSingle();
-
-      if (err || !data) {
-        setError('Código inválido ou expirado.');
-      } else if (new Date(data.data_expiracao) < new Date()) {
-        setError('Este link expirou. Solicite um novo ao RH.');
-      } else {
-        onValidToken(token);
-      }
-    } catch (err) {
-      setError('Erro ao validar código. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="w-full max-w-md shadow-2xl border-0 rounded-3xl overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-primary via-primary-glow to-primary" />
-          <CardHeader className="text-center pt-8">
-            <div className="mx-auto w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 shadow-inner">
-              <ShieldCheck className="w-10 h-10 text-primary" />
-            </div>
-            <CardTitle className="text-3xl font-display font-bold">Portal do Candidato</CardTitle>
-            <CardDescription className="text-base px-4">
-              Use o código de acesso enviado pelo RH para iniciar seu processo de admissão digital.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 px-8 pb-8">
-            <div className="space-y-3">
-              <Label className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Código de Acesso</Label>
-              <Input
-                placeholder="Insira seu código aqui..."
-                value={token}
-                onChange={e => setToken(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                className="h-14 text-center text-xl font-mono tracking-widest rounded-2xl border-2 focus-visible:ring-primary"
-              />
-              {error && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-destructive flex items-center justify-center gap-1 font-medium">
-                  <AlertCircle className="w-4 h-4" /> {error}
-                </motion.p>
-              )}
-            </div>
-            <Button 
-              className="w-full h-14 rounded-2xl text-lg font-bold shadow-glow hover:scale-[1.02] transition-all" 
-              onClick={handleSubmit} 
-              disabled={!token || loading}
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-              Acessar Portal
-            </Button>
-            
-            <div className="pt-4 flex items-center justify-center gap-2">
-              <img src="https://vignette.wikia.nocookie.net/logopedia/images/4/4b/Gov.br_logo.png/revision/latest?cb=20190822144131" alt="Gov.br" className="h-6 opacity-50 grayscale hover:grayscale-0 transition-all cursor-not-allowed" title="Em breve: Acesso via Gov.br" />
-              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Powered by Lovable Cloud</span>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
-  );
-}
-
+// ... keep existing code
 function ContratacaoWorkflow({ token }: { token: string }) {
   const [step, setStep] = useState(0);
   const queryClient = useQueryClient();
@@ -120,18 +37,9 @@ function ContratacaoWorkflow({ token }: { token: string }) {
   const [contractHtml, setContractHtml] = useState<string | null>(null);
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, { name: string, status: 'uploading' | 'success' | 'error', result?: OCRResult }>>({});
   const { processDocument, isProcessing: isOCRProcessing } = useDocumentOCR();
-import { contratacaoService } from '@/services/contratacaoService';
 
   const { data: tokenData, isLoading } = useQuery({
-    queryKey: ['contratacao-token', token],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('admissao_tokens')
-        .select('*, admissao:admissoes(*)')
-        .eq('token', token)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+// ... keep existing code
     },
   });
 
@@ -151,8 +59,12 @@ import { contratacaoService } from '@/services/contratacaoService';
       if (tokenData.contrato_assinado) setStep(3);
       else if (tokenData.documentos_enviados) setStep(2);
       else if (tokenData.dados_preenchidos) setStep(1);
+
+      // Load contract template
+      contratacaoService.gerarTemplateContrato(adm.id).then(setContractHtml);
     }
   }, [tokenData]);
+
 
   const saveDados = useMutation({
     mutationFn: async () => {
