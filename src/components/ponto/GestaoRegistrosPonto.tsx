@@ -57,14 +57,21 @@ export function GestaoRegistrosPonto() {
 
   const filtrados = registros.filter((r: any) => {
     const nome = r.colaborador?.nome_completo?.toLowerCase() || '';
-    const nomeMatch = !busca || nome.includes(busca.toLowerCase());
+    const cargo = r.colaborador?.cargo?.toLowerCase() || '';
+    const depto = r.colaborador?.departamento?.toLowerCase() || '';
+    const query = busca.toLowerCase();
     
-    if (tipoExcecao === 'todas') return nomeMatch;
-    if (tipoExcecao === 'atrasos') return nomeMatch && r.atraso_minutos > 0;
-    if (tipoExcecao === 'faltas') return nomeMatch && (!r.entrada_1 && !r.saida_1);
-    if (tipoExcecao === 'incompletos') return nomeMatch && (r.entrada_1 && !r.saida_1);
+    const buscaMatch = !busca || 
+      nome.includes(query) || 
+      cargo.includes(query) || 
+      depto.includes(query);
     
-    return nomeMatch;
+    if (tipoExcecao === 'todas') return buscaMatch;
+    if (tipoExcecao === 'atrasos') return buscaMatch && r.atraso_minutos > 0;
+    if (tipoExcecao === 'faltas') return buscaMatch && (!r.entrada_1 && !r.saida_1);
+    if (tipoExcecao === 'incompletos') return buscaMatch && (r.entrada_1 && !r.saida_1);
+    
+    return buscaMatch;
   });
 
   const mudarDia = (offset: number) => {
