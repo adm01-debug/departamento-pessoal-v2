@@ -563,7 +563,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                     variant={filterType === type ? 'default' : 'outline'}
                     size="sm"
                     className={cn(
-                      "rounded-lg h-11 px-4 font-medium transition-all",
+                      "rounded-lg h-11 px-4 font-medium transition-all text-xs",
                       filterType === type ? "shadow-lg shadow-primary/20" : "bg-muted/20 border-border/10"
                     )}
                     onClick={() => setFilterType(type)}
@@ -576,14 +576,14 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-muted/5">
-            {isLoadingDB ? (
+            {isLoadingDB || isLoadingPonto ? (
               <div className="space-y-4">
                 {Array(4).fill(0).map((_, i) => <CardSkeleton key={i} className="h-24 rounded-2xl" />)}
               </div>
-            ) : filteredPendencias.length > 0 ? (
+            ) : paginatedPendencias.length > 0 ? (
               <div className="grid gap-4">
                 <AnimatePresence mode="popLayout">
-                  {filteredPendencias.map((item, idx) => (
+                  {paginatedPendencias.map((item, idx) => (
                     <motion.div
                       key={item.id}
                       layout
@@ -595,85 +595,155 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                     >
                       <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
                       
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex gap-4">
-                          <div className={cn(
-                            "p-3 rounded-2xl bg-gradient-to-br shrink-0 shadow-lg",
-                            item.tipo === 'ferias' ? "from-primary/80 to-primary" :
-                            item.tipo === 'ponto' ? "from-warning/80 to-warning" :
-                            item.tipo === 'assinaturas' ? "from-success/80 to-success" : "from-info/80 to-info"
-                          )}>
-                            {item.tipo === 'ferias' ? <Calendar className="h-5 w-5 text-white" /> :
-                             item.tipo === 'ponto' ? <Clock className="h-5 w-5 text-white" /> :
-                             item.tipo === 'assinaturas' ? <ShieldCheck className="h-5 w-5 text-white" /> : <Briefcase className="h-5 w-5 text-white" />}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <h4 className="font-display font-bold text-lg leading-tight">{item.titulo}</h4>
-                              <Badge className={cn("text-[10px] font-bold uppercase tracking-wider py-0.5", getPriorityColor(item.prioridade))}>
-                                {item.prioridade}
-                              </Badge>
-                              <Badge variant="outline" className="text-[10px] opacity-70">
-                                {format(new Date(item.criado_at), "dd 'de' MMM, HH:mm", { locale: ptBR })}
-                              </Badge>
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex gap-4">
+                            <div className={cn(
+                              "p-3 rounded-2xl bg-gradient-to-br shrink-0 shadow-lg",
+                              item.tipo === 'ferias' ? "from-primary/80 to-primary" :
+                              item.tipo === 'ponto' ? "from-warning/80 to-warning" :
+                              item.tipo === 'assinaturas' ? "from-success/80 to-success" : "from-info/80 to-info"
+                            )}>
+                              {item.tipo === 'ferias' ? <Calendar className="h-5 w-5 text-white" /> :
+                               item.tipo === 'ponto' ? <Clock className="h-5 w-5 text-white" /> :
+                               item.tipo === 'assinaturas' ? <ShieldCheck className="h-5 w-5 text-white" /> : <Briefcase className="h-5 w-5 text-white" />}
                             </div>
-                            <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
-                              {item.descricao}
-                            </p>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <h4 className="font-display font-bold text-lg leading-tight">{item.titulo}</h4>
+                                <Badge className={cn("text-[10px] font-bold uppercase tracking-wider py-0.5", getPriorityColor(item.prioridade))}>
+                                  {item.prioridade}
+                                </Badge>
+                                <Badge variant="outline" className="text-[10px] opacity-70">
+                                  {format(new Date(item.criado_at), "dd 'de' MMM, HH:mm", { locale: ptBR })}
+                                </Badge>
+                              </div>
+                              <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
+                                {item.descricao}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 shrink-0">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all"
+                              onClick={() => window.open(`/detalhes/${item.referencia_id || item.id}`, '_blank')}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 border-border/40 shadow-xl glass">
+                                <DropdownMenuItem 
+                                  className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" 
+                                  onClick={() => {
+                                    if (item.source === 'ponto') {
+                                      responderSolicitacao.mutate({ id: item.id, status: 'aprovado' });
+                                    } else {
+                                      updateStatus.mutate({ id: item.id, status: 'concluido' });
+                                    }
+                                  }}
+                                >
+                                  <Check className="h-4 w-4" /> Aprovar / Concluir
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" 
+                                  onClick={() => {
+                                    if (item.source === 'ponto') {
+                                      responderSolicitacao.mutate({ id: item.id, status: 'recusado', observacoes: 'Necessita revisão.' });
+                                    } else {
+                                      updateStatus.mutate({ id: item.id, status: 'em_analise' });
+                                    }
+                                  }}
+                                >
+                                  <Activity className="h-4 w-4" /> {item.source === 'ponto' ? 'Recusar' : 'Marcar Revisão'}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer">
+                                  <Forward className="h-4 w-4" /> Encaminhar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
 
-                        <div className="flex gap-2 shrink-0">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all"
-                            onClick={() => window.open(`/detalhes/${item.referencia_id}`, '_blank')}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 border-border/40 shadow-xl glass">
-                              <DropdownMenuItem 
-                                className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" 
-                                onClick={() => {
-                                  if (item.source === 'ponto') {
-                                    responderSolicitacao.mutate({ id: item.id, status: 'aprovado' });
-                                  } else {
-                                    updateStatus.mutate({ id: item.id, status: 'concluido' });
-                                  }
-                                }}
-                              >
-                                <Check className="h-4 w-4" /> Aprovar / Concluir
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" 
-                                onClick={() => {
-                                  if (item.source === 'ponto') {
-                                    responderSolicitacao.mutate({ id: item.id, status: 'recusado', observacoes: 'Necessita revisão.' });
-                                  } else {
-                                    updateStatus.mutate({ id: item.id, status: 'em_analise' });
-                                  }
-                                }}
-                              >
-                                <Activity className="h-4 w-4" /> {item.source === 'ponto' ? 'Recusar' : 'Marcar Revisão'}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer">
-                                <Forward className="h-4 w-4" /> Encaminhar
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
+                        {/* Compliance & History Highlight for Ponto */}
+                        {item.source === 'ponto' && item.raw && (
+                          <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-primary opacity-70" />
+                              <div className="text-[10px]">
+                                <p className="text-muted-foreground font-bold uppercase">Timezone</p>
+                                <p className="font-medium">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                              </div>
+                            </div>
+                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                              <History className="h-4 w-4 text-warning opacity-70" />
+                              <div className="text-[10px]">
+                                <p className="text-muted-foreground font-bold uppercase">Original</p>
+                                <p className="font-medium">{item.raw.hora_original?.substring(0, 5) || 'N/A'}</p>
+                              </div>
+                            </div>
+                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                              <Shield className="h-4 w-4 text-success opacity-70" />
+                              <div className="text-[10px]">
+                                <p className="text-muted-foreground font-bold uppercase">Conformidade 671</p>
+                                <p className="font-medium">Validado</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-6 p-4 bg-muted/20 rounded-2xl border border-border/10">
+                    <p className="text-xs text-muted-foreground">
+                      Mostrando {Math.min(filteredPendencias.length, (page - 1) * itemsPerPage + 1)}-{Math.min(filteredPendencias.length, page * itemsPerPage)} de {filteredPendencias.length}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page === 1}
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        className="h-9 w-9 p-0 rounded-lg"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <div className="flex items-center gap-1 px-2">
+                        {Array.from({ length: totalPages }).map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setPage(i + 1)}
+                            className={cn(
+                              "w-2 h-2 rounded-full transition-all",
+                              page === i + 1 ? "bg-primary w-4" : "bg-primary/20 hover:bg-primary/40"
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page === totalPages}
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        className="h-9 w-9 p-0 rounded-lg"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
