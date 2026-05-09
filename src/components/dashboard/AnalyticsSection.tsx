@@ -7,7 +7,7 @@ import {
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
-  Check, Eye, Forward, MoreHorizontal, History
+  Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -29,6 +29,8 @@ import { usePendencias, type Pendencia as DB_Pendencia } from '@/hooks/usePenden
 import { usePontoMelhorado, type SolicitacaoAjuste } from '@/hooks/usePontoMelhorado';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const MotionCard = motion.create(Card);
 
