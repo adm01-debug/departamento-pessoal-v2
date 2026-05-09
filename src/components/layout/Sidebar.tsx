@@ -122,7 +122,6 @@ const menuGroups: MenuGroup[] = [
       { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
       { path: '/esocial', label: 'eSocial', icon: FileCheck },
       { path: '/obrigacoes-fiscais', label: 'Obrigações Fiscais', icon: ScrollText },
-      { path: '/auditoria', label: 'Auditoria', icon: Shield },
       { path: '/calculadora-rescisao', label: 'Calculadora Rescisão', icon: DollarSign },
     ],
   },
@@ -131,6 +130,8 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: '/usuarios', label: 'Usuários', icon: UserCog },
       { path: '/controle-acesso', label: 'Controle de Acesso', icon: Lock },
+      { path: '/seguranca', label: 'Segurança', icon: ShieldCheck },
+      { path: '/auditoria', label: 'Auditoria', icon: Shield },
       { path: '/assinaturas', label: 'Assinaturas', icon: PenTool },
       { path: '/gerador-documentos', label: 'Gerador Docs', icon: FileText },
       { path: '/workflows', label: 'Workflows', icon: Workflow },
@@ -139,6 +140,7 @@ const menuGroups: MenuGroup[] = [
       { path: '/importacao', label: 'Importação', icon: Database },
       { path: '/integracoes', label: 'Integrações', icon: Plug },
       { path: '/lgpd', label: 'LGPD', icon: ShieldCheck },
+      { path: '/telemetria', label: 'Telemetria', icon: BarChart3 },
       { path: '/backup', label: 'Backup', icon: Database },
       { path: '/perfil', label: 'Meu Perfil', icon: UserCog },
       { path: '/configuracoes', label: 'Configurações', icon: Settings },
@@ -155,7 +157,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, className, pendingCounts }: SidebarProps) {
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
 
   const activeGroupLabel = menuGroups.find(g =>
@@ -259,6 +261,10 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                       className="space-y-0.5 overflow-hidden"
                     >
                       {group.items.map(({ path, label, icon: Icon }) => {
+                        // Admin-only paths
+                        const adminPaths = ['/usuarios', '/seguranca', '/auditoria', '/telemetria', '/lgpd', '/controle-acesso'];
+                        if (adminPaths.includes(path) && !isAdmin) return null;
+
                         const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
                         const badge = getBadge(path);
 
