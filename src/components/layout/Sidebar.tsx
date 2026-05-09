@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
-  Zap, ChevronRight, UserPlus, UserMinus, Briefcase,
+  Zap, ChevronRight, ChevronLeft, UserPlus, UserMinus, Briefcase,
   FolderOpen, CalendarDays, Plug, Database,
   Network, Shield, UserCog, Lock,
   Timer, GraduationCap, ClipboardList, Heart,
