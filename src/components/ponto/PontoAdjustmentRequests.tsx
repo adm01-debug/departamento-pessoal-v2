@@ -154,7 +154,7 @@ export function PontoAdjustmentRequests() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => showAudit(s)}>
+                              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => showDetails(s)}>
                                 <History className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
