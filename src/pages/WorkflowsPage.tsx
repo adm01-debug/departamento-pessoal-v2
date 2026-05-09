@@ -44,6 +44,8 @@ export default function WorkflowsPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [selectedExec, setSelectedExec] = useState<any>(null);
+  const [showLog, setShowLog] = useState(false);
   const [form, setForm] = useState({ nome: '', descricao: '', tipo: 'ferias', etapas: ETAPAS_PADRAO.slice(0, 2) });
   const [numEtapas, setNumEtapas] = useState(2);
 
