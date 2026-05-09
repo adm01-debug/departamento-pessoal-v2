@@ -145,7 +145,7 @@ export default function CalculadoraRescisaoPage() {
           valor_rescisao: result.totalLiquido,
           status: 'pendente',
           created_by: user.id
-        });
+        } as any);
         
         if (!deslError) {
           toast.success('Desligamento registrado no módulo de Pessoas!');
