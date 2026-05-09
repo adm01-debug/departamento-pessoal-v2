@@ -742,6 +742,13 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                       <div className="flex flex-col gap-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex gap-4">
+                            <div className="pt-1">
+                              <Checkbox 
+                                checked={selectedIds.includes(item.id)}
+                                onCheckedChange={() => toggleSelect(item.id)}
+                                className="rounded-md border-primary/50"
+                              />
+                            </div>
                             <div className={cn(
                               "p-3 rounded-2xl bg-gradient-to-br shrink-0 shadow-lg",
                               item.tipo === 'ferias' ? "from-primary/80 to-primary" :
