@@ -32,20 +32,21 @@ export function PontoAuditTimeline() {
 
   const filteredLogs = auditLogs.filter((log: any) => 
     log.acao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.justificativa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.usuario?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+    log.tabela.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    log.user_email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExportAudit = () => {
     const exportData = filteredLogs.map((log: any) => ({
       data: format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss'),
-      usuario: log.usuario?.nome || 'Sistema',
+      usuario: log.user_email || 'Sistema',
       acao: log.acao,
-      tabela: log.tabela_nome,
-      justificativa: log.justificativa || '-'
+      tabela: log.tabela,
+      registro_id: log.registro_id
     }));
     exportPontoCSV(exportData, 'trilha-auditoria-ponto.csv');
   };
+
 
   return (
     <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
