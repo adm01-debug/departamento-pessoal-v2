@@ -141,14 +141,37 @@ export default function ESocialPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2.5 font-display">
+          <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
                 <FileCheck className="h-4 w-4 text-primary-foreground" />
               </div>
-              Eventos eSocial
-            </CardTitle>
-            <div className="flex items-center gap-2">
+              <CardTitle className="font-display">Eventos eSocial</CardTitle>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Buscar evento ou protocolo..." 
+                  className="pl-9 rounded-xl h-9" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[140px] rounded-xl h-9">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Status</SelectItem>
+                  <SelectItem value="pendente">Pendentes</SelectItem>
+                  <SelectItem value="enviado">Enviados</SelectItem>
+                  <SelectItem value="erro">Com Erro</SelectItem>
+                </SelectContent>
+              </Select>
+
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="rounded-xl gap-1.5 font-body border-success/30 hover:bg-success/5 text-success">
