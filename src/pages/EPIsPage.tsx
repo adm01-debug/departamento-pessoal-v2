@@ -30,7 +30,7 @@ export default function EPIsPage() {
   const qc = useQueryClient();
   const [openEpi, setOpenEpi] = useState(false);
   const [openEntrega, setOpenEntrega] = useState(false);
-  const [formEpi, setFormEpi] = useState({ nome: '', ca: '', validade_meses: '', categoria: 'cabeca' });
+  const [formEpi, setFormEpi] = useState({ nome: '', ca: '', validade_meses: '', categoria: 'cabeca', ca_validade: '' });
   const [formEntrega, setFormEntrega] = useState({ epi_id: '', colaborador_id: '', data_entrega: '', quantidade: '1' });
   const [searchCatalogo, setSearchCatalogo] = useState('');
   const [catFilter, setCatFilter] = useState('');
