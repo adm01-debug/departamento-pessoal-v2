@@ -174,6 +174,25 @@ export default function ProvisoesPage() {
           </TabsList>
 
           <TabsContent value="relatorio" className="space-y-6">
+            {inconsistencias && inconsistencias.length > 0 && (
+              <Card className="border-warning/30 bg-warning/5 rounded-2xl overflow-hidden shadow-sm">
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-warning/10 text-warning">
+                      <AlertCircle className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-warning-foreground">Inconsistências Detectadas</p>
+                      <p className="text-xs text-muted-foreground">{inconsistencias.length} colaboradores ativos estão sem salário base definido. As provisões para estes colaboradores serão zero.</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-warning/20 hover:bg-warning/10 text-warning-foreground" onClick={() => window.location.href = '/colaboradores'}>
+                    Corrigir
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             {!isLoading && provisoes && provisoes.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
