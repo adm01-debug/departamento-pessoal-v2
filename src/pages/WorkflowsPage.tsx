@@ -260,7 +260,7 @@ export default function WorkflowsPage() {
                     const canAct = e.status === 'pendente' || e.status === 'em_andamento';
 
                     return (
-                      <TableRow key={e.id} className="hover:bg-accent/30 transition-colors">
+                      <TableRow key={e.id} className="hover:bg-accent/30 transition-colors cursor-pointer" onClick={() => { setSelectedExec(e); setShowLog(true); }}>
                         <TableCell className="font-body font-medium">{(e as any).workflow?.nome || '—'}</TableCell>
                         <TableCell><Badge variant="outline" className="font-body text-xs">{tipoIcons[e.entidade_tipo] || '📋'} {e.entidade_tipo}</Badge></TableCell>
                         <TableCell>
