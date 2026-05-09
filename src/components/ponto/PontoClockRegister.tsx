@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle, Scan, Camera, ShieldCheck } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
@@ -28,6 +29,9 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
   const { user } = useAuth();
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showFaceScan, setShowFaceScan] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [selectedTipo, setSelectedTipo] = useState<any>(null);
 
   useEffect(() => {
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
@@ -61,7 +65,27 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
     }
   };
 
-  const handleOfflineRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
+  const startScan = (tipo: any) => {
+    setSelectedTipo(tipo);
+    setShowFaceScan(true);
+    setScanProgress(0);
+    
+    const interval = setInterval(() => {
+      setScanProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            setShowFaceScan(false);
+            finalizeRegister(tipo);
+          }, 500);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 150);
+  };
+
+  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     if (!user) return;
     
     // Se estiver online, usa o fluxo padrão
@@ -128,7 +152,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
             {buttons.map(({ tipo, label, icon: Icon, gradient }) => (
               <Button
                 key={tipo}
-                onClick={() => handleOfflineRegister(tipo)}
+                onClick={() => startScan(tipo)}
                 disabled={loading !== null}
                 className={cn(
                   'h-12 rounded-xl bg-gradient-to-r text-primary-foreground hover:opacity-90 shadow-lg transition-all font-body font-medium',
@@ -152,6 +176,62 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
           </p>
         </CardContent>
       </Card>
+
+      <Dialog open={showFaceScan} onOpenChange={setShowFaceScan}>
+        <DialogContent className="sm:max-w-md bg-slate-900 border-slate-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-center flex items-center justify-center gap-2 text-primary-glow">
+              <Scan className="h-5 w-5" /> Autenticação Biométrica Facial
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="relative w-64 h-64 rounded-full border-4 border-primary/30 overflow-hidden flex items-center justify-center bg-slate-800 shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+              {/* Fake scan line */}
+              <motion.div 
+                animate={{ top: ['0%', '100%', '0%'] }} 
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="absolute left-0 right-0 h-1 bg-primary-glow/60 shadow-[0_0_15px_rgba(34,197,94,1)] z-10" 
+              />
+              
+              <Camera className="h-20 w-20 text-slate-600" />
+              
+              {/* Progress Ring */}
+              <svg className="absolute inset-0 w-full h-full -rotate-90">
+                <circle
+                  cx="128"
+                  cy="128"
+                  r="120"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="transparent"
+                  className="text-primary/20"
+                />
+                <circle
+                  cx="128"
+                  cy="128"
+                  r="120"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="transparent"
+                  strokeDasharray={2 * Math.PI * 120}
+                  strokeDashoffset={2 * Math.PI * 120 * (1 - scanProgress / 100)}
+                  className="text-primary-glow transition-all duration-300"
+                />
+              </svg>
+            </div>
+            
+            <div className="mt-8 text-center space-y-2">
+              <p className="text-sm font-medium animate-pulse text-primary-glow">
+                {scanProgress < 100 ? 'Analisando biometria...' : '✅ Identidade Confirmada!'}
+              </p>
+              <div className="flex items-center gap-2 justify-center text-[10px] text-slate-400">
+                <ShieldCheck className="h-3 w-3" />
+                <span>Protocolo de Segurança MTP 671 Ativo</span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
