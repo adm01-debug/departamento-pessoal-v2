@@ -28,13 +28,13 @@ export function useFolhaAuditoria(folhaId?: string) {
         .from('folha_auditoria')
         .select(`
           *,
-          colaborador:colaboradores(nome)
+          colaborador:colaboradores(nome_completo)
         `)
         .eq('folha_id', folhaId!)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as (FolhaAuditoria & { colaborador?: { nome: string } })[];
+      return data as any[];
     },
   });
 
@@ -58,7 +58,7 @@ export function useFolhaAuditoria(folhaId?: string) {
   });
 
   return {
-    logs: query.data || [],
+    logs: (query.data || []) as (FolhaAuditoria & { colaborador?: { nome_completo: string } })[],
     isLoading: query.isLoading,
     registrarLog: registrarMutation.mutateAsync,
     isRegistrando: registrarMutation.isPending,
