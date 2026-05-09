@@ -9,10 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
-import { UserPlus, Search, ExternalLink, Mail, FileText, CheckCircle } from 'lucide-react';
+import { UserPlus, Search, ExternalLink, Mail, FileText, CheckCircle, MessageSquare, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { contratacaoService } from '@/services/contratacaoService';
 
 const etapaLabels: Record<string, string> = {
