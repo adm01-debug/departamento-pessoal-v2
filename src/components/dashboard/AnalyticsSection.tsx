@@ -7,7 +7,8 @@ import {
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
-  Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield
+  Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
+  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -16,8 +17,8 @@ import { DonutChart } from './DonutChart';
 import { Badge } from '@/components/ui/badge';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
 import { viewsService } from '@/services/tabelasComplementaresService';
-import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter 
@@ -31,6 +32,10 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { exportPortaria671PDF } from '@/services/exportService';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MotionCard = motion.create(Card);
 
@@ -251,33 +256,78 @@ interface AnalyticsSectionProps {
 
 export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingPendencias, isEmptySystem, empresaId }: AnalyticsSectionProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const itemsPerPage = 5;
 
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
   const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
 
-  // Real-time notifications for Ponto
-  useMemo(() => {
+  // Notifications State & Logic
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  useEffect(() => {
+    if (!empresaId) return;
+    
+    // Initial Load of Notifications
+    const loadNotifs = async () => {
+      const { data } = await supabase
+        .from('notificacoes')
+        .select('*')
+        .eq('empresa_id', empresaId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (data) setNotifications(data);
+    };
+    loadNotifs();
+
+    // Subscribe to new notifications
+    const channel = supabase
+      .channel('notif-changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notificacoes', filter: `empresa_id=eq.${empresaId}` },
+        (payload) => {
+          setNotifications(prev => [payload.new, ...prev]);
+        }
+      )
+      .subscribe();
+      
+    return () => { supabase.removeChannel(channel); };
+  }, [empresaId]);
+
+  const markNotifRead = async (id: string) => {
+    await supabase.from('notificacoes').update({ lida: true }).eq('id', id);
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, lida: true } : n));
+  };
+
+  const markAllRead = async () => {
+    if (!empresaId) return;
+    await supabase.from('notificacoes').update({ lida: true }).eq('empresa_id', empresaId).eq('lida', false);
+    setNotifications(prev => prev.map(n => ({ ...n, lida: true })));
+  };
+
+  // Real-time notifications for Ponto Logic
+  useEffect(() => {
     if (!empresaId) return;
     const channel = (supabase as any)
       .channel('ponto-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'solicitacoes_ajuste_ponto', filter: `empresa_id=eq.${empresaId}` },
+        { event: 'UPDATE', schema: 'public', table: 'solicitacoes_ajuste_ponto', filter: `empresa_id=eq.${empresaId}` },
         (payload: any) => {
-          if (payload.eventType === 'UPDATE') {
-            const status = payload.new.status;
-            if (status === 'aprovado' || status === 'recusado') {
-              toast.info(`Solicitação de Ponto ${status === 'aprovado' ? 'aprovada' : 'recusada'}.`, {
-                description: `Ajuste para ${payload.new.data_ponto} processado.`,
-                icon: status === 'aprovado' ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-destructive" />
-              });
-            }
+          const status = payload.new.status;
+          if (status === 'aprovado' || status === 'recusado') {
+            toast.info(`Solicitação de Ponto ${status === 'aprovado' ? 'aprovada' : 'recusada'}.`, {
+              description: `Ajuste para ${payload.new.data_ponto} processado.`,
+              icon: status === 'aprovado' ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-destructive" />
+            });
           }
         }
       )
@@ -328,7 +378,46 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const handleOpenDetail = (type?: string) => {
     if (type) setFilterType(type);
     setPage(1);
+    setSelectedIds([]);
     setIsDetailOpen(true);
+  };
+
+  const handleBatchAction = async (status: 'aprovado' | 'recusado' | 'em_analise' | 'concluido') => {
+    if (selectedIds.length === 0) return;
+    
+    const promise = Promise.all(selectedIds.map(async (id) => {
+      const item = filteredPendencias.find(p => p.id === id);
+      if (!item) return;
+      
+      if (item.source === 'ponto') {
+        const pStatus = (status === 'aprovado' || status === 'recusado') ? status : 'recusado';
+        await responderSolicitacao.mutateAsync({ id: item.id, status: pStatus });
+      } else {
+        const dStatus = (status === 'em_analise' || status === 'concluido') ? status : 'concluido';
+        await updateStatus.mutateAsync({ id: item.id, status: dStatus });
+      }
+    }));
+
+    toast.promise(promise, {
+      loading: 'Processando ações em lote...',
+      success: 'Ações executadas com sucesso!',
+      error: 'Erro ao processar algumas ações.'
+    });
+
+    await promise;
+    setSelectedIds([]);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginatedPendencias.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedPendencias.map(p => p.id));
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -378,16 +467,44 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
           className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-warning/20 transition-all">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning/70">
-                <Activity className="h-4 w-4 text-white" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning-glow">
+                <Bell className="h-4 w-4 text-white" />
               </div>
-              Alertas de RH
+              Notificações
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/relatorios')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-               <ChevronRight className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              {notifications.some(n => !n.lida) && (
+                <Button variant="ghost" size="sm" onClick={markAllRead} className="text-[10px] h-7 px-2 text-primary hover:bg-primary/5">
+                  Lidas
+                </Button>
+              )}
+              <Button variant="ghost" size="icon" onClick={() => setIsNotifOpen(true)} className="h-8 w-8 rounded-lg">
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent><AlertasRHWidget /></CardContent>
+          <CardContent>
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+              {notifications.length > 0 ? (
+                notifications.slice(0, 5).map((n, i) => (
+                  <div key={n.id} className={cn("p-2 rounded-xl border transition-all flex gap-3", n.lida ? "bg-muted/10 border-border/10 opacity-60" : "bg-primary/5 border-primary/20")}>
+                    <div className={cn("p-1.5 rounded-lg shrink-0", n.tipo === 'ponto_aprovado' ? "bg-success/10 text-success" : "bg-info/10 text-info")}>
+                      <Bell className="h-3 w-3" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-bold truncate">{n.titulo}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{n.mensagem}</p>
+                    </div>
+                    {!n.lida && <button onClick={() => markNotifRead(n.id)} className="p-1 hover:bg-muted rounded-full"><Check className="h-3 w-3" /></button>}
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <p className="text-caption text-muted-foreground font-body">Sem notificações</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
         </MotionCard>
 
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
@@ -538,8 +655,8 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <div className="relative flex-1 group">
+            <div className="flex flex-col sm:flex-row gap-3 mt-6 items-center">
+              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                   placeholder="Buscar por título ou descrição..."
@@ -547,23 +664,15 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                {searchQuery && (
-                  <button 
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
                 {(['all', 'ferias', 'assinaturas', 'ponto', 'documentos'] as const).map((type) => (
                   <Button
                     key={type}
                     variant={filterType === type ? 'default' : 'outline'}
                     size="sm"
                     className={cn(
-                      "rounded-lg h-11 px-4 font-medium transition-all text-xs",
+                      "rounded-lg h-11 px-4 font-medium transition-all text-xs whitespace-nowrap",
                       filterType === type ? "shadow-lg shadow-primary/20" : "bg-muted/20 border-border/10"
                     )}
                     onClick={() => setFilterType(type)}
@@ -573,9 +682,44 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                 ))}
               </div>
             </div>
+
+            <AnimatePresence>
+              {selectedIds.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-4 p-3 rounded-xl bg-primary/5 border border-primary/20 flex flex-wrap items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <ListChecks className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium">{selectedIds.length} selecionados</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="gradient-success" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('aprovado')}>
+                      <CheckCircle className="h-3.5 w-3.5" /> Aprovar
+                    </Button>
+                    <Button size="sm" variant="destructive" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('recusado')}>
+                      <AlertOctagon className="h-3.5 w-3.5" /> Recusar
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-muted/5">
+            <div className="flex items-center gap-3 mb-4 p-1 px-2">
+              <Checkbox 
+                id="select-all" 
+                checked={selectedIds.length === paginatedPendencias.length && paginatedPendencias.length > 0}
+                onCheckedChange={toggleSelectAll}
+                className="rounded-md border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              />
+              <label htmlFor="select-all" className="text-xs font-medium cursor-pointer text-muted-foreground select-none">
+                Selecionar Todos na página
+              </label>
+            </div>
             {isLoadingDB || isLoadingPonto ? (
               <div className="space-y-4">
                 {Array(4).fill(0).map((_, i) => <CardSkeleton key={i} className="h-24 rounded-2xl" />)}
@@ -598,6 +742,13 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                       <div className="flex flex-col gap-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex gap-4">
+                            <div className="pt-1">
+                              <Checkbox 
+                                checked={selectedIds.includes(item.id)}
+                                onCheckedChange={() => toggleSelect(item.id)}
+                                className="rounded-md border-primary/50"
+                              />
+                            </div>
                             <div className={cn(
                               "p-3 rounded-2xl bg-gradient-to-br shrink-0 shadow-lg",
                               item.tipo === 'ferias' ? "from-primary/80 to-primary" :
@@ -675,27 +826,40 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
 
                         {/* Compliance & History Highlight for Ponto */}
                         {item.source === 'ponto' && item.raw && (
-                          <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-primary opacity-70" />
-                              <div className="text-[10px]">
-                                <p className="text-muted-foreground font-bold uppercase">Timezone</p>
-                                <p className="font-medium">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                          <div className="mt-2 space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-primary opacity-70" />
+                                <div className="text-[10px]">
+                                  <p className="text-muted-foreground font-bold uppercase">Timezone</p>
+                                  <p className="font-medium">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                                </div>
+                              </div>
+                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                                <History className="h-4 w-4 text-warning opacity-70" />
+                                <div className="text-[10px]">
+                                  <p className="text-muted-foreground font-bold uppercase">Original</p>
+                                  <p className="font-medium">{item.raw.hora_original?.substring(0, 5) || 'Original'}</p>
+                                </div>
+                              </div>
+                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
+                                <Shield className="h-4 w-4 text-success opacity-70" />
+                                <div className="text-[10px]">
+                                  <p className="text-muted-foreground font-bold uppercase">Conformidade</p>
+                                  <p className="font-medium text-success">Validado 671</p>
+                                </div>
                               </div>
                             </div>
-                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                              <History className="h-4 w-4 text-warning opacity-70" />
-                              <div className="text-[10px]">
-                                <p className="text-muted-foreground font-bold uppercase">Original</p>
-                                <p className="font-medium">{item.raw.hora_original?.substring(0, 5) || 'N/A'}</p>
-                              </div>
-                            </div>
-                            <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                              <Shield className="h-4 w-4 text-success opacity-70" />
-                              <div className="text-[10px]">
-                                <p className="text-muted-foreground font-bold uppercase">Conformidade 671</p>
-                                <p className="font-medium">Validado</p>
-                              </div>
+                            
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 text-[10px] gap-2 rounded-lg"
+                                onClick={() => exportPortaria671PDF(item.raw)}
+                              >
+                                <Download className="h-3 w-3" /> Exportar Conformidade (PDF)
+                              </Button>
                             </div>
                           </div>
                         )}
@@ -765,6 +929,63 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
             <Button variant="outline" className="rounded-xl px-8" onClick={() => setIsDetailOpen(false)}>
               Fechar
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Central de Notificações Modal */}
+      <Dialog open={isNotifOpen} onOpenChange={setIsNotifOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col p-0 rounded-2xl border-border/40 shadow-2xl glass">
+          <DialogHeader className="p-6 pb-4 border-b border-border/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-xl font-display font-bold">Central de Notificações</DialogTitle>
+                <DialogDescription>Histórico de aprovações e ações do sistema.</DialogDescription>
+              </div>
+              <Button variant="ghost" size="sm" onClick={markAllRead} className="text-xs">Marcar todas como lidas</Button>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-6 bg-muted/5">
+            {notifications.length > 0 ? (
+              <div className="space-y-3">
+                {notifications.map((n) => (
+                  <div key={n.id} className={cn(
+                    "p-4 rounded-2xl border transition-all relative group",
+                    n.lida ? "bg-muted/10 border-border/10 opacity-60" : "bg-primary/5 border-primary/20 shadow-sm"
+                  )}>
+                    <div className="flex gap-4">
+                      <div className={cn(
+                        "p-2.5 rounded-xl shrink-0",
+                        n.tipo === 'ponto_aprovado' ? "bg-success/10 text-success" : 
+                        n.tipo === 'ponto_recusado' ? "bg-destructive/10 text-destructive" : "bg-info/10 text-info"
+                      )}>
+                        <Bell className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="font-bold text-sm">{n.titulo}</h4>
+                          <span className="text-[10px] text-muted-foreground">{format(new Date(n.created_at), "dd/MM/yyyy HH:mm")}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{n.mensagem}</p>
+                      </div>
+                      {!n.lida && (
+                        <Button variant="ghost" size="icon" onClick={() => markNotifRead(n.id)} className="h-8 w-8 hover:bg-primary/10 hover:text-primary">
+                          <Check className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <Bell className="h-10 w-10 mb-2 opacity-20" />
+                <p>Nenhuma notificação encontrada.</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="p-4 border-t border-border/10">
+            <Button variant="outline" className="rounded-xl" onClick={() => setIsNotifOpen(false)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
