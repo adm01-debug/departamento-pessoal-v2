@@ -159,6 +159,16 @@ export const feriasService = {
     } as any).eq('id', id);
     if (error) throw error;
   },
+  async listPeriodosAquisitivos(colaboradorId: string) {
+    const { data, error } = await supabase
+      .from('periodos_aquisitivos')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .order('data_inicio', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
   async enviarContabilidade(id: string, userId?: string) {
     const { error } = await supabase.from('ferias').update({
       enviado_contabilidade: true,
