@@ -7,3 +7,4 @@ export { SimuladorWhatIf } from './SimuladorWhatIf';
 export { CNABDialog } from './CNABDialog';
 export { RelatorioContabilDialog } from './RelatorioContabilDialog';
 export { FGTSDigitalDashboard } from './FGTSDigitalDashboard';
+export { RubricasDialog } from './RubricasDialog';
