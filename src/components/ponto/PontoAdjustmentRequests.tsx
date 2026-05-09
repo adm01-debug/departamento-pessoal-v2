@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Clock, FileText } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, History, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
@@ -88,16 +89,29 @@ export function PontoAdjustmentRequests() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {s.status === 'pendente' && (
-                      <div className="flex justify-end gap-1">
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-success" onClick={() => mutation.mutate({ id: s.id, status: 'aprovado' })}>
-                          <CheckCircle2 className="h-4 w-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => mutation.mutate({ id: s.id, status: 'rejeitado' })}>
-                          <XCircle className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex justify-end gap-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => toast.info(`Trilha de Auditoria: Criado em ${new Date(s.created_at).toLocaleString('pt-BR')}`)}>
+                              <History className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Ver Auditoria</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      {s.status === 'pendente' && (
+                        <>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-success" onClick={() => mutation.mutate({ id: s.id, status: 'aprovado' })}>
+                            <CheckCircle2 className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => mutation.mutate({ id: s.id, status: 'rejeitado' })}>
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
