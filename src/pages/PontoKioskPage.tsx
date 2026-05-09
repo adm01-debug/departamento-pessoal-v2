@@ -100,6 +100,7 @@ export default function PontoKioskPage() {
       }
 
       setStep('success');
+      speak("Ponto registrado com sucesso. Bom trabalho!");
       setTimeout(() => {
         setStep('pin');
         setPin('');
