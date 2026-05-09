@@ -188,20 +188,34 @@ export default function AdmissoesPage() {
                   <p><strong className="text-foreground">Salário:</strong> {Number(admissao.salario_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
                 </CardContent>
                 <CardFooter className="pt-2 flex gap-2 border-t border-border/10 bg-muted/5">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="flex-1 text-xs rounded-xl hover:bg-primary/10 hover:text-primary"
-                    onClick={() => handleEnviarLink(admissao)}
-                    disabled={sendingLink === admissao.id}
-                  >
-                    {sendingLink === admissao.id ? (
-                      <Spinner size="sm" className="mr-2" />
-                    ) : (
-                      <Mail className="w-3 h-3 mr-2" />
-                    )}
-                    Enviar Link
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="flex-1 text-xs rounded-xl hover:bg-primary/10 hover:text-primary"
+                        disabled={sendingLink === admissao.id}
+                      >
+                        {sendingLink === admissao.id ? (
+                          <Spinner size="sm" className="mr-2" />
+                        ) : (
+                          <Send className="w-3 h-3 mr-2" />
+                        )}
+                        Enviar Link
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="rounded-xl">
+                      <DropdownMenuItem onClick={() => handleEnviarLink(admissao)} className="gap-2 cursor-pointer">
+                        <Mail className="w-4 h-4 text-primary" />
+                        Enviar por E-mail
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEnviarWhatsApp(admissao)} className="gap-2 cursor-pointer">
+                        <MessageSquare className="w-4 h-4 text-success" />
+                        Enviar por WhatsApp
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   <Button 
                     variant="ghost" 
                     size="sm" 
