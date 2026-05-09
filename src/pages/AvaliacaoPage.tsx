@@ -536,7 +536,6 @@ export default function AvaliacaoPage() {
              <PerformanceAuditTimeline />
           </TabsContent>
         </Tabs>
-      )}
     </PageLayout>
     </>
   );
