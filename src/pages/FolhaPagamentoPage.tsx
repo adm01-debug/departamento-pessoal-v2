@@ -120,6 +120,8 @@ export default function FolhaPagamentoPage() {
     } finally {
       setCalcServidor(false);
     }
+  };
+
   const encerrarFolha = useMutation({
     mutationFn: async () => {
       if (!resumo?.id) throw new Error('Nenhuma folha encontrada para encerramento');
