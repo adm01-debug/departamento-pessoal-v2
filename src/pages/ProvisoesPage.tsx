@@ -357,8 +357,8 @@ export default function ProvisoesPage() {
                       </TableRow>
                     ) : (
                       auditLogs.map((log: any) => (
-                        <TableRow key={log.id} className="text-xs">
-                          <TableCell>{new Date(log.created_at).toLocaleString('pt-BR')}</TableCell>
+                        <TableRow key={log.id} className="text-xs cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setSelectedLog(log)}>
+                          <TableCell className="font-medium">{new Date(log.created_at).toLocaleString('pt-BR')}</TableCell>
                           <TableCell>{log.competencia}</TableCell>
                           <TableCell>
                             <Badge variant={log.status === 'CONCLUIDO' ? 'success' : log.status === 'ERRO' ? 'destructive' : 'secondary'} className="text-[10px] px-1.5 h-5">
