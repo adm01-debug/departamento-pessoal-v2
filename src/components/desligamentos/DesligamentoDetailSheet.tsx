@@ -36,13 +36,19 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
 
   const handleChecklistToggle = async (key: string, value: boolean) => {
     try {
-      await desligamentoService.atualizar(d.id, { [key]: value });
+      // Validação de transição lógica se marcar certas chaves
+      if (key === 'checklist_comunicacao' && value) {
+         await desligamentoService.atualizar(d.id, { etapa: 'documentacao', status: 'comunicado', [key]: value });
+      } else {
+         await desligamentoService.atualizar(d.id, { [key]: value });
+      }
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Checklist atualizado');
-    } catch {
-      toast.error('Erro ao atualizar checklist');
+    } catch (err: any) {
+      toast.error('Erro ao atualizar checklist: ' + err.message);
     }
   };
+
 
   const handleCalcular = async () => {
     if (!d.salario_base || !d.data_desligamento) {
