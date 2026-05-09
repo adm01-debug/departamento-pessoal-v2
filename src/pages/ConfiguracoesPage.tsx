@@ -93,14 +93,14 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Folha</TabsTrigger>
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
-          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bell className="mr-1 h-3 w-3" />Alertas</TabsTrigger>
-          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Shield className="mr-1 h-3 w-3" />Segurança</TabsTrigger>
-          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Layers className="mr-1 h-3 w-3" />Campos</TabsTrigger>
-          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
-          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
-          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
-          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ScrollText className="mr-1 h-3 w-3" />Logs Integ.</TabsTrigger>
-          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Database className="mr-1 h-3 w-3" />Config BD</TabsTrigger>
+          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Alertas</TabsTrigger>
+          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Segurança</TabsTrigger>
+          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Campos</TabsTrigger>
+          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">IPs</TabsTrigger>
+          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Integ.</TabsTrigger>
+          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Webhooks</TabsTrigger>
+          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Logs</TabsTrigger>
+          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">BD</TabsTrigger>
           <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
         </TabsList>
 
