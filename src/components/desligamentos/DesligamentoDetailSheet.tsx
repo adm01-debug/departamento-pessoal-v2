@@ -28,6 +28,8 @@ function fmt(v: number | null) {
 export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailSheetProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [calculating, setCalculating] = useState(false);
+  const [homologating, setHomologating] = useState(false);
   const d = desligamento;
 
   if (!d) return null;
@@ -41,6 +43,45 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
       toast.error('Erro ao atualizar checklist');
     }
   };
+
+  const handleCalcular = async () => {
+    if (!d.salario_base || !d.data_desligamento) {
+      toast.error('Salário base e data de desligamento são obrigatórios para o cálculo');
+      return;
+    }
+    setCalculating(true);
+    try {
+      await rescisaoService.calcularESalvar(d.id, {
+        salario_base: d.salario_base,
+        data_admissao: d.colaborador?.data_admissao || d.data_admissao, // Fallback
+        data_desligamento: d.data_desligamento,
+        tipo: d.tipo || 'sem_justa_causa',
+        aviso_trabalhado: d.aviso_trabalhado || false,
+        ferias_vencidas: d.ferias_vencidas_check || false,
+        saldo_fgts: d.saldo_fgts || 0,
+      });
+      queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
+      toast.success('Rescisão calculada com sucesso');
+    } catch (err: any) {
+      toast.error('Erro ao calcular: ' + err.message);
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  const handleHomologar = async () => {
+    setHomologating(true);
+    try {
+      await rescisaoService.homologar(d.id);
+      queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
+      toast.success('Homologação concluída');
+    } catch (err: any) {
+      toast.error('Erro ao homologar: ' + err.message);
+    } finally {
+      setHomologating(false);
+    }
+  };
+
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
