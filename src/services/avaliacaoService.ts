@@ -139,10 +139,16 @@ export const avaliacaoService = {
   async criarCompetencia(d: any) {
     const { data, error } = await supabase.from('competencias_matriz').insert(d).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'competencias_matriz', registro_id: data.id, acao: 'INSERT', dados_novos: data });
+    }
     return ensure(data, 'competência');
   },
   async excluirCompetencia(id: string) {
+    const { data: anterior } = await supabase.from('competencias_matriz').select('*').eq('id', id).single();
     const { error } = await supabase.from('competencias_matriz').delete().eq('id', id);
     if (error) throw error;
+    await auditLogger.log({ tabela: 'competencias_matriz', registro_id: id, acao: 'DELETE', dados_anteriores: anterior });
   },
+
 };
