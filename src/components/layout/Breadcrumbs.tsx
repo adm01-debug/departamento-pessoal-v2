@@ -84,6 +84,8 @@ export function Breadcrumbs({ className }: { className?: string }) {
     const isUuid = /^[0-9a-f]{8}-/.test(seg);
     const label = isUuid ? '...' : routeLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
 
+    if (!label) return null;
+
     return { path, label, isLast };
   });
 
