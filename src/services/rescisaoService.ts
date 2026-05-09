@@ -32,7 +32,7 @@ export const rescisaoService = {
     // 1. Buscar dados atuais para o log e validar transição
     const { data: anterior, error: fetchError } = await supabase
       .from('desligamentos')
-      .select('*, colaborador:colaboradores(nome_completo, data_admissao)')
+      .select('*, colaborador:colaboradores!desligamentos_colaborador_id_fkey(nome_completo, data_admissao)')
       .eq('id', id)
       .single();
     if (fetchError) throw fetchError;
@@ -43,7 +43,8 @@ export const rescisaoService = {
     // 2. Realizar o cálculo
     const resultado = calcularRescisao({
       salario: params.salario_base,
-      dataAdmissao: anterior.colaborador?.data_admissao || params.data_admissao,
+      dataAdmissao: (anterior.colaborador as any)?.data_admissao || params.data_admissao,
+
       dataDesligamento: params.data_desligamento,
       tipo: params.tipo,
       avisoTrabalhado: params.aviso_trabalhado,
