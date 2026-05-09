@@ -239,6 +239,38 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       uf: addr.uf,
     }));
   };
+  const handleFileUpload = async (docId: string, docType: string, file: File) => {
+    setUploadedDocs(prev => ({ ...prev, [docId]: { name: file.name, status: 'uploading' } }));
+    
+    try {
+      const result = await processDocument(file, docType);
+      
+      if (result.valid) {
+        setUploadedDocs(prev => ({ 
+          ...prev, 
+          [docId]: { name: file.name, status: 'success', result } 
+        }));
+        toast.success(`${docType.toUpperCase()} validado com sucesso!`);
+        
+        // Auto-fill data if found and not yet filled
+        if (result.extractedData) {
+          const data = result.extractedData;
+          if (data.nome && !formData.nome_completo) setFormData(p => ({ ...p, nome_completo: data.nome! }));
+          if (data.cpf && !formData.cpf) setFormData(p => ({ ...p, cpf: data.cpf! }));
+          if (data.cep && !formData.cep) setFormData(p => ({ ...p, cep: data.cep! }));
+        }
+      } else {
+        setUploadedDocs(prev => ({ 
+          ...prev, 
+          [docId]: { name: file.name, status: 'error', result } 
+        }));
+        toast.error(`Atenção: ${result.error || 'Não foi possível validar o documento.'}`);
+      }
+    } catch (error) {
+      setUploadedDocs(prev => ({ ...prev, [docId]: { name: file.name, status: 'error' } }));
+      toast.error('Erro no upload do documento.');
+    }
+  };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-primary" /></div>;
 
