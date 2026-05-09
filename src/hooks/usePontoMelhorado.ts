@@ -14,6 +14,14 @@ export interface SolicitacaoAjuste {
   status: 'rascunho' | 'enviado' | 'aprovado' | 'recusado';
   rascunho?: boolean;
   observacoes_gestor?: string;
+  relatorio_conformidade?: {
+    timestamp_validacao: string;
+    timezone: string;
+    geofencing: boolean;
+    divergencia_minutos: number;
+    sha256_integridade: string;
+    portaria_671_conformidade: boolean;
+  };
   created_at: string;
 }
 
