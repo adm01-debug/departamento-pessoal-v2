@@ -45,14 +45,11 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
     queryKey: ['audit-timeline', empresaId],
     enabled: !!empresaId,
     queryFn: async () => {
-      const response = await supabase
-        .from('audit_log')
+      const { data, error } = await (supabase.from('audit_log') as any)
         .select('*')
         .eq('empresa_id', empresaId!)
         .order('timestamp', { ascending: false })
         .limit(20);
-      
-      const { data, error } = response;
 
       if (error) throw error;
 
