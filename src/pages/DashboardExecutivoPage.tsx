@@ -61,6 +61,7 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
         { count: feriasPendentes },
         { count: afastamentosAtivos },
         { count: diasFalta },
+        { count: pontoPendentes },
         ...monthResults
       ] = await Promise.all([
         supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo').eq('empresa_id', empresaId!),
@@ -70,6 +71,7 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
         supabase.from('ferias').select('*', { count: 'exact', head: true }).eq('status', 'pendente').eq('empresa_id', empresaId!),
         supabase.from('afastamentos').select('*', { count: 'exact', head: true }).in('status', ['ativo', 'prorrogado']).eq('empresa_id', empresaId!),
         supabase.from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data', inicioMes).gt('horas_falta', '00:00:00'),
+        supabase.from('solicitacoes_ajuste_ponto').select('*', { count: 'exact', head: true }).eq('status', 'enviado').eq('empresa_id', empresaId!),
         // Per-month queries: admissoes, demissoes, folha (3 per month)
         ...monthRanges.flatMap(m => [
           supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId!).gte('data_admissao', m.inicio).lte('data_admissao', m.fim),
@@ -113,6 +115,7 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
         totalAtivos: totalAtivos || 0, evolucao, departamentos, custosMensal,
         totalFolhaAtual, variacaoFolha, feriasPendentes: feriasPendentes || 0,
         afastamentosAtivos: afastamentosAtivos || 0, custoMedio, turnover, absenteismo,
+        pontoPendentes: pontoPendentes || 0,
       };
     },
   });
@@ -470,7 +473,7 @@ export default function DashboardExecutivoPage() {
             } : undefined}
             pendencias={[
               { tipo: 'ferias', icone: 'ferias', quantidade: data?.feriasPendentes || 0, descricao: 'Férias aguardando aprovação' },
-              { tipo: 'ponto', icone: 'ponto', quantidade: 0, descricao: 'Ajustes de ponto pendentes' },
+              { tipo: 'ponto', icone: 'ponto', quantidade: data?.pontoPendentes || 0, descricao: 'Ajustes de ponto pendentes' },
               { tipo: 'assinaturas', icone: 'assinaturas', quantidade: 0, descricao: 'Documentos para assinar' }
             ]}
             isLoadingStats={isLoading}
