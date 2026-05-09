@@ -1,13 +1,29 @@
 import { toast } from 'sonner';
 import { RescisaoResult, fmt } from './rescisaoCalc';
+import { supabase } from '@/integrations/supabase/client';
 
-export async function gerarPDFRescisao(form: any, result: RescisaoResult, auditoria?: any) {
+export async function gerarPDFRescisao(form: any, result: RescisaoResult, auditoriaParam?: any) {
   const { default: jsPDF } = await import('jspdf');
   await import('jspdf-autotable');
+
+  // Buscar trilha de auditoria se não fornecida
+  let auditoria = auditoriaParam;
+  if (!auditoria && form.id) {
+    const { data } = await supabase
+      .from('audit_log')
+      .select('*')
+      .eq('registro_id', form.id)
+      .eq('tabela', 'desligamentos')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    auditoria = data;
+  }
 
   const doc = new jsPDF();
   const pw = doc.internal.pageSize.getWidth();
   let y = 20;
+
 
   // Header com selo de auditoria se disponível
   if (auditoria) {
