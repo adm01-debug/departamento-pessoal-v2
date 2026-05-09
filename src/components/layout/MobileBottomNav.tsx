@@ -16,7 +16,7 @@ export function MobileBottomNav() {
   const location = useLocation();
   const { isAdmin } = useAuth();
   
-  const items = isAdmin ? mobileItems : mobileItems.filter(i => !['/configuracoes'].includes(i.path));
+  const items = mobileItems;
 
   return (
     <nav aria-label="Navegação mobile" className="fixed bottom-0 left-0 right-0 z-sticky lg:hidden">
