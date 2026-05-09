@@ -105,27 +105,29 @@ export function PontoAuditTimeline() {
                       <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
                         <User className="h-3 w-3 text-primary" />
                       </div>
-                      <span className="text-sm font-semibold text-foreground/90">{log.usuario?.nome || 'Sistema (Automático)'}</span>
+                      <span className="text-sm font-semibold text-foreground/90">{log.user_email || 'Sistema (Automático)'}</span>
                     </div>
                     
-                    {log.justificativa && (
+                    {log.dados_novos && log.acao === 'UPDATE' && (
                       <div className="relative overflow-hidden mb-3">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/20 rounded-full" />
-                        <p className="text-xs text-muted-foreground italic bg-primary/5 p-2.5 rounded-r-lg border border-l-0 border-primary/10">
-                          {log.justificativa}
-                        </p>
+                        <div className="text-[10px] text-muted-foreground bg-primary/5 p-2.5 rounded-r-lg border border-l-0 border-primary/10">
+                          <p className="font-bold mb-1">Alteração Detectada:</p>
+                          <pre className="whitespace-pre-wrap">{JSON.stringify(log.dados_novos, null, 2)}</pre>
+                        </div>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between">
                       <div className="flex flex-wrap gap-2 text-[10px]">
                         <span className="flex items-center gap-1 text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-full border border-border/20">
-                          <Tag className="h-3 w-3" /> Entidade: {log.tabela_nome}
+                          <Tag className="h-3 w-3" /> Entidade: {log.tabela}
                         </span>
                       </div>
                       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors translate-x-0 group-hover:translate-x-1" />
                     </div>
                   </div>
+
                 </div>
               </motion.div>
             ))}
