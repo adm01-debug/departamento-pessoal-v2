@@ -378,7 +378,46 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const handleOpenDetail = (type?: string) => {
     if (type) setFilterType(type);
     setPage(1);
+    setSelectedIds([]);
     setIsDetailOpen(true);
+  };
+
+  const handleBatchAction = async (status: 'aprovado' | 'recusado' | 'em_analise' | 'concluido') => {
+    if (selectedIds.length === 0) return;
+    
+    const promise = Promise.all(selectedIds.map(async (id) => {
+      const item = filteredPendencias.find(p => p.id === id);
+      if (!item) return;
+      
+      if (item.source === 'ponto') {
+        const pStatus = (status === 'aprovado' || status === 'recusado') ? status : 'recusado';
+        await responderSolicitacao.mutateAsync({ id: item.id, status: pStatus });
+      } else {
+        const dStatus = (status === 'em_analise' || status === 'concluido') ? status : 'concluido';
+        await updateStatus.mutateAsync({ id: item.id, status: dStatus });
+      }
+    }));
+
+    toast.promise(promise, {
+      loading: 'Processando ações em lote...',
+      success: 'Ações executadas com sucesso!',
+      error: 'Erro ao processar algumas ações.'
+    });
+
+    await promise;
+    setSelectedIds([]);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginatedPendencias.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedPendencias.map(p => p.id));
+    }
   };
 
   const getPriorityColor = (priority: string) => {
