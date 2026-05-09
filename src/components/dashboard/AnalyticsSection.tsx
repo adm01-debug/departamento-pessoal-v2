@@ -7,7 +7,7 @@ import {
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
-  Check, Eye, Forward, MoreHorizontal
+  Check, Eye, Forward, MoreHorizontal, History
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -26,6 +26,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { usePendencias, type Pendencia as DB_Pendencia } from '@/hooks/usePendencias';
+import { usePontoMelhorado, type SolicitacaoAjuste } from '@/hooks/usePontoMelhorado';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -254,16 +255,40 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const [filterType, setFilterType] = useState<string>("all");
 
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
+  const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
 
   const filteredPendencias = useMemo(() => {
-    if (!dbPendencias) return [];
-    return dbPendencias.filter(p => {
+    const list: any[] = [];
+    
+    // Add DB Pendencias
+    if (dbPendencias) {
+      dbPendencias.forEach(p => list.push({ ...p, source: 'db' }));
+    }
+    
+    // Add Ponto Solicitation as Pendencias
+    if (pontoSolicitacoes) {
+      pontoSolicitacoes.filter((s: any) => s.status === 'enviado').forEach((s: any) => {
+        list.push({
+          id: s.id,
+          tipo: 'ponto',
+          titulo: `Ajuste de Ponto: ${s.colaborador?.nome_completo || 'Colaborador'}`,
+          descricao: `Sugerido: ${s.hora_sugerida} - Motivo: ${s.motivo}`,
+          prioridade: 'media',
+          status: 'pendente',
+          criado_at: s.created_at,
+          source: 'ponto',
+          raw: s
+        });
+      });
+    }
+
+    return list.filter(p => {
       const matchesSearch = p.titulo.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            p.descricao.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesType = filterType === "all" || p.tipo === filterType;
       return matchesSearch && matchesType;
     });
-  }, [dbPendencias, searchQuery, filterType]);
+  }, [dbPendencias, pontoSolicitacoes, searchQuery, filterType]);
 
   const handleOpenDetail = (type?: string) => {
     if (type) setFilterType(type);
@@ -579,11 +604,29 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 border-border/40 shadow-xl glass">
-                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" onClick={() => updateStatus.mutate({ id: item.id, status: 'concluido' })}>
+                              <DropdownMenuItem 
+                                className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" 
+                                onClick={() => {
+                                  if (item.source === 'ponto') {
+                                    responderSolicitacao.mutate({ id: item.id, status: 'aprovado' });
+                                  } else {
+                                    updateStatus.mutate({ id: item.id, status: 'concluido' });
+                                  }
+                                }}
+                              >
                                 <Check className="h-4 w-4" /> Aprovar / Concluir
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" onClick={() => updateStatus.mutate({ id: item.id, status: 'em_analise' })}>
-                                <Activity className="h-4 w-4" /> Marcar Revisão
+                              <DropdownMenuItem 
+                                className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" 
+                                onClick={() => {
+                                  if (item.source === 'ponto') {
+                                    responderSolicitacao.mutate({ id: item.id, status: 'recusado', observacoes: 'Necessita revisão.' });
+                                  } else {
+                                    updateStatus.mutate({ id: item.id, status: 'em_analise' });
+                                  }
+                                }}
+                              >
+                                <Activity className="h-4 w-4" /> {item.source === 'ponto' ? 'Recusar' : 'Marcar Revisão'}
                               </DropdownMenuItem>
                               <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer">
                                 <Forward className="h-4 w-4" /> Encaminhar

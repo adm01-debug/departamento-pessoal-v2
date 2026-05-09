@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UserPlus, UserMinus, Calendar, FileText, Clock, AlertTriangle, 
-  type LucideIcon, Filter, ArrowUpDown 
+  type LucideIcon, Filter, ArrowUpDown, ShieldCheck, MapPin, Globe
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +29,9 @@ const eventConfig: Record<string, { icon: LucideIcon; gradient: string }> = {
   folha: { icon: FileText, gradient: 'from-primary to-primary-glow' },
   ponto: { icon: Clock, gradient: 'from-primary to-primary-glow' },
   alerta: { icon: AlertTriangle, gradient: 'from-warning to-destructive' },
+  compliance: { icon: ShieldCheck, gradient: 'from-destructive to-destructive/70' },
+  geofencing: { icon: MapPin, gradient: 'from-warning to-warning/70' },
+  timezone: { icon: Globe, gradient: 'from-info to-info/70' }
 };
 
 interface EventTimelineProps {
@@ -53,19 +56,43 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
 
       if (error) throw error;
 
-      return data.map((log: any) => ({
+      // Fetch audit logs and compliance alerts
+      const [auditResponse, complianceResponse] = await Promise.all([
+        (supabase as any).from('audit_log').select('*').eq('empresa_id', empresaId!).order('timestamp', { ascending: false }).limit(10),
+        (supabase as any).from('conformidade_ponto_logs').select('*').eq('empresa_id', empresaId!).order('timestamp', { ascending: false }).limit(10)
+      ]);
+
+      if (auditResponse.error) throw auditResponse.error;
+      
+      const auditEvents = auditResponse.data.map((log: any) => ({
         id: log.id,
         title: `${log.tabela.charAt(0).toUpperCase() + log.tabela.slice(1)}: ${log.acao}`,
-        description: `Alteração realizada no registro ${log.registro_id?.substring(0, 8)}...`,
+        description: `Alteração no registro ${log.registro_id?.substring(0, 8)}...`,
         time: format(new Date(log.timestamp), "HH:mm, dd MMM", { locale: ptBR }),
         raw_time: log.timestamp,
         type: log.tabela === 'ferias' ? 'ferias' : 
+              log.tabela === 'batidas_ponto' ? 'ponto' :
               log.tabela === 'colaboradores' ? 'admissao' : 'alerta'
-      })) as TimelineEvent[];
+      }));
+
+      const complianceEvents = (complianceResponse.data || []).map((log: any) => ({
+        id: log.id,
+        title: `Alerta Portaria 671: ${log.tipo_alerta.toUpperCase()}`,
+        description: log.descricao,
+        time: format(new Date(log.timestamp), "HH:mm, dd MMM", { locale: ptBR }),
+        raw_time: log.timestamp,
+        type: log.tipo_alerta === 'geofencing' ? 'geofencing' :
+              log.tipo_alerta === 'timezone' ? 'timezone' : 'compliance'
+      }));
+
+      return [...auditEvents, ...complianceEvents].sort((a, b) => 
+        new Date(b.raw_time).getTime() - new Date(a.raw_time).getTime()
+      );
     }
   });
 
   useRealTimeSubscription('audit_log', ['audit-timeline', empresaId], empresaId);
+  useRealTimeSubscription('conformidade_ponto_logs', ['audit-timeline', empresaId], empresaId);
 
   const displayEvents = useMemo(() => {
     const list = dbEvents || initialEvents || [];
@@ -109,7 +136,7 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between gap-2 px-1">
         <div className="flex gap-1 overflow-x-auto custom-scrollbar pb-1">
-          {['all', 'admissao', 'ferias', 'alerta'].map((t) => (
+          {['all', 'admissao', 'ferias', 'ponto', 'compliance', 'alerta'].map((t) => (
             <Badge 
               key={t}
               variant={filterType === t ? 'default' : 'outline'}
