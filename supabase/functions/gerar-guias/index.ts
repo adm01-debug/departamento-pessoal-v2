@@ -9,7 +9,7 @@ const corsHeaders = {
 interface GerarGuiasRequest {
   empresaId: string;
   competencia: string;
-  tipo: 'GPS' | 'DARF' | 'FGTS' | 'TODAS';
+  tipo: 'GPS' | 'DARF' | 'FGTS' | 'FGTS_DIGITAL' | 'TODAS';
 }
 
 const calcularINSS = (base: number): number => {
@@ -124,6 +124,33 @@ serve(async (req: Request): Promise<Response> => {
         },
         vencimento: calcularVencimento(competencia, 7),
         status: 'pendente',
+      });
+    }
+    
+    // FGTS Digital - Nova Guia GFD
+    if (tipo === 'FGTS_DIGITAL' || tipo === 'TODAS') {
+      guias.push({
+        tipo: 'FGTS_DIGITAL',
+        descricao: 'FGTS Digital - Guia GFD',
+        competencia,
+        valores: {
+          fgts: Number(totalFGTS.toFixed(2)),
+          total: Number(totalFGTS.toFixed(2)),
+        },
+        vencimento: calcularVencimento(competencia, 20),
+        status: 'pendente',
+        canal: 'API_CAIXA',
+        protocolo: `GFD-${Date.now()}`
+      });
+      
+      // Integrar log de comunicação (Simulação API Caixa)
+      await supabase.from('integracao_logs').insert({
+        servico: 'fgts_digital',
+        operacao: 'gerar_guia_gfd',
+        status_code: 200,
+        payload_envio: { competencia, empresaId, total_valor: totalFGTS },
+        payload_retorno: { success: true, url_pdf: 'https://fgts.gov.br/guia_simulada.pdf' },
+        duracao_ms: 1200
       });
     }
 

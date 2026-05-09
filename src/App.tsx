@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import AuthCallbackPage from '@/pages/AuthCallbackPage';
 
 // Lazy-loaded pages
 const ColaboradoresPage = lazy(() => import('@/pages/ColaboradoresPage'));
@@ -108,6 +109,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
 ...

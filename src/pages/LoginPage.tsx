@@ -3,6 +3,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
+import { supabase } from '@/integrations/supabase/client';
 import { useBruteForceProtection } from '@/hooks/useBruteForceProtection';
 import { LockoutMessage } from '@/components/login/LockoutMessage';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const features = [
   { icon: Users, label: 'Gestão completa de Colaboradores', desc: 'Cadastro, documentos, benefícios e histórico' },
@@ -29,6 +31,7 @@ export default function LoginPage() {
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [govBrLoading, setGovBrLoading] = useState(false);
   const { signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
   const { lockState, checkLock, recordFailedAttempt, resetAttempts } = useBruteForceProtection();
@@ -47,6 +50,27 @@ export default function LoginPage() {
       setError(err.message || 'Erro ao fazer login com Google');
     } finally {
       setGoogleLoading(false);
+    }
+  };
+
+  const handleGovBrSignIn = async () => {
+    setGovBrLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('auth-gov-br', {
+        body: { 
+          action: 'get_auth_url', 
+          redirectUri: `${window.location.origin}/auth/callback` 
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      setError('Erro ao iniciar integração Gov.br');
+      toast.error(err.message);
+    } finally {
+      setGovBrLoading(false);
     }
   };
 
@@ -332,25 +356,48 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-11 rounded-lg font-body font-medium gap-3 border-border/50 hover:bg-accent/50"
-                    onClick={handleGoogleSignIn}
-                    disabled={googleLoading}
-                  >
-                    {googleLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <svg className="h-5 w-5" viewBox="0 0 24 24">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                      </svg>
-                    )}
-                    Entrar com Google
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-11 rounded-lg font-body font-medium gap-2 border-border/50 hover:bg-accent/50 text-xs px-2"
+                      onClick={handleGoogleSignIn}
+                      disabled={googleLoading}
+                    >
+                      {googleLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <svg className="h-4 w-4" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                          </svg>
+                          Google
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-11 rounded-lg font-body font-medium gap-2 border-[#004b82]/20 hover:bg-[#004b82]/5 text-[#004b82] text-xs px-2"
+                      onClick={handleGovBrSignIn}
+                      disabled={govBrLoading}
+                    >
+                      {govBrLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 rounded-full bg-[#004b82] flex items-center justify-center p-0.5">
+                            <span className="text-[6px] text-white font-bold">gov</span>
+                          </div>
+                          Gov.br
+                        </div>
+                      )}
+                    </Button>
+                  </div>
                 </form>
               )}
             </CardContent>

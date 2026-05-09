@@ -1,19 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2 } from 'lucide-react';
+import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2, CloudSync, History } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useEmpresas } from '@/hooks';
+import { format } from 'date-fns';
 
 export function FGTSDigitalDashboard() {
   const [loading, setLoading] = useState(false);
+  const { empresaAtual } = useEmpresas();
 
-  const syncFGTS = () => {
+  const syncFGTS = async () => {
+    if (!empresaAtual?.id) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const competencia = format(new Date(), 'yyyy-MM');
+      const { data, error } = await supabase.functions.invoke('gerar-guias', {
+        body: { 
+          empresaId: empresaAtual.id, 
+          competencia, 
+          tipo: 'FGTS_DIGITAL' 
+        },
+      });
+      if (error) throw error;
+      toast.success('Sincronizado com FGTS Digital via API Caixa!');
+    } catch (err: any) {
+      toast.error('Falha na sincronização: ' + err.message);
+    } finally {
       setLoading(false);
-      toast.success('Sincronizado com FGTS Digital (API Gov)');
-    }, 1500);
+    }
   };
 
   return (
@@ -23,11 +40,18 @@ export function FGTSDigitalDashboard() {
         <CardTitle className="text-lg font-display flex items-center gap-2">
           <Landmark className="h-5 w-5 text-success" />
           FGTS Digital
+          <Badge variant="outline" className="text-[10px] ml-2 border-primary/20 text-primary">API Caixa Ativa</Badge>
         </CardTitle>
-        <Button size="sm" variant="ghost" className="text-xs gap-1.5" onClick={syncFGTS} disabled={loading}>
-          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
-          Portal FGTS Digital
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="text-xs gap-1.5 h-8 rounded-xl" onClick={syncFGTS} disabled={loading}>
+            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <CloudSync className="h-3.5 w-3.5" />}
+            Sincronizar API
+          </Button>
+          <Button size="sm" variant="ghost" className="text-xs gap-1.5 h-8 rounded-xl" onClick={() => window.open('https://fgtsdigital.sistema.gov.br/', '_blank')}>
+            <ExternalLink className="h-3.5 w-3.5" />
+            Portal
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -49,25 +73,35 @@ export function FGTSDigitalDashboard() {
         </div>
 
         <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border/30 group">
+            <div className="flex items-center justify-between p-2.5 rounded-xl hover:bg-muted/30 transition-colors border border-border/10 group">
                 <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <FileText className="h-4 w-4" />
+                    </div>
                     <div className="text-xs">
-                        <p className="font-medium">Guia de Recolhimento Mensal - 04/2026</p>
-                        <p className="text-[10px] text-muted-foreground">Emitida em 05/05/2026</p>
+                        <p className="font-bold">Guia GFD Mensal - Competência 04/2026</p>
+                        <p className="text-[10px] text-muted-foreground">Emitida via API Caixa em 05/05/2026</p>
                     </div>
                 </div>
-                <Badge variant="outline" className="bg-success/10 text-success border-success/20">Pago</Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-[10px]">Pago</Badge>
+                    <Button variant="ghost" size="icon" className="h-7 w-7"><History className="h-3.5 w-3.5" /></Button>
+                </div>
             </div>
-            <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border/30 group">
+            <div className="flex items-center justify-between p-2.5 rounded-xl hover:bg-muted/30 transition-colors border border-border/10 group">
                 <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                    <div className="p-2 rounded-lg bg-warning/10 text-warning">
+                        <FileText className="h-4 w-4" />
+                    </div>
                     <div className="text-xs">
-                        <p className="font-medium">Guia Rescisória - Colab. João Silva</p>
-                        <p className="text-[10px] text-muted-foreground">Emitida em 07/05/2026</p>
+                        <p className="font-bold">Guia GFD Rescisória - Colab. João Silva</p>
+                        <p className="text-[10px] text-muted-foreground">Vencimento em 20/05/2026</p>
                     </div>
                 </div>
-                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Pendente</Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-[10px]">Pendente</Badge>
+                    <Button variant="ghost" size="icon" className="h-7 w-7"><History className="h-3.5 w-3.5" /></Button>
+                </div>
             </div>
         </div>
       </CardContent>
