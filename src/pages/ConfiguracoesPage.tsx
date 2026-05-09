@@ -95,7 +95,7 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Perfis</TabsTrigger>
           <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Folha</TabsTrigger>
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Ponto</TabsTrigger>
-          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Alertas</TabsTrigger>
+          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Notificações</TabsTrigger>
           <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Segurança</TabsTrigger>
           <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Campos</TabsTrigger>
           <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">IPs</TabsTrigger>
