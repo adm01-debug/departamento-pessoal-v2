@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 export function GestaoRegistrosPonto() {
   const { empresaAtual } = useEmpresas();
   const [filtroData, setFiltroData] = useState(new Date().toISOString().split('T')[0]);
+  const [filtroFim, setFiltroFim] = useState(new Date().toISOString().split('T')[0]);
+  const [tipoExcecao, setTipoExcecao] = useState('todas');
   const [busca, setBusca] = useState('');
 
   const { data: registros = [], isLoading } = useQuery({
@@ -48,8 +50,14 @@ export function GestaoRegistrosPonto() {
 
   const filtrados = registros.filter((r: any) => {
     if (!busca) return true;
-    const nome = r.colaborador?.nome_completo?.toLowerCase() || '';
-    return nome.includes(busca.toLowerCase());
+    const nomeMatch = !busca || nome.includes(busca.toLowerCase());
+    
+    if (tipoExcecao === 'todas') return nomeMatch;
+    if (tipoExcecao === 'atrasos') return nomeMatch && r.atraso_minutos > 0;
+    if (tipoExcecao === 'faltas') return nomeMatch && (!r.entrada_1 && !r.saida_1);
+    if (tipoExcecao === 'incompletos') return nomeMatch && (r.entrada_1 && !r.saida_1);
+    
+    return nomeMatch;
   });
 
   const mudarDia = (offset: number) => {

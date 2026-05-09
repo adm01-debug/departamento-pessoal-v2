@@ -28,6 +28,9 @@ export const pontoMonitorService = {
   },
 
   trackOfflineSync: (syncedCount: number, errorCount: number) => {
+    if (errorCount > 0) {
+      toast.error(`Falha em ${errorCount} registros na sincronização offline.`);
+    }
     return pontoMonitorService.logEvent('OFFLINE_SYNC_COMPLETE', {
       syncedCount,
       errorCount,

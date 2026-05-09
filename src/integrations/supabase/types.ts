@@ -10410,11 +10410,14 @@ export type Database = {
           data_decisao: string | null
           data_referencia: string
           gestor_id: string | null
+          historico_aprovacao: Json | null
           hora_original: string | null
           hora_sugerida: string | null
           id: string
           justificativa: string
+          nivel_aprovacao_atual: number | null
           observacoes_gestor: string | null
+          sla_vencimento: string | null
           status: string | null
           tipo_ajuste: string
           updated_at: string | null
@@ -10426,11 +10429,14 @@ export type Database = {
           data_decisao?: string | null
           data_referencia: string
           gestor_id?: string | null
+          historico_aprovacao?: Json | null
           hora_original?: string | null
           hora_sugerida?: string | null
           id?: string
           justificativa: string
+          nivel_aprovacao_atual?: number | null
           observacoes_gestor?: string | null
+          sla_vencimento?: string | null
           status?: string | null
           tipo_ajuste: string
           updated_at?: string | null
@@ -10442,11 +10448,14 @@ export type Database = {
           data_decisao?: string | null
           data_referencia?: string
           gestor_id?: string | null
+          historico_aprovacao?: Json | null
           hora_original?: string | null
           hora_sugerida?: string | null
           id?: string
           justificativa?: string
+          nivel_aprovacao_atual?: number | null
           observacoes_gestor?: string | null
+          sla_vencimento?: string | null
           status?: string | null
           tipo_ajuste?: string
           updated_at?: string | null
@@ -10492,6 +10501,42 @@ export type Database = {
           tabela_nome?: string
           user_agent?: string | null
           usuario_id?: string | null
+        }
+        Relationships: []
+      }
+      ponto_regras_aprovacao: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          exige_anexo: boolean | null
+          id: string
+          limite_mensal_solicitacoes: number | null
+          niveis_aprovacao: number | null
+          sla_horas: number | null
+          tipo_solicitacao: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          exige_anexo?: boolean | null
+          id?: string
+          limite_mensal_solicitacoes?: number | null
+          niveis_aprovacao?: number | null
+          sla_horas?: number | null
+          tipo_solicitacao: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          exige_anexo?: boolean | null
+          id?: string
+          limite_mensal_solicitacoes?: number | null
+          niveis_aprovacao?: number | null
+          sla_horas?: number | null
+          tipo_solicitacao?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
