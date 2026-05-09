@@ -221,10 +221,8 @@ export default function ESocialPage() {
           </CardContent>
         </Card>
       </motion.div>
-    </PageLayout>
-    </>
-  );
-}
+      </PageLayout>
+
       {/* Detalhes do Evento */}
       <Dialog open={!!selectedEvento} onOpenChange={(o) => { if(!o) setSelectedEvento(null); }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 border-border/30 shadow-elevated rounded-2xl">
@@ -292,3 +290,6 @@ export default function ESocialPage() {
           </div>
         </DialogContent>
       </Dialog>
+    </>
+  );
+}

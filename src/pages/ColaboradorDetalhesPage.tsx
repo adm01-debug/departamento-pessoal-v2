@@ -11,7 +11,7 @@ import {
   ArrowLeft, Users, Phone, DollarSign, Stethoscope,
   GraduationCap, Globe, Accessibility, Calendar, StickyNote,
   Landmark, FileText, BookOpen, FileStack, Briefcase, ShieldCheck,
-  MapPin, Info, Edit, MoreHorizontal, Camera
+  MapPin, Info, Edit, MoreHorizontal, Camera, User
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
