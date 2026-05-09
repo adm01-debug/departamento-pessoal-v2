@@ -51,17 +51,18 @@ export default function ProvisoesPage() {
   const { data: inconsistencias } = useQuery({
     queryKey: ['provisao-inconsistencias', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await (window as any).supabase
+      const { data, error } = await supabase
         .from('colaboradores')
         .select('id, nome_completo')
-        .eq('empresa_id', empresaAtual?.id)
-        .eq('status', 'Ativo')
+        .eq('empresa_id', empresaAtual?.id!)
+        .eq('status', 'ativo')
         .or('salario_base.is.null,salario_base.eq.0');
       if (error) throw error;
       return data;
     },
     enabled: !!empresaAtual?.id
   });
+
 
   const mutation = useMutation({
     mutationFn: () => provisaoService.calcular(empresaAtual!.id, `${competencia}-01`),
