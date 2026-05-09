@@ -172,7 +172,7 @@ export default function CalculadoraRescisaoPage() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Form */}
-        <Card className="border-border/30 rounded-2xl">
+        <Card className="border-border/30 rounded-2xl shadow-elevated">
           <CardHeader>
             <CardTitle className="text-base font-display">Dados da Rescisão</CardTitle>
             <CardDescription className="font-body text-xs">Preencha os dados para calcular as verbas rescisórias</CardDescription>
