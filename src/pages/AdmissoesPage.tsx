@@ -50,6 +50,8 @@ const etapaGradients: Record<string, string> = {
 const etapaFilters = ['todos', ...Object.keys(etapaLabels)] as const;
 
 export default function AdmissoesPage() {
+  const navigate = useNavigate();
+
   const { admissoes, isLoading } = useAdmissoes();
   const [search, setSearch] = useState('');
   const [etapaFilter, setEtapaFilter] = useState('todos');
