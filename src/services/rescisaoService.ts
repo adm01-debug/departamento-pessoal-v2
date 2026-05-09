@@ -18,13 +18,14 @@ export const rescisaoService = {
     const indexAtual = ORDEM_ETAPAS.indexOf(atual.etapa || 'comunicacao');
     const indexNova = ORDEM_ETAPAS.indexOf(novaEtapa);
     
-    // Bloqueia saltar etapas ou retroceder sem justificativa (neste nível, apenas valida a ordem)
+    // Bloqueia saltar etapas (não permite ir de comunicacao direto para calculado sem passar por documentacao)
     if (indexNova > indexAtual + 1) {
-      throw new Error(`Transição inválida: Não é possível pular de '${atual.etapa}' para '${novaEtapa}'.`);
+      throw new Error(`Transição inválida: A etapa '${novaEtapa}' exige que a etapa anterior '${ORDEM_ETAPAS[indexNova-1]}' esteja concluída.`);
     }
     
     return true;
   },
+
 
   async calcularESalvar(id: string, params: any) {
     if (!id) throw new Error('ID do desligamento é obrigatório');
