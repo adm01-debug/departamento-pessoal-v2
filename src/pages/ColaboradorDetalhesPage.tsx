@@ -10,13 +10,13 @@ import { colaboradorService } from '@/services';
 import {
   ArrowLeft, Users, Briefcase, ShieldCheck,
   Landmark, FileText, Info, Edit, MoreHorizontal, History as HistoryIcon,
-  MapPin, Calendar, Stethoscope, User as UserIcon
+  MapPin, Calendar, Stethoscope, User as UserIcon, Gift
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
   ASOTab, FormacaoTab, EstrangeiroTab, PCDTab, AquisitivosTab, AnotacoesTab,
   ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab, HistoricoContratosTab,
-  ColaboradorHistory
+  ColaboradorHistory, BeneficiosTab
 } from '@/components/colaborador-detalhes';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -137,6 +137,9 @@ export default function ColaboradorDetalhesPage() {
             </TabsTrigger>
             <TabsTrigger value="documentos" className="rounded-lg font-body px-6 gap-2">
               <FileText className="h-4 w-4" /> Documentação
+            </TabsTrigger>
+            <TabsTrigger value="beneficios" className="rounded-lg font-body px-6 gap-2">
+              <Gift className="h-4 w-4" /> Benefícios
             </TabsTrigger>
             <TabsTrigger value="historico" className="rounded-lg font-body px-6 gap-2">
               <HistoryIcon className="h-4 w-4" /> Histórico
@@ -266,6 +269,10 @@ export default function ColaboradorDetalhesPage() {
               <TabsContent value="anotacoes"><AnotacoesTab colaboradorId={id!} /></TabsContent>
               <TabsContent value="estagiario"><EstagiarioTab colaboradorId={id!} /></TabsContent>
             </Tabs>
+          </TabsContent>
+
+          <TabsContent value="beneficios">
+            <BeneficiosTab colaboradorId={id!} />
           </TabsContent>
 
           <TabsContent value="historico">

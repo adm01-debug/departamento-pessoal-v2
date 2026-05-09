@@ -12,4 +12,5 @@ export { ContasBancariasTab } from './ContasBancariasTab';
 export { DocumentosPessoaisTab } from './DocumentosPessoaisTab';
 export { EstagiarioTab } from './EstagiarioTab';
 export { HistoricoContratosTab } from './HistoricoContratosTab';
+export { BeneficiosTab } from './BeneficiosTab';
 export { ColaboradorHistory } from '../colaboradores/ColaboradorHistory';
