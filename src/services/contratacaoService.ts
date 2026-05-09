@@ -65,13 +65,19 @@ export const contratacaoService = {
 
     if (error) throw error;
 
-    // Log de auditoria usando estrutura correta
-    await supabase.from('audit_log').insert({
+    // Log de auditoria profissional
+    await auditLogger.log({
       tabela: 'admissoes',
       registro_id: admissaoId,
-      acao: `VALIDACAO_DOC_${docType.toUpperCase()}`,
-      dados_novos: { status, observacao }
+      acao: 'UPDATE',
+      dados_novos: { 
+        documento: docType, 
+        status, 
+        observacao,
+        evento: 'VALIDACAO_DOCUMENTO'
+      }
     });
+
   },
 
   async enviarLinkCandidato(admissaoId: string, email: string) {
