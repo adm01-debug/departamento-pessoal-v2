@@ -5,11 +5,14 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { StatusBadge, TipoBadge } from './DesligamentoStatusBadge';
 import { DesligamentoChecklist } from './DesligamentoChecklist';
-import { Calculator, Download, FileText, User, Calendar, DollarSign } from 'lucide-react';
+import { Calculator, Download, FileText, User, Calendar, DollarSign, RefreshCw, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { desligamentoService } from '@/services/desligamentoService';
+import { rescisaoService } from '@/services/rescisaoService';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useState } from 'react';
+
 
 interface DetailSheetProps {
   desligamento: any | null;
