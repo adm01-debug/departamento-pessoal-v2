@@ -1,6 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,11 +10,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { folhaService } from '@/services';
 import { Eye, Calculator, FileText, DollarSign, TrendingUp, TrendingDown, Banknote, Download, FileSpreadsheet, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FolhaAuditoriaTable } from '@/components/folha/FolhaAuditoriaTable';
+import { CalculoFolhaWizard } from '@/components/folha/CalculoFolhaWizard';
 import { motion } from 'framer-motion';
+
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
 import { useExcelExport } from '@/hooks/useExcelExport';
