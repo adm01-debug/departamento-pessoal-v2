@@ -372,9 +372,14 @@ export default function ConfiguracoesPage() {
           <IPBlockingTab />
         </TabsContent>
 
+        <TabsContent value="auditoria-global">
+           <GlobalAuditLogTab />
+        </TabsContent>
+
         <TabsContent value="sistema">
           <SystemHealthTab />
         </TabsContent>
+
 
         <TabsContent value="logs-integ">
           <LogsIntegracoesTab />
