@@ -51,7 +51,7 @@ function exportCSV(title: string, rows: any[], columns: string[]) {
 }
 
 export default function RelatoriosPage() {
-  const { empresaAtual } = useEmpresa();
+  const { empresaAtual } = useEmpresas();
   const [generating, setGenerating] = useState<string | null>(null);
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
