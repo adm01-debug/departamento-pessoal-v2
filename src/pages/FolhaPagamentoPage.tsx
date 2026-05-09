@@ -74,6 +74,7 @@ function useFolhaResumo(competencia: string) {
 
 /* ─── Main Page ─── */
 export default function FolhaPagamentoPage() {
+  const { empresaAtual } = useEmpresas();
   const competencias = useMemo(() => gerarCompetencias(), []);
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
   const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
