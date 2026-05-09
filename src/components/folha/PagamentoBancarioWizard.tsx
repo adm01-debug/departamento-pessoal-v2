@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -26,20 +27,33 @@ export function PagamentoBancarioWizard({ folhaId }: { folhaId?: string }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [method, setMethod] = useState<'cnab' | 'pix' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { empresaAtual } = useEmpresas();
 
   const handleProcess = async () => {
-    if (!method || !folhaId) return;
+    if (!method || !folhaId || !empresaAtual?.id) return;
     setIsProcessing(true);
     
     try {
       // Simulate real bank communication (Open Banking API pattern)
       await new Promise(resolve => setTimeout(resolve, 3000));
       
+      let content = '';
       if (method === 'pix') {
-        await cnabService.generatePIXBatch('', folhaId); // Service will handle company internally or fetch
+        content = await cnabService.generatePIXBatch(empresaAtual.id, folhaId);
       } else {
-        await cnabService.generateCNAB240('', folhaId);
+        content = await cnabService.generateCNAB240(empresaAtual.id, folhaId);
       }
+      
+      // Automatic download of the generated file
+      const blob = new Blob([content], { type: method === 'pix' ? 'text/csv' : 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = method === 'pix' ? `Lote_PIX_${folhaId}.csv` : `Remessa_CNAB_${folhaId}.rem`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       
       setCurrentStep(3);
       toast.success(method === 'pix' ? 'Lote PIX liquidado com sucesso!' : 'Arquivo de remessa gerado e enviado ao banco.');
