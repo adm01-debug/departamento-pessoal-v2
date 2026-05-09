@@ -75,8 +75,22 @@ serve(async (req: Request): Promise<Response> => {
           if (!resp.ok) throw new Error(`Bitrix API error: ${resp.status}`);
           const bitrixData = await resp.json();
           const users = bitrixData.result || [];
-          results.colaboradores = { found: users.length, note: 'Sync requires manual mapping' };
-          totalProcessed += users.length;
+          
+          for (const user of users) {
+            const { error } = await supabase.from('colaboradores').upsert({
+              nome_completo: `${user.NAME} ${user.LAST_NAME}`.trim(),
+              email: user.EMAIL,
+              empresa_id: config.empresa_id,
+              status: 'Ativo',
+              matricula: `BX-${user.ID}`,
+              departamento: user.UF_DEPARTMENT ? 'Bitrix Sync' : 'Geral'
+            }, { onConflict: 'email' });
+            
+            if (error) totalErrors++;
+            else totalSuccess++;
+            totalProcessed++;
+          }
+          results.colaboradores = { processed: users.length };
         } catch (e: any) {
           results.colaboradores = { error: e.message };
           totalErrors++;
