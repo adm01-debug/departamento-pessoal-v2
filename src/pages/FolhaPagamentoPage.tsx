@@ -120,7 +120,29 @@ export default function FolhaPagamentoPage() {
     } finally {
       setCalcServidor(false);
     }
-  };
+  const encerrarFolha = useMutation({
+    mutationFn: async () => {
+      if (!resumo?.id) throw new Error('Nenhuma folha encontrada para encerramento');
+      const { data, error } = await supabase.from('folhas_pagamento')
+        .update({ status: 'fechada' as any, data_fechamento: new Date().toISOString() })
+        .eq('id', resumo.id).select().single();
+      if (error) throw error;
+      
+      await auditLogger.log({
+        tabela: 'folhas_pagamento',
+        registro_id: resumo.id,
+        acao: 'UPDATE',
+        dados_novos: { status: 'fechada', evento: 'ENCERRAMENTO_FOLHA' }
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
+      toast.success('Folha de pagamento encerrada com sucesso!');
+    },
+    onError: (error: Error) => toast.error(`Erro: ${error.message}`),
+  });
+
 
   return (
     <>
