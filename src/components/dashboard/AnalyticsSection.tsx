@@ -467,16 +467,44 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
           className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-warning/20 transition-all">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning/70">
-                <Activity className="h-4 w-4 text-white" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning-glow">
+                <Bell className="h-4 w-4 text-white" />
               </div>
-              Alertas de RH
+              Notificações
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/relatorios')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-               <ChevronRight className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              {notifications.some(n => !n.lida) && (
+                <Button variant="ghost" size="xs" onClick={markAllRead} className="text-[10px] h-7 px-2 text-primary hover:bg-primary/5">
+                  Lidas
+                </Button>
+              )}
+              <Button variant="ghost" size="icon" onClick={() => setIsNotifOpen(true)} className="h-8 w-8 rounded-lg">
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent><AlertasRHWidget /></CardContent>
+          <CardContent>
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+              {notifications.length > 0 ? (
+                notifications.slice(0, 5).map((n, i) => (
+                  <div key={n.id} className={cn("p-2 rounded-xl border transition-all flex gap-3", n.lida ? "bg-muted/10 border-border/10 opacity-60" : "bg-primary/5 border-primary/20")}>
+                    <div className={cn("p-1.5 rounded-lg shrink-0", n.tipo === 'ponto_aprovado' ? "bg-success/10 text-success" : "bg-info/10 text-info")}>
+                      <Bell className="h-3 w-3" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-bold truncate">{n.titulo}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{n.mensagem}</p>
+                    </div>
+                    {!n.lida && <button onClick={() => markNotifRead(n.id)} className="p-1 hover:bg-muted rounded-full"><Check className="h-3 w-3" /></button>}
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <p className="text-caption text-muted-foreground font-body">Sem notificações</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
         </MotionCard>
 
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
