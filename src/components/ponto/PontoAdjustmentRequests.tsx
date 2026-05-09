@@ -303,7 +303,7 @@ export function PontoAdjustmentRequests() {
             <div className="flex gap-2">
               {selectedRequest?.status === 'pendente' && (
                 <>
-                  <Button variant="success" className="gap-2" onClick={() => {
+                  <Button variant="gradient-success" className="gap-2" onClick={() => {
                     mutation.mutate({ id: selectedRequest.id, status: 'aprovado' });
                     setSelectedRequest(null);
                   }}>
