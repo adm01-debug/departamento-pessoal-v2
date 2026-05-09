@@ -439,7 +439,14 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
               <div className="space-y-3">{Array(2).fill(0).map((_, i) => <CardSkeleton key={i} className="h-14 border-0 p-0" />)}</div>
             ) : pendencias && pendencias.length > 0 ? (
               <div className="space-y-2">
-                {pendencias.map((p, i) => <PendenciaItem key={i} pendencia={p} index={i} />)}
+                {pendencias.map((p, i) => (
+                  <PendenciaItem 
+                    key={i} 
+                    pendencia={p} 
+                    index={i} 
+                    onClick={() => handleOpenDetail(p.tipo)}
+                  />
+                ))}
               </div>
             ) : (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
@@ -454,6 +461,164 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
           </CardContent>
         </MotionCard>
       </div>
+
+      {/* Modal de Detalhes de Pendências */}
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 rounded-2xl border-border/40 shadow-2xl glass">
+          <DialogHeader className="p-6 pb-4 border-b border-border/10 bg-gradient-to-r from-primary/5 via-transparent to-transparent">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-2xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                  Lista de Pendências
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Visualize e tome ações rápidas sobre os itens pendentes do sistema.
+                </DialogDescription>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <div className="relative flex-1 group">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder="Buscar por título ou descrição..."
+                  className="pl-10 h-11 rounded-xl bg-muted/40 border-border/20 focus:bg-background transition-all"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {(['all', 'ferias', 'assinaturas', 'ponto', 'documentos'] as const).map((type) => (
+                  <Button
+                    key={type}
+                    variant={filterType === type ? 'default' : 'outline'}
+                    size="sm"
+                    className={cn(
+                      "rounded-lg h-11 px-4 font-medium transition-all",
+                      filterType === type ? "shadow-lg shadow-primary/20" : "bg-muted/20 border-border/10"
+                    )}
+                    onClick={() => setFilterType(type)}
+                  >
+                    {type === 'all' ? 'Todos' : type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-muted/5">
+            {isLoadingDB ? (
+              <div className="space-y-4">
+                {Array(4).fill(0).map((_, i) => <CardSkeleton key={i} className="h-24 rounded-2xl" />)}
+              </div>
+            ) : filteredPendencias.length > 0 ? (
+              <div className="grid gap-4">
+                <AnimatePresence mode="popLayout">
+                  {filteredPendencias.map((item, idx) => (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ duration: 0.2, delay: idx * 0.05 }}
+                      className="group p-5 rounded-2xl glass border border-border/30 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                      
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex gap-4">
+                          <div className={cn(
+                            "p-3 rounded-2xl bg-gradient-to-br shrink-0 shadow-lg",
+                            item.tipo === 'ferias' ? "from-primary/80 to-primary" :
+                            item.tipo === 'ponto' ? "from-warning/80 to-warning" :
+                            item.tipo === 'assinaturas' ? "from-success/80 to-success" : "from-info/80 to-info"
+                          )}>
+                            {item.tipo === 'ferias' ? <Calendar className="h-5 w-5 text-white" /> :
+                             item.tipo === 'ponto' ? <Clock className="h-5 w-5 text-white" /> :
+                             item.tipo === 'assinaturas' ? <ShieldCheck className="h-5 w-5 text-white" /> : <Briefcase className="h-5 w-5 text-white" />}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <h4 className="font-display font-bold text-lg leading-tight">{item.titulo}</h4>
+                              <Badge className={cn("text-[10px] font-bold uppercase tracking-wider py-0.5", getPriorityColor(item.prioridade))}>
+                                {item.prioridade}
+                              </Badge>
+                              <Badge variant="outline" className="text-[10px] opacity-70">
+                                {format(new Date(item.criado_at), "dd 'de' MMM, HH:mm", { locale: ptBR })}
+                              </Badge>
+                            </div>
+                            <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
+                              {item.descricao}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 shrink-0">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all"
+                            onClick={() => window.open(`/detalhes/${item.referencia_id}`, '_blank')}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 border-border/40 shadow-xl glass">
+                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" onClick={() => updateStatus.mutate({ id: item.id, status: 'concluido' })}>
+                                <Check className="h-4 w-4" /> Aprovar / Concluir
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" onClick={() => updateStatus.mutate({ id: item.id, status: 'em_analise' })}>
+                                <Activity className="h-4 w-4" /> Marcar Revisão
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer">
+                                <Forward className="h-4 w-4" /> Encaminhar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="p-6 rounded-3xl bg-muted/20 mb-4 border border-border/10">
+                  <X className="h-12 w-12 text-muted-foreground/30" />
+                </div>
+                <h3 className="text-xl font-display font-bold">Nenhuma pendência</h3>
+                <p className="text-muted-foreground mt-2 max-w-xs mx-auto">
+                  Não encontramos itens que correspondam à sua busca ou filtro.
+                </p>
+                <Button variant="outline" className="mt-6 rounded-xl px-8" onClick={() => { setSearchQuery(""); setFilterType("all"); }}>
+                  Limpar Filtros
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-6 border-t border-border/10 bg-muted/5">
+            <Button variant="outline" className="rounded-xl px-8" onClick={() => setIsDetailOpen(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
