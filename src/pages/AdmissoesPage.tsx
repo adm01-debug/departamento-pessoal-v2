@@ -12,6 +12,8 @@ import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { UserPlus, Search, ExternalLink, Mail, FileText, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { contratacaoService } from '@/services/contratacaoService';
 
 const etapaLabels: Record<string, string> = {
   documentos_pendentes: 'Docs Pendentes',
