@@ -88,7 +88,8 @@ export default function ConfiguracoesPage() {
     >
       <Tabs defaultValue="geral" className="space-y-4">
         <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30">
-          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Geral</TabsTrigger>
+          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Preferências</TabsTrigger>
+          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Empresa</TabsTrigger>
           <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Folha</TabsTrigger>
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
