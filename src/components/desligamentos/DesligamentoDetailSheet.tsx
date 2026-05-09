@@ -38,18 +38,25 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
 
   const handleChecklistToggle = async (key: string, value: boolean) => {
     try {
-      // Validação de transição lógica se marcar certas chaves
+      // Regras de transição de etapa baseadas no checklist
+      let updates: any = { [key]: value };
+      
       if (key === 'checklist_comunicacao' && value) {
-         await desligamentoService.atualizar(d.id, { etapa: 'documentacao', status: 'comunicado', [key]: value });
-      } else {
-         await desligamentoService.atualizar(d.id, { [key]: value });
+        updates.etapa = 'documentacao';
+        updates.status = 'comunicado';
+      } else if (key === 'checklist_documentacao' && value) {
+        // Se concluiu documentação, habilita etapa de cálculo
+        if (d.etapa === 'documentacao') updates.etapa = 'calculo';
       }
+
+      await desligamentoService.atualizar(d.id, updates);
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Checklist atualizado');
     } catch (err: any) {
       toast.error('Erro ao atualizar checklist: ' + err.message);
     }
   };
+
 
 
   const handleCalcular = async () => {
