@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { auditLogger } from '@/utils/auditLogger';
+
 
 export const contratacaoService = {
   async gerarTemplateContrato(admissaoId: string) {
