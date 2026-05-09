@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
@@ -22,12 +22,18 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG', 'CPF', 'CTPS', 'Comprovante', 'Outro'];
 
+import { useSearchParams } from 'react-router-dom';
+
 export default function DocumentosPage() {
+  const [searchParams] = useSearchParams();
+  const urlColaboradorId = searchParams.get('colaborador');
   const [search, setSearch] = useState('');
   const [tipoFilter, setTipoFilter] = useState('todos');
+  const [colaboradorFilter, setColaboradorFilter] = useState(urlColaboradorId || 'todos');
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
+  const [colaboradorId, setColaboradorId] = useState(urlColaboradorId || '');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
@@ -35,9 +41,21 @@ export default function DocumentosPage() {
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    if (urlColaboradorId) {
+      setColaboradorFilter(urlColaboradorId);
+      setColaboradorId(urlColaboradorId);
+    }
+  }, [urlColaboradorId]);
+
   const { data: documentos, isLoading } = useQuery({
-    queryKey: ['documentos'],
-    queryFn: () => documentoService.listar(),
+    queryKey: ['documentos', colaboradorFilter],
+    queryFn: () => documentoService.listar(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
+  });
+
+  const { data: colaboradores } = useQuery({
+    queryKey: ['colaboradores-simples'],
+    queryFn: () => colaboradorService.listar(),
   });
 
   const deleteMutation = useMutation({
@@ -85,6 +103,7 @@ export default function DocumentosPage() {
         tamanho: file.size,
         mime_type: file.type,
         storage_path: storagePath,
+        colaborador_id: colaboradorId || undefined,
       });
 
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
@@ -159,7 +178,9 @@ export default function DocumentosPage() {
   };
 
   const filtered = documentos?.filter((d: any) => {
-    const searchMatch = !search || (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase());
+    const searchMatch = !search || 
+      (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase()) ||
+      (d.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase());
     const tipoMatch = tipoFilter === 'todos' || d.tipo === tipoFilter;
     return searchMatch && tipoMatch;
   });
@@ -188,18 +209,31 @@ export default function DocumentosPage() {
             className="pl-9 rounded-xl border-border/40 focus:ring-primary/20"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
           <Filter className="h-4 w-4 text-muted-foreground hidden sm:block" />
           <Select value={tipoFilter} onValueChange={setTipoFilter}>
-            <SelectTrigger className="w-[180px] rounded-xl border-border/40">
-              <SelectValue placeholder="Tipo de Documento" />
+            <SelectTrigger className="w-[150px] rounded-xl border-border/40">
+              <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos os Tipos</SelectItem>
+              <SelectItem value="todos">Todos Tipos</SelectItem>
               {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTipoFilter('todos'); }} className="text-xs text-muted-foreground hover:text-foreground">
+
+          <Select value={colaboradorFilter} onValueChange={setColaboradorFilter}>
+            <SelectTrigger className="w-[180px] rounded-xl border-border/40">
+              <SelectValue placeholder="Colaborador" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos Colaboradores</SelectItem>
+              {colaboradores?.map((c: any) => (
+                <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTipoFilter('todos'); setColaboradorFilter('todos'); }} className="text-xs text-muted-foreground hover:text-foreground">
             Limpar
           </Button>
         </div>
@@ -215,10 +249,11 @@ export default function DocumentosPage() {
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead className="font-display font-semibold">Nome</TableHead>
+                <TableHead className="font-display font-semibold">Dono</TableHead>
                 <TableHead className="font-display font-semibold">Tipo</TableHead>
                 <TableHead className="font-display font-semibold">Tamanho</TableHead>
                 <TableHead className="font-display font-semibold">Data</TableHead>
-                <TableHead className="w-[140px] font-display font-semibold">Ações</TableHead>
+                <TableHead className="w-[140px] font-display font-semibold text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -228,10 +263,16 @@ export default function DocumentosPage() {
                     <File className="h-4 w-4 text-muted-foreground shrink-0" />
                     {doc.nome || doc.nome_arquivo || '-'}
                   </TableCell>
-                  <TableCell><Badge className="bg-info/15 text-info border-0 font-body">{doc.tipo || '-'}</Badge></TableCell>
-                  <TableCell className="font-body text-muted-foreground">{formatSize(doc.tamanho)}</TableCell>
-                  <TableCell className="font-body">{doc.created_at ? new Date(doc.created_at).toLocaleDateString('pt-BR') : '-'}</TableCell>
                   <TableCell>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium">{doc.colaborador?.nome_completo || 'Empresa (Geral)'}</span>
+                      {doc.colaborador?.cpf && <span className="text-[10px] text-muted-foreground">{doc.colaborador.cpf}</span>}
+                    </div>
+                  </TableCell>
+                  <TableCell><Badge className="bg-info/15 text-info border-0 font-body text-[10px]">{doc.tipo || '-'}</Badge></TableCell>
+                  <TableCell className="font-body text-muted-foreground text-xs">{formatSize(doc.tamanho)}</TableCell>
+                  <TableCell className="font-body text-xs">{doc.created_at ? new Date(doc.created_at).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                  <TableCell className="text-right">
                     <div className="flex gap-1">
                       <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary" onClick={() => handleOCR(doc)} title="Analisar com IA">
                         <Sparkles className="h-4 w-4" />
@@ -319,14 +360,28 @@ export default function DocumentosPage() {
             <DialogTitle className="font-display">Enviar Documento</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="font-body">Tipo de Documento</Label>
-              <Select value={tipo} onValueChange={setTipo}>
-                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione o tipo" /></SelectTrigger>
-                <SelectContent>
-                  {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="font-body text-xs">Tipo de Documento</Label>
+                <Select value={tipo} onValueChange={setTipo}>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-body text-xs">Colaborador (Opcional)</Label>
+                <Select value={colaboradorId} onValueChange={setColaboradorId}>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Geral" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="geral">Geral / Empresa</SelectItem>
+                    {colaboradores?.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="font-body">Arquivo</Label>

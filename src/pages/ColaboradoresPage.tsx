@@ -192,16 +192,27 @@ export default function ColaboradoresPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg hover:bg-primary/10"
+                        className="h-8 w-8 rounded-lg hover:bg-info/10 text-info"
                         onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}/editar`); }}
+                        title="Ver Perfil"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg hover:bg-primary/10"
+                        className="h-8 w-8 rounded-lg hover:bg-warning/10 text-warning"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/documentos?colaborador=${c.id}`); }}
+                        title="Documentos"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-lg hover:bg-primary/10 text-primary"
                         onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}/editar`); }}
+                        title="Editar"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
