@@ -45,7 +45,8 @@ export const pontoOfflineService = {
 
     for (const item of queue) {
       try {
-        const { error } = await supabase.from('batidas_ponto').insert({
+        // Usamos uma asserção de tipo para evitar erros com o gerador de tipos do Supabase
+        const { error } = await (supabase as any).from('batidas_ponto').insert({
           colaborador_id: item.colaborador_id,
           tipo: item.tipo,
           data: item.timestamp.split('T')[0],
