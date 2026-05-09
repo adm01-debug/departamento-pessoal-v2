@@ -108,7 +108,7 @@ export default function FolhaPagamentoPage() {
     setCalcServidor(true);
     try {
       const [mes, ano] = competencia.split('/');
-      await edgeFunctionsService.calcularFolha({ empresaId: '', competencia: `${ano}-${mes}` });
+      await edgeFunctionsService.calcularFolha({ empresaId: empresaAtual?.id || '', competencia: `${ano}-${mes}` });
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       toast.success('Folha calculada no servidor com sucesso!');
     } catch (err: any) {
