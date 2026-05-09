@@ -17,6 +17,7 @@ import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
   ASOTab, FormacaoTab, EstrangeiroTab, PCDTab, AquisitivosTab, AnotacoesTab,
   ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab, HistoricoContratosTab,
+  ColaboradorHistory
 } from '@/components/colaborador-detalhes';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
