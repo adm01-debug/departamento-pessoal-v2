@@ -12,7 +12,8 @@ import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
 import { Card, CardContent } from '@/components/ui/card';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline } from '@/components/folha';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard } from '@/components/folha';
+import { folhaCalc } from '@/utils/folhaCalc';
 
 
 
@@ -203,6 +204,8 @@ export default function FolhaPagamentoPage() {
         }
       >
         <FolhaKPIs resumo={resumo} isLoading={isLoading} />
+        
+        {!isLoading && <FolhaDashboard competencia={competencia} />}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
