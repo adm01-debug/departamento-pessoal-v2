@@ -250,10 +250,16 @@ export default function DocumentosPage() {
                     <File className="h-4 w-4 text-muted-foreground shrink-0" />
                     {doc.nome || doc.nome_arquivo || '-'}
                   </TableCell>
-                  <TableCell><Badge className="bg-info/15 text-info border-0 font-body">{doc.tipo || '-'}</Badge></TableCell>
-                  <TableCell className="font-body text-muted-foreground">{formatSize(doc.tamanho)}</TableCell>
-                  <TableCell className="font-body">{doc.created_at ? new Date(doc.created_at).toLocaleDateString('pt-BR') : '-'}</TableCell>
                   <TableCell>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium">{doc.colaborador?.nome_completo || 'Empresa (Geral)'}</span>
+                      {doc.colaborador?.cpf && <span className="text-[10px] text-muted-foreground">{doc.colaborador.cpf}</span>}
+                    </div>
+                  </TableCell>
+                  <TableCell><Badge className="bg-info/15 text-info border-0 font-body text-[10px]">{doc.tipo || '-'}</Badge></TableCell>
+                  <TableCell className="font-body text-muted-foreground text-xs">{formatSize(doc.tamanho)}</TableCell>
+                  <TableCell className="font-body text-xs">{doc.created_at ? new Date(doc.created_at).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                  <TableCell className="text-right">
                     <div className="flex gap-1">
                       <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary" onClick={() => handleOCR(doc)} title="Analisar com IA">
                         <Sparkles className="h-4 w-4" />
