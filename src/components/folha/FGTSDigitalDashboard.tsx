@@ -73,25 +73,35 @@ export function FGTSDigitalDashboard() {
         </div>
 
         <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border/30 group">
+            <div className="flex items-center justify-between p-2.5 rounded-xl hover:bg-muted/30 transition-colors border border-border/10 group">
                 <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <FileText className="h-4 w-4" />
+                    </div>
                     <div className="text-xs">
-                        <p className="font-medium">Guia de Recolhimento Mensal - 04/2026</p>
-                        <p className="text-[10px] text-muted-foreground">Emitida em 05/05/2026</p>
+                        <p className="font-bold">Guia GFD Mensal - Competência 04/2026</p>
+                        <p className="text-[10px] text-muted-foreground">Emitida via API Caixa em 05/05/2026</p>
                     </div>
                 </div>
-                <Badge variant="outline" className="bg-success/10 text-success border-success/20">Pago</Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-[10px]">Pago</Badge>
+                    <Button variant="ghost" size="icon" className="h-7 w-7"><History className="h-3.5 w-3.5" /></Button>
+                </div>
             </div>
-            <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border/30 group">
+            <div className="flex items-center justify-between p-2.5 rounded-xl hover:bg-muted/30 transition-colors border border-border/10 group">
                 <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                    <div className="p-2 rounded-lg bg-warning/10 text-warning">
+                        <FileText className="h-4 w-4" />
+                    </div>
                     <div className="text-xs">
-                        <p className="font-medium">Guia Rescisória - Colab. João Silva</p>
-                        <p className="text-[10px] text-muted-foreground">Emitida em 07/05/2026</p>
+                        <p className="font-bold">Guia GFD Rescisória - Colab. João Silva</p>
+                        <p className="text-[10px] text-muted-foreground">Vencimento em 20/05/2026</p>
                     </div>
                 </div>
-                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Pendente</Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-[10px]">Pendente</Badge>
+                    <Button variant="ghost" size="icon" className="h-7 w-7"><History className="h-3.5 w-3.5" /></Button>
+                </div>
             </div>
         </div>
       </CardContent>
