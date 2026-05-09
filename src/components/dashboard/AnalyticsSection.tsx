@@ -7,7 +7,8 @@ import {
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
-  Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield
+  Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
+  Download, ListChecks, CheckCircle, AlertOctagon, Bell
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -16,8 +17,8 @@ import { DonutChart } from './DonutChart';
 import { Badge } from '@/components/ui/badge';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
 import { viewsService } from '@/services/tabelasComplementaresService';
-import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter 
@@ -31,6 +32,10 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { exportPortaria671PDF } from '@/services/exportService';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MotionCard = motion.create(Card);
 
