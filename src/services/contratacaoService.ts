@@ -52,5 +52,23 @@ export const contratacaoService = {
 
     if (error) throw error;
     return data;
+  },
+
+  async enviarWhatsApp(admissaoId: string, telefone: string, token: string) {
+    // In a real scenario, this would call an API like Twilio or Evolution API
+    // For now, we generate a WhatsApp link for the user to click and send
+    const baseUrl = window.location.origin;
+    const link = `${baseUrl}/contratacao?token=${token}`;
+    const mensagem = encodeURIComponent(`Olá! 👋 Boas-vindas à nossa equipe! \n\nPara completar sua contratação digital, acesse o link seguro: ${link}`);
+    
+    window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank');
+    
+    // Log the event
+    await supabase.from('notificacoes_admissao').insert({
+      admissao_id: admissaoId,
+      tipo: 'whatsapp',
+      status: 'enviado',
+      metadata: { link }
+    });
   }
 };
