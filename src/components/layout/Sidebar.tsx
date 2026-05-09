@@ -261,6 +261,10 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                       className="space-y-0.5 overflow-hidden"
                     >
                       {group.items.map(({ path, label, icon: Icon }) => {
+                        // Admin-only paths
+                        const adminPaths = ['/usuarios', '/seguranca', '/auditoria', '/telemetria', '/lgpd', '/controle-acesso'];
+                        if (adminPaths.includes(path) && user?.role !== 'admin') return null;
+
                         const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
                         const badge = getBadge(path);
 
