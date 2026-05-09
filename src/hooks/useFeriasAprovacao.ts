@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { feriasService } from '@/services';
 import { useAuth } from '@/contexts';
+import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
 
 export function useFeriasAprovacao() {
   const { user } = useAuth();
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id;
   const qc = useQueryClient();
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ['ferias'] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
 
   const aprovarGestor = useMutation({
     mutationFn: (id: string) => feriasService.aprovarGestor(id, user?.id),
@@ -68,3 +71,4 @@ export function useFeriasAprovacao() {
       cancelar.isPending,
   };
 }
+

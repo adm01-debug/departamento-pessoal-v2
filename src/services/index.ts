@@ -168,6 +168,20 @@ export const feriasService = {
     if (error) throw error;
     return data || [];
   },
+  async criarPeriodoAquisitivo(d: any) {
+    const { data, error } = await supabase.from('periodos_aquisitivos').insert(d).select().maybeSingle();
+    if (error) throw error;
+    return ensureSingleResult(data, 'período aquisitivo');
+  },
+  async atualizarPeriodoAquisitivo(id: string, d: any) {
+    const { data, error } = await supabase.from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    return ensureSingleResult(data, 'período aquisitivo');
+  },
+  async excluirPeriodoAquisitivo(id: string) {
+    const { error } = await supabase.from('periodos_aquisitivos').delete().eq('id', id);
+    if (error) throw error;
+  },
 
   async enviarContabilidade(id: string, userId?: string) {
     const { error } = await supabase.from('ferias').update({

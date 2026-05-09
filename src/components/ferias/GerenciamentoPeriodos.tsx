@@ -1,22 +1,115 @@
-import { useQuery } from '@tanstack/react-query';
-import { feriasService } from '@/services';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { feriasService, colaboradorService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Calendar, AlertTriangle, CheckCircle2, Clock, Plus, Trash2, Edit2, Loader2, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useEmpresas } from '@/hooks/useEmpresas';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface GerenciamentoPeriodosProps {
-  colaboradorId: string;
+  colaboradorId?: string;
 }
 
-export function GerenciamentoPeriodos({ colaboradorId }: GerenciamentoPeriodosProps) {
-  const { data: periodos, isLoading } = useQuery({
-    queryKey: ['periodos-aquisitivos', colaboradorId],
-    queryFn: () => feriasService.listPeriodosAquisitivos(colaboradorId),
-    enabled: !!colaboradorId,
+export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: GerenciamentoPeriodosProps) {
+  const { empresaAtual } = useEmpresas();
+  const qc = useQueryClient();
+  const [selectedColabId, setSelectedColabId] = useState(initialColaboradorId || '');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPeriodo, setEditingPeriodo] = useState<any>(null);
+  const [form, setForm] = useState({
+    data_inicio: '',
+    data_fim: '',
+    dias_direito: '30',
+    status: 'aberto',
+    numero_periodo: '1'
   });
+
+  const { data: colaboradores } = useQuery({
+    queryKey: ['colaboradores-ferias', empresaAtual?.id],
+    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
+  });
+
+  const { data: periodos, isLoading } = useQuery({
+    queryKey: ['periodos-aquisitivos', selectedColabId],
+    queryFn: () => feriasService.listPeriodosAquisitivos(selectedColabId),
+    enabled: !!selectedColabId,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => feriasService.criarPeriodoAquisitivo(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
+      toast.success('Período aquisitivo criado');
+      setIsDialogOpen(false);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => feriasService.atualizarPeriodoAquisitivo(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
+      toast.success('Período aquisitivo atualizado');
+      setIsDialogOpen(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => feriasService.excluirPeriodoAquisitivo(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
+      toast.success('Período aquisitivo excluído');
+    },
+  });
+
+  const handleSave = () => {
+    const data = {
+      ...form,
+      colaborador_id: selectedColabId,
+      dias_direito: parseInt(form.dias_direito),
+      numero_periodo: parseInt(form.numero_periodo),
+    };
+
+    if (editingPeriodo) {
+      updateMutation.mutate({ id: editingPeriodo.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const openCreate = () => {
+    setEditingPeriodo(null);
+    setForm({
+      data_inicio: '',
+      data_fim: '',
+      dias_direito: '30',
+      status: 'aberto',
+      numero_periodo: ((periodos?.length || 0) + 1).toString()
+    });
+    setIsDialogOpen(true);
+  };
+
+  const openEdit = (p: any) => {
+    setEditingPeriodo(p);
+    setForm({
+      data_inicio: p.data_inicio,
+      data_fim: p.data_fim,
+      dias_direito: p.dias_direito.toString(),
+      status: p.status,
+      numero_periodo: p.numero_periodo.toString()
+    });
+    setIsDialogOpen(true);
+  };
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -31,48 +124,172 @@ export function GerenciamentoPeriodos({ colaboradorId }: GerenciamentoPeriodosPr
     }
   };
 
-  if (isLoading) return <div>Carregando períodos...</div>;
-
   return (
-    <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
-      <CardHeader className="bg-muted/30 pb-4">
-        <CardTitle className="text-lg font-display flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
-          Períodos Aquisitivos
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-border/40">
-              <TableHead className="font-display">Período</TableHead>
-              <TableHead className="font-display">Início</TableHead>
-              <TableHead className="font-display">Fim</TableHead>
-              <TableHead className="font-display">Direito</TableHead>
-              <TableHead className="font-display">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!periodos?.length ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground font-body">
-                  Nenhum período aquisitivo encontrado.
-                </TableCell>
+    <div className="space-y-6">
+      <Card className="border-border/40 shadow-sm rounded-2xl">
+        <CardContent className="p-4 flex flex-col md:flex-row items-end gap-4">
+          <div className="flex-1 space-y-2">
+            <Label className="font-display text-xs">Selecionar Colaborador</Label>
+            <Select value={selectedColabId} onValueChange={setSelectedColabId}>
+              <SelectTrigger className="rounded-xl">
+                <SelectValue placeholder="Escolha um colaborador..." />
+              </SelectTrigger>
+              <SelectContent>
+                {colaboradores?.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button 
+            onClick={openCreate} 
+            disabled={!selectedColabId}
+            className="rounded-xl bg-primary gap-2 font-body"
+          >
+            <Plus className="h-4 w-4" /> Novo Período
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="bg-muted/30 pb-4 flex flex-row items-center justify-between">
+          <CardTitle className="text-lg font-display flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-primary" />
+            Períodos Aquisitivos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-border/40">
+                <TableHead className="font-display">Período</TableHead>
+                <TableHead className="font-display">Início</TableHead>
+                <TableHead className="font-display">Fim</TableHead>
+                <TableHead className="font-display">Direito</TableHead>
+                <TableHead className="font-display">Status</TableHead>
+                <TableHead className="font-display text-right w-[100px]">Ações</TableHead>
               </TableRow>
-            ) : (
-              periodos.map((p) => (
-                <TableRow key={p.id} className="hover:bg-muted/20 border-border/40 transition-colors">
-                  <TableCell className="font-body font-medium">#{p.numero_periodo}</TableCell>
-                  <TableCell className="font-body">{format(new Date(p.data_inicio), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
-                  <TableCell className="font-body">{format(new Date(p.data_fim), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
-                  <TableCell className="font-body">{p.dias_direito} dias</TableCell>
-                  <TableCell>{getStatusBadge(p.status)}</TableCell>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              ) : !selectedColabId ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground font-body">
+                    Selecione um colaborador para ver seus períodos.
+                  </TableCell>
+                </TableRow>
+              ) : !periodos?.length ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground font-body">
+                    Nenhum período aquisitivo encontrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                periodos.map((p) => (
+                  <TableRow key={p.id} className="hover:bg-muted/20 border-border/40 transition-colors group">
+                    <TableCell className="font-body font-medium">#{p.numero_periodo}</TableCell>
+                    <TableCell className="font-body">{format(new Date(p.data_inicio), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell className="font-body">{format(new Date(p.data_fim), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell className="font-body">{p.dias_direito} dias</TableCell>
+                    <TableCell>{getStatusBadge(p.status)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(p)} className="h-8 w-8">
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => deleteMutation.mutate(p.id)}
+                          className="h-8 w-8 text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingPeriodo ? 'Editar Período' : 'Novo Período'}</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="space-y-2">
+              <Label>Número Período</Label>
+              <Input 
+                type="number" 
+                value={form.numero_periodo} 
+                onChange={e => setForm(p => ({ ...p, numero_periodo: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={form.status} onValueChange={v => setForm(p => ({ ...p, status: v }))}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="aberto">Aberto</SelectItem>
+                  <SelectItem value="vencido">Vencido</SelectItem>
+                  <SelectItem value="concluido">Concluído</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Data Início</Label>
+              <Input 
+                type="date" 
+                value={form.data_inicio} 
+                onChange={e => setForm(p => ({ ...p, data_inicio: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Data Fim</Label>
+              <Input 
+                type="date" 
+                value={form.data_fim} 
+                onChange={e => setForm(p => ({ ...p, data_fim: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Dias de Direito</Label>
+              <Input 
+                type="number" 
+                value={form.dias_direito} 
+                onChange={e => setForm(p => ({ ...p, dias_direito: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={createMutation.isPending || updateMutation.isPending}
+              className="rounded-xl"
+            >
+              {createMutation.isPending || updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
+
