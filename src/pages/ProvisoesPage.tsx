@@ -139,10 +139,10 @@ export default function ProvisoesPage() {
   const { data: trendData } = useQuery({
     queryKey: ['provisao-trend', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await (window as any).supabase
+      const { data, error } = await supabase
         .from('provisao_logs')
         .select('competencia, valor_total_provisionado')
-        .eq('empresa_id', empresaAtual?.id)
+        .eq('empresa_id', empresaAtual?.id!)
         .eq('status', 'CONCLUIDO')
         .order('competencia', { ascending: true })
         .limit(6);
@@ -151,6 +151,7 @@ export default function ProvisoesPage() {
     },
     enabled: !!empresaAtual?.id
   });
+
 
   return (
     <>
