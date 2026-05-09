@@ -6830,6 +6830,71 @@ export type Database = {
         }
         Relationships: []
       }
+      folha_auditoria: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string
+          criado_por: string | null
+          detalhes: Json | null
+          folha_id: string | null
+          id: string
+          mensagem: string
+          severidade: string
+          tipo_evento: string
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string
+          criado_por?: string | null
+          detalhes?: Json | null
+          folha_id?: string | null
+          id?: string
+          mensagem: string
+          severidade?: string
+          tipo_evento: string
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string
+          criado_por?: string | null
+          detalhes?: Json | null
+          folha_id?: string | null
+          id?: string
+          mensagem?: string
+          severidade?: string
+          tipo_evento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folha_auditoria_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_auditoria_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_auditoria_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_auditoria_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       folhas_pagamento: {
         Row: {
           competencia: string
