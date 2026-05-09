@@ -157,7 +157,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, className, pendingCounts }: SidebarProps) {
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
 
   const activeGroupLabel = menuGroups.find(g =>
@@ -263,7 +263,7 @@ export function Sidebar({ collapsed = false, className, pendingCounts }: Sidebar
                       {group.items.map(({ path, label, icon: Icon }) => {
                         // Admin-only paths
                         const adminPaths = ['/usuarios', '/seguranca', '/auditoria', '/telemetria', '/lgpd', '/controle-acesso'];
-                        if (adminPaths.includes(path) && user?.role !== 'admin') return null;
+                        if (adminPaths.includes(path) && !isAdmin) return null;
 
                         const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
                         const badge = getBadge(path);
