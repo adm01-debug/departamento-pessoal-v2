@@ -87,6 +87,32 @@ Deno.serve(async (req) => {
 
     if (insErr) throw insErr;
 
+    // Integrated Accounting: Create ledger entries for provisions if accounts exist
+    const { data: plano } = await supabase
+      .from('plano_contas')
+      .select('id, codigo')
+      .eq('empresa_id', empresa_id);
+
+    if (plano?.length) {
+      const contaDespesaProvisao = plano.find(c => c.codigo === '3.1.01.002' || c.codigo === '3.1.01.001');
+      const contaPassivoProvisao = plano.find(c => c.codigo === '2.1.01.002');
+
+      if (contaDespesaProvisao && contaPassivoProvisao) {
+        const totalProvisions = provisoes.reduce((acc, p) => acc + p.valor_principal + p.encargos_inss + p.encargos_fgts, 0);
+        
+        await supabase.from('lancamentos_contabeis').insert({
+          empresa_id,
+          data_lancamento: new Date().toISOString().split('T')[0],
+          descricao: `Provisão Mensal (Férias/13º) - ${competencia}`,
+          valor: Math.round(totalProvisions * 100) / 100,
+          conta_debito_id: contaDespesaProvisao.id,
+          conta_credito_id: contaPassivoProvisao.id,
+          origem: 'provisao',
+          status: 'consolidado'
+        });
+      }
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
       count: provisoes.length,

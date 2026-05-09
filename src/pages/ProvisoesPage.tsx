@@ -108,12 +108,16 @@ export default function ProvisoesPage() {
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <DataTableToolbar 
-            search={competencia} 
-            onSearchChange={setCompetencia} 
-            searchPlaceholder="Competência (AAAA-MM)" 
-          />
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-muted/20 p-4 rounded-2xl border border-border/30">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-body font-medium text-muted-foreground whitespace-nowrap">Referência:</span>
+            <input 
+              type="month" 
+              value={competencia} 
+              onChange={(e) => setCompetencia(e.target.value)}
+              className="bg-background border border-border/40 rounded-lg px-3 py-1.5 text-sm font-body focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+            />
+          </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
