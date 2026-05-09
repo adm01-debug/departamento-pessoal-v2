@@ -164,14 +164,20 @@ export function GestaoRegistrosPonto() {
                 </Popover>
                 
                 <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm bg-background">
-                  <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" onClick={() => {
-                    toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
-                      loading: 'Validando integridade SHA-256...',
-                      success: 'Assinaturas digitais verificadas! Integridade 100% garantida.',
-                      error: 'Erro na auditoria'
-                    });
-                  }}>
-                    <ShieldCheck className="h-3 w-3" /> Audit
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" 
+                    onClick={async () => {
+                      if (!empresaAtual?.id) return;
+                      toast.promise(batidasPontoService.fecharPeriodo(empresaAtual.id, filtroData, filtroFim), {
+                        loading: 'Fechando período e integrando com folha...',
+                        success: 'Período encerrado e dados enviados para processamento de folha!',
+                        error: 'Erro ao fechar período'
+                      });
+                    }}
+                  >
+                    <ShieldCheck className="h-3 w-3" /> Fechar Período
                   </Button>
                   <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-info/10" onClick={() => exportData('csv')}>
                     <Download className="h-3 w-3" /> CSV
@@ -180,6 +186,7 @@ export function GestaoRegistrosPonto() {
                     <FileText className="h-3 w-3" /> PDF
                   </Button>
                 </div>
+
               </div>
             </div>
             <div className="flex items-center justify-between gap-4">
