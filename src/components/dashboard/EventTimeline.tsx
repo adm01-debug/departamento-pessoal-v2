@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -38,8 +38,8 @@ interface EventTimelineProps {
 }
 
 export const EventTimeline = memo(function EventTimeline({ events: initialEvents, className, empresaId }: EventTimelineProps) {
-  const [filterType, setFilterType] = (require('react').useState)('all');
-  const [sortOrder, setSortOrder] = (require('react').useState)('desc');
+  const [filterType, setFilterType] = useState('all');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const { data: dbEvents, isLoading } = useQuery({
     queryKey: ['audit-timeline', empresaId],
