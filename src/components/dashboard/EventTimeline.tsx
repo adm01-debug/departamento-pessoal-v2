@@ -134,37 +134,41 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
       <div className="space-y-0 relative">
         <AnimatePresence mode="popLayout">
           {displayEvents.map((event, i) => {
-        const config = eventConfig[event.type] || eventConfig.alerta;
-        const Icon = config.icon;
-        const isLast = i === events.length - 1;
+            const config = eventConfig[event.type] || eventConfig.alerta;
+            const Icon = config.icon;
+            const isLast = i === displayEvents.length - 1;
 
-        return (
-          <motion.div
-            key={event.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.08 }}
-            className="flex gap-3 group"
-          >
-            {/* Timeline line + dot */}
-            <div className="flex flex-col items-center shrink-0">
-              <div className={cn('p-1.5 rounded-lg bg-gradient-to-br shadow-sm', config.gradient)}>
-                <Icon className="h-3 w-3 text-primary-foreground" />
-              </div>
-              {!isLast && (
-                <div className="w-px flex-1 bg-border/40 my-1" />
-              )}
-            </div>
+            return (
+              <motion.div
+                key={event.id}
+                layout
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: i * 0.08 }}
+                className="flex gap-3 group"
+              >
+                {/* Timeline line + dot */}
+                <div className="flex flex-col items-center shrink-0">
+                  <div className={cn('p-1.5 rounded-lg bg-gradient-to-br shadow-sm', config.gradient)}>
+                    <Icon className="h-3 w-3 text-primary-foreground" />
+                  </div>
+                  {!isLast && (
+                    <div className="w-px flex-1 bg-border/40 my-1" />
+                  )}
+                </div>
 
-            {/* Content */}
-            <div className={cn('pb-4 min-w-0', isLast && 'pb-0')}>
-              <p className="text-body font-body font-medium truncate leading-tight">{event.title}</p>
-              <p className="text-caption text-muted-foreground font-body truncate">{event.description}</p>
-              <p className="text-[10px] text-muted-foreground/60 font-body mt-0.5">{event.time}</p>
-            </div>
-          </motion.div>
-        );
-      })}
+                {/* Content */}
+                <div className={cn('pb-4 min-w-0', isLast && 'pb-0')}>
+                  <p className="text-body font-body font-medium truncate leading-tight">{event.title}</p>
+                  <p className="text-caption text-muted-foreground font-body truncate">{event.description}</p>
+                  <p className="text-[10px] text-muted-foreground/60 font-body mt-0.5">{event.time}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
     </div>
   );
 });
