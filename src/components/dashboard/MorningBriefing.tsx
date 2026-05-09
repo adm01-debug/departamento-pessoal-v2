@@ -51,7 +51,7 @@ function useMorningBriefing() {
         supabase.from('admissoes').select('nome, cargo').eq('data_prevista', hojeStr),
         supabase.from('asos').select('data_validade, tipo, colaboradores!asos_colaborador_id_fkey(nome_completo)').gte('data_validade', hojeStr).lte('data_validade', em7Dias),
         supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
-        supabase.from('registros_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
+        supabase.from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
       ]);
 
       const aniversariantes = (colabs || [])
