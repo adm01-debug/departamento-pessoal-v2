@@ -18,7 +18,7 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { RelatoriosAnalyticsTab } from '@/components/relatorios/RelatoriosAnalyticsTab';
-import { RelatoriosExportTab } from '@/components/relatorios/RelatoriosExportTab';
+import { RelatoriosAgendadosTab } from '@/components/relatorios/RelatoriosAgendadosTab';
 
 const relatorios = [
   { id: 'colaboradores', title: 'Resumo Colaboradores', description: 'Colaboradores ativos com dados completos', icon: Users, gradient: 'from-info to-info/70' },
