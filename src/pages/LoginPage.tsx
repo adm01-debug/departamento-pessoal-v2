@@ -3,6 +3,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
+import { supabase } from '@/integrations/supabase/client';
 import { useBruteForceProtection } from '@/hooks/useBruteForceProtection';
 import { LockoutMessage } from '@/components/login/LockoutMessage';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const features = [
   { icon: Users, label: 'Gestão completa de Colaboradores', desc: 'Cadastro, documentos, benefícios e histórico' },
