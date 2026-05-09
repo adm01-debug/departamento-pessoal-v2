@@ -123,116 +123,158 @@ export default function AdmissoesPage() {
       gradient="from-primary to-primary-glow"
       actions={<NovaAdmissaoDialog />}
     >
-      <div className="space-y-3">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nome, cargo ou departamento..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="pl-9 rounded-xl border-border/30 bg-card"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {etapaFilters.map(etapa => {
-            const count = etapaCounts[etapa] || 0;
-            const isActive = etapaFilter === etapa;
-            return (
-              <button
-                key={etapa}
-                onClick={() => setEtapaFilter(etapa)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-caption font-body font-medium transition-all',
-                  isActive
-                    ? 'bg-primary text-primary-foreground shadow-glow-sm'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                {etapa === 'todos' ? 'Todos' : etapaLabels[etapa] || etapa}
-                {count > 0 && (
-                  <span className={cn(
-                    'min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold',
-                    isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted-foreground/15 text-muted-foreground'
-                  )}>
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <Tabs defaultValue="dashboard" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="dashboard" className="rounded-lg gap-2">
+            <LayoutDashboard className="h-4 w-4" /> Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="gestao" className="rounded-lg gap-2">
+            <List className="h-4 w-4" /> Gestão de Candidatos
+          </TabsTrigger>
+          <TabsTrigger value="auditoria" className="rounded-lg gap-2">
+            <History className="h-4 w-4" /> Auditoria
+          </TabsTrigger>
+        </TabsList>
 
-      {isLoading ? (
-        <div className="flex justify-center p-8"><Spinner size="lg" /></div>
-      ) : (admissoes?.length || 0) === 0 ? (
-        <EmptyList entityName="admissão" />
-      ) : filtered.length === 0 ? (
-        <EmptySearch search={search} onClear={() => { setSearch(''); setEtapaFilter('todos'); }} />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((admissao: any, i: number) => (
-            <motion.div key={admissao.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <Card className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 rounded-2xl overflow-hidden">
-                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow opacity-60 group-hover:opacity-100 transition-opacity" />
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-display">{admissao.nome}</CardTitle>
-                    <Badge className={etapaGradients[admissao.etapa] || 'bg-muted text-muted-foreground border-0'}>
-                      {etapaLabels[admissao.etapa] || admissao.etapa}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground space-y-1 font-body">
-                  <p><strong className="text-foreground">Cargo:</strong> {admissao.cargo}</p>
-                  <p><strong className="text-foreground">Departamento:</strong> {admissao.departamento}</p>
-                  <p><strong className="text-foreground">Data prevista:</strong> {new Date(admissao.data_prevista).toLocaleDateString('pt-BR')}</p>
-                  <p><strong className="text-foreground">Salário:</strong> {Number(admissao.salario_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </CardContent>
-                <CardFooter className="pt-2 flex gap-2 border-t border-border/10 bg-muted/5">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+        <TabsContent value="dashboard" className="space-y-6">
+          {isLoading ? (
+            <div className="flex justify-center p-12"><Spinner size="lg" /></div>
+          ) : (
+            <OnboardingDashboard admissoes={admissoes || []} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="gestao" className="space-y-6">
+          <div className="space-y-3">
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome, cargo ou departamento..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-9 rounded-xl border-border/30 bg-card"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {etapaFilters.map(etapa => {
+                const count = etapaCounts[etapa] || 0;
+                const isActive = etapaFilter === etapa;
+                return (
+                  <button
+                    key={etapa}
+                    onClick={() => setEtapaFilter(etapa)}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-caption font-body font-medium transition-all',
+                      isActive
+                        ? 'bg-primary text-primary-foreground shadow-glow-sm'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
+                  >
+                    {etapa === 'todos' ? 'Todos' : etapaLabels[etapa] || etapa}
+                    {count > 0 && (
+                      <span className={cn(
+                        'min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold',
+                        isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted-foreground/15 text-muted-foreground'
+                      )}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center p-8"><Spinner size="lg" /></div>
+          ) : (admissoes?.length || 0) === 0 ? (
+            <EmptyList entityName="admissão" />
+          ) : filtered.length === 0 ? (
+            <EmptySearch search={search} onClear={() => { setSearch(''); setEtapaFilter('todos'); }} />
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((admissao: any, i: number) => (
+                <motion.div key={admissao.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                  <Card className="group border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-glow transition-all duration-300 rounded-2xl overflow-hidden">
+                    <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base font-display">{admissao.nome}</CardTitle>
+                        <Badge className={etapaGradients[admissao.etapa] || 'bg-muted text-muted-foreground border-0'}>
+                          {etapaLabels[admissao.etapa] || admissao.etapa}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="text-sm text-muted-foreground space-y-1 font-body">
+                      <p><strong className="text-foreground">Cargo:</strong> {admissao.cargo}</p>
+                      <p><strong className="text-foreground">Departamento:</strong> {admissao.departamento}</p>
+                      <p><strong className="text-foreground">Data prevista:</strong> {new Date(admissao.data_prevista).toLocaleDateString('pt-BR')}</p>
+                      <p><strong className="text-foreground">Salário:</strong> {Number(admissao.salario_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                    </CardContent>
+                    <CardFooter className="pt-2 flex gap-2 border-t border-border/10 bg-muted/5">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="flex-1 text-xs rounded-xl hover:bg-primary/10 hover:text-primary"
+                            disabled={sendingLink === admissao.id}
+                          >
+                            {sendingLink === admissao.id ? (
+                              <Spinner size="sm" className="mr-2" />
+                            ) : (
+                              <Send className="w-3 h-3 mr-2" />
+                            )}
+                            Enviar Link
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-xl">
+                          <DropdownMenuItem onClick={() => handleEnviarLink(admissao)} className="gap-2 cursor-pointer">
+                            <Mail className="w-4 h-4 text-primary" />
+                            Enviar por E-mail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEnviarWhatsApp(admissao)} className="gap-2 cursor-pointer">
+                            <MessageSquare className="w-4 h-4 text-success" />
+                            Enviar por WhatsApp
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="flex-1 text-xs rounded-xl hover:bg-primary/10 hover:text-primary"
-                        disabled={sendingLink === admissao.id}
+                        className="flex-1 text-xs rounded-xl hover:bg-info/10 hover:text-info"
+                        onClick={() => setSelectedAdmissao(admissao)}
                       >
-                        {sendingLink === admissao.id ? (
-                          <Spinner size="sm" className="mr-2" />
-                        ) : (
-                          <Send className="w-3 h-3 mr-2" />
-                        )}
-                        Enviar Link
+                        <ExternalLink className="w-3 h-3 mr-2" />
+                        Detalhes
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="rounded-xl">
-                      <DropdownMenuItem onClick={() => handleEnviarLink(admissao)} className="gap-2 cursor-pointer">
-                        <Mail className="w-4 h-4 text-primary" />
-                        Enviar por E-mail
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEnviarWhatsApp(admissao)} className="gap-2 cursor-pointer">
-                        <MessageSquare className="w-4 h-4 text-success" />
-                        Enviar por WhatsApp
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="flex-1 text-xs rounded-xl hover:bg-info/10 hover:text-info"
-                    onClick={() => setSelectedAdmissao(admissao)}
-                  >
-                    <ExternalLink className="w-3 h-3 mr-2" />
-                    Detalhes
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      )}
+        <TabsContent value="auditoria">
+           <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+             <CardHeader className="bg-muted/30">
+               <CardTitle className="text-sm font-display flex items-center gap-2">
+                 <History className="h-4 w-4 text-primary" /> Histórico de Auditoria - Admissões
+               </CardTitle>
+             </CardHeader>
+             <CardContent className="py-8 text-center">
+                <History className="h-12 w-12 text-muted-foreground/20 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">O monitoramento de auditoria eSocial e admissão digital está ativo.</p>
+                <Button variant="link" className="text-xs text-primary mt-2" onClick={() => navigate('/configuracoes/logs')}>
+                  Ver Logs Globais
+                </Button>
+             </CardContent>
+           </Card>
+        </TabsContent>
+      </Tabs>
+
     </PageLayout>
     
     <DetalhesAdmissaoDialog 
