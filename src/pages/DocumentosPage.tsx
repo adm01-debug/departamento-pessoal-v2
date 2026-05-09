@@ -340,14 +340,28 @@ export default function DocumentosPage() {
             <DialogTitle className="font-display">Enviar Documento</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="font-body">Tipo de Documento</Label>
-              <Select value={tipo} onValueChange={setTipo}>
-                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione o tipo" /></SelectTrigger>
-                <SelectContent>
-                  {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="font-body text-xs">Tipo de Documento</Label>
+                <Select value={tipo} onValueChange={setTipo}>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-body text-xs">Colaborador (Opcional)</Label>
+                <Select value={colaboradorId} onValueChange={setColaboradorId}>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Geral" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="geral">Geral / Empresa</SelectItem>
+                    {colaboradores?.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="font-body">Arquivo</Label>
