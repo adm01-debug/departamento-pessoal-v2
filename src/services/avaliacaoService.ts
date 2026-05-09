@@ -82,12 +82,18 @@ export const avaliacaoService = {
   async criarFeedback(d: any) {
     const { data, error } = await supabase.from('feedbacks_360').insert(d).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'feedbacks_360', registro_id: data.id, acao: 'INSERT', dados_novos: data });
+    }
     return ensure(data, 'feedback');
   },
   async excluirFeedback(id: string) {
+    const { data: anterior } = await supabase.from('feedbacks_360').select('*').eq('id', id).single();
     const { error } = await supabase.from('feedbacks_360').delete().eq('id', id);
     if (error) throw error;
+    await auditLogger.log({ tabela: 'feedbacks_360', registro_id: id, acao: 'DELETE', dados_anteriores: anterior });
   },
+
 
   // PDIs
   async listarPDIs(empresaId?: string) {
