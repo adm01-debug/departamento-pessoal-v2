@@ -696,7 +696,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                     <span className="text-sm font-medium">{selectedIds.length} selecionados</span>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="success" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('aprovado')}>
+                    <Button size="sm" variant="gradient-success" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('aprovado')}>
                       <CheckCircle className="h-3.5 w-3.5" /> Aprovar
                     </Button>
                     <Button size="sm" variant="destructive" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('recusado')}>
