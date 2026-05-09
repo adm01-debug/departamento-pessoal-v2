@@ -17,9 +17,32 @@ import { avaliacaoService } from '@/services/avaliacaoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGrid } from 'lucide-react';
 
 const statusColors: Record<string, string> = { rascunho: 'secondary', ativo: 'default', finalizado: 'outline', pendente: 'secondary', em_andamento: 'default', concluido: 'outline' };
+
+const classifyScore = (score: number) => {
+  if (score <= 2.5) return 1;
+  if (score <= 3.5) return 2;
+  return 3;
+};
+
+const getNineBoxLabel = (perf: number, pot: number) => {
+  const labels: Record<string, string> = {
+    '1-3': 'Enigma', '2-3': 'Alto Potencial', '3-3': 'Estrela',
+    '1-2': 'Dilema', '2-2': 'Core Player', '3-2': 'Alto Profissional',
+    '1-1': 'Sub-performer', '2-1': 'Efetivo', '3-1': 'Profissional Confiável'
+  };
+  return labels[`${perf}-${pot}`];
+};
+
+const getNineBoxColor = (perf: number, pot: number) => {
+  if (perf === 3 && pot === 3) return 'bg-green-100 border-green-500 text-green-700';
+  if (perf === 1 && pot === 1) return 'bg-red-100 border-red-500 text-red-700';
+  if (pot === 3 || perf === 3) return 'bg-blue-100 border-blue-500 text-blue-700';
+  return 'bg-yellow-100 border-yellow-500 text-yellow-700';
+};
 
 export default function AvaliacaoPage() {
   const { empresaAtual } = useEmpresas();
@@ -32,6 +55,15 @@ export default function AvaliacaoPage() {
   const { data: feedbacks = [], isLoading: loadFeedbacks } = useQuery({ queryKey: ['feedbacks_360', empresaAtual?.id], queryFn: () => avaliacaoService.listarFeedbacks(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: pdis = [], isLoading: loadPDIs } = useQuery({ queryKey: ['pdis', empresaAtual?.id], queryFn: () => avaliacaoService.listarPDIs(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: competencias = [], isLoading: loadComp } = useQuery({ queryKey: ['competencias', empresaAtual?.id], queryFn: () => avaliacaoService.listarCompetencias(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: nineBox = [], isLoading: loadNineBox } = useQuery({ 
+    queryKey: ['nine_box', empresaAtual?.id], 
+    queryFn: async () => {
+      const { data, error } = await supabase.from('vw_matriz_nine_box' as any).select('*').eq('empresa_id', empresaAtual?.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id 
+  });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   // === Ciclos ===
@@ -56,10 +88,16 @@ export default function AvaliacaoPage() {
 
   // === Feedbacks ===
   const [openFeedback, setOpenFeedback] = useState(false);
-  const [fbForm, setFbForm] = useState({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '' });
+  const [fbForm, setFbForm] = useState({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '', performance: '3', potencial: '3' });
   const criarFeedback = useMutation({
-    mutationFn: () => avaliacaoService.criarFeedback({ ...fbForm, nota_geral: fbForm.nota_geral ? Number(fbForm.nota_geral) : null, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['feedbacks_360'] }); setOpenFeedback(false); setFbForm({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '' }); toast.success('Feedback registrado!'); },
+    mutationFn: () => avaliacaoService.criarFeedback({ 
+      ...fbForm, 
+      nota_geral: fbForm.nota_geral ? Number(fbForm.nota_geral) : null, 
+      performance: Number(fbForm.performance),
+      potencial: Number(fbForm.potencial),
+      empresa_id: empresaAtual?.id 
+    } as any),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['feedbacks_360'] }); setOpenFeedback(false); setFbForm({ avaliado_id: '', avaliador_id: '', tipo: 'par', nota_geral: '', pontos_fortes: '', pontos_melhoria: '', performance: '3', potencial: '3' }); toast.success('Feedback registrado!'); },
     onError: () => toast.error('Erro ao registrar feedback'),
   });
   const excluirFeedback = useMutation({ mutationFn: (id: string) => avaliacaoService.excluirFeedback(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['feedbacks_360'] }); toast.success('Feedback excluído'); } });
@@ -107,6 +145,7 @@ export default function AvaliacaoPage() {
             <TabsTrigger value="feedbacks">Feedback 360°</TabsTrigger>
             <TabsTrigger value="pdis">PDI</TabsTrigger>
             <TabsTrigger value="competencias">Competências</TabsTrigger>
+            <TabsTrigger value="ninebox">Matriz Nine-Box</TabsTrigger>
           </TabsList>
 
           {/* CICLOS */}
@@ -232,6 +271,24 @@ export default function AvaliacaoPage() {
                       </div>
                       <div><Label>Nota (0-10)</Label><Input type="number" min="0" max="10" value={fbForm.nota_geral} onChange={e => setFbForm(p => ({ ...p, nota_geral: e.target.value }))} /></div>
                     </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><Label>Performance (1-5)</Label>
+                        <Select value={fbForm.performance} onValueChange={v => setFbForm(p => ({ ...p, performance: v }))}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div><Label>Potencial (1-5)</Label>
+                        <Select value={fbForm.potencial} onValueChange={v => setFbForm(p => ({ ...p, potencial: v }))}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <div><Label>Pontos Fortes</Label><Textarea value={fbForm.pontos_fortes} onChange={e => setFbForm(p => ({ ...p, pontos_fortes: e.target.value }))} /></div>
                     <div><Label>Pontos de Melhoria</Label><Textarea value={fbForm.pontos_melhoria} onChange={e => setFbForm(p => ({ ...p, pontos_melhoria: e.target.value }))} /></div>
                     <Button onClick={() => criarFeedback.mutate()} disabled={!fbForm.avaliado_id || !fbForm.avaliador_id || criarFeedback.isPending}>{criarFeedback.isPending ? 'Salvando...' : 'Salvar'}</Button>
@@ -335,6 +392,52 @@ export default function AvaliacaoPage() {
                 </TableBody>
               </Table>
             </CardContent></Card>
+          </TabsContent>
+          
+          {/* NINE BOX */}
+          <TabsContent value="ninebox">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-3 gap-4 h-[600px]">
+                  {[3, 2, 1].map(pot => (
+                    [1, 2, 3].map(perf => {
+                      const label = getNineBoxLabel(perf, pot);
+                      const color = getNineBoxColor(perf, pot);
+                      const items = nineBox.filter((n: any) => 
+                        classifyScore(Number(n.media_performance)) === perf && 
+                        classifyScore(Number(n.media_potencial)) === pot
+                      );
+                      
+                      return (
+                        <div key={`${perf}-${pot}`} className={`border-2 rounded-lg p-3 flex flex-col ${color} border-opacity-40 shadow-sm transition-all hover:scale-[1.02]`}>
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+                            <Badge variant="secondary" className="text-[9px] h-4 px-1">{items.length}</Badge>
+                          </div>
+                          <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                            {items.map((it: any) => (
+                              <div key={it.avaliado_id} className="text-[10px] bg-white bg-opacity-60 p-1.5 rounded border border-white border-opacity-50 flex justify-between items-center group hover:bg-opacity-100 transition-all">
+                                <span className="truncate font-medium">{it.nome_completo}</span>
+                                <span className="text-[9px] opacity-60 font-mono">P{it.media_performance}/K{it.media_potencial}</span>
+                              </div>
+                            ))}
+                            {items.length === 0 && <div className="h-full flex items-center justify-center opacity-20"><LayoutGrid className="h-8 w-8" /></div>}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )).flat()}
+                </div>
+                <div className="mt-8 grid grid-cols-2 gap-8 text-xs text-muted-foreground border-t pt-4">
+                  <div className="flex items-center justify-center gap-2 font-medium">
+                    <TrendingUp className="h-4 w-4 text-primary" /> Eixo Y: Potencial (Baixo 1-2, Médio 3, Alto 4-5)
+                  </div>
+                  <div className="flex items-center justify-center gap-2 font-medium">
+                    <Target className="h-4 w-4 text-primary" /> Eixo X: Performance (Baixa 1-2, Média 3, Alta 4-5)
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       )}

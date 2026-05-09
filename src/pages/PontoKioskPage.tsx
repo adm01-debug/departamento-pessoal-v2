@@ -15,7 +15,7 @@ export default function PontoKioskPage() {
   const [time, setTime] = useState(new Date());
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<'pin' | 'action' | 'success'>('pin');
+  const [step, setStep] = useState<'pin' | 'facial_scan' | 'action' | 'success'>('pin');
   const [selectedColab, setSelectedColab] = useState<any>(null);
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -65,8 +65,12 @@ export default function PontoKioskPage() {
       if (!colab) throw new Error('PIN/Matrícula inválida');
 
       setSelectedColab(colab);
-      setStep('action');
-      speak(`Olá ${colab.nome_completo.split(' ')[0]}, selecione o tipo de registro.`);
+      setStep('facial_scan');
+      speak(`Olá ${colab.nome_completo.split(' ')[0]}, olhe para a câmera para identificação facial.`);
+      setTimeout(() => {
+        setStep('action');
+        speak(`Identidade confirmada. Selecione o tipo de registro.`);
+      }, 3500);
     } catch (e: any) {
       toast.error(e.message);
       setPin('');
@@ -183,6 +187,51 @@ export default function PontoKioskPage() {
                 </Button>
               </form>
             </CardContent>
+          </Card>
+        )}
+
+        {step === 'facial_scan' && (
+          <Card className="shadow-2xl border-primary/20 overflow-hidden relative group">
+            <div className="h-80 bg-slate-900 relative flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-primary/10" />
+              
+              {/* Scan Overlay */}
+              <div className="relative w-64 h-64 border-2 border-primary/30 rounded-3xl flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 border-[1px] border-primary/20 rounded-3xl scale-95 animate-pulse" />
+                <Camera className="h-16 w-16 text-primary/40" />
+                
+                {/* Scanning Bar */}
+                <motion.div 
+                  initial={{ top: 0 }}
+                  animate={{ top: '100%' }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_rgba(var(--primary),0.5)] z-10"
+                />
+
+                {/* Face Mapping Dots */}
+                <div className="absolute inset-0 grid grid-cols-6 grid-rows-6 opacity-20">
+                  {Array.from({ length: 36 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-center">
+                      <div className="w-1 h-1 bg-primary rounded-full animate-pulse" style={{ animationDelay: `${i * 0.05}s` }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="absolute bottom-6 left-0 right-0 text-center space-y-2">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                  </span>
+                  <p className="text-white text-sm font-display font-medium tracking-widest uppercase">Processando Biometria</p>
+                </div>
+                <p className="text-primary/60 text-[10px] font-mono tracking-tighter">HASH: {Math.random().toString(16).slice(2, 10).toUpperCase()}</p>
+              </div>
+            </div>
+            <div className="p-4 bg-white border-t border-primary/10 text-center">
+               <p className="text-xs text-muted-foreground animate-pulse">Aguarde o reconhecimento do sistema...</p>
+            </div>
           </Card>
         )}
 

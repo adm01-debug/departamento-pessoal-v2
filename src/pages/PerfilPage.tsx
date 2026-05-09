@@ -12,6 +12,7 @@ import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, S
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 export default function PerfilPage() {
   const { user } = useAuth();
