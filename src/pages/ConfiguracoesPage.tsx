@@ -280,7 +280,7 @@ export default function ConfiguracoesPage() {
                         <TableRow key={w.id}>
                           <TableCell className="font-mono text-xs max-w-[200px] truncate">{w.url || w.webhook_url || '-'}</TableCell>
                           <TableCell className="text-sm">{w.evento || w.event || '-'}</TableCell>
-                          <TableCell><Badge variant={w.status_code === 200 ? 'default' : 'destructive'} className="rounded-full">{w.status_code || w.status || '-'}</Badge></TableCell>
+                          <TableCell><Badge variant={w.status_code === 200 ? 'outline' : 'destructive'} className={w.status_code === 200 ? 'bg-success/10 text-success border-success/30 rounded-full' : 'rounded-full'}>{w.status_code || w.status || '-'}</Badge></TableCell>
                           <TableCell className="text-sm text-muted-foreground">{w.created_at ? new Date(w.created_at).toLocaleString('pt-BR') : '-'}</TableCell>
                         </TableRow>
                       ))}
