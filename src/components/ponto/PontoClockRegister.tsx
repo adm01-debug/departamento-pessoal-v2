@@ -1,8 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { pontoOfflineService } from '@/services/pontoOfflineService';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts';
 
 interface PontoClockRegisterProps {
   time: Date;
@@ -19,6 +24,70 @@ const buttons = [
 ];
 
 export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: PontoClockRegisterProps) {
+  const { user } = useAuth();
+  const [offlineQueueSize, setOfflineQueueSize] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    
+    // Tenta sincronizar se estiver online
+    if (navigator.onLine) {
+      handleSync();
+    }
+
+    const interval = setInterval(() => {
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSync = async () => {
+    if (isSyncing || !navigator.onLine) return;
+    setIsSyncing(true);
+    try {
+      const result = await pontoOfflineService.syncOfflineQueue();
+      if (result.synced > 0) {
+        toast.success(`${result.synced} registros offline sincronizados!`);
+      }
+    } catch (e) {
+      console.error('Erro na sincronização automática', e);
+    } finally {
+      setIsSyncing(false);
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    }
+  };
+
+  const handleOfflineRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
+    if (!user) return;
+    
+    // Se estiver online, usa o fluxo padrão
+    if (navigator.onLine) {
+      onRegistrar(tipo);
+      return;
+    }
+
+    // Modo Offline
+    try {
+      const { data: colab } = await (window as any).supabase.from('colaboradores').select('id').eq('email', user.email).maybeSingle();
+      if (!colab) throw new Error('Colaborador não identificado localmente');
+
+      await pontoOfflineService.queueRegistro({
+        tipo,
+        colaborador_id: colab.id,
+        timestamp: new Date().toISOString(),
+        dispositivoId: navigator.userAgent
+      });
+      
+      toast.warning(`Ponto registrado em modo OFFLINE. Será sincronizado quando a conexão voltar.`, {
+        icon: <WifiOff className="h-4 w-4" />
+      });
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    } catch (e: any) {
+      toast.error(`Erro no registro offline: ${e.message}`);
+    }
+  };
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
@@ -29,6 +98,16 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
               <Clock className="h-4 w-4 text-primary-foreground" />
             </div>
             Registrar Ponto
+            {offlineQueueSize > 0 && (
+              <Badge variant="outline" className="ml-auto text-[10px] bg-warning/10 text-warning border-warning/20 animate-pulse">
+                <WifiOff className="h-3 w-3 mr-1" /> {offlineQueueSize} pendentes
+              </Badge>
+            )}
+            {offlineQueueSize > 0 && navigator.onLine && (
+              <Button variant="ghost" size="icon" className="h-6 w-6 ml-1" onClick={handleSync} disabled={isSyncing}>
+                <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
+              </Button>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -42,7 +121,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
             {buttons.map(({ tipo, label, icon: Icon, gradient }) => (
               <Button
                 key={tipo}
-                onClick={() => onRegistrar(tipo)}
+                onClick={() => handleOfflineRegister(tipo)}
                 disabled={loading !== null}
                 className={cn(
                   'h-12 rounded-xl bg-gradient-to-r text-primary-foreground hover:opacity-90 shadow-lg transition-all font-body font-medium',
