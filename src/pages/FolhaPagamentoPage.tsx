@@ -57,9 +57,15 @@ function useFolhaResumo(competencia: string) {
       const colaboradores = folhaData?.length || 0;
       const totalProventos = folhaData?.reduce((acc, f) => acc + (f.total_proventos || 0), 0) || 0;
       const totalDescontos = folhaData?.reduce((acc, f) => acc + (f.total_descontos || 0), 0) || 0;
-      const inss = totalProventos * 0.11;
-      const fgts = totalProventos * 0.08;
-      const irrf = Math.max(0, totalDescontos - inss);
+      
+      // Cálculo preciso usando o novo utilitário folhaCalc
+      const inss = folhaData?.reduce((acc, f) => acc + folhaCalc.calcularINSS(f.total_proventos || 0).valor, 0) || 0;
+      const fgts = folhaCalc.calcularFGTS(totalProventos);
+      const irrf = folhaData?.reduce((acc, f) => {
+        const i = folhaCalc.calcularINSS(f.total_proventos || 0).valor;
+        return acc + folhaCalc.calcularIRRF(f.total_proventos || 0, i).valor;
+      }, 0) || 0;
+
       const hasData = colaboradores > 0;
       return {
         id: folhaData?.[0]?.id,
