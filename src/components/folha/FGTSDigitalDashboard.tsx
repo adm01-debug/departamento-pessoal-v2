@@ -40,11 +40,18 @@ export function FGTSDigitalDashboard() {
         <CardTitle className="text-lg font-display flex items-center gap-2">
           <Landmark className="h-5 w-5 text-success" />
           FGTS Digital
+          <Badge variant="outline" className="text-[10px] ml-2 border-primary/20 text-primary">API Caixa Ativa</Badge>
         </CardTitle>
-        <Button size="sm" variant="ghost" className="text-xs gap-1.5" onClick={syncFGTS} disabled={loading}>
-          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
-          Portal FGTS Digital
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="text-xs gap-1.5 h-8 rounded-xl" onClick={syncFGTS} disabled={loading}>
+            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <CloudSync className="h-3.5 w-3.5" />}
+            Sincronizar API
+          </Button>
+          <Button size="sm" variant="ghost" className="text-xs gap-1.5 h-8 rounded-xl" onClick={() => window.open('https://fgtsdigital.sistema.gov.br/', '_blank')}>
+            <ExternalLink className="h-3.5 w-3.5" />
+            Portal
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
