@@ -28,7 +28,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <GuidedTour />
 
       <div className={cn('hidden lg:block transition-all duration-300', sidebarOpen ? 'w-64' : 'w-16')}>
-        <Sidebar collapsed={!sidebarOpen} />
+        <Sidebar collapsed={!sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       </div>
 
       {mobileSidebarOpen && (

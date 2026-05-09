@@ -12,13 +12,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye, Activity, Database, ScrollText } from 'lucide-react';
+import { Settings, Plus, Trash2, Bell, Shield, Layers, ShieldBan, Plug, Webhook, Eye, Activity, Database, ScrollText, Users } from 'lucide-react';
 import { CamposCustomizadosTab } from '@/components/settings/CamposCustomizadosTab';
 import { IPBlockingTab } from '@/components/settings/IPBlockingTab';
 import { SystemHealthTab } from '@/components/settings/SystemHealthTab';
 import { ConfiguracoesGeraisTab } from '@/components/settings/ConfiguracoesGeraisTab';
 import { LogsIntegracoesTab } from '@/components/settings/LogsIntegracoesTab';
 import { MFASetup } from '@/components/settings/MFASetup';
+import { EmpresaSettingsTab } from '@/components/settings/EmpresaSettingsTab';
+import { UserRolesTab } from '@/components/settings/UserRolesTab';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -86,22 +88,23 @@ export default function ConfiguracoesPage() {
       icon={<Settings className="h-5 w-5 text-primary-foreground" />}
       gradient="from-muted-foreground to-foreground"
     >
-      <Tabs defaultValue="geral" className="space-y-4">
-        <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30">
-          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Preferências</TabsTrigger>
-          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Empresa</TabsTrigger>
-          <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Folha</TabsTrigger>
-          <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
-          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
-          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Alertas</TabsTrigger>
-          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Segurança</TabsTrigger>
-          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Campos</TabsTrigger>
-          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">IPs</TabsTrigger>
-          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Integ.</TabsTrigger>
-          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Webhooks</TabsTrigger>
-          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Logs</TabsTrigger>
-          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">BD</TabsTrigger>
-          <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
+      <Tabs defaultValue="empresa" className="space-y-4">
+        <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 overflow-x-auto no-scrollbar flex-nowrap w-full h-auto">
+          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Preferências</TabsTrigger>
+          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Empresa</TabsTrigger>
+          <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Perfis</TabsTrigger>
+          <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Folha</TabsTrigger>
+          <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Ponto</TabsTrigger>
+          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Notificações</TabsTrigger>
+          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Alertas</TabsTrigger>
+          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Segurança</TabsTrigger>
+          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Campos</TabsTrigger>
+          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">IPs</TabsTrigger>
+          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Integ.</TabsTrigger>
+          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Webhooks</TabsTrigger>
+          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Logs</TabsTrigger>
+          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">BD</TabsTrigger>
+          <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Sistema</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
@@ -121,7 +124,26 @@ export default function ConfiguracoesPage() {
             </Card>
           </motion.div>
         </TabsContent>
-
+        <TabsContent value="notificacoes">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+                <CardHeader>
+                   <CardTitle className="font-display">Central de Notificações</CardTitle>
+                   <CardDescription>Configure como e quando o sistema deve alertar os usuários</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 font-body">
+                   <FormSwitch label="Novas Admissões" description="Notificar gestores sobre novos processos" />
+                   <FormSwitch label="Férias Pendentes" description="Alertar sobre solicitações aguardando aprovação" />
+                   <FormSwitch label="Vencimento de Exames" description="Avisar 15 dias antes do vencimento de ASOs" />
+                   <FormSwitch label="Logs de Erro" description="Notificar administradores sobre falhas em integrações" />
+                   <div className="pt-2">
+                      <Button className="rounded-xl shadow-glow">Salvar Preferências</Button>
+                   </div>
+                </CardContent>
+             </Card>
+          </motion.div>
+        </TabsContent>
         <TabsContent value="folha">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
@@ -152,20 +174,6 @@ export default function ConfiguracoesPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="notificacoes">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-              <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
-              <CardHeader><CardTitle className="font-display">Notificações</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <FormSwitch label="Email de Férias Vencendo" />
-                <FormSwitch label="Email de Folha Calculada" />
-                <FormSwitch label="Alertas de Documentos" />
-                <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body">Salvar</Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </TabsContent>
 
         <TabsContent value="alertas">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -273,7 +281,7 @@ export default function ConfiguracoesPage() {
                         <TableRow key={w.id}>
                           <TableCell className="font-mono text-xs max-w-[200px] truncate">{w.url || w.webhook_url || '-'}</TableCell>
                           <TableCell className="text-sm">{w.evento || w.event || '-'}</TableCell>
-                          <TableCell><Badge variant={w.status_code === 200 ? 'default' : 'destructive'} className="rounded-full">{w.status_code || w.status || '-'}</Badge></TableCell>
+                          <TableCell><Badge variant={w.status_code === 200 ? 'outline' : 'destructive'} className={w.status_code === 200 ? 'bg-success/10 text-success border-success/30 rounded-full' : 'rounded-full'}>{w.status_code || w.status || '-'}</Badge></TableCell>
                           <TableCell className="text-sm text-muted-foreground">{w.created_at ? new Date(w.created_at).toLocaleString('pt-BR') : '-'}</TableCell>
                         </TableRow>
                       ))}
@@ -301,39 +309,11 @@ export default function ConfiguracoesPage() {
         <TabsContent value="config-bd">
           <ConfiguracoesGeraisTab />
         </TabsContent>
+        <TabsContent value="perfis">
+          <UserRolesTab />
+        </TabsContent>
         <TabsContent value="empresa">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
-                <CardHeader>
-                   <CardTitle className="font-display">Dados da Empresa</CardTitle>
-                   <CardDescription>Informações cadastrais e fiscais da organização ativa</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                         <Label>Razão Social</Label>
-                         <Input defaultValue="Empresa Exemplo LTDA" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label>CNPJ</Label>
-                         <Input defaultValue="00.000.000/0001-00" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label>Inscrição Estadual</Label>
-                         <Input defaultValue="Isento" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label>CNAE Principal</Label>
-                         <Input defaultValue="7020-4/00" />
-                      </div>
-                   </div>
-                   <div className="pt-4">
-                      <Button className="rounded-xl shadow-glow">Salvar Alterações</Button>
-                   </div>
-                </CardContent>
-             </Card>
-          </motion.div>
+          <EmpresaSettingsTab />
         </TabsContent>
       </Tabs>
     </PageLayout>

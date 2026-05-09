@@ -80,6 +80,30 @@ export function SystemHealthTab() {
     }
   };
 
+  const runSincronizarBitrix = async () => {
+    setLoading('bitrix');
+    try {
+      await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
+      toast.success('Sincronização Bitrix24 iniciada!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const runLimparCache = async () => {
+    setLoading('cache');
+    try {
+      await edgeFunctionsService.cache({ action: 'invalidate' });
+      toast.success('Cache do sistema limpo com sucesso!');
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setLoading(null);
+    }
+  };
+
   const StatusIcon = ({ ok }: { ok: boolean }) => ok
     ? <CheckCircle className="h-4 w-4 text-green-500" />
     : <XCircle className="h-4 w-4 text-destructive" />;
@@ -94,7 +118,7 @@ export function SystemHealthTab() {
           <CardDescription className="font-body">Execute operações de manutenção e monitoramento</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             <Button onClick={runHealthcheck} disabled={loading === 'health'} variant="outline" className="rounded-xl h-auto py-3 flex-col gap-1.5 font-body">
               {loading === 'health' ? <Loader2 className="h-5 w-5 animate-spin" /> : <Activity className="h-5 w-5" />}
               <span className="text-xs">Health Check</span>
@@ -114,6 +138,14 @@ export function SystemHealthTab() {
             <Button onClick={runAgendamentos} disabled={loading === 'agendamentos'} variant="outline" className="rounded-xl h-auto py-3 flex-col gap-1.5 font-body">
               {loading === 'agendamentos' ? <Loader2 className="h-5 w-5 animate-spin" /> : <Clock className="h-5 w-5" />}
               <span className="text-xs">Agendamentos</span>
+            </Button>
+            <Button onClick={runSincronizarBitrix} disabled={loading === 'bitrix'} variant="outline" className="rounded-xl h-auto py-3 flex-col gap-1.5 font-body">
+              {loading === 'bitrix' ? <Loader2 className="h-5 w-5 animate-spin" /> : <RefreshCw className="h-5 w-5" />}
+              <span className="text-xs">Sync Bitrix</span>
+            </Button>
+            <Button onClick={runLimparCache} disabled={loading === 'cache'} variant="outline" className="rounded-xl h-auto py-3 flex-col gap-1.5 font-body border-destructive/20 text-destructive hover:bg-destructive/5">
+              {loading === 'cache' ? <Loader2 className="h-5 w-5 animate-spin" /> : <Database className="h-5 w-5" />}
+              <span className="text-xs">Limpar Cache</span>
             </Button>
           </div>
         </CardContent>
