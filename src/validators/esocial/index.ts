@@ -7,7 +7,7 @@ export { validarS2190, validarS2200, validarS2205, validarS2206, validarS2230, v
 
 import { ValidationResult } from './helpers';
 import { validarS1000, validarS1005, validarS1010, validarS1020, validarS1070, validarS1200, validarS1210, validarS1260, validarS1270, validarS1280 } from './periodicosValidators';
-import { validarS2190, validarS2205, validarS2206, validarS2230, validarS2299, validarS2300, validarS3000 } from './naoPeriodicosValidators';
+import { validarS2190, validarS2200, validarS2205, validarS2206, validarS2230, validarS2299, validarS2300, validarS3000 } from './naoPeriodicosValidators';
 
 const validadores: Record<string, (dados: Record<string, any>) => ValidationResult> = {
   'S-1000': validarS1000, 'S-1005': validarS1005, 'S-1010': validarS1010,
