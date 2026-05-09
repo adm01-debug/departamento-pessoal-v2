@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send } from 'lucide-react';
+import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send, History, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
