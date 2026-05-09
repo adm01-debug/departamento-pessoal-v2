@@ -131,30 +131,30 @@ export default function AvaliacaoPage() {
 
   return (
     <>
-    <PageTitle title="Avaliação" description="Avaliação de desempenho" />
-    <PageLayout title="Avaliação de Desempenho" description="Ciclos, metas, feedback 360° e PDI" icon={<Target className="h-5 w-5 text-primary-foreground" />} gradient="from-warning to-primary">
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <Card><CardContent className="pt-4 text-center"><ClipboardList className="h-6 w-6 mx-auto text-primary mb-1" /><p className="text-2xl font-bold">{ciclos.length}</p><p className="text-xs text-muted-foreground">Ciclos</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Target className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{metas.length}</p><p className="text-xs text-muted-foreground">Metas</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Users className="h-6 w-6 mx-auto text-info mb-1" /><p className="text-2xl font-bold">{feedbacks.length}</p><p className="text-xs text-muted-foreground">Feedbacks</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><TrendingUp className="h-6 w-6 mx-auto text-warning mb-1" /><p className="text-2xl font-bold">{pdis.length}</p><p className="text-xs text-muted-foreground">PDIs</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Star className="h-6 w-6 mx-auto text-destructive mb-1" /><p className="text-2xl font-bold">{competencias.length}</p><p className="text-xs text-muted-foreground">Competências</p></CardContent></Card>
-      </div>
+    <PageTitle title="Desempenho & OKRs" description="Gestão estratégica de pessoas" />
+    <PageLayout 
+      title="Avaliação de Desempenho" 
+      description="Ciclos, metas, feedback 360° e PDI" 
+      icon={<Target className="h-5 w-5 text-primary-foreground" />} 
+      gradient="from-warning to-primary"
+    >
+      <Tabs value={tab} onValueChange={setTab} className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="ciclos" className="rounded-lg gap-2"><BarChart2 className="h-4 w-4" /> Ciclos</TabsTrigger>
+          <TabsTrigger value="metas" className="rounded-lg gap-2"><Target className="h-4 w-4" /> Metas & OKRs</TabsTrigger>
+          <TabsTrigger value="feedbacks" className="rounded-lg gap-2"><Users className="h-4 w-4" /> Feedbacks</TabsTrigger>
+          <TabsTrigger value="pdis" className="rounded-lg gap-2"><TrendingUp className="h-4 w-4" /> PDI</TabsTrigger>
+          <TabsTrigger value="ninebox" className="rounded-lg gap-2"><LayoutGrid className="h-4 w-4" /> Nine-Box</TabsTrigger>
+          <TabsTrigger value="auditoria" className="rounded-lg gap-2"><History className="h-4 w-4" /> Auditoria</TabsTrigger>
+        </TabsList>
 
-      {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : (
-        <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="ciclos">Ciclos</TabsTrigger>
-            <TabsTrigger value="metas">Metas & OKRs</TabsTrigger>
-            <TabsTrigger value="feedbacks">Feedback 360°</TabsTrigger>
-            <TabsTrigger value="pdis">PDI</TabsTrigger>
-            <TabsTrigger value="competencias">Competências</TabsTrigger>
-            <TabsTrigger value="ninebox">Matriz Nine-Box</TabsTrigger>
-          </TabsList>
+        <TabsContent value="ciclos" className="space-y-6">
+          <PerformanceDashboard 
+             stats={{ ciclos: ciclos.length, metas: metas.length, feedbacks: feedbacks.length, pdis: pdis.length, competencias: competencias.length }}
+             feedbacks={feedbacks}
+             metas={metas}
+          />
 
-          {/* CICLOS */}
-          <TabsContent value="ciclos">
             <div className="flex justify-end mb-4">
               <Dialog open={openCiclo} onOpenChange={setOpenCiclo}>
                 <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-2" />Novo Ciclo</Button></DialogTrigger>
