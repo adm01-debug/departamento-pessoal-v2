@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Users, FileText, Calendar, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -13,12 +14,15 @@ const mobileItems = [
 
 export function MobileBottomNav() {
   const location = useLocation();
+  const { isAdmin } = useAuth();
+  
+  const items = isAdmin ? mobileItems : mobileItems.filter(i => !['/configuracoes'].includes(i.path));
 
   return (
     <nav aria-label="Navegação mobile" className="fixed bottom-0 left-0 right-0 z-sticky lg:hidden">
       <div className="glass border-t border-border/50 px-2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16" role="list">
-          {mobileItems.map(({ path, label, icon: Icon, color }) => {
+          {items.map(({ path, label, icon: Icon, color }) => {
             const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
 
             return (
