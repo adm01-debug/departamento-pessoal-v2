@@ -108,13 +108,58 @@ export default function ContabilidadePage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={gerarLancamentos} disabled={processing || !selectedFolha} className="rounded-xl gap-2 bg-gradient-to-r from-primary to-primary-glow font-body">
-                {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />} Gerar Lançamentos
+              <Button 
+                onClick={gerarLancamentos} 
+                disabled={processing || !selectedFolha} 
+                className="rounded-xl gap-2 bg-gradient-to-r from-primary to-primary-glow font-body shadow-lg hover:opacity-90"
+              >
+                {processing ? <Loader2 className="h-4 w-4 animate-spin text-primary-foreground" /> : <Zap className="h-4 w-4" />} 
+                Gerar Lançamentos
               </Button>
-              <Button variant="outline" onClick={exportarSPED} className="rounded-xl gap-2 font-body border-border/40">
+              <Button 
+                variant="outline" 
+                onClick={exportarSPED} 
+                className="rounded-xl gap-2 font-body border-border/40 hover:bg-muted/30"
+              >
                 <Download className="h-4 w-4" /> Exportar SPED
               </Button>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card className="border border-border/30 rounded-2xl overflow-hidden bg-card/50">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-blue-500/10 text-blue-500">
+                  <BookOpen className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-body">Contas Ativas</p>
+                  <p className="text-xl font-display font-bold">{planoContas.length}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border border-border/30 rounded-2xl overflow-hidden bg-card/50">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-success/10 text-success">
+                  <History className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-body">Total Lançamentos</p>
+                  <p className="text-xl font-display font-bold">{lancamentos.length}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border border-border/30 rounded-2xl overflow-hidden bg-card/50">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-body">Status SPED</p>
+                  <p className="text-xl font-display font-bold">Pronto para Envio</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <Tabs defaultValue="lancamentos" className="w-full">
