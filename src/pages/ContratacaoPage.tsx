@@ -21,6 +21,7 @@ import { CEPInput, Address } from '@/components/ui/cep-input';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { SignaturePad } from '@/components/admissao/SignaturePad';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDocumentOCR, OCRResult } from '@/hooks/useDocumentOCR';
 
 const STEPS = [
   { id: 'dados', label: 'Dados', icon: User },
