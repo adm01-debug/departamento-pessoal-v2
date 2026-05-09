@@ -243,19 +243,31 @@ export default function ESocialPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {eventos.map((e, i) => (
+                {filteredEventos.map((e, i) => (
                   <motion.div
                     key={e.id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 + i * 0.03 }}
-                    className="flex items-center justify-between p-3.5 rounded-xl glass hover:border-border/60 transition-all"
+                    className="flex items-center justify-between p-3.5 rounded-xl glass hover:border-border/60 transition-all group"
                   >
                     <div className="flex items-center gap-4">
                       {statusIcon(e.status || 'pendente')}
                       <div>
-                        <p className="font-body font-medium">
+                        <p className="font-body font-medium flex items-center gap-2">
                           {e.tipo_evento} - {getEventoDescricao(e.tipo_evento)}
+                          {e.status === 'erro' && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <AlertTriangle className="h-3.5 w-3.5 text-destructive animate-pulse cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-destructive text-destructive-foreground border-none">
+                                  <p className="max-w-xs text-xs">{e.erros?.mensagem || e.erros?.validacao?.[0]?.mensagem || 'Erro desconhecido na transmissão'}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                         </p>
                         <p className="text-sm text-muted-foreground font-body">
                           {formatDate(e.data_envio || e.created_at)}
@@ -266,17 +278,55 @@ export default function ESocialPage() {
                     <div className="flex items-center gap-2">
                       <StatusBadge status={e.status || 'pendente'} variant={statusVariant(e.status || 'pendente') as any} />
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setSelectedEvento(e)} title="Ver detalhes">
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <TooltipProvider>
+                          <div className="flex gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setSelectedEvento(e)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent><p>Ver Detalhes</p></TooltipContent>
+                            </Tooltip>
+
+                            {e.xml && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-primary" onClick={() => handleExportXML(e)}>
+                                    <Download className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Exportar XML</p></TooltipContent>
+                              </Tooltip>
+                            )}
+
+                            {e.status === 'pendente' && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-8 w-8 rounded-lg text-warning" 
+                                    onClick={() => handleValidar(e)}
+                                    disabled={isValidating === e.id}
+                                  >
+                                    {isValidating === e.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Validar Regras Gov.br</p></TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </TooltipProvider>
+
                         {e.status === 'pendente' && empresaAtual?.id && (
                           <Button
                             size="sm"
                             disabled={isSending}
                             onClick={() => enviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                            className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body"
+                            className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 text-primary-foreground font-body h-8"
                           >
-                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
+                            {isSending ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Send className="h-3 w-3 mr-1" /> Enviar</>}
                           </Button>
                         )}
                         {e.status === 'erro' && empresaAtual?.id && (
@@ -284,9 +334,9 @@ export default function ESocialPage() {
                             size="sm"
                             disabled={isSending}
                             onClick={() => reenviarEvento({ eventoId: e.id, empresaId: empresaAtual.id })}
-                            className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body"
+                            className="rounded-xl bg-gradient-to-r from-destructive to-destructive/70/70 hover:opacity-90 text-primary-foreground font-body h-8"
                           >
-                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
+                            {isSending ? <Loader2 className="h-3 w-3 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Reenviar</>}
                           </Button>
                         )}
                       </div>
