@@ -16,17 +16,27 @@ export const avaliacaoService = {
   async criarCiclo(d: any) {
     const { data, error } = await supabase.from('ciclos_avaliacao').insert(d).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'ciclos_avaliacao', registro_id: data.id, acao: 'INSERT', dados_novos: data });
+    }
     return ensure(data, 'ciclo');
   },
   async atualizarCiclo(id: string, d: any) {
+    const { data: anterior } = await supabase.from('ciclos_avaliacao').select('*').eq('id', id).single();
     const { data, error } = await supabase.from('ciclos_avaliacao').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'ciclos_avaliacao', registro_id: id, acao: 'UPDATE', dados_anteriores: anterior, dados_novos: data });
+    }
     return ensure(data, 'ciclo');
   },
   async excluirCiclo(id: string) {
+    const { data: anterior } = await supabase.from('ciclos_avaliacao').select('*').eq('id', id).single();
     const { error } = await supabase.from('ciclos_avaliacao').delete().eq('id', id);
     if (error) throw error;
+    await auditLogger.log({ tabela: 'ciclos_avaliacao', registro_id: id, acao: 'DELETE', dados_anteriores: anterior });
   },
+
 
   // Metas/OKRs
   async listarMetas(empresaId?: string) {
