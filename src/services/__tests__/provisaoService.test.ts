@@ -31,15 +31,14 @@ describe('provisaoService', () => {
     });
 
     it('should throw error if supabase fails', async () => {
-      const mockResult = { data: null, error: { message: 'DB Error' } };
+      const mockQuery = {
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        then: vi.fn().mockImplementation((onSuccess) => onSuccess({ data: null, error: { message: 'DB Error' } }))
+      };
       
-      vi.mocked(supabase.from).mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue(mockResult)
-          })
-        })
-      } as any);
+      const mockSelect = vi.fn().mockReturnValue(mockQuery);
+      vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
 
       await expect(provisaoService.list('1', '2026-05')).rejects.toMatchObject({ message: 'DB Error' });
     });
