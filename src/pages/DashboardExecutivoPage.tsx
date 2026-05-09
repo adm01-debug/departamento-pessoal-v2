@@ -15,10 +15,10 @@ import { motion } from 'framer-motion';
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Calendar, Clock,
   ArrowUpRight, ArrowDownRight, Building2, Briefcase, Target, PieChart,
-  Download, RefreshCw, AlertTriangle
+  Download, RefreshCw, AlertTriangle, ShieldCheck, Gavel, Landmark, TrendingUp as TrendingIcon, Wallet
 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line } from 'recharts';
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line, ScatterChart, Scatter } from 'recharts';
 import { useState, useMemo } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
