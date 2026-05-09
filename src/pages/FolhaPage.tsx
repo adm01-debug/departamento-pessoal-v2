@@ -10,9 +10,11 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { folhaService } from '@/services';
-import { Eye, Calculator, FileText, DollarSign, TrendingUp, TrendingDown, Banknote, Download, FileSpreadsheet } from 'lucide-react';
+import { Eye, Calculator, FileText, DollarSign, TrendingUp, TrendingDown, Banknote, Download, FileSpreadsheet, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { FolhaAuditoriaTable } from '@/components/folha/FolhaAuditoriaTable';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
@@ -158,7 +160,7 @@ export default function FolhaPage() {
                   <TableHead className="font-display font-semibold text-right">Descontos</TableHead>
                   <TableHead className="font-display font-semibold text-right">Líquido</TableHead>
                   <TableHead className="font-display font-semibold">Status</TableHead>
-                  <TableHead className="w-[60px]" />
+                  <TableHead className="w-[120px]" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -171,10 +173,31 @@ export default function FolhaPage() {
                     <TableCell className="text-right font-display font-bold tabular-nums">{formatCurrency(f.total_liquido || 0)}</TableCell>
                     <TableCell><FolhaStatus status={f.status} /></TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => navigate('/folha/calcular')} aria-label="Visualizar detalhes">
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10" title="Auditoria e Conferência">
+                              <ClipboardList className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col rounded-2xl">
+                            <DialogHeader>
+                              <DialogTitle className="flex items-center gap-2">
+                                <ClipboardList className="h-5 w-5 text-primary" />
+                                Auditoria e Conferência - Competência {f.competencia}
+                              </DialogTitle>
+                            </DialogHeader>
+                            <div className="flex-1 overflow-hidden py-4">
+                              <FolhaAuditoriaTable folhaId={f.id} />
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10"
+                          onClick={() => navigate('/folha/calcular')} aria-label="Visualizar detalhes">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

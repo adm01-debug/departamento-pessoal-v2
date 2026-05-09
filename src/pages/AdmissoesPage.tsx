@@ -14,8 +14,6 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { contratacaoService } from '@/services/contratacaoService';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 
 const etapaLabels: Record<string, string> = {
   documentos_pendentes: 'Docs Pendentes',

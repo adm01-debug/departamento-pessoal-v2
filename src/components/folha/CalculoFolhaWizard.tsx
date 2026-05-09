@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useFolhaAuditoria } from '@/hooks/useFolhaAuditoria';
 import {
   Dialog,
   DialogContent,
@@ -54,6 +55,8 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentFolhaId, setCurrentFolhaId] = useState<string | null>(null);
+  const { registrarLog } = useFolhaAuditoria(currentFolhaId || undefined);
   const queryClient = useQueryClient();
 
   // Queries for validation
@@ -77,11 +80,27 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
     setIsProcessing(true);
     try {
       const [mes, ano] = competencia.split('/');
-      await edgeFunctionsService.calcularFolha({ 
+      const response = await edgeFunctionsService.calcularFolha({ 
         empresaId: empresaAtualId!, 
         competencia: `${ano}-${mes}` 
-      });
+      }) as any;
+      
+      const folhaId = response?.folhaId;
+      setCurrentFolhaId(folhaId);
+
+      // Registrar log de auditoria do processamento
+      if (folhaId) {
+        await registrarLog({
+          folha_id: folhaId,
+          tipo_evento: 'CALCULO',
+          severidade: 'INFO',
+          mensagem: `Cálculo de folha iniciado e concluído via Assistente para competência ${competencia}.`,
+          detalhes: { competencia, data_processamento: new Date().toISOString() }
+        });
+      }
+
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
+      queryClient.invalidateQueries({ queryKey: ['folhas'] });
       setCurrentStep(4);
       toast.success('Folha processada com sucesso!');
     } catch (err: any) {
