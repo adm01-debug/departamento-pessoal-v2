@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin, RefreshCw, Loader2 } from 'lucide-react';
+import { Clock, MapPin, RefreshCw, Loader2, AlertCircle, Settings } from 'lucide-react';
 import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas } from '@/hooks';
@@ -19,7 +19,9 @@ import { PontoCharts } from '@/components/ponto/PontoCharts';
 import { PontoClockRegister } from '@/components/ponto/PontoClockRegister';
 import { PontoTodayCard } from '@/components/ponto/PontoTodayCard';
 import { PontoWeekSummary } from '@/components/ponto/PontoWeekSummary';
+import { PontoAdjustmentRequests } from '@/components/ponto/PontoAdjustmentRequests';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
