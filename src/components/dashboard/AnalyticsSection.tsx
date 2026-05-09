@@ -6,7 +6,7 @@ import {
   TrendingUp, Activity, Timer, PieChart,
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
-  TrendingDown, Minus
+  TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
