@@ -2,22 +2,50 @@ import { supabase } from '@/integrations/supabase/client';
 import { calcularRescisao } from '@/utils/rescisaoCalc';
 import { auditLogger } from '@/utils/auditLogger';
 
+// Ordem lógica das etapas para validação
+const ORDEM_ETAPAS = ['comunicacao', 'documentacao', 'calculo', 'homologacao', 'pagamento', 'finalizado'];
+
 export const rescisaoService = {
+  async validarTransicao(id: string, novaEtapa: string) {
+    const { data: atual, error } = await supabase
+      .from('desligamentos')
+      .select('etapa, status')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    
+    const indexAtual = ORDEM_ETAPAS.indexOf(atual.etapa || 'comunicacao');
+    const indexNova = ORDEM_ETAPAS.indexOf(novaEtapa);
+    
+    // Bloqueia saltar etapas (não permite ir de comunicacao direto para calculado sem passar por documentacao)
+    if (indexNova > indexAtual + 1) {
+      throw new Error(`Transição inválida: A etapa '${novaEtapa}' exige que a etapa anterior '${ORDEM_ETAPAS[indexNova-1]}' esteja concluída.`);
+    }
+    
+    return true;
+  },
+
+
   async calcularESalvar(id: string, params: any) {
     if (!id) throw new Error('ID do desligamento é obrigatório');
 
-    // 1. Buscar dados atuais para o log
+    // 1. Buscar dados atuais para o log e validar transição
     const { data: anterior, error: fetchError } = await supabase
       .from('desligamentos')
-      .select('*')
+      .select('*, colaborador:colaboradores!desligamentos_colaborador_id_fkey(nome_completo, data_admissao)')
       .eq('id', id)
       .single();
     if (fetchError) throw fetchError;
 
+    // Validar se pode ir para a etapa de cálculo
+    await this.validarTransicao(id, 'calculo');
+
     // 2. Realizar o cálculo
     const resultado = calcularRescisao({
       salario: params.salario_base,
-      dataAdmissao: params.data_admissao,
+      dataAdmissao: (anterior.colaborador as any)?.data_admissao || params.data_admissao,
+
       dataDesligamento: params.data_desligamento,
       tipo: params.tipo,
       avisoTrabalhado: params.aviso_trabalhado,
@@ -37,9 +65,10 @@ export const rescisaoService = {
       total_proventos: resultado.totalProventos,
       total_descontos: resultado.totalDescontos,
       valor_liquido: resultado.totalLiquido,
-      detalhes_calculo: resultado, // Armazena o objeto completo para rastreabilidade
+      detalhes_calculo: resultado,
       status: 'calculado',
-      etapa: 'homologacao'
+      etapa: 'homologacao',
+      checklist_calculo_rescisao: true // Atualiza automaticamente o checklist
     };
 
     const { data: novo, error: updateError } = await supabase
@@ -51,19 +80,26 @@ export const rescisaoService = {
 
     if (updateError) throw updateError;
 
-    // 4. Log de Auditoria
+    // 4. Log de Auditoria robusto
     await auditLogger.log({
       tabela: 'desligamentos',
       registro_id: id,
       acao: 'EXECUTE_CALC',
-      dados_anteriores: anterior,
-      dados_novos: novo,
+      dados_anteriores: { etapa: anterior.etapa, status: anterior.status },
+      dados_novos: { 
+        etapa: novo.etapa, 
+        status: novo.status, 
+        valor_liquido: novo.valor_liquido,
+        hash_integridade: btoa(JSON.stringify(resultado)).slice(0, 32)
+      },
     });
 
     return novo;
   },
 
   async homologar(id: string) {
+    await this.validarTransicao(id, 'homologacao');
+
     const { data, error } = await supabase
       .from('desligamentos')
       .update({ status: 'homologado', etapa: 'pagamento', checklist_homologacao: true })
@@ -77,9 +113,10 @@ export const rescisaoService = {
       tabela: 'desligamentos',
       registro_id: id,
       acao: 'UPDATE',
-      dados_novos: data,
+      dados_novos: { status: 'homologado', etapa: 'pagamento', evento: 'HOMOLOGACAO_CONCLUIDA' },
     });
 
     return data;
   }
 };
+

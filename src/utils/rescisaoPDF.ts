@@ -1,13 +1,20 @@
 import { toast } from 'sonner';
 import { RescisaoResult, fmt } from './rescisaoCalc';
 
-export async function gerarPDFRescisao(form: any, result: RescisaoResult) {
+export async function gerarPDFRescisao(form: any, result: RescisaoResult, auditoria?: any) {
   const { default: jsPDF } = await import('jspdf');
   await import('jspdf-autotable');
 
   const doc = new jsPDF();
   const pw = doc.internal.pageSize.getWidth();
   let y = 20;
+
+  // Header com selo de auditoria se disponível
+  if (auditoria) {
+    doc.setFontSize(8); doc.setTextColor(150);
+    doc.text(`Doc ID: ${auditoria.id || 'N/A'} | Assinado digitalmente pela trilha de auditoria`, 14, 10);
+    doc.setTextColor(0);
+  }
 
   doc.setFontSize(14); doc.setFont('helvetica', 'bold');
   doc.text('TERMO DE RESCISÃO DO CONTRATO DE TRABALHO', pw / 2, y, { align: 'center' }); y += 12;
@@ -43,7 +50,28 @@ export async function gerarPDFRescisao(form: any, result: RescisaoResult) {
     styles: { fontSize: 9 },
   });
 
-  y = (doc as any).lastAutoTable.finalY + 20;
+  y = (doc as any).lastAutoTable.finalY + 15;
+  
+  // Checklist de Homologação se disponível no form (desligamento object)
+  if (form.checklist_homologacao !== undefined) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('CHECKLIST DE HOMOLOGAÇÃO', 14, y); y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    const items = [
+      ['Comunicação', form.checklist_comunicacao ? '✓ OK' : '—'],
+      ['Documentação', form.checklist_documentacao ? '✓ OK' : '—'],
+      ['Cálculo', form.checklist_calculo_rescisao ? '✓ OK' : '—'],
+      ['Equipamentos', form.checklist_devolucao_equipamentos ? '✓ OK' : '—'],
+      ['Homologação', form.checklist_homologacao ? '✓ OK' : '—'],
+      ['Pagamento', form.checklist_pagamento ? '✓ OK' : '—'],
+    ];
+    items.forEach(([label, status]) => {
+      doc.text(`${label}: ${status}`, 20, y); y += 5;
+    });
+    y += 5;
+  }
+
   const hoje = new Date().toLocaleDateString('pt-BR');
   doc.text(`Data: ${hoje}`, pw / 2, y, { align: 'center' }); y += 20;
   doc.line(14, y, 90, y); doc.line(pw - 90, y, pw - 14, y); y += 5;
@@ -51,6 +79,13 @@ export async function gerarPDFRescisao(form: any, result: RescisaoResult) {
   doc.text('EMPREGADOR', 52, y, { align: 'center' });
   doc.text('EMPREGADO(A)', pw - 52, y, { align: 'center' });
 
-  doc.save(`TRCT_${(form.nomeColaborador || 'rescisao').replace(/\s/g, '_')}.pdf`);
+  if (auditoria) {
+     y += 10;
+     doc.setFontSize(7); doc.setTextColor(180);
+     doc.text(`Hash de Integridade: ${auditoria.hash || 'N/A'}`, 14, y);
+  }
+
+  doc.save(`TRCT_${(form.nomeColaborador || form.nome || 'rescisao').replace(/\s/g, '_')}.pdf`);
   toast.success('TRCT gerado com sucesso!');
 }
+

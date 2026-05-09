@@ -12,22 +12,30 @@ import { ptBR } from 'date-fns/locale';
 import { exportPontoCSV } from '@/services/exportService';
 import { motion } from 'framer-motion';
 
-export function PontoAuditTimeline() {
+export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: auditLogs = [], isLoading } = useQuery({
-    queryKey: ['ponto-audit-logs'],
+    queryKey: ['ponto-audit-logs', filterTabela],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      let query = (supabase as any)
         .from('audit_log')
-        .select('*')
-        .or('tabela.eq.batidas_ponto,tabela.eq.registros_ponto')
+        .select('*');
+      
+      if (filterTabela) {
+        query = query.eq('tabela', filterTabela);
+      } else {
+        query = query.or('tabela.eq.batidas_ponto,tabela.eq.registros_ponto');
+      }
+      
+      const { data, error } = await query
         .order('created_at', { ascending: false })
         .limit(100);
       if (error) throw error;
       return data || [];
     }
   });
+
 
 
   const filteredLogs = auditLogs.filter((log: any) => 

@@ -42,7 +42,8 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
     setLoadingColab(true);
     const { data } = await supabase
       .from('colaboradores')
-      .select('id, nome_completo, cargo, salario')
+      .select('id, nome_completo, cargo, salario_base')
+
       .eq('empresa_id', empresaAtual.id)
       .eq('status', 'ativo')
       .order('nome_completo');
@@ -72,7 +73,7 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
         data_aviso_previo: form.data_aviso_previo || null,
         quebra_contrato: form.quebra_contrato,
         remover_beneficios: form.remover_beneficios,
-        salario_base: colaborador?.salario || 0,
+        salario_base: colaborador?.salario_base || 0,
         status: 'pendente',
         empresa_id: empresaAtual?.id,
       });
