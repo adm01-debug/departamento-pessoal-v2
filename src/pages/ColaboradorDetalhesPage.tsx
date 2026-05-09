@@ -8,10 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { colaboradorService } from '@/services';
 import {
-  ArrowLeft, Users, Phone, DollarSign, Stethoscope,
-  GraduationCap, Globe, Accessibility, Calendar, StickyNote,
-  Landmark, FileText, BookOpen, FileStack, Briefcase, ShieldCheck,
-  MapPin, Info, Edit, MoreHorizontal, Camera, User
+  ArrowLeft, Users, Briefcase, ShieldCheck,
+  Landmark, FileText, Info, Edit, MoreHorizontal, History as HistoryIcon,
+  MapPin, Calendar, Stethoscope
 } from 'lucide-react';
 import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
