@@ -158,9 +158,11 @@ export default function DocumentosPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const filtered = documentos?.filter((d: any) =>
-    !search || (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = documentos?.filter((d: any) => {
+    const searchMatch = !search || (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase());
+    const tipoMatch = tipoFilter === 'todos' || d.tipo === tipoFilter;
+    return searchMatch && tipoMatch;
+  });
 
   return (
     <>
