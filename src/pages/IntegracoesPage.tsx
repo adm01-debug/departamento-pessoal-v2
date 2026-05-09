@@ -119,7 +119,13 @@ function Bitrix24ConfigPanel() {
             <div className="flex items-center gap-2"><Switch checked={form.sync_cargos} onCheckedChange={v => setForm(p => ({ ...p, sync_cargos: v }))} /><Label className="text-sm">Cargos</Label></div>
           </div>
           <div><Label>Intervalo de Sincronização (min)</Label><Input type="number" value={form.intervalo_minutos} onChange={e => setForm(p => ({ ...p, intervalo_minutos: Number(e.target.value) }))} /></div>
-          <Button onClick={() => salvar.mutate()} disabled={!form.webhook_url || salvar.isPending}>{salvar.isPending ? 'Salvando...' : 'Salvar Configuração'}</Button>
+          <div className="flex gap-2">
+            <Button onClick={() => salvar.mutate()} disabled={!form.webhook_url || salvar.isPending} className="flex-1">{salvar.isPending ? 'Salvando...' : 'Salvar Configuração'}</Button>
+            <Button variant="outline" onClick={() => sincronizar.mutate()} disabled={!config?.habilitado || sincronizar.isPending}>
+              {sincronizar.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+              Sync Agora
+            </Button>
+          </div>
         </div>
       </TabsContent>
 
