@@ -123,7 +123,6 @@ export function MorningBriefing() {
       setRunningAction(null);
     }
   };
-  const navigate = useNavigate();
   const hoje = new Date();
   const hora = hoje.getHours();
 
