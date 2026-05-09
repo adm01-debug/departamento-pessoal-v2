@@ -4530,6 +4530,7 @@ export type Database = {
           etapa: string | null
           ferias_proporcionais: number | null
           ferias_vencidas: number | null
+          hash_integridade: string | null
           id: string
           motivo: string | null
           multa_fgts: number | null
@@ -4571,6 +4572,7 @@ export type Database = {
           etapa?: string | null
           ferias_proporcionais?: number | null
           ferias_vencidas?: number | null
+          hash_integridade?: string | null
           id?: string
           motivo?: string | null
           multa_fgts?: number | null
@@ -4612,6 +4614,7 @@ export type Database = {
           etapa?: string | null
           ferias_proporcionais?: number | null
           ferias_vencidas?: number | null
+          hash_integridade?: string | null
           id?: string
           motivo?: string | null
           multa_fgts?: number | null
