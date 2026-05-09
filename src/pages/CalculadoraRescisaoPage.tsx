@@ -27,6 +27,7 @@ export default function CalculadoraRescisaoPage() {
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
     avisoTrabalhado: false, feriasVencidas: false, saldoFGTS: '',
+    motivoDesligamento: '', observacoes: ''
   });
   const [result, setResult] = useState<RescisaoResult | null>(null);
   const [saving, setSaving] = useState(false);
