@@ -473,7 +473,7 @@ export default function DashboardExecutivoPage() {
             } : undefined}
             pendencias={[
               { tipo: 'ferias', icone: 'ferias', quantidade: data?.feriasPendentes || 0, descricao: 'Férias aguardando aprovação' },
-              { tipo: 'ponto', icone: 'ponto', quantidade: 0, descricao: 'Ajustes de ponto pendentes' },
+              { tipo: 'ponto', icone: 'ponto', quantidade: data?.pontoPendentes || 0, descricao: 'Ajustes de ponto pendentes' },
               { tipo: 'assinaturas', icone: 'assinaturas', quantidade: 0, descricao: 'Documentos para assinar' }
             ]}
             isLoadingStats={isLoading}
