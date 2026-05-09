@@ -16,13 +16,16 @@ import { motion } from 'framer-motion';
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Calendar, Clock,
   ArrowUpRight, ArrowDownRight, Building2, Briefcase, Target, PieChart,
-  Download, RefreshCw, AlertTriangle, ShieldCheck, Gavel, Landmark, TrendingUp as TrendingIcon, Wallet
+  Download, RefreshCw, AlertTriangle, ShieldCheck, Gavel, Landmark, Wallet,
+  Activity, UserPlus
 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line, ScatterChart, Scatter } from 'recharts';
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line } from 'recharts';
 import { useState, useMemo } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AnalyticsSection, EventTimeline } from '@/components/dashboard';
+import { useNavigate } from 'react-router-dom';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--warning))', 'hsl(var(--success))', 'hsl(var(--info))', 'hsl(var(--destructive))', 'hsl(var(--accent))'];
 
