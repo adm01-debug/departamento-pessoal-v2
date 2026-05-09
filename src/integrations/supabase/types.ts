@@ -970,6 +970,7 @@ export type Database = {
           dispositivo_id: string | null
           empresa_id: string | null
           hash_digital: string | null
+          hash_integridade: string | null
           hora: string
           id: string
           ip_address: string | null
@@ -977,6 +978,7 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           motivo_ajuste: string | null
+          offline: boolean | null
           ordem: number
           origem: string | null
           precisao_metros: number | null
@@ -997,6 +999,7 @@ export type Database = {
           dispositivo_id?: string | null
           empresa_id?: string | null
           hash_digital?: string | null
+          hash_integridade?: string | null
           hora: string
           id?: string
           ip_address?: string | null
@@ -1004,6 +1007,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           motivo_ajuste?: string | null
+          offline?: boolean | null
           ordem: number
           origem?: string | null
           precisao_metros?: number | null
@@ -1024,6 +1028,7 @@ export type Database = {
           dispositivo_id?: string | null
           empresa_id?: string | null
           hash_digital?: string | null
+          hash_integridade?: string | null
           hora?: string
           id?: string
           ip_address?: string | null
@@ -1031,6 +1036,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           motivo_ajuste?: string | null
+          offline?: boolean | null
           ordem?: number
           origem?: string | null
           precisao_metros?: number | null
@@ -12744,6 +12750,60 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trilha_auditoria_ponto: {
+        Row: {
+          acao: string
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          id: string
+          ip_address: string | null
+          justificativa: string | null
+          ponto_id: string | null
+          user_agent: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          ip_address?: string | null
+          justificativa?: string | null
+          ponto_id?: string | null
+          user_agent?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          ip_address?: string | null
+          justificativa?: string | null
+          ponto_id?: string | null
+          user_agent?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trilha_auditoria_ponto_ponto_id_fkey"
+            columns: ["ponto_id"]
+            isOneToOne: false
+            referencedRelation: "batidas_ponto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trilha_auditoria_ponto_ponto_id_fkey"
+            columns: ["ponto_id"]
+            isOneToOne: false
+            referencedRelation: "vw_batidas_dia"
             referencedColumns: ["id"]
           },
         ]

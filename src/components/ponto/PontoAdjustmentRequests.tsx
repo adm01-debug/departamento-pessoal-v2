@@ -3,15 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Clock, FileText, History, Info } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, History, Info, ExternalLink, Calendar } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function PontoAdjustmentRequests() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
+  const [selectedAudit, setSelectedAudit] = useState<any[] | null>(null);
 
   const { data: solicitacoes = [], isLoading } = useQuery({
     queryKey: ['solicitacoes-ajuste-ponto', empresaAtual?.id],
@@ -28,23 +32,32 @@ export function PontoAdjustmentRequests() {
     enabled: !!empresaAtual?.id,
   });
 
+  const { data: auditLogs = [] } = useQuery({
+    queryKey: ['trilha-auditoria-ponto', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trilha_auditoria_ponto')
+        .select('*, batidas_ponto!inner(colaborador_id)')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id,
+  });
+
   const mutation = useMutation({
     mutationFn: async ({ id, status, observacoes }: { id: string, status: string, observacoes?: string }) => {
-      // 1. Update the request
-      const { data: request, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('solicitacoes_ajuste_ponto')
         .update({ 
           status, 
           observacoes_gestor: observacoes, 
           updated_at: new Date().toISOString() 
         })
-        .eq('id', id)
-        .select()
-        .single();
+        .eq('id', id);
       
       if (updateError) throw updateError;
 
-      // 2. If approved, apply the change to batidas_ponto
       if (status === 'aprovado') {
         const { error: applyError } = await supabase.rpc('processar_ajuste_aprovado', {
           p_solicitacao_id: id
@@ -61,80 +74,136 @@ export function PontoAdjustmentRequests() {
     }
   });
 
+  const showAudit = (solicitacao: any) => {
+    const logs = auditLogs.filter((log: any) => log.ponto_id === solicitacao.id);
+    setSelectedAudit(logs);
+  };
+
   if (isLoading) return <div>Carregando...</div>;
 
   return (
-    <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
-      <div className="h-[2px] bg-gradient-to-r from-warning to-warning-glow" />
-      <CardHeader>
-        <CardTitle className="font-display flex items-center gap-2">
-          <Clock className="h-4 w-4 text-warning" /> Solicitações de Ajuste
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead>Colaborador</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Sugestão</TableHead>
-              <TableHead>Motivo</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {solicitacoes.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  Nenhuma solicitação pendente
-                </TableCell>
+    <>
+      <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
+        <div className="h-[2px] bg-gradient-to-r from-warning to-warning-glow" />
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="font-display flex items-center gap-2">
+            <Clock className="h-4 w-4 text-warning" /> Solicitações de Ajuste
+          </CardTitle>
+          <Badge variant="outline" className="text-[10px]">{solicitacoes.filter((s:any) => s.status === 'pendente').length} Pendentes</Badge>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead>Colaborador</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Sugestão</TableHead>
+                <TableHead>Motivo</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            ) : (
-              solicitacoes.map((s: any) => (
-                <TableRow key={s.id}>
-                  <TableCell className="font-medium">{s.colaborador?.nome_completo}</TableCell>
-                  <TableCell>{new Date(s.data_ponto).toLocaleDateString('pt-BR')}</TableCell>
-                  <TableCell><Badge variant="outline">{s.tipo_ponto}</Badge></TableCell>
-                  <TableCell className="font-mono">{s.hora_sugerida?.substring(0, 5)}</TableCell>
-                  <TableCell className="max-w-xs truncate">{s.motivo}</TableCell>
-                  <TableCell>
-                    <Badge variant={s.status === 'pendente' ? 'secondary' : s.status === 'aprovado' ? 'success' : 'destructive'} className="capitalize">
-                      {s.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => toast.info(`Trilha de Auditoria: Criado em ${new Date(s.created_at).toLocaleString('pt-BR')}`)}>
-                              <History className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Ver Auditoria</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-
-                      {s.status === 'pendente' && (
-                        <>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-success" onClick={() => mutation.mutate({ id: s.id, status: 'aprovado' })}>
-                            <CheckCircle2 className="h-4 w-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => mutation.mutate({ id: s.id, status: 'rejeitado' })}>
-                            <XCircle className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {solicitacoes.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    Nenhuma solicitação pendente
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              ) : (
+                solicitacoes.map((s: any) => (
+                  <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
+                    <TableCell className="font-medium">{s.colaborador?.nome_completo}</TableCell>
+                    <TableCell>{new Date(s.data_ponto).toLocaleDateString('pt-BR')}</TableCell>
+                    <TableCell><Badge variant="outline" className="text-[10px]">{s.tipo_ponto}</Badge></TableCell>
+                    <TableCell className="font-mono text-xs">{s.hora_sugerida?.substring(0, 5)}</TableCell>
+                    <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground" title={s.motivo}>{s.motivo}</TableCell>
+                    <TableCell>
+                      <Badge variant={s.status === 'pendente' ? 'secondary' : s.status === 'aprovado' ? 'success' : 'destructive'} className="capitalize text-[10px]">
+                        {s.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => showAudit(s)}>
+                                <History className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Trilha de Auditoria</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        {s.status === 'pendente' && (
+                          <>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-success hover:bg-success/10" onClick={() => mutation.mutate({ id: s.id, status: 'aprovado' })}>
+                              <CheckCircle2 className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => mutation.mutate({ id: s.id, status: 'rejeitado' })}>
+                              <XCircle className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!selectedAudit} onOpenChange={() => setSelectedAudit(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-primary" /> Trilha de Auditoria Detalhada
+            </DialogTitle>
+            <DialogDescription>Histórico completo de alterações para este registro de ponto.</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[400px] pr-4">
+            <div className="space-y-6 relative before:absolute before:inset-0 before:left-2 before:w-0.5 before:bg-muted">
+              {selectedAudit && selectedAudit.length > 0 ? (
+                selectedAudit.map((log, index) => (
+                  <div key={log.id} className="relative pl-8">
+                    <div className="absolute left-0 top-1.5 h-4 w-4 rounded-full border-2 border-primary bg-background z-10" />
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-xs capitalize text-primary">{log.acao}</span>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" /> {new Date(log.created_at).toLocaleString('pt-BR')}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-3">{log.justificativa || 'Sem justificativa adicional'}</p>
+                      {log.dados_novos && (
+                        <div className="grid grid-cols-2 gap-2 p-2 bg-background/50 rounded-lg border border-border/30">
+                          <div className="text-[10px]">
+                            <p className="text-muted-foreground font-bold uppercase">Anterior</p>
+                            <p className="font-mono">{JSON.stringify(log.dados_anteriores).substring(0, 50)}...</p>
+                          </div>
+                          <div className="text-[10px]">
+                            <p className="text-primary font-bold uppercase">Novo</p>
+                            <p className="font-mono text-primary">{JSON.stringify(log.dados_novos).substring(0, 50)}...</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                  <Info className="h-8 w-8 mb-2 opacity-20" />
+                  <p className="text-sm">Nenhum log histórico encontrado para este ajuste.</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

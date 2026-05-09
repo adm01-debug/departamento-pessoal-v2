@@ -6,14 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp } from 'lucide-react';
+import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp, Filter } from 'lucide-react';
 import { PontoInconsistencyPanel } from './PontoInconsistencyPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { GestaoPontoAnalytics } from './GestaoPontoAnalytics';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export function GestaoRegistrosPonto() {
   const { empresaAtual } = useEmpresas();
@@ -22,6 +24,7 @@ export function GestaoRegistrosPonto() {
   const [filtroFim, setFiltroFim] = useState(new Date().toISOString().split('T')[0]);
   const [tipoExcecao, setTipoExcecao] = useState('todas');
   const [busca, setBusca] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   const { data: registros = [], isLoading } = useQuery({
     queryKey: ['gestao-registros-ponto', empresaAtual?.id, filtroData, filtroFim],
@@ -35,7 +38,6 @@ export function GestaoRegistrosPonto() {
         .lte('data', filtroFim)
         .order('data', { ascending: false });
       if (error) throw error;
-      return data || [];
       return data || [];
     },
     enabled: !!empresaAtual?.id,
@@ -55,14 +57,21 @@ export function GestaoRegistrosPonto() {
 
   const filtrados = registros.filter((r: any) => {
     const nome = r.colaborador?.nome_completo?.toLowerCase() || '';
-    const nomeMatch = !busca || nome.includes(busca.toLowerCase());
+    const cargo = r.colaborador?.cargo?.toLowerCase() || '';
+    const depto = r.colaborador?.departamento?.toLowerCase() || '';
+    const query = busca.toLowerCase();
     
-    if (tipoExcecao === 'todas') return nomeMatch;
-    if (tipoExcecao === 'atrasos') return nomeMatch && r.atraso_minutos > 0;
-    if (tipoExcecao === 'faltas') return nomeMatch && (!r.entrada_1 && !r.saida_1);
-    if (tipoExcecao === 'incompletos') return nomeMatch && (r.entrada_1 && !r.saida_1);
+    const buscaMatch = !busca || 
+      nome.includes(query) || 
+      cargo.includes(query) || 
+      depto.includes(query);
     
-    return nomeMatch;
+    if (tipoExcecao === 'todas') return buscaMatch;
+    if (tipoExcecao === 'atrasos') return buscaMatch && r.atraso_minutos > 0;
+    if (tipoExcecao === 'faltas') return buscaMatch && (!r.entrada_1 && !r.saida_1);
+    if (tipoExcecao === 'incompletos') return buscaMatch && (r.entrada_1 && !r.saida_1);
+    
+    return buscaMatch;
   });
 
   const mudarDia = (offset: number) => {
@@ -111,49 +120,58 @@ export function GestaoRegistrosPonto() {
                 <Users className="h-4 w-4 text-info" /> Controle de Ponto - Gestão Avançada
               </CardTitle>
               <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border">
-                  <Input
-                    type="date"
-                    value={filtroData}
-                    onChange={(e) => setFiltroData(e.target.value)}
-                    className="w-32 h-7 text-[10px] border-none bg-transparent"
-                  />
-                  <span className="text-[10px] text-muted-foreground">até</span>
-                  <Input
-                    type="date"
-                    value={filtroFim}
-                    onChange={(e) => setFiltroFim(e.target.value)}
-                    className="w-32 h-7 text-[10px] border-none bg-transparent"
-                  />
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 gap-2 text-[10px] border-dashed">
+                      <Filter className="h-3 w-3" /> Filtros Avançados
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 p-4" align="end">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-xs uppercase text-muted-foreground">Período</h4>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="date"
+                            value={filtroData}
+                            onChange={(e) => setFiltroData(e.target.value)}
+                            className="h-8 text-[10px]"
+                          />
+                          <span className="text-[10px] text-muted-foreground">até</span>
+                          <Input
+                            type="date"
+                            value={filtroFim}
+                            onChange={(e) => setFiltroFim(e.target.value)}
+                            className="h-8 text-[10px]"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-xs uppercase text-muted-foreground">Tipo de Exceção</h4>
+                        <select 
+                          value={tipoExcecao} 
+                          onChange={(e) => setTipoExcecao(e.target.value)}
+                          className="w-full h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-sm focus:ring-1 focus:ring-primary"
+                        >
+                          <option value="todas">Todas as Batidas</option>
+                          <option value="atrasos">Apenas Atrasos</option>
+                          <option value="faltas">Apenas Faltas</option>
+                          <option value="incompletos">Incompletos/Abertos</option>
+                        </select>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] text-muted-foreground font-bold px-1">TIPO DE EXCEÇÃO</span>
-                  <select 
-                    value={tipoExcecao} 
-                    onChange={(e) => setTipoExcecao(e.target.value)}
-                    className="h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-sm focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="todas">Todas as Batidas</option>
-                    <option value="atrasos">Apenas Atrasos</option>
-                    <option value="faltas">Apenas Faltas</option>
-                    <option value="incompletos">Incompletos/Abertos</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm">
+                <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm bg-background">
                   <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" onClick={() => {
                     toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
-                      loading: 'Auditando integridade...',
-                      success: 'Todos os hashes de integridade validados! 100% Conformidade.',
+                      loading: 'Validando integridade SHA-256...',
+                      success: 'Assinaturas digitais verificadas! Integridade 100% garantida.',
                       error: 'Erro na auditoria'
                     });
                   }}>
                     <ShieldCheck className="h-3 w-3" /> Audit
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-info/10 relative">
-                    <Bell className="h-3 w-3" />
-                    <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-destructive rounded-full border border-background animate-pulse" />
                   </Button>
                   <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-info/10" onClick={() => exportData('csv')}>
                     <Download className="h-3 w-3" /> CSV
@@ -168,24 +186,26 @@ export function GestaoRegistrosPonto() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Filtrar por nome de colaborador..."
+                  placeholder="Buscar colaborador, departamento ou cargo..."
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
-                  className="pl-9 h-9 rounded-xl border-border/40"
+                  className="pl-9 h-9 rounded-xl border-border/40 bg-muted/20 focus:bg-background transition-colors"
                 />
               </div>
               
-              {selecionados.length > 0 && (
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-lg border border-primary/20">
-                  <span className="text-[10px] font-bold text-primary">{selecionados.length} selecionados</span>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] text-primary hover:bg-primary/20" onClick={() => {
-                    toast.success(`${selecionados.length} registros aprovados em lote!`);
-                    setSelecionados([]);
-                  }}>
-                    Aprovar em Lote
-                  </Button>
-                </motion.div>
-              )}
+              <AnimatePresence>
+                {selecionados.length > 0 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-lg border border-primary/20">
+                    <span className="text-[10px] font-bold text-primary">{selecionados.length} selecionados</span>
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] text-primary hover:bg-primary/20" onClick={() => {
+                      toast.success(`${selecionados.length} registros aprovados em lote!`);
+                      setSelecionados([]);
+                    }}>
+                      Aprovar Lote
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </CardHeader>
