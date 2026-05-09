@@ -11,6 +11,8 @@ import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { DetalhesAdmissaoDialog } from '@/components/admissoes/DetalhesAdmissaoDialog';
 import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send, LayoutDashboard, List, History } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
