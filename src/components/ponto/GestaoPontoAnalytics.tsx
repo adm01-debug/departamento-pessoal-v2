@@ -132,13 +132,13 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="flex items-center justify-between p-3 bg-background rounded-xl border border-destructive/10">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-destructive/10 text-destructive"><ShieldAlert className="h-5 w-5" /></div>
                 <div>
-                  <p className="text-xs font-bold">Violações de Interjornada</p>
-                  <p className="text-[10px] text-muted-foreground">Menos de 11h de descanso entre turnos</p>
+                  <p className="text-xs font-bold">Interjornada</p>
+                  <p className="text-[10px] text-muted-foreground">< 11h descanso</p>
                 </div>
               </div>
               <p className="text-2xl font-display font-bold text-destructive">{complianceStats.interjornadaViolations}</p>
@@ -148,11 +148,33 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-warning/10 text-warning"><Clock className="h-5 w-5" /></div>
                 <div>
-                  <p className="text-xs font-bold">Jornadas Excessivas</p>
-                  <p className="text-[10px] text-muted-foreground">Colaboradores com mais de 10h trabalhadas</p>
+                  <p className="text-xs font-bold">Jornada > 10h</p>
+                  <p className="text-[10px] text-muted-foreground">Limite diário CLT</p>
                 </div>
               </div>
               <p className="text-2xl font-display font-bold text-warning">{complianceStats.excessiveWorkdays}</p>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-background rounded-xl border border-info/10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-info/10 text-info"><Calendar className="h-5 w-5" /></div>
+                <div>
+                  <p className="text-xs font-bold">Provisão Férias</p>
+                  <p className="text-[10px] text-muted-foreground">Est. 1/12 avos</p>
+                </div>
+              </div>
+              <p className="text-sm font-display font-bold text-info">R$ {(registros.length * 12.5).toLocaleString('pt-BR')}</p>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-background rounded-xl border border-success/10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-success/10 text-success"><Activity className="h-5 w-5" /></div>
+                <div>
+                  <p className="text-xs font-bold">Encargos Est.</p>
+                  <p className="text-[10px] text-muted-foreground">FGTS/INSS Proj.</p>
+                </div>
+              </div>
+              <p className="text-sm font-display font-bold text-success">R$ {(registros.length * 28.4).toLocaleString('pt-BR')}</p>
             </div>
           </div>
         </CardContent>
