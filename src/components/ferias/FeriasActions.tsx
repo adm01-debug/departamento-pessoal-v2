@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { UserCheck, Shield, Building2, X, Ban } from 'lucide-react';
+import { UserCheck, Shield, Building2, X, Ban, FileDown } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { feriasPDF } from '@/utils/feriasPDF';
 
 interface FeriasActionsProps {
   solicitacao: Record<string, any>;
@@ -52,6 +53,21 @@ export function FeriasActions(props: FeriasActionsProps) {
             </Tooltip>
           );
         })}
+        
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 rounded-lg hover:bg-primary/10 text-primary"
+              onClick={() => feriasPDF.gerarRecibo(solicitacao)}
+            >
+              <FileDown className="h-3.5 w-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent><p className="text-xs">Baixar Recibo</p></TooltipContent>
+        </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
