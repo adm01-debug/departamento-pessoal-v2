@@ -27,20 +27,32 @@ const acaoColors: Record<string, string> = {
 
 export default function AuditoriaPage() {
   const [search, setSearch] = useState('');
+  const [tabelaFilter, setTabelaFilter] = useState('todos');
+  const [acaoFilter, setAcaoFilter] = useState('todos');
   const [selectedLog, setSelectedLog] = useState<any>(null);
   const { exportarExcel } = useExcelExport();
 
   const { data: logs, isLoading } = useQuery({
     queryKey: ['auditoria'],
-    queryFn: () => auditoriaService.listar({ limite: 200 }),
+    queryFn: () => auditoriaService.listar({ limite: 500 }),
   });
 
-  const filtered = logs?.filter((l: any) =>
-    !search || 
-    (l.tabela || '').toLowerCase().includes(search.toLowerCase()) || 
-    (l.user_email || '').toLowerCase().includes(search.toLowerCase()) ||
-    (l.acao || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const uniqueTables = useMemo(() => {
+    if (!logs) return [];
+    return Array.from(new Set(logs.map((l: any) => l.tabela))).sort();
+  }, [logs]);
+
+  const filtered = useMemo(() => {
+    return logs?.filter((l: any) => {
+      const matchSearch = !search || 
+        (l.user_email || '').toLowerCase().includes(search.toLowerCase()) ||
+        (l.registro_id || '').toLowerCase().includes(search.toLowerCase());
+      const matchTabela = tabelaFilter === 'todos' || l.tabela === tabelaFilter;
+      const matchAcao = acaoFilter === 'todos' || l.acao === acaoFilter;
+      return matchSearch && matchTabela && matchAcao;
+    });
+  }, [logs, search, tabelaFilter, acaoFilter]);
+
   const handleExport = () => {
     if (!filtered?.length) return;
     exportarExcel(
