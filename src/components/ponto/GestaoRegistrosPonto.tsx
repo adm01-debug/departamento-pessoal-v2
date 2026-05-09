@@ -152,14 +152,28 @@ export function GestaoRegistrosPonto() {
                 </div>
               </div>
             </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Filtrar por nome de colaborador..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                className="pl-9 h-9 rounded-xl border-border/40"
-              />
+            <div className="flex items-center justify-between gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrar por nome de colaborador..."
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  className="pl-9 h-9 rounded-xl border-border/40"
+                />
+              </div>
+              
+              {selecionados.length > 0 && (
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-lg border border-primary/20">
+                  <span className="text-[10px] font-bold text-primary">{selecionados.length} selecionados</span>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] text-primary hover:bg-primary/20" onClick={() => {
+                    toast.success(`${selecionados.length} registros aprovados em lote!`);
+                    setSelecionados([]);
+                  }}>
+                    Aprovar em Lote
+                  </Button>
+                </motion.div>
+              )}
             </div>
           </div>
         </CardHeader>
