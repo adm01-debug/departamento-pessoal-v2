@@ -43,30 +43,8 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   return data;
 };
 
-export const beneficioService = {
-  async list(empresaId?: string) {
-    let query = supabase.from('beneficios').select('*').order('nome');
-    if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  },
-  listar: async (empresaId?: string) => beneficioService.list(empresaId),
-  async criar(d: any) {
-    const { data, error } = await supabase.from('beneficios').insert(d).select().maybeSingle();
-    if (error) throw error;
-    return ensureSingleResult(data, 'benefício');
-  },
-  async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('beneficios').update(d).eq('id', id).select().maybeSingle();
-    if (error) throw error;
-    return ensureSingleResult(data, 'benefício');
-  },
-  async excluir(id: string) {
-    const { error } = await supabase.from('beneficios').delete().eq('id', id);
-    if (error) throw error;
-  },
-};
+export { beneficioService } from './beneficioService';
+
 
 export const colaboradorService = {
   async list(empresaId?: string) {

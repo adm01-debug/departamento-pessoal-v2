@@ -24,6 +24,8 @@ import { LogsIntegracoesTab } from '@/components/settings/LogsIntegracoesTab';
 import { MFASetup } from '@/components/settings/MFASetup';
 import { EmpresaSettingsTab } from '@/components/settings/EmpresaSettingsTab';
 import { UserRolesTab } from '@/components/settings/UserRolesTab';
+import { GlobalAuditLogTab } from '@/components/settings/GlobalAuditLogTab';
+
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -108,7 +110,9 @@ export default function ConfiguracoesPage() {
               <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Filtro IP</TabsTrigger>
               <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Integ.</TabsTrigger>
               <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Webhooks</TabsTrigger>
-              <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Logs</TabsTrigger>
+              <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Integ. Logs</TabsTrigger>
+              <TabsTrigger value="auditoria-global" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Auditoria</TabsTrigger>
+
               <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">BD</TabsTrigger>
               <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Saúde/Sync</TabsTrigger>
             </>
@@ -368,9 +372,14 @@ export default function ConfiguracoesPage() {
           <IPBlockingTab />
         </TabsContent>
 
+        <TabsContent value="auditoria-global">
+           <GlobalAuditLogTab />
+        </TabsContent>
+
         <TabsContent value="sistema">
           <SystemHealthTab />
         </TabsContent>
+
 
         <TabsContent value="logs-integ">
           <LogsIntegracoesTab />

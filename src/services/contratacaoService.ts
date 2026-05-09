@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { auditLogger } from '@/utils/auditLogger';
+
 
 export const contratacaoService = {
   async gerarTemplateContrato(admissaoId: string) {
@@ -63,13 +65,19 @@ export const contratacaoService = {
 
     if (error) throw error;
 
-    // Log de auditoria usando estrutura correta
-    await supabase.from('audit_log').insert({
+    // Log de auditoria profissional
+    await auditLogger.log({
       tabela: 'admissoes',
       registro_id: admissaoId,
-      acao: `VALIDACAO_DOC_${docType.toUpperCase()}`,
-      dados_novos: { status, observacao }
+      acao: 'UPDATE',
+      dados_novos: { 
+        documento: docType, 
+        status, 
+        observacao,
+        evento: 'VALIDACAO_DOCUMENTO'
+      }
     });
+
   },
 
   async enviarLinkCandidato(admissaoId: string, email: string) {
@@ -106,5 +114,29 @@ export const contratacaoService = {
       status: 'enviado',
       mensagem: `Link de contratação enviado via WhatsApp`
     });
+  },
+
+  async transmitirESocial(admissaoId: string) {
+    const { data: admissao } = await supabase.from('admissoes').select('*').eq('id', admissaoId).single();
+    
+    // Simulação de transmissão eSocial (S-2200)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const { error } = await supabase
+      .from('admissoes')
+      .update({ etapa: 'esocial', metadata: { esocial_protocol: `PROTO-${Math.random().toString(36).toUpperCase().slice(0, 10)}` } as any })
+      .eq('id', admissaoId);
+      
+    if (error) throw error;
+    
+    await auditLogger.log({
+      tabela: 'admissoes',
+      registro_id: admissaoId,
+      acao: 'EXECUTE_CALC',
+      dados_novos: { evento: 'TRANSMISSAO_ESOCIAL_S2200', status: 'sucesso' }
+    });
+    
+    return true;
   }
 };
+

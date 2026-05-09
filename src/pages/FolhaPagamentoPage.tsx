@@ -2,7 +2,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Calculator, RefreshCw, Shield, Loader2, Banknote } from 'lucide-react';
+import { Upload, Calculator, RefreshCw, Shield, Loader2, Banknote, Lock, History } from 'lucide-react';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { PageLayout } from '@/components/layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,7 +10,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard } from '@/components/folha';
+import { auditLogger } from '@/utils/auditLogger';
+import { Card, CardContent } from '@/components/ui/card';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline } from '@/components/folha';
+
+
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
@@ -120,6 +124,30 @@ export default function FolhaPagamentoPage() {
     }
   };
 
+  const encerrarFolha = useMutation({
+    mutationFn: async () => {
+      if (!resumo?.id) throw new Error('Nenhuma folha encontrada para encerramento');
+      const { data, error } = await supabase.from('folhas_pagamento')
+        .update({ status: 'fechada' as any, data_fechamento: new Date().toISOString() })
+        .eq('id', resumo.id).select().single();
+      if (error) throw error;
+      
+      await auditLogger.log({
+        tabela: 'folhas_pagamento',
+        registro_id: resumo.id,
+        acao: 'UPDATE',
+        dados_novos: { status: 'fechada', evento: 'ENCERRAMENTO_FOLHA' }
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
+      toast.success('Folha de pagamento encerrada com sucesso!');
+    },
+    onError: (error: Error) => toast.error(`Erro: ${error.message}`),
+  });
+
+
   return (
     <>
       <PageTitle title="Cálculo de Folha" description="Processamento de folha de pagamento" />
@@ -158,6 +186,16 @@ export default function FolhaPagamentoPage() {
             <RubricasDialog />
             <Simulador13Dialog />
             <SimuladorWhatIf />
+            <Button
+              size="sm" 
+              variant="outline"
+              onClick={() => encerrarFolha.mutate()}
+              disabled={encerrarFolha.isPending || resumo?.status?.fechamento === 'fechado'}
+              className="rounded-xl gap-1.5 font-body border-destructive/30 text-destructive hover:bg-destructive/10"
+            >
+              {encerrarFolha.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              <span className="hidden sm:inline">Encerrar</span>
+            </Button>
             {resumo?.id && <PagamentoBancarioWizard folhaId={resumo.id} />}
             {resumo?.id && <CNABDialog folhaId={resumo.id} />}
             {resumo?.id && <RelatorioContabilDialog folhaId={resumo.id} />}
@@ -166,21 +204,39 @@ export default function FolhaPagamentoPage() {
       >
         <FolhaKPIs resumo={resumo} isLoading={isLoading} />
 
-        {resumo && <FolhaPipeline status={resumo.status} competencia={competencia} />}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            {resumo && <FolhaPipeline status={resumo.status} competencia={competencia} />}
+            
+            {!isLoading && resumo && <FolhaValidationAlerts resumo={resumo} />}
 
-        {!isLoading && resumo && <FolhaValidationAlerts resumo={resumo} />}
-
-        {!isLoading && resumo && resumo.colaboradores > 0 && (
-          <FolhaComposicao
-            totalProventos={resumo.totalProventos}
-            inss={resumo.inss}
-            irrf={resumo.irrf}
-            fgts={resumo.fgts}
-            totalDescontos={resumo.totalDescontos}
-          />
-        )}
+            {!isLoading && resumo && resumo.colaboradores > 0 && (
+              <FolhaComposicao
+                totalProventos={resumo.totalProventos}
+                inss={resumo.inss}
+                irrf={resumo.irrf}
+                fgts={resumo.fgts}
+                totalDescontos={resumo.totalDescontos}
+              />
+            )}
+          </div>
+          
+          <div className="space-y-6">
+            <FolhaAuditTimeline competencia={competencia} />
+            <Card className="border border-border/30 rounded-2xl bg-primary/5">
+              <CardContent className="p-4 flex items-center gap-3">
+                <Shield className="h-5 w-5 text-primary" />
+                <div>
+                   <p className="text-xs font-bold">Cálculo Auditado</p>
+                   <p className="text-[10px] text-muted-foreground">Motor de cálculo validado pela Portaria 671 MTP.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
         
         <FGTSDigitalDashboard />
+
       </PageLayout>
     </>
   );

@@ -131,30 +131,10 @@ export default function PontoPage() {
           </TabsContent>
 
           <TabsContent value="gestao" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6">
               <PontoAdjustmentRequests />
-              <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
-                <div className="h-[2px] bg-gradient-to-r from-destructive to-destructive/70" />
-                <CardHeader>
-                  <CardTitle className="font-display flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-destructive" /> Exceções Detectadas (Smart)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">O motor de IA detectou as seguintes inconsistências:</p>
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/10 flex items-center justify-between">
-                      <span className="text-sm font-medium">Batidas Ímpares</span>
-                      <Badge variant="destructive">12 casos</Badge>
-                    </div>
-                    <div className="p-3 rounded-lg bg-warning/5 border border-warning/10 flex items-center justify-between">
-                      <span className="text-sm font-medium">Intervalo Mínimo Não Respeitado</span>
-                      <Badge variant="warning">5 casos</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
+
             <GestaoRegistrosPonto />
             <PontoAuditTimeline />
           </TabsContent>

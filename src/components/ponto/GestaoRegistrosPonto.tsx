@@ -6,14 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp, Filter } from 'lucide-react';
+import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText, Smartphone, ShieldCheck, Activity, Bell, Zap, TrendingUp, Filter, History } from 'lucide-react';
 import { PontoInconsistencyPanel } from './PontoInconsistencyPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
+import { batidasPontoService } from '@/services/batidasPontoService';
 import { GestaoPontoAnalytics } from './GestaoPontoAnalytics';
 import { toast } from 'sonner';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -164,14 +166,20 @@ export function GestaoRegistrosPonto() {
                 </Popover>
                 
                 <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm bg-background">
-                  <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" onClick={() => {
-                    toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
-                      loading: 'Validando integridade SHA-256...',
-                      success: 'Assinaturas digitais verificadas! Integridade 100% garantida.',
-                      error: 'Erro na auditoria'
-                    });
-                  }}>
-                    <ShieldCheck className="h-3 w-3" /> Audit
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" 
+                    onClick={async () => {
+                      if (!empresaAtual?.id) return;
+                      toast.promise(batidasPontoService.fecharPeriodo(empresaAtual.id, filtroData, filtroFim), {
+                        loading: 'Fechando período e integrando com folha...',
+                        success: 'Período encerrado e dados enviados para processamento de folha!',
+                        error: 'Erro ao fechar período'
+                      });
+                    }}
+                  >
+                    <ShieldCheck className="h-3 w-3" /> Fechar Período
                   </Button>
                   <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-info/10" onClick={() => exportData('csv')}>
                     <Download className="h-3 w-3" /> CSV
@@ -180,6 +188,7 @@ export function GestaoRegistrosPonto() {
                     <FileText className="h-3 w-3" /> PDF
                   </Button>
                 </div>
+
               </div>
             </div>
             <div className="flex items-center justify-between gap-4">
@@ -292,8 +301,10 @@ export function GestaoRegistrosPonto() {
                     <TableHead className="font-display font-semibold">Trabalhadas</TableHead>
                     <TableHead className="font-display font-semibold">Extras</TableHead>
                     <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="font-display font-semibold text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {filtrados.map((r: any) => {
                     const trabalhadas = formatInterval(r.horas_trabalhadas);
@@ -369,7 +380,14 @@ export function GestaoRegistrosPonto() {
                             )}
                           </div>
                         </TableCell>
+
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-info/10 text-info" onClick={() => toast.info(`Visualizando auditoria de ${r.colaborador?.nome_completo}...`)}>
+                            <History className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
+
                     );
                   })}
                 </TableBody>

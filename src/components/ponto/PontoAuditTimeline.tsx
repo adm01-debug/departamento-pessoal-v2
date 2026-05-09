@@ -19,31 +19,34 @@ export function PontoAuditTimeline() {
     queryKey: ['ponto-audit-logs'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('ponto_auditoria')
-        .select('*, usuario:profiles(nome)')
+        .from('audit_log')
+        .select('*')
+        .or('tabela.eq.batidas_ponto,tabela.eq.registros_ponto')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
       if (error) throw error;
       return data || [];
     }
   });
 
+
   const filteredLogs = auditLogs.filter((log: any) => 
     log.acao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.justificativa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.usuario?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+    log.tabela.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    log.user_email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExportAudit = () => {
     const exportData = filteredLogs.map((log: any) => ({
       data: format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss'),
-      usuario: log.usuario?.nome || 'Sistema',
+      usuario: log.user_email || 'Sistema',
       acao: log.acao,
-      tabela: log.tabela_nome,
-      justificativa: log.justificativa || '-'
+      tabela: log.tabela,
+      registro_id: log.registro_id
     }));
     exportPontoCSV(exportData, 'trilha-auditoria-ponto.csv');
   };
+
 
   return (
     <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
@@ -102,27 +105,29 @@ export function PontoAuditTimeline() {
                       <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
                         <User className="h-3 w-3 text-primary" />
                       </div>
-                      <span className="text-sm font-semibold text-foreground/90">{log.usuario?.nome || 'Sistema (Automático)'}</span>
+                      <span className="text-sm font-semibold text-foreground/90">{log.user_email || 'Sistema (Automático)'}</span>
                     </div>
                     
-                    {log.justificativa && (
+                    {log.dados_novos && log.acao === 'UPDATE' && (
                       <div className="relative overflow-hidden mb-3">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/20 rounded-full" />
-                        <p className="text-xs text-muted-foreground italic bg-primary/5 p-2.5 rounded-r-lg border border-l-0 border-primary/10">
-                          {log.justificativa}
-                        </p>
+                        <div className="text-[10px] text-muted-foreground bg-primary/5 p-2.5 rounded-r-lg border border-l-0 border-primary/10">
+                          <p className="font-bold mb-1">Alteração Detectada:</p>
+                          <pre className="whitespace-pre-wrap">{JSON.stringify(log.dados_novos, null, 2)}</pre>
+                        </div>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between">
                       <div className="flex flex-wrap gap-2 text-[10px]">
                         <span className="flex items-center gap-1 text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-full border border-border/20">
-                          <Tag className="h-3 w-3" /> Entidade: {log.tabela_nome}
+                          <Tag className="h-3 w-3" /> Entidade: {log.tabela}
                         </span>
                       </div>
                       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors translate-x-0 group-hover:translate-x-1" />
                     </div>
                   </div>
+
                 </div>
               </motion.div>
             ))}
