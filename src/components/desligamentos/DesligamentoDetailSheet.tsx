@@ -150,14 +150,35 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
               </CardContent>
             </Card>
 
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={handleCalcular}
+                disabled={calculating}
+                className="rounded-xl font-body bg-primary hover:bg-primary-glow"
+              >
+                {calculating ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Calculator className="h-4 w-4 mr-2" />}
+                {d.valor_liquido ? 'Recalcular' : 'Calcular Agora'}
+              </Button>
+
+              <Button
+                onClick={handleHomologar}
+                disabled={homologating || d.status === 'homologado'}
+                variant="outline"
+                className="rounded-xl font-body border-success/50 hover:bg-success/10 text-success"
+              >
+                {homologating ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                Homologar
+              </Button>
+            </div>
+
             <Button
               onClick={() => navigate('/calculadora-rescisao')}
-              variant="outline"
-              className="w-full rounded-xl font-body"
+              variant="ghost"
+              className="w-full rounded-xl font-body text-xs text-muted-foreground"
             >
-              <Calculator className="h-4 w-4 mr-2" />
-              Abrir Calculadora de Rescisão
+              Abrir Calculadora Avançada
             </Button>
+
           </TabsContent>
         </Tabs>
       </SheetContent>
