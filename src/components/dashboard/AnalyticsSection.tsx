@@ -256,33 +256,78 @@ interface AnalyticsSectionProps {
 
 export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingPendencias, isEmptySystem, empresaId }: AnalyticsSectionProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const itemsPerPage = 5;
 
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
   const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
 
-  // Real-time notifications for Ponto
-  useMemo(() => {
+  // Notifications State & Logic
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  useEffect(() => {
+    if (!empresaId) return;
+    
+    // Initial Load of Notifications
+    const loadNotifs = async () => {
+      const { data } = await supabase
+        .from('notificacoes')
+        .select('*')
+        .eq('empresa_id', empresaId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (data) setNotifications(data);
+    };
+    loadNotifs();
+
+    // Subscribe to new notifications
+    const channel = supabase
+      .channel('notif-changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notificacoes', filter: `empresa_id=eq.${empresaId}` },
+        (payload) => {
+          setNotifications(prev => [payload.new, ...prev]);
+        }
+      )
+      .subscribe();
+      
+    return () => { supabase.removeChannel(channel); };
+  }, [empresaId]);
+
+  const markNotifRead = async (id: string) => {
+    await supabase.from('notificacoes').update({ lida: true }).eq('id', id);
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, lida: true } : n));
+  };
+
+  const markAllRead = async () => {
+    if (!empresaId) return;
+    await supabase.from('notificacoes').update({ lida: true }).eq('empresa_id', empresaId).eq('lida', false);
+    setNotifications(prev => prev.map(n => ({ ...n, lida: true })));
+  };
+
+  // Real-time notifications for Ponto Logic
+  useEffect(() => {
     if (!empresaId) return;
     const channel = (supabase as any)
       .channel('ponto-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'solicitacoes_ajuste_ponto', filter: `empresa_id=eq.${empresaId}` },
+        { event: 'UPDATE', schema: 'public', table: 'solicitacoes_ajuste_ponto', filter: `empresa_id=eq.${empresaId}` },
         (payload: any) => {
-          if (payload.eventType === 'UPDATE') {
-            const status = payload.new.status;
-            if (status === 'aprovado' || status === 'recusado') {
-              toast.info(`Solicitação de Ponto ${status === 'aprovado' ? 'aprovada' : 'recusada'}.`, {
-                description: `Ajuste para ${payload.new.data_ponto} processado.`,
-                icon: status === 'aprovado' ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-destructive" />
-              });
-            }
+          const status = payload.new.status;
+          if (status === 'aprovado' || status === 'recusado') {
+            toast.info(`Solicitação de Ponto ${status === 'aprovado' ? 'aprovada' : 'recusada'}.`, {
+              description: `Ajuste para ${payload.new.data_ponto} processado.`,
+              icon: status === 'aprovado' ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-destructive" />
+            });
           }
         }
       )
