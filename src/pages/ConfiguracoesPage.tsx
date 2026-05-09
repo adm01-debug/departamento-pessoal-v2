@@ -304,6 +304,9 @@ export default function ConfiguracoesPage() {
         <TabsContent value="config-bd">
           <ConfiguracoesGeraisTab />
         </TabsContent>
+        <TabsContent value="perfis">
+          <UserRolesTab />
+        </TabsContent>
         <TabsContent value="empresa">
           <EmpresaSettingsTab />
         </TabsContent>
