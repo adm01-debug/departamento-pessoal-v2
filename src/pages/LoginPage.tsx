@@ -392,24 +392,8 @@ export default function LoginPage() {
                         <>
                           <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-10 transition-opacity" />
                           <img src="https://www.gov.br/governodigital/pt-br/identidade-digital-gov.br/imagens/govbr-logo.png" alt="Gov.br" className="h-4 w-auto" />
-                          <span className="truncate">Gov.br</span>
+                          <span className="truncate font-bold">Gov.br</span>
                         </>
-                      )}
-                    </Button>
-                      variant="outline"
-                      className="h-11 rounded-lg font-body font-medium gap-2 border-[#004b82]/20 hover:bg-[#004b82]/5 text-[#004b82] text-xs px-2"
-                      onClick={handleGovBrSignIn}
-                      disabled={govBrLoading}
-                    >
-                      {govBrLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <div className="h-4 w-4 rounded-full bg-[#004b82] flex items-center justify-center p-0.5">
-                            <span className="text-[6px] text-white font-bold">gov</span>
-                          </div>
-                          Gov.br
-                        </div>
                       )}
                     </Button>
                   </div>
