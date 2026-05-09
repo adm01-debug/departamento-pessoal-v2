@@ -124,6 +124,39 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
           </div>
         </CardContent>
       </Card>
+
+      <Card className="border-destructive/20 bg-destructive/5 lg:col-span-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-display flex items-center gap-2 text-destructive">
+            <Gavel className="h-4 w-4" /> Monitor de Riscos Trabalhistas (Compliance CLT)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-3 bg-background rounded-xl border border-destructive/10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-destructive/10 text-destructive"><ShieldAlert className="h-5 w-5" /></div>
+                <div>
+                  <p className="text-xs font-bold">Violações de Interjornada</p>
+                  <p className="text-[10px] text-muted-foreground">Menos de 11h de descanso entre turnos</p>
+                </div>
+              </div>
+              <p className="text-2xl font-display font-bold text-destructive">{complianceStats.interjornadaViolations}</p>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-background rounded-xl border border-warning/10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-warning/10 text-warning"><Clock className="h-5 w-5" /></div>
+                <div>
+                  <p className="text-xs font-bold">Jornadas Excessivas</p>
+                  <p className="text-[10px] text-muted-foreground">Colaboradores com mais de 10h trabalhadas</p>
+                </div>
+              </div>
+              <p className="text-2xl font-display font-bold text-warning">{complianceStats.excessiveWorkdays}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
