@@ -108,90 +108,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="colaboradores" element={<LazyPage Component={ColaboradoresPage} />} />
-        <Route path="colaboradores/novo" element={<LazyPage Component={ColaboradorFormPage} />} />
-        <Route path="colaboradores/:id/editar" element={<LazyPage Component={ColaboradorFormPage} />} />
-        <Route path="colaboradores/:id/detalhes" element={<LazyPage Component={ColaboradorDetalhesPage} />} />
-        <Route path="empresas" element={<LazyPage Component={EmpresasPage} />} />
-        <Route path="empresas/nova" element={<LazyPage Component={EmpresaFormPage} />} />
-        <Route path="empresas/:id/editar" element={<LazyPage Component={EmpresaFormPage} />} />
-        <Route path="folha" element={<LazyPage Component={FolhaPage} />} />
-        <Route path="folha/calcular" element={<LazyPage Component={FolhaPagamentoPage} />} />
-        <Route path="folha/rubricas" element={<LazyPage Component={RubricasPage} />} />
-        <Route path="provisoes" element={<LazyPage Component={ProvisoesPage} />} />
-        <Route path="bancario" element={<LazyPage Component={FinanceiroBancarioPage} />} />
-        <Route path="contabilidade" element={<LazyPage Component={ContabilidadePage} />} />
-
-        <Route path="ferias" element={<LazyPage Component={FeriasPage} />} />
-        <Route path="ponto" element={<LazyPage Component={PontoPage} />} />
-        <Route path="ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
-        <Route path="beneficios" element={<LazyPage Component={BeneficiosPage} />} />
-        <Route path="beneficios/novo" element={<LazyPage Component={BeneficioFormPage} />} />
-        <Route path="relatorios" element={<LazyPage Component={RelatoriosPage} />} />
-        <Route path="esocial" element={<LazyPage Component={ESocialPage} />} />
-        <Route path="configuracoes" element={<LazyPage Component={ConfiguracoesPage} />} />
-        <Route path="admissoes" element={<LazyPage Component={AdmissoesPage} />} />
-        <Route path="afastamentos" element={<LazyPage Component={AfastamentosPage} />} />
-        <Route path="cargos" element={<LazyPage Component={CargosPage} />} />
-        <Route path="departamentos" element={<LazyPage Component={DepartamentosPage} />} />
-        <Route path="desligamentos" element={<LazyPage Component={DesligamentosPage} />} />
-        <Route path="documentos" element={<LazyPage Component={DocumentosPage} />} />
-        <Route path="auditoria" element={<AdminRoute><LazyPage Component={AuditoriaPage} /></AdminRoute>} />
-        <Route path="feriados" element={<LazyPage Component={FeriadosPage} />} />
-        <Route path="usuarios" element={<AdminRoute><LazyPage Component={UsuariosPage} /></AdminRoute>} />
-        <Route path="perfil" element={<LazyPage Component={PerfilPage} />} />
-        <Route path="notificacoes" element={<LazyPage Component={NotificacoesPage} />} />
-        <Route path="integracoes" element={<LazyPage Component={IntegracoesPage} />} />
-        <Route path="backup" element={<LazyPage Component={BackupPage} />} />
-        <Route path="organograma" element={<LazyPage Component={OrganogramaPage} />} />
-        <Route path="portal" element={<LazyPage Component={PortalPage} />} />
-        <Route path="avaliacao" element={<LazyPage Component={AvaliacaoPage} />} />
-        <Route path="treinamentos" element={<LazyPage Component={TreinamentosPage} />} />
-        <Route path="recrutamento" element={<LazyPage Component={RecrutamentoPage} />} />
-        <Route path="onboarding" element={<LazyPage Component={OnboardingPage} />} />
-        <Route path="assinaturas" element={<LazyPage Component={AssinaturasPage} />} />
-        <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
-        <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
-        <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
-        <Route path="pesquisas-clima" element={<LazyPage Component={PesquisasClimaPage} />} />
-        <Route path="workflows" element={<LazyPage Component={WorkflowsPage} />} />
-        <Route path="turnos" element={<LazyPage Component={TurnosPage} />} />
-        <Route path="comunicacao" element={<LazyPage Component={ComunicacaoInternaPage} />} />
-        <Route path="despesas" element={<LazyPage Component={DespesasPage} />} />
-        <Route path="controle-acesso" element={<AdminRoute><LazyPage Component={ControleAcessoPage} /></AdminRoute>} />
-        <Route path="lgpd" element={<AdminRoute><LazyPage Component={LGPDPage} /></AdminRoute>} />
-        <Route path="banco-horas" element={<LazyPage Component={BancoHorasPage} />} />
-        <Route path="epis" element={<LazyPage Component={EPIsPage} />} />
-        <Route path="faltas" element={<LazyPage Component={FaltasPage} />} />
-        <Route path="medidas-disciplinares" element={<LazyPage Component={MedidasDisciplinaresPage} />} />
-        <Route path="jornadas" element={<LazyPage Component={JornadasPage} />} />
-        <Route path="centros-custo" element={<LazyPage Component={CentrosCustoPage} />} />
-        <Route path="times" element={<LazyPage Component={TimesPage} />} />
-        <Route path="movimentacoes" element={<LazyPage Component={MovimentacoesPage} />} />
-        <Route path="sindicatos" element={<LazyPage Component={SindicatosPage} />} />
-        <Route path="obrigacoes-fiscais" element={<LazyPage Component={ObrigacoesFiscaisPage} />} />
-        <Route path="planos-saude" element={<LazyPage Component={PlanosSaudePage} />} />
-        <Route path="canal-etica" element={<LazyPage Component={CanalEticaPage} />} />
-        <Route path="convenios" element={<LazyPage Component={ConveniosPage} />} />
-        <Route path="escalas" element={<LazyPage Component={EscalasPage} />} />
-        <Route path="seguros-vida" element={<LazyPage Component={SegurosVidaPage} />} />
-        <Route path="pensoes" element={<LazyPage Component={PensoesPage} />} />
-        <Route path="vales" element={<LazyPage Component={ValesPage} />} />
-        <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
-        <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
-        <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
-        <Route path="assistente-ia" element={<LazyPage Component={AssistenteIAPage} />} />
-        <Route path="gerador-documentos" element={<LazyPage Component={GeradorDocumentosPage} />} />
-        <Route path="sst" element={<LazyPage Component={SSTPage} />} />
-        <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
-        <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
-        <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
-        <Route path="telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />
-        <Route path="seguranca" element={<AdminRoute><LazyPage Component={SegurancaPage} /></AdminRoute>} />
-        <Route path="*" element={<NotFoundPage />} />
+...
       </Route>
       {/* Public route - no auth required */}
       <Route path="/contratacao" element={<Suspense fallback={<PageLoader />}><ContratacaoPage /></Suspense>} />
