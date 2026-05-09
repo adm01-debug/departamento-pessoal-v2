@@ -17,7 +17,7 @@ export function FGTSDigitalDashboard() {
     setLoading(true);
     try {
       const competencia = format(new Date(), 'yyyy-MM');
-      const { data, error } = await lovable.functions.invoke('gerar-guias', {
+      const { data, error } = await supabase.functions.invoke('gerar-guias', {
         body: { 
           empresaId: empresaAtual.id, 
           competencia, 
