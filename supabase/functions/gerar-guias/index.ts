@@ -9,7 +9,7 @@ const corsHeaders = {
 interface GerarGuiasRequest {
   empresaId: string;
   competencia: string;
-  tipo: 'GPS' | 'DARF' | 'FGTS' | 'FGTS_DIGITAL' | 'TODAS';
+  tipo: 'GPS' | 'DARF' | 'FGTS' | 'FGTS_DIGITAL' | 'TODAS' | 'GFD';
 }
 
 const calcularINSS = (base: number): number => {
@@ -128,7 +128,7 @@ serve(async (req: Request): Promise<Response> => {
     }
     
     // FGTS Digital - Nova Guia GFD
-    if (tipo === 'FGTS_DIGITAL' || tipo === 'TODAS') {
+    if (tipo === 'FGTS_DIGITAL' || tipo === 'GFD' || tipo === 'TODAS') {
       guias.push({
         tipo: 'FGTS_DIGITAL',
         descricao: 'FGTS Digital - Guia GFD',

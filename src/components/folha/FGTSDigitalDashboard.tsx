@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { format } from 'date-fns';
 
 export function FGTSDigitalDashboard() {
@@ -17,12 +18,10 @@ export function FGTSDigitalDashboard() {
     setLoading(true);
     try {
       const competencia = format(new Date(), 'yyyy-MM');
-      const { data, error } = await supabase.functions.invoke('gerar-guias', {
-        body: { 
-          empresaId: empresaAtual.id, 
-          competencia, 
-          tipo: 'FGTS_DIGITAL' 
-        },
+      const { data, error } = await edgeFunctionsService.gerarGuias({
+        empresaId: empresaAtual.id,
+        competencia,
+        tipo: 'fgts_digital'
       });
       if (error) throw error;
       toast.success('Sincronizado com FGTS Digital via API Caixa!');
