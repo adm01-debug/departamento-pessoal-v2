@@ -7,13 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send, History, Clock } from 'lucide-react';
+import { Users, DollarSign, Calendar, TrendingUp, Cake, BarChart3, FileText, Loader2, Mail, Send } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
@@ -30,11 +28,101 @@ const relatorios = [
   { id: 'encargos', title: 'Encargos Sociais', description: 'Resumo INSS, FGTS, IRRF', icon: FileText, gradient: 'from-info to-primary' },
 ];
 
-async function fetchReportData(id: string) {
+async function fetchReportData(id: string, empresaId?: string) {
+  if (!empresaId) throw new Error('Selecione uma empresa');
+  
   switch (id) {
-    case 'colaboradores': { const { data, error } = await supabase.from('colaboradores').select('nome_completo, cpf, cargo, departamento, status, data_admissao, salario_base').eq('status', 'ativo').order('nome_completo'); if (error) throw error; return { title: 'Colaboradores Ativos', rows: data || [], columns: ['nome_completo', 'cpf', 'cargo', 'departamento', 'salario_base'] }; }
-    case 'folha': { const comp = new Date().toISOString().slice(0, 7); const { data, error } = await supabase.from('folhas_pagamento').select('*').eq('competencia', comp); if (error) throw error; return { title: `Folha ${comp}`, rows: data || [], columns: ['colaborador_id', 'competencia', 'total_proventos', 'total_descontos', 'total_liquido', 'status'] }; }
-    case 'aniversariantes': { const mes = new Date().getMonth() + 1; const { data, error } = await supabase.from('colaboradores').select('nome_completo, data_nascimento, departamento, cargo').eq('status', 'ativo'); if (error) throw error; return { title: `Aniversariantes - Mês ${mes}`, rows: (data || []).filter(c => c.data_nascimento && new Date(c.data_nascimento).getMonth() + 1 === mes), columns: ['nome_completo', 'data_nascimento', 'departamento', 'cargo'] }; }
+    case 'colaboradores': { 
+      const { data, error } = await supabase
+        .from('colaboradores')
+        .select('nome_completo, cpf, cargo, departamento, status, data_admissao, salario_base')
+        .eq('empresa_id', empresaId)
+        .eq('status', 'ativo')
+        .order('nome_completo'); 
+      if (error) throw error; 
+      return { 
+        title: 'Colaboradores Ativos', 
+        rows: data || [], 
+        columns: ['nome_completo', 'cpf', 'cargo', 'departamento', 'salario_base', 'data_admissao'] 
+      }; 
+    }
+    case 'folha': { 
+      const comp = new Date().toISOString().slice(0, 7); 
+      const { data, error } = await supabase
+        .from('folhas_pagamento')
+        .select('*')
+        .eq('empresa_id', empresaId)
+        .eq('competencia', comp); 
+      if (error) throw error; 
+      return { 
+        title: `Histórico de Folha - ${comp}`, 
+        rows: data || [], 
+        columns: ['competencia', 'tipo', 'total_proventos', 'total_descontos', 'total_liquido', 'status'] 
+      }; 
+    }
+    case 'ferias': {
+      const em30Dias = new Date();
+      em30Dias.setDate(em30Dias.getDate() + 30);
+      const { data, error } = await supabase
+        .from('ferias')
+        .select('*, colaborador:colaboradores(nome_completo, departamento)')
+        .eq('empresa_id', empresaId)
+        .gte('data_inicio', new Date().toISOString())
+        .lte('data_inicio', em30Dias.toISOString());
+      if (error) throw error;
+      return {
+        title: 'Férias Próximas (30 dias)',
+        rows: (data || []).map(f => ({
+          colaborador: (f.colaborador as any)?.nome_completo,
+          departamento: (f.colaborador as any)?.departamento,
+          inicio: f.data_inicio,
+          fim: f.data_fim,
+          status: f.status
+        })),
+        columns: ['colaborador', 'departamento', 'inicio', 'fim', 'status']
+      };
+    }
+    case 'aniversariantes': { 
+      const mes = new Date().getMonth() + 1; 
+      const { data, error } = await supabase
+        .from('colaboradores')
+        .select('nome_completo, data_nascimento, departamento, cargo')
+        .eq('empresa_id', empresaId)
+        .eq('status', 'ativo'); 
+      if (error) throw error; 
+      const rows = (data || []).filter(c => {
+        if (!c.data_nascimento) return false;
+        return new Date(c.data_nascimento).getUTCMonth() + 1 === mes;
+      });
+      return { 
+        title: `Aniversariantes do Mês`, 
+        rows: rows, 
+        columns: ['nome_completo', 'data_nascimento', 'departamento', 'cargo'] 
+      }; 
+    }
+    case 'turnover': {
+      const { data, error } = await supabase.from('vw_kpi_turnover' as any).select('*');
+      if (error) throw error;
+      return {
+        title: 'Análise de Turnover',
+        rows: data || [],
+        columns: ['competencia', 'taxa_turnover', 'admissoes', 'desligamentos']
+      };
+    }
+    case 'encargos': {
+      const comp = new Date().toISOString().slice(0, 7);
+      const { data, error } = await supabase
+        .from('folhas_pagamento')
+        .select('competencia, total_fgts, total_inss_patronal, total_liquido')
+        .eq('empresa_id', empresaId)
+        .eq('competencia', comp);
+      if (error) throw error;
+      return {
+        title: `Resumo de Encargos - ${comp}`,
+        rows: data || [],
+        columns: ['competencia', 'total_fgts', 'total_inss_patronal', 'total_liquido']
+      };
+    }
     default: return { title: 'Relatório', rows: [], columns: [] };
   }
 }
@@ -84,9 +172,13 @@ export default function RelatoriosPage() {
   });
 
   const handleExport = async (id: string) => { 
+    if (!empresaAtual?.id) {
+      toast.error('Selecione uma empresa');
+      return;
+    }
     setGenerating(id); 
     try { 
-      const r = await fetchReportData(id); 
+      const r = await fetchReportData(id, empresaAtual.id); 
       if (exportFormat === 'excel') {
         exportarExcel(r.title, r.rows, r.columns);
       } else if (exportFormat === 'pdf') {
@@ -94,13 +186,42 @@ export default function RelatoriosPage() {
       } else {
         exportCSV(r.title, r.rows, r.columns); 
       }
+
+      await supabase.from('audit_log').insert({
+        tabela: 'relatorios',
+        acao: 'EXPORTACAO',
+        registro_id: id,
+        dados_novos: { 
+          formato: exportFormat, 
+          titulo: r.title,
+          registros: r.rows.length 
+        }
+      });
     } catch (e: any) { 
       toast.error(`Erro: ${e.message}`); 
     } finally { 
       setGenerating(null); 
     } 
   };
-  const handleSendEmail = async () => { if (!emailDialog || !emailTo || !empresaAtual?.id) return; setSendingEmail(true); try { await edgeFunctionsService.enviarRelatorioEmail({ tipo: emailDialog, destinatarios: emailTo.split(',').map(e => e.trim()), empresaId: empresaAtual.id }); toast.success('Relatório enviado por email!'); setEmailDialog(null); setEmailTo(''); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setSendingEmail(false); } };
+
+  const handleSendEmail = async () => { 
+    if (!emailDialog || !emailTo || !empresaAtual?.id) return; 
+    setSendingEmail(true); 
+    try { 
+      await edgeFunctionsService.enviarRelatorioEmail({ 
+        tipo: emailDialog, 
+        destinatarios: emailTo.split(',').map(e => e.trim()), 
+        empresaId: empresaAtual.id 
+      }); 
+      toast.success('Relatório enviado por email!'); 
+      setEmailDialog(null); 
+      setEmailTo(''); 
+    } catch (e: any) { 
+      toast.error(`Erro: ${e.message}`); 
+    } finally { 
+      setSendingEmail(false); 
+    } 
+  };
 
   return (
     <>
