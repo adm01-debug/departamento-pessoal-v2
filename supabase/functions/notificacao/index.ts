@@ -16,11 +16,32 @@ serve(async (req) => {
     switch (action) {
       case 'enviar': {
         for (const dest of (destinatarios || [])) {
-          await supabase.from('notificacoes').insert({
+          // 1. In-app notification
+          const { data: notif, error: notifErr } = await supabase.from('notificacoes').insert({
             user_id: dest.user_id || null, empresa_id: empresaId || null,
             tipo: tipo || 'info', titulo: assunto || 'Notificação',
             mensagem: conteudo || '', lida: false,
-          });
+          }).select().single();
+
+          if (!notifErr && notif) {
+            // 2. Queue for real delivery (Email/Push Engine)
+            await supabase.from('fila_notificacoes').insert([
+              { 
+                user_id: dest.user_id, 
+                tipo: 'email', 
+                titulo: assunto, 
+                conteudo: conteudo,
+                metadados: { notification_id: notif.id } 
+              },
+              { 
+                user_id: dest.user_id, 
+                tipo: 'push', 
+                titulo: assunto, 
+                conteudo: conteudo,
+                metadados: { notification_id: notif.id } 
+              }
+            ]);
+          }
         }
         return new Response(JSON.stringify({ success: true, enviadas: destinatarios?.length || 0 }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
