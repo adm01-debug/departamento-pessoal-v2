@@ -604,11 +604,29 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 border-border/40 shadow-xl glass">
-                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" onClick={() => updateStatus.mutate({ id: item.id, status: 'concluido' })}>
+                              <DropdownMenuItem 
+                                className="rounded-lg gap-2 cursor-pointer focus:bg-primary/10 focus:text-primary" 
+                                onClick={() => {
+                                  if (item.source === 'ponto') {
+                                    responderSolicitacao.mutate({ id: item.id, status: 'aprovado' });
+                                  } else {
+                                    updateStatus.mutate({ id: item.id, status: 'concluido' });
+                                  }
+                                }}
+                              >
                                 <Check className="h-4 w-4" /> Aprovar / Concluir
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" onClick={() => updateStatus.mutate({ id: item.id, status: 'em_analise' })}>
-                                <Activity className="h-4 w-4" /> Marcar Revisão
+                              <DropdownMenuItem 
+                                className="rounded-lg gap-2 cursor-pointer focus:bg-warning/10 focus:text-warning" 
+                                onClick={() => {
+                                  if (item.source === 'ponto') {
+                                    responderSolicitacao.mutate({ id: item.id, status: 'recusado', observacoes: 'Necessita revisão.' });
+                                  } else {
+                                    updateStatus.mutate({ id: item.id, status: 'em_analise' });
+                                  }
+                                }}
+                              >
+                                <Activity className="h-4 w-4" /> {item.source === 'ponto' ? 'Recusar' : 'Marcar Revisão'}
                               </DropdownMenuItem>
                               <DropdownMenuItem className="rounded-lg gap-2 cursor-pointer">
                                 <Forward className="h-4 w-4" /> Encaminhar
