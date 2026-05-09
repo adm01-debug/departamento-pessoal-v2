@@ -6687,6 +6687,53 @@ export type Database = {
           },
         ]
       }
+      ferias_audit_log: {
+        Row: {
+          acao: string
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          empresa_id: string | null
+          entidade_id: string
+          entidade_tipo: string
+          id: string
+          metadata: Json | null
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          empresa_id?: string | null
+          entidade_id: string
+          entidade_tipo: string
+          id?: string
+          metadata?: Json | null
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          empresa_id?: string | null
+          entidade_id?: string
+          entidade_tipo?: string
+          id?: string
+          metadata?: Json | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_audit_log_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ferias_coletivas: {
         Row: {
           aprovado_por: string | null
