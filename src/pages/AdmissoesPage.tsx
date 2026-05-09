@@ -65,6 +65,24 @@ export default function AdmissoesPage() {
       setSendingLink(null);
     }
   };
+  
+  const handleEnviarWhatsApp = async (admissao: any) => {
+    if (!admissao.telefone) {
+      toast.error('Candidato sem telefone cadastrado');
+      return;
+    }
+    setSendingLink(admissao.id);
+    try {
+      // First generate/get token
+      const tokenData = await contratacaoService.enviarLinkCandidato(admissao.id, admissao.email || '');
+      await contratacaoService.enviarWhatsApp(admissao.id, admissao.telefone, tokenData.token);
+      toast.success('Link gerado para WhatsApp!');
+    } catch (error: any) {
+      toast.error('Erro ao gerar link: ' + error.message);
+    } finally {
+      setSendingLink(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     let result = admissoes || [];
