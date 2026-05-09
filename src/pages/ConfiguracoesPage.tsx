@@ -242,27 +242,89 @@ export default function ConfiguracoesPage() {
         </TabsContent>
 
         <TabsContent value="integracoes">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            {/* Quick Sync Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-elevated">
+                <div className="h-[2px] bg-[#00AEEF]" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-display">Bitrix24 CRM</CardTitle>
+                    <Badge variant="outline" className="text-success border-success/30 bg-success/5">Conectado</Badge>
+                  </div>
+                  <CardDescription className="text-xs">Sincronize sua base de talentos</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex flex-col gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="rounded-xl gap-2 font-body text-xs justify-start"
+                      onClick={async () => {
+                        try {
+                          await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
+                          toast.success('Sincronização Bitrix24 iniciada!');
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" /> Sincronizar Tudo agora
+                    </Button>
+                    <Button variant="ghost" size="sm" className="rounded-xl gap-2 font-body text-xs justify-start">
+                      <Settings className="h-3.5 w-3.5" /> Configurar Webhook
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-elevated opacity-60">
+                <div className="h-[2px] bg-[#FF3333]" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-display">RD Station</CardTitle>
+                    <Badge variant="secondary" className="text-[10px]">Em breve</Badge>
+                  </div>
+                  <CardDescription className="text-xs">Exportação de dados para marketing</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm" disabled className="w-full rounded-xl text-xs font-body">Conectar</Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-elevated opacity-60">
+                <div className="h-[2px] bg-[#4285F4]" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-display">Google Workspace</CardTitle>
+                    <Badge variant="secondary" className="text-[10px]">Em breve</Badge>
+                  </div>
+                  <CardDescription className="text-xs">Provisionamento de contas e e-mail</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm" disabled className="w-full rounded-xl text-xs font-body">Conectar</Button>
+                </CardContent>
+              </Card>
+            </div>
+
             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
               <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
               <CardHeader>
-                <CardTitle className="font-display flex items-center gap-2"><Plug className="h-5 w-5" /> Integrações</CardTitle>
-                <CardDescription className="font-body">Integrações configuradas no sistema</CardDescription>
+                <CardTitle className="font-display flex items-center gap-2"><Plug className="h-5 w-5" /> Todas as Integrações</CardTitle>
+                <CardDescription className="font-body text-xs">Histórico e status de conexões ativas</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 {loadInteg ? <div className="p-8 flex justify-center"><Spinner /></div> : (
                   <Table>
-                    <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead>Última Sync</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow className="bg-muted/30"><TableHead className="text-xs font-bold uppercase">Nome</TableHead><TableHead className="text-xs font-bold uppercase">Tipo</TableHead><TableHead className="text-xs font-bold uppercase">Status</TableHead><TableHead className="text-xs font-bold uppercase">Última Sync</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {integracoes.map((i: any) => (
-                        <TableRow key={i.id}>
-                          <TableCell className="font-medium">{i.nome}</TableCell>
-                          <TableCell className="text-muted-foreground">{i.tipo || '-'}</TableCell>
-                          <TableCell><Badge variant={i.ativo ? 'default' : 'secondary'} className="rounded-full">{i.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>
-                          <TableCell className="text-sm text-muted-foreground">{i.ultima_sync ? new Date(i.ultima_sync).toLocaleString('pt-BR') : '-'}</TableCell>
+                        <TableRow key={i.id} className="hover:bg-accent/30 transition-colors">
+                          <TableCell className="font-medium text-sm">{i.nome}</TableCell>
+                          <TableCell className="text-muted-foreground text-xs">{i.tipo || '-'}</TableCell>
+                          <TableCell><Badge variant={i.ativo ? 'default' : 'secondary'} className="rounded-full text-[10px]">{i.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>
+                          <TableCell className="text-[10px] text-muted-foreground font-mono">{i.ultima_sync ? new Date(i.ultima_sync).toLocaleString('pt-BR') : '-'}</TableCell>
                         </TableRow>
                       ))}
-                      {integracoes.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma integração configurada</TableCell></TableRow>}
+                      {integracoes.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8 font-body text-sm">Nenhuma integração personalizada configurada</TableCell></TableRow>}
                     </TableBody>
                   </Table>
                 )}
