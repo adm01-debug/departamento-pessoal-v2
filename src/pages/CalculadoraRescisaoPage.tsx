@@ -131,8 +131,27 @@ export default function CalculadoraRescisaoPage() {
         total_descontos: result.totalDescontos,
         total_liquido: result.totalLiquido,
         resultado: result as any,
-      });
-      if (error) throw error;
+      }).select().single();
+      
+      if (histError) throw histError;
+
+      // 2. Integration with Desligamentos Table
+      if (form.dataDesligamento) {
+        const { error: deslError } = await supabase.from('desligamentos').insert({
+          empresa_id: empresaAtual.id,
+          colaborador_id: colaboradores.find(c => c.nome_completo === form.nomeColaborador)?.id,
+          data_desligamento: form.dataDesligamento,
+          motivo: form.tipo.replace(/_/g, ' '),
+          valor_rescisao: result.totalLiquido,
+          status: 'pendente',
+          created_by: user.id
+        });
+        
+        if (!deslError) {
+          toast.success('Desligamento registrado no módulo de Pessoas!');
+        }
+      }
+
       toast.success('Cálculo salvo no histórico!');
     } catch (err: any) {
       toast.error(`Erro ao salvar: ${err.message}`);
