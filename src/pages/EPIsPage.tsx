@@ -161,7 +161,8 @@ export default function EPIsPage() {
                     <div className="space-y-3">
                       <div><Label>Nome *</Label><Input value={formEpi.nome} onChange={e => setFormEpi(p => ({ ...p, nome: e.target.value }))} placeholder="Ex.: Capacete de segurança" /></div>
                       <div><Label>Certificado de Aprovação (CA)</Label><Input value={formEpi.ca} onChange={e => setFormEpi(p => ({ ...p, ca: e.target.value }))} placeholder="Ex.: 12345" /></div>
-                      <div><Label>Validade (meses)</Label><Input type="number" min={1} value={formEpi.validade_meses} onChange={e => setFormEpi(p => ({ ...p, validade_meses: e.target.value }))} /></div>
+                      <div><Label>Vencimento do CA</Label><Input type="date" value={formEpi.ca_validade} onChange={e => setFormEpi(p => ({ ...p, ca_validade: e.target.value }))} /></div>
+                      <div><Label>Validade de Uso (meses)</Label><Input type="number" min={1} value={formEpi.validade_meses} onChange={e => setFormEpi(p => ({ ...p, validade_meses: e.target.value }))} /></div>
                       <div>
                         <Label>Categoria</Label>
                         <Select value={formEpi.categoria} onValueChange={v => setFormEpi(p => ({ ...p, categoria: v }))}>
