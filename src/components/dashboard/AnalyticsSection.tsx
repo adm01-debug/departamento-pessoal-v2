@@ -7,7 +7,7 @@ import {
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
-  Check, Eye, Forward, MoreHorizontal
+  Check, Eye, Forward, MoreHorizontal, History
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -26,6 +26,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { usePendencias, type Pendencia as DB_Pendencia } from '@/hooks/usePendencias';
+import { usePontoMelhorado, type SolicitacaoAjuste } from '@/hooks/usePontoMelhorado';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
