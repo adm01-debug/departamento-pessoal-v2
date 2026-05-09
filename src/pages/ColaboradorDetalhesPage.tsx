@@ -17,6 +17,7 @@ import {
   DependentesTab, EmergenciaTab, HistoricoSalarialTab, ExperienciaTab,
   ASOTab, FormacaoTab, EstrangeiroTab, PCDTab, AquisitivosTab, AnotacoesTab,
   ContasBancariasTab, DocumentosPessoaisTab, EstagiarioTab, HistoricoContratosTab,
+  ColaboradorHistory
 } from '@/components/colaborador-detalhes';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -144,6 +145,9 @@ export default function ColaboradorDetalhesPage() {
             <TabsTrigger value="documentos" className="rounded-lg font-body px-6 gap-2">
               <FileText className="h-4 w-4" /> Documentação
             </TabsTrigger>
+            <TabsTrigger value="historico" className="rounded-lg font-body px-6 gap-2">
+              <History className="h-4 w-4" /> Histórico
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="geral">
@@ -269,6 +273,10 @@ export default function ColaboradorDetalhesPage() {
               <TabsContent value="anotacoes"><AnotacoesTab colaboradorId={id!} /></TabsContent>
               <TabsContent value="estagiario"><EstagiarioTab colaboradorId={id!} /></TabsContent>
             </Tabs>
+          </TabsContent>
+
+          <TabsContent value="historico">
+            <ColaboradorHistory colaboradorId={id!} />
           </TabsContent>
         </Tabs>
       </PageLayout>

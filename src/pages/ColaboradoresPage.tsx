@@ -11,13 +11,15 @@ import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { colaboradorService } from '@/services';
-import { Eye, Edit, Users, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { Eye, Edit, Users, Download, FileSpreadsheet, FileText, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEmpresa } from '@/contexts';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
+import { useDepartamentos } from '@/hooks/useDepartamentos';
+import { useCargos } from '@/hooks/useCargos';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,9 +32,13 @@ const PAGE_SIZE = 25;
 export default function ColaboradoresPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [deptoFilter, setDeptoFilter] = useState('');
+  const [cargoFilter, setCargoFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const { empresaAtual } = useEmpresa();
+  const { departamentos } = useDepartamentos();
+  const { cargos } = useCargos();
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
 
@@ -60,11 +66,18 @@ export default function ColaboradoresPage() {
 
   const filtered = useMemo(() => {
     return colaboradores?.filter((c) => {
-      const matchSearch = !search || c.nome_completo.toLowerCase().includes(search.toLowerCase()) || c.cpf?.includes(search);
-      const matchStatus = !statusFilter || c.status === statusFilter;
-      return matchSearch && matchStatus;
+      const matchSearch = !search || 
+        c.nome_completo.toLowerCase().includes(search.toLowerCase()) || 
+        c.cpf?.includes(search) ||
+        c.email?.toLowerCase().includes(search.toLowerCase());
+      
+      const matchStatus = !statusFilter || statusFilter === 'all' || c.status === statusFilter;
+      const matchDepto = !deptoFilter || deptoFilter === 'all' || c.departamento === deptoFilter;
+      const matchCargo = !cargoFilter || cargoFilter === 'all' || c.cargo === cargoFilter;
+      
+      return matchSearch && matchStatus && matchDepto && matchCargo;
     }) || [];
-  }, [colaboradores, search, statusFilter]);
+  }, [colaboradores, search, statusFilter, deptoFilter, cargoFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -136,8 +149,19 @@ export default function ColaboradoresPage() {
       <DataTableToolbar
         search={search}
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Buscar por nome ou CPF..."
-        filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: handleStatusChange }]}
+        searchPlaceholder="Nome, CPF ou E-mail..."
+        filters={[
+          { key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: handleStatusChange },
+          { key: 'departamento', label: 'Departamento', options: departamentos.map(d => ({ value: d.nome, label: d.nome })), value: deptoFilter, onChange: (v) => { setDeptoFilter(v); setCurrentPage(1); } },
+          { key: 'cargo', label: 'Cargo', options: cargos.map(c => ({ value: c.nome, label: c.nome })), value: cargoFilter, onChange: (v) => { setCargoFilter(v); setCurrentPage(1); } }
+        ]}
+        onClearFilters={() => {
+          setStatusFilter('');
+          setDeptoFilter('');
+          setCargoFilter('');
+          setSearch('');
+          setCurrentPage(1);
+        }}
       />
 
       {isLoading ? (
