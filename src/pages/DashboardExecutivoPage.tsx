@@ -1,4 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
+import { useRealTimeSubscription } from '@/hooks/useRealTimeSubscription';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +16,16 @@ import { motion } from 'framer-motion';
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Calendar, Clock,
   ArrowUpRight, ArrowDownRight, Building2, Briefcase, Target, PieChart,
-  Download, RefreshCw, AlertTriangle, ShieldCheck, Gavel, Landmark, TrendingUp as TrendingIcon, Wallet
+  Download, RefreshCw, AlertTriangle, ShieldCheck, Gavel, Landmark, Wallet,
+  Activity, UserPlus
 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line, ScatterChart, Scatter } from 'recharts';
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Line } from 'recharts';
 import { useState, useMemo } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AnalyticsSection, EventTimeline } from '@/components/dashboard';
+import { useNavigate } from 'react-router-dom';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--warning))', 'hsl(var(--success))', 'hsl(var(--info))', 'hsl(var(--destructive))', 'hsl(var(--accent))'];
 
@@ -150,10 +154,17 @@ function useStrategicFinancials(empresaId?: string) {
 }
 
 export default function DashboardExecutivoPage() {
+  const navigate = useNavigate();
   const { empresaAtualId } = useEmpresas();
   const [periodo, setPeriodo] = useState('6');
   const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId, periodo);
   const { data: strategic, isLoading: isStrategicLoading } = useStrategicFinancials(empresaAtualId);
+
+  // Subscribe to real-time updates for KPIs
+  useRealTimeSubscription('colaboradores', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('folhas_pagamento', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('ferias', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('afastamentos', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
 
   const kpis = [
     { label: 'Headcount', value: data?.totalAtivos || 0, icon: Users, gradient: 'from-primary to-primary-glow', format: 'number' },
@@ -226,6 +237,7 @@ export default function DashboardExecutivoPage() {
           <TabsTrigger value="custos"><DollarSign className="mr-1 h-4 w-4" />Custos</TabsTrigger>
           <TabsTrigger value="estrutura"><Building2 className="mr-1 h-4 w-4" />Estrutura</TabsTrigger>
           <TabsTrigger value="estrategia"><ShieldCheck className="mr-1 h-4 w-4" />Estratégia & Orçamento</TabsTrigger>
+          <TabsTrigger value="analitico"><Activity className="mr-1 h-4 w-4" />Análise Detalhada</TabsTrigger>
         </TabsList>
 
         <TabsContent value="evolucao">
@@ -324,7 +336,7 @@ export default function DashboardExecutivoPage() {
             <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
               <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-sm font-display flex items-center gap-2">
-                  <TrendingIcon className="h-4 w-4 text-primary" /> Projeção de Fluxo de Caixa (Pessoal)
+                  <TrendingUp className="h-4 w-4 text-primary" /> Projeção de Fluxo de Caixa (Pessoal)
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -443,6 +455,55 @@ export default function DashboardExecutivoPage() {
                   </div>
                 </div>
               </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        <TabsContent value="analitico" className="space-y-6">
+          <AnalyticsSection 
+            stats={data ? {
+              headcount: data.totalAtivos,
+              admissoesMes: data.evolucao[data.evolucao.length - 1]?.admissoes || 0,
+              demissoesMes: data.evolucao[data.evolucao.length - 1]?.demissoes || 0,
+              turnover: data.turnover,
+              absenteismo: data.absenteismo,
+              departamentos: data.departamentos.map(d => ({ nome: d.nome, count: d.value }))
+            } : undefined}
+            pendencias={[
+              { tipo: 'ferias', icone: 'ferias', quantidade: data?.feriasPendentes || 0, descricao: 'Férias aguardando aprovação' },
+              { tipo: 'ponto', icone: 'ponto', quantidade: 0, descricao: 'Ajustes de ponto pendentes' },
+              { tipo: 'assinaturas', icone: 'assinaturas', quantidade: 0, descricao: 'Documentos para assinar' }
+            ]}
+            isLoadingStats={isLoading}
+            isLoadingPendencias={isLoading}
+            isEmptySystem={!data?.totalAtivos}
+            empresaId={empresaAtualId}
+          />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 border border-border/30 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-sm font-display flex items-center gap-2">
+                  <Clock className="h-4 w-4" /> Timeline de Auditoria (Real-time)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <EventTimeline empresaId={empresaAtualId} />
+              </CardContent>
+            </Card>
+            <Card className="border border-border/30 rounded-2xl">
+               <CardHeader>
+                 <CardTitle className="text-sm font-display">Ações Rápidas</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start rounded-xl" onClick={() => navigate('/colaboradores/novo')}>
+                    <UserPlus className="mr-2 h-4 w-4" /> Novo Colaborador
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start rounded-xl" onClick={() => navigate('/ferias')}>
+                    <Calendar className="mr-2 h-4 w-4" /> Gerenciar Férias
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start rounded-xl" onClick={() => navigate('/folha-pagamento')}>
+                    <DollarSign className="mr-2 h-4 w-4" /> Folha de Pagamento
+                  </Button>
+               </CardContent>
             </Card>
           </div>
         </TabsContent>
