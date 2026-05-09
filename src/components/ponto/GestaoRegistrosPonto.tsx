@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 
 export function GestaoRegistrosPonto() {
   const { empresaAtual } = useEmpresas();
+  const [selecionados, setSelecionados] = useState<string[]>([]);
   const [filtroData, setFiltroData] = useState(new Date().toISOString().split('T')[0]);
   const [filtroFim, setFiltroFim] = useState(new Date().toISOString().split('T')[0]);
   const [tipoExcecao, setTipoExcecao] = useState('todas');
