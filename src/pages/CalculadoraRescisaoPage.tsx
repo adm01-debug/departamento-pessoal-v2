@@ -8,17 +8,21 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Calculator, Download, Save, Shield, Loader2 } from 'lucide-react';
+import { Calculator, Download, Save, Shield, Loader2, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { calcularRescisao, fmt, type RescisaoResult } from '@/utils/rescisaoCalc';
 import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { useQuery } from '@tanstack/react-query';
 
 export default function CalculadoraRescisaoPage() {
   const { user } = useAuth();
+  const { empresaAtual } = useEmpresas();
+  const [loadingColab, setLoadingColab] = useState(false);
   const [form, setForm] = useState({
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
@@ -27,6 +31,40 @@ export default function CalculadoraRescisaoPage() {
   const [result, setResult] = useState<RescisaoResult | null>(null);
   const [saving, setSaving] = useState(false);
   const [calcServidor, setCalcServidor] = useState(false);
+
+  const handleSelectColaborador = async (id: string) => {
+    if (!id) return;
+    setLoadingColab(true);
+    try {
+      const { data, error } = await supabase.from('colaboradores').select('*').eq('id', id).single();
+      if (error) throw error;
+      setForm(p => ({
+        ...p,
+        nomeColaborador: data.nome_completo,
+        cpf: data.cpf || '',
+        cargo: data.cargo || '',
+        salario: data.salario_base?.toString() || '',
+        dataAdmissao: data.data_admissao || '',
+        saldoFGTS: (data as any).saldo_fgts_estimado?.toString() || '',
+      }));
+      toast.success('Dados do colaborador importados!');
+    } catch (err: any) {
+      toast.error('Erro ao buscar colaborador');
+    } finally {
+      setLoadingColab(false);
+    }
+  };
+
+  const { data: colaboradores = [] } = useQuery({
+    queryKey: ['colaboradores-select', empresaAtual?.id],
+    queryFn: async () => {
+      if (!empresaAtual?.id) return [];
+      const { data, error } = await supabase.from('colaboradores').select('id, nome_completo').eq('empresa_id', empresaAtual.id).eq('status', 'ativo').order('nome_completo');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id
+  });
 
   const handleCalcServidor = async () => {
     if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
@@ -118,6 +156,16 @@ export default function CalculadoraRescisaoPage() {
             <CardDescription className="font-body text-xs">Preencha os dados para calcular as verbas rescisórias</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="font-body text-xs">Importar Colaborador Ativo</Label>
+              <Select onValueChange={handleSelectColaborador} disabled={loadingColab}>
+                <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione para preencher automaticamente" /></SelectTrigger>
+                <SelectContent>
+                  {colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="font-body text-xs">Nome do Colaborador</Label><Input value={form.nomeColaborador} onChange={e => set('nomeColaborador', e.target.value)} className="rounded-xl" placeholder="Nome completo" /></div>
               <div><Label className="font-body text-xs">CPF</Label><Input value={form.cpf} onChange={e => set('cpf', e.target.value)} className="rounded-xl" placeholder="000.000.000-00" /></div>

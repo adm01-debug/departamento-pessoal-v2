@@ -88,18 +88,19 @@ export default function ConfiguracoesPage() {
     >
       <Tabs defaultValue="geral" className="space-y-4">
         <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30">
-          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Geral</TabsTrigger>
+          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Preferências</TabsTrigger>
+          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Empresa</TabsTrigger>
           <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Folha</TabsTrigger>
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
-          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Bell className="mr-1 h-3 w-3" />Alertas</TabsTrigger>
-          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Shield className="mr-1 h-3 w-3" />Segurança</TabsTrigger>
-          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Layers className="mr-1 h-3 w-3" />Campos</TabsTrigger>
-          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ShieldBan className="mr-1 h-3 w-3" />IPs</TabsTrigger>
-          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Plug className="mr-1 h-3 w-3" />Integrações</TabsTrigger>
-          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Webhook className="mr-1 h-3 w-3" />Webhooks</TabsTrigger>
-          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><ScrollText className="mr-1 h-3 w-3" />Logs Integ.</TabsTrigger>
-          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Database className="mr-1 h-3 w-3" />Config BD</TabsTrigger>
+          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Alertas</TabsTrigger>
+          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Segurança</TabsTrigger>
+          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Campos</TabsTrigger>
+          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">IPs</TabsTrigger>
+          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Integ.</TabsTrigger>
+          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Webhooks</TabsTrigger>
+          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Logs</TabsTrigger>
+          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">BD</TabsTrigger>
           <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
         </TabsList>
 
@@ -299,6 +300,40 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="config-bd">
           <ConfiguracoesGeraisTab />
+        </TabsContent>
+        <TabsContent value="empresa">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+                <CardHeader>
+                   <CardTitle className="font-display">Dados da Empresa</CardTitle>
+                   <CardDescription>Informações cadastrais e fiscais da organização ativa</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                         <Label>Razão Social</Label>
+                         <Input defaultValue="Empresa Exemplo LTDA" />
+                      </div>
+                      <div className="space-y-2">
+                         <Label>CNPJ</Label>
+                         <Input defaultValue="00.000.000/0001-00" />
+                      </div>
+                      <div className="space-y-2">
+                         <Label>Inscrição Estadual</Label>
+                         <Input defaultValue="Isento" />
+                      </div>
+                      <div className="space-y-2">
+                         <Label>CNAE Principal</Label>
+                         <Input defaultValue="7020-4/00" />
+                      </div>
+                   </div>
+                   <div className="pt-4">
+                      <Button className="rounded-xl shadow-glow">Salvar Alterações</Button>
+                   </div>
+                </CardContent>
+             </Card>
+          </motion.div>
         </TabsContent>
       </Tabs>
     </PageLayout>

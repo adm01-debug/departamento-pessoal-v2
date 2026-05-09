@@ -49,9 +49,9 @@ function useMorningBriefing() {
         supabase.from('ferias').select('data_inicio, data_fim, colaboradores!fk_ferias_colaborador(nome_completo)').in('status', ['aprovada', 'em_andamento']).lte('data_inicio', hojeStr).gte('data_fim', hojeStr),
         supabase.from('afastamentos').select('tipo, colaboradores!afastamentos_colaborador_id_fkey(nome_completo)').eq('status', 'ativo').lte('data_inicio', hojeStr).gte('data_fim_prevista', hojeStr),
         supabase.from('admissoes').select('nome, cargo').eq('data_prevista', hojeStr),
-        supabase.from('asos').select('data_validade, tipo, colaboradores!asos_colaborador_id_fkey(nome_completo)').gte('data_validade', hojeStr).lte('data_validade', em7Dias),
+        supabase.from('exames').select('data_validade, tipo, colaboradores!exames_colaborador_id_fkey(nome_completo)').gte('data_validade', hojeStr).lte('data_validade', em7Dias),
         supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
-        supabase.from('registros_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
+        supabase.from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
       ]);
 
       const aniversariantes = (colabs || [])
@@ -67,8 +67,8 @@ function useMorningBriefing() {
       const afastadosHoje = (afastData || []).map((a: any) => ({ nome: a.colaboradores?.nome_completo || 'Colaborador', tipo: a.tipo }));
       const admissoesHoje = (admData || []).map(a => ({ nome: a.nome, cargo: a.cargo }));
       const vencimentosHoje = (asoData || []).map((a: any) => ({
-        descricao: `ASO ${a.tipo} de ${a.colaboradores?.nome_completo || 'Colaborador'} - ${format(parseISO(a.data_validade), 'dd/MM')}`,
-        tipo: 'aso',
+        descricao: `Exame ${a.tipo} de ${a.colaboradores?.nome_completo || 'Colaborador'} - ${format(parseISO(a.data_validade), 'dd/MM')}`,
+        tipo: 'exame',
       }));
 
       return {
@@ -204,7 +204,7 @@ export function MorningBriefing() {
           />
           <BriefingItem
             icon={FileText}
-            label={`ASOs vencendo em 7 dias`}
+            label={`Exames vencendo em 7 dias`}
             count={data.vencimentosHoje.length}
             gradient="from-warning to-warning/70"
             onClick={() => navigate('/exames')}

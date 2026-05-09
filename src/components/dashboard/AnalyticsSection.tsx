@@ -1,11 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp, Activity, Timer, PieChart,
   AlertCircle, UserPlus, UserMinus, Briefcase,
-  CheckCircle2, AlertTriangle, Calendar, ChevronRight
+  CheckCircle2, AlertTriangle, Calendar, ChevronRight,
+  TrendingDown, Minus
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
 import { BarChartWidget } from './BarChartWidget';
 import { DonutChart } from './DonutChart';
@@ -120,6 +123,7 @@ function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: numb
 
 /* ─── Alertas RH Widget ─── */
 function AlertasRHWidget() {
+  const navigate = useNavigate();
   const { data: alertas = [], isLoading } = useQuery({
     queryKey: ['vw-alertas-rh'],
     queryFn: () => viewsService.alertasRH(),
@@ -135,13 +139,28 @@ function AlertasRHWidget() {
   );
 
   return (
-    <div className="space-y-2 max-h-48 overflow-y-auto">
-      {alertas.slice(0, 5).map((a: any, i: number) => (
-        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm">
-          <AlertTriangle className="h-4 w-4 text-warning shrink-0" />
-          <span className="flex-1 truncate text-body font-body">{a.descricao || a.tipo || 'Alerta'}</span>
-          {a.prioridade && <Badge variant="outline" className="text-[10px]">{a.prioridade}</Badge>}
-        </div>
+    <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+      {alertas.slice(0, 8).map((a: any, i: number) => (
+        <motion.div 
+          key={i} 
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: i * 0.05 }}
+          onClick={() => navigate('/relatorios')}
+          className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm hover:border-primary/20 cursor-pointer group transition-all"
+        >
+          <div className={cn(
+            "p-1.5 rounded-lg shrink-0",
+            a.prioridade === 'alta' ? "bg-destructive/10 text-destructive" : 
+            a.prioridade === 'media' ? "bg-warning/10 text-warning" : "bg-info/10 text-info"
+          )}>
+            <AlertTriangle className="h-3.5 w-3.5" />
+          </div>
+          <span className="flex-1 truncate text-body font-body text-xs font-medium">{a.descricao || a.tipo || 'Alerta de sistema'}</span>
+          <Badge variant="outline" className="text-[9px] uppercase font-bold tracking-tight opacity-70">
+            {a.prioridade || 'Normal'}
+          </Badge>
+        </motion.div>
       ))}
     </div>
   );
@@ -149,6 +168,7 @@ function AlertasRHWidget() {
 
 /* ─── Cadastro Incompleto Widget ─── */
 function CadastroIncompletoWidget() {
+  const navigate = useNavigate();
   const { data: incompletos = [], isLoading } = useQuery({
     queryKey: ['vw-cadastro-incompleto'],
     queryFn: () => viewsService.cadastroIncompleto(),
@@ -164,13 +184,25 @@ function CadastroIncompletoWidget() {
   );
 
   return (
-    <div className="space-y-2 max-h-48 overflow-y-auto">
-      {incompletos.slice(0, 5).map((c: any, i: number) => (
-        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm">
-          <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
-          <span className="flex-1 truncate font-body">{c.nome_completo || 'Colaborador'}</span>
-          <span className="text-[10px] text-muted-foreground">{c.campos_faltantes || ''}</span>
-        </div>
+    <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+      {incompletos.slice(0, 8).map((c: any, i: number) => (
+        <motion.div 
+          key={i} 
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: i * 0.05 }}
+          onClick={() => navigate(`/colaboradores/${c.id}/editar`)}
+          className="flex items-center gap-3 p-2.5 rounded-xl glass text-sm hover:border-destructive/20 cursor-pointer group transition-all"
+        >
+          <div className="p-1.5 rounded-lg bg-destructive/10 text-destructive shrink-0 group-hover:bg-destructive group-hover:text-white transition-colors">
+            <AlertCircle className="h-3.5 w-3.5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-xs font-semibold font-display">{c.nome_completo || 'Colaborador'}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{c.campos_faltantes || 'Dados pendentes'}</p>
+          </div>
+          <ChevronRight className="h-3 w-3 text-muted-foreground opacity-30 group-hover:opacity-100 transition-opacity" />
+        </motion.div>
       ))}
     </div>
   );
@@ -193,19 +225,23 @@ interface AnalyticsSectionProps {
 }
 
 export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingPendencias, isEmptySystem }: AnalyticsSectionProps) {
+  const navigate = useNavigate();
   return (
     <>
       {/* Row 1: 3-col analytics */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-          <CardHeader className="pb-3">
+          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-primary/20 transition-all">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary-glow">
                 <TrendingUp className="h-4 w-4 text-primary-foreground" />
               </div>
               Evolução Headcount
             </CardTitle>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/relatorios')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+               <ChevronRight className="h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent>
             {isEmptySystem ? (
@@ -214,33 +250,45 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                 <p className="text-caption text-muted-foreground font-body">Cadastre colaboradores para visualizar</p>
               </div>
             ) : (
-              <BarChartWidget data={[{ label: 'Atual', value: stats?.headcount || 0, color: 'bg-gradient-to-t from-primary to-primary-glow' }]} height={140} />
+              <BarChartWidget 
+                data={[
+                  { label: 'Headcount', value: stats?.headcount || 0, color: 'bg-gradient-to-t from-primary to-primary-glow' },
+                  { label: 'Novos', value: stats?.admissoesMes || 0, color: 'bg-gradient-to-t from-success to-success/70' }
+                ]} 
+                height={140} 
+              />
             )}
           </CardContent>
         </MotionCard>
 
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-          <CardHeader className="pb-3">
+          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-warning/20 transition-all">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/80 to-primary">
-                <Activity className="h-4 w-4 text-primary-foreground" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-warning to-warning/70">
+                <Activity className="h-4 w-4 text-white" />
               </div>
-              Eventos Recentes
+              Alertas de RH
             </CardTitle>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/relatorios')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+               <ChevronRight className="h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent><AlertasRHWidget /></CardContent>
         </MotionCard>
 
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-          <CardHeader className="pb-3">
+          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-destructive/20 transition-all">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/60 to-primary/90">
-                <Timer className="h-4 w-4 text-primary-foreground" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-destructive to-destructive/70">
+                <Timer className="h-4 w-4 text-white" />
               </div>
-              Cadastros Incompletos
+              Integridade Cadastral
             </CardTitle>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/colaboradores')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+               <ChevronRight className="h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent><CadastroIncompletoWidget /></CardContent>
         </MotionCard>

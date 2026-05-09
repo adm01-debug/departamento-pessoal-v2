@@ -58,6 +58,9 @@ function useDashboardStats(enabled: boolean) {
         { count: admissoesMes },
         { count: demissoesMes },
         { data: deptData },
+        { data: viewTurnover },
+        { data: viewAbsenteismo },
+        { data: viewPonto },
       ] = await Promise.all([
         supabase.from("colaboradores").select("*", { count: "exact", head: true }).eq("status", "ativo"),
         supabase.from("folhas_pagamento").select("total_liquido").eq("competencia", mesAtual),
@@ -66,6 +69,9 @@ function useDashboardStats(enabled: boolean) {
         supabase.from("admissoes").select("*", { count: "exact", head: true }).gte("data_prevista", inicioMes),
         supabase.from("desligamentos").select("*", { count: "exact", head: true }).gte("data_desligamento", inicioMes),
         supabase.from("colaboradores").select("departamento").eq("status", "ativo"),
+        supabase.from("vw_kpi_turnover" as any).select("*"),
+        supabase.from("vw_kpi_absenteismo" as any).select("*"),
+        supabase.from("vw_kpi_ponto_resumo" as any).select("*"),
       ]);
 
       const folhaMensal = folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
@@ -76,16 +82,25 @@ function useDashboardStats(enabled: boolean) {
       }, 0) || 0;
 
       const deptMap: Record<string, number> = {};
-      deptData?.forEach(c => { deptMap[c.departamento] = (deptMap[c.departamento] || 0) + 1; });
-      const departamentos = Object.entries(deptMap).map(([nome, count]) => ({ nome, count })).sort((a, b) => b.count - a.count).slice(0, 6);
+      deptData?.forEach(c => { 
+        const dept = c.departamento || "Sem Depto";
+        deptMap[dept] = (deptMap[dept] || 0) + 1; 
+      });
+      const departamentos = Object.entries(deptMap)
+        .map(([nome, count]) => ({ nome, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+
+      const turnoverVal = (viewTurnover as any)?.[0]?.taxa_turnover ?? ((demissoesMes || 0) / (colaboradoresAtivos || 1)) * 100;
+      const absenteismoVal = (viewAbsenteismo as any)?.[0]?.taxa_absenteismo ?? 0;
 
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
         folhaMensal,
         feriasPendentes: feriasPendentes || 0,
         bancoHoras: Math.round(bancoHoras / 60),
-        turnover: colaboradoresAtivos ? ((demissoesMes || 0) / colaboradoresAtivos) * 100 : 0,
-        absenteismo: colaboradoresAtivos ? ((demissoesMes || 0) + (admissoesMes || 0)) / colaboradoresAtivos * 100 : 0,
+        turnover: Number(turnoverVal),
+        absenteismo: Number(absenteismoVal),
         headcount: colaboradoresAtivos || 0,
         admissoesMes: admissoesMes || 0,
         demissoesMes: demissoesMes || 0,

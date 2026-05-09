@@ -10,7 +10,7 @@ const TABLE_LABELS: Record<string, string> = {
   afastamentos: '🏥 Atualização de afastamento',
   notificacoes: '🔔 Nova notificação',
   colaboradores: '👤 Atualização de colaborador',
-  registros_ponto: '⏰ Novo registro de ponto',
+  batidas_ponto: '⏰ Novo registro de ponto',
   comunicados: '📢 Novo comunicado',
   folhas_pagamento: '💰 Folha atualizada',
   beneficios: '🎁 Benefício atualizado',
@@ -62,7 +62,7 @@ export function useRealtimeDashboard() {
         queryClient.invalidateQueries({ queryKey: ['executive-kpis'] });
         toast.info(TABLE_LABELS.colaboradores);
       })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'registros_ponto' }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'batidas_ponto' }, () => {
         queryClient.invalidateQueries({ queryKey: ['morning-briefing'] });
         queryClient.invalidateQueries({ queryKey: ['portal-completo'] });
       })
