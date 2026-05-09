@@ -87,11 +87,22 @@ export function PontoAdjustmentRequests() {
     <>
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
         <div className="h-[2px] bg-gradient-to-r from-warning to-warning-glow" />
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="font-display flex items-center gap-2">
-            <Clock className="h-4 w-4 text-warning" /> Solicitações de Ajuste
-          </CardTitle>
-          <Badge variant="outline" className="text-[10px]">{solicitacoes.filter((s:any) => s.status === 'pendente').length} Pendentes</Badge>
+        <CardHeader className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <CardTitle className="font-display flex items-center gap-2">
+              <Clock className="h-4 w-4 text-warning" /> Solicitações de Ajuste
+            </CardTitle>
+            <Badge variant="outline" className="text-[10px]">{solicitacoes.filter((s:any) => s.status === 'pendente').length} Pendentes</Badge>
+          </div>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input 
+              placeholder="Buscar colaborador..." 
+              className="pl-8 h-8 text-xs" 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
