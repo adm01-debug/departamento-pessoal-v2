@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { format } from 'date-fns';
 
 export function FGTSDigitalDashboard() {

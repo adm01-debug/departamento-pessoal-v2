@@ -382,6 +382,21 @@ export default function LoginPage() {
                     <Button
                       type="button"
                       variant="outline"
+                      className="h-11 rounded-lg font-body font-medium gap-2 border-border/50 hover:bg-accent/50 text-xs px-2 overflow-hidden group relative"
+                      onClick={handleGovBrSignIn}
+                      disabled={govBrLoading}
+                    >
+                      {govBrLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-10 transition-opacity" />
+                          <img src="https://www.gov.br/governodigital/pt-br/identidade-digital-gov.br/imagens/govbr-logo.png" alt="Gov.br" className="h-4 w-auto" />
+                          <span className="truncate">Gov.br</span>
+                        </>
+                      )}
+                    </Button>
+                      variant="outline"
                       className="h-11 rounded-lg font-body font-medium gap-2 border-[#004b82]/20 hover:bg-[#004b82]/5 text-[#004b82] text-xs px-2"
                       onClick={handleGovBrSignIn}
                       disabled={govBrLoading}
