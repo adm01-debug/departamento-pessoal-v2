@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { documentoService } from '@/services';
+import { documentoService, colaboradorService } from '@/services';
 import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
