@@ -10719,6 +10719,81 @@ export type Database = {
           },
         ]
       }
+      provisao_auditoria: {
+        Row: {
+          created_at: string | null
+          id: string
+          motivo: string | null
+          provisao_id: string
+          usuario_id: string | null
+          valor_anterior: number | null
+          valor_novo: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          motivo?: string | null
+          provisao_id: string
+          usuario_id?: string | null
+          valor_anterior?: number | null
+          valor_novo?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          motivo?: string | null
+          provisao_id?: string
+          usuario_id?: string | null
+          valor_anterior?: number | null
+          valor_novo?: number | null
+        }
+        Relationships: []
+      }
+      provisao_logs: {
+        Row: {
+          competencia: string
+          created_at: string | null
+          duracao_ms: number | null
+          empresa_id: string
+          erro_mensagem: string | null
+          id: string
+          metadados: Json | null
+          status: string
+          tipo_calculo: string | null
+          total_colaboradores: number | null
+          usuario_id: string | null
+          valor_total_provisionado: number | null
+        }
+        Insert: {
+          competencia: string
+          created_at?: string | null
+          duracao_ms?: number | null
+          empresa_id: string
+          erro_mensagem?: string | null
+          id?: string
+          metadados?: Json | null
+          status: string
+          tipo_calculo?: string | null
+          total_colaboradores?: number | null
+          usuario_id?: string | null
+          valor_total_provisionado?: number | null
+        }
+        Update: {
+          competencia?: string
+          created_at?: string | null
+          duracao_ms?: number | null
+          empresa_id?: string
+          erro_mensagem?: string | null
+          id?: string
+          metadados?: Json | null
+          status?: string
+          tipo_calculo?: string | null
+          total_colaboradores?: number | null
+          usuario_id?: string | null
+          valor_total_provisionado?: number | null
+        }
+        Relationships: []
+      }
       provisoes_mensais: {
         Row: {
           colaborador_id: string
@@ -10728,6 +10803,7 @@ export type Database = {
           encargos_fgts: number
           encargos_inss: number
           id: string
+          log_id: string | null
           tipo: string
           total: number | null
           updated_at: string
@@ -10741,6 +10817,7 @@ export type Database = {
           encargos_fgts?: number
           encargos_inss?: number
           id?: string
+          log_id?: string | null
           tipo: string
           total?: number | null
           updated_at?: string
@@ -10754,6 +10831,7 @@ export type Database = {
           encargos_fgts?: number
           encargos_inss?: number
           id?: string
+          log_id?: string | null
           tipo?: string
           total?: number | null
           updated_at?: string
@@ -10786,6 +10864,13 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_mensais_log_id_fkey"
+            columns: ["log_id"]
+            isOneToOne: false
+            referencedRelation: "provisao_logs"
             referencedColumns: ["id"]
           },
         ]
