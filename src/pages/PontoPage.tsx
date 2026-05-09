@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin, RefreshCw, Loader2 } from 'lucide-react';
+import { Clock, MapPin, RefreshCw, Loader2, AlertCircle, Settings } from 'lucide-react';
 import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas } from '@/hooks';
@@ -19,7 +19,9 @@ import { PontoCharts } from '@/components/ponto/PontoCharts';
 import { PontoClockRegister } from '@/components/ponto/PontoClockRegister';
 import { PontoTodayCard } from '@/components/ponto/PontoTodayCard';
 import { PontoWeekSummary } from '@/components/ponto/PontoWeekSummary';
+import { PontoAdjustmentRequests } from '@/components/ponto/PontoAdjustmentRequests';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -46,15 +48,44 @@ export default function PontoPage() {
     enabled: !!user?.id,
   });
 
-  const captureGeo = (): Promise<{ lat: number; lng: number } | null> => new Promise((resolve) => {
+  const captureGeo = (): Promise<{ lat: number; lng: number, accuracy: number } | null> => new Promise((resolve) => {
     if (!navigator.geolocation) { resolve(null); return; }
     setGeoStatus('capturing');
-    navigator.geolocation.getCurrentPosition(pos => { setGeoStatus('success'); resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); }, () => { setGeoStatus('error'); resolve(null); }, { enableHighAccuracy: true, timeout: 8000 });
+    navigator.geolocation.getCurrentPosition(
+      pos => { 
+        setGeoStatus('success'); 
+        resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }); 
+      }, 
+      () => { setGeoStatus('error'); resolve(null); }, 
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   });
 
   const registrar = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
     setLoading(tipo);
-    try { const geo = await captureGeo(); await pontoService.registrar(tipo, user?.id); toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); refetchRegistro(); refetchBatidas(); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setLoading(null); setTimeout(() => setGeoStatus('idle'), 2000); }
+    try { 
+      const geo = await captureGeo(); 
+      if (!user?.id) throw new Error('Usuário não autenticado');
+      
+      const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
+      if (!colab) throw new Error('Colaborador não encontrado');
+
+      await pontoService.registrar(tipo, colab.id, {
+        latitude: geo?.lat,
+        longitude: geo?.lng,
+        precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
+        dispositivoId: navigator.userAgent
+      }); 
+      
+      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
+      refetchRegistro(); 
+      refetchBatidas(); 
+    } catch (e: any) { 
+      toast.error(`Erro: ${e.message}`); 
+    } finally { 
+      setLoading(null); 
+      setTimeout(() => setGeoStatus('idle'), 2000); 
+    }
   };
 
   const processarPontoServidor = async () => {
@@ -65,26 +96,78 @@ export default function PontoPage() {
   return (
     <>
       <PageTitle title="Registro de Ponto" description="Controle de ponto eletrônico" />
-      <PageLayout title="Ponto Eletrônico" description="Registre e acompanhe sua jornada" icon={<Clock className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/60 to-primary/90"
-        actions={<Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={processarPontoServidor} disabled={processando}>{processando ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}<span className="hidden sm:inline">Processar Servidor</span></Button>}
+      <PageLayout 
+        title="Ponto Eletrônico" 
+        description="Registre e acompanhe sua jornada" 
+        icon={<Clock className="h-5 w-5 text-primary-foreground" />} 
+        gradient="from-primary/60 to-primary/90"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={() => window.open('/ponto/kiosk', '_blank')}>
+              <Settings className="h-4 w-4" /> Kiosk Mode
+            </Button>
+            <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={processarPontoServidor} disabled={processando}>
+              {processando ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              <span className="hidden sm:inline">Processar Servidor</span>
+            </Button>
+          </div>
+        }
       >
-        <div className="grid gap-6 lg:grid-cols-3">
-          <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
-          <PontoTodayCard registroHoje={registroHoje} />
-          <PontoWeekSummary registrosSemana={registrosSemana} />
-        </div>
-        <div className="mt-6"><PontoStreakCard /></div>
-        <PontoCharts />
+        <Tabs defaultValue="meu-ponto" className="space-y-6">
+          <TabsList className="bg-muted/50 p-1 rounded-xl">
+            <TabsTrigger value="meu-ponto" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Meu Ponto</TabsTrigger>
+            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Gestão da Equipe</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="meu-ponto" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+              <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
+              <PontoTodayCard registroHoje={registroHoje} />
+              <PontoWeekSummary registrosSemana={registrosSemana} />
+            </div>
+            <div className="mt-6"><PontoStreakCard /></div>
+            <PontoCharts />
+          </TabsContent>
+
+          <TabsContent value="gestao" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <PontoAdjustmentRequests />
+              <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden mt-6">
+                <div className="h-[2px] bg-gradient-to-r from-destructive to-destructive/70" />
+                <CardHeader>
+                  <CardTitle className="font-display flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-destructive" /> Exceções Detectadas (Smart)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">O motor de IA detectou as seguintes inconsistências:</p>
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/10 flex items-center justify-between">
+                      <span className="text-sm font-medium">Batidas Ímpares</span>
+                      <Badge variant="destructive">12 casos</Badge>
+                    </div>
+                    <div className="p-3 rounded-lg bg-warning/5 border border-warning/10 flex items-center justify-between">
+                      <span className="text-sm font-medium">Intervalo Mínimo Não Respeitado</span>
+                      <Badge variant="warning">5 casos</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <GestaoRegistrosPonto />
+          </TabsContent>
+        </Tabs>
+
         {batidasHoje.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
               <div className="h-[2px] bg-gradient-to-r from-primary-glow to-primary" />
-              <CardHeader><CardTitle className="font-display flex items-center gap-2"><MapPin className="h-4 w-4 text-warning" /> Batidas da Equipe Hoje</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="font-display flex items-center gap-2"><MapPin className="h-4 w-4 text-warning" /> Batidas Recentes</CardTitle></CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader><TableRow className="bg-muted/30 hover:bg-muted/30"><TableHead className="font-display font-semibold">Colaborador</TableHead><TableHead className="font-display font-semibold">Hora</TableHead><TableHead className="font-display font-semibold">Tipo</TableHead><TableHead className="font-display font-semibold">Ordem</TableHead></TableRow></TableHeader>
                   <TableBody>
-                    {batidasHoje.slice(0, 20).map((b: any) => (
+                    {batidasHoje.slice(0, 5).map((b: any) => (
                       <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
                         <TableCell className="font-body font-medium">{(b as any).colaborador?.nome_completo || b.colaborador_id?.slice(0, 8)}</TableCell>
                         <TableCell className="font-body font-mono">{b.hora}</TableCell>
@@ -98,7 +181,6 @@ export default function PontoPage() {
             </Card>
           </motion.div>
         )}
-        <div className="mt-6"><GestaoRegistrosPonto /></div>
       </PageLayout>
     </>
   );

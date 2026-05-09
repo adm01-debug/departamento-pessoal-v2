@@ -966,7 +966,9 @@ export type Database = {
           created_at: string | null
           data: string
           dentro_raio: boolean | null
+          dispositivo_id: string | null
           empresa_id: string | null
+          hash_digital: string | null
           hora: string
           id: string
           ip_address: string | null
@@ -976,8 +978,10 @@ export type Database = {
           ordem: number
           origem: string | null
           precisao_metros: number | null
+          timezone: string | null
           tipo: string
           updated_at: string | null
+          versao_app: string | null
         }
         Insert: {
           ajustado?: boolean | null
@@ -986,7 +990,9 @@ export type Database = {
           created_at?: string | null
           data: string
           dentro_raio?: boolean | null
+          dispositivo_id?: string | null
           empresa_id?: string | null
+          hash_digital?: string | null
           hora: string
           id?: string
           ip_address?: string | null
@@ -996,8 +1002,10 @@ export type Database = {
           ordem: number
           origem?: string | null
           precisao_metros?: number | null
+          timezone?: string | null
           tipo?: string
           updated_at?: string | null
+          versao_app?: string | null
         }
         Update: {
           ajustado?: boolean | null
@@ -1006,7 +1014,9 @@ export type Database = {
           created_at?: string | null
           data?: string
           dentro_raio?: boolean | null
+          dispositivo_id?: string | null
           empresa_id?: string | null
+          hash_digital?: string | null
           hora?: string
           id?: string
           ip_address?: string | null
@@ -1016,8 +1026,10 @@ export type Database = {
           ordem?: number
           origem?: string | null
           precisao_metros?: number | null
+          timezone?: string | null
           tipo?: string
           updated_at?: string | null
+          versao_app?: string | null
         }
         Relationships: [
           {
@@ -3216,6 +3228,53 @@ export type Database = {
             foreignKeyName: "fk_configuracoes_intervalo_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      configuracoes_ponto: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          exige_geolocalizacao: boolean | null
+          exige_reconhecimento_facial: boolean | null
+          id: string
+          intervalo_minimo_minutos: number | null
+          permite_ponto_offline: boolean | null
+          raio_maximo_metros: number | null
+          tolerancia_minutos: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          exige_geolocalizacao?: boolean | null
+          exige_reconhecimento_facial?: boolean | null
+          id?: string
+          intervalo_minimo_minutos?: number | null
+          permite_ponto_offline?: boolean | null
+          raio_maximo_metros?: number | null
+          tolerancia_minutos?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          exige_geolocalizacao?: boolean | null
+          exige_reconhecimento_facial?: boolean | null
+          id?: string
+          intervalo_minimo_minutos?: number | null
+          permite_ponto_offline?: boolean | null
+          raio_maximo_metros?: number | null
+          tolerancia_minutos?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
             referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
@@ -8329,6 +8388,8 @@ export type Database = {
           empresa_id: string | null
           endereco: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           nome: string
           pais: string | null
           telefone: string | null
@@ -8343,6 +8404,8 @@ export type Database = {
           empresa_id?: string | null
           endereco?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           nome: string
           pais?: string | null
           telefone?: string | null
@@ -8357,6 +8420,8 @@ export type Database = {
           empresa_id?: string | null
           endereco?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           nome?: string
           pais?: string | null
           telefone?: string | null
@@ -10782,6 +10847,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           data: string
+          dispositivo_id: string | null
           empresa_id: string | null
           entrada_1: string | null
           entrada_2: string | null
@@ -10790,6 +10856,7 @@ export type Database = {
           entrada_5: string | null
           entrada_6: string | null
           entrada_esperada: string | null
+          hash_digital: string | null
           horas_extras: string | null
           horas_falta: string | null
           horas_trabalhadas: string | null
@@ -10806,9 +10873,11 @@ export type Database = {
           saida_antecipada_minutos: number | null
           saida_esperada: string | null
           saida_intervalo: string | null
+          timezone: string | null
           tipo_dia: string | null
           total_batidas: number | null
           updated_at: string
+          versao_app: string | null
         }
         Insert: {
           aprovado?: boolean | null
@@ -10819,6 +10888,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data: string
+          dispositivo_id?: string | null
           empresa_id?: string | null
           entrada_1?: string | null
           entrada_2?: string | null
@@ -10827,6 +10897,7 @@ export type Database = {
           entrada_5?: string | null
           entrada_6?: string | null
           entrada_esperada?: string | null
+          hash_digital?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
@@ -10843,9 +10914,11 @@ export type Database = {
           saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
+          timezone?: string | null
           tipo_dia?: string | null
           total_batidas?: number | null
           updated_at?: string
+          versao_app?: string | null
         }
         Update: {
           aprovado?: boolean | null
@@ -10856,6 +10929,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data?: string
+          dispositivo_id?: string | null
           empresa_id?: string | null
           entrada_1?: string | null
           entrada_2?: string | null
@@ -10864,6 +10938,7 @@ export type Database = {
           entrada_5?: string | null
           entrada_6?: string | null
           entrada_esperada?: string | null
+          hash_digital?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
@@ -10880,9 +10955,11 @@ export type Database = {
           saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
+          timezone?: string | null
           tipo_dia?: string | null
           total_batidas?: number | null
           updated_at?: string
+          versao_app?: string | null
         }
         Relationships: [
           {
@@ -11584,6 +11661,90 @@ export type Database = {
             columns: ["seguro_vida_id"]
             isOneToOne: false
             referencedRelation: "seguros_vida"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solicitacoes_ajuste_ponto: {
+        Row: {
+          aprovado_por: string | null
+          colaborador_id: string
+          created_at: string | null
+          data_ponto: string
+          empresa_id: string
+          hora_original: string | null
+          hora_sugerida: string
+          id: string
+          motivo: string
+          observacoes_gestor: string | null
+          status: string | null
+          tipo_ponto: string
+          updated_at: string | null
+        }
+        Insert: {
+          aprovado_por?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data_ponto: string
+          empresa_id: string
+          hora_original?: string | null
+          hora_sugerida: string
+          id?: string
+          motivo: string
+          observacoes_gestor?: string | null
+          status?: string | null
+          tipo_ponto: string
+          updated_at?: string | null
+        }
+        Update: {
+          aprovado_por?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data_ponto?: string
+          empresa_id?: string
+          hora_original?: string | null
+          hora_sugerida?: string
+          id?: string
+          motivo?: string
+          observacoes_gestor?: string | null
+          status?: string | null
+          tipo_ponto?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
@@ -13442,6 +13603,59 @@ export type Database = {
       }
     }
     Views: {
+      excecoes_ponto: {
+        Row: {
+          colaborador_id: string | null
+          colaborador_nome: string | null
+          data: string | null
+          status_alerta: string | null
+          total_batidas: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pontos_abertos: {
         Row: {
           colaborador_id: string | null
