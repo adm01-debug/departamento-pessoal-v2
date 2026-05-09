@@ -31,8 +31,7 @@ describe('provisaoService', () => {
     });
 
     it('should throw error if supabase fails', async () => {
-      const mockResult = { data: null, error: { message: 'DB Error' } };
-      const mockEq = vi.fn().mockResolvedValue(mockResult);
+      const mockEq = vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: { message: 'DB Error' } }));
       const mockOrder = vi.fn().mockReturnValue({ eq: mockEq });
       const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
       
