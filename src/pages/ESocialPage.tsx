@@ -405,15 +405,54 @@ export default function ESocialPage() {
 
               <div>
                 <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5 block">Dados do Evento (JSON)</Label>
-                <pre className="text-[10px] p-4 bg-muted rounded-xl border font-mono max-h-[300px] overflow-auto">
-                  {JSON.stringify(selectedEvento?.dados_evento || {}, null, 2)}
-                </pre>
+                <div className="relative group/json">
+                  <pre className="text-[10px] p-4 bg-muted rounded-xl border font-mono max-h-[300px] overflow-auto">
+                    {JSON.stringify(selectedEvento?.dados_evento || selectedEvento?.dados || {}, null, 2)}
+                  </pre>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover/json:opacity-100 transition-opacity"
+                    onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(selectedEvento?.dados_evento || selectedEvento?.dados || {}, null, 2));
+                      toast.success("JSON copiado");
+                    }}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
+
+              {selectedEvento?.xml && (
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="text-[11px] uppercase tracking-widest text-muted-foreground block">Conteúdo XML Assinado</Label>
+                    <Badge variant="outline" className="text-[9px] h-4 gap-1 border-primary/20 bg-primary/5 text-primary">
+                      <ShieldCheck className="h-2.5 w-2.5" /> SHA-256 Assinado
+                    </Badge>
+                  </div>
+                  <pre className="text-[10px] p-4 bg-primary/5 rounded-xl border border-primary/10 font-mono max-h-[300px] overflow-auto text-primary/80">
+                    {selectedEvento.xml}
+                  </pre>
+                </div>
+              )}
             </div>
           </ScrollArea>
           
-          <div className="p-4 bg-muted/20 border-t border-border/20 flex justify-end">
-            <Button variant="outline" onClick={() => setSelectedEvento(null)} className="rounded-xl">Fechar</Button>
+          <div className="p-4 bg-muted/20 border-t border-border/20 flex justify-between items-center">
+            <div className="flex gap-2">
+              {selectedEvento?.xml && (
+                <Button variant="outline" size="sm" onClick={() => handleExportXML(selectedEvento)} className="rounded-xl h-9 gap-2">
+                  <Download className="h-4 w-4" /> Exportar XML
+                </Button>
+              )}
+              {selectedEvento?.status === 'pendente' && (
+                <Button variant="outline" size="sm" onClick={() => handleValidar(selectedEvento)} className="rounded-xl h-9 gap-2">
+                  <ShieldCheck className="h-4 w-4" /> Validar Agora
+                </Button>
+              )}
+            </div>
+            <Button variant="default" onClick={() => setSelectedEvento(null)} className="rounded-xl h-9 px-6">Fechar</Button>
           </div>
         </DialogContent>
       </Dialog>
