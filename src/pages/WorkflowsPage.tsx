@@ -343,7 +343,6 @@ export default function WorkflowsPage() {
           </div>
         </TabsContent>
       </Tabs>
-      </Tabs>
 
       {/* Audit Log Modal */}
       <Dialog open={showLog} onOpenChange={setShowLog}>
