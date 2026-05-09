@@ -1,19 +1,23 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   Sun, Moon, Sunset, Gift, Calendar, AlertTriangle, 
   CheckCircle2, Clock, UserPlus, UserMinus, FileText, 
-  ChevronRight, Sparkles, Coffee
+  ChevronRight, Sparkles, Coffee, Database, Zap,
+  Loader2, RefreshCw, Trash2, Bell, ShieldAlert
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, isToday, parseISO, differenceInDays, isSameMonth } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface BriefingData {
   aniversariantes: { nome: string; dia: number }[];
@@ -105,6 +109,20 @@ function BriefingItem({ icon: Icon, label, count, gradient, onClick }: {
 
 export function MorningBriefing() {
   const { data, isLoading } = useMorningBriefing();
+  const [runningAction, setRunningAction] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleAction = async (id: string, fn: () => Promise<any>, successMsg: string) => {
+    setRunningAction(id);
+    try {
+      await fn();
+      toast.success(successMsg);
+    } catch (err: any) {
+      toast.error(`Erro: ${err.message}`);
+    } finally {
+      setRunningAction(null);
+    }
+  };
   const navigate = useNavigate();
   const hoje = new Date();
   const hora = hoje.getHours();
@@ -216,6 +234,52 @@ export function MorningBriefing() {
             gradient="from-primary-glow to-primary"
             onClick={() => navigate('/colaboradores')}
           />
+        </div>
+
+        <div className="pt-4 border-t border-border/20">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-3">Manutenção do Sistema</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!!runningAction}
+              onClick={() => handleAction('alertas', edgeFunctionsService.dispararAlertasDP, 'Alertas DP disparados!')}
+              className="rounded-xl h-auto py-2 flex-col gap-1 text-[10px] font-body"
+            >
+              {runningAction === 'alertas' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4 text-amber-500" />}
+              <span>Alertas DP</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!!runningAction}
+              onClick={() => handleAction('cache', () => edgeFunctionsService.cache({ action: 'invalidate' }), 'Cache limpo!')}
+              className="rounded-xl h-auto py-2 flex-col gap-1 text-[10px] font-body"
+            >
+              {runningAction === 'cache' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 text-primary" />}
+              <span>Limpar Cache</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!!runningAction}
+              onClick={() => handleAction('limpeza', edgeFunctionsService.limpezaDados, 'Limpeza concluída!')}
+              className="rounded-xl h-auto py-2 flex-col gap-1 text-[10px] font-body"
+            >
+              {runningAction === 'limpeza' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
+              <span>Limpeza</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!!runningAction}
+              onClick={() => handleAction('health', edgeFunctionsService.healthcheck, 'Sistema saudável!')}
+              className="rounded-xl h-auto py-2 flex-col gap-1 text-[10px] font-body"
+            >
+              {runningAction === 'health' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4 text-success" />}
+              <span>Saúde</span>
+            </Button>
+          </div>
         </div>
 
         {!hasContent && (
