@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp, Activity, Timer, PieChart,
   AlertCircle, UserPlus, UserMinus, Briefcase,
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
-  TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X
+  TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
+  Check, Eye, Forward, MoreHorizontal
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -16,6 +17,17 @@ import { Badge } from '@/components/ui/badge';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
 import { viewsService } from '@/services/tabelasComplementaresService';
 import { useQuery } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { Input } from '@/components/ui/input';
+import { 
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter 
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { usePendencias, type Pendencia as DB_Pendencia } from '@/hooks/usePendencias';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const MotionCard = motion.create(Card);
 
