@@ -25,7 +25,7 @@ export const contratacaoService = {
 
         <p><strong>EMPREGADO:</strong> ${admissao.nome}<br>
         <strong>CPF:</strong> ${admissao.cpf || '—'}<br>
-        <strong>ENDEREÇO:</strong> ${admissao.metadata?.endereco || 'Residência informada no cadastro'}</p>
+        <strong>ENDEREÇO:</strong> ${(admissao.metadata as any)?.endereco || 'Residência informada no cadastro'}</p>
 
         <p>As partes acima qualificadas celebram o presente contrato sob as cláusulas seguintes:</p>
 
@@ -55,20 +55,20 @@ export const contratacaoService = {
       .update({
         [`checklist_${docType}`]: status === 'validado',
         metadata: { 
-          [`obs_${docType}`]: observacao,
+          obs: observacao,
           last_validation: new Date().toISOString()
         }
-      })
+      } as any)
       .eq('id', admissaoId);
 
     if (error) throw error;
 
-    // Log de auditoria
+    // Log de auditoria usando estrutura correta
     await supabase.from('audit_log').insert({
-      entidade_tipo: 'admissao',
-      entidade_id: admissaoId,
+      tabela: 'admissoes',
+      registro_id: admissaoId,
       acao: `VALIDACAO_DOC_${docType.toUpperCase()}`,
-      metadata: { status, observacao }
+      dados_novos: { status, observacao }
     });
   },
 
