@@ -136,7 +136,7 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between gap-2 px-1">
         <div className="flex gap-1 overflow-x-auto custom-scrollbar pb-1">
-          {['all', 'admissao', 'ferias', 'alerta'].map((t) => (
+          {['all', 'admissao', 'ferias', 'ponto', 'compliance', 'alerta'].map((t) => (
             <Badge 
               key={t}
               variant={filterType === t ? 'default' : 'outline'}
