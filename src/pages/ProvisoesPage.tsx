@@ -46,6 +46,21 @@ export default function ProvisoesPage() {
     enabled: !!empresaAtual?.id,
   });
 
+  const { data: inconsistencias } = useQuery({
+    queryKey: ['provisao-inconsistencias', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await (window as any).supabase
+        .from('colaboradores')
+        .select('id, nome_completo')
+        .eq('empresa_id', empresaAtual?.id)
+        .eq('status', 'Ativo')
+        .or('salario_base.is.null,salario_base.eq.0');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!empresaAtual?.id
+  });
+
   const mutation = useMutation({
     mutationFn: () => provisaoService.calcular(empresaAtual!.id, `${competencia}-01`),
     onSuccess: (data) => {
