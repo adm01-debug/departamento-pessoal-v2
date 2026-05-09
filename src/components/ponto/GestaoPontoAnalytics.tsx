@@ -34,6 +34,39 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
     return Object.entries(hours).map(([hour, count]) => ({ hour, count }));
   }, [registros]);
 
+  // 3. Legal Compliance (CLT) check
+  const complianceStats = useMemo(() => {
+    let interjornadaViolations = 0;
+    let excessiveWorkdays = 0; // > 10h total
+
+    // Sort by collaborator and date to check interjornada
+    const sorted = [...registros].sort((a, b) => {
+      if (a.colaborador_id !== b.colaborador_id) return a.colaborador_id.localeCompare(b.colaborador_id);
+      return new Date(a.data).getTime() - new Date(b.data).getTime();
+    });
+
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const current = sorted[i];
+      const next = sorted[i + 1];
+
+      // Interjornada (11h between shifts)
+      if (current.colaborador_id === next.colaborador_id && current.saida_1 && next.entrada_1) {
+        const outTime = new Date(`${current.data}T${current.saida_1}`);
+        const inTime = new Date(`${next.data}T${next.entrada_1}`);
+        const diffHours = (inTime.getTime() - outTime.getTime()) / (1000 * 60 * 60);
+        if (diffHours < 11 && diffHours > 0) interjornadaViolations++;
+      }
+
+      // Max workday (10h legal limit in Brazil)
+      if (current.horas_trabalhadas) {
+        const match = String(current.horas_trabalhadas).match(/(\d+):/);
+        if (match && parseInt(match[1]) >= 10) excessiveWorkdays++;
+      }
+    }
+
+    return { interjornadaViolations, excessiveWorkdays };
+  }, [registros]);
+
   const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#6366f1'];
 
   return (
