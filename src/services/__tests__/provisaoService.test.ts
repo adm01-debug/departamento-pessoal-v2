@@ -31,9 +31,8 @@ describe('provisaoService', () => {
     });
 
     it('should throw error if supabase fails', async () => {
-      // If error is present, supabase-js still resolves but with error object
-      // But the service does: if (error) throw error;
-      const mockEq = vi.fn().mockResolvedValue({ data: null, error: { message: 'DB Error' } });
+      const mockResult = { data: null, error: { message: 'DB Error' } };
+      const mockEq = vi.fn().mockResolvedValue(mockResult);
       const mockOrder = vi.fn().mockReturnValue({ eq: mockEq });
       const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
       
