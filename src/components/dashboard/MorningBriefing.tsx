@@ -67,8 +67,8 @@ function useMorningBriefing() {
       const afastadosHoje = (afastData || []).map((a: any) => ({ nome: a.colaboradores?.nome_completo || 'Colaborador', tipo: a.tipo }));
       const admissoesHoje = (admData || []).map(a => ({ nome: a.nome, cargo: a.cargo }));
       const vencimentosHoje = (asoData || []).map((a: any) => ({
-        descricao: `ASO ${a.tipo} de ${a.colaboradores?.nome_completo || 'Colaborador'} - ${format(parseISO(a.data_validade), 'dd/MM')}`,
-        tipo: 'aso',
+        descricao: `Exame ${a.tipo} de ${a.colaboradores?.nome_completo || 'Colaborador'} - ${format(parseISO(a.data_validade), 'dd/MM')}`,
+        tipo: 'exame',
       }));
 
       return {
