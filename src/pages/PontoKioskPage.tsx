@@ -147,6 +147,6 @@ export default function PontoKioskPage() {
           </div>
         )}
       </div>
-    </PageLayout>
+    </div>
   );
 }
