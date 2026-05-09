@@ -966,18 +966,21 @@ export type Database = {
           created_at: string | null
           data: string
           dentro_raio: boolean | null
+          device_metadata: Json | null
           dispositivo_id: string | null
           empresa_id: string | null
           hash_digital: string | null
           hora: string
           id: string
           ip_address: string | null
+          is_offline: boolean | null
           latitude: number | null
           longitude: number | null
           motivo_ajuste: string | null
           ordem: number
           origem: string | null
           precisao_metros: number | null
+          sync_at: string | null
           timezone: string | null
           tipo: string
           updated_at: string | null
@@ -990,18 +993,21 @@ export type Database = {
           created_at?: string | null
           data: string
           dentro_raio?: boolean | null
+          device_metadata?: Json | null
           dispositivo_id?: string | null
           empresa_id?: string | null
           hash_digital?: string | null
           hora: string
           id?: string
           ip_address?: string | null
+          is_offline?: boolean | null
           latitude?: number | null
           longitude?: number | null
           motivo_ajuste?: string | null
           ordem: number
           origem?: string | null
           precisao_metros?: number | null
+          sync_at?: string | null
           timezone?: string | null
           tipo?: string
           updated_at?: string | null
@@ -1014,18 +1020,21 @@ export type Database = {
           created_at?: string | null
           data?: string
           dentro_raio?: boolean | null
+          device_metadata?: Json | null
           dispositivo_id?: string | null
           empresa_id?: string | null
           hash_digital?: string | null
           hora?: string
           id?: string
           ip_address?: string | null
+          is_offline?: boolean | null
           latitude?: number | null
           longitude?: number | null
           motivo_ajuste?: string | null
           ordem?: number
           origem?: string | null
           precisao_metros?: number | null
+          sync_at?: string | null
           timezone?: string | null
           tipo?: string
           updated_at?: string | null
@@ -10393,6 +10402,99 @@ export type Database = {
           },
         ]
       }
+      ponto_ajustes: {
+        Row: {
+          anexo_url: string | null
+          colaborador_id: string
+          created_at: string | null
+          data_decisao: string | null
+          data_referencia: string
+          gestor_id: string | null
+          hora_original: string | null
+          hora_sugerida: string | null
+          id: string
+          justificativa: string
+          observacoes_gestor: string | null
+          status: string | null
+          tipo_ajuste: string
+          updated_at: string | null
+        }
+        Insert: {
+          anexo_url?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data_decisao?: string | null
+          data_referencia: string
+          gestor_id?: string | null
+          hora_original?: string | null
+          hora_sugerida?: string | null
+          id?: string
+          justificativa: string
+          observacoes_gestor?: string | null
+          status?: string | null
+          tipo_ajuste: string
+          updated_at?: string | null
+        }
+        Update: {
+          anexo_url?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data_decisao?: string | null
+          data_referencia?: string
+          gestor_id?: string | null
+          hora_original?: string | null
+          hora_sugerida?: string | null
+          id?: string
+          justificativa?: string
+          observacoes_gestor?: string | null
+          status?: string | null
+          tipo_ajuste?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ponto_auditoria: {
+        Row: {
+          acao: string
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          id: string
+          ip_address: string | null
+          justificativa: string | null
+          registro_id: string
+          tabela_nome: string
+          user_agent: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          ip_address?: string | null
+          justificativa?: string | null
+          registro_id: string
+          tabela_nome: string
+          user_agent?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          ip_address?: string | null
+          justificativa?: string | null
+          registro_id?: string
+          tabela_nome?: string
+          user_agent?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -10857,10 +10959,12 @@ export type Database = {
           entrada_6: string | null
           entrada_esperada: string | null
           hash_digital: string | null
+          hash_integridade: string | null
           horas_extras: string | null
           horas_falta: string | null
           horas_trabalhadas: string | null
           id: string
+          is_offline: boolean | null
           justificativa: string | null
           observacoes: string | null
           retorno_intervalo: string | null
@@ -10873,6 +10977,7 @@ export type Database = {
           saida_antecipada_minutos: number | null
           saida_esperada: string | null
           saida_intervalo: string | null
+          sync_at: string | null
           timezone: string | null
           tipo_dia: string | null
           total_batidas: number | null
@@ -10898,10 +11003,12 @@ export type Database = {
           entrada_6?: string | null
           entrada_esperada?: string | null
           hash_digital?: string | null
+          hash_integridade?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
           id?: string
+          is_offline?: boolean | null
           justificativa?: string | null
           observacoes?: string | null
           retorno_intervalo?: string | null
@@ -10914,6 +11021,7 @@ export type Database = {
           saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
+          sync_at?: string | null
           timezone?: string | null
           tipo_dia?: string | null
           total_batidas?: number | null
@@ -10939,10 +11047,12 @@ export type Database = {
           entrada_6?: string | null
           entrada_esperada?: string | null
           hash_digital?: string | null
+          hash_integridade?: string | null
           horas_extras?: string | null
           horas_falta?: string | null
           horas_trabalhadas?: string | null
           id?: string
+          is_offline?: boolean | null
           justificativa?: string | null
           observacoes?: string | null
           retorno_intervalo?: string | null
@@ -10955,6 +11065,7 @@ export type Database = {
           saida_antecipada_minutos?: number | null
           saida_esperada?: string | null
           saida_intervalo?: string | null
+          sync_at?: string | null
           timezone?: string | null
           tipo_dia?: string | null
           total_batidas?: number | null
