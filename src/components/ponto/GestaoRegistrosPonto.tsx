@@ -226,6 +226,7 @@ export function GestaoRegistrosPonto() {
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
                     <TableHead className="font-display font-semibold">Colaborador</TableHead>
+                    <TableHead className="font-display font-semibold">Escala</TableHead>
                     <TableHead className="font-display font-semibold">Entrada 1</TableHead>
                     <TableHead className="font-display font-semibold">Saída Int.</TableHead>
                     <TableHead className="font-display font-semibold">Ret. Int.</TableHead>
