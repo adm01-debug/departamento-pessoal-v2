@@ -454,6 +454,55 @@ export default function DashboardExecutivoPage() {
             </Card>
           </div>
         </TabsContent>
+        <TabsContent value="analitico" className="space-y-6">
+          <AnalyticsSection 
+            stats={data ? {
+              headcount: data.totalAtivos,
+              admissoesMes: data.evolucao[data.evolucao.length - 1]?.admissoes || 0,
+              demissoesMes: data.evolucao[data.evolucao.length - 1]?.demissoes || 0,
+              turnover: data.turnover,
+              absenteismo: data.absenteismo,
+              departamentos: data.departamentos.map(d => ({ nome: d.nome, count: d.value }))
+            } : undefined}
+            pendencias={[
+              { tipo: 'ferias', icone: 'ferias', quantidade: data?.feriasPendentes || 0, descricao: 'Férias aguardando aprovação' },
+              { tipo: 'ponto', icone: 'ponto', quantidade: 0, descricao: 'Ajustes de ponto pendentes' },
+              { tipo: 'assinaturas', icone: 'assinaturas', quantidade: 0, descricao: 'Documentos para assinar' }
+            ]}
+            isLoadingStats={isLoading}
+            isLoadingPendencias={isLoading}
+            isEmptySystem={!data?.totalAtivos}
+            empresaId={empresaAtualId}
+          />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 border border-border/30 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-sm font-display flex items-center gap-2">
+                  <Clock className="h-4 w-4" /> Timeline de Auditoria (Real-time)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <EventTimeline empresaId={empresaAtualId} />
+              </CardContent>
+            </Card>
+            <Card className="border border-border/30 rounded-2xl">
+               <CardHeader>
+                 <CardTitle className="text-sm font-display">Ações Rápidas</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start rounded-xl" onClick={() => navigate('/colaboradores/novo')}>
+                    <UserPlus className="mr-2 h-4 w-4" /> Novo Colaborador
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start rounded-xl" onClick={() => navigate('/ferias')}>
+                    <Calendar className="mr-2 h-4 w-4" /> Gerenciar Férias
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start rounded-xl" onClick={() => navigate('/folha-pagamento')}>
+                    <DollarSign className="mr-2 h-4 w-4" /> Folha de Pagamento
+                  </Button>
+               </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
         </Tabs>
     </PageLayout>
     </>
