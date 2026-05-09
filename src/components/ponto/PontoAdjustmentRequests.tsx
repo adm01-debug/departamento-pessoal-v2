@@ -9,9 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useState, useMemo } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { exportPortaria671PDF } from '@/services/exportService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function PontoAdjustmentRequests() {
   const { empresaAtual } = useEmpresas();
