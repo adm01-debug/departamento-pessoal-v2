@@ -454,33 +454,64 @@ function ContratacaoWorkflow({ token }: { token: string }) {
                     
                     <div className="grid gap-4">
                       {[
-                        { id: 'rg', label: 'RG ou CNH (Frente e Verso)', icon: Fingerprint, required: true },
-                        { id: 'cpf', label: 'CPF', icon: ShieldCheck, required: true },
-                        { id: 'residencia', label: 'Comprovante de Residência', icon: MapPin, required: true },
-                        { id: 'foto', label: 'Sua Foto (Selfie)', icon: User, required: true },
-                        { id: 'ctps', label: 'CTPS Digital', icon: FileText, required: false },
-                      ].map(doc => (
-                        <div key={doc.id} className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border-2 border-slate-100 hover:border-primary/30 transition-all bg-white gap-4">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                              <doc.icon className="w-6 h-6" />
+                        { id: 'rg', label: 'RG ou CNH (Frente e Verso)', icon: Fingerprint, required: true, type: 'rg' },
+                        { id: 'cpf', label: 'CPF', icon: ShieldCheck, required: true, type: 'cpf' },
+                        { id: 'residencia', label: 'Comprovante de Residência', icon: MapPin, required: true, type: 'residencia' },
+                        { id: 'foto', label: 'Sua Foto (Selfie)', icon: User, required: true, type: 'foto' },
+                        { id: 'ctps', label: 'CTPS Digital', icon: FileText, required: false, type: 'ctps' },
+                      ].map(doc => {
+                        const status = uploadedDocs[doc.id];
+                        return (
+                          <div key={doc.id} className={cn(
+                            "group flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border-2 transition-all bg-white gap-4",
+                            status?.status === 'success' ? "border-success/30 bg-success/5" : 
+                            status?.status === 'error' ? "border-destructive/30 bg-destructive/5" :
+                            "border-slate-100 hover:border-primary/30"
+                          )}>
+                            <div className="flex items-center gap-4">
+                              <div className={cn(
+                                "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
+                                status?.status === 'success' ? "bg-success/20 text-success" :
+                                status?.status === 'error' ? "bg-destructive/20 text-destructive" :
+                                "bg-slate-50 text-slate-400 group-hover:bg-primary/10 group-hover:text-primary"
+                              )}>
+                                {status?.status === 'success' ? <CheckCircle2 className="w-6 h-6" /> : <doc.icon className="w-6 h-6" />}
+                              </div>
+                              <div>
+                                <p className="font-bold text-slate-800">{doc.label}</p>
+                                <div className="flex gap-2 items-center">
+                                  {doc.required && <Badge variant="secondary" className="text-[10px] uppercase bg-slate-100 text-slate-500">Obrigatório</Badge>}
+                                  {status?.status === 'uploading' && <span className="text-[10px] text-primary animate-pulse font-bold uppercase">Validando IA...</span>}
+                                  {status?.status === 'success' && <span className="text-[10px] text-success font-bold uppercase">Validado</span>}
+                                </div>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-bold text-slate-800">{doc.label}</p>
-                              {doc.required && <Badge variant="secondary" className="text-[10px] uppercase bg-slate-100 text-slate-500">Obrigatório</Badge>}
+                            <div className="flex gap-2">
+                               <input 
+                                 type="file" 
+                                 id={`file-${doc.id}`} 
+                                 className="hidden" 
+                                 accept="image/*,.pdf"
+                                 onChange={(e) => {
+                                   const file = e.target.files?.[0];
+                                   if (file) handleFileUpload(doc.id, doc.type, file);
+                                 }}
+                               />
+                               <Button 
+                                 variant={status?.status === 'success' ? "secondary" : "outline"}
+                                 className="flex-1 sm:flex-none rounded-xl border-slate-200 h-10"
+                                 onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
+                                 disabled={status?.status === 'uploading'}
+                               >
+                                 {status?.status === 'uploading' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />} 
+                                 {status?.status === 'success' ? 'Trocar' : 'Enviar'}
+                               </Button>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                             <Button variant="outline" className="flex-1 sm:flex-none rounded-xl border-slate-200 h-10">
-                               <Upload className="w-4 h-4 mr-2" /> Enviar
-                             </Button>
-                             {/* Mock of a success state for a document */}
-                             {/* <CheckCircle2 className="w-6 h-6 text-success" /> */}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
-                    
+
                     <div className="flex justify-between pt-6 border-t border-slate-100">
                       <Button variant="ghost" onClick={() => setStep(0)} className="h-12 rounded-xl"><ArrowLeft className="w-4 h-4 mr-2" /> Voltar</Button>
                       <Button onClick={() => markDocsUploaded.mutate()} disabled={markDocsUploaded.isPending} className="h-14 px-10 rounded-2xl text-lg font-bold shadow-glow">
