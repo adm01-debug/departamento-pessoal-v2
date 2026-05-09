@@ -122,7 +122,6 @@ const menuGroups: MenuGroup[] = [
       { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
       { path: '/esocial', label: 'eSocial', icon: FileCheck },
       { path: '/obrigacoes-fiscais', label: 'Obrigações Fiscais', icon: ScrollText },
-      { path: '/auditoria', label: 'Auditoria', icon: Shield },
       { path: '/calculadora-rescisao', label: 'Calculadora Rescisão', icon: DollarSign },
     ],
   },
