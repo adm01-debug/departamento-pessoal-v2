@@ -49,17 +49,27 @@ export const avaliacaoService = {
   async criarMeta(d: any) {
     const { data, error } = await supabase.from('metas_okrs').insert(d).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'metas_okrs', registro_id: data.id, acao: 'INSERT', dados_novos: data });
+    }
     return ensure(data, 'meta');
   },
   async atualizarMeta(id: string, d: any) {
+    const { data: anterior } = await supabase.from('metas_okrs').select('*').eq('id', id).single();
     const { data, error } = await supabase.from('metas_okrs').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'metas_okrs', registro_id: id, acao: 'UPDATE', dados_anteriores: anterior, dados_novos: data });
+    }
     return ensure(data, 'meta');
   },
   async excluirMeta(id: string) {
+    const { data: anterior } = await supabase.from('metas_okrs').select('*').eq('id', id).single();
     const { error } = await supabase.from('metas_okrs').delete().eq('id', id);
     if (error) throw error;
+    await auditLogger.log({ tabela: 'metas_okrs', registro_id: id, acao: 'DELETE', dados_anteriores: anterior });
   },
+
 
   // Feedbacks 360
   async listarFeedbacks(empresaId?: string) {
