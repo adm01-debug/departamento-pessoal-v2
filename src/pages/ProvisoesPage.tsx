@@ -310,6 +310,8 @@ export default function ProvisoesPage() {
                       <TableHead className="text-xs">Data/Hora</TableHead>
                       <TableHead className="text-xs">Competência</TableHead>
                       <TableHead className="text-xs">Status</TableHead>
+                      <TableHead className="text-xs">Duração</TableHead>
+                      <TableHead className="text-xs">Colaboradores</TableHead>
                       <TableHead className="text-xs text-right">Valor Total</TableHead>
                     </TableRow>
                   </TableHeader>
