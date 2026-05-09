@@ -160,7 +160,7 @@ export default function FolhaPage() {
                   <TableHead className="font-display font-semibold text-right">Descontos</TableHead>
                   <TableHead className="font-display font-semibold text-right">Líquido</TableHead>
                   <TableHead className="font-display font-semibold">Status</TableHead>
-                  <TableHead className="w-[60px]" />
+                  <TableHead className="w-[120px]" />
                 </TableRow>
               </TableHeader>
               <TableBody>
