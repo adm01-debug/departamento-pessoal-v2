@@ -355,7 +355,15 @@ export default function AvaliacaoPage() {
                         <TableCell>{p.competencia || '—'}</TableCell>
                         <TableCell>{p.progresso ?? 0}%</TableCell>
                         <TableCell><Badge variant={(statusColors[p.status] || 'secondary') as any}>{p.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirPDI.mutate(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                        <TableCell className="text-right flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => gerarPDIPDF(p.colaborador?.nome_completo || 'Colaborador', p)}>
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => excluirPDI.mutate(p.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+
                       </TableRow>
                     ))
                   }
