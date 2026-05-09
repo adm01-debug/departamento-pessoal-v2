@@ -327,7 +327,28 @@ export function CommandPalette() {
         {/* Results */}
         <div className="max-h-[400px] overflow-y-auto p-2 no-scrollbar">
           <AnimatePresence mode="wait">
-            {allItems.length === 0 ? (
+            {allItems.length === 0 && !query ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 py-4">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-3 font-body">Buscas Recentes</p>
+                {getRecentSearches().length > 0 ? (
+                  getRecentSearches().map((term, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setQuery(term)}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left hover:bg-accent/40 group transition-all"
+                    >
+                      <Clock className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                      <span className="text-sm font-body">{term}</span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Zap className="h-10 w-10 text-muted-foreground/20 mb-3" />
+                    <p className="text-xs text-muted-foreground font-body">Use ⌘K para encontrar pessoas e ferramentas rapidamente</p>
+                  </div>
+                )}
+              </motion.div>
+            ) : allItems.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
