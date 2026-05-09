@@ -185,17 +185,10 @@ export default function FeriasPage() {
 
         <TabsContent value="periodos">
           <div className="grid gap-6">
-            {/* Typically we would have a selector for collaborator here, 
-                for now we show the most recent ones or a generic list */}
-            <p className="text-sm text-muted-foreground font-body">
-              Selecione um colaborador na tabela de solicitações para ver seus períodos detalhados ou visualize o resumo geral abaixo.
-            </p>
-            {/* If we had a selectedColaboradorId state, we would pass it here */}
-            {filtered && filtered.length > 0 && (
-              <GerenciamentoPeriodos colaboradorId={filtered[0].colaborador_id} />
-            )}
+            <GerenciamentoPeriodos />
           </div>
         </TabsContent>
+
       </Tabs>
     </PageLayout>
 
