@@ -102,6 +102,7 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Webhooks</TabsTrigger>
           <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Logs</TabsTrigger>
           <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">BD</TabsTrigger>
+          <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Perfis</TabsTrigger>
           <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
         </TabsList>
 
