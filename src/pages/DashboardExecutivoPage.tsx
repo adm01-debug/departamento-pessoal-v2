@@ -225,6 +225,7 @@ export default function DashboardExecutivoPage() {
           <TabsTrigger value="evolucao"><TrendingUp className="mr-1 h-4 w-4" />Evolução</TabsTrigger>
           <TabsTrigger value="custos"><DollarSign className="mr-1 h-4 w-4" />Custos</TabsTrigger>
           <TabsTrigger value="estrutura"><Building2 className="mr-1 h-4 w-4" />Estrutura</TabsTrigger>
+          <TabsTrigger value="estrategia"><ShieldCheck className="mr-1 h-4 w-4" />Estratégia & Orçamento</TabsTrigger>
         </TabsList>
 
         <TabsContent value="evolucao">
