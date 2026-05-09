@@ -9,8 +9,19 @@ import { EmptyList, EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { provisaoService } from '@/services';
-import { Calculator, Wallet, TrendingUp, Landmark, PieChart, Info, Download, FileText, FileSpreadsheet, History } from 'lucide-react';
+import { Calculator, Wallet, TrendingUp, Landmark, PieChart, Info, Download, FileText, FileSpreadsheet, History, BarChart3, ShieldCheck, Activity, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Cell,
+  Legend
+} from 'recharts';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
