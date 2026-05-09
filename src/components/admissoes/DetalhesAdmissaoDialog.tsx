@@ -197,6 +197,28 @@ export function DetalhesAdmissaoDialog({ admissao, open, onOpenChange }: Detalhe
                     </p>
                   </div>
                 </div>
+
+                <div className="bg-success/5 p-4 rounded-2xl border border-success/10 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center">
+                      <ShieldCheck className="w-6 h-6 text-success" />
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-bold text-success">eSocial: Admissão (S-2200)</h5>
+                      <p className="text-xs text-muted-foreground">
+                        Sincronize os dados do colaborador com o Governo Federal.
+                      </p>
+                    </div>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="rounded-xl border-success/30 text-success hover:bg-success/10 h-10 gap-2 font-bold"
+                    onClick={handleEnvioESocial}
+                  >
+                    <Send className="w-4 h-4" /> Transmitir Agora
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="documentos" className="m-0">
