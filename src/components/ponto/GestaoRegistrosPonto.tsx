@@ -170,6 +170,8 @@ export function GestaoRegistrosPonto() {
             </div>
           ) : (
             <>
+              <PontoInconsistencyPanel registros={registros} />
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 <Card className="bg-muted/30 border-none">
                   <CardContent className="p-4 flex items-center gap-3">
