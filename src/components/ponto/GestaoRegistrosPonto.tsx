@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { motion } from 'framer-motion';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
+import { GestaoPontoAnalytics } from './GestaoPontoAnalytics';
 import { toast } from 'sonner';
 
 export function GestaoRegistrosPonto() {
