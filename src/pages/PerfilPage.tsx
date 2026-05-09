@@ -159,6 +159,38 @@ export default function PerfilPage() {
             </Button>
           </CardContent>
         </Card>
+        <Card className="border border-border/30 rounded-2xl shadow-elevated">
+          <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2"><Lock className="h-5 w-5 text-warning" />Segurança & Acesso</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 font-body">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="h-6 w-6 text-success" />
+                <div>
+                  <p className="font-bold text-sm">Autenticação de Dois Fatores (MFA)</p>
+                  <p className="text-xs text-muted-foreground">Sua conta está protegida por MFA via aplicativo.</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-success border-success/30">Habilitado</Badge>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10">
+              <div className="flex items-center gap-3">
+                <History className="h-6 w-6 text-info" />
+                <div>
+                  <p className="font-bold text-sm">Último Acesso</p>
+                  <p className="text-xs text-muted-foreground">{new Date().toLocaleString('pt-BR')} (IP: 187.64.21.XX)</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" className="text-xs text-primary">Ver Logs</Button>
+            </div>
+
+            <Button variant="outline" className="w-full rounded-xl border-dashed">
+              Alterar Senha de Acesso
+            </Button>
+          </CardContent>
+        </Card>
       </motion.div>
     </PageLayout>
     </>
