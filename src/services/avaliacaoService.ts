@@ -106,17 +106,27 @@ export const avaliacaoService = {
   async criarPDI(d: any) {
     const { data, error } = await supabase.from('pdis').insert(d).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'pdis', registro_id: data.id, acao: 'INSERT', dados_novos: data });
+    }
     return ensure(data, 'PDI');
   },
   async atualizarPDI(id: string, d: any) {
+    const { data: anterior } = await supabase.from('pdis').select('*').eq('id', id).single();
     const { data, error } = await supabase.from('pdis').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
+    if (data) {
+      await auditLogger.log({ tabela: 'pdis', registro_id: id, acao: 'UPDATE', dados_anteriores: anterior, dados_novos: data });
+    }
     return ensure(data, 'PDI');
   },
   async excluirPDI(id: string) {
+    const { data: anterior } = await supabase.from('pdis').select('*').eq('id', id).single();
     const { error } = await supabase.from('pdis').delete().eq('id', id);
     if (error) throw error;
+    await auditLogger.log({ tabela: 'pdis', registro_id: id, acao: 'DELETE', dados_anteriores: anterior });
   },
+
 
   // Competências
   async listarCompetencias(empresaId?: string) {
