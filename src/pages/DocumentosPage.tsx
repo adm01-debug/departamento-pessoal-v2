@@ -196,18 +196,31 @@ export default function DocumentosPage() {
             className="pl-9 rounded-xl border-border/40 focus:ring-primary/20"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
           <Filter className="h-4 w-4 text-muted-foreground hidden sm:block" />
           <Select value={tipoFilter} onValueChange={setTipoFilter}>
-            <SelectTrigger className="w-[180px] rounded-xl border-border/40">
-              <SelectValue placeholder="Tipo de Documento" />
+            <SelectTrigger className="w-[150px] rounded-xl border-border/40">
+              <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos os Tipos</SelectItem>
+              <SelectItem value="todos">Todos Tipos</SelectItem>
               {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTipoFilter('todos'); }} className="text-xs text-muted-foreground hover:text-foreground">
+
+          <Select value={colaboradorFilter} onValueChange={setColaboradorFilter}>
+            <SelectTrigger className="w-[180px] rounded-xl border-border/40">
+              <SelectValue placeholder="Colaborador" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos Colaboradores</SelectItem>
+              {colaboradores?.map((c: any) => (
+                <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTipoFilter('todos'); setColaboradorFilter('todos'); }} className="text-xs text-muted-foreground hover:text-foreground">
             Limpar
           </Button>
         </div>
