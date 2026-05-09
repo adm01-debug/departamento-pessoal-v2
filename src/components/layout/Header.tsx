@@ -32,7 +32,7 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         </Button>
 
         {/* Breadcrumbs */}
-        {isAdmin && <Breadcrumbs className="hidden md:flex" />}
+        <Breadcrumbs className="hidden md:flex" />
 
         {/* Compact search trigger */}
         <button
