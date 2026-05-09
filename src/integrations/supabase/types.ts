@@ -8388,6 +8388,8 @@ export type Database = {
           empresa_id: string | null
           endereco: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           nome: string
           pais: string | null
           telefone: string | null
@@ -8402,6 +8404,8 @@ export type Database = {
           empresa_id?: string | null
           endereco?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           nome: string
           pais?: string | null
           telefone?: string | null
@@ -8416,6 +8420,8 @@ export type Database = {
           empresa_id?: string | null
           endereco?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           nome?: string
           pais?: string | null
           telefone?: string | null
