@@ -117,6 +117,22 @@ export default function ProvisoesPage() {
     enabled: !!empresaAtual?.id
   });
 
+  const { data: trendData } = useQuery({
+    queryKey: ['provisao-trend', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await (window as any).supabase
+        .from('provisao_logs')
+        .select('competencia, valor_total_provisionado')
+        .eq('empresa_id', empresaAtual?.id)
+        .eq('status', 'CONCLUIDO')
+        .order('competencia', { ascending: true })
+        .limit(6);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!empresaAtual?.id
+  });
+
   return (
     <>
       <PageTitle title="Provisões Mensais" description="Gestão de provisões de férias e 13º salário" />
