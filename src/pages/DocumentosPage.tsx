@@ -41,6 +41,13 @@ export default function DocumentosPage() {
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    if (urlColaboradorId) {
+      setColaboradorFilter(urlColaboradorId);
+      setColaboradorId(urlColaboradorId);
+    }
+  }, [urlColaboradorId]);
+
   const { data: documentos, isLoading } = useQuery({
     queryKey: ['documentos', colaboradorFilter],
     queryFn: () => documentoService.listar(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
