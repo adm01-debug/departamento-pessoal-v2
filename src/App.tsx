@@ -127,6 +127,7 @@ export default function App() {
 
         <Route path="ferias" element={<LazyPage Component={FeriasPage} />} />
         <Route path="ponto" element={<LazyPage Component={PontoPage} />} />
+        <Route path="ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
         <Route path="beneficios" element={<LazyPage Component={BeneficiosPage} />} />
         <Route path="beneficios/novo" element={<LazyPage Component={BeneficioFormPage} />} />
         <Route path="relatorios" element={<LazyPage Component={RelatoriosPage} />} />
