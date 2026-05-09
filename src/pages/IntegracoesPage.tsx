@@ -135,6 +135,134 @@ function Bitrix24ConfigPanel() {
   );
 }
 
+function CnabConfigPanel() {
+  const [tab, setTab] = useState('remessas');
+  const { data: config } = useQuery({ queryKey: ['cnab_config'], queryFn: cnabService.getConfig });
+  const { data: remessas = [], isLoading } = useQuery({ queryKey: ['cnab_remessas'], queryFn: cnabService.getRemessas });
+
+  return (
+    <Tabs value={tab} onValueChange={setTab} className="flex-1 flex flex-col overflow-hidden">
+      <div className="px-6 border-b border-border/20 bg-muted/20">
+        <TabsList className="h-12 bg-transparent gap-4">
+          <TabsTrigger value="remessas" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Remessas Geradas</TabsTrigger>
+          <TabsTrigger value="config" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Configuração Bancária</TabsTrigger>
+        </TabsList>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-6">
+        <TabsContent value="remessas" className="m-0">
+          {isLoading ? <Spinner /> : (
+            <Table>
+              <TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Banco</TableHead><TableHead>Arquivo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Ações</TableHead></TableRow></TableHeader>
+              <TableBody>
+                {remessas.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">Nenhuma remessa gerada</TableCell></TableRow> :
+                  remessas.map((r: any) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="text-xs">{new Date(r.created_at).toLocaleString('pt-BR')}</TableCell>
+                      <TableCell className="font-medium text-sm">{r.banco_nome || 'Banco do Brasil'}</TableCell>
+                      <TableCell className="font-mono text-xs">{r.nome_arquivo || `REMESSA_${r.id.slice(0, 8)}.txt`}</TableCell>
+                      <TableCell><Badge variant="outline" className="bg-success/10 text-success border-0">{r.status || 'Processado'}</Badge></TableCell>
+                      <TableCell className="text-right"><Button variant="ghost" size="sm" className="h-8 rounded-lg"><ExternalLink className="h-3 w-3 mr-2" />Download</Button></TableCell>
+                    </TableRow>
+                  ))
+                }
+              </TableBody>
+            </Table>
+          )}
+        </TabsContent>
+
+        <TabsContent value="config" className="m-0">
+          <div className="grid gap-6 max-w-2xl">
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2"><Label>Banco Principal</Label><Input placeholder="Ex: Itaú Unibanco" defaultValue={config?.banco_nome} /></div>
+               <div className="space-y-2"><Label>Código do Banco</Label><Input placeholder="Ex: 341" defaultValue={config?.banco_codigo} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2"><Label>Agência</Label><Input placeholder="0000" defaultValue={config?.agencia} /></div>
+               <div className="space-y-2"><Label>Conta Corrente</Label><Input placeholder="00000-0" defaultValue={config?.conta} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2"><Label>Layout CNAB</Label><Input placeholder="Ex: CNAB 240" defaultValue={config?.layout_cnab} /></div>
+               <div className="space-y-2"><Label>Convênio</Label><Input placeholder="Código de convênio" defaultValue={config?.convenio} /></div>
+            </div>
+            <Button className="w-fit px-8 rounded-xl shadow-lg shadow-primary/20">Salvar Configurações</Button>
+          </div>
+        </TabsContent>
+      </div>
+    </Tabs>
+  );
+}
+
+function WebhookConfigPanel() {
+  const [tab, setTab] = useState('webhooks');
+  const { data: webhooks = [], isLoading: loadWebhooks } = useQuery({ queryKey: ['webhooks'], queryFn: webhookService.listar });
+  const { data: logs = [], isLoading: loadLogs } = useQuery({ queryKey: ['webhook_logs'], queryFn: webhookService.getLogs });
+
+  return (
+    <Tabs value={tab} onValueChange={setTab} className="flex-1 flex flex-col overflow-hidden">
+      <div className="px-6 border-b border-border/20 bg-muted/20">
+        <TabsList className="h-12 bg-transparent gap-4">
+          <TabsTrigger value="webhooks" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Webhooks Ativos</TabsTrigger>
+          <TabsTrigger value="logs" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none">Logs de Entrega</TabsTrigger>
+        </TabsList>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-6">
+        <TabsContent value="webhooks" className="m-0">
+           <div className="flex justify-between items-center mb-6">
+              <div><h3 className="font-semibold text-lg">Seus Webhooks</h3><p className="text-sm text-muted-foreground">Configure URLs para receber eventos do sistema</p></div>
+              <Button size="sm" className="rounded-xl"><Plus className="h-4 w-4 mr-2" />Novo Webhook</Button>
+           </div>
+           {loadWebhooks ? <Spinner /> : (
+             <div className="grid gap-4">
+                {webhooks.length === 0 ? <div className="p-12 text-center border border-dashed rounded-2xl text-muted-foreground">Clique em "Novo Webhook" para começar</div> :
+                  webhooks.map((w: any) => (
+                    <Card key={w.id} className="border-border/30 overflow-hidden group">
+                       <CardContent className="p-4 flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                             <div className="p-2 bg-primary/10 rounded-xl"><Zap className="h-5 w-5 text-primary" /></div>
+                             <div>
+                                <h4 className="font-medium text-sm">{w.nome}</h4>
+                                <p className="text-xs font-mono text-muted-foreground">{w.url}</p>
+                             </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                             <Badge variant="outline" className="bg-success/10 text-success border-0">Ativo</Badge>
+                             <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10"><XCircle className="h-4 w-4" /></Button>
+                          </div>
+                       </CardContent>
+                    </Card>
+                  ))
+                }
+             </div>
+           )}
+        </TabsContent>
+
+        <TabsContent value="logs" className="m-0">
+           {loadLogs ? <Spinner /> : (
+             <Table>
+                <TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Webhook</TableHead><TableHead>Evento</TableHead><TableHead>Status</TableHead><TableHead>Resposta</TableHead></TableRow></TableHeader>
+                <TableBody>
+                   {logs.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">Nenhum log de entrega</TableCell></TableRow> :
+                     logs.map((l: any) => (
+                       <TableRow key={l.id}>
+                          <TableCell className="text-xs">{new Date(l.created_at).toLocaleString('pt-BR')}</TableCell>
+                          <TableCell className="text-sm">{l.webhook_nome || 'Webhook Principal'}</TableCell>
+                          <TableCell><Badge variant="outline" className="text-[10px]">{l.evento || 'colaborador.criado'}</Badge></TableCell>
+                          <TableCell>{l.status_code === 200 ? <Badge className="bg-success text-white">200 OK</Badge> : <Badge variant="destructive">{l.status_code || 'Erro'}</Badge>}</TableCell>
+                          <TableCell className="text-xs font-mono max-w-[150px] truncate text-muted-foreground">{l.response_body || '—'}</TableCell>
+                       </TableRow>
+                     ))
+                   }
+                </TableBody>
+             </Table>
+           )}
+        </TabsContent>
+      </div>
+    </Tabs>
+  );
+}
+
 export default function IntegracoesPage() {
   const [bitrixOpen, setBitrixOpen] = useState(false);
   const [cnabOpen, setCnabOpen] = useState(false);
