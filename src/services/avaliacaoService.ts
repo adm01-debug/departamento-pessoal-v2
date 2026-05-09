@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
+import { auditLogger } from '@/utils/auditLogger';
 
 const ensure = <T>(d: T | null, e: string): T => { if (!d) throw new Error(`Nenhum registro de ${e} retornado.`); return d; };
+
 
 export const avaliacaoService = {
   // Ciclos
