@@ -9,10 +9,13 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { beneficioService } from '@/services';
-import { useEmpresa } from '@/contexts';
-import { Edit, Gift } from 'lucide-react';
+import { useEmpresas } from '@/hooks/useEmpresas';
+import { Edit, Gift, LayoutDashboard, List, History, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BeneficiosDashboard } from '@/components/beneficios/BeneficiosDashboard';
+
 
 export default function BeneficiosPage() {
   const [search, setSearch] = useState('');
