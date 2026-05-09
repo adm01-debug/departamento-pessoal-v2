@@ -92,6 +92,7 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
   });
 
   useRealTimeSubscription('audit_log', ['audit-timeline', empresaId], empresaId);
+  useRealTimeSubscription('conformidade_ponto_logs', ['audit-timeline', empresaId], empresaId);
 
   const displayEvents = useMemo(() => {
     const list = dbEvents || initialEvents || [];
