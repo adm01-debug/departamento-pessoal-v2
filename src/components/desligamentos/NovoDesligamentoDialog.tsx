@@ -42,7 +42,8 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
     setLoadingColab(true);
     const { data } = await supabase
       .from('colaboradores')
-      .select('id, nome_completo, cargo, salario')
+      .select('id, nome_completo, cargo, salario_base')
+
       .eq('empresa_id', empresaAtual.id)
       .eq('status', 'ativo')
       .order('nome_completo');
