@@ -6898,6 +6898,83 @@ export type Database = {
           },
         ]
       }
+      folha_itens: {
+        Row: {
+          colaborador_id: string
+          created_at: string | null
+          detalhes: Json | null
+          fgts_mes: number | null
+          folha_id: string
+          id: string
+          inss_mes: number | null
+          irrf_mes: number | null
+          salario_base: number | null
+          status_pagamento: string | null
+          total_descontos: number | null
+          total_liquido: number | null
+          total_proventos: number | null
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string | null
+          detalhes?: Json | null
+          fgts_mes?: number | null
+          folha_id: string
+          id?: string
+          inss_mes?: number | null
+          irrf_mes?: number | null
+          salario_base?: number | null
+          status_pagamento?: string | null
+          total_descontos?: number | null
+          total_liquido?: number | null
+          total_proventos?: number | null
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string | null
+          detalhes?: Json | null
+          fgts_mes?: number | null
+          folha_id?: string
+          id?: string
+          inss_mes?: number | null
+          irrf_mes?: number | null
+          salario_base?: number | null
+          status_pagamento?: string | null
+          total_descontos?: number | null
+          total_liquido?: number | null
+          total_proventos?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folha_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_itens_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       folhas_pagamento: {
         Row: {
           competencia: string
