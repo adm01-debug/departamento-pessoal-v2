@@ -94,14 +94,14 @@ function QuickStat({ label, value, icon: Icon, gradient, index = 0 }: {
 }
 
 /* ─── Pendencia Item ─── */
-interface Pendencia {
+interface PendenciaSummary {
   tipo: string;
   descricao: string;
   quantidade: number;
   icone: 'ferias' | 'afastamentos' | 'admissoes' | 'assinaturas' | 'ponto' | 'documentos';
 }
 
-function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: number }) {
+function PendenciaItem({ pendencia, index, onClick }: { pendencia: PendenciaSummary; index: number; onClick?: () => void }) {
   const iconMap: Record<string, React.ElementType> = {
     ferias: Calendar, 
     afastamentos: AlertTriangle, 
@@ -125,6 +125,7 @@ function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: numb
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
+      onClick={onClick}
       className="flex items-center gap-3 p-3 rounded-xl glass hover:border-primary/20 transition-all cursor-pointer group"
     >
       <div className={cn("p-2.5 rounded-xl bg-gradient-to-br", gradientMap[pendencia.icone])}>
