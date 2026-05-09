@@ -138,7 +138,7 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
                 <div className="p-2 rounded-lg bg-destructive/10 text-destructive"><ShieldAlert className="h-5 w-5" /></div>
                 <div>
                   <p className="text-xs font-bold">Interjornada</p>
-                  <p className="text-[10px] text-muted-foreground">< 11h descanso</p>
+                  <p className="text-[10px] text-muted-foreground">{'< 11h descanso'}</p>
                 </div>
               </div>
               <p className="text-2xl font-display font-bold text-destructive">{complianceStats.interjornadaViolations}</p>
@@ -148,7 +148,7 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-warning/10 text-warning"><Clock className="h-5 w-5" /></div>
                 <div>
-                  <p className="text-xs font-bold">Jornada > 10h</p>
+                  <p className="text-xs font-bold">Jornada {'>'} 10h</p>
                   <p className="text-[10px] text-muted-foreground">Limite diário CLT</p>
                 </div>
               </div>
