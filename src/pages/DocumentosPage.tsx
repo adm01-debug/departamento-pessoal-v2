@@ -92,6 +92,7 @@ export default function DocumentosPage() {
         tamanho: file.size,
         mime_type: file.type,
         storage_path: storagePath,
+        colaborador_id: colaboradorId || undefined,
       });
 
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
