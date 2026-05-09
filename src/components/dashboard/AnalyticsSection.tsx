@@ -253,9 +253,35 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
 
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
   const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
+
+  // Real-time notifications for Ponto
+  useMemo(() => {
+    if (!empresaId) return;
+    const channel = (supabase as any)
+      .channel('ponto-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'solicitacoes_ajuste_ponto', filter: `empresa_id=eq.${empresaId}` },
+        (payload: any) => {
+          if (payload.eventType === 'UPDATE') {
+            const status = payload.new.status;
+            if (status === 'aprovado' || status === 'recusado') {
+              toast.info(`Solicitação de Ponto ${status === 'aprovado' ? 'aprovada' : 'recusada'}.`, {
+                description: `Ajuste para ${payload.new.data_ponto} processado.`,
+                icon: status === 'aprovado' ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-destructive" />
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+    return () => { (supabase as any).removeChannel(channel); };
+  }, [empresaId]);
 
   const filteredPendencias = useMemo(() => {
     const list: any[] = [];
