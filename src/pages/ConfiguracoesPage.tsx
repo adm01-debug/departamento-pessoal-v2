@@ -302,38 +302,7 @@ export default function ConfiguracoesPage() {
           <ConfiguracoesGeraisTab />
         </TabsContent>
         <TabsContent value="empresa">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-                <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
-                <CardHeader>
-                   <CardTitle className="font-display">Dados da Empresa</CardTitle>
-                   <CardDescription>Informações cadastrais e fiscais da organização ativa</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                         <Label>Razão Social</Label>
-                         <Input defaultValue="Empresa Exemplo LTDA" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label>CNPJ</Label>
-                         <Input defaultValue="00.000.000/0001-00" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label>Inscrição Estadual</Label>
-                         <Input defaultValue="Isento" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label>CNAE Principal</Label>
-                         <Input defaultValue="7020-4/00" />
-                      </div>
-                   </div>
-                   <div className="pt-4">
-                      <Button className="rounded-xl shadow-glow">Salvar Alterações</Button>
-                   </div>
-                </CardContent>
-             </Card>
-          </motion.div>
+          <EmpresaSettingsTab />
         </TabsContent>
       </Tabs>
     </PageLayout>
