@@ -1,5 +1,7 @@
 // Services Index - Complete
 import { supabase } from '@/integrations/supabase/client';
+import { contratacaoService } from './contratacaoService';
+export { contratacaoService };
 
 export { authService } from './authService';
 export { afastamentoService } from './afastamentoService';

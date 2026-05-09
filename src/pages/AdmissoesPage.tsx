@@ -2,13 +2,18 @@ import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useAdmissoes } from '@/hooks/useAdmissoes';
 import { PageLayout } from '@/components/layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
-import { UserPlus, Search } from 'lucide-react';
+import { UserPlus, Search, ExternalLink, Mail, FileText, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { contratacaoService } from '@/services/contratacaoService';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +44,23 @@ export default function AdmissoesPage() {
   const { admissoes, isLoading } = useAdmissoes();
   const [search, setSearch] = useState('');
   const [etapaFilter, setEtapaFilter] = useState('todos');
+  const [sendingLink, setSendingLink] = useState<string | null>(null);
+
+  const handleEnviarLink = async (admissao: any) => {
+    if (!admissao.email) {
+      toast.error('Candidato sem e-mail cadastrado');
+      return;
+    }
+    setSendingLink(admissao.id);
+    try {
+      await contratacaoService.enviarLinkCandidato(admissao.id, admissao.email);
+      toast.success('Link de contratação enviado com sucesso!');
+    } catch (error: any) {
+      toast.error('Erro ao enviar link: ' + error.message);
+    } finally {
+      setSendingLink(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     let result = admissoes || [];
@@ -143,6 +165,31 @@ export default function AdmissoesPage() {
                   <p><strong className="text-foreground">Data prevista:</strong> {new Date(admissao.data_prevista).toLocaleDateString('pt-BR')}</p>
                   <p><strong className="text-foreground">Salário:</strong> {Number(admissao.salario_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
                 </CardContent>
+                <CardFooter className="pt-2 flex gap-2 border-t border-border/10 bg-muted/5">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex-1 text-xs rounded-xl hover:bg-primary/10 hover:text-primary"
+                    onClick={() => handleEnviarLink(admissao)}
+                    disabled={sendingLink === admissao.id}
+                  >
+                    {sendingLink === admissao.id ? (
+                      <Spinner size="sm" className="mr-2" />
+                    ) : (
+                      <Mail className="w-3 h-3 mr-2" />
+                    )}
+                    Enviar Link
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex-1 text-xs rounded-xl hover:bg-info/10 hover:text-info"
+                    title="Ver Detalhes"
+                  >
+                    <ExternalLink className="w-3 h-3 mr-2" />
+                    Detalhes
+                  </Button>
+                </CardFooter>
               </Card>
             </motion.div>
           ))}
