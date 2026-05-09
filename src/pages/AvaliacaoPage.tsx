@@ -178,23 +178,47 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead>Período</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Ciclo de Avaliação</TableHead>
+                    <TableHead className="font-display font-semibold">Tipo</TableHead>
+                    <TableHead className="font-display font-semibold">Período</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {ciclos.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum ciclo cadastrado</TableCell></TableRow> :
+                  {ciclos.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-12">Nenhum ciclo de desempenho configurado</TableCell></TableRow> :
                     ciclos.map((c: any) => (
-                      <TableRow key={c.id}>
-                        <TableCell className="font-medium">{c.nome}</TableCell>
-                        <TableCell>{c.tipo}</TableCell>
-                        <TableCell>{c.data_inicio} → {c.data_fim}</TableCell>
-                        <TableCell><Badge variant={(statusColors[c.status] || 'secondary') as any}>{c.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirCiclo.mutate(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={c.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell>
+                           <div className="flex flex-col">
+                              <span className="font-body font-bold text-sm">{c.nome}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[250px]">{c.descricao}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell className="capitalize text-xs font-body">{c.tipo}</TableCell>
+                        <TableCell className="text-xs font-body text-muted-foreground">
+                           <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(c.data_inicio).toLocaleDateString('pt-BR')} → {new Date(c.data_fim).toLocaleDateString('pt-BR')}
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[c.status] || 'secondary') as any} className="text-[10px]">{c.status}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirCiclo.mutate(c.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* METAS */}
