@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { workflowService } from '@/services/workflowService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow, ArrowRight, Users, AlertTriangle, Timer } from 'lucide-react';
+import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow, ArrowRight, Users, AlertTriangle, Timer, History, Zap, Mail, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
