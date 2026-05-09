@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { exportPontoCSV } from '@/services/exportService';
+import { motion } from 'framer-motion';
 
 export function PontoAuditTimeline() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,48 +69,62 @@ export function PontoAuditTimeline() {
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[400px] pr-4">
-          <div className="space-y-6 relative before:absolute before:inset-0 before:left-[11px] before:w-px before:bg-border/50">
+          <div className="space-y-6 relative before:absolute before:inset-0 before:left-[11px] before:w-px before:bg-gradient-to-b before:from-primary/50 before:via-border/50 before:to-transparent">
             {filteredLogs.map((log: any, idx: number) => (
-              <div key={log.id} className="relative pl-8 group">
-                <div className="absolute left-0 top-1.5 h-[24px] w-[24px] rounded-full bg-background border-2 border-primary flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
+              <motion.div 
+                key={log.id} 
+                initial={{ opacity: 0, x: -10 }} 
+                animate={{ opacity: 1, x: 0 }} 
+                transition={{ delay: idx * 0.05 }}
+                className="relative pl-8 group"
+              >
+                <div className="absolute left-0 top-1.5 h-[24px] w-[24px] rounded-full bg-background border-2 border-primary flex items-center justify-center z-10 group-hover:scale-110 transition-transform shadow-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                 </div>
                 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px] h-5 bg-primary/5 text-primary border-primary/20">
+                      <Badge variant="outline" className="text-[10px] h-5 bg-primary/5 text-primary border-primary/20 font-bold uppercase tracking-wider">
                         {log.acao}
                       </Badge>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                         <Calendar className="h-3 w-3" /> {format(new Date(log.created_at), "dd 'de' MMM, HH:mm", { locale: ptBR })}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 rounded">
-                      ID: {log.registro_id.slice(0, 8)}
+                    <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded border border-border/30">
+                      REF: {log.registro_id.slice(0, 8)}
                     </span>
                   </div>
                   
-                  <div className="p-3 rounded-xl bg-muted/30 border border-border/40 group-hover:border-primary/20 transition-colors">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/30 to-background border border-border/40 group-hover:border-primary/30 transition-all group-hover:shadow-md">
                     <div className="flex items-center gap-2 mb-2">
-                      <User className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-sm font-medium">{log.usuario?.nome || 'Sistema (Automático)'}</span>
+                      <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-3 w-3 text-primary" />
+                      </div>
+                      <span className="text-sm font-semibold text-foreground/90">{log.usuario?.nome || 'Sistema (Automático)'}</span>
                     </div>
                     
                     {log.justificativa && (
-                      <p className="text-xs text-muted-foreground italic bg-background/50 p-2 rounded-lg border border-dashed mb-2">
-                        "{log.justificativa}"
-                      </p>
+                      <div className="relative overflow-hidden mb-3">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/20 rounded-full" />
+                        <p className="text-xs text-muted-foreground italic bg-primary/5 p-2.5 rounded-r-lg border border-l-0 border-primary/10">
+                          {log.justificativa}
+                        </p>
+                      </div>
                     )}
 
-                    <div className="flex flex-wrap gap-2 text-[10px]">
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Tag className="h-3 w-3" /> Tabela: {log.tabela_nome}
-                      </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-2 text-[10px]">
+                        <span className="flex items-center gap-1 text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-full border border-border/20">
+                          <Tag className="h-3 w-3" /> Entidade: {log.tabela_nome}
+                        </span>
+                      </div>
+                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors translate-x-0 group-hover:translate-x-1" />
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </ScrollArea>

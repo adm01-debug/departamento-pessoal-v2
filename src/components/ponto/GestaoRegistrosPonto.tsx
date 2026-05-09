@@ -127,16 +127,19 @@ export function GestaoRegistrosPonto() {
                   />
                 </div>
                 
-                <select 
-                  value={tipoExcecao} 
-                  onChange={(e) => setTipoExcecao(e.target.value)}
-                  className="h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-sm"
-                >
-                  <option value="todas">Todas as Batidas</option>
-                  <option value="atrasos">Apenas Atrasos</option>
-                  <option value="faltas">Apenas Faltas</option>
-                  <option value="incompletos">Incompletos/Abertos</option>
-                </select>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] text-muted-foreground font-bold px-1">TIPO DE EXCEÇÃO</span>
+                  <select 
+                    value={tipoExcecao} 
+                    onChange={(e) => setTipoExcecao(e.target.value)}
+                    className="h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-sm focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="todas">Todas as Batidas</option>
+                    <option value="atrasos">Apenas Atrasos</option>
+                    <option value="faltas">Apenas Faltas</option>
+                    <option value="incompletos">Incompletos/Abertos</option>
+                  </select>
+                </div>
 
                 <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm">
                   <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" onClick={() => {
