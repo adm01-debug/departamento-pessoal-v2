@@ -154,6 +154,7 @@ function useStrategicFinancials(empresaId?: string) {
 }
 
 export default function DashboardExecutivoPage() {
+  const navigate = useNavigate();
   const { empresaAtualId } = useEmpresas();
   const [periodo, setPeriodo] = useState('6');
   const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId, periodo);
