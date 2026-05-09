@@ -83,6 +83,21 @@ function Bitrix24ConfigPanel() {
     onError: () => toast.error('Erro ao salvar'),
   });
 
+  const sincronizar = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await (window as any).supabase.functions.invoke('sincronizar-bitrix', {
+        body: { action: 'sync_all' }
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['bitrix24_sync_logs'] });
+      toast.success(`Sincronização concluída: ${res.data.totals.success} sucessos.`);
+    },
+    onError: (err: any) => toast.error(`Falha no Sync: ${err.message}`),
+  });
+
   if (loadConfig) return <div className="flex justify-center py-8"><Spinner /></div>;
 
   return (
