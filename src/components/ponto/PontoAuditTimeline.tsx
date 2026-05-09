@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) {
   const [searchTerm, setSearchTerm] = useState('');
 
+  const queryClient = useQueryClient();
   const { data: auditLogs = [], isLoading } = useQuery({
     queryKey: ['ponto-audit-logs', filterTabela],
     queryFn: async () => {
@@ -25,7 +26,7 @@ export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) 
       if (filterTabela) {
         query = query.eq('tabela', filterTabela);
       } else {
-        query = query.or('tabela.eq.batidas_ponto,tabela.eq.registros_ponto');
+        query = query.or('tabela.eq.batidas_ponto,tabela.eq.registros_ponto,tabela.eq.solicitacoes_ajuste_ponto');
       }
       
       const { data, error } = await query
@@ -35,6 +36,21 @@ export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) 
       return data || [];
     }
   });
+
+  // Real-time listener for audit logs
+  useMemo(() => {
+    const channel = (supabase as any)
+      .channel('audit-changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'audit_log' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['ponto-audit-logs'] });
+        }
+      )
+      .subscribe();
+    return () => { (supabase as any).removeChannel(channel); };
+  }, [queryClient]);
 
 
 
