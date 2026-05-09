@@ -123,6 +123,7 @@ export default function AvaliacaoPage() {
             <TabsTrigger value="feedbacks">Feedback 360°</TabsTrigger>
             <TabsTrigger value="pdis">PDI</TabsTrigger>
             <TabsTrigger value="competencias">Competências</TabsTrigger>
+            <TabsTrigger value="ninebox">Matriz Nine-Box</TabsTrigger>
           </TabsList>
 
           {/* CICLOS */}
