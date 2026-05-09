@@ -89,7 +89,6 @@ const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const FinanceiroBancarioPage = lazy(() => import('@/pages/FinanceiroBancarioPage'));
 const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
-const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
 
 
 function PageLoader() {
