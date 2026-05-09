@@ -65,7 +65,16 @@ export default function PontoKioskPage() {
   };
 
   return (
-    <PageLayout title="Modo Quiosque" description="Registro rápido para múltiplos colaboradores" icon={<Fingerprint className="h-5 w-5" />} hideSidebar>
+    <div className="min-h-screen bg-background p-6 font-body">
+      <div className="max-w-4xl mx-auto flex items-center gap-3 mb-8">
+        <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg">
+          <Fingerprint className="h-6 w-6 text-primary-foreground" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-display font-bold">Modo Quiosque</h1>
+          <p className="text-muted-foreground text-sm">Registro rápido para múltiplos colaboradores</p>
+        </div>
+      </div>
       <div className="max-w-md mx-auto mt-12">
         <div className="text-center mb-12">
           <div className="text-7xl font-display font-bold tabular-nums mb-2">
