@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { DetalhesAdmissaoDialog } from '@/components/admissoes/DetalhesAdmissaoDialog';
-import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send } from 'lucide-react';
+import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send, LayoutDashboard, List, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -21,6 +21,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { contratacaoService } from '@/services/contratacaoService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OnboardingDashboard } from '@/components/admissoes/OnboardingDashboard';
+
 
 const etapaLabels: Record<string, string> = {
   solicitacao: 'Solicitação',
