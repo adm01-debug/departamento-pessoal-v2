@@ -44,8 +44,16 @@ function ContratacaoWorkflow({ token }: { token: string }) {
   const { processDocument, isProcessing: isOCRProcessing } = useDocumentOCR();
 
   const { data: tokenData, isLoading } = useQuery({
-// ... keep existing code
-    },
+    queryKey: ['contratacao-token', token],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admissao_tokens')
+        .select('*, admissao:admissoes(*)')
+        .eq('token', token)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+
   });
 
   useEffect(() => {
