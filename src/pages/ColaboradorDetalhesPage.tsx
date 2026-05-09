@@ -42,7 +42,7 @@ export default function ColaboradorDetalhesPage() {
   if (!colaborador) return <div className="p-6">Colaborador não encontrado</div>;
 
   const sections = [
-    { id: 'pessoal', label: 'Pessoal', icon: User, tabs: ['dependentes', 'emergencia', 'pcd', 'estrangeiro'] },
+    { id: 'pessoal', label: 'Pessoal', icon: UserIcon, tabs: ['dependentes', 'emergencia', 'pcd', 'estrangeiro'] },
     { id: 'carreira', label: 'Carreira', icon: Briefcase, tabs: ['experiencia', 'formacao', 'aso', 'contratos', 'historico'] },
     { id: 'administrativo', label: 'Administrativo', icon: ShieldCheck, tabs: ['contas', 'documentos', 'aquisitivos', 'anotacoes', 'estagiario'] },
   ];

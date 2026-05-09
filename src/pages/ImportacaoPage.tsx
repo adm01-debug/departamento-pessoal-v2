@@ -250,7 +250,7 @@ export default function ImportacaoPage() {
             <Card className="border-border/30 rounded-xl"><CardContent className="p-3"><p className="text-lg font-bold text-destructive">{importResult.errors}</p><p className="text-[10px] font-body text-muted-foreground">Erros</p></CardContent></Card>
             <Card className="border-border/30 rounded-xl"><CardContent className="p-3"><p className="text-lg font-bold text-warning">{importResult.duplicates}</p><p className="text-[10px] font-body text-muted-foreground">Duplicados</p></CardContent></Card>
           </div>
-          <Button onClick={() => { setStep('upload'); setRows([]); setProgress(0); }} className="rounded-xl font-body">Nova Importação</Button>
+          <Button onClick={() => { setStep('upload'); setRows([]); }} className="rounded-xl font-body">Nova Importação</Button>
         </motion.div>
       )}
     </PageLayout>
