@@ -9959,6 +9959,50 @@ export type Database = {
         }
         Relationships: []
       }
+      personnel_budget: {
+        Row: {
+          ano: number
+          created_at: string | null
+          departamento: string
+          descricao: string | null
+          empresa_id: string
+          id: string
+          mes: number
+          updated_at: string | null
+          valor_orcado: number
+        }
+        Insert: {
+          ano: number
+          created_at?: string | null
+          departamento: string
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          mes: number
+          updated_at?: string | null
+          valor_orcado?: number
+        }
+        Update: {
+          ano?: number
+          created_at?: string | null
+          departamento?: string
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          mes?: number
+          updated_at?: string | null
+          valor_orcado?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personnel_budget_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pesquisas: {
         Row: {
           anonima: boolean | null
@@ -14779,6 +14823,13 @@ export type Database = {
         Returns: Json
       }
       cleanup_security_logs: { Args: never; Returns: undefined }
+      get_personnel_cost_projection: {
+        Args: { p_empresa_id: string; p_months: number }
+        Returns: {
+          mes_ref: string
+          total_estimado: number
+        }[]
+      }
       get_user_default_empresa: { Args: { _user_id: string }; Returns: string }
       get_user_empresas: { Args: { _user_id: string }; Returns: string[] }
       get_user_roles: {
