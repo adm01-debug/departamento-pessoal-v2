@@ -67,8 +67,9 @@ export const contratacaoService = {
     await supabase.from('notificacoes_admissao').insert({
       admissao_id: admissaoId,
       tipo: 'whatsapp',
+      canal: 'whatsapp',
       status: 'enviado',
-      metadata: { link }
+      mensagem: `Link de contratação enviado via WhatsApp`
     });
   }
 };
