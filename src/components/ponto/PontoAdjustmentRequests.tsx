@@ -30,11 +30,27 @@ export function PontoAdjustmentRequests() {
 
   const mutation = useMutation({
     mutationFn: async ({ id, status, observacoes }: { id: string, status: string, observacoes?: string }) => {
-      const { error } = await supabase
+      // 1. Update the request
+      const { data: request, error: updateError } = await supabase
         .from('solicitacoes_ajuste_ponto')
-        .update({ status, observacoes_gestor: observacoes, updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) throw error;
+        .update({ 
+          status, 
+          observacoes_gestor: observacoes, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (updateError) throw updateError;
+
+      // 2. If approved, apply the change to batidas_ponto
+      if (status === 'aprovado') {
+        const { error: applyError } = await supabase.rpc('processar_ajuste_aprovado', {
+          p_solicitacao_id: id
+        });
+        if (applyError) throw applyError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes-ajuste-ponto'] });

@@ -9,7 +9,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard } from '@/components/folha';
+import { useEmpresas } from '@/hooks/useEmpresas';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard } from '@/components/folha';
 
 /* ─── Helpers ─── */
 function gerarCompetencias(): string[] {
@@ -74,6 +75,7 @@ function useFolhaResumo(competencia: string) {
 
 /* ─── Main Page ─── */
 export default function FolhaPagamentoPage() {
+  const { empresaAtual } = useEmpresas();
   const competencias = useMemo(() => gerarCompetencias(), []);
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
   const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
@@ -108,7 +110,7 @@ export default function FolhaPagamentoPage() {
     setCalcServidor(true);
     try {
       const [mes, ano] = competencia.split('/');
-      await edgeFunctionsService.calcularFolha({ empresaId: '', competencia: `${ano}-${mes}` });
+      await edgeFunctionsService.calcularFolha({ empresaId: empresaAtual?.id || '', competencia: `${ano}-${mes}` });
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       toast.success('Folha calculada no servidor com sucesso!');
     } catch (err: any) {
@@ -156,6 +158,7 @@ export default function FolhaPagamentoPage() {
             <RubricasDialog />
             <Simulador13Dialog />
             <SimuladorWhatIf />
+            {resumo?.id && <PagamentoBancarioWizard folhaId={resumo.id} />}
             {resumo?.id && <CNABDialog folhaId={resumo.id} />}
             {resumo?.id && <RelatorioContabilDialog folhaId={resumo.id} />}
           </div>

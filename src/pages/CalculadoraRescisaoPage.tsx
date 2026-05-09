@@ -27,6 +27,7 @@ export default function CalculadoraRescisaoPage() {
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
     avisoTrabalhado: false, feriasVencidas: false, saldoFGTS: '',
+    motivoDesligamento: '', observacoes: ''
   });
   const [result, setResult] = useState<RescisaoResult | null>(null);
   const [saving, setSaving] = useState(false);
@@ -109,10 +110,12 @@ export default function CalculadoraRescisaoPage() {
   }, [form]);
 
   const salvarHistorico = useCallback(async () => {
-    if (!result || !user) return;
+    if (!result || !user || !empresaAtual) return;
     setSaving(true);
     try {
-      const { error } = await supabase.from('historico_rescisoes' as any).insert({
+      // 1. Save to History
+      const { data: historico, error: histError } = await supabase.from('historico_rescisoes' as any).insert({
+        empresa_id: empresaAtual.id,
         created_by: user.id,
         nome_colaborador: form.nomeColaborador || null,
         cpf: form.cpf || null,
@@ -128,8 +131,27 @@ export default function CalculadoraRescisaoPage() {
         total_descontos: result.totalDescontos,
         total_liquido: result.totalLiquido,
         resultado: result as any,
-      });
-      if (error) throw error;
+      }).select().single();
+      
+      if (histError) throw histError;
+
+      // 2. Integration with Desligamentos Table
+      if (form.dataDesligamento) {
+        const { error: deslError } = await supabase.from('desligamentos').insert({
+          empresa_id: empresaAtual.id,
+          colaborador_id: colaboradores.find(c => c.nome_completo === form.nomeColaborador)?.id,
+          data_desligamento: form.dataDesligamento,
+          motivo: form.tipo.replace(/_/g, ' '),
+          valor_rescisao: result.totalLiquido,
+          status: 'pendente',
+          created_by: user.id
+        });
+        
+        if (!deslError) {
+          toast.success('Desligamento registrado no módulo de Pessoas!');
+        }
+      }
+
       toast.success('Cálculo salvo no histórico!');
     } catch (err: any) {
       toast.error(`Erro ao salvar: ${err.message}`);
@@ -150,7 +172,7 @@ export default function CalculadoraRescisaoPage() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Form */}
-        <Card className="border-border/30 rounded-2xl">
+        <Card className="border-border/30 rounded-2xl shadow-elevated">
           <CardHeader>
             <CardTitle className="text-base font-display">Dados da Rescisão</CardTitle>
             <CardDescription className="font-body text-xs">Preencha os dados para calcular as verbas rescisórias</CardDescription>
