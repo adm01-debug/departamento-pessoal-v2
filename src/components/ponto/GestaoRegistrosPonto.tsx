@@ -240,6 +240,17 @@ export function GestaoRegistrosPonto() {
                 <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="w-10">
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-gray-300"
+                        checked={selecionados.length === filtrados.length && filtrados.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) setSelecionados(filtrados.map((f: any) => f.id));
+                          else setSelecionados([]);
+                        }}
+                      />
+                    </TableHead>
                     <TableHead className="font-display font-semibold">Colaborador</TableHead>
                     <TableHead className="font-display font-semibold">Escala</TableHead>
                     <TableHead className="font-display font-semibold">Entrada 1</TableHead>
