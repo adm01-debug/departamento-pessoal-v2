@@ -114,6 +114,41 @@ function useExecutiveKPIs(empresaId?: string, periodo: string = '6') {
   });
 }
 
+function useStrategicFinancials(empresaId?: string) {
+  return useQuery({
+    queryKey: ['strategic-financials', empresaId],
+    enabled: !!empresaId,
+    queryFn: async () => {
+      // 1. Get Projections from our new SQL function
+      const { data: projections, error: projErr } = await supabase.rpc('get_personnel_cost_projection', {
+        p_empresa_id: empresaId!,
+        p_months: 6
+      });
+
+      // 2. Get Budgets
+      const { data: budgets } = await supabase
+        .from('personnel_budget')
+        .select('*')
+        .eq('empresa_id', empresaId!)
+        .eq('ano', new Date().getFullYear());
+
+      // 3. Get Actual costs per department (from last payroll)
+      const { data: actuals } = await supabase
+        .from('folhas_pagamento')
+        .select('total_proventos, total_liquido, total_descontos')
+        .eq('empresa_id', empresaId!)
+        .order('competencia', { ascending: false })
+        .limit(1);
+
+      return {
+        projections: projections || [],
+        budgets: budgets || [],
+        actuals: actuals?.[0] || null
+      };
+    }
+  });
+}
+
 export default function DashboardExecutivoPage() {
   const { empresaAtualId } = useEmpresas();
   const [periodo, setPeriodo] = useState('6');
