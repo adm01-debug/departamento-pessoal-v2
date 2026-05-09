@@ -25,7 +25,12 @@ import { useDocumentOCR, OCRResult } from '@/hooks/useDocumentOCR';
 import { contratacaoService } from '@/services/contratacaoService';
 
 const STEPS = [
-// ... keep existing code
+  { id: 'dados', label: 'Dados', icon: User },
+  { id: 'documentos', label: 'Documentos', icon: Upload },
+  { id: 'contrato', label: 'Contrato', icon: FileText },
+  { id: 'assinatura', label: 'Assinatura', icon: PenTool },
+] as const;
+
 function ContratacaoWorkflow({ token }: { token: string }) {
   const [step, setStep] = useState(0);
   const queryClient = useQueryClient();
