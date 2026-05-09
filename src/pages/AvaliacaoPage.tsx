@@ -17,7 +17,8 @@ import { avaliacaoService } from '@/services/avaliacaoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGrid } from 'lucide-react';
 
 const statusColors: Record<string, string> = { rascunho: 'secondary', ativo: 'default', finalizado: 'outline', pendente: 'secondary', em_andamento: 'default', concluido: 'outline' };
 
