@@ -11665,6 +11665,90 @@ export type Database = {
           },
         ]
       }
+      solicitacoes_ajuste_ponto: {
+        Row: {
+          aprovado_por: string | null
+          colaborador_id: string
+          created_at: string | null
+          data_ponto: string
+          empresa_id: string
+          hora_original: string | null
+          hora_sugerida: string
+          id: string
+          motivo: string
+          observacoes_gestor: string | null
+          status: string | null
+          tipo_ponto: string
+          updated_at: string | null
+        }
+        Insert: {
+          aprovado_por?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          data_ponto: string
+          empresa_id: string
+          hora_original?: string | null
+          hora_sugerida: string
+          id?: string
+          motivo: string
+          observacoes_gestor?: string | null
+          status?: string | null
+          tipo_ponto: string
+          updated_at?: string | null
+        }
+        Update: {
+          aprovado_por?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          data_ponto?: string
+          empresa_id?: string
+          hora_original?: string | null
+          hora_sugerida?: string
+          id?: string
+          motivo?: string
+          observacoes_gestor?: string | null
+          status?: string | null
+          tipo_ponto?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_aprovado_por_fkey"
+            columns: ["aprovado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_ajuste_ponto_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       solicitacoes_hora_extra: {
         Row: {
           aprovado_em: string | null
@@ -13519,6 +13603,59 @@ export type Database = {
       }
     }
     Views: {
+      excecoes_ponto: {
+        Row: {
+          colaborador_id: string | null
+          colaborador_nome: string | null
+          data: string | null
+          status_alerta: string | null
+          total_batidas: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pontos_abertos: {
         Row: {
           colaborador_id: string | null
