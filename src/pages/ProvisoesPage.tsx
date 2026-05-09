@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
@@ -9,8 +9,19 @@ import { EmptyList, EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { provisaoService } from '@/services';
-import { Calculator, Wallet, TrendingUp, Landmark, PieChart, Info, Download, FileText, FileSpreadsheet, History } from 'lucide-react';
+import { Calculator, Wallet, TrendingUp, Landmark, PieChart, Info, Download, FileText, FileSpreadsheet, History, BarChart3, ShieldCheck, Activity, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Cell,
+  Legend
+} from 'recharts';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
@@ -26,6 +37,7 @@ function formatCurrency(value: number): string {
 
 export default function ProvisoesPage() {
   const [competencia, setCompetencia] = useState(new Date().toISOString().substring(0, 7));
+  const [selectedLog, setSelectedLog] = useState<any>(null);
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
 
@@ -33,6 +45,21 @@ export default function ProvisoesPage() {
     queryKey: ['provisoes', empresaAtual?.id, competencia],
     queryFn: () => provisaoService.list(empresaAtual?.id, `${competencia}-01`),
     enabled: !!empresaAtual?.id,
+  });
+
+  const { data: inconsistencias } = useQuery({
+    queryKey: ['provisao-inconsistencias', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await (window as any).supabase
+        .from('colaboradores')
+        .select('id, nome_completo')
+        .eq('empresa_id', empresaAtual?.id)
+        .eq('status', 'Ativo')
+        .or('salario_base.is.null,salario_base.eq.0');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!empresaAtual?.id
   });
 
   const mutation = useMutation({
@@ -106,6 +133,22 @@ export default function ProvisoesPage() {
     enabled: !!empresaAtual?.id
   });
 
+  const { data: trendData } = useQuery({
+    queryKey: ['provisao-trend', empresaAtual?.id],
+    queryFn: async () => {
+      const { data, error } = await (window as any).supabase
+        .from('provisao_logs')
+        .select('competencia, valor_total_provisionado')
+        .eq('empresa_id', empresaAtual?.id)
+        .eq('status', 'CONCLUIDO')
+        .order('competencia', { ascending: true })
+        .limit(6);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!empresaAtual?.id
+  });
+
   return (
     <>
       <PageTitle title="Provisões Mensais" description="Gestão de provisões de férias e 13º salário" />
@@ -132,6 +175,25 @@ export default function ProvisoesPage() {
           </TabsList>
 
           <TabsContent value="relatorio" className="space-y-6">
+            {inconsistencias && inconsistencias.length > 0 && (
+              <Card className="border-warning/30 bg-warning/5 rounded-2xl overflow-hidden shadow-sm">
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-warning/10 text-warning">
+                      <AlertCircle className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-warning-foreground">Inconsistências Detectadas</p>
+                      <p className="text-xs text-muted-foreground">{inconsistencias.length} colaboradores ativos estão sem salário base definido. As provisões para estes colaboradores serão zero.</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-warning/20 hover:bg-warning/10 text-warning-foreground" onClick={() => window.location.href = '/colaboradores'}>
+                    Corrigir
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             {!isLoading && provisoes && provisoes.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
@@ -193,6 +255,36 @@ export default function ProvisoesPage() {
               </div>
             </div>
 
+            {trendData && trendData.length > 1 && (
+              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm bg-muted/10">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-display flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+                    <BarChart3 className="h-3.5 w-3.5" /> Tendência de Provisões (Últimos Meses)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={trendData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
+                        <XAxis dataKey="competencia" fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `R$${v / 1000}k`} />
+                        <RechartsTooltip 
+                          formatter={(v: any) => formatCurrency(v)}
+                          contentStyle={{ backgroundColor: 'hsl(var(--background))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
+                        />
+                        <Bar dataKey="valor_total_provisionado" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40}>
+                          {trendData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fillOpacity={0.8 + (index / trendData.length) * 0.2} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {isLoading ? (
               <div className="flex justify-center p-12"><Spinner size="lg" /></div>
             ) : !provisoes?.length ? (
@@ -253,6 +345,8 @@ export default function ProvisoesPage() {
                       <TableHead className="text-xs">Data/Hora</TableHead>
                       <TableHead className="text-xs">Competência</TableHead>
                       <TableHead className="text-xs">Status</TableHead>
+                      <TableHead className="text-xs">Duração</TableHead>
+                      <TableHead className="text-xs">Colaboradores</TableHead>
                       <TableHead className="text-xs text-right">Valor Total</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -263,15 +357,18 @@ export default function ProvisoesPage() {
                       </TableRow>
                     ) : (
                       auditLogs.map((log: any) => (
-                        <TableRow key={log.id} className="text-xs">
-                          <TableCell>{new Date(log.created_at).toLocaleString('pt-BR')}</TableCell>
+                        <TableRow key={log.id} className="text-xs cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setSelectedLog(log)}>
+                          <TableCell className="font-medium">{new Date(log.created_at).toLocaleString('pt-BR')}</TableCell>
                           <TableCell>{log.competencia}</TableCell>
                           <TableCell>
                             <Badge variant={log.status === 'CONCLUIDO' ? 'success' : log.status === 'ERRO' ? 'destructive' : 'secondary'} className="text-[10px] px-1.5 h-5">
+                              {log.status === 'CONCLUIDO' ? <ShieldCheck className="h-3 w-3 mr-1" /> : log.status === 'PROCESSANDO' ? <Activity className="h-3 w-3 mr-1 animate-spin" /> : <AlertCircle className="h-3 w-3 mr-1" />}
                               {log.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right font-mono">{formatCurrency(log.valor_total_provisionado || 0)}</TableCell>
+                          <TableCell className="text-muted-foreground">{log.duracao_ms ? `${log.duracao_ms}ms` : '-'}</TableCell>
+                          <TableCell className="font-medium">{log.total_colaboradores || 0}</TableCell>
+                          <TableCell className="text-right font-mono font-bold text-primary">{formatCurrency(log.valor_total_provisionado || 0)}</TableCell>
                         </TableRow>
                       ))
                     )}
@@ -281,6 +378,53 @@ export default function ProvisoesPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {selectedLog && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedLog(null)}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              className="bg-card border border-border/40 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden" 
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-muted/30 p-4 border-b border-border/40 flex items-center justify-between">
+                <h3 className="font-display font-bold flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Detalhes da Auditoria
+                </h3>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setSelectedLog(null)}>×</Button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-muted/20 rounded-xl border border-border/30">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Status</p>
+                    <Badge variant={selectedLog.status === 'CONCLUIDO' ? 'success' : 'destructive'} className="text-[10px]">
+                      {selectedLog.status}
+                    </Badge>
+                  </div>
+                  <div className="p-3 bg-muted/20 rounded-xl border border-border/30">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Duração</p>
+                    <p className="text-sm font-mono">{selectedLog.duracao_ms || 0}ms</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Rastreabilidade Técnica (JSON)</p>
+                  <pre className="p-4 bg-slate-950 text-slate-400 rounded-xl text-[10px] overflow-auto max-h-48 font-mono">
+                    {JSON.stringify(selectedLog.metadados, null, 2)}
+                  </pre>
+                </div>
+
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground bg-info/5 p-3 rounded-xl border border-info/10">
+                  <Info className="h-3.5 w-3.5 text-info" />
+                  <span>Este registro é imutável e serve como prova de execução para auditorias de conformidade.</span>
+                </div>
+              </div>
+              <div className="bg-muted/30 p-4 flex justify-end">
+                <Button variant="secondary" size="sm" className="rounded-xl" onClick={() => setSelectedLog(null)}>Fechar</Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </PageLayout>
     </>
   );
