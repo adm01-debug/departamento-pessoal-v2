@@ -23,11 +23,16 @@ export const calculoFerias = {
     diasAbono = 0,
     dependentesIrrf = 0
   }: CalculoFeriasParams): CalculoFeriasResult => {
+    // Validação de Abono Pecuniário (Máximo 1/3 do período)
+    const maxAbono = Math.floor(diasFerias / 3);
+    const diasAbonoEfetivo = Math.min(diasAbono, maxAbono, 10);
+
     const valorDia = salarioBase / 30;
     const vf = Math.round(valorDia * diasFerias * 100) / 100;
     const tc = Math.round(vf / 3 * 100) / 100;
-    const va = Math.round(valorDia * diasAbono * 100) / 100;
+    const va = Math.round(valorDia * diasAbonoEfetivo * 100) / 100;
     const ta = Math.round(va / 3 * 100) / 100;
+
     
     const bruto = vf + tc + va + ta;
     
