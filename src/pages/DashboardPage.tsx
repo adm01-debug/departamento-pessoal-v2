@@ -91,8 +91,8 @@ function useDashboardStats(enabled: boolean) {
         .sort((a, b) => b.count - a.count)
         .slice(0, 6);
 
-      const turnoverVal = viewTurnover?.[0]?.taxa_turnover ?? ((demissoesMes || 0) / (colaboradoresAtivos || 1)) * 100;
-      const absenteismoVal = viewAbsenteismo?.[0]?.taxa_absenteismo ?? 0;
+      const turnoverVal = (viewTurnover as any)?.[0]?.taxa_turnover ?? ((demissoesMes || 0) / (colaboradoresAtivos || 1)) * 100;
+      const absenteismoVal = (viewAbsenteismo as any)?.[0]?.taxa_absenteismo ?? 0;
 
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
