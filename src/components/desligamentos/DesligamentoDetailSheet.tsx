@@ -5,11 +5,14 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { StatusBadge, TipoBadge } from './DesligamentoStatusBadge';
 import { DesligamentoChecklist } from './DesligamentoChecklist';
-import { Calculator, Download, FileText, User, Calendar, DollarSign } from 'lucide-react';
+import { Calculator, Download, FileText, User, Calendar, DollarSign, RefreshCw, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { desligamentoService } from '@/services/desligamentoService';
+import { rescisaoService } from '@/services/rescisaoService';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useState } from 'react';
+
 
 interface DetailSheetProps {
   desligamento: any | null;
@@ -25,6 +28,8 @@ function fmt(v: number | null) {
 export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailSheetProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [calculating, setCalculating] = useState(false);
+  const [homologating, setHomologating] = useState(false);
   const d = desligamento;
 
   if (!d) return null;
@@ -38,6 +43,45 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
       toast.error('Erro ao atualizar checklist');
     }
   };
+
+  const handleCalcular = async () => {
+    if (!d.salario_base || !d.data_desligamento) {
+      toast.error('Salário base e data de desligamento são obrigatórios para o cálculo');
+      return;
+    }
+    setCalculating(true);
+    try {
+      await rescisaoService.calcularESalvar(d.id, {
+        salario_base: d.salario_base,
+        data_admissao: d.colaborador?.data_admissao || d.data_admissao, // Fallback
+        data_desligamento: d.data_desligamento,
+        tipo: d.tipo || 'sem_justa_causa',
+        aviso_trabalhado: d.aviso_trabalhado || false,
+        ferias_vencidas: d.ferias_vencidas_check || false,
+        saldo_fgts: d.saldo_fgts || 0,
+      });
+      queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
+      toast.success('Rescisão calculada com sucesso');
+    } catch (err: any) {
+      toast.error('Erro ao calcular: ' + err.message);
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  const handleHomologar = async () => {
+    setHomologating(true);
+    try {
+      await rescisaoService.homologar(d.id);
+      queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
+      toast.success('Homologação concluída');
+    } catch (err: any) {
+      toast.error('Erro ao homologar: ' + err.message);
+    } finally {
+      setHomologating(false);
+    }
+  };
+
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -106,14 +150,35 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
               </CardContent>
             </Card>
 
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={handleCalcular}
+                disabled={calculating}
+                className="rounded-xl font-body bg-primary hover:bg-primary-glow"
+              >
+                {calculating ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Calculator className="h-4 w-4 mr-2" />}
+                {d.valor_liquido ? 'Recalcular' : 'Calcular Agora'}
+              </Button>
+
+              <Button
+                onClick={handleHomologar}
+                disabled={homologating || d.status === 'homologado'}
+                variant="outline"
+                className="rounded-xl font-body border-success/50 hover:bg-success/10 text-success"
+              >
+                {homologating ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                Homologar
+              </Button>
+            </div>
+
             <Button
               onClick={() => navigate('/calculadora-rescisao')}
-              variant="outline"
-              className="w-full rounded-xl font-body"
+              variant="ghost"
+              className="w-full rounded-xl font-body text-xs text-muted-foreground"
             >
-              <Calculator className="h-4 w-4 mr-2" />
-              Abrir Calculadora de Rescisão
+              Abrir Calculadora Avançada
             </Button>
+
           </TabsContent>
         </Tabs>
       </SheetContent>
