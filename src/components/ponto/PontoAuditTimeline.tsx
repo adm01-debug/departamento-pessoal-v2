@@ -19,14 +19,16 @@ export function PontoAuditTimeline() {
     queryKey: ['ponto-audit-logs'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('ponto_auditoria')
-        .select('*, usuario:profiles(nome)')
+        .from('audit_log')
+        .select('*')
+        .or('tabela.eq.batidas_ponto,tabela.eq.registros_ponto')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
       if (error) throw error;
       return data || [];
     }
   });
+
 
   const filteredLogs = auditLogs.filter((log: any) => 
     log.acao.toLowerCase().includes(searchTerm.toLowerCase()) ||
