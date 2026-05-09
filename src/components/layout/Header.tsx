@@ -6,6 +6,7 @@ import { UserProfileMenu } from '@/components/ui/user-profile-menu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Breadcrumbs } from './Breadcrumbs';
 import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
+import { useAuth } from '@/hooks/useAuth';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -14,6 +15,7 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick, user, className }: HeaderProps) {
+  const { isAdmin } = useAuth();
   const handleSearchClick = () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
   };
@@ -30,7 +32,7 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         </Button>
 
         {/* Breadcrumbs */}
-        <Breadcrumbs className="hidden md:flex" />
+        {isAdmin && <Breadcrumbs className="hidden md:flex" />}
 
         {/* Compact search trigger */}
         <button
