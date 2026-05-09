@@ -14931,6 +14931,10 @@ export type Database = {
       }
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
+      processar_ajuste_aprovado: {
+        Args: { p_solicitacao_id: string }
+        Returns: undefined
+      }
       record_failed_login: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: {
