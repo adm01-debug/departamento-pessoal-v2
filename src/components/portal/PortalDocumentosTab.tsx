@@ -9,6 +9,8 @@ interface PortalDocumentosTabProps {
 export function PortalDocumentosTab({ navigate }: PortalDocumentosTabProps) {
   const items = [
     { label: 'Documentos Pessoais', path: '/documentos', icon: FileText, desc: 'Envie e consulte seus documentos' },
+    { label: 'Certificados', path: '/documentos?tipo=Certificado', icon: FileText, desc: 'Certificados de cursos e treinamentos' },
+    { label: 'Atestados', path: '/documentos?tipo=Atestado', icon: FileText, desc: 'Envie seus atestados médicos' },
     { label: 'Contratos', path: '/assinaturas', icon: PenTool, desc: 'Assine documentos pendentes' },
     { label: 'Holerites', path: '/holerites', icon: DollarSign, desc: 'Baixe seus contracheques' },
     { label: 'Gerador de Docs', path: '/gerador-documentos', icon: FileText, desc: 'Gere declarações e atestados' },
