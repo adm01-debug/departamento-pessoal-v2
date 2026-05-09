@@ -18,6 +18,7 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { RelatoriosAnalyticsTab } from '@/components/relatorios/RelatoriosAnalyticsTab';
+import { RelatoriosExportTab } from '@/components/relatorios/RelatoriosExportTab';
 import { RelatoriosAgendadosTab } from '@/components/relatorios/RelatoriosAgendadosTab';
 
 const relatorios = [
