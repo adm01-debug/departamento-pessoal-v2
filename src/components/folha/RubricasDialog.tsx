@@ -18,11 +18,32 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Settings2, Plus, Trash2, Check, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Settings2, Plus, Trash2, Check, X, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function RubricasDialog() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newRubrica, setNewRubrica] = useState({
+    codigo: '',
+    descricao: '',
+    tipo: 'provento' as 'provento' | 'desconto',
+    incide_inss: true,
+    incide_fgts: true,
+    incide_irrf: true,
+    automatico: false,
+    ativo: true,
+  });
   const queryClient = useQueryClient();
 
   const { data: rubricas, isLoading } = useQuery({
@@ -34,6 +55,33 @@ export function RubricasDialog() {
         .order('codigo', { ascending: true });
       if (error) throw error;
       return data;
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (rubrica: typeof newRubrica) => {
+      const { error } = await supabase
+        .from('rubricas_folha')
+        .insert(rubrica);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rubricas_folha'] });
+      toast.success('Rubrica criada com sucesso');
+      setIsAdding(false);
+      setNewRubrica({
+        codigo: '',
+        descricao: '',
+        tipo: 'provento',
+        incide_inss: true,
+        incide_fgts: true,
+        incide_irrf: true,
+        automatico: false,
+        ativo: true,
+      });
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao criar rubrica: ${error.message}`);
     },
   });
 
@@ -66,12 +114,92 @@ export function RubricasDialog() {
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>Gestão de Rubricas (Eventos)</DialogTitle>
-            <Button size="sm" className="gap-2 rounded-xl">
-              <Plus className="h-4 w-4" />
-              Nova Rubrica
+            <Button 
+              size="sm" 
+              className="gap-2 rounded-xl"
+              onClick={() => setIsAdding(!isAdding)}
+            >
+              {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {isAdding ? 'Cancelar' : 'Nova Rubrica'}
             </Button>
           </div>
         </DialogHeader>
+
+        {isAdding && (
+          <div className="mt-4 p-4 border rounded-xl bg-muted/30 space-y-4 animate-in fade-in slide-in-from-top-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="codigo">Código</Label>
+                <Input
+                  id="codigo"
+                  placeholder="Ex: 101"
+                  value={newRubrica.codigo}
+                  onChange={(e) => setNewRubrica({ ...newRubrica, codigo: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tipo">Tipo</Label>
+                <Select
+                  value={newRubrica.tipo}
+                  onValueChange={(val: any) => setNewRubrica({ ...newRubrica, tipo: val })}
+                >
+                  <SelectTrigger id="tipo">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="provento">Provento</SelectItem>
+                    <SelectItem value="desconto">Desconto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Input
+                id="descricao"
+                placeholder="Ex: Salário Base"
+                value={newRubrica.descricao}
+                onChange={(e) => setNewRubrica({ ...newRubrica, descricao: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-wrap gap-6 py-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="inss"
+                  checked={newRubrica.incide_inss}
+                  onCheckedChange={(checked) => setNewRubrica({ ...newRubrica, incide_inss: !!checked })}
+                />
+                <Label htmlFor="inss" className="cursor-pointer">Incide INSS</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="fgts"
+                  checked={newRubrica.incide_fgts}
+                  onCheckedChange={(checked) => setNewRubrica({ ...newRubrica, incide_fgts: !!checked })}
+                />
+                <Label htmlFor="fgts" className="cursor-pointer">Incide FGTS</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="irrf"
+                  checked={newRubrica.incide_irrf}
+                  onCheckedChange={(checked) => setNewRubrica({ ...newRubrica, incide_irrf: !!checked })}
+                />
+                <Label htmlFor="irrf" className="cursor-pointer">Incide IRRF</Label>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button 
+                onClick={() => createMutation.mutate(newRubrica)}
+                disabled={createMutation.isPending || !newRubrica.codigo || !newRubrica.descricao}
+                className="gap-2 rounded-xl"
+              >
+                <Save className="h-4 w-4" />
+                Salvar Rubrica
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-4">
           <Table>
