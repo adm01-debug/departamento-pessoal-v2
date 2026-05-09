@@ -32,6 +32,15 @@ export default function AvaliacaoPage() {
   const { data: feedbacks = [], isLoading: loadFeedbacks } = useQuery({ queryKey: ['feedbacks_360', empresaAtual?.id], queryFn: () => avaliacaoService.listarFeedbacks(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: pdis = [], isLoading: loadPDIs } = useQuery({ queryKey: ['pdis', empresaAtual?.id], queryFn: () => avaliacaoService.listarPDIs(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: competencias = [], isLoading: loadComp } = useQuery({ queryKey: ['competencias', empresaAtual?.id], queryFn: () => avaliacaoService.listarCompetencias(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: nineBox = [], isLoading: loadNineBox } = useQuery({ 
+    queryKey: ['nine_box', empresaAtual?.id], 
+    queryFn: async () => {
+      const { data, error } = await supabase.from('vw_matriz_nine_box' as any).select('*').eq('empresa_id', empresaAtual?.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id 
+  });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   // === Ciclos ===
