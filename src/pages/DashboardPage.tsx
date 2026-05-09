@@ -37,7 +37,7 @@ interface Pendencia {
   tipo: string;
   descricao: string;
   quantidade: number;
-  icone: 'ferias' | 'afastamentos' | 'admissoes';
+  icone: 'ferias' | 'afastamentos' | 'admissoes' | 'assinaturas' | 'ponto' | 'documentos';
 }
 
 function useDashboardStats(enabled: boolean) {
@@ -121,15 +121,22 @@ function usePendencias(enabled: boolean) {
         { count: feriasPendentes },
         { count: afastamentosAtivos },
         { count: admissoesPendentes },
+        { count: assinaturasPendentes },
+        { count: pontoPendente },
       ] = await Promise.all([
         supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "pendente"),
         supabase.from("afastamentos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
         supabase.from("admissoes").select("*", { count: "exact", head: true }).filter('etapa', 'not.in', '("concluida","cancelada")'),
+        supabase.from("assinaturas_digitais" as any).select("*", { count: "exact", head: true }).eq("status", "pendente"),
+        supabase.from("solicitacoes_ajuste_ponto" as any).select("*", { count: "exact", head: true }).eq("status", "pendente"),
       ]);
       const pendencias: Pendencia[] = [];
-      if (feriasPendentes && feriasPendentes > 0) pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes de aprovação`, quantidade: feriasPendentes, icone: 'ferias' });
-      if (afastamentosAtivos && afastamentosAtivos > 0) pendencias.push({ tipo: "afastamentos", descricao: `${afastamentosAtivos} afastamentos em andamento`, quantidade: afastamentosAtivos, icone: 'afastamentos' });
-      if (admissoesPendentes && admissoesPendentes > 0) pendencias.push({ tipo: "admissoes", descricao: `${admissoesPendentes} admissões em andamento`, quantidade: admissoesPendentes, icone: 'admissoes' });
+      if (feriasPendentes && feriasPendentes > 0) pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes`, quantidade: feriasPendentes, icone: 'ferias' });
+      if (afastamentosAtivos && afastamentosAtivos > 0) pendencias.push({ tipo: "afastamentos", descricao: `${afastamentosAtivos} afastamentos ativos`, quantidade: afastamentosAtivos, icone: 'afastamentos' });
+      if (admissoesPendentes && admissoesPendentes > 0) pendencias.push({ tipo: "admissoes", descricao: `${admissoesPendentes} admissões em curso`, quantidade: admissoesPendentes, icone: 'admissoes' });
+      if (assinaturasPendentes && assinaturasPendentes > 0) pendencias.push({ tipo: "assinaturas", descricao: `${assinaturasPendentes} assinaturas pendentes`, quantidade: assinaturasPendentes, icone: 'assinaturas' });
+      if (pontoPendente && pontoPendente > 0) pendencias.push({ tipo: "ponto", descricao: `${pontoPendente} ajustes de ponto`, quantidade: pontoPendente, icone: 'ponto' });
+      
       return pendencias;
     },
     staleTime: 5 * 60 * 1000,

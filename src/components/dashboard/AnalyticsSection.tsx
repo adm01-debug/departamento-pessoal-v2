@@ -86,17 +86,25 @@ interface Pendencia {
   tipo: string;
   descricao: string;
   quantidade: number;
-  icone: 'ferias' | 'afastamentos' | 'admissoes';
+  icone: 'ferias' | 'afastamentos' | 'admissoes' | 'assinaturas' | 'ponto' | 'documentos';
 }
 
 function PendenciaItem({ pendencia, index }: { pendencia: Pendencia; index: number }) {
   const iconMap: Record<string, React.ElementType> = {
-    ferias: Calendar, afastamentos: AlertTriangle, admissoes: UserPlus,
+    ferias: Calendar, 
+    afastamentos: AlertTriangle, 
+    admissoes: UserPlus,
+    assinaturas: ShieldCheck,
+    ponto: Clock,
+    documentos: Briefcase
   };
   const gradientMap: Record<string, string> = {
     ferias: "from-primary/80 to-primary",
     afastamentos: "from-primary/60 to-primary/90",
     admissoes: "from-primary to-primary-glow",
+    assinaturas: "from-success/70 to-success",
+    ponto: "from-warning/70 to-warning",
+    documentos: "from-info/70 to-info",
   };
   const Icon = iconMap[pendencia.icone] || AlertCircle;
 
