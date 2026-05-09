@@ -89,22 +89,21 @@ export default function ConfiguracoesPage() {
       gradient="from-muted-foreground to-foreground"
     >
       <Tabs defaultValue="geral" className="space-y-4">
-        <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30">
-          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Preferências</TabsTrigger>
-          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Empresa</TabsTrigger>
-          <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Folha</TabsTrigger>
-          <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Ponto</TabsTrigger>
-          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Notificações</TabsTrigger>
-          <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Alertas</TabsTrigger>
-          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Segurança</TabsTrigger>
-          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Campos</TabsTrigger>
-          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">IPs</TabsTrigger>
-          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Integ.</TabsTrigger>
-          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Webhooks</TabsTrigger>
-          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Logs</TabsTrigger>
-          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">BD</TabsTrigger>
-          <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm">Perfis</TabsTrigger>
-          <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm"><Activity className="mr-1 h-3 w-3" />Sistema</TabsTrigger>
+        <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 overflow-x-auto no-scrollbar flex-nowrap w-full h-auto">
+          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Preferências</TabsTrigger>
+          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Empresa</TabsTrigger>
+          <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Perfis</TabsTrigger>
+          <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Folha</TabsTrigger>
+          <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Ponto</TabsTrigger>
+          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Alertas</TabsTrigger>
+          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Segurança</TabsTrigger>
+          <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Campos</TabsTrigger>
+          <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">IPs</TabsTrigger>
+          <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Integ.</TabsTrigger>
+          <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Webhooks</TabsTrigger>
+          <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Logs</TabsTrigger>
+          <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">BD</TabsTrigger>
+          <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Sistema</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral">
