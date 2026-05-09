@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { pontoMonitorService } from './pontoMonitorService';
+import CryptoJS from 'crypto-js';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
@@ -75,11 +77,18 @@ export const pontoService = {
         dentroRaio = distance <= (settings.raio_maximo_metros || 200);
         
         if (!dentroRaio && settings.exige_geolocalizacao) {
-          // We still register it but marked as "fora do raio" or we could block it
-          // Brazil's Portaria 671 doesn't explicitly allow blocking but allows flagging
+          await pontoMonitorService.trackGeofenceFailure(
+            colaboradorId, 
+            options.latitude, 
+            options.longitude, 
+            settings.raio_maximo_metros || 200
+          );
         }
       }
     }
+
+    const hashPayload = `${colaboradorId}|${data}|${hora}|${options?.dispositivoId || 'web'}`;
+    const hashIntegridade = CryptoJS.SHA256(hashPayload).toString();
 
     const tipoMap: Record<string, string> = { 
       entrada: 'entrada', 
@@ -114,7 +123,8 @@ export const pontoService = {
         dispositivo_id: options?.dispositivoId || 'web-browser',
         dentro_raio: dentroRaio,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        versao_app: '2.0.0-perf'
+        versao_app: '2.0.0-perf',
+        hash_integridade: hashIntegridade
       })
       .select()
       .maybeSingle();

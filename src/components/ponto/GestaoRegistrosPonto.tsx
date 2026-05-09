@@ -5,10 +5,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
+import { Users, Search, ChevronLeft, ChevronRight, Clock, AlertTriangle, Download, FileJson, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { motion } from 'framer-motion';
+import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
+import { toast } from 'sonner';
 
 export function GestaoRegistrosPonto() {
   const { empresaAtual } = useEmpresas();
@@ -56,6 +58,35 @@ export function GestaoRegistrosPonto() {
     setFiltroData(d.toISOString().split('T')[0]);
   };
 
+  const exportData = (format: 'csv' | 'pdf') => {
+    if (filtrados.length === 0) {
+      toast.error('Nenhum dado para exportar');
+      return;
+    }
+
+    const dataToExport = filtrados.map((r: any) => ({
+      colaborador: r.colaborador?.nome_completo,
+      data: r.data,
+      entrada_1: formatTime(r.entrada_1),
+      saida_intervalo: formatTime(r.saida_intervalo),
+      retorno_intervalo: formatTime(r.retorno_intervalo),
+      saida_1: formatTime(r.saida_1),
+      horas_trabalhadas: formatInterval(r.horas_trabalhadas),
+      horas_extras: formatInterval(r.horas_extras),
+    }));
+
+    if (format === 'csv') {
+      exportPontoCSV(dataToExport, `ponto-${filtroData}.csv`);
+    } else {
+      exportPontoPDF(
+        dataToExport, 
+        `Relatório de Ponto - ${filtroData}`, 
+        ['colaborador', 'entrada_1', 'saida_intervalo', 'retorno_intervalo', 'saida_1', 'horas_trabalhadas']
+      );
+    }
+    toast.success('Relatório gerado com sucesso!');
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-6">
       <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
@@ -78,6 +109,14 @@ export function GestaoRegistrosPonto() {
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => mudarDia(1)}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
+              <div className="flex items-center border rounded-lg overflow-hidden ml-2 h-8">
+                <Button variant="ghost" size="sm" className="h-full px-2 text-xs gap-1 border-r rounded-none" onClick={() => exportData('csv')}>
+                  <FileJson className="h-3 w-3" /> CSV
+                </Button>
+                <Button variant="ghost" size="sm" className="h-full px-2 text-xs gap-1 rounded-none" onClick={() => exportData('pdf')}>
+                  <FileText className="h-3 w-3" /> PDF
+                </Button>
+              </div>
             </div>
           </div>
           <div className="relative mt-2">
