@@ -22,6 +22,39 @@ export function validarS2190(dados: Record<string, any>): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
+export function validarS2200(dados: Record<string, any>): ValidationResult {
+  const errors: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
+  
+  required(dados.cpfTrab, 'cpfTrab', errors);
+  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
+  required(dados.nmTrab, 'nmTrab', errors);
+  maxLen(dados.nmTrab, 70, 'nmTrab', errors);
+  required(dados.dtNascto, 'dtNascto', errors);
+  dataValida(dados.dtNascto, 'dtNascto', errors);
+  required(dados.dtAdm, 'dtAdm', errors);
+  dataValida(dados.dtAdm, 'dtAdm', errors);
+  required(dados.tpRegTrab, 'tpRegTrab', errors);
+  enumValido(dados.tpRegTrab?.toString(), ['1', '2'], 'tpRegTrab', errors);
+  required(dados.tpRegPrev, 'tpRegPrev', errors);
+  enumValido(dados.tpRegPrev?.toString(), ['1', '2', '3'], 'tpRegPrev', errors);
+  
+  if (dados.dtAdm && dados.dtNascto) {
+    const nascimento = new Date(dados.dtNascto);
+    const admissao = new Date(dados.dtAdm);
+    const idade = (admissao.getTime() - nascimento.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+    if (idade < 14) errors.push({ campo: 'dtNascto', mensagem: 'Trabalhador deve ter pelo menos 14 anos', regra: 'REGRA_IDADE_MINIMA' });
+  }
+
+  required(dados.codCargo, 'codCargo', errors);
+  required(dados.vrSalFx, 'vrSalFx', errors);
+  if (dados.vrSalFx !== undefined && dados.vrSalFx <= 0) {
+    errors.push({ campo: 'vrSalFx', mensagem: 'Salário deve ser maior que zero', regra: 'REGRA_VALOR_POSITIVO' });
+  }
+
+  return { valid: errors.length === 0, errors, warnings };
+}
+
 export function validarS2205(dados: Record<string, any>): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
