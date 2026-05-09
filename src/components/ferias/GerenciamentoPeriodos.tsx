@@ -124,48 +124,172 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
     }
   };
 
-  if (isLoading) return <div>Carregando períodos...</div>;
-
   return (
-    <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
-      <CardHeader className="bg-muted/30 pb-4">
-        <CardTitle className="text-lg font-display flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
-          Períodos Aquisitivos
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-border/40">
-              <TableHead className="font-display">Período</TableHead>
-              <TableHead className="font-display">Início</TableHead>
-              <TableHead className="font-display">Fim</TableHead>
-              <TableHead className="font-display">Direito</TableHead>
-              <TableHead className="font-display">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!periodos?.length ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground font-body">
-                  Nenhum período aquisitivo encontrado.
-                </TableCell>
+    <div className="space-y-6">
+      <Card className="border-border/40 shadow-sm rounded-2xl">
+        <CardContent className="p-4 flex flex-col md:flex-row items-end gap-4">
+          <div className="flex-1 space-y-2">
+            <Label className="font-display text-xs">Selecionar Colaborador</Label>
+            <Select value={selectedColabId} onValueChange={setSelectedColabId}>
+              <SelectTrigger className="rounded-xl">
+                <SelectValue placeholder="Escolha um colaborador..." />
+              </SelectTrigger>
+              <SelectContent>
+                {colaboradores?.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button 
+            onClick={openCreate} 
+            disabled={!selectedColabId}
+            className="rounded-xl bg-primary gap-2 font-body"
+          >
+            <Plus className="h-4 w-4" /> Novo Período
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="bg-muted/30 pb-4 flex flex-row items-center justify-between">
+          <CardTitle className="text-lg font-display flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-primary" />
+            Períodos Aquisitivos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-border/40">
+                <TableHead className="font-display">Período</TableHead>
+                <TableHead className="font-display">Início</TableHead>
+                <TableHead className="font-display">Fim</TableHead>
+                <TableHead className="font-display">Direito</TableHead>
+                <TableHead className="font-display">Status</TableHead>
+                <TableHead className="font-display text-right w-[100px]">Ações</TableHead>
               </TableRow>
-            ) : (
-              periodos.map((p) => (
-                <TableRow key={p.id} className="hover:bg-muted/20 border-border/40 transition-colors">
-                  <TableCell className="font-body font-medium">#{p.numero_periodo}</TableCell>
-                  <TableCell className="font-body">{format(new Date(p.data_inicio), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
-                  <TableCell className="font-body">{format(new Date(p.data_fim), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
-                  <TableCell className="font-body">{p.dias_direito} dias</TableCell>
-                  <TableCell>{getStatusBadge(p.status)}</TableCell>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              ) : !selectedColabId ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground font-body">
+                    Selecione um colaborador para ver seus períodos.
+                  </TableCell>
+                </TableRow>
+              ) : !periodos?.length ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground font-body">
+                    Nenhum período aquisitivo encontrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                periodos.map((p) => (
+                  <TableRow key={p.id} className="hover:bg-muted/20 border-border/40 transition-colors group">
+                    <TableCell className="font-body font-medium">#{p.numero_periodo}</TableCell>
+                    <TableCell className="font-body">{format(new Date(p.data_inicio), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell className="font-body">{format(new Date(p.data_fim), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell className="font-body">{p.dias_direito} dias</TableCell>
+                    <TableCell>{getStatusBadge(p.status)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(p)} className="h-8 w-8">
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => deleteMutation.mutate(p.id)}
+                          className="h-8 w-8 text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingPeriodo ? 'Editar Período' : 'Novo Período'}</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="space-y-2">
+              <Label>Número Período</Label>
+              <Input 
+                type="number" 
+                value={form.numero_periodo} 
+                onChange={e => setForm(p => ({ ...p, numero_periodo: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={form.status} onValueChange={v => setForm(p => ({ ...p, status: v }))}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="aberto">Aberto</SelectItem>
+                  <SelectItem value="vencido">Vencido</SelectItem>
+                  <SelectItem value="concluido">Concluído</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Data Início</Label>
+              <Input 
+                type="date" 
+                value={form.data_inicio} 
+                onChange={e => setForm(p => ({ ...p, data_inicio: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Data Fim</Label>
+              <Input 
+                type="date" 
+                value={form.data_fim} 
+                onChange={e => setForm(p => ({ ...p, data_fim: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Dias de Direito</Label>
+              <Input 
+                type="number" 
+                value={form.dias_direito} 
+                onChange={e => setForm(p => ({ ...p, dias_direito: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={createMutation.isPending || updateMutation.isPending}
+              className="rounded-xl"
+            >
+              {createMutation.isPending || updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
+
