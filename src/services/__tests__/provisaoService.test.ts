@@ -47,6 +47,7 @@ describe('provisaoService', () => {
       
       vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
 
+      // The service throws error if error exists
       await expect(provisaoService.list()).rejects.toThrow('DB Error');
     });
   });
