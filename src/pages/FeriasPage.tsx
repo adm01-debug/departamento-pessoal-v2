@@ -1,15 +1,15 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
 import { FeriasKPIs, FeriasTable } from '@/components/ferias';
-import { feriasService } from '@/services';
+import { useFerias } from '@/hooks/useFerias';
+import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { useAuth } from '@/contexts';
-import { Calendar, Calculator, Loader2 } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -17,6 +17,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CalendarioFerias } from '@/components/ferias/CalendarioFerias';
+import { GerenciamentoPeriodos } from '@/components/ferias/GerenciamentoPeriodos';
+import { calculoFerias } from '@/utils/calculoFerias';
+
 
 const statusOptions = [
   { value: 'pendente', label: 'Pendente' },
