@@ -220,6 +220,36 @@ export default function ProvisoesPage() {
               </div>
             </div>
 
+            {trendData && trendData.length > 1 && (
+              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm bg-muted/10">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-display flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+                    <BarChart3 className="h-3.5 w-3.5" /> Tendência de Provisões (Últimos Meses)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={trendData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
+                        <XAxis dataKey="competencia" fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis fontSize={10} tick={{ fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `R$${v / 1000}k`} />
+                        <RechartsTooltip 
+                          formatter={(v: any) => formatCurrency(v)}
+                          contentStyle={{ backgroundColor: 'hsl(var(--background))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
+                        />
+                        <Bar dataKey="valor_total_provisionado" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40}>
+                          {trendData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fillOpacity={0.8 + (index / trendData.length) * 0.2} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {isLoading ? (
               <div className="flex justify-center p-12"><Spinner size="lg" /></div>
             ) : !provisoes?.length ? (
