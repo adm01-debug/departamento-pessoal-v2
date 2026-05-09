@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut } from 'lucide-react';
+import { LogOut, HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useGuidedTour } from '@/components/onboarding/GuidedTour';
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -10,6 +11,7 @@ interface SidebarFooterProps {
 }
 
 export function SidebarFooter({ collapsed, user, userInitials, onSignOut }: SidebarFooterProps) {
+  const { restart } = useGuidedTour();
   return (
     <div className="border-t border-sidebar-border p-3">
       {!collapsed ? (
@@ -29,6 +31,13 @@ export function SidebarFooter({ collapsed, user, userInitials, onSignOut }: Side
               </p>
             </div>
           </div>
+          <button
+            onClick={restart}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors text-sm font-body"
+          >
+            <HelpCircle className="h-4 w-4" />
+            <span>Tour do Sistema</span>
+          </button>
           <button
             onClick={onSignOut}
             aria-label="Sair do sistema"
