@@ -39,23 +39,37 @@ export default function FeriasPage() {
   const [calcLoading, setCalcLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
   const [calcResult, setCalcResult] = useState<any>(null);
-  const qc = useQueryClient();
-  const { empresaAtual } = useEmpresas();
-  const { user } = useAuth();
+  
+  const { ferias, isLoading } = useFerias();
+  const { 
+    aprovarGestor, 
+    aprovarRH, 
+    enviarContabilidade, 
+    rejeitar, 
+    cancelar 
+  } = useFeriasAprovacao();
 
   const handleCalcFerias = async () => {
     setCalcLoading(true);
-    setCalcResult(null);
+    // Instant client-side calculation for better UX
+    const instant = calculoFerias.calcular({
+      salarioBase: parseFloat(calcForm.salario) || 0,
+      diasFerias: parseInt(calcForm.diasFerias) || 30,
+      diasAbono: parseInt(calcForm.diasAbono) || 0
+    });
+    setCalcResult(instant);
+    
     try {
+      // Refresh with authoritative backend calculation
       const result = await edgeFunctionsService.calcularFerias({
         salario_base: parseFloat(calcForm.salario) || 0,
         dias_ferias: parseInt(calcForm.diasFerias) || 30,
         dias_abono: parseInt(calcForm.diasAbono) || 0,
       });
       setCalcResult(result);
-      toast.success('Férias calculadas com sucesso!');
+      toast.success('Cálculo validado pelo servidor');
     } catch (err: any) {
-      toast.error(`Erro: ${err.message}`);
+      console.error('Erro no cálculo server-side:', err);
     } finally {
       setCalcLoading(false);
     }
@@ -63,23 +77,7 @@ export default function FeriasPage() {
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  const { data: solicitacoes, isLoading } = useQuery({
-    queryKey: ['ferias-solicitacoes', empresaAtual?.id],
-    queryFn: () => feriasService.listSolicitacoes(empresaAtual?.id),
-    enabled: !!empresaAtual?.id,
-  });
-
-  const mutationOpts = (msg: string) => ({
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['ferias-solicitacoes'] }); toast.success(msg); },
-  });
-
-  const aprovarGestor = useMutation({ mutationFn: (id: string) => feriasService.aprovarGestor(id, user?.id), ...mutationOpts('Aprovado pelo gestor') });
-  const aprovarRH = useMutation({ mutationFn: (id: string) => feriasService.aprovarRH(id, user?.id), ...mutationOpts('Aprovado pelo RH') });
-  const enviarContabilidade = useMutation({ mutationFn: (id: string) => feriasService.enviarContabilidade(id, user?.id), ...mutationOpts('Enviado à contabilidade') });
-  const rejeitarMutation = useMutation({ mutationFn: (id: string) => feriasService.rejeitar(id), ...mutationOpts('Férias rejeitadas') });
-  const cancelarMutation = useMutation({ mutationFn: (id: string) => feriasService.cancelar(id, user?.id), ...mutationOpts('Férias canceladas') });
-
-  const filtered = solicitacoes?.filter((s: Record<string, any>) => {
+  const filtered = ferias?.filter((s: Record<string, any>) => {
     if (statusFilter && statusFilter !== 'all' && s.status !== statusFilter) return false;
     if (search) {
       const nome = (s.colaborador?.nome_completo || '').toLowerCase();
@@ -89,13 +87,14 @@ export default function FeriasPage() {
   });
 
   const stats = {
-    total: solicitacoes?.length || 0,
-    pendentes: solicitacoes?.filter((s: any) => s.status === 'pendente').length || 0,
-    aprovadas: solicitacoes?.filter((s: any) => s.status === 'aprovada' || s.aprovado_rh).length || 0,
-    emGozo: solicitacoes?.filter((s: any) => s.status === 'em_gozo').length || 0,
-    abonoPecuniario: solicitacoes?.filter((s: any) => s.abono_pecuniario).length || 0,
-    vencidas: solicitacoes?.filter((s: any) => s.status === 'vencida').length || 0,
+    total: ferias?.length || 0,
+    pendentes: ferias?.filter((s: any) => s.status === 'pendente').length || 0,
+    aprovadas: ferias?.filter((s: any) => s.status === 'aprovada' || s.aprovado_rh).length || 0,
+    emGozo: ferias?.filter((s: any) => s.status === 'em_gozo').length || 0,
+    abonoPecuniario: ferias?.filter((s: any) => s.abono_pecuniario).length || 0,
+    vencidas: ferias?.filter((s: any) => s.status === 'vencida').length || 0,
   };
+
 
   return (
     <>
