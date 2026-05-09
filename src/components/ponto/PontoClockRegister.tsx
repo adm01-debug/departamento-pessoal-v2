@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle, Scan, Camera, ShieldCheck } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
