@@ -9,6 +9,8 @@ import { Calculator, Download, FileText, User, Calendar, DollarSign, RefreshCw, 
 import { useNavigate } from 'react-router-dom';
 import { desligamentoService } from '@/services/desligamentoService';
 import { rescisaoService } from '@/services/rescisaoService';
+import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useState } from 'react';
