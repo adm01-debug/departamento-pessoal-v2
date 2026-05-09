@@ -159,7 +159,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
             <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={handleCalcular}
-                disabled={calculating}
+                disabled={calculating || d.status === 'homologado' || d.status === 'finalizado'}
                 className="rounded-xl font-body bg-primary hover:bg-primary-glow"
               >
                 {calculating ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Calculator className="h-4 w-4 mr-2" />}
@@ -168,7 +168,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
 
               <Button
                 onClick={handleHomologar}
-                disabled={homologating || d.status === 'homologado'}
+                disabled={homologating || d.status === 'homologado' || d.status === 'finalizado' || !d.valor_liquido}
                 variant="outline"
                 className="rounded-xl font-body border-success/50 hover:bg-success/10 text-success"
               >
@@ -176,6 +176,28 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
                 Homologar
               </Button>
             </div>
+
+            {d.valor_liquido && (
+              <Button
+                onClick={() => {
+                   const form = {
+                      nomeColaborador: d.colaborador?.nome_completo,
+                      cpf: d.colaborador?.cpf,
+                      cargo: d.colaborador?.cargo,
+                      dataAdmissao: d.colaborador?.data_admissao,
+                      dataDesligamento: d.data_desligamento,
+                      tipo: d.tipo,
+                      ...d
+                   };
+                   gerarPDFRescisao(form, d.detalhes_calculo || d);
+                }}
+                variant="outline"
+                className="w-full rounded-xl font-body gap-2"
+              >
+                <Download className="h-4 w-4" /> Download TRCT assinado
+              </Button>
+            )}
+
 
             <Button
               onClick={() => navigate('/calculadora-rescisao')}
