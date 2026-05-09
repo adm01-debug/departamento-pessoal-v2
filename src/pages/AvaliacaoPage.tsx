@@ -18,7 +18,7 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGrid, Download, History, BarChart2 } from 'lucide-react';
+import { Target, Plus, ClipboardList, Users, TrendingUp, Star, Trash2, LayoutGrid, Download, History, BarChart2, Calendar } from 'lucide-react';
 import { PerformanceDashboard } from '@/components/avaliacao/PerformanceDashboard';
 import { NineBoxMatrix } from '@/components/avaliacao/NineBoxMatrix';
 import { PerformanceAuditTimeline } from '@/components/avaliacao/PerformanceAuditTimeline';
