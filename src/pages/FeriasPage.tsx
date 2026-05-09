@@ -141,29 +141,64 @@ export default function FeriasPage() {
     >
       <FeriasKPIs stats={stats} />
 
-      <DataTableToolbar
-        search={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Buscar colaborador..."
-        filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter }]}
-        onClearFilters={() => { setStatusFilter(''); setSearch(''); }}
-      />
+      <Tabs defaultValue="solicitacoes" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="solicitacoes" className="rounded-lg gap-2 font-display">
+            <List className="h-4 w-4" /> Solicitações
+          </TabsTrigger>
+          <TabsTrigger value="calendario" className="rounded-lg gap-2 font-display">
+            <CalendarDays className="h-4 w-4" /> Calendário
+          </TabsTrigger>
+          <TabsTrigger value="periodos" className="rounded-lg gap-2 font-display">
+            <History className="h-4 w-4" /> Períodos Aquisitivos
+          </TabsTrigger>
+        </TabsList>
 
-      {isLoading ? (
-        <TableSkeleton rows={6} columns={7} />
-      ) : !filtered?.length ? (
-        <EmptyList entityName="solicitação de férias" />
-      ) : (
-        <FeriasTable
-          data={filtered}
-          onAprovarGestor={(id) => aprovarGestor.mutate(id)}
-          onAprovarRH={(id) => aprovarRH.mutate(id)}
-          onEnviarContabilidade={(id) => enviarContabilidade.mutate(id)}
-          onRejeitar={(id) => rejeitarMutation.mutate(id)}
-          onCancelar={(id) => cancelarMutation.mutate(id)}
-        />
-      )}
+        <TabsContent value="solicitacoes" className="space-y-6">
+          <DataTableToolbar
+            search={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Buscar colaborador..."
+            filters={[{ key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: setStatusFilter }]}
+            onClearFilters={() => { setStatusFilter(''); setSearch(''); }}
+          />
+
+          {isLoading ? (
+            <TableSkeleton rows={6} columns={7} />
+          ) : !filtered?.length ? (
+            <EmptyList entityName="solicitação de férias" />
+          ) : (
+            <FeriasTable
+              data={filtered}
+              onAprovarGestor={(id) => aprovarGestor(id)}
+              onAprovarRH={(id) => aprovarRH(id)}
+              onEnviarContabilidade={(id) => enviarContabilidade(id)}
+              onRejeitar={(id) => rejeitar(id)}
+              onCancelar={(id) => cancelar(id)}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="calendario">
+          <CalendarioFerias />
+        </TabsContent>
+
+        <TabsContent value="periodos">
+          <div className="grid gap-6">
+            {/* Typically we would have a selector for collaborator here, 
+                for now we show the most recent ones or a generic list */}
+            <p className="text-sm text-muted-foreground font-body">
+              Selecione um colaborador na tabela de solicitações para ver seus períodos detalhados ou visualize o resumo geral abaixo.
+            </p>
+            {/* If we had a selectedColaboradorId state, we would pass it here */}
+            {filtered && filtered.length > 0 && (
+              <GerenciamentoPeriodos colaboradorId={filtered[0].colaborador_id} />
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </PageLayout>
+
     </>
   );
 }
