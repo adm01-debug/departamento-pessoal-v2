@@ -88,6 +88,8 @@ const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const FinanceiroBancarioPage = lazy(() => import('@/pages/FinanceiroBancarioPage'));
 const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
+const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
+const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
 
 
 function PageLoader() {
@@ -187,6 +189,7 @@ export default function App() {
         <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
         <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
         <Route path="telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />
+        <Route path="seguranca" element={<AdminRoute><LazyPage Component={SegurancaPage} /></AdminRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Public route - no auth required */}

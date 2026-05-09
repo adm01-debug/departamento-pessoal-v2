@@ -39,3 +39,5 @@ export { default as AssinaturasPage } from './AssinaturasPage';
 export { default as FinanceiroBancarioPage } from './FinanceiroBancarioPage';
 export { default as ProvisoesPage } from './ProvisoesPage';
 export { default as ContabilidadePage } from './ContabilidadePage';
+export { default as SegurancaPage } from './SegurancaPage';
+export { default as AdminTelemetriaPage } from './AdminTelemetriaPage';
