@@ -271,7 +271,18 @@ export function GestaoRegistrosPonto() {
                     const aberto = !r.saida_1 && r.entrada_1;
 
                     return (
-                      <TableRow key={r.id} className="hover:bg-accent/30 transition-colors">
+                      <TableRow key={r.id} className={`hover:bg-accent/30 transition-colors ${selecionados.includes(r.id) ? 'bg-primary/5' : ''}`}>
+                        <TableCell>
+                          <input 
+                            type="checkbox" 
+                            className="rounded border-gray-300"
+                            checked={selecionados.includes(r.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) setSelecionados([...selecionados, r.id]);
+                              else setSelecionados(selecionados.filter(id => id !== r.id));
+                            }}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {r.colaborador?.foto_url ? (
