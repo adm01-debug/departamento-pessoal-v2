@@ -1,9 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import CryptoJS from 'crypto-js';
-import { toast } from 'sonner';
 
 const PONTO_OFFLINE_STORAGE_KEY = 'ponto_offline_queue';
-const CRYPTO_KEY = 'lovable-ponto-secure-v1'; // Em produção, viria de config segura
+const CRYPTO_KEY = 'lovable-ponto-secure-v1';
 
 export interface OfflineRegistro {
   id: string;
@@ -18,14 +17,12 @@ export interface OfflineRegistro {
 }
 
 export const pontoOfflineService = {
-  // Gera hash de integridade Portaria 671
   generateIntegrityHash: (data: any) => {
     const payload = `${data.colaborador_id}|${data.timestamp}|${data.tipo}|${data.dispositivoId}`;
     return CryptoJS.SHA256(payload).toString();
   },
 
-  queueRegistro: async (registro: Omit<OfflineRegistro, 'id' | 'hash'>) => {
-    // Recupera e descriptografa fila existente
+  queueRegistro: async (registro: Omit<OfflineRegistro, 'id'>) => {
     const stored = localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY);
     let queue: OfflineRegistro[] = [];
     
@@ -34,17 +31,16 @@ export const pontoOfflineService = {
         const bytes = CryptoJS.AES.decrypt(stored, CRYPTO_KEY);
         queue = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
       } catch (e) {
-        console.error('Falha ao descriptografar fila offline. Resetando.', e);
         queue = [];
       }
     }
     
+    const id = crypto.randomUUID();
     const hash = registro.hash || pontoOfflineService.generateIntegrityHash(registro);
     
     const newEntry: OfflineRegistro = { ...registro, id, hash };
     queue.push(newEntry);
     
-    // Criptografa antes de salvar
     const encrypted = CryptoJS.AES.encrypt(JSON.stringify(queue), CRYPTO_KEY).toString();
     localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
     return newEntry;
@@ -70,7 +66,6 @@ export const pontoOfflineService = {
 
     for (const item of queue) {
       try {
-        // Usamos uma asserção de tipo para evitar erros com o gerador de tipos do Supabase
         const { error } = await (supabase as any).from('batidas_ponto').insert({
           colaborador_id: item.colaborador_id,
           tipo: item.tipo,
@@ -88,7 +83,6 @@ export const pontoOfflineService = {
         if (error) throw error;
         synced++;
       } catch (err) {
-        console.error('Erro ao sincronizar registro offline:', err);
         errors++;
         remaining.push(item);
       }

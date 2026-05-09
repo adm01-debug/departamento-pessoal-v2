@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { provisaoService } from '@/services';
 import { Calculator, Wallet, TrendingUp, Landmark, PieChart, Info, Download, FileText, FileSpreadsheet, History } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
