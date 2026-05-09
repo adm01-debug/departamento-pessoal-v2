@@ -3,7 +3,7 @@
  */
 export type { ValidationResult, ValidationError, ValidationWarning } from './helpers';
 export { validarS1000, validarS1005, validarS1010, validarS1020, validarS1070, validarS1200, validarS1210, validarS1260, validarS1270, validarS1280 } from './periodicosValidators';
-export { validarS2190, validarS2205, validarS2206, validarS2230, validarS2299, validarS2300, validarS3000 } from './naoPeriodicosValidators';
+export { validarS2190, validarS2200, validarS2205, validarS2206, validarS2230, validarS2299, validarS2300, validarS3000 } from './naoPeriodicosValidators';
 
 import { ValidationResult } from './helpers';
 import { validarS1000, validarS1005, validarS1010, validarS1020, validarS1070, validarS1200, validarS1210, validarS1260, validarS1270, validarS1280 } from './periodicosValidators';
