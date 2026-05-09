@@ -100,6 +100,7 @@ export type Database = {
           estado_civil: string | null
           etapa: Database["public"]["Enums"]["etapa_admissao"]
           id: string
+          metadata: Json | null
           nome: string
           nome_mae: string | null
           observacoes: string | null
@@ -128,6 +129,7 @@ export type Database = {
           estado_civil?: string | null
           etapa?: Database["public"]["Enums"]["etapa_admissao"]
           id?: string
+          metadata?: Json | null
           nome: string
           nome_mae?: string | null
           observacoes?: string | null
@@ -156,6 +158,7 @@ export type Database = {
           estado_civil?: string | null
           etapa?: Database["public"]["Enums"]["etapa_admissao"]
           id?: string
+          metadata?: Json | null
           nome?: string
           nome_mae?: string | null
           observacoes?: string | null

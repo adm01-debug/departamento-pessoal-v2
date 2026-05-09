@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
-import { UserPlus, Search, ExternalLink, Mail, FileText, CheckCircle, MessageSquare, Send } from 'lucide-react';
+import { DetalhesAdmissaoDialog } from '@/components/admissoes/DetalhesAdmissaoDialog';
+import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -22,21 +23,22 @@ import {
 import { contratacaoService } from '@/services/contratacaoService';
 
 const etapaLabels: Record<string, string> = {
-  documentos_pendentes: 'Docs Pendentes',
-  aguardando_exame: 'Aguardando Exame',
-  aguardando_aprovacao: 'Aguardando Aprovação',
-  aprovada: 'Aprovada',
-  contrato_gerado: 'Contrato Gerado',
+  solicitacao: 'Solicitação',
+  documentos: 'Docs Pendentes',
+  validacao: 'Em Validação',
+  exame: 'Aguardando Exame',
+  contrato: 'Contrato Gerado',
+  assinatura: 'Assinatura',
+  esocial: 'eSocial',
   concluida: 'Concluída',
   cancelada: 'Cancelada',
-  esocial: 'eSocial',
 };
 
 const etapaGradients: Record<string, string> = {
-  documentos_pendentes: 'bg-warning/15 text-warning border-0',
-  aguardando_exame: 'bg-warning/15 text-warning border-0',
-  aguardando_aprovacao: 'bg-info/15 text-info border-0',
-  aprovada: 'bg-success/15 text-success border-0',
+  documentos: 'bg-warning/15 text-warning border-0',
+  validacao: 'bg-info/15 text-info border-0',
+  exame: 'bg-warning/15 text-warning border-0',
+  contrato: 'bg-info/15 text-info border-0',
   concluida: 'bg-success/15 text-success border-0',
   cancelada: 'bg-destructive/15 text-destructive border-0',
   esocial: 'bg-primary/15 text-primary border-0',
@@ -49,6 +51,7 @@ export default function AdmissoesPage() {
   const [search, setSearch] = useState('');
   const [etapaFilter, setEtapaFilter] = useState('todos');
   const [sendingLink, setSendingLink] = useState<string | null>(null);
+  const [selectedAdmissao, setSelectedAdmissao] = useState<any>(null);
 
   const handleEnviarLink = async (admissao: any) => {
     if (!admissao.email) {
@@ -73,7 +76,6 @@ export default function AdmissoesPage() {
     }
     setSendingLink(admissao.id);
     try {
-      // First generate/get token
       const tokenData = await contratacaoService.enviarLinkCandidato(admissao.id, admissao.email || '');
       await contratacaoService.enviarWhatsApp(admissao.id, admissao.telefone, tokenData.token);
       toast.success('Link gerado para WhatsApp!');
@@ -100,7 +102,6 @@ export default function AdmissoesPage() {
     return result;
   }, [admissoes, search, etapaFilter]);
 
-  // Count per etapa for filter badges
   const etapaCounts = useMemo(() => {
     const counts: Record<string, number> = { todos: admissoes?.length || 0 };
     admissoes?.forEach((a: any) => {
@@ -119,7 +120,6 @@ export default function AdmissoesPage() {
       gradient="from-primary to-primary-glow"
       actions={<NovaAdmissaoDialog />}
     >
-      {/* Search + Filters */}
       <div className="space-y-3">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -160,10 +160,9 @@ export default function AdmissoesPage() {
         </div>
       </div>
 
-      {/* Content */}
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
-      ) : admissoes.length === 0 ? (
+      ) : (admissoes?.length || 0) === 0 ? (
         <EmptyList entityName="admissão" />
       ) : filtered.length === 0 ? (
         <EmptySearch search={search} onClear={() => { setSearch(''); setEtapaFilter('todos'); }} />
@@ -220,7 +219,7 @@ export default function AdmissoesPage() {
                     variant="ghost" 
                     size="sm" 
                     className="flex-1 text-xs rounded-xl hover:bg-info/10 hover:text-info"
-                    title="Ver Detalhes"
+                    onClick={() => setSelectedAdmissao(admissao)}
                   >
                     <ExternalLink className="w-3 h-3 mr-2" />
                     Detalhes
@@ -232,6 +231,12 @@ export default function AdmissoesPage() {
         </div>
       )}
     </PageLayout>
+    
+    <DetalhesAdmissaoDialog 
+      admissao={selectedAdmissao} 
+      open={!!selectedAdmissao} 
+      onOpenChange={(open) => !open && setSelectedAdmissao(null)} 
+    />
     </>
   );
 }

@@ -22,6 +22,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { SignaturePad } from '@/components/admissao/SignaturePad';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDocumentOCR, OCRResult } from '@/hooks/useDocumentOCR';
+import { contratacaoService } from '@/services/contratacaoService';
 
 const STEPS = [
   { id: 'dados', label: 'Dados', icon: User },
@@ -29,85 +30,6 @@ const STEPS = [
   { id: 'contrato', label: 'Contrato', icon: FileText },
   { id: 'assinatura', label: 'Assinatura', icon: PenTool },
 ] as const;
-
-function TokenInput({ onValidToken }: { onValidToken: (token: string) => void }) {
-  const [token, setToken] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const { data, error: err } = await supabase
-        .from('admissao_tokens')
-        .select('*')
-        .eq('token', token)
-        .maybeSingle();
-
-      if (err || !data) {
-        setError('Código inválido ou expirado.');
-      } else if (new Date(data.data_expiracao) < new Date()) {
-        setError('Este link expirou. Solicite um novo ao RH.');
-      } else {
-        onValidToken(token);
-      }
-    } catch (err) {
-      setError('Erro ao validar código. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="w-full max-w-md shadow-2xl border-0 rounded-3xl overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-primary via-primary-glow to-primary" />
-          <CardHeader className="text-center pt-8">
-            <div className="mx-auto w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 shadow-inner">
-              <ShieldCheck className="w-10 h-10 text-primary" />
-            </div>
-            <CardTitle className="text-3xl font-display font-bold">Portal do Candidato</CardTitle>
-            <CardDescription className="text-base px-4">
-              Use o código de acesso enviado pelo RH para iniciar seu processo de admissão digital.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 px-8 pb-8">
-            <div className="space-y-3">
-              <Label className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Código de Acesso</Label>
-              <Input
-                placeholder="Insira seu código aqui..."
-                value={token}
-                onChange={e => setToken(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                className="h-14 text-center text-xl font-mono tracking-widest rounded-2xl border-2 focus-visible:ring-primary"
-              />
-              {error && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-destructive flex items-center justify-center gap-1 font-medium">
-                  <AlertCircle className="w-4 h-4" /> {error}
-                </motion.p>
-              )}
-            </div>
-            <Button 
-              className="w-full h-14 rounded-2xl text-lg font-bold shadow-glow hover:scale-[1.02] transition-all" 
-              onClick={handleSubmit} 
-              disabled={!token || loading}
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-              Acessar Portal
-            </Button>
-            
-            <div className="pt-4 flex items-center justify-center gap-2">
-              <img src="https://vignette.wikia.nocookie.net/logopedia/images/4/4b/Gov.br_logo.png/revision/latest?cb=20190822144131" alt="Gov.br" className="h-6 opacity-50 grayscale hover:grayscale-0 transition-all cursor-not-allowed" title="Em breve: Acesso via Gov.br" />
-              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Powered by Lovable Cloud</span>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
-  );
-}
 
 function ContratacaoWorkflow({ token }: { token: string }) {
   const [step, setStep] = useState(0);
@@ -117,6 +39,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
     cep: '', logradouro: '', numero: '', bairro: '', cidade: '', uf: '',
   });
   const [signature, setSignature] = useState<string | null>(null);
+  const [contractHtml, setContractHtml] = useState<string | null>(null);
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, { name: string, status: 'uploading' | 'success' | 'error', result?: OCRResult }>>({});
   const { processDocument, isProcessing: isOCRProcessing } = useDocumentOCR();
 
@@ -132,6 +55,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       return data;
     },
   });
+
 
   useEffect(() => {
     if (tokenData?.admissao) {
@@ -149,8 +73,12 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       if (tokenData.contrato_assinado) setStep(3);
       else if (tokenData.documentos_enviados) setStep(2);
       else if (tokenData.dados_preenchidos) setStep(1);
+
+      // Load contract template
+      contratacaoService.gerarTemplateContrato(adm.id).then(setContractHtml);
     }
   }, [tokenData]);
+
 
   const saveDados = useMutation({
     mutationFn: async () => {
@@ -531,23 +459,18 @@ function ContratacaoWorkflow({ token }: { token: string }) {
                       </div>
                     </div>
                     
-                    <div className="p-6 md:p-10 rounded-3xl border-2 border-slate-100 bg-slate-50 shadow-inner max-h-[400px] overflow-y-auto font-serif leading-relaxed text-slate-700">
-                      <div className="text-center mb-8">
-                        <h3 className="text-xl font-bold uppercase tracking-widest text-slate-800">Contrato Individual de Trabalho</h3>
-                        <p className="text-xs opacity-60 mt-1">Instrumento Particular de Relação Laboral</p>
-                      </div>
-                      
-                      <p className="mb-4">
-                        Pelo presente instrumento particular, a empresa contratante admite o(a) Sr(a). <strong>{tokenData?.admissao?.nome}</strong> 
-                        para exercer a função de <strong>{tokenData?.admissao?.cargo}</strong>, no departamento de <strong>{tokenData?.admissao?.departamento}</strong>.
-                      </p>
-                      
-                      <p className="mb-4">
-                        A remuneração acordada é de <strong>R$ {tokenData?.admissao?.salario_proposto?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>, 
-                        conforme as leis vigentes e normas coletivas da categoria.
-                      </p>
+                    <div className="p-6 md:p-10 rounded-3xl border-2 border-slate-100 bg-slate-50 shadow-inner max-h-[500px] overflow-y-auto">
+                      {contractHtml ? (
+                        <div dangerouslySetInnerHTML={{ __html: contractHtml }} className="prose prose-sm max-w-none" />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-12 gap-4">
+                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          <p className="text-sm text-muted-foreground">Gerando seu contrato personalizado...</p>
+                        </div>
+                      )}
                       
                       <div className="h-px bg-slate-200 my-8" />
+
                       
                       <div className="space-y-6">
                         <h4 className="font-bold text-sm uppercase text-slate-800 tracking-wider">Assinatura Eletrônica</h4>
