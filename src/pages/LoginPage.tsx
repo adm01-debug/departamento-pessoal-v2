@@ -51,6 +51,27 @@ export default function LoginPage() {
     }
   };
 
+  const handleGovBrSignIn = async () => {
+    setGovBrLoading(true);
+    try {
+      const { data, error } = await lovable.functions.invoke('auth-gov-br', {
+        body: { 
+          action: 'get_auth_url', 
+          redirectUri: `${window.location.origin}/auth/callback` 
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      setError('Erro ao iniciar integração Gov.br');
+      toast.error(err.message);
+    } finally {
+      setGovBrLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (lockState.isLocked) return;
