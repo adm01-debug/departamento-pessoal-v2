@@ -28,7 +28,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 export default function ConfiguracoesPage() {
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
 
   // === Config Alertas Indicadores ===
@@ -91,7 +91,7 @@ export default function ConfiguracoesPage() {
       icon={<Settings className="h-5 w-5 text-primary-foreground" />}
       gradient="from-muted-foreground to-foreground"
     >
-      <Tabs defaultValue="empresa" className="space-y-4">
+      <Tabs defaultValue={isAdmin ? "empresa" : "seguranca"} className="space-y-4">
         <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 overflow-x-auto no-scrollbar flex-nowrap w-full h-auto">
           <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Empresa</TabsTrigger>
           <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Perfis</TabsTrigger>
