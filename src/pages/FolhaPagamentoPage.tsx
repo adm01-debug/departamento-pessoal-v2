@@ -11,7 +11,9 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
+import { Card, CardContent } from '@/components/ui/card';
 import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline } from '@/components/folha';
+
 
 
 /* ─── Helpers ─── */
