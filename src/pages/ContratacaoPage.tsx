@@ -53,8 +53,9 @@ function ContratacaoWorkflow({ token }: { token: string }) {
         .maybeSingle();
       if (error) throw error;
       return data;
-
+    },
   });
+
 
   useEffect(() => {
     if (tokenData?.admissao) {
