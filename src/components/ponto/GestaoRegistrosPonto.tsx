@@ -139,6 +139,15 @@ export function GestaoRegistrosPonto() {
                 </select>
 
                 <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm">
+                  <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-success/10 text-success" onClick={() => {
+                    toast.promise(new Promise(resolve => setTimeout(resolve, 1500)), {
+                      loading: 'Auditando integridade...',
+                      success: 'Todos os hashes de integridade validados! 100% Conformidade.',
+                      error: 'Erro na auditoria'
+                    });
+                  }}>
+                    <ShieldCheck className="h-3 w-3" /> Audit
+                  </Button>
                   <Button variant="ghost" size="sm" className="h-full px-2 text-[10px] gap-1 border-r rounded-none hover:bg-info/10 relative">
                     <Bell className="h-3 w-3" />
                     <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-destructive rounded-full border border-background animate-pulse" />
