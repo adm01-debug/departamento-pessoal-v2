@@ -155,6 +155,12 @@ export default function DashboardExecutivoPage() {
   const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId, periodo);
   const { data: strategic, isLoading: isStrategicLoading } = useStrategicFinancials(empresaAtualId);
 
+  // Subscribe to real-time updates for KPIs
+  useRealTimeSubscription('colaboradores', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('folhas_pagamento', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('ferias', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('afastamentos', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+
   const kpis = [
     { label: 'Headcount', value: data?.totalAtivos || 0, icon: Users, gradient: 'from-primary to-primary-glow', format: 'number' },
     { label: 'Folha Mensal', value: data?.totalFolhaAtual || 0, icon: DollarSign, gradient: 'from-success to-success/70', format: 'currency', delta: data?.variacaoFolha },
