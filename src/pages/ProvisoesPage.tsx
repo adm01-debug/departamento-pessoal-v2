@@ -378,6 +378,53 @@ export default function ProvisoesPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {selectedLog && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedLog(null)}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              className="bg-card border border-border/40 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden" 
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-muted/30 p-4 border-b border-border/40 flex items-center justify-between">
+                <h3 className="font-display font-bold flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Detalhes da Auditoria
+                </h3>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setSelectedLog(null)}>×</Button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-muted/20 rounded-xl border border-border/30">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Status</p>
+                    <Badge variant={selectedLog.status === 'CONCLUIDO' ? 'success' : 'destructive'} className="text-[10px]">
+                      {selectedLog.status}
+                    </Badge>
+                  </div>
+                  <div className="p-3 bg-muted/20 rounded-xl border border-border/30">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Duração</p>
+                    <p className="text-sm font-mono">{selectedLog.duracao_ms || 0}ms</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Rastreabilidade Técnica (JSON)</p>
+                  <pre className="p-4 bg-slate-950 text-slate-400 rounded-xl text-[10px] overflow-auto max-h-48 font-mono">
+                    {JSON.stringify(selectedLog.metadados, null, 2)}
+                  </pre>
+                </div>
+
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground bg-info/5 p-3 rounded-xl border border-info/10">
+                  <Info className="h-3.5 w-3.5 text-info" />
+                  <span>Este registro é imutável e serve como prova de execução para auditorias de conformidade.</span>
+                </div>
+              </div>
+              <div className="bg-muted/30 p-4 flex justify-end">
+                <Button variant="secondary" size="sm" className="rounded-xl" onClick={() => setSelectedLog(null)}>Fechar</Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </PageLayout>
     </>
   );
