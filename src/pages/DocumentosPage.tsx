@@ -167,7 +167,9 @@ export default function DocumentosPage() {
   };
 
   const filtered = documentos?.filter((d: any) => {
-    const searchMatch = !search || (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase());
+    const searchMatch = !search || 
+      (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase()) ||
+      (d.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase());
     const tipoMatch = tipoFilter === 'todos' || d.tipo === tipoFilter;
     return searchMatch && tipoMatch;
   });
