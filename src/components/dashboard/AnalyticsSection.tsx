@@ -318,8 +318,16 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
     });
   }, [dbPendencias, pontoSolicitacoes, searchQuery, filterType]);
 
+  const paginatedPendencias = useMemo(() => {
+    const startIndex = (page - 1) * itemsPerPage;
+    return filteredPendencias.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredPendencias, page]);
+
+  const totalPages = Math.ceil(filteredPendencias.length / itemsPerPage);
+
   const handleOpenDetail = (type?: string) => {
     if (type) setFilterType(type);
+    setPage(1);
     setIsDetailOpen(true);
   };
 
