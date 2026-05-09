@@ -32,9 +32,13 @@ const PAGE_SIZE = 25;
 export default function ColaboradoresPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [deptoFilter, setDeptoFilter] = useState('');
+  const [cargoFilter, setCargoFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const { empresaAtual } = useEmpresa();
+  const { departamentos } = useDepartamentos();
+  const { cargos } = useCargos();
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
 
