@@ -112,8 +112,16 @@ export default function PontoKioskPage() {
     }
   };
 
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background p-6 font-body">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 font-body">
       <div className="max-w-4xl mx-auto flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg">
