@@ -445,23 +445,18 @@ function ContratacaoWorkflow({ token }: { token: string }) {
                       </div>
                     </div>
                     
-                    <div className="p-6 md:p-10 rounded-3xl border-2 border-slate-100 bg-slate-50 shadow-inner max-h-[400px] overflow-y-auto font-serif leading-relaxed text-slate-700">
-                      <div className="text-center mb-8">
-                        <h3 className="text-xl font-bold uppercase tracking-widest text-slate-800">Contrato Individual de Trabalho</h3>
-                        <p className="text-xs opacity-60 mt-1">Instrumento Particular de Relação Laboral</p>
-                      </div>
-                      
-                      <p className="mb-4">
-                        Pelo presente instrumento particular, a empresa contratante admite o(a) Sr(a). <strong>{tokenData?.admissao?.nome}</strong> 
-                        para exercer a função de <strong>{tokenData?.admissao?.cargo}</strong>, no departamento de <strong>{tokenData?.admissao?.departamento}</strong>.
-                      </p>
-                      
-                      <p className="mb-4">
-                        A remuneração acordada é de <strong>R$ {tokenData?.admissao?.salario_proposto?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>, 
-                        conforme as leis vigentes e normas coletivas da categoria.
-                      </p>
+                    <div className="p-6 md:p-10 rounded-3xl border-2 border-slate-100 bg-slate-50 shadow-inner max-h-[500px] overflow-y-auto">
+                      {contractHtml ? (
+                        <div dangerouslySetInnerHTML={{ __html: contractHtml }} className="prose prose-sm max-w-none" />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-12 gap-4">
+                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          <p className="text-sm text-muted-foreground">Gerando seu contrato personalizado...</p>
+                        </div>
+                      )}
                       
                       <div className="h-px bg-slate-200 my-8" />
+
                       
                       <div className="space-y-6">
                         <h4 className="font-bold text-sm uppercase text-slate-800 tracking-wider">Assinatura Eletrônica</h4>
