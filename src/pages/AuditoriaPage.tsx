@@ -90,7 +90,41 @@ export default function AuditoriaPage() {
         </Button>
       }
     >
-      <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por tabela ou usuário..." />
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <DataTableToolbar 
+            search={search} 
+            onSearchChange={setSearch} 
+            searchPlaceholder="Buscar por usuário ou ID do registro..." 
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={tabelaFilter} onValueChange={setTabelaFilter}>
+            <SelectTrigger className="w-[180px] rounded-xl">
+              <SelectValue placeholder="Tabela" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as Tabelas</SelectItem>
+              {uniqueTables.map(t => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={acaoFilter} onValueChange={setAcaoFilter}>
+            <SelectTrigger className="w-[150px] rounded-xl">
+              <SelectValue placeholder="Ação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as Ações</SelectItem>
+              <SelectItem value="INSERT">Inclusão</SelectItem>
+              <SelectItem value="UPDATE">Alteração</SelectItem>
+              <SelectItem value="DELETE">Exclusão</SelectItem>
+              <SelectItem value="EXECUTE_CALC">Cálculo</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
 
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
