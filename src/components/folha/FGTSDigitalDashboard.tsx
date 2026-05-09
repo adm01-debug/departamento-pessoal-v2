@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2, CloudSync, History } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { lovable } from '@/integrations/lovable/index';
+import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { format } from 'date-fns';
 
