@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
-import { Activity, Users, Clock, Calendar } from 'lucide-react';
+import { Activity, Users, Clock, Calendar, ShieldAlert, Gavel } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
