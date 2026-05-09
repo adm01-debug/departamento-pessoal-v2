@@ -328,24 +328,44 @@ export default function AvaliacaoPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Avaliado</TableHead><TableHead>Avaliador</TableHead><TableHead>Tipo</TableHead><TableHead>Nota</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
+            <div className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="font-display font-semibold">Colaborador</TableHead>
+                    <TableHead className="font-display font-semibold">Avaliador</TableHead>
+                    <TableHead className="font-display font-semibold">Relação</TableHead>
+                    <TableHead className="font-display font-semibold text-center">Nota</TableHead>
+                    <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableHead className="text-right font-display font-semibold">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
-                  {feedbacks.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum feedback registrado</TableCell></TableRow> :
+                  {feedbacks.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">Nenhum feedback registrado no período</TableCell></TableRow> :
                     feedbacks.map((f: any) => (
-                      <TableRow key={f.id}>
-                        <TableCell>{f.avaliado?.nome_completo || '—'}</TableCell>
-                        <TableCell>{f.avaliador?.nome_completo || '—'}</TableCell>
-                        <TableCell>{f.tipo}</TableCell>
-                        <TableCell>{f.nota_geral ?? '—'}</TableCell>
-                        <TableCell><Badge variant={(statusColors[f.status] || 'secondary') as any}>{f.status}</Badge></TableCell>
-                        <TableCell><Button variant="ghost" size="icon" onClick={() => excluirFeedback.mutate(f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableRow key={f.id} className="hover:bg-accent/30 transition-colors group">
+                        <TableCell className="font-body font-bold text-sm">{f.avaliado?.nome_completo || '—'}</TableCell>
+                        <TableCell className="font-body text-xs text-muted-foreground">{f.avaliador?.nome_completo || '—'}</TableCell>
+                        <TableCell><Badge variant="secondary" className="capitalize text-[9px]">{f.tipo}</Badge></TableCell>
+                        <TableCell className="text-center">
+                           <div className="flex items-center justify-center gap-1">
+                              <Star className="h-3 w-3 text-warning fill-warning" />
+                              <span className="font-mono font-bold">{f.nota_geral ?? '—'}</span>
+                           </div>
+                        </TableCell>
+                        <TableCell><Badge variant={(statusColors[f.status] || 'secondary') as any} className="text-[10px]">{f.status}</Badge></TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirFeedback.mutate(f.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   }
                 </TableBody>
               </Table>
-            </CardContent></Card>
+            </div>
+
           </TabsContent>
 
           {/* PDIs */}
