@@ -655,8 +655,8 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <div className="relative flex-1 group">
+            <div className="flex flex-col sm:flex-row gap-3 mt-6 items-center">
+              <div className="relative flex-1 group w-full">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                   placeholder="Buscar por título ou descrição..."
@@ -664,23 +664,15 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                {searchQuery && (
-                  <button 
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
                 {(['all', 'ferias', 'assinaturas', 'ponto', 'documentos'] as const).map((type) => (
                   <Button
                     key={type}
                     variant={filterType === type ? 'default' : 'outline'}
                     size="sm"
                     className={cn(
-                      "rounded-lg h-11 px-4 font-medium transition-all text-xs",
+                      "rounded-lg h-11 px-4 font-medium transition-all text-xs whitespace-nowrap",
                       filterType === type ? "shadow-lg shadow-primary/20" : "bg-muted/20 border-border/10"
                     )}
                     onClick={() => setFilterType(type)}
@@ -690,9 +682,44 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                 ))}
               </div>
             </div>
+
+            <AnimatePresence>
+              {selectedIds.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-4 p-3 rounded-xl bg-primary/5 border border-primary/20 flex flex-wrap items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <ListChecks className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium">{selectedIds.length} selecionados</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="success" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('aprovado')}>
+                      <CheckCircle className="h-3.5 w-3.5" /> Aprovar
+                    </Button>
+                    <Button size="sm" variant="destructive" className="h-9 px-4 gap-2 rounded-lg" onClick={() => handleBatchAction('recusado')}>
+                      <AlertOctagon className="h-3.5 w-3.5" /> Recusar
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-muted/5">
+            <div className="flex items-center gap-3 mb-4 p-1 px-2">
+              <Checkbox 
+                id="select-all" 
+                checked={selectedIds.length === paginatedPendencias.length && paginatedPendencias.length > 0}
+                onCheckedChange={toggleSelectAll}
+                className="rounded-md border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              />
+              <label htmlFor="select-all" className="text-xs font-medium cursor-pointer text-muted-foreground select-none">
+                Selecionar Todos na página
+              </label>
+            </div>
             {isLoadingDB || isLoadingPonto ? (
               <div className="space-y-4">
                 {Array(4).fill(0).map((_, i) => <CardSkeleton key={i} className="h-24 rounded-2xl" />)}
