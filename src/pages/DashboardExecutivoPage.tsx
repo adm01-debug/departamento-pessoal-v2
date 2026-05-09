@@ -1,4 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
+import { useRealTimeSubscription } from '@/hooks/useRealTimeSubscription';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
