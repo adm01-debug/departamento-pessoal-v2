@@ -25,7 +25,11 @@ export const calculoFerias = {
   }: CalculoFeriasParams): CalculoFeriasResult => {
     // Validação de Abono Pecuniário (Máximo 1/3 do período)
     const maxAbono = Math.floor(diasFerias / 3);
-    const diasAbonoEfetivo = Math.min(diasAbono, maxAbono, 10);
+    // Se diasFerias for 20, maxAbono = 6. O usuário quer 10. 
+    // Legalmente o abono é de 1/3 do direito. Se o direito for 30, pode vender 10.
+    // O parâmetro diasFerias aqui parece ser os dias de GOZO.
+    const diasDireitoTotal = diasFerias + diasAbono;
+    const diasAbonoEfetivo = Math.min(diasAbono, Math.floor(diasDireitoTotal / 3), 10);
 
     const valorDia = salarioBase / 30;
     const vf = Math.round(valorDia * diasFerias * 100) / 100;
