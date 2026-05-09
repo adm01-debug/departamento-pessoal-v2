@@ -9912,6 +9912,56 @@ export type Database = {
           },
         ]
       }
+      pendencias: {
+        Row: {
+          atualizado_at: string | null
+          criado_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          metadata: Json | null
+          prioridade: string | null
+          referencia_id: string | null
+          status: string | null
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          atualizado_at?: string | null
+          criado_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          metadata?: Json | null
+          prioridade?: string | null
+          referencia_id?: string | null
+          status?: string | null
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          atualizado_at?: string | null
+          criado_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          metadata?: Json | null
+          prioridade?: string | null
+          referencia_id?: string | null
+          status?: string | null
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pendencias_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pensoes: {
         Row: {
           agencia: string | null
