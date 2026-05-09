@@ -101,10 +101,9 @@ export default function FolhaPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={() => navigate('/folha/calcular')} className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body gap-1.5">
-            <Calculator className="h-4 w-4" />Processar Folha
-          </Button>
+          <CalculoFolhaWizard competencia={new Date().toISOString().slice(0, 7)} />
         </div>
+
       }
     >
       {/* Summary Cards */}
