@@ -178,7 +178,32 @@ export default function DocumentosPage() {
         </Button>
       }
     >
-      <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar documento..." />
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Buscar documento pelo nome..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 rounded-xl border-border/40 focus:ring-primary/20"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground hidden sm:block" />
+          <Select value={tipoFilter} onValueChange={setTipoFilter}>
+            <SelectTrigger className="w-[180px] rounded-xl border-border/40">
+              <SelectValue placeholder="Tipo de Documento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os Tipos</SelectItem>
+              {TIPOS_DOCUMENTO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setTipoFilter('todos'); }} className="text-xs text-muted-foreground hover:text-foreground">
+            Limpar
+          </Button>
+        </div>
+      </div>
 
       {isLoading ? (
         <div className="flex justify-center p-8"><Spinner size="lg" /></div>
