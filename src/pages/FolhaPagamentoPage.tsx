@@ -158,6 +158,7 @@ export default function FolhaPagamentoPage() {
             <RubricasDialog />
             <Simulador13Dialog />
             <SimuladorWhatIf />
+            {resumo?.id && <PagamentoBancarioWizard folhaId={resumo.id} />}
             {resumo?.id && <CNABDialog folhaId={resumo.id} />}
             {resumo?.id && <RelatorioContabilDialog folhaId={resumo.id} />}
           </div>
