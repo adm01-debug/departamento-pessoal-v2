@@ -1,22 +1,115 @@
-import { useQuery } from '@tanstack/react-query';
-import { feriasService } from '@/services';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { feriasService, colaboradorService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Calendar, AlertTriangle, CheckCircle2, Clock, Plus, Trash2, Edit2, Loader2, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useEmpresas } from '@/hooks/useEmpresas';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface GerenciamentoPeriodosProps {
-  colaboradorId: string;
+  colaboradorId?: string;
 }
 
-export function GerenciamentoPeriodos({ colaboradorId }: GerenciamentoPeriodosProps) {
-  const { data: periodos, isLoading } = useQuery({
-    queryKey: ['periodos-aquisitivos', colaboradorId],
-    queryFn: () => feriasService.listPeriodosAquisitivos(colaboradorId),
-    enabled: !!colaboradorId,
+export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: GerenciamentoPeriodosProps) {
+  const { empresaAtual } = useEmpresas();
+  const qc = useQueryClient();
+  const [selectedColabId, setSelectedColabId] = useState(initialColaboradorId || '');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPeriodo, setEditingPeriodo] = useState<any>(null);
+  const [form, setForm] = useState({
+    data_inicio: '',
+    data_fim: '',
+    dias_direito: '30',
+    status: 'aberto',
+    numero_periodo: '1'
   });
+
+  const { data: colaboradores } = useQuery({
+    queryKey: ['colaboradores-ferias', empresaAtual?.id],
+    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    enabled: !!empresaAtual?.id,
+  });
+
+  const { data: periodos, isLoading } = useQuery({
+    queryKey: ['periodos-aquisitivos', selectedColabId],
+    queryFn: () => feriasService.listPeriodosAquisitivos(selectedColabId),
+    enabled: !!selectedColabId,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => feriasService.criarPeriodoAquisitivo(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
+      toast.success('Período aquisitivo criado');
+      setIsDialogOpen(false);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => feriasService.atualizarPeriodoAquisitivo(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
+      toast.success('Período aquisitivo atualizado');
+      setIsDialogOpen(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => feriasService.excluirPeriodoAquisitivo(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
+      toast.success('Período aquisitivo excluído');
+    },
+  });
+
+  const handleSave = () => {
+    const data = {
+      ...form,
+      colaborador_id: selectedColabId,
+      dias_direito: parseInt(form.dias_direito),
+      numero_periodo: parseInt(form.numero_periodo),
+    };
+
+    if (editingPeriodo) {
+      updateMutation.mutate({ id: editingPeriodo.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const openCreate = () => {
+    setEditingPeriodo(null);
+    setForm({
+      data_inicio: '',
+      data_fim: '',
+      dias_direito: '30',
+      status: 'aberto',
+      numero_periodo: ((periodos?.length || 0) + 1).toString()
+    });
+    setIsDialogOpen(true);
+  };
+
+  const openEdit = (p: any) => {
+    setEditingPeriodo(p);
+    setForm({
+      data_inicio: p.data_inicio,
+      data_fim: p.data_fim,
+      dias_direito: p.dias_direito.toString(),
+      status: p.status,
+      numero_periodo: p.numero_periodo.toString()
+    });
+    setIsDialogOpen(true);
+  };
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
