@@ -56,14 +56,25 @@ export async function notificarAjustePonto(
     .eq('id', colaboradorId)
     .maybeSingle();
 
-  if (colab?.user_id) {
+  if (colab) {
+    // Tentar encontrar o user_id através do email se disponível
+    let targetUserId = null;
+    if (colab.email) {
+      const { data: profile } = await supabase
+        .from('profiles' as any)
+        .select('user_id')
+        .eq('email', colab.email)
+        .maybeSingle();
+      targetUserId = (profile as any)?.user_id;
+    }
+
     await criarNotificacao({
       titulo: `Ajuste de Ponto ${status === 'aprovado' ? 'Aprovado' : 'Recusado'}`,
       mensagem: status === 'aprovado' 
         ? 'Seu ajuste de ponto foi aprovado pelo gestor.' 
         : `Seu ajuste de ponto foi recusado. Motivo: ${motivo || 'Não informado'}`,
       tipo: status === 'aprovado' ? 'sucesso' : 'erro',
-      user_id: colab.user_id,
+      user_id: targetUserId,
       empresa_id: colab.empresa_id
     });
   }
