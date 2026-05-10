@@ -101,6 +101,12 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
         .single();
 
       if (error) throw error;
+      
+      // Notificar o colaborador sobre o resultado
+      if (status === 'aprovado' || status === 'recusado') {
+        await notificarAjustePonto(data.colaborador_id, status, observacoes);
+      }
+
       return data;
     },
     onSuccess: (_, variables) => {
