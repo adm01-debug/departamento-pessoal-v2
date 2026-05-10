@@ -286,9 +286,8 @@ export function PontoAdjustmentRequests() {
                 <TabsContent value="audit" className="mt-0">
                   <ScrollArea className="h-[300px] pr-4">
                     <div className="space-y-6 relative before:absolute before:inset-0 before:left-2 before:w-0.5 before:bg-muted">
-                      {auditLogs.filter((log: any) => log.registro_id === selectedRequest.id).length > 0 ? (
-                        auditLogs
-                          .filter((log: any) => log.registro_id === selectedRequest.id)
+                      {requestAuditLogs.length > 0 ? (
+                        requestAuditLogs
                           .map((log: any) => (
                             <div key={log.id} className="relative pl-8">
                               <div className="absolute left-0 top-1.5 h-4 w-4 rounded-full border-2 border-primary bg-background z-10" />
