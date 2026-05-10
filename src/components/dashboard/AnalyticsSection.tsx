@@ -8,7 +8,7 @@ import {
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
   Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
-  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink
+  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink, FileJson
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -32,10 +32,11 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { exportPortaria671PDF } from '@/services/exportService';
+import { exportPortaria671PDF, exportPontoCSV } from '@/services/exportService';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useRealTimeSubscription } from '@/hooks/useRealTimeSubscription';
 
 const MotionCard = motion.create(Card);
 
@@ -268,6 +269,11 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
   const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
 
+  // Real-time Subscriptions for Auto-refresh
+  useRealTimeSubscription('solicitacoes_ajuste_ponto', ['solicitacoes-ajuste-ponto', empresaId], empresaId);
+  useRealTimeSubscription('notificacoes', ['notificacoes', empresaId], empresaId);
+  useRealTimeSubscription('pendencias', ['pendencias', empresaId], empresaId);
+
   // Notifications State & Logic
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -287,14 +293,18 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
     };
     loadNotifs();
 
-    // Subscribe to new notifications
+    // Subscribe to new notifications (Toast only, data refresh is handled by useRealTimeSubscription)
     const channel = supabase
-      .channel('notif-changes')
+      .channel('notif-toast')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'notificacoes', filter: `empresa_id=eq.${empresaId}` },
         (payload) => {
           setNotifications(prev => [payload.new, ...prev]);
+          toast.info(payload.new.titulo, {
+            description: payload.new.mensagem,
+            icon: <Bell className="h-4 w-4 text-primary" />
+          });
         }
       )
       .subscribe();
@@ -826,39 +836,85 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
 
                         {/* Compliance & History Highlight for Ponto */}
                         {item.source === 'ponto' && item.raw && (
-                          <div className="mt-2 space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                                <MapPin className="h-4 w-4 text-primary opacity-70" />
-                                <div className="text-[10px]">
-                                  <p className="text-muted-foreground font-bold uppercase">Timezone</p>
-                                  <p className="font-medium">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                          <div className="mt-2 space-y-4">
+                            <Tabs defaultValue="highlights" className="w-full">
+                              <TabsList className="grid grid-cols-2 h-8 mb-3 bg-muted/50 p-1">
+                                <TabsTrigger value="highlights" className="text-[10px] py-1">Destaques Críticos</TabsTrigger>
+                                <TabsTrigger value="history" className="text-[10px] py-1">Histórico de Alterações</TabsTrigger>
+                              </TabsList>
+                              
+                              <TabsContent value="highlights" className="mt-0">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-2 group/card">
+                                    <MapPin className="h-4 w-4 text-primary opacity-70 group-hover/card:scale-110 transition-transform" />
+                                    <div className="text-[10px]">
+                                      <p className="text-muted-foreground font-bold uppercase">Timezone</p>
+                                      <p className="font-semibold text-foreground">{item.raw.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 rounded-xl bg-warning/5 border border-warning/10 flex items-center gap-2 group/card">
+                                    <History className="h-4 w-4 text-warning opacity-70 group-hover/card:rotate-[-45deg] transition-transform" />
+                                    <div className="text-[10px]">
+                                      <p className="text-muted-foreground font-bold uppercase">Hora Original</p>
+                                      <p className="font-semibold text-foreground">{item.raw.hora_original?.substring(0, 5) || 'Não registrada'}</p>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 rounded-xl bg-success/5 border border-success/10 flex items-center gap-2 group/card">
+                                    <Shield className="h-4 w-4 text-success opacity-70 group-hover/card:scale-110 transition-transform" />
+                                    <div className="text-[10px]">
+                                      <p className="text-muted-foreground font-bold uppercase">Geofencing</p>
+                                      <p className={cn("font-semibold", item.raw.relatorio_conformidade?.geofencing ? "text-success" : "text-destructive")}>
+                                        {item.raw.relatorio_conformidade?.geofencing ? 'Dentro do Perímetro' : 'Fora do Perímetro'}
+                                      </p>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                                <History className="h-4 w-4 text-warning opacity-70" />
-                                <div className="text-[10px]">
-                                  <p className="text-muted-foreground font-bold uppercase">Original</p>
-                                  <p className="font-medium">{item.raw.hora_original?.substring(0, 5) || 'Original'}</p>
+                              </TabsContent>
+
+                              <TabsContent value="history" className="mt-0">
+                                <div className="p-4 rounded-xl bg-muted/20 border border-border/10">
+                                  <div className="flex items-center justify-between text-[10px] mb-3 pb-2 border-b border-border/5">
+                                    <span className="font-bold text-muted-foreground uppercase">Campo</span>
+                                    <span className="font-bold text-muted-foreground uppercase text-right">Comparação (De → Para)</span>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between text-[11px]">
+                                      <span className="text-muted-foreground">Hora do Ponto</span>
+                                      <span className="font-medium">
+                                        <span className="text-destructive line-through opacity-70 mr-2">{item.raw.hora_original?.substring(0, 5) || '--:--'}</span>
+                                        <ChevronRight className="h-3 w-3 inline text-muted-foreground mx-1" />
+                                        <span className="text-success font-bold ml-1">{item.raw.hora_sugerida?.substring(0, 5)}</span>
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between text-[11px]">
+                                      <span className="text-muted-foreground">Minutos de Divergência</span>
+                                      <span className="font-medium text-warning">{item.raw.relatorio_conformidade?.divergencia_minutos || 0} min</span>
+                                    </div>
+                                    <div className="flex justify-between text-[11px]">
+                                      <span className="text-muted-foreground">Integridade (SHA256)</span>
+                                      <span className="font-mono text-[9px] truncate max-w-[120px] text-muted-foreground">{item.raw.relatorio_conformidade?.sha256_integridade?.slice(0, 12)}...</span>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="p-3 rounded-xl bg-muted/30 border border-border/10 flex items-center gap-2">
-                                <Shield className="h-4 w-4 text-success opacity-70" />
-                                <div className="text-[10px]">
-                                  <p className="text-muted-foreground font-bold uppercase">Conformidade</p>
-                                  <p className="font-medium text-success">Validado 671</p>
-                                </div>
-                              </div>
-                            </div>
+                              </TabsContent>
+                            </Tabs>
                             
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-end gap-2 pt-1">
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-8 text-[10px] gap-2 rounded-lg"
+                                className="h-8 text-[10px] gap-2 rounded-lg hover:bg-primary/5 transition-colors"
                                 onClick={() => exportPortaria671PDF(item.raw)}
                               >
-                                <Download className="h-3 w-3" /> Exportar Conformidade (PDF)
+                                <Download className="h-3 w-3" /> Exportar PDF (Portaria 671)
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 text-[10px] gap-2 rounded-lg"
+                                onClick={() => exportPontoCSV([item.raw], `conformidade-${item.id.slice(0, 8)}.csv`)}
+                              >
+                                <FileJson className="h-3 w-3" /> Exportar CSV
                               </Button>
                             </div>
                           </div>
