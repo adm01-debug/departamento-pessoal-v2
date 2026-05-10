@@ -158,9 +158,28 @@ export function PontoAdjustmentRequests() {
           </div>
         </CardHeader>
         <CardContent>
+          {selectedIds.length > 0 && (
+            <div className="flex items-center justify-between mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20 animate-in fade-in slide-in-from-top-2">
+              <span className="text-sm font-medium">{selectedIds.length} selecionados</span>
+              <div className="flex gap-2">
+                <Button size="sm" variant="gradient-success" onClick={() => batchMutation.mutate({ ids: selectedIds, status: 'aprovado' })}>
+                  Aprovar em Lote
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => batchMutation.mutate({ ids: selectedIds, status: 'recusado' })}>
+                  Rejeitar em Lote
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setSelectedIds([])}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="w-10">
+                  <Checkbox checked={selectedIds.length === filteredSolicitacoes.length && filteredSolicitacoes.length > 0} onCheckedChange={toggleSelectAll} />
+                </TableHead>
                 <TableHead>Colaborador</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Tipo</TableHead>
