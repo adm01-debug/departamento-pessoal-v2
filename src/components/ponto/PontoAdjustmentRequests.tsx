@@ -384,7 +384,7 @@ export function PontoAdjustmentRequests() {
                     <CheckCircle2 className="h-4 w-4" /> Aprovar
                   </Button>
                   <Button variant="destructive" className="gap-2" onClick={() => {
-                    mutation.mutate({ id: selectedRequest.id, status: 'rejeitado' });
+                    mutation.mutate({ id: selectedRequest.id, status: 'recusado' });
                     setSelectedRequest(null);
                   }}>
                     <XCircle className="h-4 w-4" /> Rejeitar
