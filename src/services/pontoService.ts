@@ -100,14 +100,17 @@ export const pontoService = {
       saida: 'saida' 
     };
 
-    // Determine order
-    const { count } = await supabase
+    // Determine order - Buscar o último registro do dia para garantir a ordem correta
+    const { data: lastPoint } = await supabase
       .from('batidas_ponto')
-      .select('*', { count: 'exact', head: true })
+      .select('ordem')
       .eq('colaborador_id', colab.id)
-      .eq('data', data);
+      .eq('data', data)
+      .order('ordem', { ascending: false })
+      .limit(1)
+      .maybeSingle();
     
-    const ordem = (count || 0) + 1;
+    const ordem = (lastPoint?.ordem || 0) + 1;
 
     // Insert RAW event
     const { data: batida, error: insertError } = await supabase
