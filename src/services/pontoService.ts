@@ -49,8 +49,9 @@ export const pontoService = {
     if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
     
     const now = new Date();
-    const data = now.toISOString().split('T')[0];
-    const hora = now.toTimeString().split(' ')[0].substring(0, 5);
+    // Ajuste para pegar a data e hora local correta, evitando o erro do toISOString() que usa UTC
+    const data = format(now, 'yyyy-MM-dd');
+    const hora = format(now, 'HH:mm');
 
     // Get colaborador and workplace info
     const { data: colab, error: colabError } = await supabase
