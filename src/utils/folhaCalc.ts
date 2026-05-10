@@ -1,7 +1,13 @@
 /**
- * Utilitário de cálculo de folha de pagamento e impostos (INSS/IRRF/FGTS)
- * Baseado nas tabelas vigentes e projeções para 2026
+ * Utilitário de cálculo de folha (INSS/IRRF/FGTS).
+ *
+ * IMPORTANTE: Este módulo é apenas um WRAPPER em torno de `src/calculators/impostos.ts`,
+ * que é a fonte única de verdade das tabelas vigentes (sincronizada com a edge function
+ * `calcular-folha`). Mantido por compatibilidade com componentes que esperam a forma
+ * `{ valor, faixa }`.
  */
+import { calcularINSS as _inss, calcularIRRF as _irrf, calcularFGTS as _fgts } from '@/calculators/impostos';
+import { FAIXAS_INSS_2026, FAIXAS_IRRF_2026, DEDUCAO_DEPENDENTE_IRRF } from '@/calculators/tabelas';
 
 export interface CalculoResultado {
   proventos: number;
@@ -14,98 +20,52 @@ export interface CalculoResultado {
   faixaIrrf: string;
 }
 
+const TETO_INSS = FAIXAS_INSS_2026[FAIXAS_INSS_2026.length - 1].limite;
+
+function descreverFaixaInss(salarioBruto: number): string {
+  if (salarioBruto >= TETO_INSS) return 'Teto (14%)';
+  for (let i = 0; i < FAIXAS_INSS_2026.length; i++) {
+    if (salarioBruto <= FAIXAS_INSS_2026[i].limite) {
+      return `${(FAIXAS_INSS_2026[i].aliquota * 100).toFixed(1).replace('.0', '')}%`;
+    }
+  }
+  return '14%';
+}
+
+function descreverFaixaIrrf(base: number): string {
+  if (base <= FAIXAS_IRRF_2026[0].limite) return 'Isento';
+  for (const f of FAIXAS_IRRF_2026) {
+    if (base <= f.limite) return `${(f.aliquota * 100).toFixed(1).replace('.0', '')}%`;
+  }
+  return '27.5%';
+}
+
 export const folhaCalc = {
-  /**
-   * Tabela INSS 2025/2026 (Projetada)
-   * Faixas progressivas
-   */
-  calcularINSS: (salarioBruto: number): { valor: number; faixa: string } => {
-    // Teto INSS 2025/2026 estimado em R$ 8.157,41
-    const teto = 8157.41;
-    const base = Math.min(salarioBruto, teto);
-    
-    let inss = 0;
-    let faixa = "";
+  calcularINSS: (salarioBruto: number): { valor: number; faixa: string } => ({
+    valor: _inss(salarioBruto),
+    faixa: descreverFaixaInss(salarioBruto),
+  }),
 
-    // Faixa 1: Até 1.518,00 (7,5%)
-    if (base > 0) {
-      const v1 = Math.min(base, 1518.00);
-      inss += v1 * 0.075;
-      faixa = "7.5%";
-    }
-    
-    // Faixa 2: 1.518,01 até 2.793,88 (9%)
-    if (base > 1518.00) {
-      const v2 = Math.min(base, 2793.88) - 1518.00;
-      inss += v2 * 0.09;
-      faixa = "9%";
-    }
-
-    // Faixa 3: 2.793,89 até 4.190,83 (12%)
-    if (base > 2793.88) {
-      const v3 = Math.min(base, 4190.83) - 2793.88;
-      inss += v3 * 0.12;
-      faixa = "12%";
-    }
-
-    // Faixa 4: 4.190,84 até 8.157,41 (14%)
-    if (base > 4190.83) {
-      const v4 = base - 4190.83;
-      inss += v4 * 0.14;
-      faixa = "14%";
-    }
-
-    return { 
-      valor: Math.round(inss * 100) / 100,
-      faixa: base >= teto ? "Teto (14%)" : faixa
-    };
-  },
-
-  /**
-   * Tabela IRRF 2025/2026 (Projetada)
-   * Base = Salário Bruto - INSS - Dependentes (R$ 189,59 cada)
-   */
   calcularIRRF: (salarioBruto: number, inss: number, dependentes: number = 0): { valor: number; faixa: string } => {
-    const base = salarioBruto - inss - (dependentes * 189.59);
-    
-    // Simplificação da tabela progressiva com parcelas a deduzir
-    if (base <= 2259.20) return { valor: 0, faixa: "Isento" };
-    
-    if (base <= 2826.65) {
-      return { valor: Math.round((base * 0.075 - 169.44) * 100) / 100, faixa: "7.5%" };
-    }
-    if (base <= 3751.05) {
-      return { valor: Math.round((base * 0.15 - 381.44) * 100) / 100, faixa: "15%" };
-    }
-    if (base <= 4664.68) {
-      return { valor: Math.round((base * 0.225 - 662.77) * 100) / 100, faixa: "22.5%" };
-    }
-    
-    return { valor: Math.round((base * 0.275 - 896.00) * 100) / 100, faixa: "27.5%" };
+    const valor = _irrf(salarioBruto, dependentes);
+    const base = salarioBruto - inss - dependentes * DEDUCAO_DEPENDENTE_IRRF;
+    return { valor, faixa: descreverFaixaIrrf(base) };
   },
 
-  calcularFGTS: (salarioBruto: number): number => {
-    return Math.round(salarioBruto * 0.08 * 100) / 100;
-  },
+  calcularFGTS: (salarioBruto: number): number => _fgts(salarioBruto),
 
-  processar: (salarioBase: number, adicionais: number = 0, descontosExtras: number = 0, dependentes: number = 0): CalculoResultado => {
+  processar: (
+    salarioBase: number,
+    adicionais: number = 0,
+    descontosExtras: number = 0,
+    dependentes: number = 0
+  ): CalculoResultado => {
     const proventos = salarioBase + adicionais;
     const { valor: inss, faixa: faixaInss } = folhaCalc.calcularINSS(proventos);
     const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(proventos, inss, dependentes);
     const fgts = folhaCalc.calcularFGTS(proventos);
-    
-    const descontos = inss + irrf + descontosExtras;
-    const liquido = proventos - descontos;
-
-    return {
-      proventos,
-      descontos,
-      liquido,
-      inss,
-      irrf,
-      fgts,
-      faixaInss,
-      faixaIrrf
-    };
-  }
+    const descontos = Math.round((inss + irrf + descontosExtras) * 100) / 100;
+    const liquido = Math.round((proventos - descontos) * 100) / 100;
+    return { proventos, descontos, liquido, inss, irrf, fgts, faixaInss, faixaIrrf };
+  },
 };
