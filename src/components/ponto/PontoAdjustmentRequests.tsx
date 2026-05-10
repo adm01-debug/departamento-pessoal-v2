@@ -350,15 +350,29 @@ export function PontoAdjustmentRequests() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Timezone de Registro</p>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Timezone (Diff)</p>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                          <p className="text-sm font-medium">{selectedRequest.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-muted-foreground line-through">America/Sao_Paulo (Original)</span>
+                            <span className="text-sm font-medium text-primary">{selectedRequest.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Geofencing (Diff)</p>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground line-through">Dentro do Raio (Original)</span>
+                          <span className={`text-sm font-medium ${selectedRequest.relatorio_conformidade?.geofencing ? 'text-success' : 'text-warning'}`}>
+                            {selectedRequest.relatorio_conformidade?.geofencing ? 'VÁLIDO' : 'NÃO VERIFICADO'}
+                          </span>
                         </div>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] text-muted-foreground font-bold uppercase">Divergência de Tempo</p>
-                        <p className="text-sm font-medium">{selectedRequest.relatorio_conformidade?.divergencia_minutos || 0} minutos em relação ao original</p>
+                        <p className="text-sm font-medium">
+                          {selectedRequest.relatorio_conformidade?.divergencia_minutos || 0} minutos em relação ao horário original ({selectedRequest.hora_original || '--:--'})
+                        </p>
                       </div>
                       <div className="space-y-1 col-span-2 pt-2 border-t">
                         <p className="text-[10px] text-muted-foreground font-bold uppercase">Assinatura Digital de Integridade (SHA256)</p>
