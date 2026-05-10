@@ -190,28 +190,32 @@ export function PontoAdjustmentRequests() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {solicitacoes.length === 0 ? (
+              {filteredSolicitacoes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     Nenhuma solicitação pendente
                   </TableCell>
                 </TableRow>
               ) : (
-                solicitacoes
-                  .filter((s: any) => s.colaborador?.nome_completo.toLowerCase().includes(search.toLowerCase()))
-                  .map((s: any) => (
-                    <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
-                      <TableCell className="font-medium">
-                        <div className="flex flex-col">
-                          <span>{s.colaborador?.nome_completo}</span>
-                          {s.relatorio_conformidade?.portaria_671_conformidade && (
-                            <span className="text-[9px] text-success flex items-center gap-0.5 mt-0.5">
-                              <Shield className="h-2.5 w-2.5" /> Validado Portaria 671
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                    <TableCell>{new Date(s.data_ponto).toLocaleDateString('pt-BR')}</TableCell>
+                filteredSolicitacoes.map((s: any) => (
+                  <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedIds.includes(s.id)} 
+                        onCheckedChange={() => toggleSelect(s.id)} 
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col">
+                        <span>{s.colaborador?.nome_completo}</span>
+                        {s.relatorio_conformidade?.portaria_671_conformidade && (
+                          <span className="text-[9px] text-success flex items-center gap-0.5 mt-0.5">
+                            <Shield className="h-2.5 w-2.5" /> Validado Portaria 671
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{format(parseISO(s.data_ponto), 'dd/MM/yyyy')}</TableCell>
                     <TableCell><Badge variant="outline" className="text-[10px]">{s.tipo_ponto}</Badge></TableCell>
                     <TableCell className="font-mono text-xs">{s.hora_sugerida?.substring(0, 5)}</TableCell>
                     <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground" title={s.motivo}>{s.motivo}</TableCell>
@@ -238,7 +242,7 @@ export function PontoAdjustmentRequests() {
                             <Button size="icon" variant="ghost" className="h-8 w-8 text-success hover:bg-success/10" onClick={() => mutation.mutate({ id: s.id, status: 'aprovado' })}>
                               <CheckCircle2 className="h-4 w-4" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => mutation.mutate({ id: s.id, status: 'rejeitado' })}>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => mutation.mutate({ id: s.id, status: 'recusado' })}>
                               <XCircle className="h-4 w-4" />
                             </Button>
                           </>
