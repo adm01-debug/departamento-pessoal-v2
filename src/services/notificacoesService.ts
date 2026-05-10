@@ -49,10 +49,10 @@ export async function notificarAjustePonto(
   status: 'aprovado' | 'recusado',
   motivo?: string
 ): Promise<void> {
-  // Buscar o user_id do colaborador
+  // Buscar o colaborador para obter empresa_id e possivelmente o email para vínculo futuro
   const { data: colab } = await supabase
     .from('colaboradores')
-    .select('user_id, empresa_id')
+    .select('id, empresa_id, email')
     .eq('id', colaboradorId)
     .maybeSingle();
 
