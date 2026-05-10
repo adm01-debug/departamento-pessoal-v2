@@ -39,25 +39,30 @@ export function PontoAdjustmentRequests() {
     enabled: !!empresaAtual?.id,
   });
 
-  const { data: auditLogs = [] } = useQuery({
-    queryKey: ['trilha-auditoria-ponto', empresaAtual?.id],
+  const { data: requestAuditLogs = [], isLoading: isLoadingAudit } = useQuery({
+    queryKey: ['trilha-auditoria-ponto', selectedRequest?.id],
     queryFn: async () => {
+      if (!selectedRequest?.id) return [];
       const { data, error } = await supabase
         .from('trilha_auditoria_ponto')
-        .select('*, batidas_ponto!inner(colaborador_id)')
+        .select('*')
+        .eq('registro_id', selectedRequest.id)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
-    enabled: !!empresaAtual?.id,
+    enabled: !!selectedRequest?.id,
   });
 
   const mutation = useMutation({
     mutationFn: async ({ id, status, observacoes }: { id: string, status: string, observacoes?: string }) => {
+      // Ajuste para garantir que usamos o status correto do ENUM (recusado ao invés de rejeitado)
+      const finalStatus = status === 'rejeitado' ? 'recusado' : status;
+
       const { error: updateError } = await supabase
         .from('solicitacoes_ajuste_ponto')
         .update({ 
-          status, 
+          status: finalStatus, 
           observacoes_gestor: observacoes, 
           updated_at: new Date().toISOString() 
         })
@@ -65,7 +70,7 @@ export function PontoAdjustmentRequests() {
       
       if (updateError) throw updateError;
 
-      if (status === 'aprovado') {
+      if (finalStatus === 'aprovado') {
         const { error: applyError } = await supabase.rpc('processar_ajuste_aprovado', {
           p_solicitacao_id: id
         });
@@ -74,12 +79,56 @@ export function PontoAdjustmentRequests() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes-ajuste-ponto'] });
-      toast.success('Solicitação atualizada com sucesso!');
+      toast.success('Solicitação processada com sucesso!');
     },
     onError: (e: any) => {
-      toast.error(`Erro: ${e.message}`);
+      toast.error(`Erro ao processar: ${e.message}`);
     }
   });
+
+  const batchMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[], status: 'aprovado' | 'recusado' }) => {
+      const results = await Promise.all(ids.map(async (id) => {
+        try {
+          await mutation.mutateAsync({ id, status });
+          return { id, success: true };
+        } catch (e: any) {
+          return { id, success: false, error: e.message };
+        }
+      }));
+      return results;
+    },
+    onSuccess: (results) => {
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      if (failed === 0) {
+        toast.success(`${successful} solicitações processadas em lote.`);
+      } else {
+        toast.warning(`${successful} sucesso, ${failed} falhas. Verifique os itens individuais.`);
+      }
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['solicitacoes-ajuste-ponto'] });
+    }
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredSolicitacoes.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredSolicitacoes.map(s => s.id));
+    }
+  };
+
+  const filteredSolicitacoes = useMemo(() => {
+    return solicitacoes.filter((s: any) => 
+      s.colaborador?.nome_completo.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [solicitacoes, search]);
 
   const showDetails = (solicitacao: any) => {
     setSelectedRequest(solicitacao);
