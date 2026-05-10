@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { pontoMonitorService } from './pontoMonitorService';
 import CryptoJS from 'crypto-js';
+import { format } from 'date-fns';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
