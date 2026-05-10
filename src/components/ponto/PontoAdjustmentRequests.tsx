@@ -289,7 +289,7 @@ export function PontoAdjustmentRequests() {
                     </div>
                     <div className="p-4 rounded-xl border bg-card">
                       <p className="text-[10px] text-muted-foreground font-bold uppercase mb-2">Data do Ponto</p>
-                      <p className="font-semibold text-sm">{new Date(selectedRequest.data_ponto).toLocaleDateString('pt-BR')}</p>
+                      <p className="font-semibold text-sm">{format(parseISO(selectedRequest.data_ponto), 'dd/MM/yyyy')}</p>
                     </div>
                     <div className="p-4 rounded-xl border bg-card">
                       <p className="text-[10px] text-muted-foreground font-bold uppercase mb-2">Hora Original</p>
