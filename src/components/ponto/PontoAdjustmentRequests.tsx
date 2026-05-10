@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Clock, FileText, History, Info, ExternalLink, Calendar, MapPin, Shield, Search, Download } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, History, Info, ExternalLink, Calendar, MapPin, Shield, Search, Download, CheckSquare, Square, MoreHorizontal } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
@@ -14,12 +14,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { exportPortaria671PDF } from '@/services/exportService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { format, parseISO } from 'date-fns';
 
 export function PontoAdjustmentRequests() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
   const [search, setSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const { data: solicitacoes = [], isLoading } = useQuery({
     queryKey: ['solicitacoes-ajuste-ponto', empresaAtual?.id],
@@ -36,25 +39,30 @@ export function PontoAdjustmentRequests() {
     enabled: !!empresaAtual?.id,
   });
 
-  const { data: auditLogs = [] } = useQuery({
-    queryKey: ['trilha-auditoria-ponto', empresaAtual?.id],
+  const { data: requestAuditLogs = [], isLoading: isLoadingAudit } = useQuery({
+    queryKey: ['trilha-auditoria-ponto', selectedRequest?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!selectedRequest?.id) return [];
+      const { data, error } = await (supabase as any)
         .from('trilha_auditoria_ponto')
-        .select('*, batidas_ponto!inner(colaborador_id)')
+        .select('*')
+        .eq('registro_id', selectedRequest.id)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
-    enabled: !!empresaAtual?.id,
+    enabled: !!selectedRequest?.id,
   });
 
   const mutation = useMutation({
     mutationFn: async ({ id, status, observacoes }: { id: string, status: string, observacoes?: string }) => {
+      // Ajuste para garantir que usamos o status correto do ENUM (recusado ao invés de rejeitado)
+      const finalStatus = status === 'rejeitado' ? 'recusado' : status;
+
       const { error: updateError } = await supabase
         .from('solicitacoes_ajuste_ponto')
         .update({ 
-          status, 
+          status: finalStatus, 
           observacoes_gestor: observacoes, 
           updated_at: new Date().toISOString() 
         })
@@ -62,7 +70,7 @@ export function PontoAdjustmentRequests() {
       
       if (updateError) throw updateError;
 
-      if (status === 'aprovado') {
+      if (finalStatus === 'aprovado') {
         const { error: applyError } = await supabase.rpc('processar_ajuste_aprovado', {
           p_solicitacao_id: id
         });
@@ -71,12 +79,56 @@ export function PontoAdjustmentRequests() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes-ajuste-ponto'] });
-      toast.success('Solicitação atualizada com sucesso!');
+      toast.success('Solicitação processada com sucesso!');
     },
     onError: (e: any) => {
-      toast.error(`Erro: ${e.message}`);
+      toast.error(`Erro ao processar: ${e.message}`);
     }
   });
+
+  const batchMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[], status: 'aprovado' | 'recusado' }) => {
+      const results = await Promise.all(ids.map(async (id) => {
+        try {
+          await mutation.mutateAsync({ id, status });
+          return { id, success: true };
+        } catch (e: any) {
+          return { id, success: false, error: e.message };
+        }
+      }));
+      return results;
+    },
+    onSuccess: (results) => {
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      if (failed === 0) {
+        toast.success(`${successful} solicitações processadas em lote.`);
+      } else {
+        toast.warning(`${successful} sucesso, ${failed} falhas. Verifique os itens individuais.`);
+      }
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['solicitacoes-ajuste-ponto'] });
+    }
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredSolicitacoes.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredSolicitacoes.map(s => s.id));
+    }
+  };
+
+  const filteredSolicitacoes = useMemo(() => {
+    return solicitacoes.filter((s: any) => 
+      s.colaborador?.nome_completo.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [solicitacoes, search]);
 
   const showDetails = (solicitacao: any) => {
     setSelectedRequest(solicitacao);
@@ -106,9 +158,28 @@ export function PontoAdjustmentRequests() {
           </div>
         </CardHeader>
         <CardContent>
+          {selectedIds.length > 0 && (
+            <div className="flex items-center justify-between mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20 animate-in fade-in slide-in-from-top-2">
+              <span className="text-sm font-medium">{selectedIds.length} selecionados</span>
+              <div className="flex gap-2">
+                <Button size="sm" variant="gradient-success" onClick={() => batchMutation.mutate({ ids: selectedIds, status: 'aprovado' })}>
+                  Aprovar em Lote
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => batchMutation.mutate({ ids: selectedIds, status: 'recusado' })}>
+                  Rejeitar em Lote
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setSelectedIds([])}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="w-10">
+                  <Checkbox checked={selectedIds.length === filteredSolicitacoes.length && filteredSolicitacoes.length > 0} onCheckedChange={toggleSelectAll} />
+                </TableHead>
                 <TableHead>Colaborador</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Tipo</TableHead>
@@ -119,28 +190,32 @@ export function PontoAdjustmentRequests() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {solicitacoes.length === 0 ? (
+              {filteredSolicitacoes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     Nenhuma solicitação pendente
                   </TableCell>
                 </TableRow>
               ) : (
-                solicitacoes
-                  .filter((s: any) => s.colaborador?.nome_completo.toLowerCase().includes(search.toLowerCase()))
-                  .map((s: any) => (
-                    <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
-                      <TableCell className="font-medium">
-                        <div className="flex flex-col">
-                          <span>{s.colaborador?.nome_completo}</span>
-                          {s.relatorio_conformidade?.portaria_671_conformidade && (
-                            <span className="text-[9px] text-success flex items-center gap-0.5 mt-0.5">
-                              <Shield className="h-2.5 w-2.5" /> Validado Portaria 671
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                    <TableCell>{new Date(s.data_ponto).toLocaleDateString('pt-BR')}</TableCell>
+                filteredSolicitacoes.map((s: any) => (
+                  <TableRow key={s.id} className="group transition-colors hover:bg-muted/10">
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedIds.includes(s.id)} 
+                        onCheckedChange={() => toggleSelect(s.id)} 
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col">
+                        <span>{s.colaborador?.nome_completo}</span>
+                        {s.relatorio_conformidade?.portaria_671_conformidade && (
+                          <span className="text-[9px] text-success flex items-center gap-0.5 mt-0.5">
+                            <Shield className="h-2.5 w-2.5" /> Validado Portaria 671
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{format(parseISO(s.data_ponto), 'dd/MM/yyyy')}</TableCell>
                     <TableCell><Badge variant="outline" className="text-[10px]">{s.tipo_ponto}</Badge></TableCell>
                     <TableCell className="font-mono text-xs">{s.hora_sugerida?.substring(0, 5)}</TableCell>
                     <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground" title={s.motivo}>{s.motivo}</TableCell>
@@ -167,7 +242,7 @@ export function PontoAdjustmentRequests() {
                             <Button size="icon" variant="ghost" className="h-8 w-8 text-success hover:bg-success/10" onClick={() => mutation.mutate({ id: s.id, status: 'aprovado' })}>
                               <CheckCircle2 className="h-4 w-4" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => mutation.mutate({ id: s.id, status: 'rejeitado' })}>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => mutation.mutate({ id: s.id, status: 'recusado' })}>
                               <XCircle className="h-4 w-4" />
                             </Button>
                           </>
@@ -214,7 +289,7 @@ export function PontoAdjustmentRequests() {
                     </div>
                     <div className="p-4 rounded-xl border bg-card">
                       <p className="text-[10px] text-muted-foreground font-bold uppercase mb-2">Data do Ponto</p>
-                      <p className="font-semibold text-sm">{new Date(selectedRequest.data_ponto).toLocaleDateString('pt-BR')}</p>
+                      <p className="font-semibold text-sm">{format(parseISO(selectedRequest.data_ponto), 'dd/MM/yyyy')}</p>
                     </div>
                     <div className="p-4 rounded-xl border bg-card">
                       <p className="text-[10px] text-muted-foreground font-bold uppercase mb-2">Hora Original</p>
@@ -234,9 +309,8 @@ export function PontoAdjustmentRequests() {
                 <TabsContent value="audit" className="mt-0">
                   <ScrollArea className="h-[300px] pr-4">
                     <div className="space-y-6 relative before:absolute before:inset-0 before:left-2 before:w-0.5 before:bg-muted">
-                      {auditLogs.filter((log: any) => log.registro_id === selectedRequest.id).length > 0 ? (
-                        auditLogs
-                          .filter((log: any) => log.registro_id === selectedRequest.id)
+                      {requestAuditLogs.length > 0 ? (
+                        requestAuditLogs
                           .map((log: any) => (
                             <div key={log.id} className="relative pl-8">
                               <div className="absolute left-0 top-1.5 h-4 w-4 rounded-full border-2 border-primary bg-background z-10" />
@@ -276,15 +350,29 @@ export function PontoAdjustmentRequests() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Timezone de Registro</p>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Timezone (Diff)</p>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                          <p className="text-sm font-medium">{selectedRequest.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</p>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-muted-foreground line-through">America/Sao_Paulo (Original)</span>
+                            <span className="text-sm font-medium text-primary">{selectedRequest.relatorio_conformidade?.timezone || 'America/Sao_Paulo'}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Geofencing (Diff)</p>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground line-through">Dentro do Raio (Original)</span>
+                          <span className={`text-sm font-medium ${selectedRequest.relatorio_conformidade?.geofencing ? 'text-success' : 'text-warning'}`}>
+                            {selectedRequest.relatorio_conformidade?.geofencing ? 'VÁLIDO' : 'NÃO VERIFICADO'}
+                          </span>
                         </div>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] text-muted-foreground font-bold uppercase">Divergência de Tempo</p>
-                        <p className="text-sm font-medium">{selectedRequest.relatorio_conformidade?.divergencia_minutos || 0} minutos em relação ao original</p>
+                        <p className="text-sm font-medium">
+                          {selectedRequest.relatorio_conformidade?.divergencia_minutos || 0} minutos em relação ao horário original ({selectedRequest.hora_original || '--:--'})
+                        </p>
                       </div>
                       <div className="space-y-1 col-span-2 pt-2 border-t">
                         <p className="text-[10px] text-muted-foreground font-bold uppercase">Assinatura Digital de Integridade (SHA256)</p>
@@ -310,7 +398,7 @@ export function PontoAdjustmentRequests() {
                     <CheckCircle2 className="h-4 w-4" /> Aprovar
                   </Button>
                   <Button variant="destructive" className="gap-2" onClick={() => {
-                    mutation.mutate({ id: selectedRequest.id, status: 'rejeitado' });
+                    mutation.mutate({ id: selectedRequest.id, status: 'recusado' });
                     setSelectedRequest(null);
                   }}>
                     <XCircle className="h-4 w-4" /> Rejeitar

@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { pontoMonitorService } from './pontoMonitorService';
 import CryptoJS from 'crypto-js';
+import { format } from 'date-fns';
 
 const ensureSingleResult = <T>(data: T | null, entity: string): T => {
   if (!data) throw new Error(`Nenhum registro de ${entity} foi retornado pela operação.`);
@@ -49,8 +50,9 @@ export const pontoService = {
     if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
     
     const now = new Date();
-    const data = now.toISOString().split('T')[0];
-    const hora = now.toTimeString().split(' ')[0].substring(0, 5);
+    // Ajuste para pegar a data e hora local correta, evitando o erro do toISOString() que usa UTC
+    const data = format(now, 'yyyy-MM-dd');
+    const hora = format(now, 'HH:mm');
 
     // Get colaborador and workplace info
     const { data: colab, error: colabError } = await supabase
@@ -98,14 +100,17 @@ export const pontoService = {
       saida: 'saida' 
     };
 
-    // Determine order
-    const { count } = await supabase
+    // Determine order - Buscar o último registro do dia para garantir a ordem correta
+    const { data: lastPoint } = await supabase
       .from('batidas_ponto')
-      .select('*', { count: 'exact', head: true })
+      .select('ordem')
       .eq('colaborador_id', colab.id)
-      .eq('data', data);
+      .eq('data', data)
+      .order('ordem', { ascending: false })
+      .limit(1)
+      .maybeSingle();
     
-    const ordem = (count || 0) + 1;
+    const ordem = (lastPoint?.ordem || 0) + 1;
 
     // Insert RAW event
     const { data: batida, error: insertError } = await supabase
