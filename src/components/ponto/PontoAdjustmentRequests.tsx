@@ -43,7 +43,7 @@ export function PontoAdjustmentRequests() {
     queryKey: ['trilha-auditoria-ponto', selectedRequest?.id],
     queryFn: async () => {
       if (!selectedRequest?.id) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('trilha_auditoria_ponto')
         .select('*')
         .eq('registro_id', selectedRequest.id)
