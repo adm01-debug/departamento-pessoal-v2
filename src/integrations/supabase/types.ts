@@ -7082,6 +7082,7 @@ export type Database = {
       }
       folhas_pagamento: {
         Row: {
+          alerta_calculo: Json | null
           competencia: string
           created_at: string
           created_by: string | null
@@ -7102,6 +7103,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alerta_calculo?: Json | null
           competencia: string
           created_at?: string
           created_by?: string | null
@@ -7122,6 +7124,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alerta_calculo?: Json | null
           competencia?: string
           created_at?: string
           created_by?: string | null
@@ -7512,6 +7515,48 @@ export type Database = {
           valor?: number
         }
         Relationships: []
+      }
+      historico_calculos_folha: {
+        Row: {
+          created_at: string | null
+          criado_por: string | null
+          empresa_id: string | null
+          folha_id: string | null
+          id: string
+          snapshot: Json
+        }
+        Insert: {
+          created_at?: string | null
+          criado_por?: string | null
+          empresa_id?: string | null
+          folha_id?: string | null
+          id?: string
+          snapshot: Json
+        }
+        Update: {
+          created_at?: string | null
+          criado_por?: string | null
+          empresa_id?: string | null
+          folha_id?: string | null
+          id?: string
+          snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_calculos_folha_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_calculos_folha_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       historico_cargo: {
         Row: {
@@ -11038,6 +11083,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           cargo: string | null
+          config_notificacoes: Json | null
           cpf_validado_govbr: boolean | null
           created_at: string
           departamento: string | null
@@ -11053,6 +11099,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           cargo?: string | null
+          config_notificacoes?: Json | null
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
@@ -11068,6 +11115,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           cargo?: string | null
+          config_notificacoes?: Json | null
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
@@ -11296,6 +11344,68 @@ export type Database = {
           valor_total_provisionado?: number | null
         }
         Relationships: []
+      }
+      provisoes_folha: {
+        Row: {
+          colaborador_id: string
+          competencia: string
+          created_at: string | null
+          empresa_id: string
+          encargos_provisao: number | null
+          id: string
+          valor_13_salario: number | null
+          valor_ferias: number | null
+        }
+        Insert: {
+          colaborador_id: string
+          competencia: string
+          created_at?: string | null
+          empresa_id: string
+          encargos_provisao?: number | null
+          id?: string
+          valor_13_salario?: number | null
+          valor_ferias?: number | null
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string
+          created_at?: string | null
+          empresa_id?: string
+          encargos_provisao?: number | null
+          id?: string
+          valor_13_salario?: number | null
+          valor_ferias?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_folha_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       provisoes_mensais: {
         Row: {
@@ -11910,42 +12020,59 @@ export type Database = {
           ativo: boolean | null
           automatico: boolean | null
           codigo: string
+          codigo_esocial: string | null
           created_at: string
           descricao: string
+          empresa_id: string | null
           formula: string | null
           id: string
           incide_fgts: boolean | null
           incide_inss: boolean | null
           incide_irrf: boolean | null
+          natureza_rubrica: string | null
           tipo: Database["public"]["Enums"]["tipo_evento_folha"]
         }
         Insert: {
           ativo?: boolean | null
           automatico?: boolean | null
           codigo: string
+          codigo_esocial?: string | null
           created_at?: string
           descricao: string
+          empresa_id?: string | null
           formula?: string | null
           id?: string
           incide_fgts?: boolean | null
           incide_inss?: boolean | null
           incide_irrf?: boolean | null
+          natureza_rubrica?: string | null
           tipo: Database["public"]["Enums"]["tipo_evento_folha"]
         }
         Update: {
           ativo?: boolean | null
           automatico?: boolean | null
           codigo?: string
+          codigo_esocial?: string | null
           created_at?: string
           descricao?: string
+          empresa_id?: string | null
           formula?: string | null
           id?: string
           incide_fgts?: boolean | null
           incide_inss?: boolean | null
           incide_irrf?: boolean | null
+          natureza_rubrica?: string | null
           tipo?: Database["public"]["Enums"]["tipo_evento_folha"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rubricas_folha_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_filters: {
         Row: {
