@@ -80,15 +80,15 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
       <FolhaKPI title="Líquido Total" value={resumo?.liquido || 0} icon={DollarSign}
         gradient="from-primary-glow to-primary" index={3}
         tooltip="Valor total líquido a ser pago aos colaboradores" />
-      <FolhaKPI title="Encargos" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
+      <FolhaKPI title="Encargos (INSS+FGTS)" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
         gradient="from-info to-info/70" index={4}
-        tooltip="Encargos patronais estimados (INSS + FGTS)" />
-      <FolhaKPI title="IRRF" value={resumo?.irrf || 0} icon={Receipt}
+        tooltip="Encargos patronais e sociais estimados (INSS + FGTS)" />
+      <FolhaKPI title="IRRF Retido" value={resumo?.irrf || 0} icon={Receipt}
         gradient="from-warning to-warning/70" index={5}
         tooltip="Imposto de Renda Retido na Fonte (IRRF)" />
-      <FolhaKPI title="Custo Total" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) + (resumo?.fgts || 0) + ((resumo?.totalProventos || 0) * 0.28)} icon={DollarSign}
+      <FolhaKPI title="Custo Empresa" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) * 1.358} icon={DollarSign}
         gradient="from-purple-500 to-indigo-600" index={6}
-        tooltip="Custo total real estimado para a empresa (Bruto + Encargos Patronais ~28% + FGTS)" />
+        tooltip="Custo real estimado (Bruto + Encargos + Provisões 1/12)" />
     </div>
   );
 }
