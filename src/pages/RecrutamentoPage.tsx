@@ -74,13 +74,15 @@ export default function RecrutamentoPage() {
               <DialogTrigger asChild>
                 <Button className="rounded-xl shadow-lg"><Plus className="h-4 w-4 mr-2" />Nova Vaga</Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-xl">
                 <DialogHeader><DialogTitle>Anunciar Nova Vaga</DialogTitle></DialogHeader>
-                <div className="grid gap-3 pt-4">
+                <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="grid gap-1"><Label>Título da Vaga</Label><Input placeholder="Ex: Desenvolvedor Senior" /></div>
                   <div className="grid gap-1"><Label>Departamento</Label><Input placeholder="Ex: Tecnologia" /></div>
+                  <div className="grid gap-1"><Label>Modalidade</Label><Input placeholder="Remoto, Híbrido, Presencial" /></div>
                   <div className="grid gap-1"><Label>Quantidade</Label><Input type="number" defaultValue={1} /></div>
-                  <Button className="mt-2">Publicar Vaga</Button>
+                  <div className="grid gap-1 col-span-2"><Label>Requisitos (separados por vírgula)</Label><Input placeholder="React, TypeScript, Node.js..." /></div>
+                  <Button className="col-span-2 mt-2">Publicar Vaga</Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -117,59 +119,79 @@ export default function RecrutamentoPage() {
               <>
                 {/* PIPELINE KANBAN */}
                 <TabsContent value="pipeline" className="mt-0">
-                  <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar min-h-[500px]">
+                  <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar min-h-[600px] select-none">
                     {ETAPAS.map((etapa) => (
                       <div key={etapa.id} className="flex-shrink-0 w-72 flex flex-col gap-3">
                         <div className="flex items-center justify-between px-2">
                           <h3 className="font-display font-semibold text-sm flex items-center gap-2">
                             {etapa.label}
-                            <Badge variant="secondary" className="rounded-full h-5 px-1.5 text-[10px]">
+                            <Badge variant="secondary" className="rounded-full h-5 px-1.5 text-[10px] bg-muted/80">
                               {candidaturas.filter((c: any) => (c.etapa || 'triagem') === etapa.id).length}
                             </Badge>
                           </h3>
                         </div>
                         
-                        <div className={cn("flex-1 rounded-2xl border-2 border-dashed p-3 space-y-3 transition-colors", etapa.color)}>
+                        <div className={cn("flex-1 rounded-2xl border-2 border-dashed p-3 space-y-3 transition-colors duration-300", etapa.color)}>
                           {candidaturas
                             .filter((c: any) => (c.etapa || 'triagem') === etapa.id)
-                            .map((cand: any, idx: number) => (
+                            .map((cand: any) => (
                               <motion.div 
                                 key={cand.id}
                                 layoutId={cand.id}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-white p-3 rounded-xl shadow-sm border border-border/40 hover:shadow-md transition-all cursor-pointer group"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="bg-white p-4 rounded-xl shadow-sm border border-border/40 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group relative"
                               >
                                 <div className="flex justify-between items-start mb-2">
-                                  <h4 className="font-semibold text-xs truncate max-w-[150px]">{cand.candidato?.nome}</h4>
-                                  <Badge variant="outline" className="text-[9px] h-4 px-1">{cand.vaga?.titulo}</Badge>
-                                </div>
-                                <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-3">
-                                  <span className="flex items-center gap-1"><Star className="h-3 w-3 text-warning fill-warning" /> {cand.nota_geral || 0}</span>
-                                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> 2d</span>
-                                </div>
-                                <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <div className="flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md"><Mail className="h-3 w-3" /></Button>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md"><Phone className="h-3 w-3" /></Button>
+                                  <div>
+                                    <h4 className="font-semibold text-sm truncate max-w-[180px]">{cand.candidato?.nome}</h4>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">{cand.vaga?.titulo}</p>
                                   </div>
-                                  <Select 
-                                    onValueChange={(val) => updateEtapa.mutate({ id: cand.id, etapa: val })}
-                                    defaultValue={etapa.id}
-                                  >
-                                    <SelectTrigger className="h-6 text-[9px] w-24 rounded-md">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {ETAPAS.map(e => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}
-                                    </SelectContent>
-                                  </Select>
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1 bg-muted/30">{cand.candidato?.origem || 'Direto'}</Badge>
+                                </div>
+                                
+                                <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-4">
+                                  <span className="flex items-center gap-1">
+                                    <Star className={cn("h-3 w-3", (cand.nota_geral || 0) > 0 ? "text-warning fill-warning" : "text-slate-300")} /> 
+                                    {cand.nota_geral || 'S/N'}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" /> 
+                                    {new Date(cand.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                  <div className="flex -space-x-2">
+                                    <div className="h-6 w-6 rounded-full bg-primary/10 border-2 border-white flex items-center justify-center text-[10px] font-bold text-primary">
+                                      {cand.candidato?.nome?.charAt(0)}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-blue-50 hover:text-blue-600">
+                                      <Mail className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Select 
+                                      onValueChange={(val) => updateEtapa.mutate({ id: cand.id, etapa: val })}
+                                      defaultValue={etapa.id}
+                                    >
+                                      <SelectTrigger className="h-7 text-[9px] w-28 rounded-lg border-primary/20 bg-primary/5">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {ETAPAS.map(e => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
                               </motion.div>
                             ))}
                           {candidaturas.filter((c: any) => (c.etapa || 'triagem') === etapa.id).length === 0 && (
-                            <div className="h-32 flex items-center justify-center border border-dashed rounded-xl opacity-20">
-                              <span className="text-xs">Vazio</span>
+                            <div className="h-32 flex flex-col items-center justify-center border border-dashed rounded-xl opacity-20 gap-2">
+                              <Users className="h-6 w-6" />
+                              <span className="text-xs font-medium">Sem candidatos</span>
                             </div>
                           )}
                         </div>
@@ -180,59 +202,127 @@ export default function RecrutamentoPage() {
 
                 {/* VAGAS */}
                 <TabsContent value="vagas" className="mt-0">
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {vagas.map((vaga: any) => (
-                      <Card key={vaga.id} className="rounded-2xl border-border/40 hover:border-primary/30 transition-all group overflow-hidden">
+                      <Card key={vaga.id} className="rounded-2xl border-border/40 hover:border-primary/30 hover:shadow-xl transition-all group overflow-hidden bg-card/50 backdrop-blur-sm">
                         <CardHeader className="pb-3">
-                          <div className="flex justify-between items-start">
-                            <Badge variant={vaga.status === 'aberta' ? 'default' : 'secondary'} className="rounded-lg">{vaga.status}</Badge>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                          <div className="flex justify-between items-start mb-2">
+                            <Badge 
+                              className={cn(
+                                "rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                                vaga.status === 'aberta' ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"
+                              )}
+                            >
+                              {vaga.status}
+                            </Badge>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5"><BarChart3 className="h-4 w-4" /></Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5"><Trash2 className="h-4 w-4" /></Button>
+                            </div>
                           </div>
-                          <CardTitle className="text-lg mt-2 font-display">{vaga.titulo}</CardTitle>
-                          <CardDescription className="text-xs">{vaga.departamento} • {vaga.modalidade}</CardDescription>
+                          <CardTitle className="text-xl font-display font-bold leading-tight group-hover:text-primary transition-colors">{vaga.titulo}</CardTitle>
+                          <CardDescription className="flex items-center gap-2 text-xs font-medium mt-1">
+                            <Briefcase className="h-3 w-3" /> {vaga.departamento} 
+                            <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                            {vaga.modalidade}
+                          </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1"><Users className="h-4 w-4" /> {candidaturas.filter((c: any) => c.vaga_id === vaga.id).length} Candidatos</div>
-                            <Button variant="ghost" size="sm" className="h-8 rounded-lg group-hover:translate-x-1 transition-transform">
-                              Ver Detalhes <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
+                          <div className="space-y-4">
+                            <div className="flex flex-wrap gap-1.5">
+                              {(vaga.requisitos?.split(',') || []).slice(0, 3).map((req: string, i: number) => (
+                                <Badge key={i} variant="secondary" className="text-[9px] bg-slate-100/50 text-slate-600 font-normal">{req.trim()}</Badge>
+                              ))}
+                              {(vaga.requisitos?.split(',').length > 3) && (
+                                <Badge variant="secondary" className="text-[9px] bg-slate-100/50 text-slate-600 font-normal">+{vaga.requisitos.split(',').length - 3}</Badge>
+                              )}
+                            </div>
+
+                            <div className="pt-4 border-t border-border/40 flex items-center justify-between">
+                              <div className="flex flex-col">
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Candidatos</span>
+                                <span className="text-lg font-display font-bold text-primary">
+                                  {candidaturas.filter((c: any) => c.vaga_id === vaga.id).length}
+                                </span>
+                              </div>
+                              <Button className="rounded-xl h-9 px-4 text-xs font-bold shadow-sm group-hover:shadow-md transition-all">
+                                Gerenciar Vaga
+                                <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                              </Button>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
+                    <button className="border-2 border-dashed border-border/60 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 hover:border-primary/40 hover:bg-primary/5 transition-all group min-h-[250px]">
+                      <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                        <Plus className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-sm">Criar Nova Vaga</p>
+                        <p className="text-xs text-muted-foreground">Inicie um novo processo seletivo</p>
+                      </div>
+                    </button>
                   </div>
                 </TabsContent>
 
                 {/* CANDIDATOS */}
                 <TabsContent value="candidatos" className="mt-0">
-                   <Card className="rounded-2xl border-border/40 overflow-hidden">
+                   <Card className="rounded-3xl border-border/40 overflow-hidden shadow-sm">
                      <CardContent className="p-0">
                        <div className="overflow-x-auto">
                          <table className="w-full text-sm">
-                           <thead className="bg-muted/30 border-b">
-                             <tr>
-                               <th className="px-4 py-3 text-left font-medium">Nome</th>
-                               <th className="px-4 py-3 text-left font-medium">E-mail</th>
-                               <th className="px-4 py-3 text-left font-medium">Experiência</th>
-                               <th className="px-4 py-3 text-left font-medium">Pretensão</th>
-                               <th className="px-4 py-3 text-right font-medium">Ações</th>
+                           <thead>
+                             <tr className="bg-muted/30 border-b">
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Candidato</th>
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Contato</th>
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Experiência</th>
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Pretensão</th>
+                               <th className="px-6 py-4 text-right font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Ações</th>
                              </tr>
                            </thead>
-                           <tbody>
+                           <tbody className="divide-y divide-border/30">
                              {candidatos.map((cand: any) => (
-                               <tr key={cand.id} className="border-b hover:bg-muted/10 transition-colors group">
-                                 <td className="px-4 py-3 font-medium">{cand.nome}</td>
-                                 <td className="px-4 py-3 text-muted-foreground">{cand.email}</td>
-                                 <td className="px-4 py-3">{cand.experiencia_anos} anos</td>
-                                 <td className="px-4 py-3 text-success font-medium">R$ {cand.pretensao_salarial?.toLocaleString()}</td>
-                                 <td className="px-4 py-3 text-right">
-                                   <Button variant="ghost" size="sm" className="rounded-lg">Perfil</Button>
+                               <tr key={cand.id} className="hover:bg-primary/[0.02] transition-colors group">
+                                 <td className="px-6 py-4">
+                                   <div className="flex items-center gap-3">
+                                     <div className="h-9 w-9 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold">
+                                       {cand.nome?.charAt(0)}
+                                     </div>
+                                     <div>
+                                       <p className="font-bold text-sm text-foreground">{cand.nome}</p>
+                                       <p className="text-[10px] text-muted-foreground">{cand.origem || 'Website'}</p>
+                                     </div>
+                                   </div>
+                                 </td>
+                                 <td className="px-6 py-4">
+                                   <div className="flex flex-col gap-0.5">
+                                      <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><Mail className="h-3 w-3" /> {cand.email}</span>
+                                      {cand.telefone && <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><Phone className="h-3 w-3" /> {cand.telefone}</span>}
+                                   </div>
+                                 </td>
+                                 <td className="px-6 py-4">
+                                   <Badge variant="secondary" className="rounded-lg bg-slate-100 font-medium">{cand.experiencia_anos} anos</Badge>
+                                 </td>
+                                 <td className="px-6 py-4 font-display font-bold text-success">
+                                   {cand.pretensao_salarial ? `R$ ${cand.pretensao_salarial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'N/D'}
+                                 </td>
+                                 <td className="px-6 py-4 text-right">
+                                   <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                     <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs font-bold border-primary/20 hover:bg-primary/5 hover:text-primary">Perfil</Button>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/5"><Trash2 className="h-4 w-4" /></Button>
+                                   </div>
                                  </td>
                                </tr>
                              ))}
                            </tbody>
                          </table>
+                         {candidatos.length === 0 && (
+                           <div className="py-20 text-center">
+                             <Users className="h-10 w-10 text-muted/20 mx-auto mb-3" />
+                             <p className="text-muted-foreground font-medium">Nenhum candidato cadastrado</p>
+                           </div>
+                         )}
                        </div>
                      </CardContent>
                    </Card>
