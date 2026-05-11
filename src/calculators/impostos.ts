@@ -18,14 +18,21 @@ export function calcularINSS(salarioBruto: number): number {
 export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outrasDeducoes: number = 0): number {
   const descontoINSS = calcularINSS(salarioBruto);
   const baseCalculo = salarioBruto - descontoINSS - (dependentes * DEDUCAO_DEPENDENTE_IRRF) - outrasDeducoes;
+  
   if (baseCalculo <= 0) return 0;
-  for (const faixa of FAIXAS_IRRF_2026) {
-    if (baseCalculo <= faixa.limite) {
-      const imposto = baseCalculo * faixa.aliquota - faixa.deducao;
-      return Math.max(0, Math.round(imposto * 100) / 100);
-    }
+
+  // Cálculo por faixas progressivas (Simulando 2026)
+  let impostoTotal = 0;
+  for (let i = 0; i < FAIXAS_IRRF_2026.length; i++) {
+    const faixa = FAIXAS_IRRF_2026[i];
+    const limiteAnterior = i === 0 ? 0 : FAIXAS_IRRF_2026[i - 1].limite;
+    const baseNaFaixa = Math.min(Math.max(0, baseCalculo - limiteAnterior), (faixa.limite || Infinity) - limiteAnterior);
+    
+    if (baseNaFaixa <= 0) break;
+    impostoTotal += baseNaFaixa * faixa.aliquota;
   }
-  return 0;
+  
+  return Math.max(0, Math.round(impostoTotal * 100) / 100);
 }
 
 export function calcularFGTS(salarioBruto: number): number {

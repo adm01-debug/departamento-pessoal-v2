@@ -117,14 +117,25 @@ export const calculoLoteService = {
           });
 
           progress.success++;
+          // Notifica progresso em tempo real
+          onProgress?.({ ...progress });
         } catch (err) {
           console.error(`Erro no colaborador ${colab.nome_completo}:`, err);
           progress.errors++;
+          onProgress?.({ ...progress });
         }
         
         progress.current++;
-        onProgress?.({ ...progress });
       }
+
+      // 4. Registrar evento global de cálculo em lote
+      await (supabase as any).from('folha_auditoria').insert({
+        folha_id: folhaId,
+        tipo_evento: 'calculo_mensal',
+        mensagem: `Processamento em lote finalizado para ${progress.total} colaboradores.`,
+        severidade: 'info',
+        detalhes: { progress, competencia }
+      });
 
       return progress;
     } catch (error: any) {
