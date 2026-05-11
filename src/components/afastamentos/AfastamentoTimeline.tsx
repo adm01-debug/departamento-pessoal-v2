@@ -13,7 +13,7 @@ interface AfastamentoTimelineProps {
 }
 
 export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps) {
-  const { prorrogacoes, isLoading } = useProrrogacoesAfastamento(afastamentoId);
+  const { prorrogacoes, isLoading } = useProrrogacoesAfastamento();
   const { afastamentos } = useAfastamentos();
   
   const afastamento = afastamentos.find((a: any) => a.id === afastamentoId);
