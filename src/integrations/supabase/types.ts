@@ -11297,6 +11297,68 @@ export type Database = {
         }
         Relationships: []
       }
+      provisoes_folha: {
+        Row: {
+          colaborador_id: string
+          competencia: string
+          created_at: string | null
+          empresa_id: string
+          encargos_provisao: number | null
+          id: string
+          valor_13_salario: number | null
+          valor_ferias: number | null
+        }
+        Insert: {
+          colaborador_id: string
+          competencia: string
+          created_at?: string | null
+          empresa_id: string
+          encargos_provisao?: number | null
+          id?: string
+          valor_13_salario?: number | null
+          valor_ferias?: number | null
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string
+          created_at?: string | null
+          empresa_id?: string
+          encargos_provisao?: number | null
+          id?: string
+          valor_13_salario?: number | null
+          valor_ferias?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_folha_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provisoes_mensais: {
         Row: {
           colaborador_id: string
