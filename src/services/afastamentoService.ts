@@ -19,7 +19,6 @@ export const afastamentoService = {
     
     if (empresaId) query = query.eq('empresa_id', empresaId);
     if (filtros?.status) query = query.eq('status', filtros.status);
-    if (filtros?.departamentoId) query = query.eq('colaborador.departamento_id', filtros.departamentoId);
     
     const { data, error } = await query;
     if (error) throw error;

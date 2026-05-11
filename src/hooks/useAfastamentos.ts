@@ -8,8 +8,7 @@ export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
-
-  const [filtros, setFeltros] = useState<any>({});
+  const [filtros, setFiltros] = useState<any>({});
 
   const query = useQuery({
     queryKey: ['afastamentos', empresaId, filtros],
@@ -54,6 +53,8 @@ export function useAfastamentos() {
     configs: configsQuery.data || [],
     isLoading: query.isLoading || configsQuery.isLoading,
     error: query.error,
+    filtros,
+    setFeltros: setFiltros,
     criar: criarMutation.mutateAsync,
     isCriando: criarMutation.isPending,
     atualizar: atualizarMutation.mutateAsync,
@@ -69,7 +70,7 @@ export function useProrrogacoesAfastamento() {
 
   const query = useQuery({
     queryKey: ['prorrogacoes-afastamento', empresaAtual?.id],
-    queryFn: () => afastamentoService.listarProrrogacoes(empresaAtual?.id),
+    queryFn: () => afastamentoService.listarProrrogacoes(),
     enabled: !!empresaAtual?.id,
   });
 
@@ -111,7 +112,7 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => afastamentoService.excluirDocumento(id),
+    mutationFn: (id: string) => afastamentoService.excluir(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });
       toast.success('Documento excluído com sucesso');
