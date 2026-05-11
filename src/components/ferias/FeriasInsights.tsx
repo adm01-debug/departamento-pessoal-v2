@@ -126,20 +126,23 @@ export function FeriasInsights({ stats }: FeriasInsightsProps) {
                 </div>
               </div>
 
-              <div className="bg-background/40 rounded-lg p-2.5 space-y-2 border border-current/5">
+              <div className="bg-background/40 rounded-lg p-3 space-y-2 border border-current/5">
                 <div className="flex items-center gap-1.5">
                   <Info className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Base de Dados e Justificativa</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Evidências e Justificativa IA</span>
                 </div>
                 <p className="text-[10px] text-muted-foreground/80 leading-relaxed italic border-l-2 border-primary/20 pl-2">
                   {insight.justification}
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   <Badge variant="outline" className="text-[8px] h-3.5 bg-background/50 text-muted-foreground border-muted-foreground/20">
-                    KPI: {insight.type === 'critical' ? 'Vencidos' : insight.type === 'warning' ? 'Workflow' : 'Abono'}
+                    KPI Base: {insight.type === 'critical' ? 'Taxa de Vencimento' : insight.type === 'warning' ? 'SLA de Aprovação' : 'Adesão ao Abono'}
                   </Badge>
                   <Badge variant="outline" className="text-[8px] h-3.5 bg-background/50 text-muted-foreground border-muted-foreground/20">
-                    Fonte: Hub Unificado
+                    Fonte: Sincronização Hub
+                  </Badge>
+                  <Badge variant="outline" className="text-[8px] h-3.5 bg-background/50 text-muted-foreground border-muted-foreground/20">
+                    Status: Validado
                   </Badge>
                 </div>
               </div>

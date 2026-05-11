@@ -91,15 +91,15 @@ export const feriasPDF = {
       doc.text(`GERADO EM: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, pageWidth - 20, 28, { align: 'right' });
     };
 
-    const drawFooter = (doc: jsPDF, pageNumber: number) => {
+    const drawFooter = (doc: jsPDF, pageNumber: number, totalPages: number) => {
       doc.setDrawColor(colors.light[0], colors.light[1], colors.light[2]);
       doc.line(20, pageHeight - 15, pageWidth - 20, pageHeight - 15);
       
       doc.setFontSize(8);
       doc.setTextColor(colors.light[0], colors.light[1], colors.light[2]);
-      doc.text(`Lovable HR - Sistema Integrado`, 20, pageHeight - 10);
-      doc.text(`Página ${pageNumber}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-      doc.text(`Documento Confidencial`, pageWidth - 20, pageHeight - 10, { align: 'right' });
+      doc.text(`Lovable HR - Sistema Integrado de Gestão de Férias`, 20, pageHeight - 10);
+      doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      doc.text(`Documento Confidencial - RH`, pageWidth - 20, pageHeight - 10, { align: 'right' });
     };
 
     drawHeader(doc);
@@ -113,7 +113,7 @@ export const feriasPDF = {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     let currentY = 50;
-    doc.text(`Período Selecionado: ${stats.periodoLabel || 'Todos'}`, 20, currentY);
+    doc.text(`Período Analisado: ${stats.periodoLabel || 'Todos'}`, 20, currentY);
     
     if (filters?.search || filters?.status) {
       currentY += 5;
@@ -121,7 +121,7 @@ export const feriasPDF = {
         filters?.search ? `Busca: "${filters.search}"` : '',
         filters?.status ? `Status: ${filters.status}` : ''
       ].filter(Boolean).join(' | ');
-      doc.text(`Filtros Ativos: ${filterText}`, 20, currentY);
+      doc.text(`Filtros Aplicados na Exportação: ${filterText}`, 20, currentY);
     }
 
     // KPIs Grid
@@ -129,7 +129,7 @@ export const feriasPDF = {
       startY: currentY + 10,
       head: [['INDICADOR OPERACIONAL', 'VALOR ATUAL']],
       body: [
-        ['VOLUME TOTAL DE REGISTROS', stats.total.toString()],
+        ['VOLUME TOTAL DE REGISTROS NA AMOSTRA', stats.total.toString()],
         ['SOLICITAÇÕES PENDENTES (EM WORKFLOW)', stats.pendentes.toString()],
         ['CONCESSÕES APROVADAS/CONFIRMADAS', stats.aprovadas.toString()],
         ['COLABORADORES EM GOZO ATIVO', stats.emGozo.toString()],
@@ -166,13 +166,14 @@ export const feriasPDF = {
       headStyles: { fillColor: colors.accent, fontSize: 9, fontStyle: 'bold' },
       bodyStyles: { fontSize: 8 },
       alternateRowStyles: { fillColor: [245, 245, 245] },
+      margin: { top: 40, bottom: 20 },
       didDrawPage: (dataArg) => {
+        const totalPages = (doc as any).internal.getNumberOfPages();
+        drawFooter(doc, dataArg.pageNumber, totalPages);
         if (dataArg.pageNumber > 1) {
           drawHeader(doc);
         }
-        drawFooter(doc, dataArg.pageNumber);
-      },
-      margin: { top: 40, bottom: 20 }
+      }
     });
 
     const blob = doc.output('blob');
