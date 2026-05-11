@@ -30,7 +30,17 @@ export default function EPIsPage() {
   const qc = useQueryClient();
   const [openEpi, setOpenEpi] = useState(false);
   const [openEntrega, setOpenEntrega] = useState(false);
-  const [formEpi, setFormEpi] = useState({ nome: '', ca: '', validade_meses: '', categoria: 'cabeca', ca_validade: '' });
+  const [formEpi, setFormEpi] = useState({ 
+    nome: '', 
+    ca: '', 
+    validade_meses: '', 
+    categoria: 'cabeca', 
+    ca_validade: '',
+    fabricante: '',
+    unidade_medida: 'un',
+    estoque_atual: '0',
+    estoque_minimo: '0'
+  });
   const [formEntrega, setFormEntrega] = useState({ epi_id: '', colaborador_id: '', data_entrega: '', quantidade: '1' });
   const [searchCatalogo, setSearchCatalogo] = useState('');
   const [catFilter, setCatFilter] = useState('');
@@ -55,11 +65,27 @@ export default function EPIsPage() {
   });
 
   const criarEpi = useMutation({
-    mutationFn: (d: any) => episService.criar({ ...d, empresa_id: empresaAtual?.id, validade_meses: Number(d.validade_meses) || null }),
+    mutationFn: (d: any) => episService.criar({ 
+      ...d, 
+      empresa_id: empresaAtual?.id, 
+      validade_meses: Number(d.validade_meses) || null,
+      estoque_atual: Number(d.estoque_atual) || 0,
+      estoque_minimo: Number(d.estoque_minimo) || 0
+    }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['epis'] });
       setOpenEpi(false);
-      setFormEpi({ nome: '', ca: '', validade_meses: '', categoria: 'cabeca', ca_validade: '' });
+      setFormEpi({ 
+        nome: '', 
+        ca: '', 
+        validade_meses: '', 
+        categoria: 'cabeca', 
+        ca_validade: '',
+        fabricante: '',
+        unidade_medida: 'un',
+        estoque_atual: '0',
+        estoque_minimo: '0'
+      });
       toast.success('EPI cadastrado!');
     },
     onError: (e: Error) => toast.error(e.message),
@@ -117,6 +143,8 @@ export default function EPIsPage() {
       comCA: epis.filter((e: any) => e.ca).length,
       semCA: epis.filter((e: any) => !e.ca).length,
       vencimentoProximo: vencProximo,
+      estoqueBaixo: epis.filter((e: any) => e.estoque_atual <= e.estoque_minimo && e.estoque_minimo > 0).length,
+      totalEstoque: epis.reduce((acc: number, e: any) => acc + (e.estoque_atual || 0), 0),
     };
   }, [epis, entregas]);
 
@@ -159,18 +187,23 @@ export default function EPIsPage() {
                   <DialogContent>
                     <DialogHeader><DialogTitle className="font-display">Cadastrar EPI</DialogTitle></DialogHeader>
                     <div className="space-y-3">
-                      <div><Label>Nome *</Label><Input value={formEpi.nome} onChange={e => setFormEpi(p => ({ ...p, nome: e.target.value }))} placeholder="Ex.: Capacete de segurança" /></div>
-                      <div><Label>Certificado de Aprovação (CA)</Label><Input value={formEpi.ca} onChange={e => setFormEpi(p => ({ ...p, ca: e.target.value }))} placeholder="Ex.: 12345" /></div>
-                      <div><Label>Vencimento do CA</Label><Input type="date" value={formEpi.ca_validade} onChange={e => setFormEpi(p => ({ ...p, ca_validade: e.target.value }))} /></div>
-                      <div><Label>Validade de Uso (meses)</Label><Input type="number" min={1} value={formEpi.validade_meses} onChange={e => setFormEpi(p => ({ ...p, validade_meses: e.target.value }))} /></div>
-                      <div>
-                        <Label>Categoria</Label>
-                        <Select value={formEpi.categoria} onValueChange={v => setFormEpi(p => ({ ...p, categoria: v }))}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {categorias.map(c => <SelectItem key={c} value={c}>{categoriaLabels[c]}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="col-span-2"><Label>Nome *</Label><Input value={formEpi.nome} onChange={e => setFormEpi(p => ({ ...p, nome: e.target.value }))} placeholder="Ex.: Capacete de segurança" /></div>
+                        <div><Label>CA</Label><Input value={formEpi.ca} onChange={e => setFormEpi(p => ({ ...p, ca: e.target.value }))} placeholder="Ex.: 12345" /></div>
+                        <div><Label>Validade CA</Label><Input type="date" value={formEpi.ca_validade} onChange={e => setFormEpi(p => ({ ...p, ca_validade: e.target.value }))} /></div>
+                        <div className="col-span-2"><Label>Fabricante</Label><Input value={formEpi.fabricante} onChange={e => setFormEpi(p => ({ ...p, fabricante: e.target.value }))} placeholder="Ex.: 3M Brasil" /></div>
+                        <div><Label>Validade Uso (meses)</Label><Input type="number" min={1} value={formEpi.validade_meses} onChange={e => setFormEpi(p => ({ ...p, validade_meses: e.target.value }))} /></div>
+                        <div>
+                          <Label>Categoria</Label>
+                          <Select value={formEpi.categoria} onValueChange={v => setFormEpi(p => ({ ...p, categoria: v }))}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {categorias.map(c => <SelectItem key={c} value={c}>{categoriaLabels[c]}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div><Label>Estoque Atual</Label><Input type="number" min={0} value={formEpi.estoque_atual} onChange={e => setFormEpi(p => ({ ...p, estoque_atual: e.target.value }))} /></div>
+                        <div><Label>Estoque Mínimo</Label><Input type="number" min={0} value={formEpi.estoque_minimo} onChange={e => setFormEpi(p => ({ ...p, estoque_minimo: e.target.value }))} /></div>
                       </div>
                       <Button className="w-full rounded-xl" onClick={() => criarEpi.mutate(formEpi)} disabled={!formEpi.nome}>
                         Cadastrar EPI

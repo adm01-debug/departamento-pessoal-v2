@@ -10,6 +10,8 @@ interface EpiStats {
   comCA: number;
   semCA: number;
   vencimentoProximo: number;
+  estoqueBaixo: number;
+  totalEstoque: number;
 }
 
 interface EpiKPIsProps {
@@ -19,25 +21,25 @@ interface EpiKPIsProps {
 const kpis = [
   {
     key: 'totalEpis' as const,
-    label: 'EPIs Cadastrados',
+    label: 'Modelos EPI',
     icon: HardHat,
     color: 'text-primary',
     bgColor: 'bg-primary/5',
     borderColor: 'border-primary/20',
-    tooltip: 'Total de equipamentos no catálogo',
+    tooltip: 'Total de modelos de equipamentos no catálogo',
   },
   {
-    key: 'totalEntregas' as const,
-    label: 'Entregas',
+    key: 'totalEstoque' as const,
+    label: 'Itens em Estoque',
     icon: Package,
     color: 'text-accent-foreground',
     bgColor: 'bg-accent/30',
     borderColor: 'border-accent/40',
-    tooltip: 'Total de entregas realizadas a colaboradores',
+    tooltip: 'Quantidade total de itens físicos em estoque somando todos os modelos',
   },
   {
     key: 'comCA' as const,
-    label: 'Com CA',
+    label: 'Conformes (CA)',
     icon: CheckCircle2,
     color: 'text-primary',
     bgColor: 'bg-primary/5',
@@ -45,31 +47,31 @@ const kpis = [
     tooltip: 'EPIs com Certificado de Aprovação válido (NR-6)',
   },
   {
-    key: 'semCA' as const,
-    label: 'Sem CA',
+    key: 'estoqueBaixo' as const,
+    label: 'Estoque Baixo',
     icon: ShieldAlert,
     color: 'text-destructive',
     bgColor: 'bg-destructive/5',
     borderColor: 'border-destructive/20',
-    tooltip: 'EPIs sem CA — risco de não conformidade com NR-6',
-  },
-  {
-    key: 'categoriasCobertas' as const,
-    label: 'Categorias',
-    icon: HardHat,
-    color: 'text-foreground',
-    bgColor: 'bg-muted/50',
-    borderColor: 'border-border/40',
-    tooltip: 'Categorias de proteção cobertas (cabeça, olhos, mãos, etc.)',
+    tooltip: 'Modelos de EPI com estoque abaixo do mínimo configurado',
   },
   {
     key: 'vencimentoProximo' as const,
-    label: 'Vencimento Próximo',
+    label: 'A Substituir',
     icon: Clock,
     color: 'text-warning',
     bgColor: 'bg-warning/5',
     borderColor: 'border-warning/20',
     tooltip: 'Entregas com validade vencendo nos próximos 30 dias',
+  },
+  {
+    key: 'semCA' as const,
+    label: 'Irregulares',
+    icon: AlertTriangle,
+    color: 'text-destructive',
+    bgColor: 'bg-destructive/10',
+    borderColor: 'border-destructive/30',
+    tooltip: 'EPIs sem CA — não conformidade NR-6',
   },
 ];
 
@@ -92,7 +94,7 @@ export function EpiKPIs({ stats }: EpiKPIsProps) {
                     <CardContent className="pt-4 pb-3 px-4">
                       <div className="flex items-center justify-between mb-2">
                         <Icon className={`h-4 w-4 ${kpi.color}`} />
-                        {kpi.key === 'semCA' && value > 0 && (
+                        {(kpi.key === 'semCA' || kpi.key === 'estoqueBaixo') && value > 0 && (
                           <span className="flex h-2 w-2 rounded-full bg-destructive animate-pulse" />
                         )}
                         {kpi.key === 'vencimentoProximo' && value > 0 && (

@@ -5455,8 +5455,12 @@ export type Database = {
           created_at: string | null
           descricao: string | null
           empresa_id: string | null
+          estoque_atual: number | null
+          estoque_minimo: number | null
+          fabricante: string | null
           id: string
           nome: string
+          unidade_medida: string | null
           updated_at: string | null
           validade_ca: string | null
         }
@@ -5468,8 +5472,12 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           empresa_id?: string | null
+          estoque_atual?: number | null
+          estoque_minimo?: number | null
+          fabricante?: string | null
           id?: string
           nome: string
+          unidade_medida?: string | null
           updated_at?: string | null
           validade_ca?: string | null
         }
@@ -5481,8 +5489,12 @@ export type Database = {
           created_at?: string | null
           descricao?: string | null
           empresa_id?: string | null
+          estoque_atual?: number | null
+          estoque_minimo?: number | null
+          fabricante?: string | null
           id?: string
           nome?: string
+          unidade_medida?: string | null
           updated_at?: string | null
           validade_ca?: string | null
         }
