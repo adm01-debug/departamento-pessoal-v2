@@ -12,10 +12,13 @@ export function useBeneficios() {
     enabled: !!empresaId,
   });
 
+  const refetch = query.refetch;
+
   return {
     beneficios: query.data || [],
     isLoading: query.isLoading,
     error: query.error,
-    refetch: query.refetch,
+    refetch,
+    tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
   };
 }
