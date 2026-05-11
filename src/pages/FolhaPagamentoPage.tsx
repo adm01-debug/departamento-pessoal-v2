@@ -230,7 +230,7 @@ export default function FolhaPagamentoPage() {
           <div className="lg:col-span-2">
             {resumo && <FolhaPipeline status={resumo.status} competencia={competencia} />}
             
-            {!isLoading && resumo && <FolhaValidationAlerts resumo={resumo} />}
+            {!isLoading && resumo && <FolhaValidationAlerts resumo={resumo} competencia={competencia} />}
 
             {!isLoading && resumo && resumo.colaboradores > 0 && (
               <FolhaComposicao
