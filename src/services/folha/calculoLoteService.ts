@@ -79,9 +79,30 @@ export const calculoLoteService = {
           const dependentesCount = colab.dependentes?.length || 0;
           const eventosVariaveis = colab.eventos_variaveis || [];
 
+          // 3.1 Integrar dados de PONTO ELETRÔNICO (Horas Extras e Faltas Aprovadas)
+          const { data: registrosPonto } = await (supabase as any)
+            .from('registros_ponto')
+            .select('horas_extras, horas_falta')
+            .eq('colaborador_id', colab.id)
+            .eq('aprovado', true)
+            .gte('data', dataInicio)
+            .lte('data', dataFim);
+          
+          let totalHE = 0;
+          let totalFaltas = 0;
+          
+          if (registrosPonto) {
+            registrosPonto.forEach((r: any) => {
+              totalHE += pontoIntegracaoUtils.intervalToDecimal(r.horas_extras);
+              totalFaltas += pontoIntegracaoUtils.intervalToDecimal(r.horas_falta);
+            });
+          }
+
           const res = folhaCalc.processar(Number(colab.salario_base || 0), {
             dependentes: dependentesCount,
-            eventos: eventosVariaveis
+            eventos: eventosVariaveis,
+            horasExtras50: totalHE, // Assumindo 50% por padrão na integração automática
+            horasFalta: totalFaltas
           });
 
           // Salva o item da folha
