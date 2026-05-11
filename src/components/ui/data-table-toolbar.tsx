@@ -1,8 +1,10 @@
-// V15-180: src/components/ui/data-table-toolbar.tsx
+// V26-PERFECT: src/components/ui/data-table-toolbar.tsx
 import { Input } from './input';
 import { Button } from './button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { Search, X, Download, Plus, Filter } from 'lucide-react';
+import { Search, X, Download, Plus, Filter, SlidersHorizontal } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DataTableToolbarProps {
   search?: string;
@@ -19,6 +21,7 @@ interface DataTableToolbarProps {
     onChange: (value: string) => void;
   }>;
   onClearFilters?: () => void;
+  className?: string;
 }
 
 export function DataTableToolbar({
@@ -30,47 +33,122 @@ export function DataTableToolbar({
   onExport,
   filters,
   onClearFilters,
+  className
 }: DataTableToolbarProps) {
-  const hasActiveFilters = filters?.some(f => f.value && f.value !== 'all');
+  const hasActiveFilters = filters?.some(f => f.value && f.value !== '' && f.value !== 'all');
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-4">
-      <div className="flex-1 flex gap-2">
-        {onSearchChange && (
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9"
-            />
+    <div className={cn("flex flex-col gap-4 mb-6", className)}>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="relative w-full md:max-w-md group">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            placeholder={searchPlaceholder}
+            value={search}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            className="pl-10 h-11 rounded-xl bg-card/50 border-border/40 focus:bg-background transition-all shadow-sm"
+          />
+          <AnimatePresence>
             {search && (
-              <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => onSearchChange('')}>
-                <X className="h-4 w-4" />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }} 
+                animate={{ opacity: 1, scale: 1 }} 
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+              >
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-7 w-7 rounded-lg hover:bg-muted" 
+                  onClick={() => onSearchChange?.('')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="hidden sm:flex items-center gap-2 mr-2">
+            {filters?.slice(0, 2).map((filter) => (
+              <Select key={filter.key} value={filter.value} onValueChange={filter.onChange}>
+                <SelectTrigger className="h-11 min-w-[140px] rounded-xl bg-card/50 border-border/40 shadow-sm">
+                  <SelectValue placeholder={filter.label} />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="all">Todos ({filter.label})</SelectItem>
+                  {filter.options.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            {hasActiveFilters && onClearFilters && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onClearFilters}
+                className="h-11 rounded-xl px-4 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Limpar
+              </Button>
+            )}
+            
+            <Button variant="outline" className="h-11 w-11 p-0 rounded-xl md:hidden">
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
+
+            {onExport && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onExport}
+                className="h-11 rounded-xl px-4 gap-2 bg-card/50 shadow-sm hidden sm:flex"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden lg:inline">Exportar</span>
+              </Button>
+            )}
+            
+            {onAdd && (
+              <Button 
+                size="sm" 
+                onClick={onAdd}
+                className="h-11 rounded-xl px-5 gap-2 bg-primary text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                <span>{addLabel}</span>
               </Button>
             )}
           </div>
-        )}
-        {filters?.map((filter) => (
-          <Select key={filter.key} value={filter.value} onValueChange={filter.onChange}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder={filter.label} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {filter.options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ))}
-        {hasActiveFilters && onClearFilters && (
-          <Button variant="ghost" size="sm" onClick={onClearFilters}><X className="h-4 w-4 mr-1" />Limpar</Button>
-        )}
+        </div>
       </div>
-      <div className="flex gap-2">
-        {onExport && <Button variant="outline" size="sm" onClick={onExport}><Download className="h-4 w-4 mr-1" />Exportar</Button>}
-        {onAdd && <Button size="sm" onClick={onAdd}><Plus className="h-4 w-4 mr-1" />{addLabel}</Button>}
-      </div>
+      
+      {filters && filters.length > 2 && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mr-2">
+            <Filter className="h-3 w-3" /> Filtros Adicionais
+          </div>
+          {filters.slice(2).map((filter) => (
+            <Select key={filter.key} value={filter.value} onValueChange={filter.onChange}>
+              <SelectTrigger className="h-9 min-w-[140px] rounded-lg bg-muted/40 border-border/20 text-xs">
+                <SelectValue placeholder={filter.label} />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="all">Todos ({filter.label})</SelectItem>
+                {filter.options.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
