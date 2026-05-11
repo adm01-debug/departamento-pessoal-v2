@@ -294,11 +294,14 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                       <motion.div 
                         className="h-full bg-primary" 
                         initial={{ width: "0%" }} 
-                        animate={{ width: "100%" }} 
-                        transition={{ duration: 5 }}
+                        animate={{ width: `${progressoLote ? (progressoLote.current / progressoLote.total) * 100 : 5}%` }} 
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-4">Calculando INSS, FGTS e IRRF...</p>
+                    <p className="text-xs text-muted-foreground mt-4">
+                      {progressoLote 
+                        ? `Processando: ${progressoLote.current} de ${progressoLote.total} (${progressoLote.success} sucessos)` 
+                        : "Sincronizando dados de ponto eletrônico..."}
+                    </p>
                   </>
                 )}
               </motion.div>
