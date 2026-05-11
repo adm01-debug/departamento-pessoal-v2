@@ -113,8 +113,26 @@ export const validadorFolha = {
           gravidade: 'alta'
         });
       }
+
+      // Regra 6: Alerta de IRRF Retido sem Dependente (Verificação de otimização fiscal)
+      const irrfValor = Number(item.irrf_mes);
+      const dependentesCount = detalhes?.dependentes || 0;
+      
+      if (irrfValor > 500 && !dependentesCount) {
+         alertas.push({
+          colaboradorId: item.colaborador_id,
+          nome: colab.nome_completo,
+          tipo: 'falta_informacao',
+          mensagem: `Retenção de IRRF elevada (${formatCurrency(irrfValor)}). Verifique se há dependentes não cadastrados.`,
+          gravidade: 'baixa'
+        });
+      }
     }
 
     return alertas;
   }
 };
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+}
