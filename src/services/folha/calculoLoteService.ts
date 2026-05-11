@@ -119,8 +119,19 @@ export const calculoLoteService = {
           progress.success++;
           // Notifica progresso em tempo real
           onProgress?.({ ...progress });
-        } catch (err) {
+        } catch (err: any) {
           console.error(`Erro no colaborador ${colab.nome_completo}:`, err);
+          
+          // Registrar erro analítico na auditoria
+          await (supabase as any).from('folha_auditoria').insert({
+            folha_id: folhaId,
+            colaborador_id: colab.id,
+            tipo_evento: 'calculo_mensal',
+            mensagem: `Erro ao processar ${colab.nome_completo}: ${err.message}`,
+            severidade: 'erro',
+            detalhes: { error: err.message, stack: err.stack }
+          });
+
           progress.errors++;
           onProgress?.({ ...progress });
         }

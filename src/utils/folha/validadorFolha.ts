@@ -127,6 +127,17 @@ export const validadorFolha = {
           gravidade: 'baixa'
         });
       }
+
+      // Regra 7: Verificação de Salário Base Zero
+      if (salarioBase === 0) {
+        alertas.push({
+          colaboradorId: item.colaborador_id,
+          nome: colab.nome_completo,
+          tipo: 'falta_informacao',
+          mensagem: 'Salário base não configurado no cadastro do colaborador.',
+          gravidade: 'alta'
+        });
+      }
     }
 
     return alertas;
