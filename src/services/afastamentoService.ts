@@ -131,7 +131,7 @@ export const afastamentoService = {
   async validarDocumento(id: string, validado: boolean) {
     const { data, error } = await supabase
       .from('documentos_afastamento')
-      .update({ validado })
+      .update({ validado } as any)
       .eq('id', id)
       .select()
       .maybeSingle();
