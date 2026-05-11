@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileDown, Settings2, Loader2, Landmark, CheckCircle2, Zap } from 'lucide-react';
+import { FileDown, Settings2, Loader2, Landmark, CheckCircle2, Zap, ShieldCheck } from 'lucide-react';
 import { cnabService, CNABConfig } from '@/services/cnabService';
 import { toast } from 'sonner';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -78,13 +78,13 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `CNAB240_PAGTO_${new Date().toISOString().slice(0, 10)}.rem`;
+      a.download = `CNAB240_PAGTO_REM_${new Date().toISOString().slice(0, 10)}.rem`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
-      toast.success('Arquivo CNAB 240 gerado com sucesso!');
+      toast.success('Arquivo CNAB 240 (Remessa de Salários) gerado!');
       setOpen(false);
     } catch (err: any) {
       toast.error('Erro ao gerar CNAB: ' + err.message);
@@ -102,12 +102,12 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `LOTE_PIX_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `LOTE_PIX_SALARIOS_${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success('Lote PIX gerado com sucesso!');
+      toast.success('Lote PIX analítico gerado com sucesso!');
       setOpen(false);
     } catch (err: any) {
       toast.error('Erro ao gerar PIX: ' + err.message);
@@ -121,23 +121,23 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body border-primary/30 hover:bg-primary/5">
           <FileDown className="h-4 w-4 text-primary" />
-          <span className="hidden sm:inline">Gerar CNAB 240</span>
+          <span className="hidden sm:inline">Exportar Bancário</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display">
             <Landmark className="h-5 w-5 text-primary" />
-            Pagamento Bancário (CNAB 240)
+            Pagamento de Salários (CNAB/PIX)
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <Card className="border border-border/30 shadow-none bg-muted/20">
+          <Card className="border border-border/30 shadow-none bg-muted/10">
             <CardContent className="p-4 space-y-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-primary mb-2">
                 <Settings2 className="h-4 w-4" />
-                Configuração da Conta Origem
+                Convênio e Conta Origem (Empresa)
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -173,26 +173,34 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
                 </div>
               </div>
 
-              <Button variant="ghost" size="sm" onClick={handleSaveConfig} disabled={saving} className="w-full text-xs gap-1.5 h-8">
+              <Button variant="ghost" size="sm" onClick={handleSaveConfig} disabled={saving} className="w-full text-xs gap-1.5 h-8 border border-dashed border-primary/20 hover:bg-primary/5">
                 {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
-                Salvar Configuração de Remessa
+                Salvar Configurações de Remessa
               </Button>
             </CardContent>
           </Card>
 
           <div className="grid grid-cols-2 gap-3 pt-2">
-            <Button onClick={handleGenerate} className="rounded-xl gap-2 h-11 shadow-lg bg-gradient-to-r from-primary to-primary-glow" disabled={loading}>
+            <Button onClick={handleGenerate} className="rounded-xl gap-2 h-12 shadow-lg bg-gradient-to-r from-primary to-primary-glow" disabled={loading}>
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileDown className="h-5 w-5" />}
-              CNAB 240
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-sm">CNAB 240</span>
+                <span className="text-[10px] opacity-70">Remessa FEBRABAN</span>
+              </div>
             </Button>
-            <Button onClick={handleGeneratePIX} variant="outline" className="rounded-xl gap-2 h-11 border-primary/30 hover:bg-primary/5" disabled={loading}>
+            <Button onClick={handleGeneratePIX} variant="outline" className="rounded-xl gap-2 h-12 border-primary/30 hover:bg-primary/5" disabled={loading}>
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5 text-amber-500" />}
-              PIX em Lote
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-sm">PIX Analítico</span>
+                <span className="text-[10px] opacity-70 text-muted-foreground">Lote Instantâneo</span>
+              </div>
             </Button>
           </div>
-          <p className="text-[10px] text-center text-muted-foreground mt-3 uppercase tracking-widest font-medium">
-            Formatos compatíveis com bancos tradicionais e fintechs
-          </p>
+          
+          <div className="flex items-center gap-2 justify-center p-2 bg-success/5 rounded-lg border border-success/20">
+            <ShieldCheck className="h-3.5 w-3.5 text-success" />
+            <span className="text-[10px] text-success font-medium uppercase tracking-tighter">Protocolo Bancário Seguro TLS 1.3 Ativo</span>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
