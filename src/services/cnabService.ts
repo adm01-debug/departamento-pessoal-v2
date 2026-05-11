@@ -20,7 +20,7 @@ export const cnabService = {
       .maybeSingle();
     
     if (error) throw error;
-    return data as CNABConfig | null;
+    return data as any as CNABConfig | null;
   },
 
   async saveConfig(empresaId: string, config: CNABConfig) {
