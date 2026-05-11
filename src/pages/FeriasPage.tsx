@@ -9,6 +9,7 @@ import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/comp
 import { FeriasRelatorioDialog } from '@/components/ferias/FeriasRelatorioDialog';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
+import { feriasService } from '@/services';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw } from 'lucide-react';
