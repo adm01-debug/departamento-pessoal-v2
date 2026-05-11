@@ -14,7 +14,7 @@ interface AfastamentoDocumentManagerProps {
   afastamentoId: string;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
 
 export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumentManagerProps) {
@@ -24,13 +24,20 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
 
   const validateFile = (file: File) => {
     if (file.size > MAX_FILE_SIZE) {
-      toast.error('O arquivo é muito grande. O limite é de 5MB.');
+      toast.error('O arquivo é muito grande. O limite é de 10MB.');
       return false;
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
       toast.error('Tipo de arquivo não suportado. Use PDF, JPG ou PNG.');
       return false;
     }
+    
+    // Validação extra de integridade/metadados
+    if (file.size === 0) {
+      toast.error('O arquivo está vazio.');
+      return false;
+    }
+
     return true;
   };
 
@@ -39,6 +46,7 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
     if (selectedFile) {
       if (validateFile(selectedFile)) {
         setFile(selectedFile);
+        toast.info(`Arquivo "${selectedFile.name}" selecionado e validado.`);
       } else {
         e.target.value = '';
         setFile(null);

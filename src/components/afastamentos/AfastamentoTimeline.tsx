@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useProrrogacoesAfastamento, useAfastamentos } from '@/hooks/useAfastamentos';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, ArrowRight, History, Clock, FileText, Stethoscope } from 'lucide-react';
+import { Calendar, ArrowRight, History, Clock, FileText, Stethoscope, AlertCircle } from 'lucide-react';
+import { afastamentoService } from '@/services/afastamentoService';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Spinner } from '@/components/ui/spinner';
@@ -99,17 +100,24 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
                   </div>
                 </div>
 
+                <div className="flex justify-between items-center bg-orange-100/30 p-2 rounded text-[10px] font-medium text-orange-800">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>Duração: {afastamentoService.calcularDias(prorr.data_fim_antiga, prorr.data_fim_nova) - 1} dias adicionais</span>
+                  </div>
+                </div>
+
                 {prorr.motivo && (
                   <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground uppercase font-semibold">Motivo</span>
-                    <p className="text-xs text-foreground italic">"{prorr.motivo}"</p>
+                    <span className="text-[10px] text-muted-foreground uppercase font-semibold">Motivo da Prorrogação</span>
+                    <p className="text-xs text-foreground italic bg-muted/30 p-2 rounded">"{prorr.motivo}"</p>
                   </div>
                 )}
                 
                 <div className="flex items-center justify-between text-[10px]">
                   <div className="flex items-center gap-1.5 text-muted-foreground">
                     <FileText className="h-3 w-3" />
-                    <span>Doc: {prorr.documento?.nome_arquivo || 'Não vinculado'}</span>
+                    <span>Doc vinculado: {prorr.documento?.nome_arquivo || 'Nenhum'}</span>
                   </div>
                 </div>
               </CardContent>

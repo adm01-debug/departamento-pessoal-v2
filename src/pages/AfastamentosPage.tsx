@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
+import { usePDFExport } from '@/hooks/usePDFExport';
 import { afastamentoService } from '@/services/afastamentoService';
 import { toast } from 'sonner';
 import { PageLayout } from '@/components/layout';
@@ -41,6 +42,7 @@ const tipoLabels: Record<string, string> = {
 export default function AfastamentosPage() {
   const { afastamentos, isLoading, filtros, setFeltros } = useAfastamentos();
   const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento();
+  const { exportarPDF } = usePDFExport();
   
   const [activeTab, setActiveTab] = useState('afastamentos');
   const [searchTerm, setSearchTerm] = useState('');
@@ -149,17 +151,42 @@ export default function AfastamentosPage() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="shadow-sm"
-              onClick={async () => {
-                await afastamentoService.exportarRelatorio(filtros.empresa_id, { ...filtros, tipo: selectedTipo });
-                toast.success('Relatório exportado com sucesso em CSV');
-              }}
-            >
-              <Download className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="shadow-sm" title="Exportar Dados">
+                  <Download className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Exportar Relatório</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={async () => {
+                  await afastamentoService.exportarRelatorio(filtros.empresa_id, { ...filtros, tipo: selectedTipo });
+                  toast.success('Relatório exportado com sucesso em CSV');
+                }}>
+                  <Download className="h-4 w-4 mr-2" /> CSV (Planilha)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => {
+                  const dataToExport = filteredAfastamentos.map(af => ({
+                    Colaborador: af.colaborador?.nome_completo || '-',
+                    Tipo: tipoLabels[af.tipo] || af.tipo,
+                    CID: af.cid?.codigo || '-',
+                    Inicio: format(new Date(af.data_inicio), 'dd/MM/yyyy'),
+                    Fim: format(new Date(af.data_fim_prevista), 'dd/MM/yyyy'),
+                    Dias: af.dias_total,
+                    Status: af.status
+                  }));
+                  
+                  await exportarPDF(
+                    'Relatorio de Afastamentos',
+                    dataToExport,
+                    ['Colaborador', 'Tipo', 'CID', 'Inicio', 'Fim', 'Dias', 'Status']
+                  );
+                }}>
+                  <FileText className="h-4 w-4 mr-2" /> PDF (Auditoria)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

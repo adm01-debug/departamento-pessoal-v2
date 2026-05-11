@@ -103,6 +103,11 @@ export const afastamentoService = {
     const fileExt = file.name.split('.').pop();
     const fileName = `${afastamentoId}/${crypto.randomUUID()}.${fileExt}`;
     
+    // Validação básica de metadados simulada (tamanho e tipo)
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error('Arquivo excede o limite de 10MB');
+    }
+
     const { error: uploadError } = await supabase.storage
       .from('afastamentos')
       .upload(fileName, file);
@@ -119,7 +124,13 @@ export const afastamentoService = {
         afastamento_id: afastamentoId,
         tipo,
         nome_arquivo: file.name,
-        url: publicUrl
+        url: publicUrl,
+        metadados: {
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified,
+          uploadedAt: new Date().toISOString()
+        }
       })
       .select()
       .maybeSingle();
