@@ -5,35 +5,67 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Upload, Trash2, Download, Eye, Loader2 } from 'lucide-react';
+import { FileText, Upload, Trash2, Eye, Loader2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 interface AfastamentoDocumentManagerProps {
   afastamentoId: string;
 }
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
 
 export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumentManagerProps) {
   const { documentos, isLoading, upload, isUploading, excluir } = useDocumentosAfastamento(afastamentoId);
   const [file, setFile] = useState<File | null>(null);
   const [tipo, setTipo] = useState('atestado');
 
+  const validateFile = (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('O arquivo é muito grande. O limite é de 5MB.');
+      return false;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Tipo de arquivo não suportado. Use PDF, JPG ou PNG.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (validateFile(selectedFile)) {
+        setFile(selectedFile);
+      } else {
+        e.target.value = '';
+        setFile(null);
+      }
+    }
+  };
+
   const handleUpload = async () => {
     if (!file) return;
     try {
       await upload({ file, tipo });
       setFile(null);
-      // Reset input file
       const input = document.getElementById('file-upload') as HTMLInputElement;
       if (input) input.value = '';
     } catch (error) {
       console.error(error);
+      toast.error('Ocorreu um erro técnico ao realizar o upload.');
     }
   };
 
   const handleExcluir = async (id: string) => {
-    if (confirm('Deseja excluir este documento?')) {
-      await excluir(id);
+    if (confirm('Deseja excluir este documento permanentemente?')) {
+      try {
+        await excluir(id);
+      } catch (error) {
+        toast.error('Não foi possível excluir o documento agora.');
+      }
     }
   };
 

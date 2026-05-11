@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, FileText, Calendar, Trash2, Edit2, AlertCircle } from 'lucide-react';
+import { MoreHorizontal, FileText, Calendar, Trash2, Edit2, AlertCircle, History } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -43,9 +43,10 @@ interface AfastamentoTableProps {
   onEdit: (afastamento: any) => void;
   onProrrogacao: (afastamento: any) => void;
   onDocuments: (afastamento: any) => void;
+  onTimeline: (afastamento: any) => void;
 }
 
-export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments }: AfastamentoTableProps) {
+export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onTimeline }: AfastamentoTableProps) {
   const { excluir } = useAfastamentos();
 
   const handleExcluir = async (id: string) => {
@@ -134,6 +135,9 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments }: A
                     <DropdownMenuLabel>Ações</DropdownMenuLabel>
                     <DropdownMenuItem onClick={() => onEdit(af)}>
                       <Edit2 className="mr-2 h-4 w-4" /> Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onTimeline(af)}>
+                      <History className="mr-2 h-4 w-4" /> Ver Linha do Tempo
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onDocuments(af)}>
                       <FileText className="mr-2 h-4 w-4" /> Documentos

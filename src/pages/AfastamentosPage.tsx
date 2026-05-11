@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
+import { toast } from 'sonner';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -12,6 +13,7 @@ import { AfastamentoStats } from '@/components/afastamentos/AfastamentoStats';
 import { AfastamentoTable } from '@/components/afastamentos/AfastamentoTable';
 import { AfastamentoForm } from '@/components/afastamentos/AfastamentoForm';
 import { AfastamentoDocumentManager } from '@/components/afastamentos/AfastamentoDocumentManager';
+import { AfastamentoTimeline } from '@/components/afastamentos/AfastamentoTimeline';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
@@ -42,9 +44,11 @@ export default function AfastamentosPage() {
   
   const [activeTab, setActiveTab] = useState('afastamentos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTipo, setSelectedTipo] = useState<string | null>(null);
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDocOpen, setIsDocOpen] = useState(false);
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const [selectedAfastamento, setSelectedAfastamento] = useState<any>(null);
 
   const stats = {
@@ -55,11 +59,16 @@ export default function AfastamentosPage() {
     diasTotais: afastamentos.reduce((sum: number, a: any) => sum + (a.dias_total || 0), 0),
   };
 
-  const filteredAfastamentos = afastamentos.filter((a: any) => 
-    a.colaborador?.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.cid?.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.tipo?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAfastamentos = afastamentos.filter((a: any) => {
+    const matchSearch = 
+      a.colaborador?.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.cid?.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.cid?.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchTipo = !selectedTipo || a.tipo === selectedTipo;
+    
+    return matchSearch && matchTipo;
+  });
 
   const handleEdit = (af: any) => {
     setSelectedAfastamento(af);
@@ -69,6 +78,11 @@ export default function AfastamentosPage() {
   const handleDocuments = (af: any) => {
     setSelectedAfastamento(af);
     setIsDocOpen(true);
+  };
+
+  const handleTimeline = (af: any) => {
+    setSelectedAfastamento(af);
+    setIsTimelineOpen(true);
   };
 
   const handleNew = () => {
@@ -104,7 +118,7 @@ export default function AfastamentosPage() {
             <div className="relative flex-1 md:w-64">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Buscar colaborador..." 
+                placeholder="Buscar por colaborador ou CID..." 
                 className="pl-9 bg-card shadow-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -116,13 +130,23 @@ export default function AfastamentosPage() {
                   <Filter className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Filtrar Status</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Filtrar por Status</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: null })}>Todos</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: null })}>Todos Status</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'ativo' })}>Ativos</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'finalizado' })}>Finalizados</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })}>Pendentes</DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Filtrar por Tipo</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setSelectedTipo(null)}>Todos Tipos</DropdownMenuItem>
+                {Object.entries(tipoLabels).map(([key, label]) => (
+                  <DropdownMenuItem key={key} onClick={() => setSelectedTipo(key)}>
+                    {label}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
             <Button 
@@ -130,8 +154,8 @@ export default function AfastamentosPage() {
               size="icon" 
               className="shadow-sm"
               onClick={async () => {
-                await afastamentoService.exportarRelatorio(filtros.empresa_id);
-                alert('Relatório exportado com sucesso (simulado)');
+                await afastamentoService.exportarRelatorio(filtros.empresa_id, { ...filtros, tipo: selectedTipo });
+                toast.success('Relatório exportado com sucesso em CSV');
               }}
             >
               <Download className="h-4 w-4" />
@@ -152,6 +176,7 @@ export default function AfastamentosPage() {
                   onEdit={handleEdit}
                   onDocuments={handleDocuments}
                   onProrrogacao={handleEdit}
+                  onTimeline={handleTimeline}
                 />
               )}
             </TabsContent>
@@ -292,6 +317,20 @@ export default function AfastamentosPage() {
           </DialogHeader>
           {selectedAfastamento && (
             <AfastamentoDocumentManager afastamentoId={selectedAfastamento.id} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isTimelineOpen} onOpenChange={setIsTimelineOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Histórico de Evolução</DialogTitle>
+            <div className="text-sm text-muted-foreground">
+              Acompanhamento completo de: {selectedAfastamento?.colaborador?.nome_completo}
+            </div>
+          </DialogHeader>
+          {selectedAfastamento && (
+            <AfastamentoTimeline afastamentoId={selectedAfastamento.id} />
           )}
         </DialogContent>
       </Dialog>

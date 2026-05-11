@@ -206,8 +206,36 @@ export const afastamentoService = {
   // --- Exportação ---
   async exportarRelatorio(empresaId: string, filtros?: any) {
     const data = await this.listar(empresaId, filtros);
-    // Em uma implementação real, isso geraria um CSV/Excel ou PDF
-    console.log('Exportando dados:', data);
+    
+    // Gerar CSV
+    const headers = ["ID", "Colaborador", "Tipo", "CID", "Início", "Fim Previsto", "Dias Totais", "Empresa", "INSS", "Status"];
+    const rows = data.map(af => [
+      af.id.split('-')[0],
+      af.colaborador?.nome_completo || '-',
+      af.tipo,
+      af.cid?.codigo || '-',
+      af.data_inicio,
+      af.data_fim_prevista,
+      af.dias_total,
+      af.dias_empresa,
+      af.dias_inss,
+      af.status
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(e => e.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `afastamentos_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     return data;
   }
 };
