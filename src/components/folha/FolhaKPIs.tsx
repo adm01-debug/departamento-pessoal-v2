@@ -71,7 +71,7 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
       <FolhaKPI title="Colaboradores" value={resumo?.colaboradores || 0} icon={Users}
         gradient="from-primary to-primary-glow" index={0}
         tooltip="Total de colaboradores com folha processada nesta competência" />
-      <FolhaKPI title="Total Proventos" value={resumo?.totalProventos || 0} icon={TrendingDown}
+      <FolhaKPI title="Total Bruto" value={resumo?.totalProventos || 0} icon={TrendingDown}
         gradient="from-success to-success/70" index={1}
         tooltip="Soma de todos os proventos: salário base, horas extras, gratificações" />
       <FolhaKPI title="Total Descontos" value={resumo?.totalDescontos || 0} icon={TrendingDown}
