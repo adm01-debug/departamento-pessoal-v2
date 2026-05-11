@@ -32,14 +32,14 @@ export function FolhaComposicao({
   
   const items = [
     { label: 'Salário Base + Adicionais', value: totalProventos - horasExtras - dsr - decimoTerceiro, color: 'bg-success', pct: totalProventos > 0 ? ((totalProventos - horasExtras - dsr - decimoTerceiro) / totalProventos) * 100 : 0 },
-    { label: `Faltas/Atrasos (Ponto)`, value: valorFaltas, color: 'bg-destructive/60', pct: totalProventos > 0 ? (valorFaltas / totalProventos) * 100 : 0 },
+    { label: 'Faltas/Atrasos (Ponto)', value: valorFaltas, color: 'bg-destructive/60', pct: totalProventos > 0 ? (valorFaltas / totalProventos) * 100 : 0 },
     { label: 'Horas Extras (50% e 100%)', value: horasExtras, color: 'bg-emerald-400', pct: totalProventos > 0 ? (horasExtras / totalProventos) * 100 : 0 },
     { label: 'DSR (Descanso Remunerado)', value: dsr, color: 'bg-teal-400', pct: totalProventos > 0 ? (dsr / totalProventos) * 100 : 0 },
     { label: '13º Salário', value: decimoTerceiro, color: 'bg-blue-400', pct: totalProventos > 0 ? (decimoTerceiro / totalProventos) * 100 : 0 },
     { label: `INSS (Faixa: ${faixaInss})`, value: inss, color: 'bg-info', pct: totalProventos > 0 ? (inss / totalProventos) * 100 : 0 },
     { label: `IRRF (Faixa: ${faixaIrrf})`, value: irrf, color: 'bg-warning', pct: totalProventos > 0 ? (irrf / totalProventos) * 100 : 0 },
     { label: 'FGTS (Patronal)', value: fgts, color: 'bg-primary', pct: totalProventos > 0 ? (fgts / totalProventos) * 100 : 0 },
-    { label: 'Outros Descontos', value: totalDescontos - inss - irrf - valorFaltas, color: 'bg-destructive', pct: totalProventos > 0 ? ((totalDescontos - inss - irrf - valorFaltas) / totalProventos) * 100 : 0 },
+    { label: 'Vale Transporte / PAT', value: totalDescontos - inss - irrf - valorFaltas, color: 'bg-destructive', pct: totalProventos > 0 ? ((totalDescontos - inss - irrf - valorFaltas) / totalProventos) * 100 : 0 },
   ].filter(item => item.value > 0 || ['Salário Base + Adicionais', 'FGTS (Patronal)'].includes(item.label));
 
   return (
