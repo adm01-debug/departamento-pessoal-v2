@@ -44,7 +44,7 @@ export default function ValesPage() {
 
   // === Recargas ===
   const [openRec, setOpenRec] = useState(false);
-  const [recForm, setRecForm] = useState({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '' });
+  const [recForm, setRecForm] = useState({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '', mes_referencia: new Date().toISOString().slice(0, 7) });
 
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores-vale', empresaAtual?.id],
@@ -153,9 +153,9 @@ export default function ValesPage() {
                       <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><Label>Mês de Referência</Label><Input type="month" value={recForm.mes_referencia} onChange={e => setRecForm(p => ({ ...p, mes_referencia: e.target.value }))} /></div>
                     <div><Label>Valor (R$)</Label><Input type="number" value={recForm.valor} onChange={e => setRecForm(p => ({ ...p, valor: e.target.value }))} /></div>
-                    <div><Label>Data Recarga</Label><Input type="date" value={recForm.data_recarga} onChange={e => setRecForm(p => ({ ...p, data_recarga: e.target.value }))} /></div>
                   </div>
                   <Button onClick={() => criarRecarga.mutate(recForm)} disabled={!recForm.valor || criarRecarga.isPending} className="w-full">{criarRecarga.isPending ? 'Salvando...' : 'Registrar'}</Button>
                 </div>
@@ -165,12 +165,13 @@ export default function ValesPage() {
           <Card><CardContent className="p-0">
             {loadRec ? <div className="p-8 flex justify-center"><Spinner /></div> : (
               <Table>
-                <TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Valor</TableHead><TableHead>Data Recarga</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Valor</TableHead><TableHead>Mês Ref.</TableHead><TableHead>Data Recarga</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {recargas.map((r: any) => (
                     <TableRow key={r.id}>
                       <TableCell className="font-medium">{(r as any).colaborador?.nome_completo || '-'}</TableCell>
                       <TableCell>{fmt(r.valor)}</TableCell>
+                      <TableCell>{r.mes_referencia || '-'}</TableCell>
                       <TableCell>{r.data_recarga ? new Date(r.data_recarga).toLocaleDateString('pt-BR') : '-'}</TableCell>
                       <TableCell><Badge variant={r.status === 'processado' ? 'default' : 'secondary'}>{r.status || 'pendente'}</Badge></TableCell>
                     </TableRow>
