@@ -26,6 +26,8 @@ import { auditCalculation } from '@/calculators/auditHelper';
 import { rubricasFolhaService } from '@/services/tabelas/folhaService';
 import { validarRubricaESocial } from '@/validators/esocial';
 import { folhaPagamentoService } from '@/services/folhaPagamentoService';
+import { FolhaComposicao } from './FolhaComposicao';
+import { folhaCalc, CalculoResultado } from '@/utils/folhaCalc';
 
 interface StepProps {
   isActive: boolean;
@@ -62,6 +64,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [rubricasValidadas, setRubricasValidadas] = useState(false);
   const [currentFolhaId, setCurrentFolhaId] = useState<string | null>(null);
+  const [resultadoCalculo, setResultadoCalculo] = useState<CalculoResultado | null>(null);
   const { registrarLog } = useFolhaAuditoria(currentFolhaId || undefined);
   const { executarCalculo, isCalculando } = useCalculoFolha();
   const queryClient = useQueryClient();
@@ -128,6 +131,9 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       
       const folhaId = resultadoItem?.folha_id;
       setCurrentFolhaId(folhaId);
+      
+      // Armazena o resultado para exibição
+      setResultadoCalculo(resultadoItem.detalhes as any);
 
       // 4. Auditoria com Assinatura Digital SHA-256
       const signature = await auditCalculation(colab.id, competencia, resultadoItem);
@@ -327,9 +333,24 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                   <CheckCircle2 className="h-12 w-12" />
                 </div>
                 <h3 className="text-xl font-display font-bold">Cálculo Finalizado!</h3>
-                <p className="text-sm text-muted-foreground mt-2 mb-8">
+                <p className="text-sm text-muted-foreground mt-2 mb-4">
                   A folha da competência {competencia} foi encerrada com sucesso.
                 </p>
+
+                {resultadoCalculo && (
+                  <div className="w-full mb-6 scale-90 origin-top">
+                    <FolhaComposicao 
+                      totalProventos={resultadoCalculo.proventos}
+                      totalDescontos={resultadoCalculo.descontos}
+                      inss={resultadoCalculo.inss}
+                      irrf={resultadoCalculo.irrf}
+                      fgts={resultadoCalculo.fgts}
+                      horasExtras={resultadoCalculo.horasExtras}
+                      dsr={resultadoCalculo.dsr}
+                      decimoTerceiro={resultadoCalculo.decimoTerceiro}
+                    />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-6">
                   <Button 
