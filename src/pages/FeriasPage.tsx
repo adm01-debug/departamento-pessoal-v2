@@ -54,6 +54,20 @@ export default function FeriasPage() {
     status: statusFilter 
   });
 
+  // Auto-sync effect
+  useEffect(() => {
+    if (!empresaAtual?.id) return;
+    
+    const intervalId = setInterval(() => {
+      console.log('Auto-sync: Sincronizando com o Hub...');
+      feriasService.syncWithHub(empresaAtual.id).then(() => {
+        refetch();
+      }).catch(err => console.error('Erro no auto-sync:', err));
+    }, 60000); // 1 minuto
+
+    return () => clearInterval(intervalId);
+  }, [empresaAtual?.id, refetch]);
+
   const { 
     aprovarGestor, 
     aprovarRH, 
