@@ -69,11 +69,13 @@ export function calcularFerias(salarioBase: number, diasFerias: number = 30, dia
   };
 }
 
-export function calcularHorasExtras(salarioBase: number, horasExtras50: number = 0, horasExtras100: number = 0) {
+export function calcularHorasExtras(salarioBase: number, horasExtras50: number = 0, horasExtras100: number = 0, diasUteis: number = 26, domingosEFeriados: number = 4) {
   const valorHora = salarioBase / 220;
   const valor50 = Math.round(valorHora * 1.5 * horasExtras50 * 100) / 100;
   const valor100 = Math.round(valorHora * 2.0 * horasExtras100 * 100) / 100;
-  return { valor50, valor100, total: Math.round((valor50 + valor100) * 100) / 100 };
+  const totalExtras = Math.round((valor50 + valor100) * 100) / 100;
+  const dsr = calcularDSR(totalExtras, diasUteis, domingosEFeriados);
+  return { valor50, valor100, total: totalExtras, dsr, totalComDsr: Math.round((totalExtras + dsr) * 100) / 100 };
 }
 
 export function calcularDSR(totalVariaveis: number, diasUteis: number, domingosEFeriados: number): number {

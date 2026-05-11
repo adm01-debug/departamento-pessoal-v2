@@ -30,16 +30,17 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
     diasUteis = 26, domingosEFeriados = 4,
   } = params;
 
-  const he = calcularHorasExtras(salarioBase, horasExtras50, horasExtras100);
+  const he = calcularHorasExtras(salarioBase, horasExtras50, horasExtras100, diasUteis, domingosEFeriados);
   const adNoturno = horasNoturnas > 0 ? calcularAdicionalNoturno(salarioBase, horasNoturnas, adicionalNoturnoPerc) : 0;
   
-  // Cálculo de DSR sobre Horas Extras e Adicional Noturno
-  const dsr = calcularDSR(he.total + adNoturno, diasUteis, domingosEFeriados);
+  // Cálculo de DSR sobre Adicional Noturno (o DSR das HE já vem no objeto he)
+  const dsrAdNoturno = calcularDSR(adNoturno, diasUteis, domingosEFeriados);
+  const dsrTotal = Math.round((he.dsr + dsrAdNoturno) * 100) / 100;
 
   const adInsalubridade = insalubridade ? calcularInsalubridade(insalubridade) : 0;
   const adPericulosidade = periculosidade ? calcularPericulosidade(salarioBase) : 0;
 
-  const totalProventos = Math.round((salarioBase + he.total + adNoturno + dsr + adInsalubridade + adPericulosidade + outrosProventos) * 100) / 100;
+  const totalProventos = Math.round((salarioBase + he.total + adNoturno + dsrTotal + adInsalubridade + adPericulosidade + outrosProventos) * 100) / 100;
 
   const inss = calcularINSS(totalProventos);
   const irrf = calcularIRRF(totalProventos, dependentes);
@@ -55,7 +56,7 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
   const lancamentos = [
     { codigo: '1000', descricao: 'Salário Base', valor: salarioBase, tipo: 'provento' },
     ...(he.total > 0 ? [{ codigo: '1001', descricao: 'Horas Extras (Total)', valor: he.total, tipo: 'provento' }] : []),
-    ...(dsr > 0 ? [{ codigo: '1003', descricao: 'DSR sobre Variáveis', valor: dsr, tipo: 'provento' }] : []),
+    ...(dsrTotal > 0 ? [{ codigo: '1003', descricao: 'DSR sobre Variáveis', valor: dsrTotal, tipo: 'provento' }] : []),
     ...(adNoturno > 0 ? [{ codigo: '1004', descricao: 'Adicional Noturno', valor: adNoturno, tipo: 'provento' }] : []),
     ...(adInsalubridade > 0 ? [{ codigo: '1005', descricao: 'Adicional de Insalubridade', valor: adInsalubridade, tipo: 'provento' }] : []),
     ...(adPericulosidade > 0 ? [{ codigo: '1006', descricao: 'Adicional de Periculosidade', valor: adPericulosidade, tipo: 'provento' }] : []),
@@ -70,7 +71,7 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
   return {
     proventos: {
       salarioBase, horasExtras: he.total, adicionalNoturno: adNoturno,
-      dsr, insalubridade: adInsalubridade, periculosidade: adPericulosidade,
+      dsr: dsrTotal, insalubridade: adInsalubridade, periculosidade: adPericulosidade,
       outrosProventos, totalProventos,
     },
     descontos: { inss, irrf, valeTransporte: descontoVT, pensao, outrosDescontos, totalDescontos },
