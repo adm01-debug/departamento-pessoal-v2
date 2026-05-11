@@ -115,7 +115,7 @@ export const feriasService = {
 
     let query = supabase
       .from('ferias')
-      .select('*, colaborador:colaboradores!ferias_colaborador_id_fkey(nome_completo, avatar_url, cargo:cargos(nome))', { count: 'exact' })
+      .select('*, colaborador:colaboradores!ferias_colaborador_id_fkey(nome_completo, avatar_url)', { count: 'exact' })
       .order('data_inicio', { ascending: false });
 
     if (empresaId) query = query.eq('empresa_id', empresaId);
@@ -124,7 +124,7 @@ export const feriasService = {
     const { data, error, count } = await query.range(from, to);
     if (error) throw error;
     
-    let filteredData = (data as any) || [];
+    let filteredData = (data as any[]) || [];
     if (search) {
       filteredData = filteredData.filter((f: any) => 
         (f.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase())
