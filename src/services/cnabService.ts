@@ -20,7 +20,7 @@ export const cnabService = {
       .maybeSingle();
     
     if (error) throw error;
-    return data;
+    return data as CNABConfig | null;
   },
 
   async saveConfig(empresaId: string, config: CNABConfig) {
@@ -42,6 +42,28 @@ export const cnabService = {
         .insert([{ empresa_id: empresaId, ...config }]);
       if (error) throw error;
     }
+  },
+
+  async listRemessas(empresaId: string) {
+    const { data, error } = await supabase
+      .from('cnab_remessas' as any)
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  async listPixLotes(empresaId: string) {
+    const { data, error } = await supabase
+      .from('pix_lotes' as any)
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
   },
 
   async generateCNAB240(empresaId: string, folhaId: string): Promise<string> {
