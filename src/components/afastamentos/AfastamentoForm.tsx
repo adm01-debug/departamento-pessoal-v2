@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
-import { Info, Calendar, Search, Stethoscope, AlertTriangle } from 'lucide-react';
+import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
@@ -26,6 +26,9 @@ const schema = z.object({
   crm_medico: z.string().optional(),
   observacoes: z.string().optional(),
   status: z.string().default('ativo'),
+  data_pericia: z.string().optional().nullable(),
+  local_pericia: z.string().optional().nullable(),
+  protocolo_inss: z.string().optional().nullable(),
 });
 
 interface AfastamentoFormProps {
@@ -260,6 +263,30 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
           </div>
         </div>
       </div>
+
+      {diasInfo.inss > 0 && (
+        <div className="space-y-4 border-t pt-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CalendarIcon className="h-4 w-4 text-warning" />
+            <h3 className="text-sm font-semibold">Agendamento de Perícia (INSS)</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Data da Perícia</Label>
+              <Input type="datetime-local" {...register('data_pericia')} />
+            </div>
+            <div className="space-y-2">
+              <Label>Protocolo INSS</Label>
+              <Input placeholder="Número do benefício/protocolo" {...register('protocolo_inss')} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Local da Perícia</Label>
+            <Input placeholder="Endereço da agência da Previdência" {...register('local_pericia')} />
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label>Observações Internas</Label>

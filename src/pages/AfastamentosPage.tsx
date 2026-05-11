@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
+import { afastamentoService } from '@/services/afastamentoService';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -124,7 +125,15 @@ export default function AfastamentosPage() {
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })}>Pendentes</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" size="icon" className="shadow-sm">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="shadow-sm"
+              onClick={async () => {
+                await afastamentoService.exportarRelatorio(filtros.empresa_id);
+                alert('Relatório exportado com sucesso (simulado)');
+              }}
+            >
               <Download className="h-4 w-4" />
             </Button>
           </div>

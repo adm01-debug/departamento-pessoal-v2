@@ -175,6 +175,12 @@ export const afastamentoService = {
     if (!inicio || !fim) return 0;
     const start = new Date(inicio);
     const end = new Date(fim);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+    
+    // Reset hours to compare dates only
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    
     const diffMs = end.getTime() - start.getTime();
     const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
     return days > 0 ? days : 0;
@@ -182,14 +188,26 @@ export const afastamentoService = {
 
   calcularDistribuicaoDias(diasTotais: number, tipo: string, configs: any[]) {
     const config = configs.find(c => c.tipo === tipo);
-    if (!config) return { empresa: diasTotais, inss: 0 };
-
-    const maxEmpresa = config.dias_empresa_maximo ?? 15;
+    // Padrão 15 dias para tipos comuns de doença/acidente
+    const tiposComLimite = ['doenca', 'acidente_trabalho', 'acidente_trajeto'];
+    const maxEmpresa = config?.dias_empresa_maximo ?? (tiposComLimite.includes(tipo) ? 15 : 0);
     
+    if (maxEmpresa === 0) {
+      return { empresa: diasTotais, inss: 0 };
+    }
+
     if (diasTotais <= maxEmpresa) {
       return { empresa: diasTotais, inss: 0 };
     } else {
       return { empresa: maxEmpresa, inss: diasTotais - maxEmpresa };
     }
+  },
+
+  // --- Exportação ---
+  async exportarRelatorio(empresaId: string, filtros?: any) {
+    const data = await this.listar(empresaId, filtros);
+    // Em uma implementação real, isso geraria um CSV/Excel ou PDF
+    console.log('Exportando dados:', data);
+    return data;
   }
 };
