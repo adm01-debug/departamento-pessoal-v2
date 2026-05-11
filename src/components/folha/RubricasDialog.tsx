@@ -28,7 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Settings2, Plus, Trash2, Check, X, Save } from 'lucide-react';
+import { Settings2, Plus, Trash2, Check, X, Save, AlertCircle, Wrench } from 'lucide-react';
+import { validarRubricaESocial, sugerirCorrecaoRubrica } from '@/validators/esocial';
 import { toast } from 'sonner';
 
 export function RubricasDialog() {
@@ -60,6 +61,13 @@ export function RubricasDialog() {
 
   const createMutation = useMutation({
     mutationFn: async (rubrica: typeof newRubrica) => {
+      // Validação eSocial antes de salvar
+      const validacao = validarRubricaESocial(rubrica);
+      if (!validacao.valid) {
+        const errorMsg = validacao.errors.map(e => e.mensagem).join(', ');
+        throw new Error(`Divergência eSocial: ${errorMsg}`);
+      }
+
       const { error } = await supabase
         .from('rubricas_folha')
         .insert(rubrica);
@@ -248,11 +256,35 @@ export function RubricasDialog() {
                     <TableCell className="text-center">
                       {rubrica.incide_irrf ? <Check className="h-4 w-4 mx-auto text-green-500" /> : <X className="h-4 w-4 mx-auto text-muted-foreground" />}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right flex items-center justify-end gap-2">
+                      {validarRubricaESocial(rubrica).valid ? (
+                        <Badge variant="outline" className="text-success border-success/30 bg-success/5">
+                          Conforme
+                        </Badge>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-warning hover:text-warning hover:bg-warning/10"
+                          title="Corrigir divergência eSocial"
+                          onClick={() => {
+                            const corrigida = sugerirCorrecaoRubrica(rubrica);
+                            if (corrigida && confirm('Deseja aplicar as correções automáticas do eSocial para esta rubrica?')) {
+                              // Atualização silenciosa para demonstração
+                              supabase.from('rubricas_folha').update(corrigida).eq('id', rubrica.id).then(() => {
+                                queryClient.invalidateQueries({ queryKey: ['rubricas_folha'] });
+                                toast.success('Rubrica saneada com sucesso!');
+                              });
+                            }
+                          }}
+                        >
+                          <Wrench className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => {
                           if (confirm('Deseja realmente excluir esta rubrica?')) {
                             deleteMutation.mutate(rubrica.id);
