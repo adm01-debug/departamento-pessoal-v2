@@ -168,7 +168,7 @@ export default function AfastamentosPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={async () => {
                   const dataToExport = filteredAfastamentos.map(af => ({
-                    Colaborador: (af.colaborador as any)?.nome_completo || '-',
+                    Colaborador: af.colaborador?.nome_completo || '-',
                     Tipo: tipoLabels[af.tipo] || af.tipo,
                     CID: af.cid?.codigo || '-',
                     Inicio: format(new Date(af.data_inicio), 'dd/MM/yyyy'),
@@ -232,7 +232,7 @@ export default function AfastamentosPage() {
                       <TableBody>
                         {prorrogacoes.map((p: any) => (
                           <TableRow key={p.id}>
-                            <TableCell className="font-medium">{(p.afastamento as any)?.colaborador?.nome_completo || '-'}</TableCell>
+                            <TableCell className="font-medium">{p.afastamento?.colaborador?.nome_completo || '-'}</TableCell>
                             <TableCell>
                               <Badge variant="secondary" className="font-normal">
                                 {tipoLabels[p.afastamento?.tipo] || p.afastamento?.tipo || '-'}
