@@ -47,9 +47,9 @@ export function FolhaAuditTimeline({ competencia }: { competencia: string }) {
                   className="flex gap-3 relative before:absolute before:left-[11px] before:top-6 before:bottom-[-16px] before:w-[1px] before:bg-border/40 last:before:hidden"
                 >
                   <div className="h-6 w-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 z-10">
-                    {log.acao === 'EXECUTE_CALC' ? <ShieldCheck className="h-3.5 w-3.5 text-primary" /> : <Tag className="h-3.5 w-3.5 text-primary" />}
+                    {log.tipo_evento === 'CALCULO' ? <ShieldCheck className="h-3.5 w-3.5 text-primary" /> : <Tag className="h-3.5 w-3.5 text-primary" />}
                   </div>
-                  
+
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
                       <Badge variant="outline" className="text-[9px] h-4 bg-background uppercase font-bold">
