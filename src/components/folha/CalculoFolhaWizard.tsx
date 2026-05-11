@@ -97,19 +97,19 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
         throw new Error(`Existem ${rubricasInvalidas.length} rubricas com divergências eSocial. Corrija-as antes de calcular.`);
       }
 
-      // 2. Busca Colaboradores para Processamento (Simulando lote para o primeiro da lista)
+      // 2. Busca Colaboradores para Processamento (Em Lote)
       const { data: colaboradores } = await supabase
         .from('colaboradores')
         .select('*')
         .eq('empresa_id', empresaAtualId!)
-        .eq('status', 'ativo')
-        .limit(1);
+        .eq('status', 'ativo');
 
       if (!colaboradores || colaboradores.length === 0) {
         throw new Error('Nenhum colaborador ativo encontrado para esta empresa.');
       }
-      const colab = colaboradores[0];
+      
       const [mes, ano] = competencia.split('/');
+      const competenciaDB = `${ano}-${mes}`;
 
       // 3. Busca Dependentes para o cálculo do IRRF
       const { count: dependentesCount } = await supabase
