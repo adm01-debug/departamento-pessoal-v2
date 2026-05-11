@@ -215,9 +215,7 @@ export default function DashboardPage() {
   const isEmptySystem = !loadingStats && stats?.colaboradoresAtivos === 0 && stats?.folhaMensal === 0;
 
   return (
-    <div className="space-y-section max-w-[1400px] mx-auto">
-      <PageTitle title="Dashboard" description="Painel executivo do Departamento Pessoal" />
-      {/* 1. Header com saudação */}
+    <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
       <DashboardHeader greeting={greeting} isLoading={loadingStats} onRefresh={() => refetchStats()} />
 
       {/* 2. KPIs Primários — métricas críticas no topo */}
