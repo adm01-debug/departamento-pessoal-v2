@@ -12,7 +12,7 @@ export const afastamentoService = {
       .from('afastamentos')
       .select(`
         *,
-        colaborador:colaboradores(nome_completo, departamento:departamentos(nome)),
+        colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo, departamento:departamentos(nome)),
         cid:cid10(codigo, descricao)
       `)
       .order('data_inicio', { ascending: false });
@@ -28,7 +28,7 @@ export const afastamentoService = {
   async buscarPorId(id: string) {
     const { data, error } = await supabase
       .from('afastamentos')
-      .select('*, colaborador:colaboradores(nome_completo), cid:cid10(*)')
+      .select('*, colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo), cid:cid10(*)')
       .eq('id', id)
       .maybeSingle();
     
@@ -103,6 +103,11 @@ export const afastamentoService = {
     const fileExt = file.name.split('.').pop();
     const fileName = `${afastamentoId}/${crypto.randomUUID()}.${fileExt}`;
     
+    // Validação básica de metadados simulada (tamanho e tipo)
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error('Arquivo excede o limite de 10MB');
+    }
+
     const { error: uploadError } = await supabase.storage
       .from('afastamentos')
       .upload(fileName, file);
@@ -119,7 +124,13 @@ export const afastamentoService = {
         afastamento_id: afastamentoId,
         tipo,
         nome_arquivo: file.name,
-        url: publicUrl
+        url: publicUrl,
+        metadados: {
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified,
+          uploadedAt: new Date().toISOString()
+        }
       })
       .select()
       .maybeSingle();
@@ -144,7 +155,7 @@ export const afastamentoService = {
   async listarProrrogacoes(afastamentoId?: string) {
     let query = supabase
       .from('prorrogacoes_afastamento')
-      .select('*, documento:documentos_afastamento(*)');
+      .select('*, documento:documentos_afastamento(*), afastamento:afastamentos!prorrogacoes_afastamento_afastamento_id_fkey(*, colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo))');
     
     if (afastamentoId) query = query.eq('afastamento_id', afastamentoId);
     
