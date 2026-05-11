@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
-import { Info, Calendar, Search, Stethoscope, AlertTriangle } from 'lucide-react';
+import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';

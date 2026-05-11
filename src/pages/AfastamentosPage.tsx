@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
+import { afastamentoService } from '@/services/afastamentoService';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
