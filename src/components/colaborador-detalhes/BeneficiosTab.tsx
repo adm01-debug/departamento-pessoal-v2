@@ -9,7 +9,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { FormField, FormSelect } from '@/components/forms';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 
 interface BeneficiosTabProps {
   colaboradorId: string;
@@ -20,7 +20,7 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
   const { beneficios: planosDisponiveis } = useBeneficios();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const { register, handleSubmit, reset, watch } = useForm({
+  const { register, handleSubmit, reset, watch, control } = useForm({
     defaultValues: {
       beneficio_id: '',
       valor: 0,
@@ -65,10 +65,18 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
               <DialogTitle>Vincular Benefício ao Colaborador</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onVincular)} className="space-y-4 pt-4">
-              <FormSelect 
-                label="Plano de Benefício" 
-                options={planosDisponiveis.map(p => ({ value: p.id, label: `${p.nome} (${p.tipo})` }))}
-                {...register('beneficio_id', { required: true })}
+              <Controller
+                name="beneficio_id"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <FormSelect 
+                    label="Plano de Benefício" 
+                    options={planosDisponiveis.map(p => ({ value: p.id, label: `${p.nome} (${p.tipo})` }))}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
 
               <div className="grid grid-cols-2 gap-4">
