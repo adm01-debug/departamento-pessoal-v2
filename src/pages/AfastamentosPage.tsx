@@ -124,7 +124,15 @@ export default function AfastamentosPage() {
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })}>Pendentes</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" size="icon" className="shadow-sm">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="shadow-sm"
+              onClick={async () => {
+                await afastamentoService.exportarRelatorio(filtros.empresa_id);
+                alert('Relatório exportado com sucesso (simulado)');
+              }}
+            >
               <Download className="h-4 w-4" />
             </Button>
           </div>
