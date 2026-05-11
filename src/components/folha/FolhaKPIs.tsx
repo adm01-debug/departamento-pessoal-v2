@@ -49,6 +49,7 @@ interface FolhaResumo {
   inss: number;
   fgts: number;
   irrf: number;
+  custoTotalEmpresa?: number;
 }
 
 interface FolhaKPIsProps {
