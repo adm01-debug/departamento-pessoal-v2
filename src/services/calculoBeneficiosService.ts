@@ -80,9 +80,9 @@ export const planoSaudeService = {
   },
   
   async listarDependentesNoPlano(colaboradorId: string) {
-    const { data, error } = await supabase
-      .from('beneficiarios_plano')
-      .select('*, dependente:dependentes(*)')
+    const { data, error } = await (supabase
+      .from('beneficiarios_plano') as any)
+      .select('*, dependente:dependentes(*)');
       .eq('colaborador_id', colaboradorId)
       .not('dependente_id', 'is', null);
     
@@ -108,8 +108,8 @@ export const seguroVidaService = {
     let totalParticipants = 0;
 
     for (const beneficio of data) {
-      const { count, error: countError } = await supabase
-        .from('beneficios_colaborador')
+      const { count, error: countError } = await (supabase
+        .from('beneficios_colaborador') as any)
         .select('*', { count: 'exact', head: true })
         .eq('beneficio_id', beneficio.id);
       
