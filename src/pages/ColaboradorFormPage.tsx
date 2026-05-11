@@ -135,8 +135,6 @@ export default function ColaboradorFormPage() {
   ];
 
   return (
-    <>
-  return (
     <div className="space-y-6 max-w-[1200px] mx-auto pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
