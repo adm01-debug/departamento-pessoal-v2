@@ -96,8 +96,8 @@ export default function PlanosSaudePage() {
   const [openPlano, setOpenPlano] = useState(false);
   const [openSeguro, setOpenSeguro] = useState(false);
   const [expandedPlano, setExpandedPlano] = useState<string | null>(null);
-  const [formPlano, setFormPlano] = useState({ nome: '', operadora: '', tipo: 'saude', valor_mensal: '', coparticipacao: '' });
-  const [formSeguro, setFormSeguro] = useState({ nome: '', seguradora: '', tipo_cobertura: 'vida', valor_mensal: '', capital_segurado: '' });
+  const [formPlano, setFormPlano] = useState({ nome: '', operadora: '', tipo: 'saude', valor_mensal: '', coparticipacao: '', ans_registro: '' });
+  const [formSeguro, setFormSeguro] = useState({ nome: '', seguradora: '', tipo_cobertura: 'vida', valor_mensal: '', capital_segurado: '', apolice_numero: '', data_vencimento_apolice: '' });
 
   const { data: planos = [], isLoading: l1 } = useQuery({
     queryKey: ['planos-saude', empresaAtual?.id],
@@ -164,7 +164,10 @@ export default function PlanosSaudePage() {
                   <DialogHeader><DialogTitle>Cadastrar Plano</DialogTitle></DialogHeader>
                   <div className="space-y-3">
                     <div><Label>Nome *</Label><Input value={formPlano.nome} onChange={e => setFormPlano(p => ({ ...p, nome: e.target.value }))} /></div>
-                    <div><Label>Operadora</Label><Input value={formPlano.operadora} onChange={e => setFormPlano(p => ({ ...p, operadora: e.target.value }))} /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label>Operadora</Label><Input value={formPlano.operadora} onChange={e => setFormPlano(p => ({ ...p, operadora: e.target.value }))} /></div>
+                      <div><Label>Registro ANS</Label><Input value={formPlano.ans_registro} onChange={e => setFormPlano(p => ({ ...p, ans_registro: e.target.value }))} /></div>
+                    </div>
                     <div><Label>Tipo</Label>
                       <Select value={formPlano.tipo} onValueChange={v => setFormPlano(p => ({ ...p, tipo: v }))}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
@@ -217,7 +220,11 @@ export default function PlanosSaudePage() {
                   <DialogHeader><DialogTitle>Cadastrar Seguro</DialogTitle></DialogHeader>
                   <div className="space-y-3">
                     <div><Label>Nome *</Label><Input value={formSeguro.nome} onChange={e => setFormSeguro(p => ({ ...p, nome: e.target.value }))} /></div>
-                    <div><Label>Seguradora</Label><Input value={formSeguro.seguradora} onChange={e => setFormSeguro(p => ({ ...p, seguradora: e.target.value }))} /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><Label>Seguradora</Label><Input value={formSeguro.seguradora} onChange={e => setFormSeguro(p => ({ ...p, seguradora: e.target.value }))} /></div>
+                      <div><Label>Nº Apólice</Label><Input value={formSeguro.apolice_numero} onChange={e => setFormSeguro(p => ({ ...p, apolice_numero: e.target.value }))} /></div>
+                    </div>
+                    <div><Label>Vencimento Apólice</Label><Input type="date" value={formSeguro.data_vencimento_apolice} onChange={e => setFormSeguro(p => ({ ...p, data_vencimento_apolice: e.target.value }))} /></div>
                     <div className="grid grid-cols-2 gap-3">
                       <div><Label>Valor Mensal</Label><Input type="number" value={formSeguro.valor_mensal} onChange={e => setFormSeguro(p => ({ ...p, valor_mensal: e.target.value }))} /></div>
                       <div><Label>Capital Segurado</Label><Input type="number" value={formSeguro.capital_segurado} onChange={e => setFormSeguro(p => ({ ...p, capital_segurado: e.target.value }))} /></div>
