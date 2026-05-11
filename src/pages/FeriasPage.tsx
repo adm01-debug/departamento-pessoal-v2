@@ -10,7 +10,7 @@ import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
