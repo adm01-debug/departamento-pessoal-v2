@@ -1,6 +1,7 @@
 // Cálculo completo de folha e salário líquido
 import { calcularINSS, calcularIRRF, calcularFGTS } from './impostos';
 import { calcularHorasExtras, calcularAdicionalNoturno, calcularInsalubridade, calcularPericulosidade, calcularDescontoVT, calcularPensaoAlimenticia, calcularDSR, type GrauInsalubridade } from './beneficios';
+import { RUBRICAS_PADRAO } from '@/constants/rubricas';
 
 export interface ParamsFolhaCompleta {
   salarioBase: number;
@@ -51,6 +52,21 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
   const totalDescontos = Math.round((inss + irrf + descontoVT + pensao + outrosDescontos) * 100) / 100;
   const salarioLiquido = Math.round((totalProventos - totalDescontos) * 100) / 100;
 
+  const lancamentos = [
+    { codigo: '1000', descricao: 'Salário Base', valor: salarioBase, tipo: 'provento' },
+    ...(he.total > 0 ? [{ codigo: '1001', descricao: 'Horas Extras (Total)', valor: he.total, tipo: 'provento' }] : []),
+    ...(dsr > 0 ? [{ codigo: '1003', descricao: 'DSR sobre Variáveis', valor: dsr, tipo: 'provento' }] : []),
+    ...(adNoturno > 0 ? [{ codigo: '1004', descricao: 'Adicional Noturno', valor: adNoturno, tipo: 'provento' }] : []),
+    ...(adInsalubridade > 0 ? [{ codigo: '1005', descricao: 'Adicional de Insalubridade', valor: adInsalubridade, tipo: 'provento' }] : []),
+    ...(adPericulosidade > 0 ? [{ codigo: '1006', descricao: 'Adicional de Periculosidade', valor: adPericulosidade, tipo: 'provento' }] : []),
+    ...(outrosProventos > 0 ? [{ codigo: '1008', descricao: 'Outros Proventos', valor: outrosProventos, tipo: 'provento' }] : []),
+    { codigo: '5000', descricao: 'INSS', valor: inss, tipo: 'desconto' },
+    ...(irrf > 0 ? [{ codigo: '5001', descricao: 'IRRF', valor: irrf, tipo: 'desconto' }] : []),
+    ...(descontoVT > 0 ? [{ codigo: '5002', descricao: 'Vale Transporte', valor: descontoVT, tipo: 'desconto' }] : []),
+    ...(pensao > 0 ? [{ codigo: '5003', descricao: 'Pensão Alimentícia', valor: pensao, tipo: 'desconto' }] : []),
+    ...(outrosDescontos > 0 ? [{ codigo: '5004', descricao: 'Outros Descontos', valor: outrosDescontos, tipo: 'desconto' }] : []),
+  ];
+
   return {
     proventos: {
       salarioBase, horasExtras: he.total, adicionalNoturno: adNoturno,
@@ -59,6 +75,7 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
     },
     descontos: { inss, irrf, valeTransporte: descontoVT, pensao, outrosDescontos, totalDescontos },
     fgts, salarioLiquido,
+    lancamentos,
   };
 }
 
