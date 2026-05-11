@@ -101,6 +101,18 @@ export const validadorFolha = {
           }
         }
       }
+
+      // Regra 5: Validação de Salário Mínimo (2026)
+      const { SALARIO_MINIMO_2026 } = await import('@/calculators/tabelas');
+      if (totalProventos < SALARIO_MINIMO_2026 && colab.status === 'ativo') {
+        alertas.push({
+          colaboradorId: item.colaborador_id,
+          nome: colab.nome_completo,
+          tipo: 'falta_informacao',
+          mensagem: `Total bruto abaixo do salário mínimo nacional (R$ ${SALARIO_MINIMO_2026}).`,
+          gravidade: 'alta'
+        });
+      }
     }
 
     return alertas;
