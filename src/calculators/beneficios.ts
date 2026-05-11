@@ -6,16 +6,47 @@ export interface ParamsDecimo13 {
   salarioBase: number;
   mesesTrabalhados: number;
   mediasVariaveis?: number;
+  parcela: 1 | 2;
+  dependentes?: number;
 }
 
-export function calcularDecimo13Proporcional(params: ParamsDecimo13): { bruto: number; inss: number; irrf: number; liquido: number } {
-  const { salarioBase, mesesTrabalhados, mediasVariaveis = 0 } = params;
+export function calcularDecimo13(params: ParamsDecimo13): { 
+  bruto: number; 
+  inss: number; 
+  irrf: number; 
+  fgts: number;
+  liquido: number;
+  mensagem?: string;
+} {
+  const { salarioBase, mesesTrabalhados, mediasVariaveis = 0, parcela, dependentes = 0 } = params;
   const meses = Math.min(12, Math.max(0, mesesTrabalhados));
-  const bruto = Math.round(((salarioBase + mediasVariaveis) / 12) * meses * 100) / 100;
-  const inss = calcularINSS(bruto);
-  const irrf = calcularIRRF(bruto);
-  const liquido = Math.round((bruto - inss - irrf) * 100) / 100;
-  return { bruto, inss, irrf, liquido };
+  
+  if (meses < 1) {
+    return { bruto: 0, inss: 0, irrf: 0, fgts: 0, liquido: 0, mensagem: 'Mínimo de 15 dias trabalhados no ano.' };
+  }
+
+  const valorIntegral = salarioBase + mediasVariaveis;
+  const valorProporcional = (valorIntegral / 12) * meses;
+
+  if (parcela === 1) {
+    // 1ª Parcela: 50% do bruto proporcional, sem descontos de INSS/IRRF (apenas FGTS)
+    const bruto = Math.round((valorProporcional / 2) * 100) / 100;
+    const fgts = Math.round(bruto * 0.08 * 100) / 100;
+    return { bruto, inss: 0, irrf: 0, fgts, liquido: bruto };
+  } else {
+    // 2ª Parcela: Restante do bruto, com descontos integrais (INSS/IRRF) incidindo sobre o total
+    const brutoTotal = Math.round(valorProporcional * 100) / 100;
+    const primeiraParcelaJaPaga = Math.round((brutoTotal / 2) * 100) / 100;
+    
+    const inss = calcularINSS(brutoTotal);
+    const irrf = calcularIRRF(brutoTotal, dependentes);
+    const fgts = Math.round((brutoTotal - primeiraParcelaJaPaga) * 0.08 * 100) / 100;
+    
+    const brutoSegunda = Math.round((brutoTotal - primeiraParcelaJaPaga) * 100) / 100;
+    const liquido = Math.round((brutoTotal - inss - irrf - primeiraParcelaJaPaga) * 100) / 100;
+    
+    return { bruto: brutoSegunda, inss, irrf, fgts, liquido };
+  }
 }
 
 export function calcularFerias(salarioBase: number, diasFerias: number = 30, diasAbono: number = 0) {
