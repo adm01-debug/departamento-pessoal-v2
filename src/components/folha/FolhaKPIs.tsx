@@ -86,9 +86,9 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
       <FolhaKPI title="IRRF" value={resumo?.irrf || 0} icon={Receipt}
         gradient="from-warning to-warning/70" index={5}
         tooltip="Imposto de Renda Retido na Fonte (IRRF)" />
-      <FolhaKPI title="Custo Empresa" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) + (resumo?.fgts || 0) + ((resumo?.totalProventos || 0) * 0.2)} icon={DollarSign}
+      <FolhaKPI title="Custo Total" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) + (resumo?.fgts || 0) + ((resumo?.totalProventos || 0) * 0.28)} icon={DollarSign}
         gradient="from-purple-500 to-indigo-600" index={6}
-        tooltip="Custo total real estimado para a empresa (Proventos + FGTS + Encargos Patronais ~20%)" />
+        tooltip="Custo total real estimado para a empresa (Bruto + Encargos Patronais ~28% + FGTS)" />
     </div>
   );
 }
