@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { auditCalculation } from '@/calculators/auditHelper';
 
 interface StepProps {
   isActive: boolean;
@@ -87,6 +88,10 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       
       const folhaId = response?.folhaId;
       setCurrentFolhaId(folhaId);
+
+      // Auditoria com Assinatura Digital
+      const signature = await auditCalculation(empresaAtualId!, competencia, response?.detalhes || response);
+      toast.info(`Cálculo assinado: ${signature.substring(0, 8)}...`);
 
       // Registrar log de auditoria do processamento
       if (folhaId) {
