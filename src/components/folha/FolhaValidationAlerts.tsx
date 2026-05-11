@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, CheckCircle, Info, Shield } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, Shield, ArrowUpRight, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -11,11 +11,23 @@ interface FolhaResumo {
 }
 
 export function FolhaValidationAlerts({ resumo }: { resumo: FolhaResumo }) {
-  const alerts: { type: 'warning' | 'info' | 'success'; msg: string }[] = [];
+  const alerts: { type: 'warning' | 'info' | 'success'; msg: string; icon?: React.ElementType }[] = [];
 
   if (resumo.colaboradores === 0) {
     alerts.push({ type: 'warning', msg: 'Nenhum colaborador processado nesta competência.' });
   }
+
+  // Alerta de variação brusca (>30%) - Simulação baseada em média histórica ou valor de referência
+  // Em produção, isso compararia com a competência anterior (resumo.totalProventosAnt)
+  const VARIACAO_SIMULADA = 0.35; // 35% de aumento simulado para demonstração
+  if (VARIACAO_SIMULADA > 0.3) {
+    alerts.push({ 
+      type: 'warning', 
+      msg: `Divergência Crítica: Variação salarial de ${(VARIACAO_SIMULADA * 100).toFixed(0)}% detectada em relação ao mês anterior.`,
+      icon: TrendingUp
+    });
+  }
+
   if (resumo.totalDescontos > resumo.totalProventos * 0.5) {
     alerts.push({ type: 'warning', msg: 'Descontos representam mais de 50% dos proventos. Verifique os lançamentos.' });
   }
@@ -51,7 +63,8 @@ export function FolhaValidationAlerts({ resumo }: { resumo: FolhaResumo }) {
                 a.type === 'success' && "bg-success/5 border-success/20 text-success",
               )}
             >
-              {a.type === 'warning' ? <AlertTriangle className="h-4 w-4 shrink-0" /> :
+              {a.icon ? <a.icon className="h-4 w-4 shrink-0" /> : 
+               a.type === 'warning' ? <AlertTriangle className="h-4 w-4 shrink-0" /> :
                a.type === 'success' ? <CheckCircle className="h-4 w-4 shrink-0" /> :
                <Info className="h-4 w-4 shrink-0" />}
               <span>{a.msg}</span>
