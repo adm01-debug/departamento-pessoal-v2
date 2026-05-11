@@ -1,11 +1,12 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { FeriasWorkflowStepper } from './FeriasWorkflowStepper';
 import { FeriasActions } from './FeriasActions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface FeriasTableProps {
   data: Record<string, any>[];
@@ -44,9 +45,25 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
               transition={{ delay: i * 0.02 }}
               className="hover:bg-accent/30 transition-colors border-b border-border/20"
             >
-              <TableCell className="font-body font-medium">{s.colaborador?.nome_completo || '-'}</TableCell>
+              <TableCell className="font-body font-medium">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8 border border-border/50">
+                    <AvatarImage src={s.colaborador?.avatar_url} />
+                    <AvatarFallback className="bg-primary/5 text-primary text-[10px]">
+                      {s.colaborador?.nome_completo?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || <User className="h-3 w-3" />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold">{s.colaborador?.nome_completo || '-'}</span>
+                    <span className="text-[10px] text-muted-foreground">{s.colaborador?.cargo?.nome || 'Colaborador'}</span>
+                  </div>
+                </div>
+              </TableCell>
               <TableCell className="font-body text-sm text-muted-foreground">
-                {format(new Date(s.data_inicio), 'dd/MM/yyyy')} – {format(new Date(s.data_fim), 'dd/MM/yyyy')}
+                <div className="flex flex-col">
+                  <span>{format(new Date(s.data_inicio), 'dd/MM/yyyy')}</span>
+                  <span className="text-[10px] opacity-70">até {format(new Date(s.data_fim), 'dd/MM/yyyy')}</span>
+                </div>
               </TableCell>
               <TableCell className="text-center">
                 <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-primary/10 text-primary font-display font-bold text-sm">

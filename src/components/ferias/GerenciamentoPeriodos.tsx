@@ -3,17 +3,19 @@ import { feriasService, colaboradorService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, AlertTriangle, CheckCircle2, Clock, Plus, Trash2, Edit2, Loader2, User } from 'lucide-react';
-import { format } from 'date-fns';
+import { Calendar, AlertTriangle, CheckCircle2, Clock, Plus, Trash2, Edit2, Loader2, User, Search } from 'lucide-react';
+import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface GerenciamentoPeriodosProps {
   colaboradorId?: string;
@@ -25,6 +27,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   const [selectedColabId, setSelectedColabId] = useState(initialColaboradorId || '');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPeriodo, setEditingPeriodo] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [form, setForm] = useState({
     data_inicio: '',
     data_fim: '',
@@ -124,30 +127,63 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
     }
   };
 
+  const filteredColaboradores = useMemo(() => {
+    if (!colaboradores) return [];
+    return colaboradores.filter(c => 
+      c.nome_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.cpf?.includes(searchTerm)
+    );
+  }, [colaboradores, searchTerm]);
+
   return (
     <div className="space-y-6">
-      <Card className="border-border/40 shadow-sm rounded-2xl">
-        <CardContent className="p-4 flex flex-col md:flex-row items-end gap-4">
-          <div className="flex-1 space-y-2">
-            <Label className="font-display text-xs">Selecionar Colaborador</Label>
-            <Select value={selectedColabId} onValueChange={setSelectedColabId}>
-              <SelectTrigger className="rounded-xl">
-                <SelectValue placeholder="Escolha um colaborador..." />
-              </SelectTrigger>
-              <SelectContent>
-                {colaboradores?.map(c => (
-                  <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col md:flex-row items-stretch border-b border-border/40">
+            <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-border/40 bg-muted/10">
+              <div className="space-y-3">
+                <Label className="font-display text-xs text-muted-foreground uppercase tracking-wider">Colaborador</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Buscar por nome ou CPF..." 
+                      className="pl-9 rounded-xl bg-background border-border/40 focus:ring-primary/20"
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <Select value={selectedColabId} onValueChange={setSelectedColabId}>
+                    <SelectTrigger className="w-[200px] rounded-xl border-border/40">
+                      <SelectValue placeholder="Selecionar..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {filteredColaboradores.map(c => (
+                        <SelectItem key={c.id} value={c.id}>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-5 w-5">
+                              <AvatarImage src={(c as any).avatar_url} />
+                              <AvatarFallback className="text-[8px]">{c.nome_completo[0]}</AvatarFallback>
+                            </Avatar>
+                            <span className="truncate">{c.nome_completo}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 flex items-end justify-center bg-muted/5">
+              <Button 
+                onClick={openCreate} 
+                disabled={!selectedColabId}
+                className="rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 gap-2 font-display py-6 px-8"
+              >
+                <Plus className="h-5 w-5" /> Novo Período
+              </Button>
+            </div>
           </div>
-          <Button 
-            onClick={openCreate} 
-            disabled={!selectedColabId}
-            className="rounded-xl bg-primary gap-2 font-body"
-          >
-            <Plus className="h-4 w-4" /> Novo Período
-          </Button>
         </CardContent>
       </Card>
 
@@ -192,10 +228,21 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
               ) : (
                 periodos.map((p) => (
                   <TableRow key={p.id} className="hover:bg-muted/20 border-border/40 transition-colors group">
-                    <TableCell className="font-body font-medium">#{p.numero_periodo}</TableCell>
-                    <TableCell className="font-body">{format(new Date(p.data_inicio), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
-                    <TableCell className="font-body">{format(new Date(p.data_fim), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
-                    <TableCell className="font-body">{p.dias_direito} dias</TableCell>
+                    <TableCell className="font-body font-medium">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold">#{p.numero_periodo}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {differenceInDays(new Date(p.data_fim), new Date(p.data_inicio)) + 1} dias corridos
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-body text-sm">{format(new Date(p.data_inicio), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell className="font-body text-sm">{format(new Date(p.data_fim), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell className="font-body">
+                      <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary font-bold">
+                        {p.dias_direito} dias
+                      </Badge>
+                    </TableCell>
                     <TableCell>{getStatusBadge(p.status)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
