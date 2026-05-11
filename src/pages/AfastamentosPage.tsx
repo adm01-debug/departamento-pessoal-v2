@@ -1,34 +1,21 @@
-import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAfastamentos } from '@/hooks/useAfastamentos';
+import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Heart, Plus, Search, Filter, Download } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { AfastamentoStats } from '@/components/afastamentos/AfastamentoStats';
+import { AfastamentoTable } from '@/components/afastamentos/AfastamentoTable';
+import { AfastamentoForm } from '@/components/afastamentos/AfastamentoForm';
+import { AfastamentoDocumentManager } from '@/components/afastamentos/AfastamentoDocumentManager';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyList } from '@/components/ui/empty-state';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
-import { useEmpresas } from '@/hooks';
-import { Heart, Plus, Calendar, Clock, AlertTriangle, Activity } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-
-const statusColors: Record<string, string> = {
-  ativo: 'bg-warning/15 text-warning border-0',
-  aprovado: 'bg-success/15 text-success border-0',
-  finalizado: 'bg-success/15 text-success border-0',
-  pendente: 'bg-info/15 text-info border-0',
-  cancelado: 'bg-destructive/15 text-destructive border-0',
-  rejeitado: 'bg-destructive/15 text-destructive border-0',
-};
+import { format } from 'date-fns';
 
 const tipoLabels: Record<string, string> = {
   doenca: 'Doença', acidente_trabalho: 'Acidente Trabalho', maternidade: 'Maternidade',
@@ -37,149 +24,147 @@ const tipoLabels: Record<string, string> = {
 
 export default function AfastamentosPage() {
   const { afastamentos, isLoading } = useAfastamentos();
-  const { empresaAtual } = useEmpresas();
-  const qc = useQueryClient();
-  const [tab, setTab] = useState('todos');
-  const [mainTab, setMainTab] = useState('afastamentos');
-
-  const filtered = tab === 'todos' ? afastamentos : afastamentos.filter((a: any) => a.status === tab);
+  const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento();
+  
+  const [activeTab, setActiveTab] = useState('afastamentos');
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Dialog States
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDocOpen, setIsDocOpen] = useState(false);
+  const [selectedAfastamento, setSelectedAfastamento] = useState<any>(null);
 
   const stats = {
     total: afastamentos.length,
     ativos: afastamentos.filter((a: any) => a.status === 'ativo').length,
     pendentes: afastamentos.filter((a: any) => a.status === 'pendente').length,
-    finalizados: afastamentos.filter((a: any) => a.status === 'finalizado').length,
+    finalizados: afastamentos.filter((a: any) => a.status === 'finalizado' || a.status === 'concluido').length,
     diasTotais: afastamentos.reduce((sum: number, a: any) => sum + (a.dias_total || 0), 0),
   };
 
-  // === Prorrogações ===
-  const [openProrr, setOpenProrr] = useState(false);
-  const [prorrForm, setProrrForm] = useState({ afastamento_id: '', data_fim_anterior: '', data_fim_nova: '', dias_adicionais: '', motivo: '', data_pericia: '', numero_beneficio_novo: '' });
+  const filteredAfastamentos = afastamentos.filter((a: any) => 
+    a.colaborador?.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    a.cid?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    a.tipo?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const { data: prorrogacoes = [], isLoading: loadProrr } = useQuery({
-    queryKey: ['prorrogacoes-afastamento'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('prorrogacoes_afastamento' as any).select('*, afastamento:afastamentos(colaborador_id, tipo, data_inicio, colaborador:colaboradores(nome_completo))').order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!empresaAtual?.id,
-  });
+  const handleEdit = (af: any) => {
+    setSelectedAfastamento(af);
+    setIsFormOpen(true);
+  };
 
-  const criarProrrogacao = useMutation({
-    mutationFn: async (d: typeof prorrForm) => {
-      const { error } = await supabase.from('prorrogacoes_afastamento' as any).insert({
-        afastamento_id: d.afastamento_id,
-        data_fim_anterior: d.data_fim_anterior,
-        data_fim_nova: d.data_fim_nova,
-        dias_adicionais: Number(d.dias_adicionais),
-        motivo: d.motivo || null,
-        data_pericia: d.data_pericia || null,
-        numero_beneficio_novo: d.numero_beneficio_novo || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['prorrogacoes-afastamento'] }); setOpenProrr(false); setProrrForm({ afastamento_id: '', data_fim_anterior: '', data_fim_nova: '', dias_adicionais: '', motivo: '', data_pericia: '', numero_beneficio_novo: '' }); toast.success('Prorrogação registrada'); },
-    onError: () => toast.error('Erro ao registrar prorrogação'),
-  });
+  const handleDocuments = (af: any) => {
+    setSelectedAfastamento(af);
+    setIsDocOpen(true);
+  };
 
-  const afastamentosAtivos = afastamentos.filter((a: any) => a.status === 'ativo' || a.status === 'aprovado');
-
-  const handleSelectAfastamento = (id: string) => {
-    const af = afastamentos.find((a: any) => a.id === id);
-    setProrrForm(p => ({ ...p, afastamento_id: id, data_fim_anterior: af?.data_fim_prevista || '' }));
+  const handleNew = () => {
+    setSelectedAfastamento(null);
+    setIsFormOpen(true);
   };
 
   return (
-    <>
-    <PageTitle title="Afastamentos" description="Controle de afastamentos de colaboradores" />
     <PageLayout
-      title="Afastamentos"
-      description="Controle completo de afastamentos, licenças e prorrogações"
-      icon={<Heart className="h-5 w-5 text-primary-foreground" />}
-      gradient="from-destructive to-warning"
+      title="Gestão de Afastamentos"
+      description="Controle integral de licenças, atestados e encaminhamentos ao INSS"
+      icon={<Heart className="h-5 w-5 text-white" />}
+      gradient="from-red-500 to-orange-500"
       actions={
-        <Button className="rounded-xl bg-gradient-to-r from-destructive to-warning hover:opacity-90 shadow-lg font-body">
-          <Plus className="h-4 w-4 mr-2" />Novo Afastamento
+        <Button 
+          onClick={handleNew}
+          className="rounded-xl bg-gradient-to-r from-red-600 to-orange-600 hover:opacity-90 shadow-md font-medium"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Novo Afastamento
         </Button>
       }
     >
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        {[
-          { label: 'Total', value: stats.total, icon: Activity, color: 'text-foreground' },
-          { label: 'Ativos', value: stats.ativos, icon: AlertTriangle, color: 'text-warning' },
-          { label: 'Pendentes', value: stats.pendentes, icon: Clock, color: 'text-info' },
-          { label: 'Finalizados', value: stats.finalizados, icon: Heart, color: 'text-success' },
-          { label: 'Dias Totais', value: stats.diasTotais, icon: Calendar, color: 'text-destructive' },
-        ].map((kpi, i) => (
-          <motion.div key={kpi.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl">
-              <CardContent className="pt-4 text-center">
-                <kpi.icon className={`h-5 w-5 mx-auto mb-1 ${kpi.color}`} />
-                <p className={`text-2xl font-display font-bold ${kpi.color}`}>{kpi.value}</p>
-                <p className="text-xs text-muted-foreground font-body">{kpi.label}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+      <AfastamentoStats stats={stats} />
 
-      <Tabs value={mainTab} onValueChange={setMainTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="afastamentos">Afastamentos</TabsTrigger>
-          <TabsTrigger value="prorrogacoes">Prorrogações</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <TabsList className="bg-muted/50 p-1">
+            <TabsTrigger value="afastamentos" className="rounded-lg">Afastamentos</TabsTrigger>
+            <TabsTrigger value="prorrogacoes" className="rounded-lg">Prorrogações</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="afastamentos">
-          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
-            <div className="h-[2px] bg-gradient-to-r from-destructive to-warning" />
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <CardTitle className="font-display">Registros de Afastamento</CardTitle>
-                <Tabs value={tab} onValueChange={setTab}>
-                  <TabsList className="h-8">
-                    <TabsTrigger value="todos" className="text-xs px-2 h-6">Todos</TabsTrigger>
-                    <TabsTrigger value="ativo" className="text-xs px-2 h-6">Ativos</TabsTrigger>
-                    <TabsTrigger value="pendente" className="text-xs px-2 h-6">Pendentes</TabsTrigger>
-                    <TabsTrigger value="finalizado" className="text-xs px-2 h-6">Finalizados</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Buscar por colaborador, CID..." 
+                className="pl-9 bg-card shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="icon" className="shadow-sm">
+              <Filter className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="shadow-sm">
+              <Download className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <TabsContent value="afastamentos" className="mt-0">
+          {isLoading ? (
+            <div className="flex justify-center p-12"><Spinner size="lg" /></div>
+          ) : filteredAfastamentos.length === 0 ? (
+            <EmptyList entityName="afastamento" />
+          ) : (
+            <AfastamentoTable 
+              data={filteredAfastamentos} 
+              onEdit={handleEdit}
+              onDocuments={handleDocuments}
+              onProrrogacao={(af) => {
+                // To be implemented or handled in edit/specific tab
+                setSelectedAfastamento(af);
+                setIsFormOpen(true);
+              }}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="prorrogacoes" className="mt-0">
+          <Card className="border border-border/50 shadow-sm rounded-xl overflow-hidden">
+            <CardHeader className="bg-muted/30 pb-4">
+              <CardTitle className="text-lg font-display">Histórico de Prorrogações</CardTitle>
             </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="flex justify-center p-8"><Spinner size="lg" /></div>
-              ) : filtered.length === 0 ? (
-                <EmptyList entityName="afastamento" />
+            <CardContent className="p-0">
+              {loadProrr ? (
+                <div className="p-12 flex justify-center"><Spinner /></div>
+              ) : prorrogacoes.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">Nenhuma prorrogação registrada.</div>
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/30">
-                      <TableHead className="font-display font-semibold">Colaborador</TableHead>
-                      <TableHead className="font-display font-semibold">Tipo</TableHead>
-                      <TableHead className="font-display font-semibold">Início</TableHead>
-                      <TableHead className="font-display font-semibold">Fim Previsto</TableHead>
-                      <TableHead className="font-display font-semibold">Dias</TableHead>
-                      <TableHead className="font-display font-semibold">CID</TableHead>
-                      <TableHead className="font-display font-semibold">Status</TableHead>
+                    <TableRow>
+                      <TableHead>Colaborador</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Fim Anterior</TableHead>
+                      <TableHead>Novo Fim</TableHead>
+                      <TableHead className="text-center">Dias Extras</TableHead>
+                      <TableHead>Data</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.map((a: any) => (
-                      <TableRow key={a.id} className="hover:bg-accent/30 transition-colors">
-                        <TableCell className="font-body font-medium">{a.colaborador?.nome_completo || '—'}</TableCell>
-                        <TableCell className="font-body text-sm">
-                          <Badge variant="outline" className="text-xs">{tipoLabels[a.tipo] || a.tipo}</Badge>
-                        </TableCell>
-                        <TableCell className="font-body text-sm">{new Date(a.data_inicio).toLocaleDateString('pt-BR')}</TableCell>
-                        <TableCell className="font-body text-sm">{new Date(a.data_fim_prevista).toLocaleDateString('pt-BR')}</TableCell>
-                        <TableCell className="font-body text-sm font-medium">{a.dias_total || '—'}</TableCell>
-                        <TableCell className="font-body text-sm">{a.cid || '—'}</TableCell>
+                    {prorrogacoes.map((p: any) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-medium">{(p as any).afastamento?.colaborador?.nome_completo || '-'}</TableCell>
                         <TableCell>
-                          <Badge className={`text-xs ${statusColors[a.status] || 'bg-muted text-muted-foreground border-0'}`}>
-                            {a.status || '—'}
+                          <Badge variant="secondary" className="font-normal">
+                            {tipoLabels[(p as any).afastamento?.tipo] || (p as any).afastamento?.tipo || '-'}
                           </Badge>
+                        </TableCell>
+                        <TableCell>{p.data_fim_anterior ? format(new Date(p.data_fim_anterior), 'dd/MM/yyyy') : '-'}</TableCell>
+                        <TableCell className="font-semibold text-primary">{p.data_fim_nova ? format(new Date(p.data_fim_nova), 'dd/MM/yyyy') : '-'}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="outline" className="text-orange-600 bg-orange-50 border-orange-200">
+                            +{p.dias_adicionais}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {format(new Date(p.created_at), 'dd/MM/yyyy')}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -189,58 +174,40 @@ export default function AfastamentosPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="prorrogacoes">
-          <div className="flex justify-end mb-4">
-            <Dialog open={openProrr} onOpenChange={setOpenProrr}>
-              <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />Nova Prorrogação</Button></DialogTrigger>
-              <DialogContent>
-                <DialogHeader><DialogTitle>Registrar Prorrogação de Afastamento</DialogTitle></DialogHeader>
-                <div className="space-y-4">
-                  <div><Label>Afastamento</Label>
-                    <Select value={prorrForm.afastamento_id} onValueChange={handleSelectAfastamento}>
-                      <SelectTrigger><SelectValue placeholder="Selecione o afastamento" /></SelectTrigger>
-                      <SelectContent>{afastamentosAtivos.map((a: any) => <SelectItem key={a.id} value={a.id}>{a.colaborador?.nome_completo || 'N/A'} — {tipoLabels[a.tipo] || a.tipo} ({new Date(a.data_inicio).toLocaleDateString('pt-BR')})</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div><Label>Fim Anterior</Label><Input type="date" value={prorrForm.data_fim_anterior} onChange={e => setProrrForm(p => ({ ...p, data_fim_anterior: e.target.value }))} /></div>
-                    <div><Label>Novo Fim</Label><Input type="date" value={prorrForm.data_fim_nova} onChange={e => setProrrForm(p => ({ ...p, data_fim_nova: e.target.value }))} /></div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div><Label>Dias Adicionais</Label><Input type="number" value={prorrForm.dias_adicionais} onChange={e => setProrrForm(p => ({ ...p, dias_adicionais: e.target.value }))} /></div>
-                    <div><Label>Data Perícia</Label><Input type="date" value={prorrForm.data_pericia} onChange={e => setProrrForm(p => ({ ...p, data_pericia: e.target.value }))} /></div>
-                  </div>
-                  <div><Label>Nº Benefício Novo</Label><Input value={prorrForm.numero_beneficio_novo} onChange={e => setProrrForm(p => ({ ...p, numero_beneficio_novo: e.target.value }))} /></div>
-                  <div><Label>Motivo</Label><Textarea value={prorrForm.motivo} onChange={e => setProrrForm(p => ({ ...p, motivo: e.target.value }))} /></div>
-                  <Button onClick={() => criarProrrogacao.mutate(prorrForm)} disabled={!prorrForm.afastamento_id || !prorrForm.dias_adicionais || criarProrrogacao.isPending} className="w-full">{criarProrrogacao.isPending ? 'Salvando...' : 'Registrar Prorrogação'}</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <Card><CardContent className="p-0">
-            {loadProrr ? <div className="p-8 flex justify-center"><Spinner /></div> : (
-              <Table>
-                <TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Tipo Afastamento</TableHead><TableHead>Fim Anterior</TableHead><TableHead>Novo Fim</TableHead><TableHead>Dias Adicionais</TableHead><TableHead>Motivo</TableHead></TableRow></TableHeader>
-                <TableBody>
-                  {prorrogacoes.map((p: any) => (
-                    <TableRow key={p.id}>
-                      <TableCell className="font-medium">{(p as any).afastamento?.colaborador?.nome_completo || '-'}</TableCell>
-                      <TableCell>{tipoLabels[(p as any).afastamento?.tipo] || (p as any).afastamento?.tipo || '-'}</TableCell>
-                      <TableCell>{p.data_fim_anterior ? new Date(p.data_fim_anterior).toLocaleDateString('pt-BR') : '-'}</TableCell>
-                      <TableCell>{p.data_fim_nova ? new Date(p.data_fim_nova).toLocaleDateString('pt-BR') : '-'}</TableCell>
-                      <TableCell className="font-medium">{p.dias_adicionais}</TableCell>
-                      <TableCell className="max-w-xs truncate">{p.motivo || '-'}</TableCell>
-                    </TableRow>
-                  ))}
-                  {prorrogacoes.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhuma prorrogação registrada</TableCell></TableRow>}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent></Card>
-        </TabsContent>
       </Tabs>
+
+      {/* Form Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedAfastamento ? 'Editar Afastamento' : 'Novo Registro de Afastamento'}
+            </DialogTitle>
+          </DialogHeader>
+          <AfastamentoForm 
+            initialData={selectedAfastamento} 
+            onSuccess={() => {
+              setIsFormOpen(false);
+              setSelectedAfastamento(null);
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Documents Dialog */}
+      <Dialog open={isDocOpen} onOpenChange={setIsDocOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Documentos e Anexos</DialogTitle>
+            <div className="text-sm text-muted-foreground">
+              Afastamento de: {selectedAfastamento?.colaborador?.nome_completo}
+            </div>
+          </DialogHeader>
+          {selectedAfastamento && (
+            <AfastamentoDocumentManager afastamentoId={selectedAfastamento.id} />
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout>
-    </>
   );
 }
