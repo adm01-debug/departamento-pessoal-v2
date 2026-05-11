@@ -25,10 +25,16 @@ const statusColors: Record<string, string> = {
 
 const tipoLabels: Record<string, string> = {
   doenca: 'Doença',
-  acidente_trabalho: 'Acidente Trab.',
-  maternidade: 'Maternidade',
-  paternidade: 'Paternidade',
-  auxilio_doenca: 'Auxílio Doença',
+  acidente_trabalho: 'Acidente Trabalho',
+  acidente_trajeto: 'Acidente Trajeto',
+  licenca_maternidade: 'L. Maternidade',
+  licenca_paternidade: 'L. Paternidade',
+  licenca_casamento: 'L. Casamento',
+  licenca_obito: 'L. Óbito',
+  licenca_nao_remunerada: 'L. Não Remunerada',
+  servico_militar: 'Serviço Militar',
+  mandato_sindical: 'Mandato Sindical',
+  suspensao_disciplinar: 'Suspensão Disc.',
   outros: 'Outros',
 };
 
