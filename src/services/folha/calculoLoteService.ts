@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { folhaCalc } from '@/utils/folhaCalc';
 import { toast } from 'sonner';
+import { pontoIntegracaoUtils } from '@/utils/folha/pontoIntegracaoUtils';
 
 export interface BatchProgress {
   total: number;
@@ -19,6 +20,10 @@ export const calculoLoteService = {
     onProgress?: (progress: BatchProgress) => void
   ) => {
     try {
+      const [ano, mes] = competencia.split('-');
+      const dataInicio = `${ano}-${mes}-01`;
+      const dataFim = `${ano}-${mes}-31`; // Simplificado para busca
+
       // 1. Buscar colaboradores ativos da empresa
       const { data: colaboradores, error: colabError } = await (supabase as any)
         .from('colaboradores')
@@ -79,9 +84,30 @@ export const calculoLoteService = {
           const dependentesCount = colab.dependentes?.length || 0;
           const eventosVariaveis = colab.eventos_variaveis || [];
 
+          // 3.1 Integrar dados de PONTO ELETRÔNICO (Horas Extras e Faltas Aprovadas)
+          const { data: registrosPonto } = await (supabase as any)
+            .from('registros_ponto')
+            .select('horas_extras, horas_falta')
+            .eq('colaborador_id', colab.id)
+            .eq('aprovado', true)
+            .gte('data', dataInicio)
+            .lte('data', dataFim);
+          
+          let totalHE = 0;
+          let totalFaltas = 0;
+          
+          if (registrosPonto) {
+            registrosPonto.forEach((r: any) => {
+              totalHE += pontoIntegracaoUtils.intervalToDecimal(r.horas_extras);
+              totalFaltas += pontoIntegracaoUtils.intervalToDecimal(r.horas_falta);
+            });
+          }
+
           const res = folhaCalc.processar(Number(colab.salario_base || 0), {
             dependentes: dependentesCount,
-            eventos: eventosVariaveis
+            eventos: eventosVariaveis,
+            horasExtras50: totalHE, // Assumindo 50% por padrão na integração automática
+            horasFalta: totalFaltas
           });
 
           // Salva o item da folha
@@ -107,7 +133,7 @@ export const calculoLoteService = {
             folha_id: folhaId,
             colaborador_id: colab.id,
             tipo_evento: 'calculo_mensal',
-            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}`,
+            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}. Integração Ponto: ${res.horasExtras?.toFixed(1)}h extras, ${res.horasFalta?.toFixed(1)}h faltas.`,
             severidade: 'info',
             detalhes: { 
               timestamp: new Date().toISOString(), 

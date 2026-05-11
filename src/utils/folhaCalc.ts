@@ -78,6 +78,7 @@ export const folhaCalc = {
       meses13?: number;
       parcela13?: 1 | 2;
       jornada?: number;
+      horasFalta?: number;
       eventos?: Array<{ codigo: string; descricao: string; tipo: 'provento' | 'desconto'; valor: number }>;
     } = {}
   ): CalculoResultado => {
@@ -90,6 +91,7 @@ export const folhaCalc = {
       meses13 = 0,
       parcela13,
       jornada = 220,
+      horasFalta = 0,
       eventos = []
     } = params;
 
@@ -123,6 +125,17 @@ export const folhaCalc = {
       });
     }
 
+    // Faltas e Atrasos (Reduzem a base de cálculo)
+    const valorFaltas = (salarioBase / jornada) * horasFalta;
+    if (valorFaltas > 0) {
+      detalheEventos.push({ 
+        codigo: '5005', 
+        descricao: 'Faltas e Atrasos', 
+        tipo: 'desconto', 
+        valor: Math.round(valorFaltas * 100) / 100 
+      });
+    }
+
     // Eventos Adicionais
     eventos.forEach(ev => {
       detalheEventos.push(ev);
@@ -132,13 +145,16 @@ export const folhaCalc = {
       .filter(e => e.tipo === 'provento')
       .reduce((acc, curr) => acc + curr.valor, 0);
 
-    const { valor: inss, faixa: faixaInss } = folhaCalc.calcularINSS(proventos);
+    // Base de cálculo para INSS/FGTS/IRRF (Proventos - Faltas)
+    const baseTributavel = Math.max(0, proventos - valorFaltas);
+
+    const { valor: inss, faixa: faixaInss } = folhaCalc.calcularINSS(baseTributavel);
     detalheEventos.push({ codigo: '5000', descricao: 'Desconto INSS', tipo: 'desconto', valor: inss });
 
-    const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(proventos, inss, dependentes);
+    const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(baseTributavel, inss, dependentes);
     if (irrf > 0) detalheEventos.push({ codigo: '5001', descricao: 'Desconto IRRF', tipo: 'desconto', valor: irrf });
 
-    const fgts = folhaCalc.calcularFGTS(proventos);
+    const fgts = folhaCalc.calcularFGTS(baseTributavel);
     
     const descontos = detalheEventos
       .filter(e => e.tipo === 'desconto')
