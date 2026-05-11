@@ -136,29 +136,39 @@ export default function ColaboradorFormPage() {
 
   return (
     <>
-      <PageTitle title={isEditing ? 'Editar Colaborador' : 'Novo Colaborador'} />
-      <PageLayout
-        title={isEditing ? colaborador?.nome_completo : 'Novo Colaborador'}
-        description={isEditing ? `Editando registro de ${colaborador?.cargo}` : 'Preencha os dados do novo integrante da equipe'}
-        icon={<User className="h-5 w-5 text-primary-foreground" />}
-        gradient="from-primary to-primary-glow"
-        actions={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => navigate('/colaboradores')}>
-              <ArrowLeft className="h-4 w-4 mr-1.5" /> Voltar
+  return (
+    <div className="space-y-6 max-w-[1200px] mx-auto pb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={() => navigate('/colaboradores')}>
+              <ArrowLeft className="h-4 w-4" />
             </Button>
-            <Button 
-              size="sm" 
-              className="rounded-xl bg-gradient-to-r from-primary to-primary-glow shadow-glow"
-              onClick={handleSubmit((data) => mutation.mutate(data))}
-              disabled={mutation.isPending}
-            >
-              {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Save className="h-4 w-4 mr-1.5" />}
-              {isEditing ? 'Salvar Alterações' : 'Cadastrar Colaborador'}
-            </Button>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              Gestão de Talentos
+            </span>
           </div>
-        }
-      >
+          <h1 className="text-display font-display font-bold tracking-tight">
+            {isEditing ? colaborador?.nome_completo : 'Novo Colaborador'}
+          </h1>
+          <p className="text-body text-muted-foreground font-body mt-1">
+            {isEditing ? `Perfil profissional · Matrícula ${colaborador?.matricula || 'N/A'}` : 'Cadastre as informações essenciais para a integração do novo talento'}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="h-11 rounded-xl px-4 shadow-sm bg-card/50" onClick={() => navigate('/colaboradores')}>
+            Cancelar
+          </Button>
+          <Button 
+            className="h-11 rounded-xl px-6 gap-2 bg-primary text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
+            onClick={handleSubmit((data) => mutation.mutate(data))}
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            <span>{isEditing ? 'Salvar Alterações' : 'Cadastrar agora'}</span>
+          </Button>
+        </div>
+      </div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 w-full justify-start overflow-x-auto no-scrollbar">
             {tabs.map(tab => (
