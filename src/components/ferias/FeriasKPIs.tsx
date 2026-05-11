@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, CheckCircle, DollarSign, AlertTriangle, TrendingUp } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 interface FeriasStats {
   total: number;
@@ -13,40 +14,40 @@ interface FeriasStats {
 }
 
 const kpiConfig = [
-  { key: 'total', label: 'Total', icon: Calendar, color: 'text-primary', bgColor: 'bg-primary/10', tooltip: 'Total de solicitações de férias no período' },
-  { key: 'pendentes', label: 'Pendentes', icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', tooltip: 'Aguardando aprovação no workflow' },
-  { key: 'aprovadas', label: 'Aprovadas', icon: CheckCircle, color: 'text-success', bgColor: 'bg-success/10', tooltip: 'Aprovadas pelo RH ou gestor' },
-  { key: 'emGozo', label: 'Em Gozo', icon: TrendingUp, color: 'text-info', bgColor: 'bg-info/10', tooltip: 'Colaboradores atualmente em férias' },
-  { key: 'abonoPecuniario', label: 'Abono Pecuniário', icon: DollarSign, color: 'text-accent-foreground', bgColor: 'bg-accent/50', tooltip: 'Solicitações com venda de até 1/3 das férias' },
-  { key: 'vencidas', label: 'Vencidas', icon: AlertTriangle, color: 'text-destructive', bgColor: 'bg-destructive/10', tooltip: 'Períodos concessivos vencidos — ação urgente' },
+  { key: 'total', label: 'Total', icon: Calendar, color: 'text-primary', bgColor: 'bg-primary/5', tooltip: 'Total de solicitações de férias no período' },
+  { key: 'pendentes', label: 'Pendentes', icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/5', tooltip: 'Aguardando aprovação no workflow' },
+  { key: 'aprovadas', label: 'Aprovadas', icon: CheckCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/5', tooltip: 'Aprovadas pelo RH ou gestor' },
+  { key: 'emGozo', label: 'Em Gozo', icon: TrendingUp, color: 'text-sky-500', bgColor: 'bg-sky-500/5', tooltip: 'Colaboradores atualmente em férias' },
+  { key: 'abonoPecuniario', label: 'Abono', icon: DollarSign, color: 'text-purple-500', bgColor: 'bg-purple-500/5', tooltip: 'Solicitações com venda de até 1/3 das férias' },
+  { key: 'vencidas', label: 'Vencidas', icon: AlertTriangle, color: 'text-rose-500', bgColor: 'bg-rose-500/5', tooltip: 'Períodos concessivos vencidos — ação urgente' },
 ] as const;
 
 export function FeriasKPIs({ stats }: { stats: FeriasStats }) {
   return (
     <TooltipProvider>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {kpiConfig.map(({ key, label, icon: Icon, color, bgColor, tooltip }, i) => (
           <motion.div
             key={key}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04, duration: 0.3 }}
+            transition={{ delay: i * 0.05, duration: 0.4 }}
           >
             <Tooltip>
               <TooltipTrigger asChild>
-                <Card className="border border-border/30 shadow-elevated rounded-2xl hover:shadow-lg transition-shadow cursor-default">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className={`p-2 rounded-xl ${bgColor}`}>
-                      <Icon className={`h-4 w-4 ${color}`} />
+                <Card className="group border border-border/40 shadow-sm rounded-2xl hover:shadow-md hover:border-primary/20 transition-all duration-300 cursor-default overflow-hidden">
+                  <CardContent className="p-5 flex flex-col items-center text-center gap-3">
+                    <div className={cn("p-3 rounded-2xl transition-transform duration-300 group-hover:scale-110", bgColor)}>
+                      <Icon className={cn("h-5 w-5", color)} />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-2xl font-display font-bold leading-none">{stats[key as keyof FeriasStats]}</p>
-                      <p className="text-[11px] text-muted-foreground font-body truncate mt-0.5">{label}</p>
+                    <div className="space-y-1">
+                      <p className="text-2xl font-display font-bold tracking-tight">{stats[key as keyof FeriasStats]}</p>
+                      <p className="text-[10px] text-muted-foreground font-display uppercase tracking-widest">{label}</p>
                     </div>
                   </CardContent>
                 </Card>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><p className="text-xs max-w-[200px]">{tooltip}</p></TooltipContent>
+              <TooltipContent side="bottom" className="bg-popover/95 backdrop-blur-sm border-border/40"><p className="text-xs font-body max-w-[180px]">{tooltip}</p></TooltipContent>
             </Tooltip>
           </motion.div>
         ))}
