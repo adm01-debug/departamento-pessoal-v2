@@ -62,7 +62,7 @@ export const feriasPDF = {
     
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text(`Período: Últimos 6 meses | Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 28, { align: 'center' });
+    doc.text(`Período: ${stats.periodoLabel || 'Últimos 6 meses'} | Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 28, { align: 'center' });
 
     // KPIs Summary
     autoTable(doc, {

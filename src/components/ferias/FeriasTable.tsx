@@ -10,6 +10,7 @@ import { FeriasAuditTimeline } from './FeriasAuditTimeline';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts';
 
 interface FeriasTableProps {
   data: Record<string, any>[];
@@ -21,6 +22,9 @@ interface FeriasTableProps {
 }
 
 export function FeriasTable({ data, ...actions }: FeriasTableProps) {
+  const { isAdmin, hasRole } = useAuth();
+  const podeVerAuditoria = isAdmin || hasRole('moderator');
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -82,23 +86,27 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
                 )}
               </TableCell>
               <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-body rounded-lg hover:bg-primary/10 hover:text-primary">
-                      <History className="h-3.5 w-3.5" /> Ver Trilha
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md rounded-2xl">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2 font-display">
-                        <History className="h-5 w-5 text-primary" /> Trilha de Auditoria
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <FeriasAuditTimeline solicitacaoId={s.id} />
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                {podeVerAuditoria ? (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-body rounded-lg hover:bg-primary/10 hover:text-primary">
+                        <History className="h-3.5 w-3.5" /> Ver Trilha
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md rounded-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 font-display">
+                          <History className="h-5 w-5 text-primary" /> Trilha de Auditoria
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <FeriasAuditTimeline solicitacaoId={s.id} />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground italic">Acesso restrito</span>
+                )}
               </TableCell>
               <TableCell>
                 <FeriasWorkflowStepper solicitacao={s} />

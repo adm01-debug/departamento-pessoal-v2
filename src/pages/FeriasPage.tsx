@@ -6,11 +6,12 @@ import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
 import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/components/ferias';
+import { FeriasRelatorioDialog } from '@/components/ferias/FeriasRelatorioDialog';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -34,21 +35,25 @@ const statusOptions = [
 ];
 
 export default function FeriasPage() {
+  const { empresaAtual } = useEmpresas();
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const limit = 10;
   const [openCalc, setOpenCalc] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
   const [calcResult, setCalcResult] = useState<any>(null);
+  const queryClient = useQueryClient();
   
-  const { ferias, totalCount, isLoading } = useFerias({ 
+  const { ferias, totalCount, isLoading, refetch } = useFerias({ 
     page, 
     limit, 
     search: search.length >= 3 ? search : undefined, 
     status: statusFilter 
   });
+
   const { 
     aprovarGestor, 
     aprovarRH, 
@@ -56,6 +61,23 @@ export default function FeriasPage() {
     rejeitar, 
     cancelar 
   } = useFeriasAprovacao();
+
+  const handleSync = async () => {
+    if (!empresaAtual?.id) return;
+    setSyncLoading(true);
+    try {
+      const { feriasService } = await import('@/services');
+      const result = await feriasService.syncWithHub(empresaAtual.id);
+      if (result.success) {
+        await refetch();
+        toast.success('Sincronização concluída com o hub unificado');
+      }
+    } catch (err) {
+      toast.error('Falha ao sincronizar dados');
+    } finally {
+      setSyncLoading(false);
+    }
+  };
 
   const handleCalcFerias = async () => {
     setCalcLoading(true);
@@ -109,10 +131,13 @@ export default function FeriasPage() {
             size="sm" 
             variant="outline" 
             className="rounded-xl gap-1.5 font-body"
-            onClick={() => feriasPDF.gerarRelatorioKPIs(stats, ferias)}
+            onClick={handleSync}
+            disabled={syncLoading}
           >
-            <FileDown className="h-4 w-4" /> Relatório PDF
+            {syncLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Sincronizar
           </Button>
+          <FeriasRelatorioDialog stats={stats} data={ferias} />
           <Dialog open={openCalc} onOpenChange={setOpenCalc}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
@@ -192,14 +217,21 @@ export default function FeriasPage() {
             <EmptyList entityName="solicitação de férias" />
           ) : (
             <>
-              <FeriasTable
-                data={ferias}
-              onAprovarGestor={(id) => aprovarGestor(id)}
-              onAprovarRH={(id) => aprovarRH(id)}
-              onEnviarContabilidade={(id) => enviarContabilidade(id)}
-              onRejeitar={(id) => rejeitar(id)}
-              onCancelar={(id) => cancelar(id)}
-              />
+              <div className="relative">
+                {isLoading && ferias.length > 0 && (
+                  <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-2xl">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                )}
+                <FeriasTable
+                  data={ferias}
+                  onAprovarGestor={(id) => aprovarGestor(id)}
+                  onAprovarRH={(id) => aprovarRH(id)}
+                  onEnviarContabilidade={(id) => enviarContabilidade(id)}
+                  onRejeitar={(id) => rejeitar(id)}
+                  onCancelar={(id) => cancelar(id)}
+                />
+              </div>
               <div className="flex items-center justify-between mt-4">
                 <p className="text-xs text-muted-foreground">Mostrando {ferias.length} de {totalCount} solicitações</p>
                 <div className="flex gap-2">

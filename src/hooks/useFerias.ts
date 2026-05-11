@@ -12,6 +12,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
     queryKey: ['ferias', empresaId, params],
     queryFn: () => feriasService.listSolicitacoes(empresaId, params),
     enabled: !!empresaId,
+    placeholderData: (previousData) => previousData,
   });
 
   const createMutation = useMutation({
