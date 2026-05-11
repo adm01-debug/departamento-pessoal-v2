@@ -115,26 +115,28 @@ export function FeriasDashboard({ data }: FeriasDashboardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {!proximos.length ? (
-              <p className="text-center py-6 text-muted-foreground font-body">Nenhuma férias aprovada para o futuro próximo.</p>
+              <p className="text-center py-12 text-muted-foreground font-body col-span-full border-2 border-dashed border-border/20 rounded-2xl">Nenhuma férias aprovada para o futuro próximo.</p>
             ) : (
               proximos.map(f => (
-                <div key={f.id} className="flex items-center justify-between p-3 rounded-xl border border-border/20 hover:bg-muted/10 transition-colors">
+                <div key={f.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/30 bg-background hover:border-primary/30 hover:shadow-md transition-all group">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <User className="h-4 w-4" />
+                    <div className="h-10 w-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                      <User className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold font-display">{f.colaborador?.nome_completo}</p>
-                      <p className="text-xs text-muted-foreground font-body">
-                        {format(new Date(f.data_inicio), 'dd/MM/yyyy')} a {format(new Date(f.data_fim), 'dd/MM/yyyy')}
+                      <p className="text-sm font-bold font-display group-hover:text-primary transition-colors">{f.colaborador?.nome_completo}</p>
+                      <p className="text-[11px] text-muted-foreground font-body">
+                        {format(new Date(f.data_inicio), 'dd/MM/yyyy')} — {format(new Date(f.data_fim), 'dd/MM/yyyy')}
                       </p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
-                    {f.dias_ferias} dias
-                  </Badge>
+                  <div className="text-right">
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-bold px-2 py-0.5 rounded-lg text-xs">
+                      {f.dias_ferias}d
+                    </Badge>
+                  </div>
                 </div>
               ))
             )}
