@@ -63,13 +63,17 @@ export default function AfastamentosPage() {
 
   const filteredAfastamentos = afastamentos.filter((a: any) => {
     const matchSearch = 
-      a.colaborador?.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.cid?.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.cid?.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
+      !searchTerm || a.colaborador?.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchCID = 
+      !filtros.cid || 
+      a.cid?.codigo?.toLowerCase().includes(filtros.cid.toLowerCase()) ||
+      a.cid?.descricao?.toLowerCase().includes(filtros.cid.toLowerCase());
     
     const matchTipo = !selectedTipo || a.tipo === selectedTipo;
+    const matchStatus = !filtros.status || a.status === filtros.status;
     
-    return matchSearch && matchTipo;
+    return matchSearch && matchCID && matchTipo && matchStatus;
   });
 
   const handleEdit = (af: any) => {
@@ -116,39 +120,55 @@ export default function AfastamentosPage() {
             <TabsTrigger value="prorrogacoes" className="rounded-lg">Prorrogações</TabsTrigger>
           </TabsList>
 
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-1 min-w-[200px] md:w-64">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Buscar por colaborador ou CID..." 
-                className="pl-9 bg-card shadow-sm"
+                placeholder="Buscar por colaborador..." 
+                className="pl-9 bg-card shadow-sm border-primary/20 focus:border-primary transition-all"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            
+            <div className="relative flex-1 min-w-[150px] md:w-48">
+              <div className="absolute left-3 top-2.5 h-4 w-4 text-primary/60">
+                <FileText className="h-4 w-4" />
+              </div>
+              <Input 
+                placeholder="Filtrar por CID-10..." 
+                className="pl-9 bg-card shadow-sm border-orange-200 focus:border-orange-500"
+                value={filtros.cid || ''}
+                onChange={(e) => setFeltros({ ...filtros, cid: e.target.value })}
+              />
+            </div>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="shadow-sm">
-                  <Filter className="h-4 w-4" />
+                <Button variant="outline" className="shadow-sm border-muted-foreground/20 hover:bg-accent">
+                  <Filter className="h-4 w-4 mr-2" />
+                  {selectedTipo ? tipoLabels[selectedTipo] : 'Filtrar Tipo'}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Filtrar por Status</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-56 p-2">
+                <DropdownMenuLabel className="text-xs uppercase text-muted-foreground font-bold">Status do Afastamento</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: null })}>Todos Status</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'ativo' })}>Ativos</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'finalizado' })}>Finalizados</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })}>Pendentes</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'ativo' })} className="text-green-600">Ativos</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'finalizado' })} className="text-blue-600">Finalizados</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })} className="text-orange-600">Pendentes</DropdownMenuItem>
                 
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Filtrar por Tipo</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-xs uppercase text-muted-foreground font-bold">Tipo de Licença</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSelectedTipo(null)}>Todos Tipos</DropdownMenuItem>
-                {Object.entries(tipoLabels).map(([key, label]) => (
-                  <DropdownMenuItem key={key} onClick={() => setSelectedTipo(key)}>
-                    {label}
-                  </DropdownMenuItem>
-                ))}
+                <ScrollArea className="h-48">
+                  {Object.entries(tipoLabels).map(([key, label]) => (
+                    <DropdownMenuItem key={key} onClick={() => setSelectedTipo(key)} className="text-xs">
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </ScrollArea>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
