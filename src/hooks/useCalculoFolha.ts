@@ -80,10 +80,10 @@ export function useCalculoFolha() {
       await supabase.from('folha_auditoria').insert({
         folha_id: folhaId,
         colaborador_id: colaboradorId,
-        tipo_evento: 'calculo_manual_individual',
+        tipo_evento: 'CALCULO',
         mensagem: 'Cálculo manual realizado',
-        severidade: 'info',
-        detalhes: { valor_liquido: res.liquido } as any
+        severidade: 'INFO',
+        detalhes: { valor_liquido: res.liquido, manual: true } as any
       });
 
       return data;

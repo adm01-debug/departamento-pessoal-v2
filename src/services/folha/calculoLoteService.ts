@@ -132,9 +132,9 @@ export const calculoLoteService = {
           await (supabase as any).from('folha_auditoria').insert({
             folha_id: folhaId,
             colaborador_id: colab.id,
-            tipo_evento: 'calculo_mensal',
+            tipo_evento: 'CALCULO',
             mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}. Integração Ponto: ${res.horasExtras?.toFixed(1)}h extras, ${res.horasFalta?.toFixed(1)}h faltas.`,
-            severidade: 'info',
+            severidade: 'INFO',
             detalhes: { 
               timestamp: new Date().toISOString(), 
               liquido: res.liquido,
@@ -152,9 +152,9 @@ export const calculoLoteService = {
           await (supabase as any).from('folha_auditoria').insert({
             folha_id: folhaId,
             colaborador_id: colab.id,
-            tipo_evento: 'calculo_mensal',
+            tipo_evento: 'CALCULO',
             mensagem: `Erro ao processar ${colab.nome_completo}: ${err.message}`,
-            severidade: 'erro',
+            severidade: 'ERRO',
             detalhes: { error: err.message, stack: err.stack }
           });
 
@@ -168,9 +168,9 @@ export const calculoLoteService = {
       // 4. Registrar evento global de cálculo em lote
       await (supabase as any).from('folha_auditoria').insert({
         folha_id: folhaId,
-        tipo_evento: 'calculo_mensal',
+        tipo_evento: 'CALCULO',
         mensagem: `Processamento em lote finalizado para ${progress.total} colaboradores.`,
-        severidade: 'info',
+        severidade: 'INFO',
         detalhes: { progress, competencia }
       });
 
