@@ -33,12 +33,12 @@ const tipoLabels: Record<string, string> = {
 };
 
 export default function AfastamentosPage() {
-  const { afastamentos, isLoading } = useAfastamentos();
+  const { afastamentos, isLoading, filtros, setFeltros } = useAfastamentos();
   const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento();
   
   const [activeTab, setActiveTab] = useState('afastamentos');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Dialog States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDocOpen, setIsDocOpen] = useState(false);
@@ -184,7 +184,71 @@ export default function AfastamentosPage() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+            </TabsContent>
+          </div>
+
+          <div className="space-y-6">
+            <Card className="border border-border/50 shadow-sm rounded-xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                  Próximas Perícias / Eventos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {afastamentos.filter((a: any) => a.data_pericia || a.dias_inss > 0).length === 0 ? (
+                      <p className="text-xs text-muted-foreground text-center py-4">Sem eventos agendados.</p>
+                    ) : (
+                      afastamentos
+                        .filter((a: any) => a.data_pericia || a.dias_inss > 0)
+                        .map((af: any) => (
+                          <div key={af.id} className="relative pl-6 pb-4 border-l border-muted last:pb-0">
+                            <div className="absolute left-[-5px] top-1 h-2.5 w-2.5 rounded-full bg-primary" />
+                            <div className="space-y-1">
+                              <p className="text-xs font-bold truncate">{af.colaborador?.nome_completo}</p>
+                              {af.data_pericia ? (
+                                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+                                  <CalendarIcon className="h-3 w-3" />
+                                  <span>Perícia: {format(new Date(af.data_pericia), 'dd/MM/yyyy')}</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1.5 text-[10px] text-warning font-semibold">
+                                  <AlertCircle className="h-3 w-3" />
+                                  <span>Aguardando agendamento INSS</span>
+                                </div>
+                              )}
+                              <p className="text-[10px] text-muted-foreground italic">
+                                {af.local_pericia || 'Local não informado'}
+                              </p>
+                            </div>
+                            <Separator className="mt-3 opacity-50" />
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-border/50 shadow-sm rounded-xl bg-muted/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold">Resumo Mensal</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground font-medium">Total de Dias Pagos</span>
+                  <span className="font-bold">{afastamentos.reduce((acc, a) => acc + (a.dias_empresa || 0), 0)} d</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground font-medium">Impacto em Folha</span>
+                  <span className="text-destructive font-bold">R$ ---</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
