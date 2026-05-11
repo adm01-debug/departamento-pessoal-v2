@@ -268,33 +268,61 @@ export default function RecrutamentoPage() {
 
                 {/* CANDIDATOS */}
                 <TabsContent value="candidatos" className="mt-0">
-                   <Card className="rounded-2xl border-border/40 overflow-hidden">
+                   <Card className="rounded-3xl border-border/40 overflow-hidden shadow-sm">
                      <CardContent className="p-0">
                        <div className="overflow-x-auto">
                          <table className="w-full text-sm">
-                           <thead className="bg-muted/30 border-b">
-                             <tr>
-                               <th className="px-4 py-3 text-left font-medium">Nome</th>
-                               <th className="px-4 py-3 text-left font-medium">E-mail</th>
-                               <th className="px-4 py-3 text-left font-medium">Experiência</th>
-                               <th className="px-4 py-3 text-left font-medium">Pretensão</th>
-                               <th className="px-4 py-3 text-right font-medium">Ações</th>
+                           <thead>
+                             <tr className="bg-muted/30 border-b">
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Candidato</th>
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Contato</th>
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Experiência</th>
+                               <th className="px-6 py-4 text-left font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Pretensão</th>
+                               <th className="px-6 py-4 text-right font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Ações</th>
                              </tr>
                            </thead>
-                           <tbody>
+                           <tbody className="divide-y divide-border/30">
                              {candidatos.map((cand: any) => (
-                               <tr key={cand.id} className="border-b hover:bg-muted/10 transition-colors group">
-                                 <td className="px-4 py-3 font-medium">{cand.nome}</td>
-                                 <td className="px-4 py-3 text-muted-foreground">{cand.email}</td>
-                                 <td className="px-4 py-3">{cand.experiencia_anos} anos</td>
-                                 <td className="px-4 py-3 text-success font-medium">R$ {cand.pretensao_salarial?.toLocaleString()}</td>
-                                 <td className="px-4 py-3 text-right">
-                                   <Button variant="ghost" size="sm" className="rounded-lg">Perfil</Button>
+                               <tr key={cand.id} className="hover:bg-primary/[0.02] transition-colors group">
+                                 <td className="px-6 py-4">
+                                   <div className="flex items-center gap-3">
+                                     <div className="h-9 w-9 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold">
+                                       {cand.nome?.charAt(0)}
+                                     </div>
+                                     <div>
+                                       <p className="font-bold text-sm text-foreground">{cand.nome}</p>
+                                       <p className="text-[10px] text-muted-foreground">{cand.origem || 'Website'}</p>
+                                     </div>
+                                   </div>
+                                 </td>
+                                 <td className="px-6 py-4">
+                                   <div className="flex flex-col gap-0.5">
+                                      <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><Mail className="h-3 w-3" /> {cand.email}</span>
+                                      {cand.telefone && <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><Phone className="h-3 w-3" /> {cand.telefone}</span>}
+                                   </div>
+                                 </td>
+                                 <td className="px-6 py-4">
+                                   <Badge variant="secondary" className="rounded-lg bg-slate-100 font-medium">{cand.experiencia_anos} anos</Badge>
+                                 </td>
+                                 <td className="px-6 py-4 font-display font-bold text-success">
+                                   {cand.pretensao_salarial ? `R$ ${cand.pretensao_salarial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'N/D'}
+                                 </td>
+                                 <td className="px-6 py-4 text-right">
+                                   <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                     <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs font-bold border-primary/20 hover:bg-primary/5 hover:text-primary">Perfil</Button>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/5"><Trash2 className="h-4 w-4" /></Button>
+                                   </div>
                                  </td>
                                </tr>
                              ))}
                            </tbody>
                          </table>
+                         {candidatos.length === 0 && (
+                           <div className="py-20 text-center">
+                             <Users className="h-10 w-10 text-muted/20 mx-auto mb-3" />
+                             <p className="text-muted-foreground font-medium">Nenhum candidato cadastrado</p>
+                           </div>
+                         )}
                        </div>
                      </CardContent>
                    </Card>
