@@ -193,15 +193,18 @@ export default function ColaboradoresPage() {
       />
 
       {isLoading ? (
-        <div className="rounded-xl border border-border/30 overflow-hidden">
+        <div className="rounded-2xl border border-border/30 overflow-hidden bg-card/30">
           <div className="p-1">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 px-4 py-3">
-                <Skeleton className="h-9 w-9 rounded-full" />
-                <Skeleton className="h-4 w-32" />
+              <div key={i} className="flex items-center gap-4 px-6 py-4 border-b border-border/10 last:border-0">
+                <Skeleton className="h-11 w-11 rounded-xl" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
                 <Skeleton className="h-4 w-24 hidden sm:block" />
-                <Skeleton className="h-4 w-28 hidden md:block" />
-                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-8 w-24 rounded-lg" />
               </div>
             ))}
           </div>
@@ -209,64 +212,69 @@ export default function ColaboradoresPage() {
       ) : !filtered?.length ? (
         <EmptyList entityName="colaborador" onCreate={() => navigate('/colaboradores/novo')} />
       ) : (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-border/30 overflow-hidden shadow-elevated">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card/30 backdrop-blur-sm"
+        >
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/30 hover:bg-muted/30">
-                <TableHead className="font-display font-semibold">Colaborador</TableHead>
-                <TableHead className="font-display font-semibold hidden sm:table-cell">CPF</TableHead>
-                <TableHead className="font-display font-semibold hidden md:table-cell">Cargo</TableHead>
-                <TableHead className="font-display font-semibold">Status</TableHead>
-                <TableHead className="w-[100px] font-display font-semibold">Ações</TableHead>
+              <TableRow className="bg-muted/30 border-b border-border/20">
+                <TableHead className="font-display font-bold py-4 pl-6 text-foreground">Colaborador</TableHead>
+                <TableHead className="font-display font-bold hidden sm:table-cell text-foreground">Identificação</TableHead>
+                <TableHead className="font-display font-bold hidden md:table-cell text-foreground">Posição</TableHead>
+                <TableHead className="font-display font-bold text-foreground">Status</TableHead>
+                <TableHead className="w-[120px] font-display font-bold pr-6 text-foreground text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginated.map((c) => (
+              {paginated.map((c, idx) => (
                 <TableRow
                   key={c.id}
-                  className="hover:bg-accent/30 transition-colors cursor-pointer group"
+                  className="hover:bg-primary/5 border-b border-border/10 last:border-0 transition-colors cursor-pointer group"
                   onClick={() => navigate(`/colaboradores/${c.id}/editar`)}
                 >
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <UserAvatar name={c.nome_completo} size="sm" />
+                  <TableCell className="py-4 pl-6">
+                    <div className="flex items-center gap-4">
+                      <UserAvatar name={c.nome_completo} size="md" className="rounded-xl shadow-sm group-hover:scale-110 transition-transform" />
                       <div>
-                        <p className="font-body font-medium text-sm">{c.nome_completo}</p>
-                        <p className="text-[11px] text-muted-foreground font-body sm:hidden">{c.cargo}</p>
+                        <p className="font-display font-bold text-base leading-tight group-hover:text-primary transition-colors">{c.nome_completo}</p>
+                        <p className="text-xs text-muted-foreground font-body mt-0.5">{c.email || 'Sem e-mail cadastrado'}</p>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-body text-muted-foreground hidden sm:table-cell">{c.cpf}</TableCell>
-                  <TableCell className="font-body text-muted-foreground hidden md:table-cell">{c.cargo}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <div className="flex flex-col">
+                      <span className="font-body font-medium text-sm">CPF: {c.cpf}</span>
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">MAT: {c.matricula || 'N/A'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <div className="flex flex-col">
+                      <span className="font-body font-medium text-sm">{c.cargo}</span>
+                      <span className="text-[10px] text-primary font-bold uppercase tracking-wider">{c.departamento}</span>
+                    </div>
+                  </TableCell>
                   <TableCell><ColaboradorStatus status={c.status} /></TableCell>
-                  <TableCell>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <TableCell className="pr-6 text-right">
+                    <div className="flex justify-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg hover:bg-info/10 text-info"
+                        className="h-9 w-9 rounded-xl hover:bg-info/10 text-info"
                         onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}/editar`); }}
                         title="Ver Perfil"
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4.5 w-4.5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg hover:bg-warning/10 text-warning"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/documentos?colaborador=${c.id}`); }}
-                        title="Documentos"
-                      >
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-lg hover:bg-primary/10 text-primary"
+                        className="h-9 w-9 rounded-xl hover:bg-primary/10 text-primary"
                         onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}/editar`); }}
                         title="Editar"
                       >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4.5 w-4.5" />
                       </Button>
                     </div>
                   </TableCell>
@@ -275,16 +283,17 @@ export default function ColaboradoresPage() {
             </TableBody>
           </Table>
 
-          <DataTablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={filtered.length}
-            pageSize={PAGE_SIZE}
-            onPageChange={setCurrentPage}
-          />
+          <div className="p-4 border-t border-border/10 bg-muted/10">
+            <DataTablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filtered.length}
+              pageSize={PAGE_SIZE}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </motion.div>
       )}
-    </PageLayout>
-    </>
+    </div>
   );
 }
