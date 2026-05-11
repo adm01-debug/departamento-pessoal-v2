@@ -74,13 +74,15 @@ export default function RecrutamentoPage() {
               <DialogTrigger asChild>
                 <Button className="rounded-xl shadow-lg"><Plus className="h-4 w-4 mr-2" />Nova Vaga</Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-xl">
                 <DialogHeader><DialogTitle>Anunciar Nova Vaga</DialogTitle></DialogHeader>
-                <div className="grid gap-3 pt-4">
+                <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="grid gap-1"><Label>Título da Vaga</Label><Input placeholder="Ex: Desenvolvedor Senior" /></div>
                   <div className="grid gap-1"><Label>Departamento</Label><Input placeholder="Ex: Tecnologia" /></div>
+                  <div className="grid gap-1"><Label>Modalidade</Label><Input placeholder="Remoto, Híbrido, Presencial" /></div>
                   <div className="grid gap-1"><Label>Quantidade</Label><Input type="number" defaultValue={1} /></div>
-                  <Button className="mt-2">Publicar Vaga</Button>
+                  <div className="grid gap-1 col-span-2"><Label>Requisitos (separados por vírgula)</Label><Input placeholder="React, TypeScript, Node.js..." /></div>
+                  <Button className="col-span-2 mt-2">Publicar Vaga</Button>
                 </div>
               </DialogContent>
             </Dialog>
