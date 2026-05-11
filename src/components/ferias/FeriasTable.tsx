@@ -10,6 +10,7 @@ import { FeriasAuditTimeline } from './FeriasAuditTimeline';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts';
 
 interface FeriasTableProps {
   data: Record<string, any>[];
