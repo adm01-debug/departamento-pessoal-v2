@@ -1,6 +1,6 @@
 // Cálculo completo de folha e salário líquido
 import { calcularINSS, calcularIRRF, calcularFGTS } from './impostos';
-import { calcularHorasExtras, calcularAdicionalNoturno, calcularInsalubridade, calcularPericulosidade, calcularDescontoVT, calcularPensaoAlimenticia, type GrauInsalubridade } from './beneficios';
+import { calcularHorasExtras, calcularAdicionalNoturno, calcularInsalubridade, calcularPericulosidade, calcularDescontoVT, calcularPensaoAlimenticia, calcularDSR, type GrauInsalubridade } from './beneficios';
 
 export interface ParamsFolhaCompleta {
   salarioBase: number;
@@ -15,6 +15,8 @@ export interface ParamsFolhaCompleta {
   pensaoPercentual?: number;
   outrosDescontos?: number;
   outrosProventos?: number;
+  diasUteis?: number;
+  domingosEFeriados?: number;
 }
 
 export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
@@ -24,14 +26,19 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
     insalubridade = null, periculosidade = false,
     dependentes = 0, valeTransporte = 0,
     pensaoPercentual = 0, outrosDescontos = 0, outrosProventos = 0,
+    diasUteis = 26, domingosEFeriados = 4,
   } = params;
 
   const he = calcularHorasExtras(salarioBase, horasExtras50, horasExtras100);
   const adNoturno = horasNoturnas > 0 ? calcularAdicionalNoturno(salarioBase, horasNoturnas, adicionalNoturnoPerc) : 0;
+  
+  // Cálculo de DSR sobre Horas Extras e Adicional Noturno
+  const dsr = calcularDSR(he.total + adNoturno, diasUteis, domingosEFeriados);
+
   const adInsalubridade = insalubridade ? calcularInsalubridade(insalubridade) : 0;
   const adPericulosidade = periculosidade ? calcularPericulosidade(salarioBase) : 0;
 
-  const totalProventos = Math.round((salarioBase + he.total + adNoturno + adInsalubridade + adPericulosidade + outrosProventos) * 100) / 100;
+  const totalProventos = Math.round((salarioBase + he.total + adNoturno + dsr + adInsalubridade + adPericulosidade + outrosProventos) * 100) / 100;
 
   const inss = calcularINSS(totalProventos);
   const irrf = calcularIRRF(totalProventos, dependentes);
@@ -47,7 +54,7 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
   return {
     proventos: {
       salarioBase, horasExtras: he.total, adicionalNoturno: adNoturno,
-      insalubridade: adInsalubridade, periculosidade: adPericulosidade,
+      dsr, insalubridade: adInsalubridade, periculosidade: adPericulosidade,
       outrosProventos, totalProventos,
     },
     descontos: { inss, irrf, valeTransporte: descontoVT, pensao, outrosDescontos, totalDescontos },
