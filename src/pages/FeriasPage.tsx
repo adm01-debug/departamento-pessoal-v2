@@ -35,21 +35,25 @@ const statusOptions = [
 ];
 
 export default function FeriasPage() {
+  const { empresaAtual } = useEmpresas();
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const limit = 10;
   const [openCalc, setOpenCalc] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
   const [calcResult, setCalcResult] = useState<any>(null);
+  const queryClient = useQueryClient();
   
-  const { ferias, totalCount, isLoading } = useFerias({ 
+  const { ferias, totalCount, isLoading, refetch } = useFerias({ 
     page, 
     limit, 
     search: search.length >= 3 ? search : undefined, 
     status: statusFilter 
   });
+
   const { 
     aprovarGestor, 
     aprovarRH, 
@@ -57,6 +61,23 @@ export default function FeriasPage() {
     rejeitar, 
     cancelar 
   } = useFeriasAprovacao();
+
+  const handleSync = async () => {
+    if (!empresaAtual?.id) return;
+    setSyncLoading(true);
+    try {
+      const { feriasService } = await import('@/services');
+      const result = await feriasService.syncWithHub(empresaAtual.id);
+      if (result.success) {
+        await refetch();
+        toast.success('Sincronização concluída com o hub unificado');
+      }
+    } catch (err) {
+      toast.error('Falha ao sincronizar dados');
+    } finally {
+      setSyncLoading(false);
+    }
+  };
 
   const handleCalcFerias = async () => {
     setCalcLoading(true);
