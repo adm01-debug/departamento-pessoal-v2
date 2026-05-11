@@ -18,8 +18,18 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { format } from 'date-fns';
 
 const tipoLabels: Record<string, string> = {
-  doenca: 'Doença', acidente_trabalho: 'Acidente Trabalho', maternidade: 'Maternidade',
-  paternidade: 'Paternidade', auxilio_doenca: 'Auxílio Doença', outros: 'Outros',
+  doenca: 'Doença',
+  acidente_trabalho: 'Acidente Trabalho',
+  acidente_trajeto: 'Acidente Trajeto',
+  licenca_maternidade: 'L. Maternidade',
+  licenca_paternidade: 'L. Paternidade',
+  licenca_casamento: 'L. Casamento',
+  licenca_obito: 'L. Óbito',
+  licenca_nao_remunerada: 'L. Não Remunerada',
+  servico_militar: 'Serviço Militar',
+  mandato_sindical: 'Mandato Sindical',
+  suspensao_disciplinar: 'Suspensão Disc.',
+  outros: 'Outros',
 };
 
 export default function AfastamentosPage() {
