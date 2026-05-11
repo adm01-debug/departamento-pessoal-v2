@@ -1292,6 +1292,8 @@ export type Database = {
       beneficios: {
         Row: {
           ativo: boolean | null
+          categoria: string | null
+          codigo_esocial: string | null
           colaborador_id: string | null
           created_at: string
           data_fim: string | null
@@ -1301,6 +1303,7 @@ export type Database = {
           id: string
           metodo_pagamento: string | null
           nome: string
+          obrigatorio_por_lei: boolean | null
           observacoes: string | null
           operadora: string | null
           status: string | null
@@ -1312,6 +1315,8 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          categoria?: string | null
+          codigo_esocial?: string | null
           colaborador_id?: string | null
           created_at?: string
           data_fim?: string | null
@@ -1321,6 +1326,7 @@ export type Database = {
           id?: string
           metodo_pagamento?: string | null
           nome: string
+          obrigatorio_por_lei?: boolean | null
           observacoes?: string | null
           operadora?: string | null
           status?: string | null
@@ -1332,6 +1338,8 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          categoria?: string | null
+          codigo_esocial?: string | null
           colaborador_id?: string | null
           created_at?: string
           data_fim?: string | null
@@ -1341,6 +1349,7 @@ export type Database = {
           id?: string
           metodo_pagamento?: string | null
           nome?: string
+          obrigatorio_por_lei?: boolean | null
           observacoes?: string | null
           operadora?: string | null
           status?: string | null
@@ -1419,7 +1428,9 @@ export type Database = {
           data_inicio: string
           desconto: number | null
           id: string
+          motivo_suspensao: string | null
           observacoes: string | null
+          status_vinculo: string | null
           tipo_beneficio_id: string
           updated_at: string
           valor: number
@@ -1433,7 +1444,9 @@ export type Database = {
           data_inicio?: string
           desconto?: number | null
           id?: string
+          motivo_suspensao?: string | null
           observacoes?: string | null
+          status_vinculo?: string | null
           tipo_beneficio_id: string
           updated_at?: string
           valor?: number
@@ -1447,7 +1460,9 @@ export type Database = {
           data_inicio?: string
           desconto?: number | null
           id?: string
+          motivo_suspensao?: string | null
           observacoes?: string | null
+          status_vinculo?: string | null
           tipo_beneficio_id?: string
           updated_at?: string
           valor?: number
@@ -4386,12 +4401,15 @@ export type Database = {
           colaborador_id: string
           cpf: string | null
           created_at: string
+          data_inicio_vigencia: string | null
           data_nascimento: string
           deficiente: boolean | null
           escolaridade: string | null
           estrangeiro: boolean | null
           genero_documento_id: number | null
+          grau_parentesco: string | null
           id: string
+          incapacidade_fisica_mental: boolean | null
           ir: boolean | null
           nome: string
           para_irrf: boolean | null
@@ -4405,12 +4423,15 @@ export type Database = {
           colaborador_id: string
           cpf?: string | null
           created_at?: string
+          data_inicio_vigencia?: string | null
           data_nascimento: string
           deficiente?: boolean | null
           escolaridade?: string | null
           estrangeiro?: boolean | null
           genero_documento_id?: number | null
+          grau_parentesco?: string | null
           id?: string
+          incapacidade_fisica_mental?: boolean | null
           ir?: boolean | null
           nome: string
           para_irrf?: boolean | null
@@ -4424,12 +4445,15 @@ export type Database = {
           colaborador_id?: string
           cpf?: string | null
           created_at?: string
+          data_inicio_vigencia?: string | null
           data_nascimento?: string
           deficiente?: boolean | null
           escolaridade?: string | null
           estrangeiro?: boolean | null
           genero_documento_id?: number | null
+          grau_parentesco?: string | null
           id?: string
+          incapacidade_fisica_mental?: boolean | null
           ir?: boolean | null
           nome?: string
           para_irrf?: boolean | null
@@ -10808,8 +10832,11 @@ export type Database = {
       }
       planos_saude: {
         Row: {
+          abrangencia: string | null
+          ans_registro: string | null
           ativo: boolean | null
           colaborador_id: string | null
+          coparticipacao_teto: number | null
           created_at: string
           data_fim: string | null
           data_inicio: string | null
@@ -10823,8 +10850,11 @@ export type Database = {
           valor_mensal: number | null
         }
         Insert: {
+          abrangencia?: string | null
+          ans_registro?: string | null
           ativo?: boolean | null
           colaborador_id?: string | null
+          coparticipacao_teto?: number | null
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
@@ -10838,8 +10868,11 @@ export type Database = {
           valor_mensal?: number | null
         }
         Update: {
+          abrangencia?: string | null
+          ans_registro?: string | null
           ativo?: boolean | null
           colaborador_id?: string | null
+          coparticipacao_teto?: number | null
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
@@ -11608,6 +11641,8 @@ export type Database = {
           created_at: string
           data_recarga: string | null
           id: string
+          mes_referencia: string | null
+          origem_recurso: string | null
           status: string | null
           vale_id: string | null
           valor: number
@@ -11617,6 +11652,8 @@ export type Database = {
           created_at?: string
           data_recarga?: string | null
           id?: string
+          mes_referencia?: string | null
+          origem_recurso?: string | null
           status?: string | null
           vale_id?: string | null
           valor: number
@@ -11626,6 +11663,8 @@ export type Database = {
           created_at?: string
           data_recarga?: string | null
           id?: string
+          mes_referencia?: string | null
+          origem_recurso?: string | null
           status?: string | null
           vale_id?: string | null
           valor?: number
@@ -12282,41 +12321,50 @@ export type Database = {
       }
       seguros_vida: {
         Row: {
+          apolice_numero: string | null
           ativo: boolean | null
           capital_segurado: number | null
           colaborador_id: string | null
           created_at: string
           data_fim: string | null
           data_inicio: string | null
+          data_vencimento_apolice: string | null
           empresa_id: string | null
           id: string
           numero_apolice: string | null
+          possui_assistencia_funeral: boolean | null
           premio_mensal: number | null
           seguradora: string | null
         }
         Insert: {
+          apolice_numero?: string | null
           ativo?: boolean | null
           capital_segurado?: number | null
           colaborador_id?: string | null
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
+          data_vencimento_apolice?: string | null
           empresa_id?: string | null
           id?: string
           numero_apolice?: string | null
+          possui_assistencia_funeral?: boolean | null
           premio_mensal?: number | null
           seguradora?: string | null
         }
         Update: {
+          apolice_numero?: string | null
           ativo?: boolean | null
           capital_segurado?: number | null
           colaborador_id?: string | null
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
+          data_vencimento_apolice?: string | null
           empresa_id?: string | null
           id?: string
           numero_apolice?: string | null
+          possui_assistencia_funeral?: boolean | null
           premio_mensal?: number | null
           seguradora?: string | null
         }

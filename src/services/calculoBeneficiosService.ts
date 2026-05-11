@@ -3,7 +3,6 @@ import { auditLogger } from '@/utils/auditLogger';
 
 export const valeTransporteService = {
   async calcularCustoMensal(colaboradorId: string, diasUteis: number = 22) {
-    // 1. Obter salário do colaborador para cálculo do desconto de 6%
     const { data: colab, error: colabError } = await supabase
       .from('colaboradores')
       .select('salario_base')
@@ -14,15 +13,14 @@ export const valeTransporteService = {
     const salario = (colab as any).salario_base || 0;
     const descontoMaximo = salario * 0.06;
 
-    // 2. Obter rotas/tarifas vinculadas ao colaborador
     const { data: rotas, error: rotasError } = await supabase
       .from('beneficios_colaborador')
       .select('*, beneficio:beneficios(*)')
-      .eq('colaborador_id', colaboradorId);
+      .eq('colaborador_id', colaboradorId)
+      .eq('status_vinculo', 'ativo');
 
     if (rotasError) throw rotasError;
 
-    // Filter by type manually if needed or update query
     const rotasTransporte = (rotas || []).filter((r: any) => r.beneficio?.tipo === 'transporte');
 
     const custoTotal = rotasTransporte.reduce((acc, r: any) => {
@@ -38,7 +36,8 @@ export const valeTransporteService = {
       custoTotal,
       descontoColaborador: descontoEfetivo,
       custoEmpresa,
-      diasUteis
+      diasUteis,
+      aliquotaDesconto: 0.06
     };
   }
 };
@@ -47,22 +46,38 @@ export const valeAlimentacaoService = {
   async calcularCredito(beneficioId: string, diasTrabalhados: number = 22) {
     const { data: beneficio, error } = await supabase
       .from('beneficios')
-      .select('valor')
+      .select('valor, tipo')
       .eq('id', beneficioId)
       .single();
 
     if (error) throw error;
-
-    // Using 'valor' as a base. If it's VR, we might assume it's daily. 
-    // This depends on how 'tipo' is used. For now, let's just fix the TS error.
     const valor = (beneficio as any).valor || 0;
     
-    // Simplification: if value is small, maybe it's daily. If large, monthly.
+    // Se for mensal (valor alto), retorna o valor cheio, senão calcula proporcional
     if (valor < 100) {
       return valor * diasTrabalhados;
     }
     
     return valor;
+  },
+
+  async registrarRecarga(dados: { colaborador_id: string, vale_id?: string, valor: number, mes_referencia: string, origem_recurso?: string }) {
+    const { data, error } = await supabase.from('recargas_vale').insert({
+      ...dados,
+      data_recarga: new Date().toISOString().split('T')[0],
+      status: 'processado'
+    }).select().single();
+
+    if (error) throw error;
+
+    await auditLogger.log({
+      tabela: 'recargas_vale',
+      registro_id: (data as any).id,
+      acao: 'INSERT',
+      dados_novos: data
+    });
+
+    return data;
   }
 };
 
@@ -72,11 +87,12 @@ export const planoSaudeService = {
       .from('beneficiarios_plano') as any)
       .select('valor_coparticipacao')
       .eq('colaborador_id', colaboradorId)
-      .eq('mes_referencia', mesReferencia);
+      .eq('mes_referencia', mesReferencia)
+      .neq('status', 'excluido');
 
     if (error) throw error;
     
-    return (data || []).reduce((acc: number, item: any) => acc + (item.valor_coparticipacao || 0), 0);
+    return (data || []).reduce((acc: number, item: any) => acc + (Number(item.valor_coparticipacao) || 0), 0);
   },
   
   async listarDependentesNoPlano(colaboradorId: string) {
@@ -84,7 +100,8 @@ export const planoSaudeService = {
       .from('beneficiarios_plano') as any)
       .select('*, dependente:dependentes(*)')
       .eq('colaborador_id', colaboradorId)
-      .not('dependente_id', 'is', null);
+      .not('dependente_id', 'is', null)
+      .neq('status', 'excluido');
     
     if (error) throw error;
     return data || [];
@@ -93,7 +110,6 @@ export const planoSaudeService = {
 
 export const seguroVidaService = {
   async calcularPremioMedio(empresaId: string) {
-    // Fixing the complex count query which often fails in Supabase TS if not configured
     const { data, error } = await supabase
       .from('beneficios')
       .select('id, valor, tipo')
@@ -101,17 +117,17 @@ export const seguroVidaService = {
       .eq('tipo', 'vida');
     
     if (error) throw error;
-    
     if (!data || data.length === 0) return 0;
 
     let totalPremiums = 0;
     let totalParticipants = 0;
 
     for (const beneficio of data) {
-      const { count, error: countError } = await (supabase
+    const { count, error: countError } = await (supabase
         .from('beneficios_colaborador') as any)
         .select('*', { count: 'exact', head: true })
-        .eq('beneficio_id', beneficio.id);
+        .eq('beneficio_id', beneficio.id)
+        .eq('status_vinculo', 'ativo');
       
       if (!countError && count !== null) {
         totalPremiums += (beneficio.valor || 0) * count;
@@ -132,13 +148,16 @@ export const dependentesService = {
       .order('nome');
     
     if (error) throw error;
-    return (data as any) || [];
+    return data || [];
   },
 
   async criar(dados: any) {
     const { data, error } = await (supabase
       .from('dependentes') as any)
-      .insert(dados)
+      .insert({
+        ...dados,
+        data_inicio_vigencia: dados.data_inicio_vigencia || new Date().toISOString().split('T')[0]
+      })
       .select()
       .single();
     

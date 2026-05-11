@@ -14,7 +14,7 @@ import { useDependentes, useCriarDependente, useExcluirDependente } from '@/hook
 
 const PARENTESCOS = ['Cônjuge', 'Filho(a)', 'Enteado(a)', 'Pai/Mãe', 'Irmão/Irmã', 'Avô/Avó', 'Neto(a)', 'Tutelado(a)', 'Outro'];
 
-const initialForm = { nome: '', parentesco: '', cpf: '', data_nascimento: '', ir: false, salario_familia: false };
+const initialForm = { nome: '', parentesco: '', cpf: '', data_nascimento: '', ir: false, salario_familia: false, incapacidade_fisica_mental: false };
 
 export function DependentesTab({ colaboradorId }: { colaboradorId: string }) {
   const { data, isLoading } = useDependentes(colaboradorId);
@@ -54,9 +54,10 @@ export function DependentesTab({ colaboradorId }: { colaboradorId: string }) {
               </div>
               <div><Label>CPF</Label><Input value={form.cpf} onChange={e => setForm(f => ({ ...f, cpf: e.target.value }))} placeholder="000.000.000-00" /></div>
               <div><Label>Data Nascimento</Label><Input type="date" value={form.data_nascimento} onChange={e => setForm(f => ({ ...f, data_nascimento: e.target.value }))} /></div>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-4">
                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.ir} onChange={e => setForm(f => ({ ...f, ir: e.target.checked }))} />IRRF</label>
                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.salario_familia} onChange={e => setForm(f => ({ ...f, salario_familia: e.target.checked }))} />Salário Família</label>
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.incapacidade_fisica_mental} onChange={e => setForm(f => ({ ...f, incapacidade_fisica_mental: e.target.checked }))} />Incapacidade F/M</label>
               </div>
               <Button onClick={handleSubmit} disabled={criar.isPending}>Salvar</Button>
             </div>
@@ -67,7 +68,7 @@ export function DependentesTab({ colaboradorId }: { colaboradorId: string }) {
         {isLoading ? <Spinner /> : !data?.length ? <p className="text-sm text-muted-foreground">Nenhum dependente cadastrado.</p> : (
           <Table>
             <TableHeader><TableRow>
-              <TableHead>Nome</TableHead><TableHead>Parentesco</TableHead><TableHead>CPF</TableHead><TableHead>IRRF</TableHead><TableHead>Sal. Família</TableHead><TableHead />
+              <TableHead>Nome</TableHead><TableHead>Parentesco</TableHead><TableHead>CPF</TableHead><TableHead>IRRF</TableHead><TableHead>Sal. Família</TableHead><TableHead>Incapacidade</TableHead><TableHead />
             </TableRow></TableHeader>
             <TableBody>
               {data.map((d: any) => (
@@ -76,7 +77,8 @@ export function DependentesTab({ colaboradorId }: { colaboradorId: string }) {
                   <TableCell>{d.parentesco}</TableCell>
                   <TableCell>{d.cpf || '-'}</TableCell>
                   <TableCell>{d.ir ? <Badge>Sim</Badge> : 'Não'}</TableCell>
-                  <TableCell>{d.salario_familia ? <Badge>Sim</Badge> : 'Não'}</TableCell>
+                   <TableCell>{d.salario_familia ? <Badge>Sim</Badge> : 'Não'}</TableCell>
+                  <TableCell>{d.incapacidade_fisica_mental ? <Badge variant="destructive">Sim</Badge> : 'Não'}</TableCell>
                   <TableCell><Button variant="ghost" size="sm" onClick={() => { if (confirm('Excluir dependente?')) excluir.mutate(d.id); }}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                 </TableRow>
               ))}
