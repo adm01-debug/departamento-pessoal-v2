@@ -130,6 +130,7 @@ export function BeneficiosSettingsTab() {
                     </TableCell>
                     <TableCell>
                       <FormSwitch 
+                        label=""
                         checked={regra.ativo} 
                         onCheckedChange={(v) => alternarStatus.mutate({ id: regra.id, ativo: v })}
                       />

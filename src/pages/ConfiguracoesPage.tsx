@@ -25,6 +25,7 @@ import { MFASetup } from '@/components/settings/MFASetup';
 import { EmpresaSettingsTab } from '@/components/settings/EmpresaSettingsTab';
 import { UserRolesTab } from '@/components/settings/UserRolesTab';
 import { GlobalAuditLogTab } from '@/components/settings/GlobalAuditLogTab';
+import { BeneficiosSettingsTab } from '@/components/settings/BeneficiosSettingsTab';
 
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
@@ -98,6 +99,7 @@ export default function ConfiguracoesPage() {
         <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 overflow-x-auto no-scrollbar flex-nowrap w-full h-auto">
           <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Empresa</TabsTrigger>
           <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Perfis</TabsTrigger>
+          <TabsTrigger value="beneficios" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Benefícios</TabsTrigger>
           <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Folha</TabsTrigger>
           <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Ponto</TabsTrigger>
           <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Notificações</TabsTrigger>
@@ -390,6 +392,9 @@ export default function ConfiguracoesPage() {
         </TabsContent>
         <TabsContent value="perfis">
           <UserRolesTab />
+        </TabsContent>
+        <TabsContent value="beneficios">
+          <BeneficiosSettingsTab />
         </TabsContent>
         <TabsContent value="empresa">
           <EmpresaSettingsTab />
