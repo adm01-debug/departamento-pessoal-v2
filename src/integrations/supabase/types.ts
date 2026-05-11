@@ -191,9 +191,11 @@ export type Database = {
           atestado_numero: string | null
           cid: string | null
           cid_descricao: string | null
+          cid_id: string | null
           colaborador_id: string
           created_at: string
           created_by: string | null
+          crm_medico: string | null
           data_fim_prevista: string
           data_fim_real: string | null
           data_inicio: string
@@ -203,9 +205,11 @@ export type Database = {
           dias_total: number | null
           empresa_id: string | null
           id: string
+          local_pericia: string | null
           medico_crm: string | null
           medico_nome: string | null
           motivo_rejeicao: string | null
+          nome_medico: string | null
           numero_beneficio: string | null
           observacoes: string | null
           rejeitado_em: string | null
@@ -220,9 +224,11 @@ export type Database = {
           atestado_numero?: string | null
           cid?: string | null
           cid_descricao?: string | null
+          cid_id?: string | null
           colaborador_id: string
           created_at?: string
           created_by?: string | null
+          crm_medico?: string | null
           data_fim_prevista: string
           data_fim_real?: string | null
           data_inicio: string
@@ -232,9 +238,11 @@ export type Database = {
           dias_total?: number | null
           empresa_id?: string | null
           id?: string
+          local_pericia?: string | null
           medico_crm?: string | null
           medico_nome?: string | null
           motivo_rejeicao?: string | null
+          nome_medico?: string | null
           numero_beneficio?: string | null
           observacoes?: string | null
           rejeitado_em?: string | null
@@ -249,9 +257,11 @@ export type Database = {
           atestado_numero?: string | null
           cid?: string | null
           cid_descricao?: string | null
+          cid_id?: string | null
           colaborador_id?: string
           created_at?: string
           created_by?: string | null
+          crm_medico?: string | null
           data_fim_prevista?: string
           data_fim_real?: string | null
           data_inicio?: string
@@ -261,9 +271,11 @@ export type Database = {
           dias_total?: number | null
           empresa_id?: string | null
           id?: string
+          local_pericia?: string | null
           medico_crm?: string | null
           medico_nome?: string | null
           motivo_rejeicao?: string | null
+          nome_medico?: string | null
           numero_beneficio?: string | null
           observacoes?: string | null
           rejeitado_em?: string | null
@@ -273,6 +285,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "afastamentos_cid_id_fkey"
+            columns: ["cid_id"]
+            isOneToOne: false
+            referencedRelation: "cid10"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "afastamentos_colaborador_id_fkey"
             columns: ["colaborador_id"]
@@ -2175,6 +2194,27 @@ export type Database = {
           },
         ]
       }
+      cid10: {
+        Row: {
+          codigo: string
+          created_at: string | null
+          descricao: string
+          id: string
+        }
+        Insert: {
+          codigo: string
+          created_at?: string | null
+          descricao: string
+          id?: string
+        }
+        Update: {
+          codigo?: string
+          created_at?: string | null
+          descricao?: string
+          id?: string
+        }
+        Relationships: []
+      }
       cnab_configuracoes: {
         Row: {
           agencia: string
@@ -3129,6 +3169,7 @@ export type Database = {
           dias_empresa_maximo: number | null
           dias_maximos: number | null
           dias_minimos: number | null
+          exige_cid: boolean | null
           id: string
           pago_empresa: boolean | null
           pago_inss: boolean | null
@@ -3140,6 +3181,7 @@ export type Database = {
           dias_empresa_maximo?: number | null
           dias_maximos?: number | null
           dias_minimos?: number | null
+          exige_cid?: boolean | null
           id?: string
           pago_empresa?: boolean | null
           pago_inss?: boolean | null
@@ -3151,6 +3193,7 @@ export type Database = {
           dias_empresa_maximo?: number | null
           dias_maximos?: number | null
           dias_minimos?: number | null
+          exige_cid?: boolean | null
           id?: string
           pago_empresa?: boolean | null
           pago_inss?: boolean | null
