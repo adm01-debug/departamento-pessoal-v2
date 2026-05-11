@@ -22,7 +22,11 @@ export const calculoLoteService = {
       // 1. Buscar colaboradores ativos da empresa
       const { data: colaboradores, error: colabError } = await (supabase as any)
         .from('colaboradores')
-        .select('*')
+        .select(`
+          *,
+          dependentes (id),
+          eventos_variaveis (codigo, descricao, tipo, valor)
+        `)
         .eq('empresa_id', empresaId)
         .eq('status', 'ativo');
 
@@ -72,10 +76,12 @@ export const calculoLoteService = {
       // 3. Processar cada colaborador
       for (const colab of colaboradores) {
         try {
-          // Por enquanto, usamos apenas o salário base + zero adicionais 
-          // (a menos que implementemos uma tabela de lançamentos por colaborador_id)
+          const dependentesCount = colab.dependentes?.length || 0;
+          const eventosVariaveis = colab.eventos_variaveis || [];
+
           const res = folhaCalc.processar(Number(colab.salario_base || 0), {
-            dependentes: 0 
+            dependentes: dependentesCount,
+            eventos: eventosVariaveis
           });
 
           // Salva o item da folha
@@ -96,14 +102,18 @@ export const calculoLoteService = {
             .from('folha_itens')
             .upsert(itemData);
 
-          // Auditoria
+          // Auditoria analítica
           await (supabase as any).from('folha_auditoria').insert({
             folha_id: folhaId,
             colaborador_id: colab.id,
             tipo_evento: 'calculo_mensal',
-            mensagem: `Cálculo processado para ${colab.nome_completo}`,
+            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}`,
             severidade: 'info',
-            detalhes: { timestamp: new Date().toISOString(), liquido: res.liquido }
+            detalhes: { 
+              timestamp: new Date().toISOString(), 
+              liquido: res.liquido,
+              eventos: res.detalheEventos 
+            }
           });
 
           progress.success++;
