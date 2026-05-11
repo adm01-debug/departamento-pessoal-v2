@@ -78,9 +78,15 @@ export function calcularHorasExtras(salarioBase: number, horasExtras50: number =
   return { valor50, valor100, total: totalExtras, dsr, totalComDsr: Math.round((totalExtras + dsr) * 100) / 100 };
 }
 
+/**
+ * Calcula o Descanso Semanal Remunerado (DSR) sobre verbas variáveis.
+ * Regra: (Total das Verbas / Dias Úteis) * (Domingos + Feriados)
+ */
 export function calcularDSR(totalVariaveis: number, diasUteis: number, domingosEFeriados: number): number {
   if (diasUteis <= 0) return 0;
-  return Math.round((totalVariaveis / diasUteis) * domingosEFeriados * 100) / 100;
+  // Precisão decimal conforme normas contábeis
+  const valorDsr = (totalVariaveis / diasUteis) * domingosEFeriados;
+  return Math.round(valorDsr * 100) / 100;
 }
 
 export function calcularAdicionalNoturno(salarioBase: number, horasNoturnas: number, percentual: number = 20): number {

@@ -21,7 +21,9 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { auditCalculation } from '@/calculators/auditHelper';
+import { auditCalculation, verifyCalculationIntegrity } from '@/calculators/auditHelper';
+import { rubricasFolhaService } from '@/services/tabelas/folhaService';
+import { validarRubricaESocial } from '@/validators/esocial';
 
 interface StepProps {
   isActive: boolean;
@@ -56,6 +58,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [rubricasValidadas, setRubricasValidadas] = useState(false);
   const [currentFolhaId, setCurrentFolhaId] = useState<string | null>(null);
   const { registrarLog } = useFolhaAuditoria(currentFolhaId || undefined);
   const queryClient = useQueryClient();
@@ -80,6 +83,14 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const handleCalculate = async () => {
     setIsProcessing(true);
     try {
+      // 1. Validação Final de Rubricas
+      const rubricas = await rubricasFolhaService.listar(empresaAtualId!);
+      const rubricasInvalidas = rubricas.filter(r => !validarRubricaESocial(r).valid);
+      
+      if (rubricasInvalidas.length > 0) {
+        throw new Error(`Existem ${rubricasInvalidas.length} rubricas com divergências eSocial. Corrija-as antes de calcular.`);
+      }
+
       const [mes, ano] = competencia.split('/');
       const response = await edgeFunctionsService.calcularFolha({ 
         empresaId: empresaAtualId!, 
@@ -89,27 +100,31 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       const folhaId = response?.folhaId;
       setCurrentFolhaId(folhaId);
 
-      // Auditoria com Assinatura Digital
+      // 2. Auditoria com Assinatura Digital SHA-256
       const signature = await auditCalculation(empresaAtualId!, competencia, response?.detalhes || response);
-      toast.info(`Cálculo assinado: ${signature.substring(0, 8)}...`);
+      toast.info(`Cálculo auditado e assinado digitalmente.`);
 
-      // Registrar log de auditoria do processamento
+      // 3. Registrar log de auditoria do processamento
       if (folhaId) {
         await registrarLog({
           folha_id: folhaId,
           tipo_evento: 'CALCULO',
           severidade: 'INFO',
-          mensagem: `Cálculo de folha iniciado e concluído via Assistente para competência ${competencia}.`,
-          detalhes: { competencia, data_processamento: new Date().toISOString() }
+          mensagem: `Cálculo de folha finalizado com assinatura SHA-256: ${signature.substring(0, 16)}...`,
+          detalhes: { 
+            competencia, 
+            data_processamento: new Date().toISOString(),
+            assinatura: signature
+          }
         });
       }
 
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
       setCurrentStep(4);
-      toast.success('Folha processada com sucesso!');
+      toast.success('Folha processada e auditada com sucesso!');
     } catch (err: any) {
-      toast.error(`Erro no processamento: ${err.message}`);
+      toast.error(err.message || 'Erro no processamento');
     } finally {
       setIsProcessing(false);
     }
