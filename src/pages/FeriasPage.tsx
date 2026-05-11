@@ -5,7 +5,8 @@ import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { FeriasKPIs, FeriasTable, FeriasDashboard } from '@/components/ferias';
+import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/components/ferias';
+import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -103,6 +104,15 @@ export default function FeriasPage() {
       icon={<Calendar className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary-glow to-primary"
       actions={
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="rounded-xl gap-1.5 font-body"
+            onClick={() => feriasPDF.gerarRelatorioKPIs(stats, ferias)}
+          >
+            <FileDown className="h-4 w-4" /> Relatório PDF
+          </Button>
         <Dialog open={openCalc} onOpenChange={setOpenCalc}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
@@ -137,7 +147,14 @@ export default function FeriasPage() {
         </Dialog>
       }
     >
-      <FeriasKPIs stats={stats} />
+      <div className="grid lg:grid-cols-4 gap-6 mb-8">
+        <div className="lg:col-span-3">
+          <FeriasKPIs stats={stats} />
+        </div>
+        <div className="lg:col-span-1">
+          <FeriasInsights stats={stats} />
+        </div>
+      </div>
 
       <Tabs defaultValue="dashboard" className="space-y-6">
         <TabsList className="bg-muted/50 p-1 rounded-xl">

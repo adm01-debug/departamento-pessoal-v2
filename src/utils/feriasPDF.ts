@@ -51,5 +51,53 @@ export const feriasPDF = {
     doc.text('Assinatura do Colaborador', 130, signatureY + 5);
 
     doc.save(`recibo_ferias_${colab.nome_completo || 'colaborador'}.pdf`);
+  },
+
+  gerarRelatorioKPIs: (stats: any, data: any[]) => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(22);
+    doc.setTextColor(44, 62, 80);
+    doc.text('Relatório Executivo de Férias', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Período: Últimos 6 meses | Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 28, { align: 'center' });
+
+    // KPIs Summary
+    autoTable(doc, {
+      startY: 40,
+      head: [['Métrica', 'Valor']],
+      body: [
+        ['Total de Solicitações', stats.total.toString()],
+        ['Pendentes de Aprovação', stats.pendentes.toString()],
+        ['Aprovadas/Confirmadas', stats.aprovadas.toString()],
+        ['Colaboradores em Gozo', stats.emGozo.toString()],
+        ['Abonos Pecuniários', stats.abonoPecuniario.toString()],
+        ['Períodos Vencidos', stats.vencidas.toString()],
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [44, 62, 80] },
+    });
+
+    // Detailed Table
+    doc.setFontSize(14);
+    doc.text('Detalhamento de Solicitações', 20, (doc as any).lastAutoTable.finalY + 15);
+
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 20,
+      head: [['Colaborador', 'Início', 'Fim', 'Dias', 'Status']],
+      body: data.map(f => [
+        f.colaborador?.nome_completo || '-',
+        format(new Date(f.data_inicio), 'dd/MM/yyyy'),
+        format(new Date(f.data_fim), 'dd/MM/yyyy'),
+        (f.dias_gozo || f.dias_ferias || '-').toString(),
+        f.status.toUpperCase()
+      ]),
+      theme: 'striped',
+      headStyles: { fillColor: [52, 152, 219] },
+    });
+
+    doc.save(`relatorio_ferias_${format(new Date(), 'yyyyMMdd')}.pdf`);
   }
 };
