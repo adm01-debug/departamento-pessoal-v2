@@ -108,15 +108,30 @@ export const empresaService = {
 };
 
 export const feriasService = {
-  async listSolicitacoes(empresaId?: string) {
+  async listSolicitacoes(empresaId?: string, params?: { page?: number; limit?: number; search?: string; status?: string }) {
+    const { page = 1, limit = 10, search, status } = params || {};
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     let query = supabase
       .from('ferias')
-      .select('*, colaborador:colaboradores(nome_completo)')
+      .select('*, colaborador:colaboradores!ferias_colaborador_id_fkey(nome_completo, avatar_url)', { count: 'exact' })
       .order('data_inicio', { ascending: false });
+
     if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
+    if (status && status !== 'all') query = query.eq('status', status);
+    
+    const { data, error, count } = await query.range(from, to);
     if (error) throw error;
-    return data || [];
+    
+    let filteredData = (data as any[]) || [];
+    if (search) {
+      filteredData = filteredData.filter((f: any) => 
+        (f.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    return { data: filteredData, count: count || 0 };
   },
   listar: async (empresaId?: string) => feriasService.listSolicitacoes(empresaId),
   async buscarPorId(id: string) {

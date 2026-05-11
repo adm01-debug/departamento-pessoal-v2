@@ -5,3 +5,6 @@ export * from './FeriasWorkflowStepper';
 export * from './GerenciamentoPeriodos';
 export * from './CalendarioFerias';
 export * from './FeriasDashboard';
+export * from './FeriasInsights';
+export * from './FeriasAuditTimeline';
+// export * from './FeriasForm';

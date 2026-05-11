@@ -1,12 +1,15 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, User } from 'lucide-react';
+import { DollarSign, User, History } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { FeriasWorkflowStepper } from './FeriasWorkflowStepper';
 import { FeriasActions } from './FeriasActions';
+import { FeriasAuditTimeline } from './FeriasAuditTimeline';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface FeriasTableProps {
   data: Record<string, any>[];
@@ -31,6 +34,7 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
             <TableHead className="font-display font-semibold">Período</TableHead>
             <TableHead className="font-display font-semibold text-center">Dias</TableHead>
             <TableHead className="font-display font-semibold">Status</TableHead>
+            <TableHead className="font-display font-semibold">Auditoria</TableHead>
             <TableHead className="font-display font-semibold">Workflow</TableHead>
             <TableHead className="font-display font-semibold">Abono/13°</TableHead>
             <TableHead className="w-[160px] font-display font-semibold text-right">Ações</TableHead>
@@ -76,6 +80,25 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
                 ) : (
                   <StatusBadge status={s.status} />
                 )}
+              </TableCell>
+              <TableCell>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-body rounded-lg hover:bg-primary/10 hover:text-primary">
+                      <History className="h-3.5 w-3.5" /> Ver Trilha
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md rounded-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 font-display">
+                        <History className="h-5 w-5 text-primary" /> Trilha de Auditoria
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <FeriasAuditTimeline solicitacaoId={s.id} />
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </TableCell>
               <TableCell>
                 <FeriasWorkflowStepper solicitacao={s} />

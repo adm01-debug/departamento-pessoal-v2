@@ -5,11 +5,12 @@ import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { FeriasKPIs, FeriasTable, FeriasDashboard } from '@/components/ferias';
+import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/components/ferias';
+import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -35,12 +36,19 @@ const statusOptions = [
 export default function FeriasPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [openCalc, setOpenCalc] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
   const [calcResult, setCalcResult] = useState<any>(null);
   
-  const { ferias, isLoading } = useFerias();
+  const { ferias, totalCount, isLoading } = useFerias({ 
+    page, 
+    limit, 
+    search: search.length >= 3 ? search : undefined, 
+    status: statusFilter 
+  });
   const { 
     aprovarGestor, 
     aprovarRH, 
@@ -77,18 +85,9 @@ export default function FeriasPage() {
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  const filtered = ferias?.filter((s: Record<string, any>) => {
-    if (statusFilter && statusFilter !== 'all' && s.status !== statusFilter) return false;
-    if (search) {
-      const nome = (s.colaborador?.nome_completo || '').toLowerCase();
-      if (!nome.includes(search.toLowerCase())) return false;
-    }
-    return true;
-  });
-
   const stats = {
-    total: ferias?.length || 0,
-    pendentes: ferias?.filter((s: any) => s.status === 'pendente').length || 0,
+    total: totalCount,
+    pendentes: ferias?.filter((s: any) => s.status === 'pendente').length || 0, // This is local but we might want global stats
     aprovadas: ferias?.filter((s: any) => s.status === 'aprovada' || s.aprovado_rh).length || 0,
     emGozo: ferias?.filter((s: any) => s.status === 'em_gozo').length || 0,
     abonoPecuniario: ferias?.filter((s: any) => s.abono_pecuniario).length || 0,
@@ -105,41 +104,58 @@ export default function FeriasPage() {
       icon={<Calendar className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary-glow to-primary"
       actions={
-        <Dialog open={openCalc} onOpenChange={setOpenCalc}>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
-              <Calculator className="h-4 w-4" />Simulador
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md rounded-2xl">
-            <DialogHeader><DialogTitle className="flex items-center gap-2 font-display"><Calculator className="h-5 w-5" /> Simulador de Férias</DialogTitle></DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2"><Label className="font-body">Salário Base (R$)</Label><Input type="number" placeholder="5000.00" value={calcForm.salario} onChange={e => setCalcForm(p => ({ ...p, salario: e.target.value }))} className="rounded-xl" /></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label className="font-body">Dias de Férias</Label><Input type="number" min="1" max="30" value={calcForm.diasFerias} onChange={e => setCalcForm(p => ({ ...p, diasFerias: e.target.value }))} className="rounded-xl" /></div>
-                <div className="space-y-2"><Label className="font-body">Dias Abono</Label><Input type="number" min="0" max="10" value={calcForm.diasAbono} onChange={e => setCalcForm(p => ({ ...p, diasAbono: e.target.value }))} className="rounded-xl" /></div>
-              </div>
-              <Button onClick={handleCalcFerias} disabled={calcLoading || !calcForm.salario} className="w-full rounded-xl bg-gradient-to-r from-primary-glow to-primary font-body">
-                {calcLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Calculator className="h-4 w-4 mr-2" />}Calcular
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="rounded-xl gap-1.5 font-body"
+            onClick={() => feriasPDF.gerarRelatorioKPIs(stats, ferias)}
+          >
+            <FileDown className="h-4 w-4" /> Relatório PDF
+          </Button>
+          <Dialog open={openCalc} onOpenChange={setOpenCalc}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
+                <Calculator className="h-4 w-4" />Simulador
               </Button>
-              {calcResult && (
-                <Card className="border border-border/30 rounded-xl">
-                  <CardContent className="p-4 space-y-2 text-sm font-body">
-                    {calcResult.ferias_brutas != null && <div className="flex justify-between"><span>Férias Brutas:</span><span className="font-bold">{fmt(calcResult.ferias_brutas)}</span></div>}
-                    {calcResult.terco_constitucional != null && <div className="flex justify-between"><span>1/3 Constitucional:</span><span className="font-bold">{fmt(calcResult.terco_constitucional)}</span></div>}
-                    {calcResult.abono_pecuniario != null && calcResult.abono_pecuniario > 0 && <div className="flex justify-between"><span>Abono Pecuniário:</span><span className="font-bold">{fmt(calcResult.abono_pecuniario)}</span></div>}
-                    {calcResult.inss != null && <div className="flex justify-between"><span>INSS:</span><span className="text-destructive">-{fmt(calcResult.inss)}</span></div>}
-                    {calcResult.irrf != null && <div className="flex justify-between"><span>IRRF:</span><span className="text-destructive">-{fmt(calcResult.irrf)}</span></div>}
-                    {calcResult.liquido != null && <div className="border-t border-border/30 pt-2 flex justify-between text-base font-bold"><span>Líquido:</span><span className="text-primary">{fmt(calcResult.liquido)}</span></div>}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-md rounded-2xl">
+              <DialogHeader><DialogTitle className="flex items-center gap-2 font-display"><Calculator className="h-5 w-5" /> Simulador de Férias</DialogTitle></DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2"><Label className="font-body">Salário Base (R$)</Label><Input type="number" placeholder="5000.00" value={calcForm.salario} onChange={e => setCalcForm(p => ({ ...p, salario: e.target.value }))} className="rounded-xl" /></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label className="font-body">Dias de Férias</Label><Input type="number" min="1" max="30" value={calcForm.diasFerias} onChange={e => setCalcForm(p => ({ ...p, diasFerias: e.target.value }))} className="rounded-xl" /></div>
+                  <div className="space-y-2"><Label className="font-body">Dias Abono</Label><Input type="number" min="0" max="10" value={calcForm.diasAbono} onChange={e => setCalcForm(p => ({ ...p, diasAbono: e.target.value }))} className="rounded-xl" /></div>
+                </div>
+                <Button onClick={handleCalcFerias} disabled={calcLoading || !calcForm.salario} className="w-full rounded-xl bg-gradient-to-r from-primary-glow to-primary font-body">
+                  {calcLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Calculator className="h-4 w-4 mr-2" />}Calcular
+                </Button>
+                {calcResult && (
+                  <Card className="border border-border/30 rounded-xl">
+                    <CardContent className="p-4 space-y-2 text-sm font-body">
+                      {calcResult.ferias_brutas != null && <div className="flex justify-between"><span>Férias Brutas:</span><span className="font-bold">{fmt(calcResult.ferias_brutas)}</span></div>}
+                      {calcResult.terco_constitucional != null && <div className="flex justify-between"><span>1/3 Constitucional:</span><span className="font-bold">{fmt(calcResult.terco_constitucional)}</span></div>}
+                      {calcResult.abono_pecuniario != null && calcResult.abono_pecuniario > 0 && <div className="flex justify-between"><span>Abono Pecuniário:</span><span className="font-bold">{fmt(calcResult.abono_pecuniario)}</span></div>}
+                      {calcResult.inss != null && <div className="flex justify-between"><span>INSS:</span><span className="text-destructive">-{fmt(calcResult.inss)}</span></div>}
+                      {calcResult.irrf != null && <div className="flex justify-between"><span>IRRF:</span><span className="text-destructive">-{fmt(calcResult.irrf)}</span></div>}
+                      {calcResult.liquido != null && <div className="border-t border-border/30 pt-2 flex justify-between text-base font-bold"><span>Líquido:</span><span className="text-primary">{fmt(calcResult.liquido)}</span></div>}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       }
     >
-      <FeriasKPIs stats={stats} />
+      <div className="grid lg:grid-cols-4 gap-6 mb-8">
+        <div className="lg:col-span-3">
+          <FeriasKPIs stats={stats} />
+        </div>
+        <div className="lg:col-span-1">
+          <FeriasInsights stats={stats} />
+        </div>
+      </div>
 
       <Tabs defaultValue="dashboard" className="space-y-6">
         <TabsList className="bg-muted/50 p-1 rounded-xl">
@@ -172,17 +188,36 @@ export default function FeriasPage() {
 
           {isLoading ? (
             <TableSkeleton rows={6} columns={7} />
-          ) : !filtered?.length ? (
+          ) : !ferias?.length ? (
             <EmptyList entityName="solicitação de férias" />
           ) : (
-            <FeriasTable
-              data={filtered}
+            <>
+              <FeriasTable
+                data={ferias}
               onAprovarGestor={(id) => aprovarGestor(id)}
               onAprovarRH={(id) => aprovarRH(id)}
               onEnviarContabilidade={(id) => enviarContabilidade(id)}
               onRejeitar={(id) => rejeitar(id)}
               onCancelar={(id) => cancelar(id)}
-            />
+              />
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-xs text-muted-foreground">Mostrando {ferias.length} de {totalCount} solicitações</p>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >Anterior</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={page * limit >= totalCount}
+                  >Próxima</Button>
+                </div>
+              </div>
+            </>
           )}
         </TabsContent>
 
