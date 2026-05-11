@@ -21,15 +21,29 @@ interface FeriasAuditTimelineProps {
 }
 
 export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps) {
+  const [filtro, setFiltro] = React.useState<string>('all');
   const { data: logs, isLoading } = useQuery({
-    queryKey: ['ferias-audit', solicitacaoId],
+    queryKey: ['ferias-audit', solicitacaoId, filtro],
     queryFn: () => auditoriaService.listar({ 
       registro_id: solicitacaoId,
       tabela: 'ferias',
-      limite: 20 
+      limite: 30 
     }),
     enabled: !!solicitacaoId
   });
+
+  // Filter logs locally for better performance on stage switching
+  const filteredLogs = React.useMemo(() => {
+    if (!logs) return [];
+    if (filtro === 'all') return logs;
+    return logs.filter(log => {
+      const payload = log.payload || {};
+      if (filtro === 'aprovacao') return payload.aprovado_rh || payload.aprovado_gestor;
+      if (filtro === 'criacao') return log.acao === 'INSERT';
+      if (filtro === 'alteracao') return log.acao === 'UPDATE' && !payload.aprovado_rh && !payload.aprovado_gestor;
+      return true;
+    });
+  }, [logs, filtro]);
 
   if (isLoading) return (
     <div className="flex items-center justify-center p-8">
