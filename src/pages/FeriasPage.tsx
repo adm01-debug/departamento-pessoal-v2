@@ -131,10 +131,13 @@ export default function FeriasPage() {
             size="sm" 
             variant="outline" 
             className="rounded-xl gap-1.5 font-body"
-            onClick={() => feriasPDF.gerarRelatorioKPIs(stats, ferias)}
+            onClick={handleSync}
+            disabled={syncLoading}
           >
-            <FileDown className="h-4 w-4" /> Relatório PDF
+            {syncLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Sincronizar
           </Button>
+          <FeriasRelatorioDialog stats={stats} data={ferias} />
           <Dialog open={openCalc} onOpenChange={setOpenCalc}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
