@@ -402,6 +402,7 @@ export default function ColaboradorFormPage() {
               </Card>
             </motion.div>
           </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
