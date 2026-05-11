@@ -3,14 +3,14 @@ import { feriasService } from '@/services';
 import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
 
-export function useFerias() {
+export function useFerias(params?: { page?: number; limit?: number; search?: string; status?: string }) {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
   const qc = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['ferias', empresaId],
-    queryFn: () => feriasService.listSolicitacoes(empresaId),
+    queryKey: ['ferias', empresaId, params],
+    queryFn: () => feriasService.listSolicitacoes(empresaId, params),
     enabled: !!empresaId,
   });
 
@@ -43,7 +43,8 @@ export function useFerias() {
 
 
   return {
-    ferias: query.data || [],
+    ferias: query.data?.data || [],
+    totalCount: query.data?.count || 0,
     isLoading: query.isLoading,
     error: query.error,
     refetch: query.refetch,

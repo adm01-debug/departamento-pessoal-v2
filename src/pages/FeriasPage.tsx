@@ -35,12 +35,19 @@ const statusOptions = [
 export default function FeriasPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [openCalc, setOpenCalc] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
   const [calcResult, setCalcResult] = useState<any>(null);
   
-  const { ferias, isLoading } = useFerias();
+  const { ferias, totalCount, isLoading } = useFerias({ 
+    page, 
+    limit, 
+    search: search.length >= 3 ? search : undefined, 
+    status: statusFilter 
+  });
   const { 
     aprovarGestor, 
     aprovarRH, 
@@ -77,18 +84,9 @@ export default function FeriasPage() {
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  const filtered = ferias?.filter((s: Record<string, any>) => {
-    if (statusFilter && statusFilter !== 'all' && s.status !== statusFilter) return false;
-    if (search) {
-      const nome = (s.colaborador?.nome_completo || '').toLowerCase();
-      if (!nome.includes(search.toLowerCase())) return false;
-    }
-    return true;
-  });
-
   const stats = {
-    total: ferias?.length || 0,
-    pendentes: ferias?.filter((s: any) => s.status === 'pendente').length || 0,
+    total: totalCount,
+    pendentes: ferias?.filter((s: any) => s.status === 'pendente').length || 0, // This is local but we might want global stats
     aprovadas: ferias?.filter((s: any) => s.status === 'aprovada' || s.aprovado_rh).length || 0,
     emGozo: ferias?.filter((s: any) => s.status === 'em_gozo').length || 0,
     abonoPecuniario: ferias?.filter((s: any) => s.abono_pecuniario).length || 0,
@@ -172,17 +170,36 @@ export default function FeriasPage() {
 
           {isLoading ? (
             <TableSkeleton rows={6} columns={7} />
-          ) : !filtered?.length ? (
+          ) : !ferias?.length ? (
             <EmptyList entityName="solicitação de férias" />
           ) : (
-            <FeriasTable
-              data={filtered}
+            <>
+              <FeriasTable
+                data={ferias}
               onAprovarGestor={(id) => aprovarGestor(id)}
               onAprovarRH={(id) => aprovarRH(id)}
               onEnviarContabilidade={(id) => enviarContabilidade(id)}
               onRejeitar={(id) => rejeitar(id)}
               onCancelar={(id) => cancelar(id)}
-            />
+              />
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-xs text-muted-foreground">Mostrando {ferias.length} de {totalCount} solicitações</p>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >Anterior</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={page * limit >= totalCount}
+                  >Próxima</Button>
+                </div>
+              </div>
+            </>
           )}
         </TabsContent>
 

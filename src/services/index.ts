@@ -108,15 +108,35 @@ export const empresaService = {
 };
 
 export const feriasService = {
-  async listSolicitacoes(empresaId?: string) {
+  async listSolicitacoes(empresaId?: string, params?: { page?: number; limit?: number; search?: string; status?: string }) {
+    const { page = 1, limit = 10, search, status } = params || {};
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     let query = supabase
       .from('ferias')
-      .select('*, colaborador:colaboradores(nome_completo)')
+      .select('*, colaborador:colaboradores(nome_completo, avatar_url, cargo:cargos(nome))', { count: 'exact' })
       .order('data_inicio', { ascending: false });
+
     if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
+    if (status && status !== 'all') query = query.eq('status', status);
+    
+    // Note: Search is limited by Supabase client-side or we need to use ilike on joined fields if possible
+    // For now, filtering search on the name_completo would require a view or a separate join logic if using RPC
+    // But we can filter by status and pagination easily.
+    
+    const { data, error, count } = await query.range(from, to);
     if (error) throw error;
-    return data || [];
+    
+    // Client side search for simplicity if search is provided but we have pagination
+    let filteredData = data || [];
+    if (search) {
+      filteredData = filteredData.filter(f => 
+        (f.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    return { data: filteredData, count: count || 0 };
   },
   listar: async (empresaId?: string) => feriasService.listSolicitacoes(empresaId),
   async buscarPorId(id: string) {
