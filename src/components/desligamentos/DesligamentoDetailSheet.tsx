@@ -71,9 +71,9 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
         data_admissao: d.colaborador?.data_admissao || d.data_admissao, // Fallback
         data_desligamento: d.data_desligamento,
         tipo: d.tipo || 'sem_justa_causa',
-        aviso_trabalhado: d.aviso_trabalhado ?? false,
-        ferias_vencidas: d.ferias_vencidas_check ?? false,
-        saldo_fgts: d.saldo_fgts ?? 0,
+        aviso_trabalhado: (d as any).aviso_trabalhado ?? false,
+        ferias_vencidas: (d as any).ferias_vencidas_check ?? false,
+        saldo_fgts: (d as any).saldo_fgts ?? 0,
       });
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Rescisão calculada com sucesso');
