@@ -217,14 +217,21 @@ export default function FeriasPage() {
             <EmptyList entityName="solicitação de férias" />
           ) : (
             <>
-              <FeriasTable
-                data={ferias}
-              onAprovarGestor={(id) => aprovarGestor(id)}
-              onAprovarRH={(id) => aprovarRH(id)}
-              onEnviarContabilidade={(id) => enviarContabilidade(id)}
-              onRejeitar={(id) => rejeitar(id)}
-              onCancelar={(id) => cancelar(id)}
-              />
+              <div className="relative">
+                {isLoading && ferias.length > 0 && (
+                  <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-2xl">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                )}
+                <FeriasTable
+                  data={ferias}
+                  onAprovarGestor={(id) => aprovarGestor(id)}
+                  onAprovarRH={(id) => aprovarRH(id)}
+                  onEnviarContabilidade={(id) => enviarContabilidade(id)}
+                  onRejeitar={(id) => rejeitar(id)}
+                  onCancelar={(id) => cancelar(id)}
+                />
+              </div>
               <div className="flex items-center justify-between mt-4">
                 <p className="text-xs text-muted-foreground">Mostrando {ferias.length} de {totalCount} solicitações</p>
                 <div className="flex gap-2">
