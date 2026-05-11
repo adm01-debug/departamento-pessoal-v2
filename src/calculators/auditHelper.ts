@@ -12,11 +12,15 @@ export async function signCalculation(data: any) {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Registra a auditoria de um cálculo de folha com assinatura SHA-256
+ */
 export async function auditCalculation(
   colaboradorId: string, 
   competencia: string, 
   resultado: any
 ) {
+  // Gera assinatura digital única do resultado
   const signature = await signCalculation(resultado);
   
   await auditLogger.log({
@@ -26,11 +30,23 @@ export async function auditCalculation(
     dados_novos: {
       competencia,
       signature,
-      total_proventos: resultado.proventos.totalProventos,
-      total_descontos: resultado.descontos.totalDescontos,
-      salario_liquido: resultado.salarioLiquido
+      // Metadados essenciais para conferência rápida
+      total_proventos: resultado.proventos?.totalProventos || resultado.proventos,
+      total_descontos: resultado.descontos?.totalDescontos || resultado.descontos,
+      salario_liquido: resultado.salarioLiquido || resultado.liquido,
+      // Flag de integridade
+      integridade_calculo: 'ASSINADO_SHA256',
+      timestamp: new Date().toISOString()
     }
   });
 
   return signature;
+}
+
+/**
+ * Verifica se um resultado de cálculo foi alterado comparando com a assinatura
+ */
+export async function verifyCalculationIntegrity(data: any, originalSignature: string): Promise<boolean> {
+  const currentSignature = await signCalculation(data);
+  return currentSignature === originalSignature;
 }
