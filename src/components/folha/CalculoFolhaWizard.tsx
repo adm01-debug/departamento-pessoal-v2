@@ -333,6 +333,9 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                       horasExtras={resultadoCalculo.horasExtras}
                       dsr={resultadoCalculo.dsr}
                       decimoTerceiro={resultadoCalculo.decimoTerceiro}
+                      horasFalta={resultadoCalculo.horasFalta}
+                      faixaInss={resultadoCalculo.faixaInss}
+                      faixaIrrf={resultadoCalculo.faixaIrrf}
                     />
                   </div>
                 )}
