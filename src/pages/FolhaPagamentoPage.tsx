@@ -96,7 +96,7 @@ export default function FolhaPagamentoPage() {
   const { empresaAtual } = useEmpresas();
   const competencias = useMemo(() => gerarCompetencias(), []);
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
-  const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
+  const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia, empresaAtual?.id);
   const queryClient = useQueryClient();
   const [calcServidor, setCalcServidor] = useState(false);
 
