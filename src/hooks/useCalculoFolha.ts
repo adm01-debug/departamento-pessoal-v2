@@ -30,20 +30,48 @@ export function useCalculoFolha() {
       setResultado(res);
 
       // Persiste no banco de dados
-      const { data, error } = await supabase
+      // 1. Garantir que existe o cabeçalho da folha para a competência
+      const { data: header, error: headerError } = await supabase
         .from('folhas_pagamento')
+        .select('id')
+        .eq('empresa_id', empresaId)
+        .eq('competencia', competencia)
+        .maybeSingle();
+
+      if (headerError) throw headerError;
+
+      let folhaId = header?.id;
+
+      if (!folhaId) {
+        const { data: newHeader, error: createError } = await supabase
+          .from('folhas_pagamento')
+          .insert({
+            empresa_id: empresaId,
+            competencia,
+            status: 'rascunho',
+            tipo: 'Mensal'
+          })
+          .select('id')
+          .single();
+        
+        if (createError) throw createError;
+        folhaId = newHeader.id;
+      }
+
+      // 2. Persiste o item individual (resultado do cálculo)
+      const { data, error } = await supabase
+        .from('folha_itens')
         .upsert({
-          empresa_id: empresaId,
+          folha_id: folhaId,
           colaborador_id: colaboradorId,
-          competencia,
+          salario_base: salarioBase,
           total_proventos: res.proventos,
           total_descontos: res.descontos,
-          salario_liquido: res.liquido,
-          inss: res.inss,
-          irrf: res.irrf,
-          fgts: res.fgts,
-          status: 'rascunho',
-          updated_at: new Date().toISOString()
+          total_liquido: res.liquido,
+          inss_mes: res.inss,
+          irrf_mes: res.irrf,
+          fgts_mes: res.fgts,
+          detalhes: res as any
         })
         .select()
         .single();
