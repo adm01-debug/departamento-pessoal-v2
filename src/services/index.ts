@@ -115,23 +115,49 @@ export const feriasService = {
 
     let query = supabase
       .from('ferias')
-      .select('*, colaborador:colaboradores!ferias_colaborador_id_fkey(nome_completo, avatar_url)', { count: 'exact' })
-      .order('data_inicio', { ascending: false });
+      .select('*, colaborador:colaboradores!ferias_colaborador_id_fkey(nome_completo, avatar_url)', { count: 'exact' });
 
     if (empresaId) query = query.eq('empresa_id', empresaId);
     if (status && status !== 'all') query = query.eq('status', status);
     
-    const { data, error, count } = await query.range(from, to);
-    if (error) throw error;
-    
-    let filteredData = (data as any[]) || [];
-    if (search) {
-      filteredData = filteredData.filter((f: any) => 
-        (f.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase())
-      );
+    // Server-side search on joined table
+    if (search && search.length >= 3) {
+      // Note: !inner makes the join an INNER JOIN, which is required for filtering on the joined table
+      query = supabase
+        .from('ferias')
+        .select('*, colaborador:colaboradores!inner!ferias_colaborador_id_fkey(nome_completo, avatar_url)', { count: 'exact' })
+        .ilike('colaborador.nome_completo', `%${search}%`);
+      
+      if (empresaId) query = query.eq('empresa_id', empresaId);
+      if (status && status !== 'all') query = query.eq('status', status);
     }
 
-    return { data: filteredData, count: count || 0 };
+    const { data, error, count } = await query.order('data_inicio', { ascending: false }).range(from, to);
+    if (error) throw error;
+    
+    return { data: (data as any[]) || [], count: count || 0 };
+  },
+  async syncWithHub(empresaId: string) {
+    // Simulated incremental sync logic
+    // In a real scenario, this would call an Edge Function or check a 'last_sync' timestamp
+    console.log('Iniciando sincronização incremental com o hub unificado...');
+    const { data: latest, error } = await supabase
+      .from('ferias')
+      .select('updated_at')
+      .eq('empresa_id', empresaId)
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    
+    if (error) throw error;
+    
+    // Simulate checking for remote updates
+    await new Promise(resolve => setTimeout(resolve, 800)); 
+    
+    return { 
+      success: true, 
+      lastSync: new Date().toISOString(),
+      recordsUpdated: 0 // In this simulation, no new records
+    };
   },
   listar: async (empresaId?: string) => feriasService.listSolicitacoes(empresaId),
   async buscarPorId(id: string) {
