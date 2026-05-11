@@ -32,12 +32,13 @@ const TETO_INSS = FAIXAS_INSS_2026[FAIXAS_INSS_2026.length - 1].limite;
 
 function descreverFaixaInss(salarioBruto: number): string {
   if (salarioBruto >= TETO_INSS) return 'Teto (14%)';
-  for (let i = 0; i < FAIXAS_INSS_2026.length; i++) {
-    if (salarioBruto <= FAIXAS_INSS_2026[i].limite) {
-      return `${(FAIXAS_INSS_2026[i].aliquota * 100).toFixed(1).replace('.0', '')}%`;
-    }
-  }
-  return '14%';
+  // Encontrar a faixa correspondente ao salário bruto para exibição da alíquota máxima aplicada
+  const faixa = FAIXAS_INSS_2026.find((f, i) => {
+    const limiteAnterior = i === 0 ? 0 : FAIXAS_INSS_2026[i - 1].limite;
+    return salarioBruto > limiteAnterior && salarioBruto <= f.limite;
+  }) || FAIXAS_INSS_2026[FAIXAS_INSS_2026.length - 1];
+  
+  return `${(faixa.aliquota * 100).toFixed(1).replace('.0', '')}%`;
 }
 
 function descreverFaixaIrrf(base: number): string {
