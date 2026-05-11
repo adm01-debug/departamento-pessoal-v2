@@ -133,7 +133,7 @@ export const calculoLoteService = {
             folha_id: folhaId,
             colaborador_id: colab.id,
             tipo_evento: 'calculo_mensal',
-            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}`,
+            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}. Integração Ponto: ${res.horasExtras?.toFixed(1)}h extras, ${res.horasFalta?.toFixed(1)}h faltas.`,
             severidade: 'info',
             detalhes: { 
               timestamp: new Date().toISOString(), 
