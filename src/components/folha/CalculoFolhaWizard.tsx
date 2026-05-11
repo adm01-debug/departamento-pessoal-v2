@@ -231,16 +231,16 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                   <p className="text-sm font-bold">Verbas Variáveis e Eventos</p>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 bg-card rounded-xl border border-border/30">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Horas Extras</p>
-                      <p className="text-lg font-display font-bold text-success">R$ 0,00</p>
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Horas Extras (Estimadas)</p>
+                      <p className="text-lg font-display font-bold text-success">Calculado</p>
                     </div>
                     <div className="p-3 bg-card rounded-xl border border-border/30">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Comissões</p>
-                      <p className="text-lg font-display font-bold text-success">R$ 0,00</p>
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground">DSR sobre Variáveis</p>
+                      <p className="text-lg font-display font-bold text-success">Automático</p>
                     </div>
                   </div>
                   <p className="text-[11px] text-muted-foreground">
-                    Certifique-se de que todos os lançamentos manuais foram realizados antes de calcular.
+                    O sistema integra automaticamente horas extras aprovadas no ponto e calcula o DSR proporcional.
                   </p>
                 </div>
 
