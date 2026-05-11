@@ -83,8 +83,8 @@ export const valeAlimentacaoService = {
 
 export const planoSaudeService = {
   async calcularCoparticipacao(colaboradorId: string, mesReferencia: string) {
-    const { data, error } = await supabase
-      .from('beneficiarios_plano')
+    const { data, error } = await (supabase
+      .from('beneficiarios_plano') as any)
       .select('valor_coparticipacao')
       .eq('colaborador_id', colaboradorId)
       .eq('mes_referencia', mesReferencia)
@@ -123,8 +123,8 @@ export const seguroVidaService = {
     let totalParticipants = 0;
 
     for (const beneficio of data) {
-      const { count, error: countError } = await supabase
-        .from('beneficios_colaborador')
+    const { count, error: countError } = await (supabase
+        .from('beneficios_colaborador') as any)
         .select('*', { count: 'exact', head: true })
         .eq('beneficio_id', beneficio.id)
         .eq('status_vinculo', 'ativo');
@@ -152,8 +152,8 @@ export const dependentesService = {
   },
 
   async criar(dados: any) {
-    const { data, error } = await supabase
-      .from('dependentes')
+    const { data, error } = await (supabase
+      .from('dependentes') as any)
       .insert({
         ...dados,
         data_inicio_vigencia: dados.data_inicio_vigencia || new Date().toISOString().split('T')[0]
