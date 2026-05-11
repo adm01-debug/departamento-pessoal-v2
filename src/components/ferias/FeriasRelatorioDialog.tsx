@@ -70,7 +70,7 @@ export function FeriasRelatorioDialog({ stats, data, filters }: FeriasRelatorioD
         periodoLabel: periodLabel
       };
 
-      await feriasPDF.gerarRelatorioKPIs(localStats, filteredData);
+      await feriasPDF.gerarRelatorioKPIs(localStats, filteredData, filters);
     } finally {
       setLoading(false);
     }
