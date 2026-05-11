@@ -4,7 +4,7 @@
  */
 export { SALARIO_MINIMO_2026 } from './tabelas';
 export { calcularINSS, calcularIRRF, calcularFGTS } from './impostos';
-export { calcularDecimo13Proporcional, calcularFerias, calcularHorasExtras, calcularDSR, calcularAdicionalNoturno, calcularPericulosidade, calcularInsalubridade, calcularDescontoVT, calcularPensaoAlimenticia, calcularSobreaviso, calcularProntidao, calcularGratificacao, calcularComissao, calcularAdicionalTransferencia, calcularSalarioFamilia, calcularSalarioMaternidade, calcularAuxilioDoenca, calcularDiarias, calcularQuilometragem, calcularBancoHoras, calcularMedias } from './beneficios';
+export { calcularDecimo13, calcularFerias, calcularHorasExtras, calcularDSR, calcularAdicionalNoturno, calcularPericulosidade, calcularInsalubridade, calcularDescontoVT, calcularPensaoAlimenticia, calcularSobreaviso, calcularProntidao, calcularGratificacao, calcularComissao, calcularAdicionalTransferencia, calcularSalarioFamilia, calcularSalarioMaternidade, calcularAuxilioDoenca, calcularDiarias, calcularQuilometragem, calcularBancoHoras, calcularMedias } from './beneficios';
 export type { ParamsDecimo13, GrauInsalubridade } from './beneficios';
 export { calcularRescisao, calcularAvisoPrevioIndenizado, calcularSeguroDesemprego, calcularMultaFGTS, calcularMulta477, calcularProvisaoFerias, calcularProvisao13, calcularEncargos, calcularProRata, calcularMargemConsignado, calcularPLR } from './rescisao';
 export type { TipoRescisao } from './rescisao';
