@@ -48,7 +48,7 @@ export function useCalculoFolha() {
           .insert({
             empresa_id: empresaId,
             competencia,
-            status: 'rascunho',
+            status: 'aberta',
             tipo: 'Mensal'
           })
           .select('id')
