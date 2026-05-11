@@ -239,6 +239,8 @@ export default function FolhaPagamentoPage() {
                 irrf={resumo.irrf}
                 fgts={resumo.fgts}
                 totalDescontos={resumo.totalDescontos}
+                faixaInss="Progressiva"
+                faixaIrrf="Progressiva"
               />
             )}
           </div>

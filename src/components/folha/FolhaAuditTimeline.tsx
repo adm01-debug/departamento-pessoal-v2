@@ -13,9 +13,8 @@ export function FolhaAuditTimeline({ competencia }: { competencia: string }) {
     queryKey: ['folha-audit-logs', competencia],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('audit_log')
-        .select('*')
-        .eq('tabela', 'folhas_pagamento')
+        .from('folha_auditoria')
+        .select('*, colaborador:colaboradores(nome_completo)')
         .order('created_at', { ascending: false })
         .limit(20);
       if (error) throw error;
@@ -47,24 +46,24 @@ export function FolhaAuditTimeline({ competencia }: { competencia: string }) {
                   className="flex gap-3 relative before:absolute before:left-[11px] before:top-6 before:bottom-[-16px] before:w-[1px] before:bg-border/40 last:before:hidden"
                 >
                   <div className="h-6 w-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 z-10">
-                    {log.acao === 'EXECUTE_CALC' ? <ShieldCheck className="h-3.5 w-3.5 text-primary" /> : <Tag className="h-3.5 w-3.5 text-primary" />}
+                    {log.tipo_evento === 'CALCULO' ? <ShieldCheck className="h-3.5 w-3.5 text-primary" /> : <Tag className="h-3.5 w-3.5 text-primary" />}
                   </div>
                   
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
                       <Badge variant="outline" className="text-[9px] h-4 bg-background uppercase font-bold">
-                        {log.acao}
+                        {log.tipo_evento}
                       </Badge>
                       <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                         <Calendar className="h-3 w-3" /> {format(new Date(log.created_at), "dd/MM HH:mm", { locale: ptBR })}
                       </span>
                     </div>
                     <p className="text-[11px] font-medium leading-snug">
-                      {log.user_email || 'Sistema (Automático)'}
+                      {log.colaborador?.nome_completo || 'Sistema'}
                     </p>
-                    {log.dados_novos && (
+                    {log.mensagem && (
                        <p className="text-[10px] text-muted-foreground italic truncate max-w-[300px]">
-                         {JSON.stringify(log.dados_novos)}
+                         {log.mensagem}
                        </p>
                     )}
                   </div>

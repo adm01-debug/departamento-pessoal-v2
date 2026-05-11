@@ -108,9 +108,9 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
 
       // 3. Registrar fechamento automático da fase de processamento na auditoria
       await (supabase as any).from('folha_auditoria').insert({
-        tipo_evento: 'calculo_mensal',
+        tipo_evento: 'CALCULO',
         mensagem: `Assistente de cálculo finalizado para a competência ${competencia}.`,
-        severidade: 'info',
+        severidade: 'INFO',
         detalhes: { wizard: 'CalculoFolhaWizard', timestamp: new Date().toISOString() }
       });
 
@@ -127,7 +127,13 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
 
       if (itens && itens.length > 0) {
         setCurrentFolhaId(itens[0].folha_id);
-        setResultadoCalculo(itens[0].detalhes as any);
+        const detalhes = itens[0].detalhes as any;
+        setResultadoCalculo({
+          ...detalhes,
+          horasFalta: detalhes.horasFalta || 0,
+          faixaInss: detalhes.faixaInss || 'Progressiva',
+          faixaIrrf: detalhes.faixaIrrf || 'Progressiva'
+        });
       }
 
       toast.info(`Cálculo em lote concluído: ${resultadoLote.success} sucessos.`);
@@ -333,6 +339,9 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                       horasExtras={resultadoCalculo.horasExtras}
                       dsr={resultadoCalculo.dsr}
                       decimoTerceiro={resultadoCalculo.decimoTerceiro}
+                      horasFalta={resultadoCalculo.horasFalta}
+                      faixaInss={resultadoCalculo.faixaInss}
+                      faixaIrrf={resultadoCalculo.faixaIrrf}
                     />
                   </div>
                 )}

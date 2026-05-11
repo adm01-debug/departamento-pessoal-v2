@@ -71,7 +71,7 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
       <FolhaKPI title="Colaboradores" value={resumo?.colaboradores || 0} icon={Users}
         gradient="from-primary to-primary-glow" index={0}
         tooltip="Total de colaboradores com folha processada nesta competência" />
-      <FolhaKPI title="Total Proventos" value={resumo?.totalProventos || 0} icon={TrendingDown}
+      <FolhaKPI title="Total Bruto" value={resumo?.totalProventos || 0} icon={TrendingDown}
         gradient="from-success to-success/70" index={1}
         tooltip="Soma de todos os proventos: salário base, horas extras, gratificações" />
       <FolhaKPI title="Total Descontos" value={resumo?.totalDescontos || 0} icon={TrendingDown}
@@ -80,15 +80,15 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
       <FolhaKPI title="Líquido Total" value={resumo?.liquido || 0} icon={DollarSign}
         gradient="from-primary-glow to-primary" index={3}
         tooltip="Valor total líquido a ser pago aos colaboradores" />
-      <FolhaKPI title="INSS + FGTS" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
+      <FolhaKPI title="Encargos" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
         gradient="from-info to-info/70" index={4}
         tooltip="Encargos patronais estimados (INSS + FGTS)" />
       <FolhaKPI title="IRRF" value={resumo?.irrf || 0} icon={Receipt}
         gradient="from-warning to-warning/70" index={5}
         tooltip="Imposto de Renda Retido na Fonte (IRRF)" />
-      <FolhaKPI title="Custo Empresa" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) + (resumo?.fgts || 0) + ((resumo?.totalProventos || 0) * 0.2)} icon={DollarSign}
+      <FolhaKPI title="Custo Total" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) + (resumo?.fgts || 0) + ((resumo?.totalProventos || 0) * 0.28)} icon={DollarSign}
         gradient="from-purple-500 to-indigo-600" index={6}
-        tooltip="Custo total real estimado para a empresa (Proventos + FGTS + Encargos Patronais ~20%)" />
+        tooltip="Custo total real estimado para a empresa (Bruto + Encargos Patronais ~28% + FGTS)" />
     </div>
   );
 }

@@ -16,6 +16,7 @@ export interface CalculoResultado {
   irrf: number;
   fgts: number;
   horasExtras?: number;
+  horasFalta?: number;
   dsr?: number;
   decimoTerceiro?: number;
   faixaInss: string;
@@ -173,6 +174,7 @@ export const folhaCalc = {
       irrf, 
       fgts, 
       horasExtras: totalHE,
+      horasFalta,
       dsr,
       decimoTerceiro,
       faixaInss, 
