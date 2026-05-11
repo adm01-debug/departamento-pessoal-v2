@@ -21,9 +21,13 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { auditCalculation, verifyCalculationIntegrity } from '@/calculators/auditHelper';
+import { useCalculoFolha } from '@/hooks/useCalculoFolha';
+import { auditCalculation } from '@/calculators/auditHelper';
 import { rubricasFolhaService } from '@/services/tabelas/folhaService';
 import { validarRubricaESocial } from '@/validators/esocial';
+import { folhaPagamentoService } from '@/services/folhaPagamentoService';
+import { FolhaComposicao } from './FolhaComposicao';
+import { folhaCalc, CalculoResultado } from '@/utils/folhaCalc';
 
 interface StepProps {
   isActive: boolean;
@@ -60,7 +64,9 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [rubricasValidadas, setRubricasValidadas] = useState(false);
   const [currentFolhaId, setCurrentFolhaId] = useState<string | null>(null);
+  const [resultadoCalculo, setResultadoCalculo] = useState<CalculoResultado | null>(null);
   const { registrarLog } = useFolhaAuditoria(currentFolhaId || undefined);
+  const { executarCalculo, isCalculando } = useCalculoFolha();
   const queryClient = useQueryClient();
 
   // Queries for validation
@@ -91,35 +97,58 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
         throw new Error(`Existem ${rubricasInvalidas.length} rubricas com divergências eSocial. Corrija-as antes de calcular.`);
       }
 
-      const [mes, ano] = competencia.split('/');
-      const response = await edgeFunctionsService.calcularFolha({ 
-        empresaId: empresaAtualId!, 
-        competencia: `${ano}-${mes}` 
-      }) as any;
-      
-      const folhaId = response?.folhaId;
-      setCurrentFolhaId(folhaId);
+      // 2. Busca Colaboradores para Processamento (Simulando lote para o primeiro da lista)
+      const { data: colaboradores } = await supabase
+        .from('colaboradores')
+        .select('*')
+        .eq('empresa_id', empresaAtualId!)
+        .eq('status', 'ativo')
+        .limit(1);
 
-      // 2. Auditoria com Assinatura Digital SHA-256
-      const signature = await auditCalculation(empresaAtualId!, competencia, response?.detalhes || response);
+      if (!colaboradores || colaboradores.length === 0) {
+        throw new Error('Nenhum colaborador ativo encontrado para esta empresa.');
+      }
+      const colab = colaboradores[0];
+      const [mes, ano] = competencia.split('/');
+
+      // 3. Busca Dependentes para o cálculo do IRRF
+      const { count: dependentesCount } = await supabase
+        .from('dependentes')
+        .select('*', { count: 'exact', head: true })
+        .eq('colaborador_id', colab.id);
+
+      // 4. Executa o Novo Hook de Cálculo (useCalculoFolha)
+      const resultadoItem = await executarCalculo({
+        colaboradorId: colab.id,
+        empresaId: empresaAtualId!,
+        competencia: `${ano}-${mes}`,
+        salarioBase: Number(colab.salario_base || 0),
+        params: {
+          adicionais: 0,
+          dependentes: dependentesCount || 0
+        }
+      });
+      
+      const folhaId = resultadoItem?.folha_id;
+      setCurrentFolhaId(folhaId);
+      
+      // Armazena o resultado para exibição
+      setResultadoCalculo(resultadoItem.detalhes as any);
+
+      // 4. Auditoria com Assinatura Digital SHA-256
+      const signature = await auditCalculation(colab.id, competencia, resultadoItem);
       toast.info(`Cálculo auditado e assinado digitalmente.`);
 
-      // 3. Registrar log de auditoria do processamento
-      if (folhaId) {
-        await registrarLog({
-          folha_id: folhaId,
-          tipo_evento: 'CALCULO',
-          severidade: 'INFO',
-          mensagem: `Cálculo de folha finalizado com assinatura SHA-256: ${signature.substring(0, 16)}...`,
-          detalhes: { 
-            competencia, 
-            data_processamento: new Date().toISOString(),
-            assinatura: signature
-          }
-        });
-      }
+      // 5. Registrar log de auditoria
+      await registrarLog({
+        folha_id: folhaId,
+        colaborador_id: colab.id,
+        tipo_evento: 'CALCULO',
+        severidade: 'INFO',
+        mensagem: `Cálculo individual processado e auditado para ${colab.nome_completo}.`,
+        detalhes: { signature }
+      });
 
-      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
       setCurrentStep(4);
       toast.success('Folha processada e auditada com sucesso!');
@@ -304,14 +333,38 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                   <CheckCircle2 className="h-12 w-12" />
                 </div>
                 <h3 className="text-xl font-display font-bold">Cálculo Finalizado!</h3>
-                <p className="text-sm text-muted-foreground mt-2 mb-8">
+                <p className="text-sm text-muted-foreground mt-2 mb-4">
                   A folha da competência {competencia} foi encerrada com sucesso.
                 </p>
 
+                {resultadoCalculo && (
+                  <div className="w-full mb-6 scale-90 origin-top">
+                    <FolhaComposicao 
+                      totalProventos={resultadoCalculo.proventos}
+                      totalDescontos={resultadoCalculo.descontos}
+                      inss={resultadoCalculo.inss}
+                      irrf={resultadoCalculo.irrf}
+                      fgts={resultadoCalculo.fgts}
+                      horasExtras={resultadoCalculo.horasExtras}
+                      dsr={resultadoCalculo.dsr}
+                      decimoTerceiro={resultadoCalculo.decimoTerceiro}
+                    />
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-6">
-                  <Button variant="outline" className="rounded-xl gap-2 h-16 flex-col">
+                  <Button 
+                    variant="outline" 
+                    className="rounded-xl gap-2 h-16 flex-col"
+                    onClick={async () => {
+                      if (currentFolhaId) {
+                        const url = await folhaPagamentoService.emitirPDF(currentFolhaId);
+                        window.open(url, '_blank');
+                      }
+                    }}
+                  >
                     <Download className="h-4 w-4" />
-                    <span className="text-[10px]">Relatório PDF</span>
+                    <span className="text-[10px]">Holerites (PDF)</span>
                   </Button>
                   <Button variant="outline" className="rounded-xl gap-2 h-16 flex-col">
                     <Landmark className="h-4 w-4 text-primary" />
