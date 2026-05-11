@@ -66,7 +66,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const [currentFolhaId, setCurrentFolhaId] = useState<string | null>(null);
   const [resultadoCalculo, setResultadoCalculo] = useState<CalculoResultado | null>(null);
   const { registrarLog } = useFolhaAuditoria(currentFolhaId || undefined);
-  const { executarCalculo, executarCalculoLote, isCalculando } = useCalculoFolha();
+  const { executarCalculo, executarCalculoLote, isCalculando, progressoLote } = useCalculoFolha();
   const queryClient = useQueryClient();
 
   // Queries for validation
