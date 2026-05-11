@@ -8,9 +8,11 @@ export function useAfastamentos() {
   const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
 
+  const [filtros, setFeltros] = useState<any>({});
+
   const query = useQuery({
-    queryKey: ['afastamentos', empresaId],
-    queryFn: () => afastamentoService.listar(empresaId),
+    queryKey: ['afastamentos', empresaId, filtros],
+    queryFn: () => afastamentoService.listar(empresaId, filtros),
     enabled: !!empresaId,
   });
 

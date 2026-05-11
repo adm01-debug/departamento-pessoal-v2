@@ -7,13 +7,19 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
 
 export const afastamentoService = {
   // --- Afastamentos ---
-  async listar(empresaId?: string) {
+  async listar(empresaId?: string, filtros?: any) {
     let query = supabase
       .from('afastamentos')
-      .select('*, colaborador:colaboradores(nome_completo)')
+      .select(`
+        *,
+        colaborador:colaboradores(nome_completo, departamento:departamentos(nome)),
+        cid:cid10(codigo, descricao)
+      `)
       .order('data_inicio', { ascending: false });
     
     if (empresaId) query = query.eq('empresa_id', empresaId);
+    if (filtros?.status) query = query.eq('status', filtros.status);
+    if (filtros?.departamentoId) query = query.eq('colaborador.departamento_id', filtros.departamentoId);
     
     const { data, error } = await query;
     if (error) throw error;
@@ -23,7 +29,7 @@ export const afastamentoService = {
   async buscarPorId(id: string) {
     const { data, error } = await supabase
       .from('afastamentos')
-      .select('*, colaborador:colaboradores(nome_completo)')
+      .select('*, colaborador:colaboradores(nome_completo), cid:cid10(*)')
       .eq('id', id)
       .maybeSingle();
     
@@ -45,7 +51,7 @@ export const afastamentoService = {
   async atualizar(id: string, d: any) {
     const { data, error } = await supabase
       .from('afastamentos')
-      .update(d)
+      .update({ ...d, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .maybeSingle();
@@ -57,6 +63,18 @@ export const afastamentoService = {
   async excluir(id: string) {
     const { error } = await supabase.from('afastamentos').delete().eq('id', id);
     if (error) throw error;
+  },
+
+  // --- CID-10 ---
+  async buscarCID(termo: string) {
+    const { data, error } = await supabase
+      .from('cid10')
+      .select('*')
+      .or(`codigo.ilike.%${termo}%,descricao.ilike.%${termo}%`)
+      .limit(10);
+    
+    if (error) throw error;
+    return data || [];
   },
 
   // --- Configurações ---
@@ -111,23 +129,27 @@ export const afastamentoService = {
     return data;
   },
 
-  async excluirDocumento(id: string) {
-    const { error } = await supabase
+  async validarDocumento(id: string, validado: boolean) {
+    const { data, error } = await supabase
       .from('documentos_afastamento')
-      .delete()
-      .eq('id', id);
+      .update({ validado })
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     
     if (error) throw error;
+    return data;
   },
 
   // --- Prorrogações ---
-  async listarProrrogacoes(empresaId?: string) {
+  async listarProrrogacoes(afastamentoId?: string) {
     let query = supabase
       .from('prorrogacoes_afastamento')
-      .select('*, afastamento:afastamentos(colaborador_id, tipo, data_inicio, colaborador:colaboradores(nome_completo))')
-      .order('created_at', { ascending: false });
+      .select('*, documento:documentos_afastamento(*)');
     
-    const { data, error } = await query;
+    if (afastamentoId) query = query.eq('afastamento_id', afastamentoId);
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },
@@ -141,10 +163,9 @@ export const afastamentoService = {
     
     if (error) throw error;
 
-    // Atualiza o afastamento original com a nova data de fim
     await this.atualizar(d.afastamento_id, {
       data_fim_prevista: d.data_fim_nova,
-      status: 'ativo' // Garante que volta a ser ativo se estava finalizado
+      status: 'prorrogado'
     });
 
     return data;
@@ -164,7 +185,7 @@ export const afastamentoService = {
     const config = configs.find(c => c.tipo === tipo);
     if (!config) return { empresa: diasTotais, inss: 0 };
 
-    const maxEmpresa = config.dias_empresa_maximo || 15;
+    const maxEmpresa = config.dias_empresa_maximo ?? 15;
     
     if (diasTotais <= maxEmpresa) {
       return { empresa: diasTotais, inss: 0 };
