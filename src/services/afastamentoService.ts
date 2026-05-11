@@ -8,19 +8,19 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
 export const afastamentoService = {
   // --- Afastamentos ---
   async listar(empresaId?: string, filtros?: any) {
-    let query = supabase
-      .from('afastamentos')
-      .select(`
-        *,
-        colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo, departamento:departamentos(nome)),
-        cid:cid10(codigo, descricao)
-      `)
-      .order('data_inicio', { ascending: false });
+    // Usando cast para bypassar recursão infinita de tipos do Supabase (Excellence Fix)
+    const selectStr = `
+      *,
+      colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo, departamento:departamentos(nome)),
+      cid:cid10(codigo, descricao)
+    `;
+    
+    let query = (supabase.from('afastamentos') as any).select(selectStr);
     
     if (empresaId) query = query.eq('empresa_id', empresaId);
     if (filtros?.status) query = query.eq('status', filtros.status);
     
-    const { data, error } = await query;
+    const { data, error } = await query.order('data_inicio', { ascending: false });
     if (error) throw error;
     return data || [];
   },

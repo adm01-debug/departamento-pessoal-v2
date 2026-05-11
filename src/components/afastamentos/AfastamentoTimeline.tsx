@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useProrrogacoesAfastamento, useAfastamentos } from '@/hooks/useAfastamentos';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, ArrowRight, History, Clock, FileText, Stethoscope, AlertCircle } from 'lucide-react';
+import { Calendar, ArrowRight, History, Clock, FileText, Stethoscope, AlertCircle, Plus } from 'lucide-react';
 import { afastamentoService } from '@/services/afastamentoService';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -83,34 +83,71 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
                   </span>
                 </div>
               </CardHeader>
-              <CardContent className="py-3 px-4 space-y-3">
-                <div className="flex items-center gap-4 justify-center py-2 bg-muted/20 rounded-lg border border-dashed">
-                  <div className="text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Fim Anterior</p>
-                    <p className="text-sm font-medium line-through opacity-50">
-                      {prorr.data_fim_antiga ? format(new Date(prorr.data_fim_antiga), 'dd/MM/yyyy') : '-'}
-                    </p>
+              <CardContent className="py-4 px-4 space-y-4">
+                <div className="flex flex-col md:flex-row items-center gap-4 justify-between p-4 bg-orange-50/50 rounded-xl border border-orange-100/50">
+                  <div className="flex-1 text-center md:text-left">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Período Anterior</p>
+                    <div className="flex items-center justify-center md:justify-start gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium line-through opacity-60">
+                        Até {prorr.data_fim_antiga ? format(new Date(prorr.data_fim_antiga), 'dd/MM/yyyy') : '-'}
+                      </span>
+                    </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-orange-400" />
-                  <div className="text-center">
-                    <p className="text-[9px] text-orange-600 uppercase font-bold">Novo Fim</p>
-                    <p className="text-sm font-bold text-orange-700">
-                      {prorr.data_fim_nova ? format(new Date(prorr.data_fim_nova), 'dd/MM/yyyy') : '-'}
-                    </p>
+                  
+                  <div className="bg-orange-200/50 p-2 rounded-full hidden md:block">
+                    <ArrowRight className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <div className="bg-orange-200/50 p-2 rounded-full block md:hidden">
+                    <History className="h-4 w-4 text-orange-600" />
+                  </div>
+
+                  <div className="flex-1 text-center md:text-right">
+                    <p className="text-[10px] text-orange-600 uppercase font-bold tracking-wider mb-1">Novo Período</p>
+                    <div className="flex items-center justify-center md:justify-end gap-2">
+                      <span className="text-base font-bold text-orange-700">
+                        Até {prorr.data_fim_nova ? format(new Date(prorr.data_fim_nova), 'dd/MM/yyyy') : '-'}
+                      </span>
+                      <Badge className="bg-orange-500 text-white border-none text-[10px] h-5">EXTENDIDO</Badge>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center bg-orange-100/30 p-2 rounded text-[10px] font-medium text-orange-800">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>Duração: {afastamentoService.calcularDias(prorr.data_fim_antiga, prorr.data_fim_nova) - 1} dias adicionais</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex items-center gap-3 p-3 bg-white border border-orange-100 rounded-lg shadow-sm">
+                    <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                      <Plus className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold">Dias Adicionais</p>
+                      <p className="text-sm font-bold text-orange-700">
+                        +{afastamentoService.calcularDias(prorr.data_fim_antiga, prorr.data_fim_nova) - 1} dias de afastamento
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-white border border-orange-100 rounded-lg shadow-sm">
+                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                      <Clock className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold">Total Acumulado</p>
+                      <p className="text-sm font-bold text-blue-700">
+                        {afastamentoService.calcularDias(afastamento?.data_inicio, prorr.data_fim_nova)} dias totais
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {prorr.motivo && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground uppercase font-semibold">Motivo da Prorrogação</span>
-                    <p className="text-xs text-foreground italic bg-muted/30 p-2 rounded">"{prorr.motivo}"</p>
+                  <div className="space-y-2 pt-2">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-3.5 w-3.5 text-orange-500" />
+                      <span className="text-[10px] text-muted-foreground uppercase font-semibold">Justificativa Médica</span>
+                    </div>
+                    <p className="text-xs text-foreground bg-muted/30 p-3 rounded-lg border-l-4 border-orange-400 italic">
+                      "{prorr.motivo}"
+                    </p>
                   </div>
                 )}
                 

@@ -82,9 +82,19 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onT
                     {tipoLabels[af.tipo] || af.tipo}
                   </Badge>
                   {af.cid && (
-                    <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
-                      {af.cid}
-                    </span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground cursor-help border border-border/50">
+                            {af.cid?.codigo || af.cid}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="font-bold">{af.cid?.codigo}</p>
+                          <p className="text-xs max-w-[200px]">{af.cid?.descricao || 'Sem descrição detalhada'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
               </TableCell>
