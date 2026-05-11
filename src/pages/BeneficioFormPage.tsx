@@ -1,14 +1,11 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { PageLayout } from '@/components/layout';
 import { FormField, FormSelect } from '@/components/forms';
 import { FormSection, FormActions } from '@/components/forms/FormSection';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useBeneficios } from '@/hooks/useBeneficios';
-import { useEmpresas } from '@/hooks/useEmpresas';
 import { ArrowLeft, Save } from 'lucide-react';
 
 interface BeneficioFormData {
@@ -21,10 +18,9 @@ interface BeneficioFormData {
 
 export default function BeneficioFormPage() {
   const navigate = useNavigate();
-  const { empresaAtual } = useEmpresas();
   const { criarBeneficio, tiposBeneficio } = useBeneficios();
   
-  const { register, handleSubmit, formState: { errors } } = useForm<BeneficioFormData>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<BeneficioFormData>({
     defaultValues: {
       tipo: 'alimentacao',
       obrigatorio: false
@@ -58,10 +54,18 @@ export default function BeneficioFormPage() {
               error={errors.nome?.message}
             />
             
-            <FormSelect 
-              label="Tipo de Benefício" 
-              options={tiposBeneficio.map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))}
-              {...register('tipo', { required: true })}
+            <Controller
+              name="tipo"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormSelect 
+                  label="Tipo de Benefício" 
+                  options={tiposBeneficio.map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
 
             <FormField 
