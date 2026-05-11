@@ -14,7 +14,7 @@ export interface CNABConfig {
 export const cnabService = {
   async getConfig(empresaId: string): Promise<CNABConfig | null> {
     const { data, error } = await supabase
-      .from('cnab_configuracoes')
+      .from('cnab_configuracoes' as any)
       .select('*')
       .eq('empresa_id', empresaId)
       .maybeSingle();
@@ -25,64 +25,45 @@ export const cnabService = {
 
   async saveConfig(empresaId: string, config: CNABConfig) {
     const { data: existing } = await supabase
-      .from('cnab_configuracoes')
+      .from('cnab_configuracoes' as any)
       .select('id')
       .eq('empresa_id', empresaId)
       .maybeSingle();
 
     if (existing) {
       const { error } = await supabase
-        .from('cnab_configuracoes')
+        .from('cnab_configuracoes' as any)
         .update(config)
-        .eq('id', existing.id);
+        .eq('id', (existing as any).id);
       if (error) throw error;
     } else {
       const { error } = await supabase
-        .from('cnab_configuracoes')
+        .from('cnab_configuracoes' as any)
         .insert([{ empresa_id: empresaId, ...config }]);
       if (error) throw error;
     }
-  },
-
-  async listRemessas(empresaId: string) {
-    const { data, error } = await supabase
-      .from('cnab_remessas')
-      .select('*')
-      .eq('empresa_id', empresaId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async listPixLotes(empresaId: string) {
-    const { data, error } = await supabase
-      .from('pix_lotes')
-      .select('*')
-      .eq('empresa_id', empresaId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
   },
 
   async generateCNAB240(empresaId: string, folhaId: string): Promise<string> {
     const config = await this.getConfig(empresaId);
     if (!config) throw new Error('Configuração CNAB não encontrada para esta empresa.');
 
-    // Fetch Holerites
-    const { data: holerites, error: hError } = await supabase
-      .from('holerites')
-      .select('*, colaborador:colaboradores(id, nome_completo, cpf)')
+    // Busca itens da folha detalhados
+    const { data: itens, error: hError } = await supabase
+      .from('folha_itens')
+      .select(`
+        *, 
+        colaborador:colaboradores(id, nome_completo, cpf)
+      `)
       .eq('folha_id', folhaId);
     
     if (hError) throw hError;
-    if (!holerites?.length) throw new Error('Nenhum pagamento encontrado para gerar CNAB.');
+    if (!itens?.length) throw new Error('Nenhum pagamento encontrado para gerar CNAB.');
 
-    // Fetch Bank Accounts for these employees
-    const colaboradorIds = holerites.map(h => h.colaborador_id);
+    // Busca contas bancárias dos colaboradores
+    const colaboradorIds = itens.map(i => i.colaborador_id);
     const { data: contas, error: cError } = await supabase
-      .from('contas_bancarias')
+      .from('contas_bancarias' as any)
       .select('*')
       .in('colaborador_id', colaboradorIds)
       .eq('principal', true);
@@ -104,117 +85,69 @@ export const cnabService = {
     const timeStr = today.toTimeString().slice(0, 8).replace(/:/g, '');
 
     // Header Arquivo (Registro 0)
-    let header = pad(config.banco_codigo, 3, '0', 'left'); // Banco
+    let header = pad(config.banco_codigo, 3, '0', 'left');
     header += '0000'; // Lote
     header += '0'; // Registro
     header += pad('', 9); // Reservado
-    header += '2'; // Inscrição Empresa (CGC/CNPJ)
-    header += pad('', 14, '0'); // CNPJ Empresa (Placeholder)
-    header += pad(config.convenio, 20); // Convênio
+    header += '2'; // Inscrição Empresa (CNPJ)
+    header += pad('', 14, '0'); // CNPJ Placeholder
+    header += pad(config.convenio, 20);
     header += pad(config.agencia, 5, '0', 'left');
     header += pad(config.agencia_digito || '', 1);
     header += pad(config.conta, 12, '0', 'left');
     header += pad(config.conta_digito, 1);
-    header += ' '; // Dígito Verificador Ag/Conta
+    header += ' ';
     header += pad(config.nome_empresa || 'EMPRESA', 30);
     header += pad('BANCO', 30);
-    header += pad('', 10); // Reservado
-    header += '1'; // Código Arquivo (1=Remessa)
+    header += pad('', 10);
+    header += '1'; // Remessa
     header += dateStr;
     header += timeStr;
     header += pad(sequence, 6, '0', 'left'); // NSA
     header += '081'; // Layout
-    header += '00000'; // Densidade
-    header += pad('', 69); // Reservado
+    header += '00000';
+    header += pad('', 69);
     lines.push(header.padEnd(240, ' '));
-
-    // Header Lote (Registro 1)
-    let headerLote = pad(config.banco_codigo, 3, '0', 'left');
-    headerLote += '0001'; // Lote
-    headerLote += '1'; // Registro
-    headerLote += 'C'; // Operação (C=Crédito)
-    headerLote += '30'; // Serviço (30=Pagamento Salários)
-    headerLote += '01'; // Forma de Lançamento (01=Crédito em Conta)
-    headerLote += '040'; // Layout Lote
-    headerLote += ' '; // Reservado
-    headerLote += '2'; // Inscrição
-    headerLote += pad('', 14, '0');
-    headerLote += pad(config.convenio, 20);
-    headerLote += pad(config.agencia, 5, '0', 'left');
-    headerLote += pad(config.agencia_digito || '', 1);
-    headerLote += pad(config.conta, 12, '0', 'left');
-    headerLote += pad(config.conta_digito, 1);
-    headerLote += ' ';
-    headerLote += pad(config.nome_empresa || 'EMPRESA', 30);
-    headerLote += pad('', 40); // Mensagem
-    headerLote += pad('', 30); // Endereço
-    headerLote += pad('', 10, '0'); // CEP
-    headerLote += pad('', 20); // Complemento
-    lines.push(headerLote.padEnd(240, ' '));
 
     let totalAmount = 0;
     let detailSequence = 1;
-    const itensToInsert = [];
 
-    for (const holerite of holerites) {
-      const conta = (contas as any[])?.find(c => c.colaborador_id === holerite.colaborador_id);
+    for (const item of itens) {
+      const colab = item.colaborador as any;
+      const conta = (contas as any[])?.find(c => c.colaborador_id === item.colaborador_id);
       if (!conta) continue;
 
-      const valor = Number(holerite.liquido);
+      const valor = Number(item.total_liquido);
       totalAmount += valor;
 
-      // Segmento A
+      // Segmento A (Crédito em Conta)
       let segA = pad(config.banco_codigo, 3, '0', 'left');
       segA += '0001'; // Lote
       segA += '3'; // Registro
       segA += pad(detailSequence++, 5, '0', 'left');
       segA += 'A'; // Segmento
-      segA += '000'; // Movimento (000=Inclusão)
-      segA += '000'; // Câmara (000=Crédito em Conta)
+      segA += '000'; // Inclusão
+      segA += '000'; // Câmara
       segA += pad(conta.banco_codigo || '000', 3, '0', 'left');
       segA += pad(conta.agencia || '', 5, '0', 'left');
       segA += pad(conta.agencia_digito || '', 1);
       segA += pad(conta.conta || '', 12, '0', 'left');
       segA += pad(conta.digito || '', 1);
       segA += ' ';
-      segA += pad(holerite.colaborador_nome || '', 30);
-      segA += pad(holerite.id.substring(0, 20), 20); // Documento
-      segA += dateStr; // Data Pagamento
-      segA += 'BRL'; // Moeda
-      segA += pad('', 15, '0'); // Quantidade
+      segA += pad(colab.nome_completo || '', 30);
+      segA += pad(item.id.substring(0, 20), 20); // Documento
+      segA += dateStr;
+      segA += 'BRL';
+      segA += pad('', 15, '0');
       segA += formatAmount(valor);
-      segA += pad('', 20); // Nosso Numero
-      segA += pad('', 8, '0'); // Data Real
-      segA += pad('', 15, '0'); // Valor Real
-      segA += pad('', 40); // Finalidade
-      segA += '00'; // Aviso
-      segA += pad('', 10); // Ocorrências
+      segA += pad('', 20);
+      segA += pad('', 8, '0');
+      segA += pad('', 15, '0');
+      segA += pad('', 40);
+      segA += '00';
+      segA += pad('', 10);
       lines.push(segA.padEnd(240, ' '));
-
-      itensToInsert.push({
-        colaborador_id: holerite.colaborador_id,
-        nome_favorecido: holerite.colaborador_nome,
-        cpf_cnpj_favorecido: holerite.colaborador_cpf,
-        banco_favorecido: conta.banco_codigo,
-        agencia_favorecido: conta.agencia,
-        conta_favorecido: conta.conta,
-        valor_pagamento: valor,
-        data_pagamento: today.toISOString().split('T')[0],
-        tipo_pagamento: 'salario'
-      });
     }
-
-    // Trailer Lote (Registro 5)
-    let trailerLote = pad(config.banco_codigo, 3, '0', 'left');
-    trailerLote += '0001';
-    trailerLote += '5';
-    trailerLote += pad('', 9);
-    trailerLote += pad(lines.length + 1 - 2, 6, '0', 'left');
-    trailerLote += formatAmount(totalAmount);
-    trailerLote += pad('', 18, '0');
-    trailerLote += pad('', 18, '0');
-    trailerLote += pad('', 165);
-    lines.push(trailerLote.padEnd(240, ' '));
 
     // Trailer Arquivo (Registro 9)
     let trailer = pad(config.banco_codigo, 3, '0', 'left');
@@ -227,102 +160,46 @@ export const cnabService = {
     trailer += pad('', 205);
     lines.push(trailer.padEnd(240, ' '));
 
-    const content = lines.join('\r\n'); // CNAB usually uses CRLF
-
-    // Save Remessa record
-    const { data: remessa, error: rError } = await supabase
-      .from('cnab_remessas')
-      .insert([{
-        empresa_id: empresaId,
-        banco_codigo: config.banco_codigo,
-        sequencial_arquivo: sequence,
-        total_pagamentos: detailSequence - 1,
-        valor_total: totalAmount,
-        status: 'gerado'
-      }])
-      .select()
-      .single();
-
-    if (rError) throw rError;
-
-    // Save Itens
-    const { error: iError } = await supabase
-      .from('cnab_itens')
-      .insert(itensToInsert.map(item => ({ ...item, remessa_id: remessa.id })));
-
-    if (iError) throw iError;
-
-    return content;
+    return lines.join('\r\n');
   },
 
   async generatePIXBatch(empresaId: string, folhaId: string): Promise<string> {
-    const { data: holerites, error: hError } = await supabase
-      .from('holerites')
-      .select('*, colaborador:colaboradores(id, nome_completo, cpf)')
+    const { data: itens, error: hError } = await supabase
+      .from('folha_itens')
+      .select(`
+        *, 
+        colaborador:colaboradores(id, nome_completo, cpf)
+      `)
       .eq('folha_id', folhaId);
     
     if (hError) throw hError;
-    if (!holerites?.length) throw new Error('Nenhum pagamento encontrado para gerar lote PIX.');
+    if (!itens?.length) throw new Error('Nenhum pagamento encontrado para gerar lote PIX.');
 
-    const colaboradorIds = holerites.map(h => h.colaborador_id);
+    const colaboradorIds = itens.map(i => i.colaborador_id);
     const { data: contas, error: cError } = await supabase
-      .from('contas_bancarias')
+      .from('contas_bancarias' as any)
       .select('*')
       .in('colaborador_id', colaboradorIds)
       .eq('principal', true);
 
     if (cError) throw cError;
 
-    const csvLines = ['Nome;CPF/CNPJ;Chave Pix;Tipo Chave;Valor;Descricao'];
+    const csvLines = ['Nome;CPF/CNPJ;Chave Pix;Tipo Chave;Valor;Descricao;ID_Folha_Item'];
     let totalAmount = 0;
-    const itensToInsert = [];
 
-    for (const holerite of holerites) {
-      const conta = (contas as any[])?.find(c => c.colaborador_id === holerite.colaborador_id);
+    for (const item of itens) {
+      const colab = item.colaborador as any;
+      const conta = (contas as any[])?.find(c => c.colaborador_id === item.colaborador_id);
       if (!conta || !conta.pix_chave) continue;
 
-      const valor = Number(holerite.liquido);
+      const valor = Number(item.total_liquido);
       totalAmount += valor;
       const valorStr = valor.toFixed(2).replace('.', ',');
-      const nome = holerite.colaborador_nome || '';
-      const cpf = holerite.colaborador_cpf || '';
-      const chave = conta.pix_chave;
-      const tipo = conta.pix_tipo || 'CPF';
-
-      csvLines.push(`${nome};${cpf};${chave};${tipo};${valorStr};Pagamento Salarial`);
       
-      itensToInsert.push({
-        colaborador_id: holerite.colaborador_id,
-        chave_pix: chave,
-        tipo_chave: tipo,
-        valor: valor,
-        descricao: 'Pagamento Salarial',
-        status: 'pendente'
-      });
+      csvLines.push(`${colab.nome_completo};${colab.cpf || ''};${conta.pix_chave};${conta.pix_tipo || 'CPF'};${valorStr};Pagamento Salarial;${item.id}`);
     }
 
     if (csvLines.length === 1) throw new Error('Nenhum colaborador com chave PIX cadastrada nesta folha.');
-
-    // Save Lote record
-    const { data: lote, error: lError } = await supabase
-      .from('pix_lotes')
-      .insert([{
-        empresa_id: empresaId,
-        valor_total: totalAmount,
-        quantidade_pagamentos: csvLines.length - 1,
-        status: 'finalizado'
-      }])
-      .select()
-      .single();
-
-    if (lError) throw lError;
-
-    // Save Itens
-    const { error: iError } = await supabase
-      .from('pix_itens')
-      .insert(itensToInsert.map(item => ({ ...item, lote_id: lote.id })));
-
-    if (iError) throw iError;
 
     return csvLines.join('\n');
   }
