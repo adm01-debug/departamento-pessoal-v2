@@ -25,9 +25,13 @@ import { Badge } from '@/components/ui/badge';
 interface FeriasRelatorioDialogProps {
   stats: any;
   data: any[];
+  filters?: {
+    search?: string;
+    status?: string;
+  };
 }
 
-export function FeriasRelatorioDialog({ stats, data }: FeriasRelatorioDialogProps) {
+export function FeriasRelatorioDialog({ stats, data, filters }: FeriasRelatorioDialogProps) {
   const [periodo, setPeriodo] = useState('6_meses');
   const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
