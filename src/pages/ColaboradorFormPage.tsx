@@ -404,22 +404,7 @@ export default function ColaboradorFormPage() {
               </Card>
             </motion.div>
           </TabsContent>
-        </Tabs>
-
-        <div className="flex justify-end gap-3 pt-6 border-t border-border/20">
-          <Button type="button" variant="outline" className="rounded-xl px-8" onClick={() => navigate('/colaboradores')}>
-            Descartar Alterações
-          </Button>
-          <Button 
-            className="rounded-xl bg-gradient-to-r from-primary to-primary-glow px-12 shadow-glow"
-            onClick={handleSubmit((data) => mutation.mutate(data))}
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-            Finalizar Cadastro
-          </Button>
-        </div>
-      </PageLayout>
-    </>
+      </div>
+    </div>
   );
 }
