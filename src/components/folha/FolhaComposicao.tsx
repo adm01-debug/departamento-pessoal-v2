@@ -15,16 +15,25 @@ interface FolhaComposicaoProps {
   irrf: number;
   fgts: number;
   totalDescontos: number;
+  horasExtras?: number;
+  dsr?: number;
+  decimoTerceiro?: number;
 }
 
-export function FolhaComposicao({ totalProventos, inss, irrf, fgts, totalDescontos }: FolhaComposicaoProps) {
+export function FolhaComposicao({ 
+  totalProventos, inss, irrf, fgts, totalDescontos,
+  horasExtras = 0, dsr = 0, decimoTerceiro = 0
+}: FolhaComposicaoProps) {
   const items = [
-    { label: 'Salário Base + Adicionais', value: totalProventos, color: 'bg-success', pct: 100 },
+    { label: 'Salário Base + Adicionais', value: totalProventos - horasExtras - dsr - decimoTerceiro, color: 'bg-success', pct: totalProventos > 0 ? ((totalProventos - horasExtras - dsr - decimoTerceiro) / totalProventos) * 100 : 0 },
+    { label: 'Horas Extras (50% e 100%)', value: horasExtras, color: 'bg-emerald-400', pct: totalProventos > 0 ? (horasExtras / totalProventos) * 100 : 0 },
+    { label: 'DSR (Descanso Remunerado)', value: dsr, color: 'bg-teal-400', pct: totalProventos > 0 ? (dsr / totalProventos) * 100 : 0 },
+    { label: '13º Salário', value: decimoTerceiro, color: 'bg-blue-400', pct: totalProventos > 0 ? (decimoTerceiro / totalProventos) * 100 : 0 },
     { label: 'INSS (Empregado)', value: inss, color: 'bg-info', pct: totalProventos > 0 ? (inss / totalProventos) * 100 : 0 },
     { label: 'IRRF', value: irrf, color: 'bg-warning', pct: totalProventos > 0 ? (irrf / totalProventos) * 100 : 0 },
     { label: 'FGTS (Patronal)', value: fgts, color: 'bg-primary', pct: totalProventos > 0 ? (fgts / totalProventos) * 100 : 0 },
     { label: 'Outros Descontos', value: totalDescontos - inss - irrf, color: 'bg-destructive', pct: totalProventos > 0 ? ((totalDescontos - inss - irrf) / totalProventos) * 100 : 0 },
-  ];
+  ].filter(item => item.value > 0 || ['Salário Base + Adicionais', 'INSS (Empregado)', 'FGTS (Patronal)'].includes(item.label));
 
   return (
     <Card className="border border-border/30 rounded-2xl overflow-hidden">

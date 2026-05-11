@@ -1,12 +1,11 @@
 /**
- * Utilitário de cálculo de folha (INSS/IRRF/FGTS).
+ * Utilitário de cálculo de folha (INSS/IRRF/FGTS/Trabalhista).
  *
- * IMPORTANTE: Este módulo é apenas um WRAPPER em torno de `src/calculators/impostos.ts`,
- * que é a fonte única de verdade das tabelas vigentes (sincronizada com a edge function
- * `calcular-folha`). Mantido por compatibilidade com componentes que esperam a forma
- * `{ valor, faixa }`.
+ * Este módulo centraliza os cálculos de folha de pagamento, integrando
+ * impostos e verbas trabalhistas.
  */
 import { calcularINSS as _inss, calcularIRRF as _irrf, calcularFGTS as _fgts } from '@/calculators/impostos';
+import { calcularHorasExtras, calcularDSR, calcular13Salario } from '@/calculators/trabalhista';
 import { FAIXAS_INSS_2026, FAIXAS_IRRF_2026, DEDUCAO_DEPENDENTE_IRRF } from '@/calculators/tabelas';
 
 export interface CalculoResultado {
@@ -16,6 +15,9 @@ export interface CalculoResultado {
   inss: number;
   irrf: number;
   fgts: number;
+  horasExtras?: number;
+  dsr?: number;
+  decimoTerceiro?: number;
   faixaInss: string;
   faixaIrrf: string;
 }
@@ -54,18 +56,71 @@ export const folhaCalc = {
 
   calcularFGTS: (salarioBruto: number): number => _fgts(salarioBruto),
 
+  calcularHorasExtras,
+  calcularDSR,
+  calcular13Salario,
+
   processar: (
     salarioBase: number,
-    adicionais: number = 0,
-    descontosExtras: number = 0,
-    dependentes: number = 0
+    params: {
+      adicionais?: number;
+      descontosExtras?: number;
+      dependentes?: number;
+      horasExtras50?: number;
+      horasExtras100?: number;
+      meses13?: number;
+      parcela13?: 1 | 2;
+      jornada?: number;
+    } = {}
   ): CalculoResultado => {
-    const proventos = salarioBase + adicionais;
+    const {
+      adicionais = 0,
+      descontosExtras = 0,
+      dependentes = 0,
+      horasExtras50 = 0,
+      horasExtras100 = 0,
+      meses13 = 0,
+      parcela13,
+      jornada = 220
+    } = params;
+
+    let totalTrabalhista = 0;
+    
+    // Cálculo de Horas Extras
+    const valorHE50 = calcularHorasExtras(salarioBase, jornada, horasExtras50, 0.5);
+    const valorHE100 = calcularHorasExtras(salarioBase, jornada, horasExtras100, 1.0);
+    const totalHE = valorHE50 + valorHE100;
+    
+    // Cálculo de DSR sobre Horas Extras (estimado 26 dias úteis / 4 domingos)
+    const dsr = calcularDSR(totalHE);
+    
+    // Cálculo de 13º Salário se solicitado
+    let decimoTerceiro = 0;
+    if (parcela13) {
+      decimoTerceiro = calcular13Salario(salarioBase, meses13 || 12, parcela13);
+    }
+
+    const proventos = salarioBase + adicionais + totalHE + dsr + decimoTerceiro;
+    
     const { valor: inss, faixa: faixaInss } = folhaCalc.calcularINSS(proventos);
     const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(proventos, inss, dependentes);
     const fgts = folhaCalc.calcularFGTS(proventos);
+    
     const descontos = Math.round((inss + irrf + descontosExtras) * 100) / 100;
     const liquido = Math.round((proventos - descontos) * 100) / 100;
-    return { proventos, descontos, liquido, inss, irrf, fgts, faixaInss, faixaIrrf };
+
+    return { 
+      proventos, 
+      descontos, 
+      liquido, 
+      inss, 
+      irrf, 
+      fgts, 
+      horasExtras: totalHE,
+      dsr,
+      decimoTerceiro,
+      faixaInss, 
+      faixaIrrf 
+    };
   },
 };
