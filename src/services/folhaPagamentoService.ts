@@ -93,6 +93,15 @@ export const folhaPagamentoService = {
       .eq('id', folhaId);
 
     if (error) throw error;
+    
+    // 3.1. Calcular provisões automáticas após o fechamento para fins de balancete
+    const [mes, ano] = folhaId.split('-').slice(-2); // Exemplo de parse de competência se ID contiver
+    const { data: folhaData } = await supabase.from('folhas_pagamento').select('competencia, empresa_id').eq('id', folhaId).single();
+    
+    if (folhaData) {
+      const { provisoesService } = await import('@/services/folha/provisoesService');
+      await provisoesService.calcularProvisoesMensais(folhaData.empresa_id, folhaData.competencia);
+    }
 
     // 4. Registrar na auditoria
     await supabase.from('folha_auditoria').insert({

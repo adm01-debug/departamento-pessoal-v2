@@ -32,7 +32,12 @@ export const provisoesService = {
         competencia,
         valor_13_salario: provisao13,
         valor_ferias: provisaoFerias,
-        encargos_provisao: fgtsProvisao
+        encargos_provisao: fgtsProvisao,
+        detalhes: { 
+          salario_base: salario, 
+          tipo_calculo: 'linear_12_avos', 
+          timestamp: new Date().toISOString() 
+        }
       });
     }
 
