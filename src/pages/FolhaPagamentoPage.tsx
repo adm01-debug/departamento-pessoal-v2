@@ -44,6 +44,7 @@ interface FolhaResumo {
   inss: number;
   fgts: number;
   irrf: number;
+  custoTotalEmpresa: number;
   status: Record<string, string>;
 }
 
