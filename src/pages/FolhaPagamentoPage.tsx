@@ -86,6 +86,7 @@ function useFolhaResumo(competencia: string, empresaId?: string) {
         status: {
           ponto: hasData ? 'importado' : 'pendente',
           lancamentos: hasData ? 'conferido' : 'pendente',
+          beneficios: hasData ? 'processado' : 'pendente',
           calculo: hasData ? 'executado' : 'pendente',
           conferencia: 'pendente',
           fechamento: (folhaData?.[0]?.folha as any)?.status || 'aberto',
