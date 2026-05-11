@@ -11,19 +11,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
-import { Info, Calendar, FileText, Upload } from 'lucide-react';
-import { toast } from 'sonner';
+import { Info, Calendar, Search, Stethoscope, AlertTriangle } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 const schema = z.object({
   colaborador_id: z.string().min(1, 'Colaborador é obrigatório'),
   tipo: z.string().min(1, 'Tipo é obrigatório'),
   data_inicio: z.string().min(1, 'Data de início é obrigatória'),
   data_fim_prevista: z.string().min(1, 'Data de fim é obrigatória'),
-  cid: z.string().optional(),
-  cid_descricao: z.string().optional(),
-  medico_nome: z.string().optional(),
-  medico_crm: z.string().optional(),
-  atestado_numero: z.string().optional(),
+  cid_id: z.string().optional(),
+  nome_medico: z.string().optional(),
+  crm_medico: z.string().optional(),
   observacoes: z.string().optional(),
   status: z.string().default('ativo'),
 });
@@ -37,6 +37,9 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const { criar, atualizar, configs, isCriando, isAtualizando } = useAfastamentos();
   const { colaboradores } = useColaboradores();
   const [diasInfo, setDiasInfo] = useState({ total: 0, empresa: 0, inss: 0 });
+  const [cidSearch, setCidSearch] = useState('');
+  const [cidResults, setCidResults] = useState<any[]>([]);
+  const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -58,11 +61,22 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
     }
   }, [watchInicio, watchFim, watchTipo, configs]);
 
+  useEffect(() => {
+    const searchCID = async () => {
+      if (cidSearch.length > 2) {
+        const results = await afastamentoService.buscarCID(cidSearch);
+        setCidResults(results);
+      }
+    };
+    const timer = setTimeout(searchCID, 300);
+    return () => clearTimeout(timer);
+  }, [cidSearch]);
+
   const onSubmit = async (data: any) => {
     try {
       const payload = {
         ...data,
-        dias_total: diasInfo.total,
+        cid_id: selectedCid?.id,
         dias_empresa: diasInfo.empresa,
         dias_inss: diasInfo.inss,
       };
@@ -79,34 +93,53 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-h-[80vh] overflow-y-auto px-1">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Colaborador</Label>
-          <Select 
-            defaultValue={initialData?.colaborador_id}
-            onValueChange={(val) => setValue('colaborador_id', val)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione o colaborador" />
-            </SelectTrigger>
-            <SelectContent>
-              {colaboradores.map((c) => (
-                <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between"
+              >
+                {watch('colaborador_id') 
+                  ? colaboradores.find(c => c.id === watch('colaborador_id'))?.nome_completo 
+                  : "Selecionar colaborador..."}
+                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <Command>
+                <CommandInput placeholder="Buscar colaborador..." />
+                <CommandList>
+                  <CommandEmpty>Nenhum colaborador encontrado.</CommandEmpty>
+                  <CommandGroup>
+                    {colaboradores.map((c) => (
+                      <CommandItem
+                        key={c.id}
+                        onSelect={() => setValue('colaborador_id', c.id)}
+                      >
+                        {c.nome_completo}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           {errors.colaborador_id && <p className="text-xs text-destructive">{errors.colaborador_id.message as string}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label>Tipo de Afastamento</Label>
+          <Label>Motivo do Afastamento</Label>
           <Select 
             defaultValue={initialData?.tipo || 'doenca'}
             onValueChange={(val) => setValue('tipo', val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Selecione o tipo" />
+              <SelectValue placeholder="Selecione o motivo" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="doenca">Doença</SelectItem>
@@ -130,82 +163,114 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Data de Início</Label>
-          <div className="relative">
-            <Input type="date" {...register('data_inicio')} />
-            <Calendar className="absolute right-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-          </div>
+          <Input type="date" {...register('data_inicio')} />
           {errors.data_inicio && <p className="text-xs text-destructive">{errors.data_inicio.message as string}</p>}
         </div>
 
         <div className="space-y-2">
           <Label>Data de Fim Prevista</Label>
-          <div className="relative">
-            <Input type="date" {...register('data_fim_prevista')} />
-            <Calendar className="absolute right-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-          </div>
+          <Input type="date" {...register('data_fim_prevista')} />
           {errors.data_fim_prevista && <p className="text-xs text-destructive">{errors.data_fim_prevista.message as string}</p>}
         </div>
       </div>
 
       {diasInfo.total > 0 && (
-        <Card className="bg-muted/30 border-dashed">
-          <CardContent className="p-4 flex flex-wrap gap-6 items-center">
-            <div className="flex items-center gap-2">
-              <Info className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Resumo do Período:</span>
-            </div>
-            <div className="text-sm">
-              <span className="text-muted-foreground">Total:</span> <span className="font-bold">{diasInfo.total} dias</span>
-            </div>
-            <div className="text-sm">
-              <span className="text-muted-foreground">Empresa:</span> <span className="font-bold">{diasInfo.empresa} dias</span>
-            </div>
-            <div className="text-sm">
-              <span className="text-muted-foreground">INSS:</span> <span className="font-bold">{diasInfo.inss} dias</span>
+        <Card className={cn("border-l-4", diasInfo.inss > 0 ? "border-l-warning bg-warning/5" : "border-l-primary bg-primary/5")}>
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground uppercase">Resumo de Pagamento</p>
+                <p className="text-sm">
+                  <span className="font-bold">{diasInfo.total} dias</span> de afastamento no total.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <div className="text-center">
+                  <p className="text-[10px] text-muted-foreground uppercase">Empresa</p>
+                  <p className="text-lg font-bold">{diasInfo.empresa}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-muted-foreground uppercase">INSS</p>
+                  <p className="text-lg font-bold text-warning">{diasInfo.inss}</p>
+                </div>
+              </div>
             </div>
             {diasInfo.inss > 0 && (
-              <div className="text-xs px-2 py-1 bg-warning/20 text-warning-foreground rounded-full font-semibold">
-                Requer encaminhamento ao INSS
+              <div className="mt-3 flex items-start gap-2 text-xs text-warning-foreground font-medium">
+                <AlertTriangle className="h-3 w-3 mt-0.5" />
+                <span>Excede 15 dias: Requer perícia e encaminhamento ao INSS.</span>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>CID</Label>
-          <Input placeholder="Ex: Z00" {...register('cid')} />
+      <div className="space-y-4 border-t pt-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Stethoscope className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold">Dados Médicos</h3>
         </div>
+        
         <div className="space-y-2">
-          <Label>Descrição do CID (opcional)</Label>
-          <Input placeholder="Descrição da doença" {...register('cid_descricao')} />
+          <Label>CID-10</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-between font-normal">
+                {selectedCid ? `[${selectedCid.codigo}] ${selectedCid.descricao}` : "Buscar por código ou descrição..."}
+                <Search className="h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[400px] p-0" align="start">
+              <Command shouldFilter={false}>
+                <CommandInput 
+                  placeholder="Pesquisar CID (ex: Z76)..." 
+                  value={cidSearch} 
+                  onValueChange={setCidSearch}
+                />
+                <CommandList>
+                  {cidResults.length === 0 && <CommandEmpty>Nenhum CID encontrado.</CommandEmpty>}
+                  <CommandGroup>
+                    {cidResults.map((c) => (
+                      <CommandItem
+                        key={c.id}
+                        onSelect={() => {
+                          setSelectedCid(c);
+                          setCidSearch('');
+                        }}
+                      >
+                        <span className="font-bold mr-2">{c.codigo}</span>
+                        <span className="truncate">{c.descricao}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label>Médico</Label>
-          <Input placeholder="Nome do médico" {...register('medico_nome')} />
-        </div>
-        <div className="space-y-2">
-          <Label>CRM</Label>
-          <Input placeholder="CRM/UF" {...register('medico_crm')} />
-        </div>
-        <div className="space-y-2">
-          <Label>Nº Atestado</Label>
-          <Input placeholder="Número do documento" {...register('atestado_numero')} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Nome do Médico</Label>
+            <Input placeholder="Dr(a)..." {...register('nome_medico')} />
+          </div>
+          <div className="space-y-2">
+            <Label>CRM / UF</Label>
+            <Input placeholder="000000/UF" {...register('crm_medico')} />
+          </div>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Observações</Label>
-        <Textarea placeholder="Informações adicionais..." {...register('observacoes')} />
+        <Label>Observações Internas</Label>
+        <Textarea placeholder="Histórico, observações importantes..." {...register('observacoes')} />
       </div>
 
-      <Button type="submit" className="w-full" disabled={isCriando || isAtualizando}>
-        {isCriando || isAtualizando ? 'Salvando...' : (initialData ? 'Atualizar Afastamento' : 'Registrar Afastamento')}
-      </Button>
+      <div className="sticky bottom-0 bg-background pt-2 border-t">
+        <Button type="submit" className="w-full" disabled={isCriando || isAtualizando}>
+          {isCriando || isAtualizando ? 'Processando...' : (initialData ? 'Salvar Alterações' : 'Concluir Registro')}
+        </Button>
+      </div>
     </form>
   );
 }
