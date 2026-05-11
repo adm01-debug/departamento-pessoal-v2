@@ -66,7 +66,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
   const [currentFolhaId, setCurrentFolhaId] = useState<string | null>(null);
   const [resultadoCalculo, setResultadoCalculo] = useState<CalculoResultado | null>(null);
   const { registrarLog } = useFolhaAuditoria(currentFolhaId || undefined);
-  const { executarCalculo, isCalculando } = useCalculoFolha();
+  const { executarCalculo, executarCalculoLote, isCalculando } = useCalculoFolha();
   const queryClient = useQueryClient();
 
   // Queries for validation
@@ -97,61 +97,35 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
         throw new Error(`Existem ${rubricasInvalidas.length} rubricas com divergências eSocial. Corrija-as antes de calcular.`);
       }
 
-      // 2. Busca Colaboradores para Processamento (Simulando lote para o primeiro da lista)
-      const { data: colaboradores } = await supabase
-        .from('colaboradores')
-        .select('*')
-        .eq('empresa_id', empresaAtualId!)
-        .eq('status', 'ativo')
+      // 2. Executar cálculo em lote via hook
+      const [mes, ano] = competencia.split('/');
+      const competenciaDB = `${ano}-${mes}`;
+      
+      const resultadoLote = await executarCalculoLote({
+        empresaId: empresaAtualId!,
+        competencia: competenciaDB
+      });
+
+      // Busca um resumo para exibição final
+      const { data: itens } = await supabase
+        .from('folha_itens')
+        .select(`
+          *,
+          folha:folhas_pagamento(*)
+        `)
+        .eq('folha.competencia', competenciaDB)
+        .eq('folha.empresa_id', empresaAtualId!)
         .limit(1);
 
-      if (!colaboradores || colaboradores.length === 0) {
-        throw new Error('Nenhum colaborador ativo encontrado para esta empresa.');
+      if (itens && itens.length > 0) {
+        setCurrentFolhaId(itens[0].folha_id);
+        setResultadoCalculo(itens[0].detalhes as any);
       }
-      const colab = colaboradores[0];
-      const [mes, ano] = competencia.split('/');
 
-      // 3. Busca Dependentes para o cálculo do IRRF
-      const { count: dependentesCount } = await supabase
-        .from('dependentes')
-        .select('*', { count: 'exact', head: true })
-        .eq('colaborador_id', colab.id);
-
-      // 4. Executa o Novo Hook de Cálculo (useCalculoFolha)
-      const resultadoItem = await executarCalculo({
-        colaboradorId: colab.id,
-        empresaId: empresaAtualId!,
-        competencia: `${ano}-${mes}`,
-        salarioBase: Number(colab.salario_base || 0),
-        params: {
-          adicionais: 0,
-          dependentes: dependentesCount || 0
-        }
-      });
+      toast.info(`Cálculo em lote concluído: ${resultadoLote.success} sucessos.`);
       
-      const folhaId = resultadoItem?.folha_id;
-      setCurrentFolhaId(folhaId);
-      
-      // Armazena o resultado para exibição
-      setResultadoCalculo(resultadoItem.detalhes as any);
-
-      // 4. Auditoria com Assinatura Digital SHA-256
-      const signature = await auditCalculation(colab.id, competencia, resultadoItem);
-      toast.info(`Cálculo auditado e assinado digitalmente.`);
-
-      // 5. Registrar log de auditoria
-      await registrarLog({
-        folha_id: folhaId,
-        colaborador_id: colab.id,
-        tipo_evento: 'CALCULO',
-        severidade: 'INFO',
-        mensagem: `Cálculo individual processado e auditado para ${colab.nome_completo}.`,
-        detalhes: { signature }
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['folhas'] });
+      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       setCurrentStep(4);
-      toast.success('Folha processada e auditada com sucesso!');
     } catch (err: any) {
       toast.error(err.message || 'Erro no processamento');
     } finally {

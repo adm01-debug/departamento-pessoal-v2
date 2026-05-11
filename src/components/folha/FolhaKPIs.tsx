@@ -49,6 +49,7 @@ interface FolhaResumo {
   inss: number;
   fgts: number;
   irrf: number;
+  custoTotalEmpresa?: number;
 }
 
 interface FolhaKPIsProps {
@@ -66,7 +67,7 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
       <FolhaKPI title="Colaboradores" value={resumo?.colaboradores || 0} icon={Users}
         gradient="from-primary to-primary-glow" index={0}
         tooltip="Total de colaboradores com folha processada nesta competência" />
@@ -75,16 +76,19 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
         tooltip="Soma de todos os proventos: salário base, horas extras, gratificações" />
       <FolhaKPI title="Total Descontos" value={resumo?.totalDescontos || 0} icon={TrendingDown}
         gradient="from-destructive to-destructive/70" index={2}
-        tooltip="INSS, IRRF, VT, VA, plano de saúde e outros descontos" />
+        tooltip="INSS, IRRF e outros descontos dos colaboradores" />
       <FolhaKPI title="Líquido Total" value={resumo?.liquido || 0} icon={DollarSign}
         gradient="from-primary-glow to-primary" index={3}
-        tooltip="Valor líquido = Proventos - Descontos" />
+        tooltip="Valor total líquido a ser pago aos colaboradores" />
       <FolhaKPI title="INSS + FGTS" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
         gradient="from-info to-info/70" index={4}
-        tooltip="Encargos patronais: INSS + FGTS sobre a folha" />
+        tooltip="Encargos patronais estimados (INSS + FGTS)" />
       <FolhaKPI title="IRRF" value={resumo?.irrf || 0} icon={Receipt}
         gradient="from-warning to-warning/70" index={5}
-        tooltip="Imposto de Renda Retido na Fonte" />
+        tooltip="Imposto de Renda Retido na Fonte (IRRF)" />
+      <FolhaKPI title="Custo Empresa" value={resumo?.custoTotalEmpresa || (resumo?.totalProventos || 0) + (resumo?.fgts || 0)} icon={DollarSign}
+        gradient="from-purple-500 to-indigo-600" index={6}
+        tooltip="Custo total real para a empresa (Proventos + Encargos Patronais)" />
     </div>
   );
 }

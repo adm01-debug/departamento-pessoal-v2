@@ -44,42 +44,55 @@ interface FolhaResumo {
   inss: number;
   fgts: number;
   irrf: number;
+  custoTotalEmpresa: number;
   status: Record<string, string>;
 }
 
-function useFolhaResumo(competencia: string) {
+function useFolhaResumo(competencia: string, empresaId?: string) {
   return useQuery<FolhaResumo>({
-    queryKey: ['folha-resumo', competencia],
+    queryKey: ['folha-resumo', competencia, empresaId],
     queryFn: async () => {
       const [mes, ano] = competencia.split('/');
       const competenciaDB = `${ano}-${mes}`;
-      const { data: folhaData } = await supabase.from('folhas_pagamento').select('*').eq('competencia', competenciaDB);
+      
+      const { data: folhaData, error } = await supabase
+        .from('folha_itens')
+        .select(`
+          *,
+          folha:folhas_pagamento(*)
+        `)
+        .eq('folha.competencia', competenciaDB)
+        .eq('folha.empresa_id', empresaId!);
+
+      if (error) throw error;
+
       const colaboradores = folhaData?.length || 0;
       const totalProventos = folhaData?.reduce((acc, f) => acc + (f.total_proventos || 0), 0) || 0;
       const totalDescontos = folhaData?.reduce((acc, f) => acc + (f.total_descontos || 0), 0) || 0;
-      
-      // Cálculo preciso usando o novo utilitário folhaCalc
-      const inss = folhaData?.reduce((acc, f) => acc + folhaCalc.calcularINSS(f.total_proventos || 0).valor, 0) || 0;
-      const fgts = folhaCalc.calcularFGTS(totalProventos);
-      const irrf = folhaData?.reduce((acc, f) => {
-        const i = folhaCalc.calcularINSS(f.total_proventos || 0).valor;
-        return acc + folhaCalc.calcularIRRF(f.total_proventos || 0, i).valor;
-      }, 0) || 0;
+      const inss = folhaData?.reduce((acc, f) => acc + (f.inss_mes || 0), 0) || 0;
+      const irrf = folhaData?.reduce((acc, f) => acc + (f.irrf_mes || 0), 0) || 0;
+      const fgts = folhaData?.reduce((acc, f) => acc + (f.fgts_mes || 0), 0) || 0;
+
+      // Estimativa de Encargos Patronais (INSS Patronal + RAT + Terceiros ~ 27.8%)
+      const inssPatronal = totalProventos * 0.278;
+      const custoTotalEmpresa = totalProventos + inssPatronal + fgts;
 
       const hasData = colaboradores > 0;
       return {
-        id: folhaData?.[0]?.id,
+        id: folhaData?.[0]?.folha_id,
         colaboradores, totalProventos, totalDescontos, inss, fgts, irrf,
         liquido: totalProventos - totalDescontos,
+        custoTotalEmpresa,
         status: {
           ponto: hasData ? 'importado' : 'pendente',
           lancamentos: hasData ? 'conferido' : 'pendente',
           calculo: hasData ? 'executado' : 'pendente',
           conferencia: 'pendente',
-          fechamento: 'aberto',
+          fechamento: (folhaData?.[0]?.folha as any)?.status || 'aberto',
         },
       };
     },
+    enabled: !!empresaId,
     staleTime: 2 * 60 * 1000,
   });
 }
@@ -89,7 +102,7 @@ export default function FolhaPagamentoPage() {
   const { empresaAtual } = useEmpresas();
   const competencias = useMemo(() => gerarCompetencias(), []);
   const [competencia, setCompetencia] = useState(getCompetenciaAtual());
-  const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia);
+  const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia, empresaAtual?.id);
   const queryClient = useQueryClient();
   const [calcServidor, setCalcServidor] = useState(false);
 

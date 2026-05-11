@@ -17,43 +17,60 @@ export function RelatorioContabilDialog({ folhaId }: RelatorioContabilDialogProp
   const handleExport = async () => {
     setLoading(true);
     try {
-      // Fetch folha details
-      const { data: holerites, error: hError } = await supabase
-        .from('holerites')
-        .select('*')
+      // Fetch folha items (detailed)
+      const { data: itens, error: hError } = await supabase
+        .from('folha_itens')
+        .select(`
+          *,
+          colaborador:colaboradores(nome_completo, departamento, centro_custo)
+        `)
         .eq('folha_id', folhaId);
       
       if (hError) throw hError;
+      if (!itens || itens.length === 0) throw new Error('Nenhum dado encontrado para esta folha.');
 
-      // Group by accounts (Simplified layout for accounting reconciliation)
-      // Account;CostCenter;Debit;Credit;Description
-      const csvLines = ['Conta;Centro de Custo;Debito;Credito;Descricao'];
+      // Header para Reconciliação Contábil Analítica (Padrão SPED/ERP)
+      const csvLines = ['Data;Conta Contabil;Centro de Custo;Debito;Credito;Descricao;Colaborador;CPF'];
+      const dataHoje = new Date().toLocaleDateString('pt-BR');
       
-      let totalLiquido = 0;
-      let totalInss = 0;
-      let totalFgts = 0;
+      itens.forEach(item => {
+        const colab = item.colaborador as any;
+        const detalhes = item.detalhes as any;
+        const eventos = detalhes?.detalheEventos || [];
+        const cc = colab.centro_custo || 'GERAL';
 
-      holerites.forEach(h => {
-        totalLiquido += Number(h.liquido);
-        totalInss += Number(h.valor_inss);
-        totalFgts += Number(h.valor_fgts);
-        
-        // Example entries
-        csvLines.push(`DESPESA_SALARIAL;${h.colaborador_departamento || 'GERAL'};${h.total_proventos};0;Proventos - ${h.colaborador_nome}`);
-        csvLines.push(`SALARIOS_A_PAGAR;${h.colaborador_departamento || 'GERAL'};0;${h.liquido};Liquido a Pagar - ${h.colaborador_nome}`);
+        eventos.forEach((ev: any) => {
+          const isProvento = ev.tipo === 'provento';
+          // Lançamento de Provento (D: Despesa Salarial, C: Salários a Pagar)
+          if (isProvento) {
+            csvLines.push(`${dataHoje};DESPESA_SALARIAL;${cc};${ev.valor.toFixed(2)};0;${ev.descricao};${colab.nome_completo};${colab.cpf || ''}`);
+            csvLines.push(`${dataHoje};SALARIOS_A_PAGAR;${cc};0;${ev.valor.toFixed(2)};${ev.descricao};${colab.nome_completo};${colab.cpf || ''}`);
+          } else {
+            // Lançamento de Desconto (D: Salários a Pagar, C: Conta de Passivo/Desconto)
+            csvLines.push(`${dataHoje};SALARIOS_A_PAGAR;${cc};${ev.valor.toFixed(2)};0;${ev.descricao};${colab.nome_completo};${colab.cpf || ''}`);
+            csvLines.push(`${dataHoje};PASSIVO_${ev.descricao.toUpperCase().replace(/\s/g, '_')};${cc};0;${ev.valor.toFixed(2)};Retencao ${ev.descricao};${colab.nome_completo};${colab.cpf || ''}`);
+          }
+        });
+
+        // Provisão de FGTS (Encargo Patronal)
+        const fgts = Number(item.fgts_mes);
+        if (fgts > 0) {
+          csvLines.push(`${dataHoje};DESPESA_FGTS;${cc};${fgts.toFixed(2)};0;Provisao FGTS;${colab.nome_completo};${colab.cpf || ''}`);
+          csvLines.push(`${dataHoje};FGTS_A_RECOLHER;${cc};0;${fgts.toFixed(2)};FGTS Mes;${colab.nome_completo};${colab.cpf || ''}`);
+        }
       });
 
-      const blob = new Blob([csvLines.join('\n')], { type: 'text/csv' });
+      const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `RECONCILIACAO_CONTABIL_${folhaId.substring(0, 8)}.csv`;
+      a.download = `CONCILIACAO_CONTABIL_ANALITICA_${folhaId.substring(0, 8)}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      toast.success('Relatório para reconciliação contábil gerado!');
+      toast.success('Relatório analítico para reconciliação contábil gerado!');
       setOpen(false);
     } catch (err: any) {
       toast.error('Erro ao exportar: ' + err.message);
@@ -74,23 +91,24 @@ export function RelatorioContabilDialog({ folhaId }: RelatorioContabilDialogProp
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display">
             <BookOpen className="h-5 w-5 text-primary" />
-            Exportar para Contabilidade (SPED)
+            Exportar para Contabilidade (Analítico)
           </DialogTitle>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <p className="text-sm text-muted-foreground">
-            Gere o arquivo de lançamentos contábeis para importação no seu ERP (Domínio, Alterdata, Totvs, etc).
+            Gere o arquivo de lançamentos contábeis analíticos por evento para importação no seu ERP (Domínio, Alterdata, Totvs, etc).
           </p>
           <Card className="border border-border/30 bg-muted/20">
             <CardContent className="p-4 text-xs space-y-2">
-              <p>• Lançamentos de Proventos e Descontos</p>
-              <p>• Provisões de Encargos (INSS/FGTS)</p>
-              <p>• Separação por Centro de Custo/Departamento</p>
+              <p>• Lançamentos detalhados por Rubrica/Evento</p>
+              <p>• Rateio por Centro de Custo/Departamento</p>
+              <p>• Identificação por Colaborador (Auditável)</p>
+              <p>• Encargos Patronais (FGTS/INSS)</p>
             </CardContent>
           </Card>
           <Button onClick={handleExport} className="w-full rounded-xl gap-2 h-11" disabled={loading}>
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-            Download CSV de Reconciliação
+            Gerar Lançamentos Contábeis
           </Button>
         </div>
       </DialogContent>
