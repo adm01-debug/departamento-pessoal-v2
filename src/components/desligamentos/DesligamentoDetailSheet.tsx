@@ -71,9 +71,9 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
         data_admissao: d.colaborador?.data_admissao || d.data_admissao, // Fallback
         data_desligamento: d.data_desligamento,
         tipo: d.tipo || 'sem_justa_causa',
-        aviso_trabalhado: d.aviso_trabalhado || false,
-        ferias_vencidas: d.ferias_vencidas_check || false,
-        saldo_fgts: d.saldo_fgts || 0,
+        aviso_trabalhado: d.aviso_trabalhado ?? false,
+        ferias_vencidas: d.ferias_vencidas_check ?? false,
+        saldo_fgts: d.saldo_fgts ?? 0,
       });
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Rescisão calculada com sucesso');
@@ -156,6 +156,9 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
                 <Separator className="my-2" />
                 <RescisaoRow label="Total Proventos" value={d.total_proventos} bold className="text-success" />
                 <RescisaoRow label="Total Descontos" value={d.total_descontos} bold className="text-destructive" />
+                <div className="flex justify-between text-[10px] font-body text-muted-foreground px-1">
+                  <span>(INSS: {fmt(d.inss)} / IRRF: {fmt(d.irrf)})</span>
+                </div>
                 <RescisaoRow label="Multa FGTS" value={d.multa_fgts} />
                 <Separator className="my-2" />
                 <div className="bg-primary/5 rounded-xl p-3 flex justify-between items-center">
