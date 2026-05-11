@@ -105,53 +105,81 @@ export default function ColaboradoresPage() {
   };
 
   return (
-    <>
-    <PageTitle title="Colaboradores" description="Gestão de colaboradores do Departamento Pessoal" />
-    <PageLayout
-      title="Colaboradores"
-      description="Gestão de colaboradores"
-      icon={<Users className="h-5 w-5 text-primary-foreground" />}
-      gradient="from-primary to-primary-glow"
-      actions={
+    <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-display-xl sm:text-display font-display font-bold tracking-tight">Colaboradores</h1>
+          <p className="text-body text-muted-foreground font-body mt-1">
+            Gestão analítica de {filtered.length} talentos da organização
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-lg font-body hidden sm:flex gap-2"
-                disabled={!filtered?.length}
-              >
+              <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 shadow-sm bg-card/50">
                 <Download className="h-4 w-4" />
-                Exportar
+                <span>Exportar Dados</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl">
-              <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+            <DropdownMenuContent align="end" className="rounded-xl w-48">
+              <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer py-2.5">
                 <FileSpreadsheet className="h-4 w-4 text-success" />
                 Excel (.xlsx)
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportPDF} className="gap-2 cursor-pointer">
+              <DropdownMenuItem onClick={handleExportPDF} className="gap-2 cursor-pointer py-2.5">
                 <FileText className="h-4 w-4 text-destructive" />
                 PDF (.pdf)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
+          
+          <Button 
             onClick={() => navigate('/colaboradores/novo')}
-            className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow font-body"
+            className="h-11 rounded-xl px-6 gap-2 bg-primary text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
           >
+            <Users className="h-4 w-4" />
             Novo Colaborador
           </Button>
         </div>
-      }
-    >
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {statusOptions.map((opt, i) => {
+          const statusKey = opt.value;
+          const isActive = statusFilter === statusKey;
+          return (
+            <motion.button
+              key={statusKey}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              onClick={() => handleStatusChange(isActive ? '' : statusKey)}
+              className={cn(
+                "p-4 rounded-2xl border transition-all text-left group",
+                isActive 
+                  ? "bg-primary/5 border-primary shadow-sm" 
+                  : "bg-card/50 border-border/40 hover:border-primary/20 hover:bg-card"
+              )}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                {opt.label.split(' (')[0]}
+              </p>
+              <p className={cn(
+                "text-2xl font-display font-bold",
+                isActive ? "text-primary" : "text-foreground"
+              )}>
+                {statusCounts[statusKey] || 0}
+              </p>
+            </motion.button>
+          );
+        })}
+      </div>
+
       <DataTableToolbar
         search={search}
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Nome, CPF ou E-mail..."
+        searchPlaceholder="Pesquisar por nome, CPF, e-mail ou matrícula..."
         filters={[
-          { key: 'status', label: 'Status', options: statusOptions, value: statusFilter, onChange: handleStatusChange },
           { key: 'departamento', label: 'Departamento', options: departamentos.map(d => ({ value: d.nome, label: d.nome })), value: deptoFilter, onChange: (v) => { setDeptoFilter(v); setCurrentPage(1); } },
           { key: 'cargo', label: 'Cargo', options: cargos.map(c => ({ value: c.nome, label: c.nome })), value: cargoFilter, onChange: (v) => { setCargoFilter(v); setCurrentPage(1); } }
         ]}
