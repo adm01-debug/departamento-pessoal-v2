@@ -138,6 +138,23 @@ export const validadorFolha = {
           gravidade: 'alta'
         });
       }
+
+      // Regra 8: Verificação de Rubricas sem Incidência (Auditável eSocial)
+      if (detalhes?.detalheEventos) {
+        const eventosSemIncidencia = detalhes.detalheEventos.filter((ev: any) => 
+          ['1000', '1001', '1002'].includes(ev.codigo) && ev.valor > 0 && !rubricas?.find(r => r.codigo === ev.codigo)?.incide_inss
+        );
+        
+        if (eventosSemIncidencia.length > 0) {
+          alertas.push({
+            colaboradorId: item.colaborador_id,
+            nome: colab.nome_completo,
+            tipo: 'divergencia_esocial',
+            mensagem: `Verbas salariais (Base/HE) detectadas sem incidência de INSS. Risco de multa eSocial.`,
+            gravidade: 'alta'
+          });
+        }
+      }
     }
 
     return alertas;

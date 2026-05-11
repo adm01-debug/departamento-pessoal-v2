@@ -111,7 +111,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
         tipo_evento: 'CALCULO',
         mensagem: `Assistente de cálculo finalizado para a competência ${competencia}.`,
         severidade: 'INFO',
-        detalhes: { wizard: 'CalculoFolhaWizard', timestamp: new Date().toISOString() }
+        detalhes: { wizard: 'CalculoFolhaWizard', timestamp: new Date().toISOString(), versao_motor: '2.0.26' }
       });
 
       // Busca um resumo para exibição final
