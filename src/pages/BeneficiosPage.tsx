@@ -116,9 +116,14 @@ export default function BeneficiosPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-primary/10 transition-colors">
-                            <Edit className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                          </Button>
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-primary/10 transition-colors" title="Editar">
+                              <Edit className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-info/10 transition-colors" title="Insights">
+                              <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-info" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
