@@ -105,6 +105,8 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       if (!colaboradores || colaboradores.length === 0) {
         throw new Error('Nenhum colaborador ativo encontrado para esta empresa.');
       }
+      const colab = colaboradores[0];
+      const [mes, ano] = competencia.split('/');
 
       // 3. Busca Dependentes para o cálculo do IRRF
       const { count: dependentesCount } = await supabase
