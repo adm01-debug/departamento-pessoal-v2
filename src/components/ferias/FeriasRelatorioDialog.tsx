@@ -21,6 +21,7 @@ import { feriasPDF } from '@/utils/feriasPDF';
 import { format, subMonths, isAfter, isBefore } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 interface FeriasRelatorioDialogProps {
   stats: any;
@@ -32,6 +33,7 @@ interface FeriasRelatorioDialogProps {
 }
 
 export function FeriasRelatorioDialog({ stats, data, filters }: FeriasRelatorioDialogProps) {
+  const { empresaAtual } = useEmpresas();
   const [periodo, setPeriodo] = useState('6_meses');
   const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -70,7 +72,7 @@ export function FeriasRelatorioDialog({ stats, data, filters }: FeriasRelatorioD
         periodoLabel: periodLabel
       };
 
-      await feriasPDF.gerarRelatorioKPIs(localStats, filteredData, filters);
+      await feriasPDF.gerarRelatorioKPIs(localStats, filteredData, filters, empresaAtual);
     } finally {
       setLoading(false);
     }
@@ -118,7 +120,7 @@ export function FeriasRelatorioDialog({ stats, data, filters }: FeriasRelatorioD
               <Badge variant="outline" className="text-[10px] h-4 font-body">{filtered.length} registros</Badge>
             </div>
             
-            <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar" id="relatorio-preview-list">
               {filtered.slice(0, 5).map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-xs border-b border-border/10 pb-2 last:border-0 last:pb-0">
                   <div className="flex flex-col">
