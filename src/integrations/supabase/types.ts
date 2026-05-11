@@ -7513,6 +7513,48 @@ export type Database = {
         }
         Relationships: []
       }
+      historico_calculos_folha: {
+        Row: {
+          created_at: string | null
+          criado_por: string | null
+          empresa_id: string | null
+          folha_id: string | null
+          id: string
+          snapshot: Json
+        }
+        Insert: {
+          created_at?: string | null
+          criado_por?: string | null
+          empresa_id?: string | null
+          folha_id?: string | null
+          id?: string
+          snapshot: Json
+        }
+        Update: {
+          created_at?: string | null
+          criado_por?: string | null
+          empresa_id?: string | null
+          folha_id?: string | null
+          id?: string
+          snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_calculos_folha_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_calculos_folha_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_cargo: {
         Row: {
           cargo_anterior: string | null
