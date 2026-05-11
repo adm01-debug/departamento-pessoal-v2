@@ -82,7 +82,7 @@ export const planoSaudeService = {
   async listarDependentesNoPlano(colaboradorId: string) {
     const { data, error } = await (supabase
       .from('beneficiarios_plano') as any)
-      .select('*, dependente:dependentes(*)');
+      .select('*, dependente:dependentes(*)')
       .eq('colaborador_id', colaboradorId)
       .not('dependente_id', 'is', null);
     
