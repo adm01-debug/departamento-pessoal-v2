@@ -106,18 +106,21 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
         throw new Error('Nenhum colaborador ativo encontrado para esta empresa.');
       }
 
-      const colab = colaboradores[0];
-      const [mes, ano] = competencia.split('/');
+      // 3. Busca Dependentes para o cálculo do IRRF
+      const { count: dependentesCount } = await supabase
+        .from('dependentes')
+        .select('*', { count: 'exact', head: true })
+        .eq('colaborador_id', colab.id);
 
-      // 3. Executa o Novo Hook de Cálculo (useCalculoFolha)
+      // 4. Executa o Novo Hook de Cálculo (useCalculoFolha)
       const resultadoItem = await executarCalculo({
         colaboradorId: colab.id,
         empresaId: empresaAtualId!,
         competencia: `${ano}-${mes}`,
         salarioBase: Number(colab.salario_base || 0),
         params: {
-          adicionais: 0, // Poderia vir de verbas variáveis
-          dependentes: colab.dependentes || 0
+          adicionais: 0,
+          dependentes: dependentesCount || 0
         }
       });
       
