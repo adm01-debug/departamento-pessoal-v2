@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface AlertaConsistencia {
   colaboradorId: string;
   nome: string;
-  tipo: 'variacao_salarial' | 'desconto_excessivo' | 'liquido_negativo' | 'falta_informacao';
+  tipo: 'variacao_salarial' | 'desconto_excessivo' | 'liquido_negativo' | 'falta_informacao' | 'divergencia_esocial';
   mensagem: string;
   gravidade: 'alta' | 'media' | 'baixa';
 }
@@ -15,13 +15,28 @@ export const validadorFolha = {
   validarFolha: async (folhaId: string): Promise<AlertaConsistencia[]> => {
     const alertas: AlertaConsistencia[] = [];
 
-    // 1. Busca os itens da folha atual
+    // 1. Busca os itens da folha atual e histórico (para variação)
     const { data: itens, error } = await supabase
       .from('folha_itens')
-      .select('*, colaborador:colaboradores(nome_completo, salario_base)')
+      .select(`
+        *, 
+        colaborador:colaboradores(
+          id, 
+          nome_completo, 
+          salario_base, 
+          status,
+          empresa_id
+        )
+      `)
       .eq('folha_id', folhaId);
 
     if (error || !itens) return [];
+
+    // Busca rubricas da empresa para validação de eSocial
+    const { data: rubricas } = await supabase
+      .from('rubricas_folha')
+      .select('*')
+      .eq('empresa_id', (itens[0]?.colaborador as any)?.empresa_id);
 
     // 2. Regras de validação
     for (const item of itens) {
@@ -29,6 +44,7 @@ export const validadorFolha = {
       const totalProventos = Number(item.total_proventos);
       const totalDescontos = Number(item.total_descontos);
       const totalLiquido = Number(item.total_liquido);
+      const detalhes = item.detalhes as any;
 
       // Regra 1: Líquido negativo ou zero
       if (totalLiquido <= 0) {
@@ -41,27 +57,49 @@ export const validadorFolha = {
         });
       }
 
-      // Regra 2: Descontos > 70% do bruto (limite legal/prudencial)
+      // Regra 2: Descontos > 30% do bruto (limite prudencial para empréstimos/retenções)
+      // Nota: O limite legal de descontos totais é maior, mas 70% é um alerta de erro crítico
       if (totalDescontos > (totalProventos * 0.7)) {
         alertas.push({
           colaboradorId: item.colaborador_id,
           nome: colab.nome_completo,
           tipo: 'desconto_excessivo',
-          mensagem: `Descontos representam ${( (totalDescontos/totalProventos)*100 ).toFixed(1)}% do total bruto.`,
-          gravidade: 'media'
+          mensagem: `Descontos críticos: ${( (totalDescontos/totalProventos)*100 ).toFixed(1)}% do bruto.`,
+          gravidade: 'alta'
         });
       }
 
-      // Regra 3: Variação contra Salário Base (exclui HE/DSR normais se possível)
-      // Se o total bruto for > 50% do salário base, pode ser um erro ou uma bonificação alta
-      if (totalProventos > (Number(colab.salario_base) * 1.5)) {
+      // Regra 3: Variação contra Salário Base
+      const salarioBase = Number(colab.salario_base);
+      if (totalProventos > (salarioBase * 2.0)) {
         alertas.push({
           colaboradorId: item.colaborador_id,
           nome: colab.nome_completo,
           tipo: 'variacao_salarial',
-          mensagem: 'Total bruto 50% maior que o salário base. Verifique bonificações.',
+          mensagem: 'Total bruto excede 100% do salário base. Verifique bonificações/extras.',
           gravidade: 'media'
         });
+      }
+
+      // Regra 4: Validação de Rubricas do Cálculo vs Rubricas do eSocial
+      if (detalhes?.detalheEventos && rubricas) {
+        const { validarRubricaESocial } = await import('@/validators/esocialValidators');
+        
+        for (const evento of detalhes.detalheEventos) {
+          const rubricaConfig = rubricas.find(r => r.codigo === evento.codigo);
+          if (rubricaConfig) {
+            const validacao = validarRubricaESocial(rubricaConfig);
+            if (!validacao.valid) {
+              alertas.push({
+                colaboradorId: item.colaborador_id,
+                nome: colab.nome_completo,
+                tipo: 'divergencia_esocial',
+                mensagem: `Evento ${evento.codigo} (${evento.descricao}) possui divergências eSocial.`,
+                gravidade: 'media'
+              });
+            }
+          }
+        }
       }
     }
 
