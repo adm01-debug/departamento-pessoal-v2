@@ -53,84 +53,131 @@ export const feriasPDF = {
     doc.save(`recibo_ferias_${colab.nome_completo || 'colaborador'}.pdf`);
   },
 
-  gerarRelatorioKPIs: (stats: any, data: any[], filters?: any) => {
+  gerarRelatorioKPIs: async (stats: any, data: any[], filters?: any) => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
     
-    // Header com Logo (Simulado por Retângulo e Texto)
-    doc.setFillColor(44, 62, 80);
-    doc.rect(0, 0, 210, 40, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.text('LOVABLE HR', 20, 25);
-    doc.setFontSize(10);
-    doc.text('Sistema Unificado de Gestão de Pessoas', 20, 32);
+    // Configurações Globais
+    const colors = {
+      primary: [44, 62, 80] as [number, number, number],
+      accent: [52, 152, 219] as [number, number, number],
+      text: [60, 60, 60] as [number, number, number],
+      light: [200, 200, 200] as [number, number, number]
+    };
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(16);
-    doc.text('Relatório Executivo de Férias', 190, 25, { align: 'right' });
+    const drawHeader = (doc: jsPDF) => {
+      // Header background
+      doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      
+      // Logo text
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('LOVABLE HR', 20, 22);
+      
+      // Subtitle
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('TECNOLOGIA PARA GESTÃO DE PESSOAS', 20, 28);
+
+      // Report Title
+      doc.setFontSize(14);
+      doc.text('RELATÓRIO EXECUTIVO DE FÉRIAS', pageWidth - 20, 22, { align: 'right' });
+      
+      // Date info
+      doc.setFontSize(8);
+      doc.text(`GERADO EM: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, pageWidth - 20, 28, { align: 'right' });
+    };
+
+    const drawFooter = (doc: jsPDF, pageNumber: number) => {
+      doc.setDrawColor(colors.light[0], colors.light[1], colors.light[2]);
+      doc.line(20, pageHeight - 15, pageWidth - 20, pageHeight - 15);
+      
+      doc.setFontSize(8);
+      doc.setTextColor(colors.light[0], colors.light[1], colors.light[2]);
+      doc.text(`Lovable HR - Sistema Integrado`, 20, pageHeight - 10);
+      doc.text(`Página ${pageNumber}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      doc.text(`Documento Confidencial`, pageWidth - 20, pageHeight - 10, { align: 'right' });
+    };
+
+    drawHeader(doc);
+
+    // Filtros e Contexto
+    doc.setTextColor(colors.text[0], colors.text[1], colors.text[2]);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PARÂMETROS DO RELATÓRIO', 20, 45);
     
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text(`Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 190, 32, { align: 'right' });
+    let currentY = 50;
+    doc.text(`Período Selecionado: ${stats.periodoLabel || 'Todos'}`, 20, currentY);
+    
+    if (filters?.search || filters?.status) {
+      currentY += 5;
+      const filterText = [
+        filters?.search ? `Busca: "${filters.search}"` : '',
+        filters?.status ? `Status: ${filters.status}` : ''
+      ].filter(Boolean).join(' | ');
+      doc.text(`Filtros Ativos: ${filterText}`, 20, currentY);
+    }
 
-    // Filtros Aplicados
-    doc.setTextColor(100);
-    doc.setFontSize(10);
-    doc.text(`Filtros: ${stats.periodoLabel || 'Todos'}`, 20, 50);
-    if (filters?.search) doc.text(`Busca: ${filters.search}`, 20, 55);
-    if (filters?.status) doc.text(`Status: ${filters.status}`, 20, 60);
-
-    // KPIs Summary Grid
+    // KPIs Grid
     autoTable(doc, {
-      startY: 65,
-      head: [['Resumo de KPIs', 'Valor']],
+      startY: currentY + 10,
+      head: [['INDICADOR OPERACIONAL', 'VALOR ATUAL']],
       body: [
-        ['Total de Registros no Filtro', stats.total.toString()],
-        ['Pendentes de Aprovação', stats.pendentes.toString()],
-        ['Aprovadas/Confirmadas', stats.aprovadas.toString()],
-        ['Colaboradores em Gozo', stats.emGozo.toString()],
-        ['Abonos Pecuniários', stats.abonoPecuniario.toString()],
-        ['Períodos Vencidos', stats.vencidas.toString()],
+        ['VOLUME TOTAL DE REGISTROS', stats.total.toString()],
+        ['SOLICITAÇÕES PENDENTES (EM WORKFLOW)', stats.pendentes.toString()],
+        ['CONCESSÕES APROVADAS/CONFIRMADAS', stats.aprovadas.toString()],
+        ['COLABORADORES EM GOZO ATIVO', stats.emGozo.toString()],
+        ['OPÇÕES POR ABONO PECUNIÁRIO', stats.abonoPecuniario.toString()],
+        ['PERÍODOS AQUISITIVOS VENCIDOS (ALERTA)', stats.vencidas.toString()],
       ],
       theme: 'grid',
-      headStyles: { fillColor: [44, 62, 80] },
-      columnStyles: { 0: { fontStyle: 'bold' } }
+      headStyles: { fillColor: colors.primary, fontStyle: 'bold', halign: 'center' },
+      bodyStyles: { fontSize: 9 },
+      columnStyles: { 
+        0: { cellWidth: 100 },
+        1: { halign: 'center', fontStyle: 'bold' } 
+      }
     });
 
-    // Detailed Table
-    doc.setTextColor(44, 62, 80);
-    doc.setFontSize(14);
-    doc.text('Detalhamento de Solicitações', 20, (doc as any).lastAutoTable.finalY + 15);
+    // Detalhamento
+    const nextY = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+    doc.text('DETALHAMENTO DAS SOLICITAÇÕES', 20, nextY);
 
     autoTable(doc, {
-      startY: (doc as any).lastAutoTable.finalY + 20,
-      head: [['Colaborador', 'Início', 'Fim', 'Dias', 'Status']],
+      startY: nextY + 5,
+      head: [['COLABORADOR', 'INÍCIO', 'FIM', 'DIAS', 'STATUS']],
       body: data.map(f => [
-        f.colaborador?.nome_completo || '-',
+        (f.colaborador?.nome_completo || 'N/A').toUpperCase(),
         format(new Date(f.data_inicio), 'dd/MM/yyyy'),
         format(new Date(f.data_fim), 'dd/MM/yyyy'),
         (f.dias_gozo || f.dias_ferias || '-').toString(),
         f.status.toUpperCase()
       ]),
       theme: 'striped',
-      headStyles: { fillColor: [52, 152, 219] },
+      headStyles: { fillColor: colors.accent, fontSize: 9, fontStyle: 'bold' },
+      bodyStyles: { fontSize: 8 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
       didDrawPage: (dataArg) => {
-        // Footer com Paginação
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text(
-          `Página ${dataArg.pageNumber}`,
-          dataArg.settings.margin.left,
-          doc.internal.pageSize.height - 10
-        );
-        doc.text(
-          'LOVABLE HR - Relatório Confidencial',
-          190,
-          doc.internal.pageSize.height - 10,
-          { align: 'right' }
-        );
-      }
+        if (dataArg.pageNumber > 1) {
+          drawHeader(doc);
+        }
+        drawFooter(doc, dataArg.pageNumber);
+      },
+      margin: { top: 40, bottom: 20 }
     });
 
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
     doc.save(`relatorio_ferias_${format(new Date(), 'yyyyMMdd')}.pdf`);
   }
 };

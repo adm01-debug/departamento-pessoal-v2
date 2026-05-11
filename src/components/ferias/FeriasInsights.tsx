@@ -129,29 +129,42 @@ export function FeriasInsights({ stats }: FeriasInsightsProps) {
               <div className="bg-background/40 rounded-lg p-2.5 space-y-2 border border-current/5">
                 <div className="flex items-center gap-1.5">
                   <Info className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Por que esta recomendação?</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Base de Dados e Justificativa</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground/80 leading-relaxed italic">
-                  "{insight.justification}"
+                <p className="text-[10px] text-muted-foreground/80 leading-relaxed italic border-l-2 border-primary/20 pl-2">
+                  {insight.justification}
                 </p>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <Badge variant="outline" className="text-[8px] h-3.5 bg-background/50 text-muted-foreground border-muted-foreground/20">
+                    KPI: {insight.type === 'critical' ? 'Vencidos' : insight.type === 'warning' ? 'Workflow' : 'Abono'}
+                  </Badge>
+                  <Badge variant="outline" className="text-[8px] h-3.5 bg-background/50 text-muted-foreground border-muted-foreground/20">
+                    Fonte: Hub Unificado
+                  </Badge>
+                </div>
               </div>
 
               <div className="flex items-center justify-between mt-1 pt-2 border-t border-current/5">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary">
-                        <History className="h-3 w-3" /> Auditoria
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                        onClick={() => handleLink('solicitacoes')} // Simplificando para levar à lista principal com auditoria
+                      >
+                        <History className="h-3 w-3" /> Ver Trilha
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent><p className="text-[10px]">Ver trilha de auditoria relacionada</p></TooltipContent>
+                    <TooltipContent><p className="text-[10px]">Rastrear ciclo de vida e auditoria</p></TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className={`h-7 px-2 text-[10px] gap-1 font-bold ${insight.color} hover:${insight.bgColor}`}
+                  className={`h-7 px-2 text-[10px] gap-1 font-bold ${insight.color} hover:${insight.bgColor} rounded-lg transition-all`}
                   onClick={() => handleLink(insight.link)}
                 >
                   {insight.action} <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
