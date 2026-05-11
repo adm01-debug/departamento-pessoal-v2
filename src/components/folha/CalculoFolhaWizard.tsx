@@ -127,12 +127,13 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
 
       if (itens && itens.length > 0) {
         setCurrentFolhaId(itens[0].folha_id);
+        const detalhes = itens[0].detalhes as any;
         setResultadoCalculo({
-          ...itens[0].detalhes,
-          horasFalta: (itens[0].detalhes as any).horasFalta || 0,
-          faixaInss: (itens[0].detalhes as any).faixaInss || 'Progressiva',
-          faixaIrrf: (itens[0].detalhes as any).faixaIrrf || 'Progressiva'
-        } as any);
+          ...detalhes,
+          horasFalta: detalhes.horasFalta || 0,
+          faixaInss: detalhes.faixaInss || 'Progressiva',
+          faixaIrrf: detalhes.faixaIrrf || 'Progressiva'
+        });
       }
 
       toast.info(`Cálculo em lote concluído: ${resultadoLote.success} sucessos.`);
