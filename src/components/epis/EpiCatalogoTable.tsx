@@ -28,8 +28,9 @@ export function EpiCatalogoTable({ data, onExcluir }: EpiCatalogoTableProps) {
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
                   <TableHead className="font-display font-semibold text-xs pl-6">Nome</TableHead>
-                  <TableHead className="font-display font-semibold text-xs">CA</TableHead>
+                  <TableHead className="font-display font-semibold text-xs">CA / Fabricante</TableHead>
                   <TableHead className="font-display font-semibold text-xs">Categoria</TableHead>
+                  <TableHead className="font-display font-semibold text-xs">Estoque</TableHead>
                   <TableHead className="font-display font-semibold text-xs">Validade</TableHead>
                   <TableHead className="font-display font-semibold text-xs w-[80px] pr-6">Ações</TableHead>
                 </TableRow>
@@ -45,32 +46,36 @@ export function EpiCatalogoTable({ data, onExcluir }: EpiCatalogoTableProps) {
                   >
                     <TableCell className="font-body font-medium text-sm pl-6">{e.nome}</TableCell>
                     <TableCell>
-                      {e.ca ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Badge variant="secondary" className="text-[10px] gap-1 cursor-default">
-                              <ShieldCheck className="h-2.5 w-2.5" /> CA {e.ca}
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent className="text-xs">Certificado de Aprovação NR-6 válido</TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Badge variant="destructive" className="text-[10px] gap-1 cursor-default">
-                              <ShieldAlert className="h-2.5 w-2.5" /> Sem CA
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent className="text-xs max-w-[200px]">
-                            Sem Certificado de Aprovação. Obrigatório pela NR-6 para proteção do trabalhador.
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                      <div className="flex flex-col gap-1">
+                        {e.ca ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="secondary" className="text-[10px] gap-1 cursor-default w-fit">
+                                <ShieldCheck className="h-2.5 w-2.5" /> CA {e.ca}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent className="text-xs">Certificado de Aprovação NR-6 válido</TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Badge variant="destructive" className="text-[10px] gap-1 cursor-default w-fit">
+                            <ShieldAlert className="h-2.5 w-2.5" /> Sem CA
+                          </Badge>
+                        )}
+                        {e.fabricante && <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{e.fabricante}</span>}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-[10px]">
                         {categoryLabels[e.categoria] || e.categoria || '—'}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className={`text-sm font-medium ${e.estoque_atual <= e.estoque_minimo ? 'text-destructive' : 'text-foreground'}`}>
+                          {e.estoque_atual} {e.unidade_medida || 'un'}
+                        </span>
+                        {e.estoque_minimo > 0 && <span className="text-[10px] text-muted-foreground">Mín: {e.estoque_minimo}</span>}
+                      </div>
                     </TableCell>
                     <TableCell className="text-xs font-body">
                       {e.validade_meses ? `${e.validade_meses} meses` : '—'}
@@ -112,8 +117,11 @@ export function EpiCatalogoTable({ data, onExcluir }: EpiCatalogoTableProps) {
                 transition={{ delay: i * 0.03 }}
                 className="p-3 rounded-xl border border-border/30 bg-card space-y-2"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-body font-medium text-sm">{e.nome}</span>
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-body font-medium text-sm">{e.nome}</span>
+                    {e.fabricante && <span className="text-[10px] text-muted-foreground">{e.fabricante}</span>}
+                  </div>
                   {e.ca ? (
                     <Badge variant="secondary" className="text-[10px]">CA {e.ca}</Badge>
                   ) : (
@@ -121,9 +129,14 @@ export function EpiCatalogoTable({ data, onExcluir }: EpiCatalogoTableProps) {
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="text-[10px]">
-                    {categoryLabels[e.categoria] || '—'}
-                  </Badge>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="text-[10px]">
+                      {categoryLabels[e.categoria] || '—'}
+                    </Badge>
+                    <span className={`text-[10px] font-medium ${e.estoque_atual <= e.estoque_minimo ? 'text-destructive' : 'text-muted-foreground'}`}>
+                      Estoque: {e.estoque_atual}
+                    </span>
+                  </div>
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onExcluir(e.id)}>
                     <Trash2 className="h-3.5 w-3.5 text-destructive" />
                   </Button>
