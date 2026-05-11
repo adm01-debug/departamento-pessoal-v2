@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { folhaCalc, CalculoResultado } from '@/utils/folhaCalc';
+import { calculoLoteService, BatchProgress } from '@/services/folha/calculoLoteService';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export function useCalculoFolha() {
   const [resultado, setResultado] = useState<CalculoResultado | null>(null);
   const [isCalculando, setIsCalculando] = useState(false);
+  const [progressoLote, setProgressoLote] = useState<BatchProgress | null>(null);
   const queryClient = useQueryClient();
 
   const calcularEGuardar = useMutation({
@@ -25,12 +27,9 @@ export function useCalculoFolha() {
     }) => {
       setIsCalculando(true);
       
-      // Realiza o cálculo
       const res = folhaCalc.processar(salarioBase, params);
       setResultado(res);
 
-      // Persiste no banco de dados
-      // 1. Garantir que existe o cabeçalho da folha para a competência
       const { data: header, error: headerError } = await supabase
         .from('folhas_pagamento')
         .select('id')
@@ -58,7 +57,6 @@ export function useCalculoFolha() {
         folhaId = newHeader.id;
       }
 
-      // 2. Persiste o item individual (resultado do cálculo)
       const { data, error } = await supabase
         .from('folha_itens')
         .upsert({
@@ -77,11 +75,20 @@ export function useCalculoFolha() {
         .single();
 
       if (error) throw error;
+
+      // Log de Auditoria para Cálculo Individual
+      await supabase.from('folha_auditoria').insert({
+        folha_id: folhaId,
+        colaborador_id: colaboradorId,
+        acao: 'calculo_manual_individual',
+        detalhes: { valor_liquido: res.liquido }
+      });
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
-      toast.success('Cálculo realizado e salvo com sucesso.');
+      toast.success('Cálculo individual realizado com sucesso.');
     },
     onError: (error: any) => {
       toast.error(`Erro ao calcular: ${error.message}`);
@@ -89,9 +96,29 @@ export function useCalculoFolha() {
     onSettled: () => setIsCalculando(false)
   });
 
+  const calcularLote = useMutation({
+    mutationFn: async ({ empresaId, competencia }: { empresaId: string; competencia: string }) => {
+      setIsCalculando(true);
+      return await calculoLoteService.processarLote(empresaId, competencia, (p) => {
+        setProgressoLote(p);
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['folhas'] });
+      toast.success(`Processamento em lote concluído: ${data.success} sucessos, ${data.errors} erros.`);
+    },
+    onSettled: () => {
+      setIsCalculando(false);
+      // Mantemos o progresso por 5 segundos para o usuário ver o 100%
+      setTimeout(() => setProgressoLote(null), 5000);
+    }
+  });
+
   return {
     resultado,
-    isCalculando: isCalculando || calcularEGuardar.isPending,
+    isCalculando: isCalculando || calcularEGuardar.isPending || calcularLote.isPending,
+    progressoLote,
     executarCalculo: calcularEGuardar.mutateAsync,
+    executarCalculoLote: calcularLote.mutateAsync,
   };
 }
