@@ -28,11 +28,11 @@ export const provisoesService = {
 
       await (supabase as any).from('provisoes_folha').upsert({
         colaborador_id: colab.id,
+        empresa_id: empresaId,
         competencia,
         valor_13_salario: provisao13,
         valor_ferias: provisaoFerias,
-        encargos_estimados: fgtsProvisao,
-        detalhes: { base_calculo: salario }
+        encargos_provisao: fgtsProvisao
       });
     }
 
