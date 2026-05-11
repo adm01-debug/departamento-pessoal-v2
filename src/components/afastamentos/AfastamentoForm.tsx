@@ -111,9 +111,15 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
             <SelectContent>
               <SelectItem value="doenca">Doença</SelectItem>
               <SelectItem value="acidente_trabalho">Acidente de Trabalho</SelectItem>
-              <SelectItem value="maternidade">Maternidade</SelectItem>
-              <SelectItem value="paternidade">Paternidade</SelectItem>
-              <SelectItem value="auxilio_doenca">Auxílio Doença (INSS)</SelectItem>
+              <SelectItem value="acidente_trajeto">Acidente de Trajeto</SelectItem>
+              <SelectItem value="licenca_maternidade">Licença Maternidade</SelectItem>
+              <SelectItem value="licenca_paternidade">Licença Paternidade</SelectItem>
+              <SelectItem value="licenca_casamento">Licença Casamento</SelectItem>
+              <SelectItem value="licenca_obito">Licença Óbito</SelectItem>
+              <SelectItem value="licenca_nao_remunerada">Licença Não Remunerada</SelectItem>
+              <SelectItem value="servico_militar">Serviço Militar</SelectItem>
+              <SelectItem value="mandato_sindical">Mandato Sindical</SelectItem>
+              <SelectItem value="suspensao_disciplinar">Suspensão Disciplinar</SelectItem>
               <SelectItem value="outros">Outros</SelectItem>
             </SelectContent>
           </Select>
