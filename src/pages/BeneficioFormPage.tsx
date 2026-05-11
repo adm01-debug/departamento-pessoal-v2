@@ -1,98 +1,107 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { PageLayout } from '@/components/layout';
-import { FormField } from '@/components/forms';
+import { FormField, FormSelect } from '@/components/forms';
 import { FormSection, FormActions } from '@/components/forms/FormSection';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useBeneficios } from '@/hooks/useBeneficios';
+import { ArrowLeft, Save } from 'lucide-react';
 
 interface BeneficioFormData {
-  colaborador_id: string;
-  tipo_beneficio_id: string;
+  nome: string;
+  tipo: string;
   valor: string;
-  desconto: string;
-  data_inicio: string;
-  observacoes: string;
+  descricao: string;
+  obrigatorio: boolean;
 }
 
 export default function BeneficioFormPage() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
-  const { register, handleSubmit } = useForm<BeneficioFormData>();
-
-  const { data: tipos } = useQuery({
-    queryKey: ['tipos_beneficio'],
-    queryFn: async () => {
-      const { data } = await supabase.from('tipos_beneficio').select('*').eq('ativo', true);
-      return data || [];
-    },
+  const { criarBeneficio, tiposBeneficio } = useBeneficios();
+  
+  const { register, handleSubmit, control, formState: { errors } } = useForm<BeneficioFormData>({
+    defaultValues: {
+      tipo: 'alimentacao',
+      obrigatorio: false
+    }
   });
 
-  const { data: colaboradores } = useQuery({
-    queryKey: ['colaboradores_ativos'],
-    queryFn: async () => {
-      const { data } = await supabase.from('colaboradores').select('id, nome_completo').eq('status', 'ativo');
-      return data || [];
-    },
-  });
-
-  const mutation = useMutation({
-    mutationFn: async (formData: BeneficioFormData) => {
-      const { error } = await supabase.from('beneficios_colaborador').insert({
-        colaborador_id: formData.colaborador_id,
-        tipo_beneficio_id: formData.tipo_beneficio_id,
-        valor: parseFloat(formData.valor) || 0,
-        desconto: parseFloat(formData.desconto) || 0,
-        data_inicio: formData.data_inicio,
-        observacoes: formData.observacoes,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['beneficios'] });
-      toast.success('Benefício cadastrado com sucesso!');
-      navigate('/beneficios');
-    },
-    onError: (err: Error) => toast.error(`Erro ao cadastrar: ${err.message}`),
-  });
+  const onSubmit = (data: BeneficioFormData) => {
+    criarBeneficio.mutate({
+      ...data,
+      valor: parseFloat(data.valor) || 0,
+      ativo: true
+    }, {
+      onSuccess: () => navigate('/beneficios')
+    });
+  };
 
   return (
     <>
-    <PageTitle title="Novo Benefício" description="Cadastro de benefício" />
-    <PageLayout title="Novo Benefício">
-      <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
-        <FormSection title="Dados do Benefício">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Colaborador</label>
-              <select {...register('colaborador_id', { required: true })} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                <option value="">Selecione...</option>
-                {colaboradores?.map((c) => (
-                  <option key={c.id} value={c.id}>{c.nome_completo}</option>
-                ))}
-              </select>
+    <PageTitle title="Novo Plano de Benefício" description="Configuração de novo pacote de benefícios" />
+    <PageLayout 
+      title="Novo Plano" 
+      icon={<ArrowLeft className="h-5 w-5 cursor-pointer" onClick={() => navigate('/beneficios')} />}
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-4xl mx-auto">
+        <FormSection title="Definição do Plano" description="Informações básicas do benefício para a empresa">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField 
+              label="Nome do Plano" 
+              placeholder="Ex: Vale Refeição Flex" 
+              {...register('nome', { required: 'Nome é obrigatório' })} 
+              error={errors.nome?.message}
+            />
+            
+            <Controller
+              name="tipo"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormSelect 
+                  label="Tipo de Benefício" 
+                  options={tiposBeneficio.map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+
+            <FormField 
+              label="Valor de Referência (R$)" 
+              type="number" 
+              step="0.01" 
+              placeholder="0,00"
+              {...register('valor', { required: 'Valor é obrigatório' })} 
+              error={errors.valor?.message}
+            />
+
+            <div className="flex flex-col gap-2 pt-8">
+               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Elegibilidade</label>
+               <div className="flex items-center gap-2">
+                 <input type="checkbox" {...register('obrigatorio')} id="obrigatorio" className="rounded border-border" />
+                 <label htmlFor="obrigatorio" className="text-sm">Benefício Obrigatório (Convenção Coletiva)</label>
+               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Tipo de Benefício</label>
-              <select {...register('tipo_beneficio_id', { required: true })} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                <option value="">Selecione...</option>
-                {tipos?.map((t) => (
-                  <option key={t.id} value={t.id}>{t.nome}</option>
-                ))}
-              </select>
+
+            <div className="md:col-span-2">
+              <FormField 
+                label="Descrição / Observações" 
+                placeholder="Detalhes sobre a operadora, regras de uso..."
+                {...register('descricao')} 
+              />
             </div>
-            <FormField label="Valor (R$)" type="number" step="0.01" {...register('valor')} />
-            <FormField label="Desconto (R$)" type="number" step="0.01" {...register('desconto')} />
-            <FormField label="Data Início" type="date" {...register('data_inicio', { required: true })} />
-            <FormField label="Observações" {...register('observacoes')} />
           </div>
         </FormSection>
+
         <FormActions>
-          <Button type="button" variant="outline" onClick={() => navigate('/beneficios')}>Cancelar</Button>
-          <Button type="submit" disabled={mutation.isPending}>{mutation.isPending ? 'Salvando...' : 'Salvar'}</Button>
+          <Button type="button" variant="outline" onClick={() => navigate('/beneficios')} className="rounded-xl">
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={criarBeneficio.isPending} className="rounded-xl gap-2 shadow-glow">
+            {criarBeneficio.isPending ? 'Salvando...' : <><Save className="h-4 w-4" /> Salvar Plano</>}
+          </Button>
         </FormActions>
       </form>
     </PageLayout>

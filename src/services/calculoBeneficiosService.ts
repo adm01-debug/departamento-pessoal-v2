@@ -2,6 +2,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
 
 export const valeTransporteService = {
+  /**
+   * Calcula o custo de VT considerando o limite de 6% do salário base (Lei 7.418/85)
+   */
   async calcularCustoMensal(colaboradorId: string, diasUteis: number = 22) {
     const { data: colab, error: colabError } = await supabase
       .from('colaboradores')
@@ -43,6 +46,9 @@ export const valeTransporteService = {
 };
 
 export const valeAlimentacaoService = {
+  /**
+   * Calcula crédito proporcional aos dias trabalhados (PAT - Portaria 671/MTP)
+   */
   async calcularCredito(beneficioId: string, diasTrabalhados: number = 22) {
     const { data: beneficio, error } = await supabase
       .from('beneficios')
@@ -82,6 +88,9 @@ export const valeAlimentacaoService = {
 };
 
 export const planoSaudeService = {
+  /**
+   * Calcula coparticipação retida em folha
+   */
   async calcularCoparticipacao(colaboradorId: string, mesReferencia: string) {
     const { data, error } = await (supabase
       .from('beneficiarios_plano') as any)
@@ -109,6 +118,9 @@ export const planoSaudeService = {
 };
 
 export const seguroVidaService = {
+  /**
+   * Monitoramento de apólices e prêmio médio por capital segurado
+   */
   async calcularPremioMedio(empresaId: string) {
     const { data, error } = await supabase
       .from('beneficios')
@@ -140,6 +152,9 @@ export const seguroVidaService = {
 };
 
 export const dependentesService = {
+  /**
+   * Gestão de dependentes para IRRF e Salário Família
+   */
   async listarPorColaborador(colaboradorId: string) {
     const { data, error } = await (supabase
       .from('dependentes') as any)
