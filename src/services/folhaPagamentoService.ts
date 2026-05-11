@@ -16,36 +16,46 @@ export const folhaPagamentoService = {
    * Gera os dados para um holerite (contracheque)
    */
   gerarDadosHolerite: async (folhaId: string, colaboradorId: string): Promise<HoleriteData> => {
-    // 1. Busca dados da folha e do colaborador
-    const { data: folha, error: folhaError } = await supabase
-      .from('folhas_pagamento')
+    // 1. Busca dados do item da folha, do colaborador e da empresa (via folha header)
+    const { data: item, error: itemError } = await supabase
+      .from('folha_itens')
       .select(`
         *,
         colaborador:colaboradores(*),
-        empresa:empresas(*)
+        folha:folhas_pagamento(
+          *,
+          empresa:empresas(*)
+        )
       `)
-      .eq('id', folhaId)
+      .eq('folha_id', folhaId)
+      .eq('colaborador_id', colaboradorId)
       .single();
 
-    if (folhaError || !folha) throw new Error('Folha não encontrada');
+    if (itemError || !item) throw new Error('Dados da folha não encontrados para este colaborador');
 
-    const colab = folha.colaborador;
-    const emp = folha.empresa;
-
-    // 2. Realiza o cálculo usando o utilitário central
-    const resultado = folhaCalc.processar(Number(colab.salario_base || 0), {
-      adicionais: Number(folha.total_proventos || 0) - Number(colab.salario_base || 0),
-      descontosExtras: Number(folha.total_descontos || 0) - (folha.inss || 0) - (folha.irrf || 0),
-      dependentes: colab.dependentes || 0
-    });
+    // Type casting for nested objects due to Supabase join complexities
+    const colab = item.colaborador as any;
+    const folhaHeader = item.folha as any;
+    const emp = folhaHeader.empresa as any;
+    const detalhes = item.detalhes as any;
 
     return {
-      ...resultado,
+      proventos: item.total_proventos || 0,
+      descontos: item.total_descontos || 0,
+      liquido: item.total_liquido || 0,
+      inss: item.inss_mes || 0,
+      irrf: item.irrf_mes || 0,
+      fgts: item.fgts_mes || 0,
+      horasExtras: detalhes?.horasExtras || 0,
+      dsr: detalhes?.dsr || 0,
+      decimoTerceiro: detalhes?.decimoTerceiro || 0,
+      faixaInss: detalhes?.faixaInss || '',
+      faixaIrrf: detalhes?.faixaIrrf || '',
       colaboradorNome: colab.nome_completo,
       cpf: colab.cpf,
       cargo: colab.cargo || 'Não informado',
       dataAdmissao: colab.data_admissao,
-      competencia: folha.competencia,
+      competencia: folhaHeader.competencia,
       empresaNome: emp.razao_social,
       cnpj: emp.cnpj
     };
