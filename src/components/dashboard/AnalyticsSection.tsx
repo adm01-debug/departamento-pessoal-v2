@@ -8,7 +8,8 @@ import {
   CheckCircle2, AlertTriangle, Calendar, ChevronRight,
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
   Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
-  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink, FileJson
+  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink, FileJson,
+  Layers, Database, BarChart3, Target, Zap
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -440,6 +441,58 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   };
   return (
     <>
+      {/* Quick Access Top Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+        <MotionCard 
+          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+          className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-primary/30 transition-all"
+        >
+          <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+            <Layers className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-bold font-display">Fluxos de Trabalho</p>
+            <p className="text-[10px] text-muted-foreground">3 processos ativos</p>
+          </div>
+        </MotionCard>
+        <MotionCard 
+          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}
+          className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-info/30 transition-all"
+        >
+          <div className="p-3 rounded-xl bg-info/10 text-info group-hover:scale-110 transition-transform">
+            <Target className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-bold font-display">Metas de RH</p>
+            <p className="text-[10px] text-muted-foreground">85% concluídas</p>
+          </div>
+        </MotionCard>
+        <MotionCard 
+          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.51 }}
+          className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-success/30 transition-all"
+        >
+          <div className="p-3 rounded-xl bg-success/10 text-success group-hover:scale-110 transition-transform">
+            <Database className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-bold font-display">Auditoria Digital</p>
+            <p className="text-[10px] text-muted-foreground">Tudo em dia</p>
+          </div>
+        </MotionCard>
+        <MotionCard 
+          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.54 }}
+          className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-warning/30 transition-all"
+        >
+          <div className="p-3 rounded-xl bg-warning/10 text-warning group-hover:scale-110 transition-transform">
+            <Zap className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-bold font-display">Insights de IA</p>
+            <p className="text-[10px] text-muted-foreground">2 novas sugestões</p>
+          </div>
+        </MotionCard>
+      </div>
+
       {/* Row 1: 3-col analytics */}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}

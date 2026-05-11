@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Shield, TrendingUp, TrendingDown, Minus, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 interface HealthMetric {
   label: string;
@@ -116,9 +117,12 @@ export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos
 
           {/* Details */}
           <div className="flex-1 space-y-3 w-full">
-            <div className="flex items-center gap-2">
-              <Shield className={cn("h-5 w-5", scoreInfo.color)} />
-              <span className={cn("text-h3 font-display font-bold", scoreInfo.color)}>{scoreInfo.label}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className={cn("h-5 w-5", scoreInfo.color)} />
+                <span className={cn("text-h3 font-display font-bold", scoreInfo.color)}>{scoreInfo.label}</span>
+              </div>
+              <Badge variant="outline" className="text-[10px] font-bold border-primary/20 bg-primary/5">Saúde RH</Badge>
             </div>
             <p className="text-caption text-muted-foreground font-body leading-relaxed">
               Resumo automatizado da conformidade do RH. Considera turnover, absenteísmo e integridade de dados.
