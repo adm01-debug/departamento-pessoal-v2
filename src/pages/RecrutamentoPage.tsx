@@ -202,27 +202,67 @@ export default function RecrutamentoPage() {
 
                 {/* VAGAS */}
                 <TabsContent value="vagas" className="mt-0">
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {vagas.map((vaga: any) => (
-                      <Card key={vaga.id} className="rounded-2xl border-border/40 hover:border-primary/30 transition-all group overflow-hidden">
+                      <Card key={vaga.id} className="rounded-2xl border-border/40 hover:border-primary/30 hover:shadow-xl transition-all group overflow-hidden bg-card/50 backdrop-blur-sm">
                         <CardHeader className="pb-3">
-                          <div className="flex justify-between items-start">
-                            <Badge variant={vaga.status === 'aberta' ? 'default' : 'secondary'} className="rounded-lg">{vaga.status}</Badge>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                          <div className="flex justify-between items-start mb-2">
+                            <Badge 
+                              className={cn(
+                                "rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                                vaga.status === 'aberta' ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"
+                              )}
+                            >
+                              {vaga.status}
+                            </Badge>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5"><BarChart3 className="h-4 w-4" /></Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5"><Trash2 className="h-4 w-4" /></Button>
+                            </div>
                           </div>
-                          <CardTitle className="text-lg mt-2 font-display">{vaga.titulo}</CardTitle>
-                          <CardDescription className="text-xs">{vaga.departamento} • {vaga.modalidade}</CardDescription>
+                          <CardTitle className="text-xl font-display font-bold leading-tight group-hover:text-primary transition-colors">{vaga.titulo}</CardTitle>
+                          <CardDescription className="flex items-center gap-2 text-xs font-medium mt-1">
+                            <Briefcase className="h-3 w-3" /> {vaga.departamento} 
+                            <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                            {vaga.modalidade}
+                          </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1"><Users className="h-4 w-4" /> {candidaturas.filter((c: any) => c.vaga_id === vaga.id).length} Candidatos</div>
-                            <Button variant="ghost" size="sm" className="h-8 rounded-lg group-hover:translate-x-1 transition-transform">
-                              Ver Detalhes <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
+                          <div className="space-y-4">
+                            <div className="flex flex-wrap gap-1.5">
+                              {(vaga.requisitos?.split(',') || []).slice(0, 3).map((req: string, i: number) => (
+                                <Badge key={i} variant="secondary" className="text-[9px] bg-slate-100/50 text-slate-600 font-normal">{req.trim()}</Badge>
+                              ))}
+                              {(vaga.requisitos?.split(',').length > 3) && (
+                                <Badge variant="secondary" className="text-[9px] bg-slate-100/50 text-slate-600 font-normal">+{vaga.requisitos.split(',').length - 3}</Badge>
+                              )}
+                            </div>
+
+                            <div className="pt-4 border-t border-border/40 flex items-center justify-between">
+                              <div className="flex flex-col">
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Candidatos</span>
+                                <span className="text-lg font-display font-bold text-primary">
+                                  {candidaturas.filter((c: any) => c.vaga_id === vaga.id).length}
+                                </span>
+                              </div>
+                              <Button className="rounded-xl h-9 px-4 text-xs font-bold shadow-sm group-hover:shadow-md transition-all">
+                                Gerenciar Vaga
+                                <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                              </Button>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
+                    <button className="border-2 border-dashed border-border/60 rounded-3xl p-8 flex flex-col items-center justify-center gap-3 hover:border-primary/40 hover:bg-primary/5 transition-all group min-h-[250px]">
+                      <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                        <Plus className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-sm">Criar Nova Vaga</p>
+                        <p className="text-xs text-muted-foreground">Inicie um novo processo seletivo</p>
+                      </div>
+                    </button>
                   </div>
                 </TabsContent>
 
