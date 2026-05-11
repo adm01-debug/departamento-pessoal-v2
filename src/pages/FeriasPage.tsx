@@ -9,10 +9,10 @@ import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/comp
 import { FeriasRelatorioDialog } from '@/components/ferias/FeriasRelatorioDialog';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
-import { feriasService } from '@/services';
+import { feriasService, auditoriaService } from '@/services';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw } from 'lucide-react';
+import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -247,68 +247,84 @@ export default function FeriasPage() {
                   onCancelar={(id) => cancelar(id)}
                 />
               </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-xs text-muted-foreground">Mostrando {ferias.length} de {totalCount} solicitações</p>
-                <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-2">
+                <p className="text-xs text-muted-foreground order-2 sm:order-1">
+                  Mostrando <span className="font-bold text-foreground">{(page - 1) * limit + 1}</span> a <span className="font-bold text-foreground">{Math.min(page * limit, totalCount)}</span> de <span className="font-bold text-foreground">{totalCount}</span> solicitações
+                </p>
+                <div className="flex items-center gap-2 order-1 sm:order-2">
                   <div className="flex items-center gap-1">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-8 w-8 p-0 rounded-lg"
+                      className="h-8 w-8 p-0 rounded-lg hover:bg-primary/5 hover:text-primary transition-colors"
                       onClick={() => setPage(1)}
                       disabled={page === 1}
+                      title="Primeira página"
                     >
-                      <span className="sr-only">Primeira página</span>
-                      {"<<"}
+                      <ChevronsLeft className="h-4 w-4" />
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-8 rounded-lg gap-1 px-3"
+                      className="h-8 rounded-lg gap-1 px-3 hover:bg-primary/5 hover:text-primary transition-colors font-body"
                       onClick={() => setPage(p => Math.max(1, p - 1))}
                       disabled={page === 1}
                     >
+                      <ChevronLeft className="h-4 w-4" />
                       Anterior
                     </Button>
                     
                     <div className="flex items-center gap-1 mx-2">
-                      {Array.from({ length: Math.min(5, Math.ceil(totalCount / limit)) }, (_, i) => {
-                        const pageNum = i + 1;
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={page === pageNum ? "default" : "outline"}
-                            size="sm"
-                            className={`h-8 w-8 p-0 rounded-lg transition-all ${page === pageNum ? 'shadow-md shadow-primary/20' : ''}`}
-                            onClick={() => setPage(pageNum)}
-                          >
-                            {pageNum}
-                          </Button>
-                        );
-                      })}
-                      {Math.ceil(totalCount / limit) > 5 && (
-                        <span className="text-muted-foreground text-xs px-1">...</span>
-                      )}
+                      {(() => {
+                        const totalPages = Math.ceil(totalCount / limit);
+                        const pages = [];
+                        let startPage = Math.max(1, page - 2);
+                        let endPage = Math.min(totalPages, startPage + 4);
+                        
+                        if (endPage - startPage < 4) {
+                          startPage = Math.max(1, endPage - 4);
+                        }
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(
+                            <Button
+                              key={i}
+                              variant={page === i ? "default" : "outline"}
+                              size="sm"
+                              className={`h-8 w-8 p-0 rounded-lg transition-all font-body ${
+                                page === i 
+                                  ? 'shadow-md shadow-primary/20 bg-gradient-to-r from-primary-glow to-primary border-none text-white' 
+                                  : 'hover:bg-primary/5 hover:text-primary'
+                              }`}
+                              onClick={() => setPage(i)}
+                            >
+                              {i}
+                            </Button>
+                          );
+                        }
+                        return pages;
+                      })()}
                     </div>
 
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-8 rounded-lg gap-1 px-3"
+                      className="h-8 rounded-lg gap-1 px-3 hover:bg-primary/5 hover:text-primary transition-colors font-body"
                       onClick={() => setPage(p => p + 1)}
                       disabled={page * limit >= totalCount}
                     >
                       Próxima
+                      <ChevronRight className="h-4 w-4" />
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-8 w-8 p-0 rounded-lg"
+                      className="h-8 w-8 p-0 rounded-lg hover:bg-primary/5 hover:text-primary transition-colors"
                       onClick={() => setPage(Math.ceil(totalCount / limit))}
                       disabled={page * limit >= totalCount}
+                      title="Última página"
                     >
-                      <span className="sr-only">Última página</span>
-                      {">>"}
+                      <ChevronsRight className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
