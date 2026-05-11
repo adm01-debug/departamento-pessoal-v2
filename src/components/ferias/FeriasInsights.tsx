@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 interface FeriasInsightsProps {
   stats: {
@@ -26,7 +27,7 @@ export function FeriasInsights({ stats }: FeriasInsightsProps) {
         type: 'critical',
         title: 'Alerta de Vencimentos',
         description: `Existem ${stats.vencidas} períodos aquisitivos vencidos. Risco de pagamento em dobro e passivo trabalhista.`,
-        justification: `Baseado em ${stats.vencidas} registros identificados no módulo de Períodos Aquisitivos com status 'Vencido'.`,
+        justification: `Baseado em ${stats.vencidas} registros identificados no módulo de Períodos Aquisitivos com status 'Vencido' no período atual.`,
         action: 'Regularizar Períodos',
         link: 'periodos',
         icon: AlertTriangle,
@@ -155,9 +156,12 @@ export function FeriasInsights({ stats }: FeriasInsightsProps) {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                        onClick={() => handleLink('solicitacoes')} // Simplificando para levar à lista principal com auditoria
+                        onClick={() => {
+                          handleLink('solicitacoes');
+                          toast.info("Navegando para a lista de solicitações com trilha de auditoria completa.");
+                        }}
                       >
-                        <History className="h-3 w-3" /> Ver Trilha
+                        <History className="h-3 w-3" /> Ver Trilha e Auditoria
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent><p className="text-[10px]">Rastrear ciclo de vida e auditoria</p></TooltipContent>

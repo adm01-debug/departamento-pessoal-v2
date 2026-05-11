@@ -53,7 +53,7 @@ export const feriasPDF = {
     doc.save(`recibo_ferias_${colab.nome_completo || 'colaborador'}.pdf`);
   },
 
-  gerarRelatorioKPIs: async (stats: any, data: any[], filters?: any) => {
+  gerarRelatorioKPIs: async (stats: any, data: any[], filters?: any, empresa?: any) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
@@ -75,7 +75,7 @@ export const feriasPDF = {
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(22);
-      doc.text('LOVABLE HR', 20, 22);
+      doc.text(empresa?.razao_social || empresa?.nome_fantasia || 'LOVABLE HR', 20, 22);
       
       // Subtitle
       doc.setFont('helvetica', 'normal');
@@ -97,7 +97,7 @@ export const feriasPDF = {
       
       doc.setFontSize(8);
       doc.setTextColor(colors.light[0], colors.light[1], colors.light[2]);
-      doc.text(`Lovable HR - Sistema Integrado de Gestão de Férias`, 20, pageHeight - 10);
+      doc.text(`${empresa?.nome_fantasia || 'Lovable HR'} - Sistema Integrado de Gestão de Férias`, 20, pageHeight - 10);
       doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
       doc.text(`Documento Confidencial - RH`, pageWidth - 20, pageHeight - 10, { align: 'right' });
     };
