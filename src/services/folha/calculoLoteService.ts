@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { folhaCalc } from '@/utils/folhaCalc';
 import { toast } from 'sonner';
+import { pontoIntegracaoUtils } from '@/utils/folha/pontoIntegracaoUtils';
 
 export interface BatchProgress {
   total: number;
@@ -19,6 +20,10 @@ export const calculoLoteService = {
     onProgress?: (progress: BatchProgress) => void
   ) => {
     try {
+      const [ano, mes] = competencia.split('-');
+      const dataInicio = `${ano}-${mes}-01`;
+      const dataFim = `${ano}-${mes}-31`; // Simplificado para busca
+
       // 1. Buscar colaboradores ativos da empresa
       const { data: colaboradores, error: colabError } = await (supabase as any)
         .from('colaboradores')
