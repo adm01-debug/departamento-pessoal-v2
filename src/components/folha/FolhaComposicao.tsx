@@ -18,6 +18,9 @@ interface FolhaComposicaoProps {
   horasExtras?: number;
   dsr?: number;
   decimoTerceiro?: number;
+  horasFalta?: number;
+  faixaInss: string;
+  faixaIrrf: string;
 }
 
 export function FolhaComposicao({ 
