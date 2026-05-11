@@ -80,7 +80,7 @@ export function FolhaKPIs({ resumo, isLoading }: FolhaKPIsProps) {
       <FolhaKPI title="Líquido Total" value={resumo?.liquido || 0} icon={DollarSign}
         gradient="from-primary-glow to-primary" index={3}
         tooltip="Valor total líquido a ser pago aos colaboradores" />
-      <FolhaKPI title="INSS + FGTS" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
+      <FolhaKPI title="Encargos" value={(resumo?.inss || 0) + (resumo?.fgts || 0)} icon={Shield}
         gradient="from-info to-info/70" index={4}
         tooltip="Encargos patronais estimados (INSS + FGTS)" />
       <FolhaKPI title="IRRF" value={resumo?.irrf || 0} icon={Receipt}
