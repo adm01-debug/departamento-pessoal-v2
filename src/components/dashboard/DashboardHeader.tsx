@@ -63,7 +63,7 @@ export function DashboardHeader({ greeting, isLoading, onRefresh }: DashboardHea
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="primary-gradient" size="sm" className="h-10 rounded-xl px-5 shadow-glow">
+          <Button variant="premium" size="sm" className="h-10 rounded-xl px-5 shadow-glow">
             Configurações
           </Button>
         </div>
