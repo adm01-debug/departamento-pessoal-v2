@@ -11910,42 +11910,59 @@ export type Database = {
           ativo: boolean | null
           automatico: boolean | null
           codigo: string
+          codigo_esocial: string | null
           created_at: string
           descricao: string
+          empresa_id: string | null
           formula: string | null
           id: string
           incide_fgts: boolean | null
           incide_inss: boolean | null
           incide_irrf: boolean | null
+          natureza_rubrica: string | null
           tipo: Database["public"]["Enums"]["tipo_evento_folha"]
         }
         Insert: {
           ativo?: boolean | null
           automatico?: boolean | null
           codigo: string
+          codigo_esocial?: string | null
           created_at?: string
           descricao: string
+          empresa_id?: string | null
           formula?: string | null
           id?: string
           incide_fgts?: boolean | null
           incide_inss?: boolean | null
           incide_irrf?: boolean | null
+          natureza_rubrica?: string | null
           tipo: Database["public"]["Enums"]["tipo_evento_folha"]
         }
         Update: {
           ativo?: boolean | null
           automatico?: boolean | null
           codigo?: string
+          codigo_esocial?: string | null
           created_at?: string
           descricao?: string
+          empresa_id?: string | null
           formula?: string | null
           id?: string
           incide_fgts?: boolean | null
           incide_inss?: boolean | null
           incide_irrf?: boolean | null
+          natureza_rubrica?: string | null
           tipo?: Database["public"]["Enums"]["tipo_evento_folha"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rubricas_folha_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_filters: {
         Row: {
