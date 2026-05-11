@@ -86,23 +86,27 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
                 )}
               </TableCell>
               <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-body rounded-lg hover:bg-primary/10 hover:text-primary">
-                      <History className="h-3.5 w-3.5" /> Ver Trilha
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md rounded-2xl">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2 font-display">
-                        <History className="h-5 w-5 text-primary" /> Trilha de Auditoria
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <FeriasAuditTimeline solicitacaoId={s.id} />
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                {podeVerAuditoria ? (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-body rounded-lg hover:bg-primary/10 hover:text-primary">
+                        <History className="h-3.5 w-3.5" /> Ver Trilha
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md rounded-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 font-display">
+                          <History className="h-5 w-5 text-primary" /> Trilha de Auditoria
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <FeriasAuditTimeline solicitacaoId={s.id} />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground italic">Acesso restrito</span>
+                )}
               </TableCell>
               <TableCell>
                 <FeriasWorkflowStepper solicitacao={s} />
