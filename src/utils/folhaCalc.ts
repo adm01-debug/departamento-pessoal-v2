@@ -145,6 +145,9 @@ export const folhaCalc = {
 
     const liquido = Math.round((proventos - descontos) * 100) / 100;
 
+    // Log de auditoria interna do cálculo
+    console.debug(`[folhaCalc] Processamento concluído: Bruto=${proventos}, Líquido=${liquido}, Eventos=${detalheEventos.length}`);
+
     return { 
       proventos, 
       descontos, 
