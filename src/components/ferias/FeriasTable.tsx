@@ -22,6 +22,9 @@ interface FeriasTableProps {
 }
 
 export function FeriasTable({ data, ...actions }: FeriasTableProps) {
+  const { isAdmin, hasRole } = useAuth();
+  const podeVerAuditoria = isAdmin || hasRole('moderator');
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
