@@ -168,7 +168,7 @@ export default function AfastamentosPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={async () => {
                   const dataToExport = filteredAfastamentos.map(af => ({
-                    Colaborador: af.colaborador?.nome_completo || '-',
+                    Colaborador: (af.colaborador as any)?.nome_completo || '-',
                     Tipo: tipoLabels[af.tipo] || af.tipo,
                     CID: af.cid?.codigo || '-',
                     Inicio: format(new Date(af.data_inicio), 'dd/MM/yyyy'),
