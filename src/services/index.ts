@@ -44,6 +44,7 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
 };
 
 export { beneficioService } from './beneficioService';
+export * from './calculoBeneficiosService';
 
 
 export const colaboradorService = {
