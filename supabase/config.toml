@@ -1,10 +1,1 @@
-project_id = "pljkphaxtafbfnnnbpdj"
-
-[functions.enviar-relatorio]
-verify_jwt = false
-
-[functions.processar-agendamentos]
-verify_jwt = false
-
-[functions.external-db-bridge]
-verify_jwt = false
+project_id = "ciziytrrjjotlsjzshnm"
