@@ -119,59 +119,79 @@ export default function RecrutamentoPage() {
               <>
                 {/* PIPELINE KANBAN */}
                 <TabsContent value="pipeline" className="mt-0">
-                  <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar min-h-[500px]">
+                  <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar min-h-[600px] select-none">
                     {ETAPAS.map((etapa) => (
                       <div key={etapa.id} className="flex-shrink-0 w-72 flex flex-col gap-3">
                         <div className="flex items-center justify-between px-2">
                           <h3 className="font-display font-semibold text-sm flex items-center gap-2">
                             {etapa.label}
-                            <Badge variant="secondary" className="rounded-full h-5 px-1.5 text-[10px]">
+                            <Badge variant="secondary" className="rounded-full h-5 px-1.5 text-[10px] bg-muted/80">
                               {candidaturas.filter((c: any) => (c.etapa || 'triagem') === etapa.id).length}
                             </Badge>
                           </h3>
                         </div>
                         
-                        <div className={cn("flex-1 rounded-2xl border-2 border-dashed p-3 space-y-3 transition-colors", etapa.color)}>
+                        <div className={cn("flex-1 rounded-2xl border-2 border-dashed p-3 space-y-3 transition-colors duration-300", etapa.color)}>
                           {candidaturas
                             .filter((c: any) => (c.etapa || 'triagem') === etapa.id)
-                            .map((cand: any, idx: number) => (
+                            .map((cand: any) => (
                               <motion.div 
                                 key={cand.id}
                                 layoutId={cand.id}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-white p-3 rounded-xl shadow-sm border border-border/40 hover:shadow-md transition-all cursor-pointer group"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="bg-white p-4 rounded-xl shadow-sm border border-border/40 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group relative"
                               >
                                 <div className="flex justify-between items-start mb-2">
-                                  <h4 className="font-semibold text-xs truncate max-w-[150px]">{cand.candidato?.nome}</h4>
-                                  <Badge variant="outline" className="text-[9px] h-4 px-1">{cand.vaga?.titulo}</Badge>
-                                </div>
-                                <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-3">
-                                  <span className="flex items-center gap-1"><Star className="h-3 w-3 text-warning fill-warning" /> {cand.nota_geral || 0}</span>
-                                  <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> 2d</span>
-                                </div>
-                                <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <div className="flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md"><Mail className="h-3 w-3" /></Button>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md"><Phone className="h-3 w-3" /></Button>
+                                  <div>
+                                    <h4 className="font-semibold text-sm truncate max-w-[180px]">{cand.candidato?.nome}</h4>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">{cand.vaga?.titulo}</p>
                                   </div>
-                                  <Select 
-                                    onValueChange={(val) => updateEtapa.mutate({ id: cand.id, etapa: val })}
-                                    defaultValue={etapa.id}
-                                  >
-                                    <SelectTrigger className="h-6 text-[9px] w-24 rounded-md">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {ETAPAS.map(e => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}
-                                    </SelectContent>
-                                  </Select>
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1 bg-muted/30">{cand.candidato?.origem || 'Direto'}</Badge>
+                                </div>
+                                
+                                <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-4">
+                                  <span className="flex items-center gap-1">
+                                    <Star className={cn("h-3 w-3", (cand.nota_geral || 0) > 0 ? "text-warning fill-warning" : "text-slate-300")} /> 
+                                    {cand.nota_geral || 'S/N'}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" /> 
+                                    {new Date(cand.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                  <div className="flex -space-x-2">
+                                    <div className="h-6 w-6 rounded-full bg-primary/10 border-2 border-white flex items-center justify-center text-[10px] font-bold text-primary">
+                                      {cand.candidato?.nome?.charAt(0)}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-blue-50 hover:text-blue-600">
+                                      <Mail className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Select 
+                                      onValueChange={(val) => updateEtapa.mutate({ id: cand.id, etapa: val })}
+                                      defaultValue={etapa.id}
+                                    >
+                                      <SelectTrigger className="h-7 text-[9px] w-28 rounded-lg border-primary/20 bg-primary/5">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {ETAPAS.map(e => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
                                 </div>
                               </motion.div>
                             ))}
                           {candidaturas.filter((c: any) => (c.etapa || 'triagem') === etapa.id).length === 0 && (
-                            <div className="h-32 flex items-center justify-center border border-dashed rounded-xl opacity-20">
-                              <span className="text-xs">Vazio</span>
+                            <div className="h-32 flex flex-col items-center justify-center border border-dashed rounded-xl opacity-20 gap-2">
+                              <Users className="h-6 w-6" />
+                              <span className="text-xs font-medium">Sem candidatos</span>
                             </div>
                           )}
                         </div>
