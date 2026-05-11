@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Shield, TrendingUp, TrendingDown, Minus, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 interface HealthMetric {
   label: string;
