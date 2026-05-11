@@ -7082,6 +7082,7 @@ export type Database = {
       }
       folhas_pagamento: {
         Row: {
+          alerta_calculo: Json | null
           competencia: string
           created_at: string
           created_by: string | null
@@ -7102,6 +7103,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alerta_calculo?: Json | null
           competencia: string
           created_at?: string
           created_by?: string | null
@@ -7122,6 +7124,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alerta_calculo?: Json | null
           competencia?: string
           created_at?: string
           created_by?: string | null
@@ -11080,6 +11083,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           cargo: string | null
+          config_notificacoes: Json | null
           cpf_validado_govbr: boolean | null
           created_at: string
           departamento: string | null
@@ -11095,6 +11099,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           cargo?: string | null
+          config_notificacoes?: Json | null
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
@@ -11110,6 +11115,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           cargo?: string | null
+          config_notificacoes?: Json | null
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
