@@ -91,20 +91,22 @@ export const calculoLoteService = {
           });
 
           // Salva o item da folha
+          const itemData: any = {
+            folha_id: folhaId,
+            colaborador_id: colab.id,
+            salario_base: colab.salario_base,
+            total_proventos: res.proventos,
+            total_descontos: res.descontos,
+            total_liquido: res.liquido,
+            inss_mes: res.inss,
+            irrf_mes: res.irrf,
+            fgts_mes: res.fgts,
+            detalhes: res as any
+          };
+
           await supabase
             .from('folha_itens')
-            .upsert({
-              folha_id: folhaId,
-              colaborador_id: colab.id,
-              salario_base: colab.salario_base,
-              total_proventos: res.proventos,
-              total_descontos: res.descontos,
-              total_liquido: res.liquido,
-              inss_mes: res.inss,
-              irrf_mes: res.irrf,
-              fgts_mes: res.fgts,
-              detalhes: res as any
-            });
+            .upsert(itemData);
 
           // Auditoria
           await supabase.from('folha_auditoria').insert({
