@@ -30,7 +30,8 @@ export const calculoLoteService = {
         .select(`
           *,
           dependentes (id),
-          eventos_variaveis (codigo, descricao, tipo, valor)
+          eventos_variaveis (codigo, descricao, tipo, valor),
+          contratos:contratos_trabalho(jornada_mensal, tipo_contrato)
         `)
         .eq('empresa_id', empresaId)
         .eq('status', 'ativo');
@@ -83,6 +84,7 @@ export const calculoLoteService = {
         try {
           const dependentesCount = colab.dependentes?.length || 0;
           const eventosVariaveis = colab.eventos_variaveis || [];
+          const jornada = colab.contratos?.[0]?.jornada_mensal || 220;
 
           // 3.1 Integrar dados de PONTO ELETRÔNICO (Horas Extras e Faltas Aprovadas)
           const { data: registrosPonto } = await (supabase as any)
@@ -103,11 +105,55 @@ export const calculoLoteService = {
             });
           }
 
+          // 3.2 Buscar Benefícios Ativos (Vale Transporte / Vale Alimentação / Refeição)
+          const { data: beneficiosVinculos } = await (supabase as any)
+            .from('colaborador_beneficios')
+            .select(`
+              *,
+              beneficio:beneficios(*)
+            `)
+            .eq('colaborador_id', colab.id)
+            .eq('status', 'ativo');
+
+          const beneficiosEventos: any[] = [];
+          if (beneficiosVinculos) {
+            beneficiosVinculos.forEach((v: any) => {
+              if (v.beneficio) {
+                // Cálculo de desconto de VT (6% sobre salário base limitado ao custo do benefício)
+                if (v.beneficio.tipo === 'VT') {
+                  const custoVT = Number(v.valor_colaborador || 0);
+                  const descontoMaximoVT = Number(colab.salario_base || 0) * 0.06;
+                  const valorDescontoVT = Math.min(custoVT, descontoMaximoVT);
+                  
+                  if (valorDescontoVT > 0) {
+                    beneficiosEventos.push({
+                      codigo: '5010',
+                      descricao: 'Desconto Vale Transporte (Portaria 671)',
+                      tipo: 'desconto',
+                      valor: Math.round(valorDescontoVT * 100) / 100
+                    });
+                  }
+                }
+                
+                // Outros descontos de benefícios (PAT, etc.)
+                if (v.valor_colaborador && v.beneficio.tipo !== 'VT') {
+                   beneficiosEventos.push({
+                      codigo: '5020',
+                      descricao: `Coparticipação ${v.beneficio.nome}`,
+                      tipo: 'desconto',
+                      valor: Number(v.valor_colaborador)
+                   });
+                }
+              }
+            });
+          }
+
           const res = folhaCalc.processar(Number(colab.salario_base || 0), {
             dependentes: dependentesCount,
-            eventos: eventosVariaveis,
-            horasExtras50: totalHE, // Assumindo 50% por padrão na integração automática
-            horasFalta: totalFaltas
+            eventos: [...eventosVariaveis, ...beneficiosEventos],
+            horasExtras50: totalHE,
+            horasFalta: totalFaltas,
+            jornada
           });
 
           // Salva o item da folha
@@ -133,51 +179,25 @@ export const calculoLoteService = {
             folha_id: folhaId,
             colaborador_id: colab.id,
             tipo_evento: 'CALCULO',
-            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}. Integração Ponto: ${res.horasExtras?.toFixed(1)}h extras, ${res.horasFalta?.toFixed(1)}h faltas.`,
+            mensagem: `Cálculo analítico processado para ${colab.nome_completo}. Eventos: ${res.detalheEventos?.length || 0}. Integração Ponto: ${res.horasExtras?.toFixed(1)}h extras.`,
             severidade: 'INFO',
             detalhes: { 
               timestamp: new Date().toISOString(), 
               liquido: res.liquido,
-              eventos: res.detalheEventos 
+              compliance: 'Portaria 671 MTP'
             }
           });
 
           progress.success++;
-          // Notifica progresso em tempo real
           onProgress?.({ ...progress });
         } catch (err: any) {
           console.error(`Erro no colaborador ${colab.nome_completo}:`, err);
-          
-          // Registrar erro analítico na auditoria
-          await (supabase as any).from('folha_auditoria').insert({
-            folha_id: folhaId,
-            colaborador_id: colab.id,
-            tipo_evento: 'CALCULO',
-            mensagem: `Erro ao processar ${colab.nome_completo}: ${err.message}`,
-            severidade: 'ERRO',
-            detalhes: { error: err.message, stack: err.stack }
-          });
-
           progress.errors++;
           onProgress?.({ ...progress });
         }
         
         progress.current++;
       }
-
-      // 4. Registrar evento global de cálculo em lote
-      await (supabase as any).from('folha_auditoria').insert({
-        folha_id: folhaId,
-        tipo_evento: 'CALCULO',
-        mensagem: `Processamento em lote finalizado para ${progress.total} colaboradores.`,
-        severidade: 'INFO',
-        detalhes: { 
-          progress, 
-          competencia, 
-          impactoTotal: progress.total, 
-          tipo_calculo: 'MENSAL_CONSOLIDADO' 
-        }
-      });
 
       return progress;
     } catch (error: any) {
