@@ -64,14 +64,42 @@ export const valeAlimentacaoService = {
 export const planoSaudeService = {
   async calcularCoparticipacao(colaboradorId: string, mesReferencia: string) {
     const { data, error } = await supabase
-      .from('coparticipacao_saude' as any)
-      .select('*')
+      .from('beneficiarios_plano')
+      .select('valor_coparticipacao')
       .eq('colaborador_id', colaboradorId)
       .eq('mes_referencia', mesReferencia);
 
     if (error) throw error;
     
-    return (data || []).reduce((acc: number, item: any) => acc + item.valor, 0);
+    return (data || []).reduce((acc: number, item: any) => acc + (item.valor_coparticipacao || 0), 0);
+  },
+  
+  async listarDependentesNoPlano(colaboradorId: string) {
+    const { data, error } = await supabase
+      .from('beneficiarios_plano')
+      .select('*, dependente:dependentes(*)')
+      .eq('colaborador_id', colaboradorId)
+      .not('dependente_id', 'is', null);
+    
+    if (error) throw error;
+    return data || [];
+  }
+};
+
+export const seguroVidaService = {
+  async calcularPremioMedio(empresaId: string) {
+    const { data, error } = await supabase
+      .from('beneficios')
+      .select('valor, beneficios_colaborador(count)')
+      .eq('empresa_id', empresaId)
+      .eq('tipo', 'vida');
+    
+    if (error) throw error;
+    
+    const total = (data || []).reduce((acc, b) => acc + (b.valor || 0) * (b.beneficios_colaborador?.[0]?.count || 0), 0);
+    const adesoes = (data || []).reduce((acc, b) => acc + (b.beneficios_colaborador?.[0]?.count || 0), 0);
+    
+    return adesoes > 0 ? total / adesoes : 0;
   }
 };
 
