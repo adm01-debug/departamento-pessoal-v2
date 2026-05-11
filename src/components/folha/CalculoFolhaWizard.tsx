@@ -109,9 +109,9 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       // 3. Registrar fechamento automático da fase de processamento na auditoria
       await (supabase as any).from('folha_auditoria').insert({
         tipo_evento: 'CALCULO',
-        mensagem: `Assistente de cálculo finalizado para a competência ${competencia}. Todos os colaboradores foram processados seguindo a Portaria 671 MTP.`,
+        mensagem: `Assistente de cálculo finalizado para a competência ${competencia}. Todos os colaboradores foram processados com conformidade eSocial e integração de benefícios.`,
         severidade: 'INFO',
-        detalhes: { wizard: 'CalculoFolhaWizard', timestamp: new Date().toISOString(), versao_motor: '2.0.26', compliance: '100%' }
+        detalhes: { wizard: 'CalculoFolhaWizard', timestamp: new Date().toISOString(), versao_motor: '2.0.26', compliance: '100%', integracao: ['Ponto', 'Beneficios'] }
       });
 
       // Busca um resumo para exibição final
