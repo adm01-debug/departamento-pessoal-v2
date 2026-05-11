@@ -403,7 +403,6 @@ export default function ColaboradorFormPage() {
             </motion.div>
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   );
 }
