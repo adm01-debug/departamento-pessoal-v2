@@ -60,11 +60,16 @@ export default function FeriasPage() {
     if (!empresaAtual?.id) return;
     
     const intervalId = setInterval(() => {
-      console.log('Auto-sync: Sincronizando com o Hub...');
-      feriasService.syncWithHub(empresaAtual.id).then(() => {
-        refetch();
+      console.log('Auto-sync: Sincronizando com o Hub Unificado (60s)...');
+      feriasService.syncWithHub(empresaAtual.id).then((result) => {
+        if (result.recordsUpdated > 0) {
+          refetch();
+          toast.info(`${result.recordsUpdated} registros atualizados via Hub`);
+        } else {
+          refetch();
+        }
       }).catch(err => console.error('Erro no auto-sync:', err));
-    }, 60000); // 1 minuto
+    }, 60000); // 1 minuto de intervalo fixo para precisão
 
     return () => clearInterval(intervalId);
   }, [empresaAtual?.id, refetch]);
