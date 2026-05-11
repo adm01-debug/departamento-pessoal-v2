@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
@@ -9,6 +9,7 @@ import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/comp
 import { FeriasRelatorioDialog } from '@/components/ferias/FeriasRelatorioDialog';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
+import { feriasService } from '@/services';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw } from 'lucide-react';
@@ -53,6 +54,20 @@ export default function FeriasPage() {
     search: search.length >= 3 ? search : undefined, 
     status: statusFilter 
   });
+
+  // Auto-sync effect
+  useEffect(() => {
+    if (!empresaAtual?.id) return;
+    
+    const intervalId = setInterval(() => {
+      console.log('Auto-sync: Sincronizando com o Hub...');
+      feriasService.syncWithHub(empresaAtual.id).then(() => {
+        refetch();
+      }).catch(err => console.error('Erro no auto-sync:', err));
+    }, 60000); // 1 minuto
+
+    return () => clearInterval(intervalId);
+  }, [empresaAtual?.id, refetch]);
 
   const { 
     aprovarGestor, 
@@ -137,7 +152,7 @@ export default function FeriasPage() {
             {syncLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             Sincronizar
           </Button>
-          <FeriasRelatorioDialog stats={stats} data={ferias} />
+          <FeriasRelatorioDialog stats={stats} data={ferias} filters={{ search, status: statusFilter }} />
           <Dialog open={openCalc} onOpenChange={setOpenCalc}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body">
@@ -235,18 +250,67 @@ export default function FeriasPage() {
               <div className="flex items-center justify-between mt-4">
                 <p className="text-xs text-muted-foreground">Mostrando {ferias.length} de {totalCount} solicitações</p>
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >Anterior</Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setPage(p => p + 1)}
-                    disabled={page * limit >= totalCount}
-                  >Próxima</Button>
+                  <div className="flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 rounded-lg"
+                      onClick={() => setPage(1)}
+                      disabled={page === 1}
+                    >
+                      <span className="sr-only">Primeira página</span>
+                      {"<<"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 rounded-lg gap-1 px-3"
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      Anterior
+                    </Button>
+                    
+                    <div className="flex items-center gap-1 mx-2">
+                      {Array.from({ length: Math.min(5, Math.ceil(totalCount / limit)) }, (_, i) => {
+                        const pageNum = i + 1;
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={page === pageNum ? "default" : "outline"}
+                            size="sm"
+                            className={`h-8 w-8 p-0 rounded-lg transition-all ${page === pageNum ? 'shadow-md shadow-primary/20' : ''}`}
+                            onClick={() => setPage(pageNum)}
+                          >
+                            {pageNum}
+                          </Button>
+                        );
+                      })}
+                      {Math.ceil(totalCount / limit) > 5 && (
+                        <span className="text-muted-foreground text-xs px-1">...</span>
+                      )}
+                    </div>
+
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 rounded-lg gap-1 px-3"
+                      onClick={() => setPage(p => p + 1)}
+                      disabled={page * limit >= totalCount}
+                    >
+                      Próxima
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 rounded-lg"
+                      onClick={() => setPage(Math.ceil(totalCount / limit))}
+                      disabled={page * limit >= totalCount}
+                    >
+                      <span className="sr-only">Última página</span>
+                      {">>"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
