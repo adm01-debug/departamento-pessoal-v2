@@ -32,6 +32,8 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
     data_aviso_previo: '',
     quebra_contrato: false,
     remover_beneficios: true,
+    aviso_trabalhado: false,
+    saldo_fgts: '',
   });
 
   const set = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
@@ -74,13 +76,25 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
         quebra_contrato: form.quebra_contrato,
         remover_beneficios: form.remover_beneficios,
         salario_base: colaborador?.salario_base || 0,
+        aviso_trabalhado: form.aviso_trabalhado,
+        saldo_fgts: Number(form.saldo_fgts) || 0,
         status: 'pendente',
         empresa_id: empresaAtual?.id,
       });
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Desligamento registrado com sucesso');
       onClose();
-      setForm({ colaborador_id: '', data_desligamento: '', tipo: 'sem_justa_causa', motivo: '', data_aviso_previo: '', quebra_contrato: false, remover_beneficios: true });
+      setForm({ 
+        colaborador_id: '', 
+        data_desligamento: '', 
+        tipo: 'sem_justa_causa', 
+        motivo: '', 
+        data_aviso_previo: '', 
+        quebra_contrato: false, 
+        remover_beneficios: true,
+        aviso_trabalhado: false,
+        saldo_fgts: ''
+      });
     } catch (e: any) {
       toast.error(e.message || 'Erro ao criar desligamento');
     } finally {
@@ -133,6 +147,19 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
                   <SelectItem value="termino_contrato">Término de Contrato</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="font-body text-xs">Aviso Prévio Trabalhado?</Label>
+              <div className="flex items-center h-10">
+                <Switch checked={form.aviso_trabalhado} onCheckedChange={(v) => set('aviso_trabalhado', v)} />
+              </div>
+            </div>
+            <div>
+              <Label className="font-body text-xs">Saldo FGTS Estimado (R$)</Label>
+              <Input type="number" value={form.saldo_fgts} onChange={(e) => set('saldo_fgts', e.target.value)} className="rounded-xl" placeholder="0.00" />
             </div>
           </div>
 
