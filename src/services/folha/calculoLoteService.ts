@@ -171,7 +171,12 @@ export const calculoLoteService = {
         tipo_evento: 'CALCULO',
         mensagem: `Processamento em lote finalizado para ${progress.total} colaboradores.`,
         severidade: 'INFO',
-        detalhes: { progress, competencia }
+        detalhes: { 
+          progress, 
+          competencia, 
+          impactoTotal: progress.total, 
+          tipo_calculo: 'MENSAL_CONSOLIDADO' 
+        }
       });
 
       return progress;
