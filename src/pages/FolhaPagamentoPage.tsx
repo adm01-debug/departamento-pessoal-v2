@@ -73,11 +73,16 @@ function useFolhaResumo(competencia: string, empresaId?: string) {
       const irrf = folhaData?.reduce((acc, f) => acc + (f.irrf_mes || 0), 0) || 0;
       const fgts = folhaData?.reduce((acc, f) => acc + (f.fgts_mes || 0), 0) || 0;
 
+      // Estimativa de Encargos Patronais (INSS Patronal + RAT + Terceiros ~ 27.8%)
+      const inssPatronal = totalProventos * 0.278;
+      const custoTotalEmpresa = totalProventos + inssPatronal + fgts;
+
       const hasData = colaboradores > 0;
       return {
         id: folhaData?.[0]?.folha_id,
         colaboradores, totalProventos, totalDescontos, inss, fgts, irrf,
         liquido: totalProventos - totalDescontos,
+        custoTotalEmpresa,
         status: {
           ponto: hasData ? 'importado' : 'pendente',
           lancamentos: hasData ? 'conferido' : 'pendente',
