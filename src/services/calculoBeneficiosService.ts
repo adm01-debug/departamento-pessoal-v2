@@ -96,8 +96,8 @@ export const planoSaudeService = {
   },
   
   async listarDependentesNoPlano(colaboradorId: string) {
-    const { data, error } = await supabase
-      .from('beneficiarios_plano')
+    const { data, error } = await (supabase
+      .from('beneficiarios_plano') as any)
       .select('*, dependente:dependentes(*)')
       .eq('colaborador_id', colaboradorId)
       .not('dependente_id', 'is', null)
@@ -141,8 +141,8 @@ export const seguroVidaService = {
 
 export const dependentesService = {
   async listarPorColaborador(colaboradorId: string) {
-    const { data, error } = await supabase
-      .from('dependentes')
+    const { data, error } = await (supabase
+      .from('dependentes') as any)
       .select('*')
       .eq('colaborador_id', colaboradorId)
       .order('nome');
