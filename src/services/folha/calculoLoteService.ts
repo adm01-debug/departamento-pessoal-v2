@@ -24,7 +24,7 @@ export const calculoLoteService = {
         .from('colaboradores')
         .select('*')
         .eq('empresa_id', empresaId)
-        .eq('status', 'Ativo');
+        .eq('status', 'ativo');
 
       if (colabError) throw colabError;
       if (!colaboradores || colaboradores.length === 0) {
@@ -110,8 +110,10 @@ export const calculoLoteService = {
           await supabase.from('folha_auditoria').insert({
             folha_id: folhaId,
             colaborador_id: colab.id,
-            acao: 'calculo_mensal',
-            detalhes: { timestamp: new Error().stack, hash: btoa(JSON.stringify(res)).substring(0, 16) }
+            tipo_evento: 'calculo_mensal',
+            mensagem: `Cálculo de folha processado em lote para ${colab.nome_completo}`,
+            severidade: 'info',
+            detalhes: { timestamp: new Date().toISOString() } as any
           });
 
           progress.success++;
