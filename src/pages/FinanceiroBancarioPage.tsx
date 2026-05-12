@@ -24,6 +24,7 @@ export default function FinanceiroBancarioPage() {
   const [folhas, setFolhas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [processingRetorno, setProcessingRetorno] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
