@@ -152,8 +152,8 @@ export default function ESocialPage() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
         <div className="lg:col-span-3 space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            {statsData.slice(0, 3).map(({ label, value, gradient }, i) => (
+          <div className="grid gap-4 md:grid-cols-4">
+            {statsData.map(({ label, value, gradient }, i) => (
               <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
                 <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
                   <div className={cn("h-[2px] bg-gradient-to-r", gradient)} />
