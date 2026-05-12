@@ -2084,15 +2084,56 @@ export type Database = {
           },
         ]
       }
+      cargo_faixas_salariais: {
+        Row: {
+          cargo_id: string | null
+          created_at: string
+          id: string
+          nivel: string
+          updated_at: string
+          valor_maximo: number
+          valor_minimo: number
+        }
+        Insert: {
+          cargo_id?: string | null
+          created_at?: string
+          id?: string
+          nivel: string
+          updated_at?: string
+          valor_maximo: number
+          valor_minimo: number
+        }
+        Update: {
+          cargo_id?: string | null
+          created_at?: string
+          id?: string
+          nivel?: string
+          updated_at?: string
+          valor_maximo?: number
+          valor_minimo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cargo_faixas_salariais_cargo_id_fkey"
+            columns: ["cargo_id"]
+            isOneToOne: false
+            referencedRelation: "cargos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cargos: {
         Row: {
           ativo: boolean | null
           cbo: string | null
           created_at: string
           departamento_id: string | null
+          descricao: string | null
           empresa_id: string | null
           id: string
+          nivel_hierarquico: number | null
           nome: string
+          requisitos: string | null
           salario_base: number | null
           updated_at: string
         }
@@ -2101,9 +2142,12 @@ export type Database = {
           cbo?: string | null
           created_at?: string
           departamento_id?: string | null
+          descricao?: string | null
           empresa_id?: string | null
           id?: string
+          nivel_hierarquico?: number | null
           nome: string
+          requisitos?: string | null
           salario_base?: number | null
           updated_at?: string
         }
@@ -2112,9 +2156,12 @@ export type Database = {
           cbo?: string | null
           created_at?: string
           departamento_id?: string | null
+          descricao?: string | null
           empresa_id?: string | null
           id?: string
+          nivel_hierarquico?: number | null
           nome?: string
+          requisitos?: string | null
           salario_base?: number | null
           updated_at?: string
         }
@@ -4572,37 +4619,74 @@ export type Database = {
       departamentos: {
         Row: {
           ativo: boolean | null
+          codigo_centro_custo: string | null
           created_at: string
+          departamento_pai_id: string | null
           empresa_id: string | null
           gestor_id: string | null
           id: string
           nome: string
+          responsavel_id: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean | null
+          codigo_centro_custo?: string | null
           created_at?: string
+          departamento_pai_id?: string | null
           empresa_id?: string | null
           gestor_id?: string | null
           id?: string
           nome: string
+          responsavel_id?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean | null
+          codigo_centro_custo?: string | null
           created_at?: string
+          departamento_pai_id?: string | null
           empresa_id?: string | null
           gestor_id?: string | null
           id?: string
           nome?: string
+          responsavel_id?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "departamentos_departamento_pai_id_fkey"
+            columns: ["departamento_pai_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "departamentos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "departamentos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "departamentos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "departamentos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
           {
