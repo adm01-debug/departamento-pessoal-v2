@@ -154,9 +154,10 @@ export default function AfastamentosPage() {
                 <DropdownMenuLabel className="text-xs uppercase text-muted-foreground font-bold">Status do Afastamento</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: null })}>Todos Status</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'ativo' })} className="text-green-600">Ativos</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'finalizado' })} className="text-blue-600">Finalizados</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })} className="text-orange-600">Pendentes</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'ativo' })} className="text-green-600 font-medium">Ativos</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })} className="text-orange-600 font-medium">Pendentes (INSS)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'finalizado' })} className="text-gray-600 font-medium">Finalizados</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'prorrogado' })} className="text-blue-600 font-medium">Prorrogados</DropdownMenuItem>
                 
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="text-xs uppercase text-muted-foreground font-bold">Tipo de Licença</DropdownMenuLabel>
@@ -194,16 +195,19 @@ export default function AfastamentosPage() {
                     Inicio: format(new Date(af.data_inicio), 'dd/MM/yyyy'),
                     Fim: format(new Date(af.data_fim_prevista), 'dd/MM/yyyy'),
                     Dias: af.dias_total,
-                    Status: af.status
+                    Status: af.status,
+                    'Dias INSS': af.dias_inss || 0,
+                    Pericia: af.data_pericia ? format(new Date(af.data_pericia), 'dd/MM/yyyy') : '-'
                   }));
                   
                   await exportarPDF(
-                    'Relatorio de Afastamentos',
+                    'Relatório de Afastamentos e Auditoria',
                     dataToExport,
-                    ['Colaborador', 'Tipo', 'CID', 'Inicio', 'Fim', 'Dias', 'Status']
+                    ['Colaborador', 'Tipo', 'CID', 'Inicio', 'Fim', 'Dias', 'Status', 'Dias INSS', 'Pericia']
                   );
+                  toast.success('Exportação PDF concluída para auditoria');
                 }}>
-                  <FileText className="h-4 w-4 mr-2" /> PDF (Auditoria)
+                  <FileText className="h-4 w-4 mr-2" /> PDF (Auditoria Detalhada)
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
