@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { bitrix24Service } from '@/services/tabelasComplementaresService';
 import { cnabService, webhookService } from '@/services/integracaoService';
 import { toast } from 'sonner';
+import { whatsappService, WhatsAppConfig } from '@/services/whatsappService';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 interface Integracao {
   id: string;
