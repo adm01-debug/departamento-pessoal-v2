@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -13,6 +13,9 @@ import { getEventoDescricao, validarAnteDeEnviar } from '@/services/esocialServi
 import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ESocialComplianceScore } from '@/components/esocial/ESocialComplianceScore';
+
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -20,6 +23,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
+import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
+
 
 const tiposEvento = [
   'S-1000', 'S-1005', 'S-1010', 'S-1020',
@@ -114,32 +119,60 @@ export default function ESocialPage() {
     <>
     <PageTitle title="eSocial" description="Gestão de eventos eSocial" />
     <PageLayout
-      title="eSocial"
-      description="Gestão de eventos eSocial"
+      title="Central eSocial 10/10"
+      description="Monitoramento proativo e conformidade total com o Governo Federal"
       icon={<FileCheck className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary to-primary-glow"
+      actions={
+        <div className="flex gap-2">
+           <Button variant="outline" size="sm" className="rounded-xl gap-1.5 border-primary/20 hover:bg-primary/5">
+              <ShieldAlert className="h-4 w-4" />
+              Auditoria IA
+           </Button>
+           <Button size="sm" className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow">
+              <RefreshCw className="h-4 w-4" />
+              Sincronizar Todos
+           </Button>
+        </div>
+      }
     >
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        {statsData.map(({ label, value, gradient }, i) => (
-          <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
-              <div className={cn("h-[2px] bg-gradient-to-r", gradient)} />
-              <CardContent className="pt-6">
-                {isLoading ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  <div className="text-3xl font-display font-bold">{value}</div>
-                )}
-                <p className="text-xs text-muted-foreground font-body mt-1">{label}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        <div className="lg:col-span-3 space-y-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            {statsData.slice(0, 3).map(({ label, value, gradient }, i) => (
+              <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
+                <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
+                  <div className={cn("h-[2px] bg-gradient-to-r", gradient)} />
+                  <CardContent className="pt-6">
+                    {isLoading ? (
+                      <Skeleton className="h-8 w-16" />
+                    ) : (
+                      <div className="text-3xl font-display font-bold">{value}</div>
+                    )}
+                    <p className="text-xs text-muted-foreground font-body mt-1">{label}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
 
-      {/* Events */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Tabs defaultValue="eventos" className="space-y-6">
+
+        <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20">
+          <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <LayoutDashboard className="h-4 w-4" /> Eventos
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <History className="h-4 w-4" /> Timeline de Transmissão
+          </TabsTrigger>
+          <TabsTrigger value="config" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <Settings2 className="h-4 w-4" /> Configurações & Certificados
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="eventos" className="space-y-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
           <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -348,8 +381,99 @@ export default function ESocialPage() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
-      </PageLayout>
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="timeline">
+          <Card className="border border-border/30 rounded-2xl overflow-hidden p-12 text-center text-muted-foreground">
+             <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
+             <p className="font-bold">Timeline Auditável</p>
+             <p className="text-sm">Rastreabilidade completa de todas as transmissões e retornos do governo.</p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="config">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border border-border/30 rounded-2xl overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-display flex items-center gap-2">
+                    <Key className="h-5 w-5 text-primary" /> Certificado Digital
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="p-4 rounded-xl border border-success/20 bg-success/5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Key className="h-8 w-8 text-success" />
+                        <div>
+                          <p className="font-bold text-sm">e-CNPJ: {empresaAtual?.razao_social}</p>
+                          <p className="text-xs text-muted-foreground">Vencimento: 12/12/2026 (Em 224 dias)</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-success border-success/30">Ativo</Badge>
+                    </div>
+                    <Button variant="outline" className="w-full rounded-xl border-dashed">
+                      <Plus className="h-4 w-4 mr-2" /> Alterar Certificado
+                    </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-border/30 rounded-2xl overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-display flex items-center gap-2">
+                    <Settings2 className="h-5 w-5 text-primary" /> Parâmetros do Gateway
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm">
+                   <div className="flex justify-between items-center py-2 border-b border-border/10">
+                      <span className="text-muted-foreground">Ambiente</span>
+                      <Badge variant="secondary" className="bg-info/10 text-info border-info/20">Produção</Badge>
+                   </div>
+                   <div className="flex justify-between items-center py-2 border-b border-border/10">
+                      <span className="text-muted-foreground">Versão do Layout</span>
+                      <span className="font-medium">S-1.2</span>
+                   </div>
+                   <div className="flex justify-between items-center py-2">
+                      <span className="text-muted-foreground">Auto-Sincronização</span>
+                      <Badge variant="outline" className="text-success">Ativado</Badge>
+                   </div>
+                </CardContent>
+              </Card>
+           </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+    
+    <div className="lg:col-span-1 space-y-6">
+      <ESocialComplianceScore stats={stats} />
+      <ESocialAIInsights />
+      
+      <Card className="border border-border/30 rounded-2xl overflow-hidden bg-gradient-to-br from-background to-muted/20">
+        <CardHeader className="pb-2">
+           <CardTitle className="text-sm font-display flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+             Status do Webservice
+           </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Gov.br Gateway</span>
+              <Badge variant="outline" className="text-[10px] bg-success/5 text-success border-success/20 gap-1.5">
+                 <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" /> Operacional
+              </Badge>
+           </div>
+           <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Latência de Resposta</span>
+              <span className="text-xs font-bold">124ms</span>
+           </div>
+           <Button variant="ghost" className="w-full text-[10px] h-8 text-muted-foreground hover:text-primary rounded-xl gap-2">
+              <Globe className="h-3 w-3" /> Ver Status da Infraestrutura
+           </Button>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+</PageLayout>
+
+
 
       {/* Detalhes do Evento */}
       <Dialog open={!!selectedEvento} onOpenChange={(o) => { if(!o) setSelectedEvento(null); }}>

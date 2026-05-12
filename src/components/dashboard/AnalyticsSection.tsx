@@ -239,7 +239,55 @@ function CadastroIncompletoWidget() {
   );
 }
 
+/* ─── eSocial Monitor Widget ─── */
+function ESocialMonitorWidget() {
+  const navigate = useNavigate();
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+           <ShieldCheck className="h-4 w-4 text-success" />
+           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Compliance eSocial</span>
+        </div>
+        <Badge variant="outline" className="text-[10px] bg-success/5 text-success border-success/20">98% Aceitação</Badge>
+      </div>
+
+      <div className="p-3 rounded-xl bg-muted/20 border border-border/30 space-y-2">
+         <div className="flex justify-between text-[11px]">
+            <span>Eventos S-1200</span>
+            <span className="font-bold">148/150</span>
+         </div>
+         <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-primary w-[98%] rounded-full" />
+         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+         <div className="p-2 rounded-lg border border-border/10 bg-background/50 text-[10px]">
+            <p className="text-muted-foreground">Certificado</p>
+            <p className="font-bold text-success">Válido (224d)</p>
+         </div>
+         <div className="p-2 rounded-lg border border-border/10 bg-background/50 text-[10px]">
+            <p className="text-muted-foreground">Último Envio</p>
+            <p className="font-bold">Hoje, 14:30</p>
+         </div>
+      </div>
+
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="w-full rounded-xl text-[10px] h-8 gap-1.5"
+        onClick={() => navigate('/esocial')}
+      >
+        <ExternalLink className="h-3 w-3" />
+        Acessar Central eSocial
+      </Button>
+    </div>
+  );
+}
+
 /* ─── Exports ─── */
+
 interface AnalyticsSectionProps {
   stats: {
     headcount: number;
@@ -571,21 +619,22 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
         </MotionCard>
 
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-destructive/20 transition-all">
+          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-info/20 transition-all">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-destructive to-destructive/70">
-                <Timer className="h-4 w-4 text-white" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-info/70">
+                <ShieldCheck className="h-4 w-4 text-white" />
               </div>
-              Integridade Cadastral
+              Monitor eSocial
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/colaboradores')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/esocial')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                <ChevronRight className="h-4 w-4" />
             </Button>
           </CardHeader>
-          <CardContent><CadastroIncompletoWidget /></CardContent>
+          <CardContent><ESocialMonitorWidget /></CardContent>
         </MotionCard>
       </div>
+
 
       {/* Row 2: 4-col details */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

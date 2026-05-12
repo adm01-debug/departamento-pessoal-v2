@@ -53,6 +53,21 @@ export async function listarEventos(empresaId: string | null) {
   return (data || []) as ESocialEvento[];
 }
 
+export async function listarEventosPorCompetencia(empresaId: string | null, competencia: string) {
+  let query = supabase
+    .from('esocial_eventos')
+    .select('*')
+    .eq('competencia', competencia);
+
+  if (empresaId) {
+    query = query.eq('empresa_id', empresaId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []) as ESocialEvento[];
+}
+
 export async function obterEstatisticas(empresaId: string | null) {
   const eventos = await listarEventos(empresaId);
 
