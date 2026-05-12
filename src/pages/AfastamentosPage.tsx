@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Heart, Plus, Search, Filter, Download, Calendar as CalendarIcon, Clock, AlertCircle, FileText } from 'lucide-react';
+import { Heart, Plus, Search, Filter, Download, Calendar as CalendarIcon, Clock, AlertCircle, FileText, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AfastamentoStats } from '@/components/afastamentos/AfastamentoStats';
 import { AfastamentoTable } from '@/components/afastamentos/AfastamentoTable';
