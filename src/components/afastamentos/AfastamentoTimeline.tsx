@@ -189,31 +189,51 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
                   <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
                     <Calendar className="h-5 w-5" />
                   </div>
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-sm font-bold text-blue-900">
-                        {format(new Date(afastamento.data_pericia), "dd 'de' MMMM, yyyy 'às' HH:mm", { locale: ptBR })}
-                      </p>
-                      <p className="text-xs text-blue-700 flex items-center gap-1 mt-1">
-                        <AlertCircle className="h-3 w-3" />
-                        Protocolo: {afastamento.protocolo_inss || 'Não informado'}
-                      </p>
-                    </div>
-                    
-                    <div className="p-2 bg-white rounded border border-blue-100 text-[11px]">
-                      <span className="font-bold text-blue-800 uppercase block mb-1">Local da Perícia:</span>
-                      <span className="text-blue-700">{afastamento.local_pericia || 'Local a ser confirmado pelo INSS'}</span>
-                    </div>
-
-                    {afastamento.data_fim_prevista && (
-                      <div className="text-[10px] text-muted-foreground flex items-center gap-1.5 pt-1">
-                        <Clock className="h-3 w-3" />
-                        <span>Cálculo de dias adicionais se prorrogado: 
-                          <span className="font-bold ml-1">+{afastamentoService.calcularDias(afastamento.data_fim_prevista, new Date().toISOString())} dias estimativos</span>
-                        </span>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-bold text-blue-900">
+                          {format(new Date(afastamento.data_pericia), "dd 'de' MMMM, yyyy 'às' HH:mm", { locale: ptBR })}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mt-1.5">
+                          <Badge variant="outline" className="text-[9px] bg-blue-100/50 border-blue-200 text-blue-700">
+                            Protocolo: {afastamento.protocolo_inss || 'Pendente'}
+                          </Badge>
+                          {afastamento.data_pericia_anterior && (
+                            <Badge variant="outline" className="text-[9px] bg-amber-50 border-amber-200 text-amber-700">
+                              REAGENDADO (Era: {format(new Date(afastamento.data_pericia_anterior), 'dd/MM/yy')})
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </div>
+                      
+                      {afastamento.motivo_pericia && (
+                        <div className="bg-white/50 p-2 rounded border border-blue-100/50 text-[10px] italic">
+                          <span className="font-bold text-blue-800 not-italic mr-1">Motivo:</span>
+                          "{afastamento.motivo_pericia}"
+                        </div>
+                      )}
+
+                      <div className="p-2 bg-white rounded border border-blue-100 text-[11px] shadow-sm">
+                        <span className="font-bold text-blue-800 uppercase block mb-1 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          Local da Perícia:
+                        </span>
+                        <span className="text-blue-700 leading-tight block">{afastamento.local_pericia || 'Local a ser confirmado pelo INSS / Ver no site Meu INSS'}</span>
+                      </div>
+
+                      {afastamento.data_fim_prevista && (
+                        <div className="bg-blue-600/5 p-2 rounded-lg border border-blue-200/50">
+                          <div className="text-[10px] text-blue-800 flex items-center gap-1.5">
+                            <Clock className="h-3 w-3" />
+                            <span className="font-semibold">Cálculo de Dias Adicionais:</span>
+                          </div>
+                          <p className="text-[11px] text-blue-700 mt-1">
+                            Se a perícia confirmar a incapacidade, a prorrogação estimada será de 
+                            <span className="font-bold ml-1">+{afastamentoService.calcularDias(afastamento.data_fim_prevista, afastamento.data_pericia)} dias</span> até a data da avaliação.
+                          </p>
+                        </div>
+                      )}
+                    </div>
                 </div>
               </CardContent>
             </Card>
