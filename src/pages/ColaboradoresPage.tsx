@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
-import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
+import { ColaboradorFilters } from '@/components/colaboradores/ColaboradorFilters';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ColaboradorStatus } from '@/components/ui/status-badge';
 import { EmptyList } from '@/components/ui/empty-state';
@@ -176,21 +176,13 @@ export default function ColaboradoresPage() {
         })}
       </div>
 
-      <DataTableToolbar
-        search={search}
+      <ColaboradorFilters
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Pesquisar por nome, CPF, e-mail ou matrícula..."
-        filters={[
-          { key: 'departamento', label: 'Departamento', options: departamentos.map(d => ({ value: d.nome, label: d.nome })), value: deptoFilter, onChange: (v) => { setDeptoFilter(v); setCurrentPage(1); } },
-          { key: 'cargo', label: 'Cargo', options: cargos.map(c => ({ value: c.nome, label: c.nome })), value: cargoFilter, onChange: (v) => { setCargoFilter(v); setCurrentPage(1); } }
-        ]}
-        onClearFilters={() => {
-          setStatusFilter('');
-          setDeptoFilter('');
-          setCargoFilter('');
-          setSearch('');
-          setCurrentPage(1);
-        }}
+        onStatusChange={handleStatusChange}
+        onDeptoChange={(v) => { setDeptoFilter(v); setCurrentPage(1); }}
+        onCargoChange={(v) => { setCargoFilter(v); setCurrentPage(1); }}
+        departamentos={departamentos}
+        cargos={cargos}
       />
 
       {isLoading ? (

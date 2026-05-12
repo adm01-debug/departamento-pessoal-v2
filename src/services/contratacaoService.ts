@@ -112,7 +112,18 @@ export const contratacaoService = {
     const link = `${baseUrl}/contratacao?token=${token}`;
     const mensagem = encodeURIComponent(`Olá! 👋 Boas-vindas à nossa equipe!\n\nSeu processo de admissão digital está pronto. Acesse pelo link seguro: ${link}\n\nCódigo de Acesso: *${token}*`);
     
-    window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank');
+    
+    try {
+      // Tenta usar a integração nativa com Evolution API via whatsappService
+      const { data: admissao } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).single();
+      if (admissao?.empresa_id) {
+        const { whatsappService } = await import('./whatsappService');
+        await whatsappService.sendMessage(admissao.empresa_id, telefone, `Olá! 👋 Boas-vindas!\n\nSeu processo de admissão digital está pronto: ${link}\n\nCódigo: *${token}*`);
+      }
+    } catch (e) {
+      // Fallback para o link manual se o serviço falhar ou não estiver configurado
+      window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank');
+    }
     
     await supabase.from('notificacoes_admissao').insert({
       admissao_id: admissaoId,

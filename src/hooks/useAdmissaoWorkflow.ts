@@ -51,6 +51,28 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
           .eq('id', admissaoId);
       }
 
+      // Automatically send link to candidate if email is present
+      const { data: admissao } = await supabase
+        .from('admissoes')
+        .select('email')
+        .eq('id', admissaoId)
+        .single();
+      
+      if (admissao?.email) {
+        const token = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const expiracao = new Date();
+        expiracao.setDate(expiracao.getDate() + 7);
+
+        await supabase
+          .from('admissao_tokens')
+          .insert({
+            admissao_id: admissaoId,
+            token: token,
+            email_candidato: admissao.email,
+            data_expiracao: expiracao.toISOString(),
+          });
+      }
+
       // Registra o início no histórico
       await supabase.from('workflows_historico').insert({
         execucao_id: execucao.id,
