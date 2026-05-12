@@ -84,21 +84,16 @@ export const validadorFolha = {
 
       // Regra 4: Validação de Rubricas do Cálculo vs Rubricas do eSocial
       if (detalhes?.detalheEventos && rubricas) {
-        const { validarRubricaESocial } = await import('@/validators/esocialValidators');
-        
         for (const evento of detalhes.detalheEventos) {
           const rubricaConfig = rubricas.find(r => r.codigo === evento.codigo);
-          if (rubricaConfig) {
-            const validacao = validarRubricaESocial(rubricaConfig);
-            if (!validacao.valid) {
-              alertas.push({
-                colaboradorId: item.colaborador_id,
-                nome: colab.nome_completo,
-                tipo: 'divergencia_esocial',
-                mensagem: `Evento ${evento.codigo} (${evento.descricao}) possui divergências eSocial.`,
-                gravidade: 'media'
-              });
-            }
+          if (!rubricaConfig) {
+            alertas.push({
+              colaboradorId: item.colaborador_id,
+              nome: colab.nome_completo,
+              tipo: 'divergencia_esocial',
+              mensagem: `Evento ${evento.codigo} não possui rubrica correspondente configurada.`,
+              gravidade: 'media'
+            });
           }
         }
       }
