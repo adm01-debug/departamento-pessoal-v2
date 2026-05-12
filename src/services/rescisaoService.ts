@@ -103,11 +103,10 @@ export const rescisaoService = {
     return novo;
   },
 
-  async homologar(id: string) {
-    // Buscar desligamento para validar se o cálculo já foi feito
+  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string) {
     const { data: d, error: fetchError } = await supabase
       .from('desligamentos')
-      .select('valor_liquido, etapa, checklist_calculo_rescisao')
+      .select('valor_liquido, etapa, checklist_calculo_rescisao, status')
       .eq('id', id)
       .single();
     
@@ -116,14 +115,29 @@ export const rescisaoService = {
       throw new Error('A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.');
     }
 
-    await this.validarTransicao(id, 'homologacao');
+    // Registrar aprovação na nova tabela de homologações
+    const { error: homError } = await supabase
+      .from('homologacoes_rescisao')
+      .insert({
+        desligamento_id: id,
+        etapa,
+        status: 'aprovado',
+        parecer,
+        data_decisao: new Date().toISOString()
+      });
+
+    if (homError) throw homError;
+
+    // Se for a última etapa (colaborador), finaliza o processo
+    const proximaEtapa = etapa === 'rh' ? 'financeiro' : etapa === 'financeiro' ? 'juridico' : etapa === 'juridico' ? 'colaborador' : 'finalizado';
+    const novoStatus = proximaEtapa === 'finalizado' ? 'homologado' : 'em_homologacao';
 
     const { data, error } = await supabase
       .from('desligamentos')
       .update({ 
-        status: 'homologado', 
-        etapa: 'pagamento', 
-        checklist_homologacao: true 
+        status: novoStatus, 
+        etapa: proximaEtapa === 'finalizado' ? 'pagamento' : 'homologacao', 
+        checklist_homologacao: proximaEtapa === 'finalizado'
       })
       .eq('id', id)
       .select()
@@ -136,11 +150,45 @@ export const rescisaoService = {
       registro_id: id,
       acao: 'UPDATE',
       dados_novos: { 
-        status: 'homologado', 
-        etapa: 'pagamento', 
-        evento: 'HOMOLOGACAO_CONCLUIDA',
-        timestamp_assinatura: new Date().toISOString()
+        status: novoStatus, 
+        etapa: proximaEtapa, 
+        evento: 'HOMOLOGACAO_PARCIAL',
+        etapa_concluida: etapa,
+        timestamp: new Date().toISOString()
       },
+    });
+
+    return data;
+  },
+
+  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador') {
+    const hash = btoa(`rescisao-${id}-${tipo}-${new Date().getTime()}`).slice(0, 32);
+    const updateData: any = {};
+    
+    if (tipo === 'empresa') {
+      updateData.assinado_empresa = true;
+      updateData.hash_assinatura_empresa = hash;
+      updateData.data_assinatura_empresa = new Date().toISOString();
+    } else {
+      updateData.assinado_colaborador = true;
+      updateData.hash_assinatura_colaborador = hash;
+      updateData.data_assinatura_colaborador = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('desligamentos')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    await auditLogger.log({
+      tabela: 'desligamentos',
+      registro_id: id,
+      acao: 'SIGN',
+      dados_novos: { tipo_assinatura: tipo, hash }
     });
 
     return data;
