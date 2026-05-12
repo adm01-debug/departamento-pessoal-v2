@@ -228,7 +228,11 @@ export default function AvaliacaoPage() {
           </TabsContent>
 
           <TabsContent value="ninebox" className="space-y-6">
-             <NineBoxMatrix data={feedbacks} />
+            <NineBoxMatrix data={feedbacks} />
+          </TabsContent>
+
+          <TabsContent value="auditoria" className="space-y-6">
+            <PerformanceAuditTimeline />
           </TabsContent>
         </Tabs>
       </PageLayout>
