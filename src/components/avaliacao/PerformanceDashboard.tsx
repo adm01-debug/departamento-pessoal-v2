@@ -17,11 +17,10 @@ export function PerformanceDashboard({ stats, feedbacks, metas }: { stats: any, 
   }, [feedbacks]);
 
   const metasProgress = useMemo(() => {
-    const data = metas.slice(0, 5).map(m => ({
+    return metas.slice(0, 5).map(m => ({
       name: m.titulo.length > 20 ? m.titulo.substring(0, 20) + '...' : m.titulo,
-      progresso: m.progresso || 0
+      progresso: m.valor_objetivo > 0 ? (m.valor_atual / m.valor_objetivo) * 100 : 0
     }));
-    return data;
   }, [metas]);
 
   return (
