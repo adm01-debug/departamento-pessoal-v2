@@ -28,7 +28,7 @@ describe('rescisaoService', () => {
         single: vi.fn().mockResolvedValue({ data: { etapa: 'comunicacao', status: 'pendente' }, error: null }),
       });
 
-      await expect(rescisaoService.validarTransicao('1', 'calculo'))
+      await expect(rescisaoService.validarTransicao('1', 'documentacao'))
         .resolves.toBe(true);
         
       await expect(rescisaoService.validarTransicao('1', 'homologacao'))

@@ -74,16 +74,27 @@ describe('folhaPagamentoService', () => {
       const mockInsert = vi.fn().mockResolvedValue({ error: null });
 
       (supabase.from as any).mockImplementation((table: string) => {
+        const chain = {
+          update: mockUpdate,
+          eq: mockEq,
+          select: mockSelect,
+          single: mockSingle,
+          insert: mockInsert,
+          then: undefined as any
+        };
+
+        chain.update = vi.fn().mockReturnThis();
+        chain.eq = vi.fn().mockReturnThis();
+        chain.select = vi.fn().mockReturnThis();
+        
         if (table === 'folhas_pagamento') {
-          return { update: mockUpdate, eq: mockEq, select: mockSelect, single: mockSingle };
+          (chain as any).single = mockSingle;
+        } else if (table === 'folha_itens') {
+          (chain as any).then = (resolve: any) => resolve({ data: [], error: null });
+        } else if (table === 'folha_auditoria') {
+          chain.insert = mockInsert;
         }
-        if (table === 'folha_itens') {
-          return { select: vi.fn().mockResolvedValue({ data: [], error: null }) };
-        }
-        if (table === 'folha_auditoria') {
-          return { insert: mockInsert };
-        }
-        return {};
+        return chain;
       });
 
       const result = await folhaPagamentoService.fecharFolha('folha-1');
