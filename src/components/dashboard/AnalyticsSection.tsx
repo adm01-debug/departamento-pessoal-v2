@@ -619,21 +619,22 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
         </MotionCard>
 
         <MotionCard initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-destructive/20 transition-all">
+          className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:border-info/20 transition-all">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2.5 text-h3 font-display">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-destructive to-destructive/70">
-                <Timer className="h-4 w-4 text-white" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-info/70">
+                <ShieldCheck className="h-4 w-4 text-white" />
               </div>
-              Integridade Cadastral
+              Monitor eSocial
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/colaboradores')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/esocial')} className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                <ChevronRight className="h-4 w-4" />
             </Button>
           </CardHeader>
-          <CardContent><CadastroIncompletoWidget /></CardContent>
+          <CardContent><ESocialMonitorWidget /></CardContent>
         </MotionCard>
       </div>
+
 
       {/* Row 2: 4-col details */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
