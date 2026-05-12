@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, FileText, Calendar, Trash2, Edit2, AlertCircle, History } from 'lucide-react';
+import { MoreHorizontal, FileText, Calendar, Trash2, Edit2, AlertCircle, History, Copy, CheckCircle2 } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -48,11 +49,18 @@ interface AfastamentoTableProps {
 
 export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onTimeline }: AfastamentoTableProps) {
   const { excluir } = useAfastamentos();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleExcluir = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este registro?')) {
       await excluir(id);
     }
+  };
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
@@ -116,28 +124,57 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onT
               </TableCell>
               <TableCell>
                 {af.dias_inss > 0 ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1 text-warning font-semibold text-sm cursor-help">
-                          <AlertCircle className="h-4 w-4" />
-                          {af.dias_inss} dias
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>O colaborador deve ser encaminhado ao INSS.</p>
-                        <p className="text-xs text-muted-foreground">Excedeu o limite de {af.dias_empresa} dias pagos pela empresa.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <div className="flex flex-col gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 text-warning font-semibold text-sm cursor-help">
+                            <AlertCircle className="h-4 w-4" />
+                            {af.dias_inss} dias
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>O colaborador deve ser encaminhado ao INSS.</p>
+                          <p className="text-xs text-muted-foreground">Excedeu o limite de {af.dias_empresa} dias pagos pela empresa.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    {af.protocolo_inss && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                        onClick={() => copyToClipboard(af.protocolo_inss, af.id)}
+                      >
+                        {copiedId === af.id ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                        {af.protocolo_inss}
+                      </Button>
+                    )}
+                  </div>
                 ) : (
-                  <span className="text-xs text-muted-foreground">A cargo da empresa</span>
+                  <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">Empresa</span>
                 )}
               </TableCell>
               <TableCell>
-                <Badge className={`capitalize shadow-none ${statusColors[af.status] || 'bg-muted text-muted-foreground'}`}>
-                  {af.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className={`capitalize shadow-none ${statusColors[af.status] || 'bg-muted text-muted-foreground'}`}>
+                    {af.status}
+                  </Badge>
+                  {af.documentos_count > 0 && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary">
+                            <FileText className="h-3 w-3" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{af.documentos_count} documento(s) anexado(s)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 <DropdownMenu>

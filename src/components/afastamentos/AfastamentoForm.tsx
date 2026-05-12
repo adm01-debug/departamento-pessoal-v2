@@ -11,9 +11,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
-import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon } from 'lucide-react';
+import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon, Zap } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 const schema = z.object({
@@ -218,12 +218,19 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
           <Label>CID-10</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-between font-normal">
-                {selectedCid ? `[${selectedCid.codigo}] ${selectedCid.descricao}` : "Buscar por código ou descrição..."}
-                <Search className="h-4 w-4 opacity-50" />
+              <Button variant="outline" className="w-full justify-between font-normal h-auto py-2.5">
+                {selectedCid ? (
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold text-primary">{selectedCid.codigo}</span>
+                    <span className="text-[10px] text-muted-foreground truncate max-w-[300px]">{selectedCid.descricao}</span>
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground">Buscar CID por código ou descrição...</span>
+                )}
+                <Search className="h-4 w-4 opacity-50 shrink-0" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0" align="start">
+            <PopoverContent className="w-[450px] p-0 shadow-2xl" align="start">
               <Command shouldFilter={false}>
                 <CommandInput 
                   placeholder="Pesquisar CID (ex: Z76)..." 
@@ -231,21 +238,44 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                   onValueChange={setCidSearch}
                 />
                 <CommandList>
-                  {cidResults.length === 0 && <CommandEmpty>Nenhum CID encontrado.</CommandEmpty>}
-                  <CommandGroup>
-                    {cidResults.map((c) => (
-                      <CommandItem
-                        key={c.id}
-                        onSelect={() => {
-                          setSelectedCid(c);
-                          setCidSearch('');
-                        }}
-                      >
-                        <span className="font-bold mr-2">{c.codigo}</span>
-                        <span className="truncate">{c.descricao}</span>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  {cidResults.length === 0 && cidSearch.length > 2 && <CommandEmpty>Nenhum CID encontrado para "{cidSearch}".</CommandEmpty>}
+                  
+                  {cidSearch.length <= 2 && (
+                    <CommandGroup heading="CIDs Frequentes">
+                      {[
+                        { id: '1', codigo: 'Z76.0', descricao: 'Emissão de receita de repetição' },
+                        { id: '2', codigo: 'R51', descricao: 'Cefaléia' },
+                        { id: '3', codigo: 'J06.9', descricao: 'Infecção respiratória aguda' },
+                        { id: '4', codigo: 'Z02.7', descricao: 'Exame para fins de atestado médico' },
+                      ].map(c => (
+                        <CommandItem key={c.codigo} onSelect={() => { setSelectedCid(c); setCidSearch(''); }}>
+                          <Zap className="mr-2 h-3 w-3 text-amber-500" />
+                          <span className="font-bold mr-2">{c.codigo}</span>
+                          <span className="text-xs truncate">{c.descricao}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+
+                  {cidResults.length > 0 && (
+                    <>
+                      <CommandSeparator />
+                      <CommandGroup heading="Resultados da Busca">
+                        {cidResults.map((c) => (
+                          <CommandItem
+                            key={c.id}
+                            onSelect={() => {
+                              setSelectedCid(c);
+                              setCidSearch('');
+                            }}
+                          >
+                            <span className="font-bold mr-2 text-primary">{c.codigo}</span>
+                            <span className="text-xs truncate">{c.descricao}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </>
+                  )}
                 </CommandList>
               </Command>
             </PopoverContent>

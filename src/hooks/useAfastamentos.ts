@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useEmpresas } from './useEmpresas';
+import { auditLogger } from '@/utils/auditLogger';
 import { toast } from 'sonner';
 
 export function useAfastamentos() {
@@ -23,8 +24,14 @@ export function useAfastamentos() {
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => afastamentoService.criar({ ...data, empresa_id: empresaId }),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'afastamentos',
+        registro_id: data.id,
+        acao: 'INSERT',
+        dados_novos: data
+      });
       toast.success('Afastamento registrado com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao registrar: ${err.message}`),
@@ -32,8 +39,14 @@ export function useAfastamentos() {
 
   const atualizarMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => afastamentoService.atualizar(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'afastamentos',
+        registro_id: variables.id,
+        acao: 'UPDATE',
+        dados_novos: variables.data
+      });
       toast.success('Afastamento atualizado com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao atualizar: ${err.message}`),
@@ -41,8 +54,13 @@ export function useAfastamentos() {
 
   const excluirMutation = useMutation({
     mutationFn: (id: string) => afastamentoService.excluir(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'afastamentos',
+        registro_id: id,
+        acao: 'DELETE'
+      });
       toast.success('Afastamento excluído com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao excluir: ${err.message}`),
@@ -76,9 +94,15 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => afastamentoService.criarProrrogacao(data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['prorrogacoes-afastamento'] });
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'prorrogacoes_afastamento',
+        registro_id: data.id,
+        acao: 'INSERT',
+        dados_novos: data
+      });
       toast.success('Prorrogação registrada com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao registrar prorrogação: ${err.message}`),
