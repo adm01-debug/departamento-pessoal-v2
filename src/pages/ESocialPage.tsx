@@ -111,9 +111,9 @@ export default function ESocialPage() {
   };
 
   const statsData = [
-    { label: 'Eventos Enviados', value: String(stats.enviados), gradient: 'from-primary to-primary-glow' },
-    { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-primary-glow to-primary' },
-    { label: 'Com Erro', value: String(stats.erros), gradient: 'from-destructive to-destructive/70/70' },
+    { label: 'Enviados', value: String(stats.enviados), gradient: 'from-success to-success/70' },
+    { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-warning to-warning/70' },
+    { label: 'Com Erro', value: String(stats.erros), gradient: 'from-destructive to-destructive/70' },
     { label: 'Conformidade', value: `${stats.conformidade}%`, gradient: 'from-primary to-primary-glow' },
   ];
 
