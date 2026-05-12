@@ -265,7 +265,12 @@ export default function ColaboradorDetalhesPage() {
                 <TabsTrigger value="anotacoes" className="data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-1 pb-2 shadow-none bg-transparent">Anotações Internas</TabsTrigger>
                 <TabsTrigger value="estagiario" className="data-[state=active]:border-primary border-b-2 border-transparent rounded-none px-1 pb-2 shadow-none bg-transparent">Dados Estagiário</TabsTrigger>
               </TabsList>
-              <TabsContent value="pessoais"><DocumentosPessoaisTab colaboradorId={id!} /></TabsContent>
+              <TabsContent value="pessoais">
+                <div className="space-y-8">
+                  <DocumentosPessoaisTab colaboradorId={id!} />
+                  <ColaboradorDocuments colaboradorId={id!} />
+                </div>
+              </TabsContent>
               <TabsContent value="anotacoes"><AnotacoesTab colaboradorId={id!} /></TabsContent>
               <TabsContent value="estagiario"><EstagiarioTab colaboradorId={id!} /></TabsContent>
             </Tabs>
