@@ -160,16 +160,7 @@ export default function DocumentosPage() {
   };
 
   const handleView = async (doc: any) => {
-    try {
-      const path = doc.storage_path || doc.url?.split(`${BUCKET}/`).pop();
-      if (!path) { toast.error('Arquivo não encontrado'); return; }
-
-      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600);
-      if (error) throw error;
-      window.open(data.signedUrl, '_blank');
-    } catch (e: any) {
-      toast.error(e.message);
-    }
+    setSelectedDocForPreview(doc);
   };
 
   const formatSize = (bytes: number) => {
