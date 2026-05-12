@@ -677,18 +677,6 @@ export default function ESocialPage() {
               </Card>
            </div>
         </TabsContent>
-                   <div className="flex justify-between items-center py-2 border-b border-border/10">
-                      <span className="text-muted-foreground">Versão do Layout</span>
-                      <span className="font-medium">S-1.2</span>
-                   </div>
-                   <div className="flex justify-between items-center py-2">
-                      <span className="text-muted-foreground">Auto-Sincronização</span>
-                      <Badge variant="outline" className="text-success">Ativado</Badge>
-                   </div>
-                </CardContent>
-              </Card>
-           </div>
-        </TabsContent>
       </Tabs>
     </div>
     
