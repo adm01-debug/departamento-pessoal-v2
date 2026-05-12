@@ -41,7 +41,7 @@ const tipoLabels: Record<string, string> = {
 
 export default function AfastamentosPage() {
   const { afastamentos, isLoading, filtros, setFeltros } = useAfastamentos();
-  const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento();
+  const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento(undefined);
   const { exportarPDF } = usePDFExport();
   
   const [activeTab, setActiveTab] = useState('afastamentos');
