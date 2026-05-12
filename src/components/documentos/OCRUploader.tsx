@@ -17,6 +17,7 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
   const [docType, setDocType] = useState<string>('generic');
   const [loading, setLoading] = useState(false);
   const [extractedText, setExtractedText] = useState('');
+  const [fields, setFields] = useState<Record<string, string>>({});
   const [fileName, setFileName] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
