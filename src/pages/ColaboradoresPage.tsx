@@ -176,21 +176,13 @@ export default function ColaboradoresPage() {
         })}
       </div>
 
-      <DataTableToolbar
-        search={search}
+      <ColaboradorFilters
         onSearchChange={handleSearchChange}
-        searchPlaceholder="Pesquisar por nome, CPF, e-mail ou matrícula..."
-        filters={[
-          { key: 'departamento', label: 'Departamento', options: departamentos.map(d => ({ value: d.nome, label: d.nome })), value: deptoFilter, onChange: (v) => { setDeptoFilter(v); setCurrentPage(1); } },
-          { key: 'cargo', label: 'Cargo', options: cargos.map(c => ({ value: c.nome, label: c.nome })), value: cargoFilter, onChange: (v) => { setCargoFilter(v); setCurrentPage(1); } }
-        ]}
-        onClearFilters={() => {
-          setStatusFilter('');
-          setDeptoFilter('');
-          setCargoFilter('');
-          setSearch('');
-          setCurrentPage(1);
-        }}
+        onStatusChange={handleStatusChange}
+        onDeptoChange={(v) => { setDeptoFilter(v); setCurrentPage(1); }}
+        onCargoChange={(v) => { setCargoFilter(v); setCurrentPage(1); }}
+        departamentos={departamentos}
+        cargos={cargos}
       />
 
       {isLoading ? (
