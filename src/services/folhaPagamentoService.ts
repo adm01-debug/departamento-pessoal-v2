@@ -19,25 +19,26 @@ export const folhaPagamentoService = {
    * Gera os dados para um holerite (contracheque)
    */
   gerarDadosHolerite: async (folhaId: string, colaboradorId: string): Promise<HoleriteData> => {
+    // Busca simplificada para evitar recursão profunda de tipos
     const { data: item, error: itemError } = await supabase
       .from('folha_itens')
-      .select(`
-        *,
-        colaborador:colaboradores(*),
-        folha:folhas_pagamento(
-          *,
-          empresa:empresas(*)
-        )
-      `)
+      .select('*, colaborador:colaboradores(*), folha:folhas_pagamento(*)')
       .eq('folha_id', folhaId)
       .eq('colaborador_id', colaboradorId)
       .single();
 
-    if (itemError || !item) throw new Error('Dados da folha não encontrados para este colaborador');
+    if (itemError || !item) throw new Error('Dados da folha não encontrados');
+
+    const folhaHeader = item.folha as any;
+    
+    // Busca os dados da empresa separadamente para evitar o join triplo que causa erro de tipo
+    const { data: emp } = await supabase
+      .from('empresas')
+      .select('*')
+      .eq('id', folhaHeader.empresa_id)
+      .single();
 
     const colab = item.colaborador as any;
-    const folhaHeader = item.folha as any;
-    const emp = folhaHeader.empresa as any;
     const detalhes = item.detalhes as any;
 
     // Buscar se já existe um holerite gerado/assinado
@@ -66,8 +67,8 @@ export const folhaPagamentoService = {
       cargo: colab.cargo || 'Não informado',
       dataAdmissao: colab.data_admissao,
       competencia: folhaHeader.competencia,
-      empresaNome: emp.razao_social,
-      cnpj: emp.cnpj,
+      empresaNome: emp?.razao_social || 'N/A',
+      cnpj: emp?.cnpj || 'N/A',
       assinado: holerite?.assinado || false,
       hashAssinatura: holerite?.hash_assinatura,
       dataAssinatura: holerite?.data_assinatura
@@ -99,7 +100,7 @@ export const folhaPagamentoService = {
         hash_assinatura: hash,
         data_assinatura: new Date().toISOString(),
         assinado: true
-      });
+      } as any);
 
     if (error) throw error;
     return hash;
