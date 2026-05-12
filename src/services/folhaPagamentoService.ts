@@ -44,7 +44,8 @@ export const folhaPagamentoService = {
     const { data: holerite } = await supabase
       .from('holerites')
       .select('*')
-      .eq('folha_item_id', item.id)
+      .eq('folha_id', folhaId)
+      .eq('colaborador_id', colaboradorId)
       .maybeSingle();
 
     return {
@@ -76,19 +77,28 @@ export const folhaPagamentoService = {
   /**
    * Assina digitalmente um holerite
    */
-  assinarHolerite: async (folhaItemId: string, colaboradorId: string): Promise<string> => {
-    const hash = btoa(`assinatura-${folhaItemId}-${colaboradorId}-${new Date().getTime()}`).substring(0, 32);
+  assinarHolerite: async (folhaId: string, colaboradorId: string): Promise<string> => {
+    const hash = btoa(`assinatura-${folhaId}-${colaboradorId}-${new Date().getTime()}`).substring(0, 32);
     
+    // Buscar dados básicos do colaborador para preencher o holerite se necessário
+    const { data: colab } = await supabase
+      .from('colaboradores')
+      .select('nome_completo, cpf, cargo')
+      .eq('id', colaboradorId)
+      .single();
+
     // UPSERT no holerite com o hash da assinatura
     const { error } = await supabase
       .from('holerites')
       .upsert({
-        folha_item_id: folhaItemId,
+        folha_id: folhaId,
         colaborador_id: colaboradorId,
+        colaborador_nome: colab?.nome_completo || 'N/A',
+        colaborador_cpf: colab?.cpf || 'N/A',
+        colaborador_cargo: colab?.cargo || 'N/A',
         hash_assinatura: hash,
         data_assinatura: new Date().toISOString(),
-        assinado: true,
-        tipo: 'Mensal'
+        assinado: true
       });
 
     if (error) throw error;
