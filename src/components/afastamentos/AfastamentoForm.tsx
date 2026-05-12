@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
-import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon, Zap } from 'lucide-react';
+import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon, Zap, History as HistoryIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
@@ -43,6 +44,8 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const [cidSearch, setCidSearch] = useState('');
   const [cidResults, setCidResults] = useState<any[]>([]);
   const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
+  const [historicoRecente, setHistoricoRecente] = useState<any[]>([]);
+  const [isVerificandoHistorico, setIsVerificandoHistorico] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -55,6 +58,24 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const watchInicio = watch('data_inicio');
   const watchFim = watch('data_fim_prevista');
   const watchTipo = watch('tipo');
+  const watchColaboradorId = watch('colaborador_id');
+
+  useEffect(() => {
+    const carregarHistorico = async () => {
+      if (watchColaboradorId) {
+        setIsVerificandoHistorico(true);
+        try {
+          const historico = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
+          setHistoricoRecente(historico);
+        } catch (e) {
+          console.error('Erro ao carregar histórico:', e);
+        } finally {
+          setIsVerificandoHistorico(false);
+        }
+      }
+    };
+    carregarHistorico();
+  }, [watchColaboradorId]);
 
   useEffect(() => {
     if (watchInicio && watchFim) {
@@ -133,6 +154,26 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
             </PopoverContent>
           </Popover>
           {errors.colaborador_id && <p className="text-xs text-destructive">{errors.colaborador_id.message as string}</p>}
+          
+          {historicoRecente.length > 0 && (
+            <div className="mt-2 p-3 bg-blue-50/50 border border-blue-100 rounded-lg animate-in fade-in slide-in-from-top-1">
+              <div className="flex items-center gap-2 mb-2 text-blue-700">
+                <HistoryIcon className="h-3 w-3" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Afastamentos Recentes (60 dias)</span>
+              </div>
+              <div className="space-y-1.5">
+                {historicoRecente.map(h => (
+                  <div key={h.id} className="text-[11px] flex justify-between items-center text-blue-800">
+                    <span>{new Date(h.data_inicio).toLocaleDateString()} - {h.dias_total} dias</span>
+                    <Badge variant="outline" className="h-4 text-[9px] bg-white/50 border-blue-200">CID: {h.cid?.codigo || 'N/A'}</Badge>
+                  </div>
+                ))}
+                <p className="text-[9px] text-muted-foreground italic mt-2">
+                  *Atenção: Mesma doença (CID) em 60 dias soma-se para o limite de 15 dias.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">

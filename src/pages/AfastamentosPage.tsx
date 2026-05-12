@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Heart, Plus, Search, Filter, Download, Calendar as CalendarIcon, Clock, AlertCircle, FileText } from 'lucide-react';
+import { Heart, Plus, Search, Filter, Download, Calendar as CalendarIcon, Clock, AlertCircle, FileText, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AfastamentoStats } from '@/components/afastamentos/AfastamentoStats';
 import { AfastamentoTable } from '@/components/afastamentos/AfastamentoTable';
@@ -24,6 +24,7 @@ import { format } from 'date-fns';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const tipoLabels: Record<string, string> = {
   doenca: 'Doença',
@@ -76,6 +77,19 @@ export default function AfastamentosPage() {
     
     return matchSearch && matchCID && matchTipo && matchStatus;
   });
+
+  const chartData = useMemo(() => {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const data = months.map(m => ({ name: m, total: 0 }));
+    
+    afastamentos.forEach((af: any) => {
+      const date = new Date(af.data_inicio);
+      const monthIndex = date.getMonth();
+      data[monthIndex].total += 1;
+    });
+    
+    return data;
+  }, [afastamentos]);
 
   const handleEdit = (af: any) => {
     setSelectedAfastamento(af);
@@ -327,18 +341,46 @@ export default function AfastamentosPage() {
               </CardContent>
             </Card>
 
-            <Card className="border border-border/50 shadow-sm rounded-xl bg-muted/20">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">Resumo Mensal</CardTitle>
+            <Card className="border border-border/50 shadow-sm rounded-xl bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                  <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                  Volume Mensal
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground font-medium">Total de Dias Pagos</span>
-                  <span className="font-bold">{afastamentos.reduce((acc, a) => acc + (a.dias_empresa || 0), 0)} d</span>
+              <CardContent>
+                <div className="h-[120px] w-full mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{fontSize: 9, fill: '#888'}} 
+                        interval={1}
+                      />
+                      <RechartsTooltip 
+                        contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        cursor={{fill: '#f5f5f5'}}
+                      />
+                      <Bar dataKey="total" radius={[4, 4, 0, 0]}>
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index === new Date().getMonth() ? '#ef4444' : '#fca5a5'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground font-medium">Casos de INSS</span>
-                  <span className="text-warning font-bold">{afastamentos.filter(a => a.dias_inss > 0).length}</span>
+                <div className="mt-4 space-y-3 pt-2 border-t">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                    <span className="text-muted-foreground">Impacto Direto</span>
+                    <span className="text-foreground">{afastamentos.reduce((acc, a) => acc + (a.dias_empresa || 0), 0)} dias pagos</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                    <span className="text-muted-foreground">Previdência</span>
+                    <span className="text-orange-600">{afastamentos.filter(a => a.dias_inss > 0).length} casos ativos</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
