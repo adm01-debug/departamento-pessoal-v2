@@ -24,8 +24,14 @@ export function useAfastamentos() {
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => afastamentoService.criar({ ...data, empresa_id: empresaId }),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'afastamentos',
+        registro_id: data.id,
+        acao: 'INSERT',
+        dados_novos: data
+      });
       toast.success('Afastamento registrado com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao registrar: ${err.message}`),
