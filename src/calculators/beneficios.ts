@@ -121,8 +121,7 @@ export function calcularPlanoSaude(custoTotal: number, coparticipacao: number = 
   return Math.round((mensalidadeFixa + coparticipacao) * 100) / 100;
 }
 
-export function calcularPensaoAlimenticia(rendimentosBrutos: number, descontosLegais: number, percentual: number): number {
-  const baseCalculo = rendimentosBrutos - descontosLegais;
+export function calcularPensaoAlimenticia(baseCalculo: number, percentual: number): number {
   return Math.round(baseCalculo * (percentual / 100) * 100) / 100;
 }
 
