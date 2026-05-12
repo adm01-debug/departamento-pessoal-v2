@@ -124,22 +124,35 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onT
               </TableCell>
               <TableCell>
                 {af.dias_inss > 0 ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1 text-warning font-semibold text-sm cursor-help">
-                          <AlertCircle className="h-4 w-4" />
-                          {af.dias_inss} dias
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>O colaborador deve ser encaminhado ao INSS.</p>
-                        <p className="text-xs text-muted-foreground">Excedeu o limite de {af.dias_empresa} dias pagos pela empresa.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <div className="flex flex-col gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 text-warning font-semibold text-sm cursor-help">
+                            <AlertCircle className="h-4 w-4" />
+                            {af.dias_inss} dias
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>O colaborador deve ser encaminhado ao INSS.</p>
+                          <p className="text-xs text-muted-foreground">Excedeu o limite de {af.dias_empresa} dias pagos pela empresa.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    {af.protocolo_inss && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                        onClick={() => copyToClipboard(af.protocolo_inss, af.id)}
+                      >
+                        {copiedId === af.id ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                        {af.protocolo_inss}
+                      </Button>
+                    )}
+                  </div>
                 ) : (
-                  <span className="text-xs text-muted-foreground">A cargo da empresa</span>
+                  <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">Empresa</span>
                 )}
               </TableCell>
               <TableCell>
