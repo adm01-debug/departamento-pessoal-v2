@@ -37,7 +37,11 @@ const tiposEvento = [
 ];
 
 export default function ESocialPage() {
-  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending, enviarLote } = useESocial();
+  const { 
+    eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, 
+    gerarEventosPeriodo, isSending, enviarLote, config, certificados, 
+    salvarConfig, adicionarCertificado 
+  } = useESocial();
   const { empresaAtual } = useEmpresas();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
