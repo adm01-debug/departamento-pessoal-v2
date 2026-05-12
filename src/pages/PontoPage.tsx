@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
 import { PontoStreakCard } from '@/components/ponto/PontoStreakCard';
@@ -23,7 +24,7 @@ import { PontoAdjustmentRequests } from '@/components/ponto/PontoAdjustmentReque
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
-import { PontoTodayCardSkeleton } from '@/components/ui/module-skeleton';
+import { CardSkeleton } from '@/components/ui/module-skeleton';
 
 interface BancoHorasResumo {
   saldo: string;
