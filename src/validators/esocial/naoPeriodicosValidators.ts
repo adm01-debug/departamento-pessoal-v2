@@ -173,4 +173,33 @@ export function validarS3000(dados: Record<string, any>): ValidationResult {
   }
   warnings.push({ campo: 'tpEvento', mensagem: 'Exclusão é irreversível: confirme os dados antes de enviar' });
   return { valid: errors.length === 0, errors, warnings };
+export function validarS2306(dados: Record<string, any>): ValidationResult {
+  const errors: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
+  required(dados.cpfTrab, 'cpfTrab', errors);
+  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
+  required(dados.dtAlteracao, 'dtAlteracao', errors);
+  dataValida(dados.dtAlteracao, 'dtAlteracao', errors);
+  return { valid: errors.length === 0, errors, warnings };
 }
+
+export function validarS2399(dados: Record<string, any>): ValidationResult {
+  const errors: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
+  required(dados.cpfTrab, 'cpfTrab', errors);
+  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
+  required(dados.dtTerm, 'dtTerm', errors);
+  dataValida(dados.dtTerm, 'dtTerm', errors);
+  return { valid: errors.length === 0, errors, warnings };
+}
+
+export function validarS2400(dados: Record<string, any>): ValidationResult {
+  const errors: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
+  required(dados.cpfBenef, 'cpfBenef', errors);
+  cpfValido(dados.cpfBenef, 'cpfBenef', errors);
+  required(dados.dtIniBenef, 'dtIniBenef', errors);
+  dataValida(dados.dtIniBenef, 'dtIniBenef', errors);
+  return { valid: errors.length === 0, errors, warnings };
+}
+
