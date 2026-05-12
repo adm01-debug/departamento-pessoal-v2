@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { CandidatoTimeline } from '@/components/recrutamento/CandidatoTimeline';
 
 const ETAPAS = [
   { id: 'triagem', label: 'Triagem', color: 'bg-slate-100 border-slate-200' },
