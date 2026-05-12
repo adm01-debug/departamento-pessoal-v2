@@ -140,6 +140,48 @@ export function calcularAuxilioDoenca(mediaSalarial: number): number {
   return Math.round(Math.max(SALARIO_MINIMO_2026, beneficio) * 100) / 100;
 }
 
+export function calcularSobreaviso(salarioBase: number, horas: number, jornadaMensal: number = 220): number {
+  const valorHora = salarioBase / jornadaMensal;
+  return Math.round(valorHora * (1 / 3) * horas * 100) / 100;
+}
+
+export function calcularProntidao(salarioBase: number, horas: number, jornadaMensal: number = 220): number {
+  const valorHora = salarioBase / jornadaMensal;
+  return Math.round(valorHora * (2 / 3) * horas * 100) / 100;
+}
+
+export function calcularGratificacao(salarioBase: number, percentual: number): number {
+  return Math.round(salarioBase * (percentual / 100) * 100) / 100;
+}
+
+export function calcularComissao(valorVendas: number, percentualComissao: number): number {
+  return Math.round(valorVendas * (percentualComissao / 100) * 100) / 100;
+}
+
+export function calcularDiarias(valorDiaria: number, dias: number, percentualDesconto: number = 0) {
+  const total = Math.round(valorDiaria * dias * 100) / 100;
+  const desconto = Math.round(total * (percentualDesconto / 100) * 100) / 100;
+  return { total, desconto, liquido: Math.round((total - desconto) * 100) / 100 };
+}
+
+export function calcularQuilometragem(km: number, valorPorKm: number = 1.20): number {
+  return Math.round(km * valorPorKm * 100) / 100;
+}
+
+export function calcularBancoHoras(creditos: string[], debitos: string[]) {
+  const parseMinutos = (h: string) => {
+    const [hh, mm] = h.split(':').map(Number);
+    return (hh || 0) * 60 + (mm || 0);
+  };
+  const totalCreditos = creditos.reduce((a, c) => a + parseMinutos(c), 0);
+  const totalDebitos = debitos.reduce((a, d) => a + parseMinutos(d), 0);
+  const saldo = totalCreditos - totalDebitos;
+  const horas = Math.floor(Math.abs(saldo) / 60);
+  const minutos = Math.abs(saldo) % 60;
+  const saldoFormatado = `${saldo < 0 ? '-' : ''}${horas}:${minutos.toString().padStart(2, '0')}`;
+  return { totalCreditos, totalDebitos, saldo, saldoFormatado };
+}
+
 export function calcularMedias(valores: number[]): number {
   if (valores.length === 0) return 0;
   const soma = valores.reduce((acc, val) => acc + val, 0);
