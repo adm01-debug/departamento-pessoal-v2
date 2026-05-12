@@ -167,25 +167,53 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
           </div>
         ))}
 
-        {/* Perícia Agendada (se houver) */}
+        {/* Eventos Futuros / Perícias Agendadas */}
         {afastamento?.data_pericia && (
           <div className="relative">
             <div className="absolute -left-[25px] top-1 h-4 w-4 rounded-full border-2 border-blue-500 bg-background flex items-center justify-center">
               <Stethoscope className="h-2.5 w-2.5 text-blue-500" />
             </div>
             <Card className="border-blue-100 bg-blue-50/20 shadow-sm">
-              <CardContent className="py-4 px-4 flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                  <Stethoscope className="h-5 w-5" />
+              <CardHeader className="py-3 px-4 bg-blue-50/40">
+                <div className="flex justify-between items-center">
+                  <Badge className="bg-blue-100 text-blue-700 border-none text-[10px] uppercase font-bold">
+                    Perícia Médica Agendada
+                  </Badge>
+                  <span className="text-[10px] text-blue-600 font-semibold">
+                    AGENDADO
+                  </span>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-blue-900">Perícia Médica Agendada</p>
-                  <p className="text-sm font-medium text-blue-700">
-                    {format(new Date(afastamento.data_pericia), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                  </p>
-                  <p className="text-[10px] text-blue-600/80 mt-1 italic">
-                    Local: {afastamento.local_pericia || 'A confirmar'}
-                  </p>
+              </CardHeader>
+              <CardContent className="py-4 px-4">
+                <div className="flex items-start gap-4">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-bold text-blue-900">
+                        {format(new Date(afastamento.data_pericia), "dd 'de' MMMM, yyyy 'às' HH:mm", { locale: ptBR })}
+                      </p>
+                      <p className="text-xs text-blue-700 flex items-center gap-1 mt-1">
+                        <AlertCircle className="h-3 w-3" />
+                        Protocolo: {afastamento.protocolo_inss || 'Não informado'}
+                      </p>
+                    </div>
+                    
+                    <div className="p-2 bg-white rounded border border-blue-100 text-[11px]">
+                      <span className="font-bold text-blue-800 uppercase block mb-1">Local da Perícia:</span>
+                      <span className="text-blue-700">{afastamento.local_pericia || 'Local a ser confirmado pelo INSS'}</span>
+                    </div>
+
+                    {afastamento.data_fim_prevista && (
+                      <div className="text-[10px] text-muted-foreground flex items-center gap-1.5 pt-1">
+                        <Clock className="h-3 w-3" />
+                        <span>Cálculo de dias adicionais se prorrogado: 
+                          <span className="font-bold ml-1">+{afastamentoService.calcularDias(afastamento.data_fim_prevista, new Date().toISOString())} dias estimativos</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
