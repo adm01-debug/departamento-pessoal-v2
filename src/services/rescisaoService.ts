@@ -192,6 +192,8 @@ export const rescisaoService = {
     });
 
     return data;
+  },
+
   async processarPagamento(id: string, comprovanteUrl?: string) {
     const { data: d, error: fetchError } = await supabase
       .from('desligamentos')

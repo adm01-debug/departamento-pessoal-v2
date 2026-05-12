@@ -27,20 +27,16 @@ export function useFolha(competencia?: string) {
 
   const fecharFolha = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase
-        .from('folhas_pagamento')
-        .update({ status: 'fechada', updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
+      const { folhaPagamentoService } = await import('@/services/folhaPagamentoService');
+      return await folhaPagamentoService.fecharFolha(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
       toast.success('Folha encerrada com sucesso!');
     },
+    onError: (err: Error) => {
+      toast.error(`Erro ao fechar folha: ${err.message}`);
+    }
   });
 
   return {

@@ -52,6 +52,13 @@ export const pontoService = {
     const now = new Date();
     const data = format(now, 'yyyy-MM-dd');
     const hora = format(now, 'HH:mm');
+    
+    const tipoMap: Record<string, string> = { 
+      entrada: 'entrada', 
+      saida_almoco: 'saida', 
+      retorno_almoco: 'entrada', 
+      saida: 'saida' 
+    };
 
     // 1. Prevenção de duplicidade (mesmo tipo no mesmo minuto)
     const { data: duplicate } = await supabase
