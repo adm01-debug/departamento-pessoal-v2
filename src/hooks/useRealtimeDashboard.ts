@@ -91,6 +91,14 @@ export function useRealtimeDashboard() {
         queryClient.invalidateQueries({ queryKey: ['nine_box'] });
         toast.info(TABLE_LABELS.feedbacks_360);
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'inscricoes_cursos' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['inscricoes_cursos'] });
+        toast.info(TABLE_LABELS.inscricoes_cursos);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'treinamentos' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['treinamentos'] });
+        toast.info(TABLE_LABELS.treinamentos);
+      })
       .subscribe();
 
     return () => {
