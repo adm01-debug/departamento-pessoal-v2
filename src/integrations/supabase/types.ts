@@ -5332,6 +5332,47 @@ export type Database = {
           },
         ]
       }
+      documentos_historico: {
+        Row: {
+          alteracoes: string | null
+          created_at: string
+          documento_id: string | null
+          id: string
+          tamanho: number | null
+          url_arquivo: string
+          usuario_id: string | null
+          versao: string
+        }
+        Insert: {
+          alteracoes?: string | null
+          created_at?: string
+          documento_id?: string | null
+          id?: string
+          tamanho?: number | null
+          url_arquivo: string
+          usuario_id?: string | null
+          versao: string
+        }
+        Update: {
+          alteracoes?: string | null
+          created_at?: string
+          documento_id?: string | null
+          id?: string
+          tamanho?: number | null
+          url_arquivo?: string
+          usuario_id?: string | null
+          versao?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_historico_documento_id_fkey"
+            columns: ["documento_id"]
+            isOneToOne: false
+            referencedRelation: "documentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_pessoais_arquivos: {
         Row: {
           arquivo_nome: string | null
