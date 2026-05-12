@@ -149,4 +149,90 @@ export async function reenviarEvento(eventoId: string, empresaId: string) {
   return enviarEvento(eventoId, empresaId);
 }
 
+
+export async function gerarEventosPeriodo(empresaId: string, competencia: string) {
+  // 1. Buscar Folhas de Pagamento do período
+  const { data: folhas, error: fError } = await supabase
+    .from('folhas_pagamento')
+    .select('*, folha_itens(*), colaboradores(*)')
+    .eq('empresa_id', empresaId)
+    .eq('competencia', competencia);
+
+  if (fError) throw fError;
+
+  const resultados = { criados: 0, pulados: 0, erros: 0 };
+
+  for (const folha of (folhas || [])) {
+    try {
+      // Verificar se já existe S-1200 para este colaborador/competência
+      const { data: existente } = await supabase
+        .from('esocial_eventos')
+        .select('id')
+        .eq('empresa_id', empresaId)
+        .eq('tipo_evento', 'S-1200')
+        .eq('competencia', competencia)
+        .contains('dados', { cpfTrab: folha.colaboradores?.cpf })
+        .maybeSingle();
+
+      if (existente) {
+        resultados.pulados++;
+        continue;
+      }
+
+      // Montar dados do S-1200
+      const dadosS1200 = {
+        cpfTrab: folha.colaboradores?.cpf,
+        perApur: competencia,
+        dmDev: [{
+          ideDmDev: `DM${folha.id.slice(0, 5)}`,
+          infoPerApur: {
+            ideEstabLot: [{
+              tpInsc: 1,
+              nrInsc: folha.empresa_id, // Simplificado
+              detVerbas: folha.folha_itens?.map((item: any) => ({
+                codRubr: item.rubrica_id || '9999',
+                vrRubr: item.valor,
+              })) || []
+            }]
+          }
+        }]
+      };
+
+      await criarEvento({
+        empresa_id: empresaId,
+        tipo_evento: 'S-1200',
+        competencia,
+        dados: dadosS1200
+      });
+
+      // Se a folha estiver paga, criar S-1210
+      if (folha.status === 'pago') {
+        const dadosS1210 = {
+          cpfTrab: folha.colaboradores?.cpf,
+          perApur: competencia,
+          infoPgto: [{
+            dtPgto: folha.data_pagamento || new Date().toISOString().split('T')[0],
+            tpPgto: 1,
+            vlrLiq: folha.valor_liquido
+          }]
+        };
+
+        await criarEvento({
+          empresa_id: empresaId,
+          tipo_evento: 'S-1210',
+          competencia,
+          dados: dadosS1210
+        });
+      }
+
+      resultados.criados++;
+    } catch (err) {
+      console.error('Erro ao gerar evento para folha:', folha.id, err);
+      resultados.erros++;
+    }
+  }
+
+  return resultados;
+}
+
 export { type ValidationResult } from '@/validators/esocialValidators';
