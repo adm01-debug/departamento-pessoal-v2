@@ -19,14 +19,13 @@ const GRID_COLORS: Record<string, string> = {
 };
 
 export function NineBoxMatrix({ data }: { data: any[] }) {
+  function classifyScore(score: number) {
+    if (score <= 1.5 || !score) return 1;
+    if (score <= 3.5) return 2;
+    return 3;
+  }
+
   const grid = useMemo(() => {
-    const res: any = {};
-    for (let p = 1; p <= 3; p++) {
-      for (let t = 1; p <= 3; p++) {
-        // res[`${p}-${t}`] = [];
-      }
-    }
-    // Correct way:
     const buckets: any = {
       '1-1': [], '1-2': [], '1-3': [],
       '2-1': [], '2-2': [], '2-3': [],
@@ -34,19 +33,14 @@ export function NineBoxMatrix({ data }: { data: any[] }) {
     };
 
     data.forEach(item => {
-      const perf = classifyScore(item.performance_avg);
-      const pot = classifyScore(item.potencial_avg);
+      // Usando performance e potencial salvos no feedback ou calculados
+      const perf = classifyScore(item.performance || item.nota_geral);
+      const pot = classifyScore(item.potencial || 2); // default mediano se não houver
       const key = `${perf}-${pot}`;
       if (buckets[key]) buckets[key].push(item);
     });
     return buckets;
   }, [data]);
-
-  function classifyScore(score: number) {
-    if (score <= 1.5) return 1;
-    if (score <= 2.5) return 2;
-    return 3;
-  }
 
   return (
     <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-elevated">
@@ -54,24 +48,27 @@ export function NineBoxMatrix({ data }: { data: any[] }) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="font-display flex items-center gap-2">
-              <LayoutGrid className="h-5 w-5 text-primary" /> Matriz Nine-Box
+              <LayoutGrid className="h-5 w-5 text-primary" /> Matriz Nine-Box 10/10
             </CardTitle>
-            <CardDescription className="font-body text-xs">Análise de Potencial vs. Performance</CardDescription>
+            <CardDescription className="font-body text-xs text-muted-foreground">Mapeamento estratégico de talentos por desempenho e potencial</CardDescription>
           </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger><Info className="h-4 w-4 text-muted-foreground" /></TooltipTrigger>
               <TooltipContent className="max-w-xs text-xs">
-                Eixo X: Performance (Baixa, Média, Alta)<br />
-                Eixo Y: Potencial (Baixa, Média, Alta)
+                Eixo Horizontal: Desempenho (Efetividade nas metas)<br />
+                Eixo Vertical: Potencial (Capacidade de assumir novos desafios)
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="grid grid-cols-3 gap-3 aspect-square max-w-[800px] mx-auto">
-          {/* Loop from Potencial 3 to 1 (Rows) and Performance 1 to 3 (Cols) */}
+      <CardContent className="p-6">
+        <div className="grid grid-cols-3 gap-3 aspect-square md:aspect-video max-w-5xl mx-auto relative">
+          {/* Labels de Eixos */}
+          <div className="absolute -left-10 top-1/2 -rotate-90 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Potencial</div>
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Desempenho</div>
+
           {[3, 2, 1].map(pot => (
             [1, 2, 3].map(perf => {
               const key = `${perf}-${pot}`;
@@ -79,20 +76,29 @@ export function NineBoxMatrix({ data }: { data: any[] }) {
               return (
                 <div 
                   key={key} 
-                  className={`border-2 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-sm ${GRID_COLORS[key] || 'bg-muted/30 border-border/30 text-muted-foreground'}`}
+                  className={`border-2 rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all hover:shadow-lg ${GRID_COLORS[key] || 'bg-muted/10 border-border/30 text-muted-foreground'}`}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-tighter mb-1">{GRID_LABELS[key]}</p>
-                  <p className="text-xl font-display font-black">{employees.length}</p>
-                  <p className="text-[9px] opacity-70">colaboradores</p>
+                  <p className="text-[10px] font-black uppercase tracking-tighter mb-1 opacity-80">{GRID_LABELS[key]}</p>
+                  <div className="relative">
+                    <p className="text-3xl font-display font-black leading-none">{employees.length}</p>
+                  </div>
                   
                   {employees.length > 0 && (
-                     <div className="mt-2 flex flex-wrap justify-center gap-1">
-                        {employees.slice(0, 3).map((e: any) => (
-                          <div key={e.colaborador_id} className="h-5 w-5 rounded-full bg-white/50 border border-black/5 flex items-center justify-center text-[8px] font-bold" title={e.nome_completo}>
-                            {e.nome_completo[0]}
+                     <div className="mt-3 flex flex-wrap justify-center gap-1">
+                        {employees.slice(0, 4).map((e: any, idx: number) => (
+                          <div 
+                            key={e.id || idx} 
+                            className="h-6 w-6 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[10px] font-bold shadow-sm" 
+                            title={e.avaliado?.nome_completo}
+                          >
+                            {e.avaliado?.nome_completo?.charAt(0)}
                           </div>
                         ))}
-                        {employees.length > 3 && <span className="text-[8px]">+ {employees.length - 3}</span>}
+                        {employees.length > 4 && (
+                          <div className="h-6 w-6 rounded-full bg-black/5 flex items-center justify-center text-[8px] font-bold">
+                            +{employees.length - 4}
+                          </div>
+                        )}
                      </div>
                   )}
                 </div>
@@ -101,18 +107,27 @@ export function NineBoxMatrix({ data }: { data: any[] }) {
           ))}
         </div>
         
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-           <div className="p-3 rounded-xl bg-green-50 border border-green-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-green-700">Top Talents (Estrelas)</span>
-              <Badge className="bg-green-500">{grid['3-3']?.length || 0}</Badge>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+           <div className="p-4 rounded-2xl bg-green-50 border border-green-200 flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">Alto Desempenho & Potencial</span>
+              <div className="flex items-center justify-between">
+                <h4 className="text-xl font-display font-bold text-green-800">Estrelas</h4>
+                <Badge className="bg-green-600 text-white font-bold">{grid['3-3']?.length || 0}</Badge>
+              </div>
            </div>
-           <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-blue-700">Core Players</span>
-              <Badge className="bg-blue-500">{grid['2-2']?.length || 0}</Badge>
+           <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Base da Empresa</span>
+              <div className="flex items-center justify-between">
+                <h4 className="text-xl font-display font-bold text-blue-800">Core Players</h4>
+                <Badge className="bg-blue-600 text-white font-bold">{grid['2-2']?.length || 0}</Badge>
+              </div>
            </div>
-           <div className="p-3 rounded-xl bg-red-50 border border-red-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-red-700">Underperformers</span>
-              <Badge className="bg-red-500">{grid['1-1']?.length || 0}</Badge>
+           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider">Atenção Necessária</span>
+              <div className="flex items-center justify-between">
+                <h4 className="text-xl font-display font-bold text-red-800">Em Risco</h4>
+                <Badge className="bg-red-600 text-white font-bold">{grid['1-1']?.length || 0}</Badge>
+              </div>
            </div>
         </div>
       </CardContent>
