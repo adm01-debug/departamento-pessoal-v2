@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from './useEmpresas';
 
@@ -10,12 +10,11 @@ export function useOrganograma() {
     queryKey: ['organograma_hierarquico', empresaId],
     enabled: !!empresaId,
     queryFn: async () => {
-      // Buscar departamentos com informações de parentesco e responsável
+      // Buscar departamentos com informações de parentesco
       const { data: deps, error: depsError } = await supabase
         .from('departamentos')
         .select(`
           *,
-          responsavel:colaboradores!departamentos_responsavel_id_fkey(id, nome_completo, cargo, avatar_url),
           departamento_pai:departamentos!departamentos_departamento_pai_id_fkey(id, nome)
         `)
         .eq('empresa_id', empresaId)
@@ -26,7 +25,7 @@ export function useOrganograma() {
       // Buscar todos os colaboradores ativos para distribuir nos departamentos
       const { data: cols, error: colsError } = await supabase
         .from('colaboradores')
-        .select('id, nome_completo, cargo, departamento, email, avatar_url')
+        .select('id, nome_completo, cargo, departamento, email, foto_url')
         .eq('empresa_id', empresaId)
         .eq('status', 'ativo');
 
