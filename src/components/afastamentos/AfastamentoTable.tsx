@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, FileText, Calendar, Trash2, Edit2, AlertCircle, History } from 'lucide-react';
+import { MoreHorizontal, FileText, Calendar, Trash2, Edit2, AlertCircle, History, Copy, CheckCircle2 } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
