@@ -54,8 +54,13 @@ export function useAfastamentos() {
 
   const excluirMutation = useMutation({
     mutationFn: (id: string) => afastamentoService.excluir(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'afastamentos',
+        registro_id: id,
+        acao: 'DELETE'
+      });
       toast.success('Afastamento excluído com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao excluir: ${err.message}`),
