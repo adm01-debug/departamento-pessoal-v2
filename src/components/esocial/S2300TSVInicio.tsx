@@ -1,6 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { User, Calendar, Briefcase, IdentificationCard } from 'lucide-react';
+import { User, Calendar, Briefcase, Contact } from 'lucide-react';
 
 export function S2300TSVInicio({ dados }: { dados: any }) {
   return (
@@ -39,7 +39,7 @@ export function S2300TSVInicio({ dados }: { dados: any }) {
           <div className="space-y-1">
             <Label className="text-[10px] text-muted-foreground">Categoria do Trabalhador</Label>
             <div className="flex items-center gap-2">
-              <IdentificationCard className="h-3.5 w-3.5 text-primary" />
+              <Contact className="h-3.5 w-3.5 text-primary" />
               <p className="text-xs font-semibold">{dados.codCateg || 'Não informado'}</p>
             </div>
           </div>
