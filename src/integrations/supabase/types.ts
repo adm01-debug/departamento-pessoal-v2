@@ -1308,6 +1308,181 @@ export type Database = {
           },
         ]
       }
+      beneficio_arquivos: {
+        Row: {
+          beneficio_id: string | null
+          created_at: string
+          empresa_id: string | null
+          id: string
+          nome: string
+          periodo_referencia: string | null
+          tipo_arquivo: string | null
+          url: string
+        }
+        Insert: {
+          beneficio_id?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          nome: string
+          periodo_referencia?: string | null
+          tipo_arquivo?: string | null
+          url: string
+        }
+        Update: {
+          beneficio_id?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+          periodo_referencia?: string | null
+          tipo_arquivo?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficio_arquivos_beneficio_id_fkey"
+            columns: ["beneficio_id"]
+            isOneToOne: false
+            referencedRelation: "beneficios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_arquivos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficio_movimentacoes: {
+        Row: {
+          beneficio_id: string | null
+          colaborador_id: string | null
+          created_at: string
+          data_movimentacao: string | null
+          id: string
+          motivo: string | null
+          tipo_movimentacao: string
+          usuario_id: string | null
+        }
+        Insert: {
+          beneficio_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_movimentacao?: string | null
+          id?: string
+          motivo?: string | null
+          tipo_movimentacao: string
+          usuario_id?: string | null
+        }
+        Update: {
+          beneficio_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_movimentacao?: string | null
+          id?: string
+          motivo?: string | null
+          tipo_movimentacao?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficio_movimentacoes_beneficio_id_fkey"
+            columns: ["beneficio_id"]
+            isOneToOne: false
+            referencedRelation: "beneficios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_movimentacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_movimentacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_movimentacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficio_regras_elegibilidade: {
+        Row: {
+          automatico: boolean | null
+          beneficio_id: string | null
+          cargo_id: string | null
+          created_at: string
+          departamento_id: string | null
+          empresa_id: string | null
+          id: string
+          tempo_casa_minimo: number | null
+          updated_at: string
+        }
+        Insert: {
+          automatico?: boolean | null
+          beneficio_id?: string | null
+          cargo_id?: string | null
+          created_at?: string
+          departamento_id?: string | null
+          empresa_id?: string | null
+          id?: string
+          tempo_casa_minimo?: number | null
+          updated_at?: string
+        }
+        Update: {
+          automatico?: boolean | null
+          beneficio_id?: string | null
+          cargo_id?: string | null
+          created_at?: string
+          departamento_id?: string | null
+          empresa_id?: string | null
+          id?: string
+          tempo_casa_minimo?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficio_regras_elegibilidade_beneficio_id_fkey"
+            columns: ["beneficio_id"]
+            isOneToOne: false
+            referencedRelation: "beneficios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_regras_elegibilidade_cargo_id_fkey"
+            columns: ["cargo_id"]
+            isOneToOne: false
+            referencedRelation: "cargos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_regras_elegibilidade_departamento_id_fkey"
+            columns: ["departamento_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_regras_elegibilidade_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficios: {
         Row: {
           ativo: boolean | null
