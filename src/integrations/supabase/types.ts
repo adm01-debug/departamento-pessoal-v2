@@ -5003,6 +5003,8 @@ export type Database = {
       }
       desligamentos: {
         Row: {
+          assinado_colaborador: boolean | null
+          assinado_empresa: boolean | null
           aviso_previo: number | null
           checklist_calculo_rescisao: boolean | null
           checklist_comunicacao: boolean | null
@@ -5015,6 +5017,8 @@ export type Database = {
           colaborador_id: string
           created_at: string
           created_by: string | null
+          data_assinatura_colaborador: string | null
+          data_assinatura_empresa: string | null
           data_aviso: string | null
           data_aviso_previo: string | null
           data_contabilidade: string | null
@@ -5025,6 +5029,8 @@ export type Database = {
           etapa: string | null
           ferias_proporcionais: number | null
           ferias_vencidas: number | null
+          hash_assinatura_colaborador: string | null
+          hash_assinatura_empresa: string | null
           hash_integridade: string | null
           id: string
           motivo: string | null
@@ -5045,6 +5051,8 @@ export type Database = {
           valor_liquido: number | null
         }
         Insert: {
+          assinado_colaborador?: boolean | null
+          assinado_empresa?: boolean | null
           aviso_previo?: number | null
           checklist_calculo_rescisao?: boolean | null
           checklist_comunicacao?: boolean | null
@@ -5057,6 +5065,8 @@ export type Database = {
           colaborador_id: string
           created_at?: string
           created_by?: string | null
+          data_assinatura_colaborador?: string | null
+          data_assinatura_empresa?: string | null
           data_aviso?: string | null
           data_aviso_previo?: string | null
           data_contabilidade?: string | null
@@ -5067,6 +5077,8 @@ export type Database = {
           etapa?: string | null
           ferias_proporcionais?: number | null
           ferias_vencidas?: number | null
+          hash_assinatura_colaborador?: string | null
+          hash_assinatura_empresa?: string | null
           hash_integridade?: string | null
           id?: string
           motivo?: string | null
@@ -5087,6 +5099,8 @@ export type Database = {
           valor_liquido?: number | null
         }
         Update: {
+          assinado_colaborador?: boolean | null
+          assinado_empresa?: boolean | null
           aviso_previo?: number | null
           checklist_calculo_rescisao?: boolean | null
           checklist_comunicacao?: boolean | null
@@ -5099,6 +5113,8 @@ export type Database = {
           colaborador_id?: string
           created_at?: string
           created_by?: string | null
+          data_assinatura_colaborador?: string | null
+          data_assinatura_empresa?: string | null
           data_aviso?: string | null
           data_aviso_previo?: string | null
           data_contabilidade?: string | null
@@ -5109,6 +5125,8 @@ export type Database = {
           etapa?: string | null
           ferias_proporcionais?: number | null
           ferias_vencidas?: number | null
+          hash_assinatura_colaborador?: string | null
+          hash_assinatura_empresa?: string | null
           hash_integridade?: string | null
           id?: string
           motivo?: string | null
@@ -8613,6 +8631,47 @@ export type Database = {
             columns: ["folha_id"]
             isOneToOne: false
             referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      homologacoes_rescisao: {
+        Row: {
+          created_at: string | null
+          data_decisao: string | null
+          desligamento_id: string
+          etapa: string
+          id: string
+          parecer: string | null
+          status: string
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_decisao?: string | null
+          desligamento_id: string
+          etapa: string
+          id?: string
+          parecer?: string | null
+          status?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_decisao?: string | null
+          desligamento_id?: string
+          etapa?: string
+          id?: string
+          parecer?: string | null
+          status?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homologacoes_rescisao_desligamento_id_fkey"
+            columns: ["desligamento_id"]
+            isOneToOne: false
+            referencedRelation: "desligamentos"
             referencedColumns: ["id"]
           },
         ]
@@ -14769,6 +14828,63 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verbas_rescisorias: {
+        Row: {
+          codigo: string | null
+          created_at: string | null
+          descricao: string
+          desligamento_id: string
+          id: string
+          incide_fgts: boolean | null
+          incide_inss: boolean | null
+          incide_irrf: boolean | null
+          rubrica_id: string | null
+          tipo: string
+          valor: number
+        }
+        Insert: {
+          codigo?: string | null
+          created_at?: string | null
+          descricao: string
+          desligamento_id: string
+          id?: string
+          incide_fgts?: boolean | null
+          incide_inss?: boolean | null
+          incide_irrf?: boolean | null
+          rubrica_id?: string | null
+          tipo: string
+          valor: number
+        }
+        Update: {
+          codigo?: string | null
+          created_at?: string | null
+          descricao?: string
+          desligamento_id?: string
+          id?: string
+          incide_fgts?: boolean | null
+          incide_inss?: boolean | null
+          incide_irrf?: boolean | null
+          rubrica_id?: string | null
+          tipo?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verbas_rescisorias_desligamento_id_fkey"
+            columns: ["desligamento_id"]
+            isOneToOne: false
+            referencedRelation: "desligamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verbas_rescisorias_rubrica_id_fkey"
+            columns: ["rubrica_id"]
+            isOneToOne: false
+            referencedRelation: "rubricas_folha"
             referencedColumns: ["id"]
           },
         ]

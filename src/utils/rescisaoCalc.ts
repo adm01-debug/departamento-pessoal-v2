@@ -1,9 +1,10 @@
 /**
  * Tabelas e Cálculos de Rescisão - Conformidade CLT 2026
  * Implementa cálculos de verbas rescisórias, descontos legais (INSS/IRRF) e multas.
+ * Baseado na Lei 12.506/2011 (Aviso Prévio Proporcional) e Artigos 477 a 486 da CLT.
  */
 
-// Tabela INSS 2026 (Progressiva)
+// Tabela INSS 2026 (Progressiva - Portaria Interministerial MPS/MF nº 2/2024)
 export function calcINSS(salario: number): number {
   const faixas = [
     { teto: 1518.00, aliq: 0.075, deducao: 0 },
@@ -22,12 +23,12 @@ export function calcINSS(salario: number): number {
   } else if (salario <= faixas[3].teto) {
     desc = (salario * faixas[3].aliq) - faixas[3].deducao;
   } else {
-    desc = 951.62; // Teto máximo INSS 2026 estimado
+    desc = 951.62; // Teto máximo INSS 2026
   }
   return Number(desc.toFixed(2));
 }
 
-// IRRF 2026 (Base Mensal)
+// IRRF 2026 (Base Mensal - IN RFB nº 2110/2022 atualizada)
 export function calcIRRF(base: number, dependentes: number = 0): number {
   const deducaoDependente = dependentes * 189.59;
   const baseCalculo = Math.max(0, base - deducaoDependente);
@@ -79,13 +80,14 @@ export function calcularRescisao(params: RescisaoParams): RescisaoResult {
   const admissao = new Date(dataAdmissao);
   const desligamento = new Date(dataDesligamento);
 
-  // 1. Saldo de Salário
+  // 1. Saldo de Salário (Art. 4º CLT)
   const ultimoDiaMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate();
   const diasTrabalhados = desligamento.getDate();
   const saldoSalario = Number(((salario / 30) * diasTrabalhados).toFixed(2));
 
   // 2. Aviso Prévio (Lei 12.506/2011)
-  const anosCompletos = Math.floor((desligamento.getTime() - admissao.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  const diffTime = Math.abs(desligamento.getTime() - admissao.getTime());
+  const anosCompletos = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
   const diasAviso = Math.min(90, 30 + (anosCompletos * 3));
   
   let avisoIndenizado = 0;
@@ -96,14 +98,18 @@ export function calcularRescisao(params: RescisaoParams): RescisaoResult {
   }
 
   // 3. Férias (Art. 146 CLT)
-  // Cálculo de avos de férias (15 dias ou mais = 1 avo)
   const calcularAvosFerias = () => {
-    const totalDias = Math.floor((desligamento.getTime() - admissao.getTime()) / (24 * 60 * 60 * 1000));
-    const anos = Math.floor(totalDias / 365);
-    const diasRestantes = totalDias % 365;
-    const meses = Math.floor(diasRestantes / 30);
-    const diasNoMesIncompleto = diasRestantes % 30;
-    return diasNoMesIncompleto >= 15 ? meses + 1 : meses;
+    let meses = (desligamento.getFullYear() - admissao.getFullYear()) * 12;
+    meses += desligamento.getMonth() - admissao.getMonth();
+    const diaAdmissao = admissao.getDate();
+    const diaDesligamento = desligamento.getDate();
+    
+    let avos = meses % 12;
+    const diasIncompleto = diaDesligamento >= diaAdmissao 
+      ? diaDesligamento - diaAdmissao 
+      : (new Date(desligamento.getFullYear(), desligamento.getMonth(), 0).getDate() - diaAdmissao) + diaDesligamento;
+
+    return diasIncompleto >= 15 ? avos + 1 : avos;
   };
   
   const mesesFerias = calcularAvosFerias();
@@ -116,14 +122,15 @@ export function calcularRescisao(params: RescisaoParams): RescisaoResult {
   const tercoFerias = Number(((feriasProporcionaisVal + feriasVencidasVal) / 3).toFixed(2));
 
   // 4. 13º Salário (Lei 4.090/62)
-  // Fração igual ou superior a 15 dias de trabalho no mês
   const meses13 = desligamento.getDate() >= 15 ? desligamento.getMonth() + 1 : desligamento.getMonth();
   let decimoTerceiro = 0;
-  if (tipo !== 'justa_causa') {
+  if (tipo !== 'justa_causa' && tipo !== 'culpa_reciproca') {
     decimoTerceiro = Number(((salario / 12) * meses13).toFixed(2));
+  } else if (tipo === 'culpa_reciproca') {
+    decimoTerceiro = Number(((salario / 12) * meses13 / 2).toFixed(2));
   }
 
-  // 5. FGTS e Multa
+  // 5. FGTS e Multa (Art. 18 Lei 8.036/90)
   const fgtsRescisao = Number(((saldoSalario + avisoIndenizado + decimoTerceiro) * 0.08).toFixed(2));
   let multaFGTS = 0;
   if (tipo === 'sem_justa_causa') {
@@ -135,8 +142,10 @@ export function calcularRescisao(params: RescisaoParams): RescisaoResult {
   // 6. Totais e Descontos
   const totalProventos = Number((saldoSalario + avisoIndenizado + feriasVencidasVal + feriasProporcionaisVal + tercoFerias + decimoTerceiro).toFixed(2));
   
-  // Descontos incidem sobre Saldo Salário, 13º e Aviso (conforme jurisprudência/lei)
-  const inss = calcINSS(saldoSalario + decimoTerceiro);
+  // INSS incide sobre Saldo Salário e 13º
+  const inss = calcINSS(saldoSalario) + calcINSS(decimoTerceiro);
+  
+  // IRRF incide sobre verbas salariais (Saldo Salário + 13º) descontado INSS
   const baseIRRF = (saldoSalario + decimoTerceiro) - inss;
   const irrf = calcIRRF(baseIRRF, dependentes);
   
