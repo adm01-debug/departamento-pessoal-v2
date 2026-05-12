@@ -3,7 +3,7 @@ import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Landmark, FileDown, History, Settings, CheckCircle, AlertCircle, Loader2, Download, Plus, Banknote, Globe } from 'lucide-react';
+import { Landmark, FileDown, History, Settings, CheckCircle, AlertCircle, Loader2, Download, Plus, Banknote, Globe, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
