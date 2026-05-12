@@ -1,8 +1,9 @@
 /**
  * Utilitário de cálculo de folha (INSS/IRRF/FGTS/Trabalhista).
- *
+ * 
  * Este módulo centraliza os cálculos de folha de pagamento, integrando
  * impostos e verbas trabalhistas de acordo com a legislação 2026.
+ * Implementa conformidade com a IN RFB nº 2110/2022 e Portaria Interministerial MPS/MF nº 2/2024.
  */
 import { calcularINSS as _inss, calcularIRRF as _irrf, calcularFGTS as _fgts } from '@/calculators/impostos';
 import { calcularHorasExtras, calcularDSR, calcular13Salario } from '@/calculators/trabalhista';
@@ -33,7 +34,6 @@ const TETO_INSS = FAIXAS_INSS_2026[FAIXAS_INSS_2026.length - 1].limite;
 
 function descreverFaixaInss(salarioBruto: number): string {
   if (salarioBruto >= TETO_INSS) return 'Teto (14%)';
-  // Encontrar a faixa correspondente ao salário bruto para exibição da alíquota máxima aplicada
   const faixa = FAIXAS_INSS_2026.find((f, i) => {
     const limiteAnterior = i === 0 ? 0 : FAIXAS_INSS_2026[i - 1].limite;
     return salarioBruto > limiteAnterior && salarioBruto <= f.limite;
@@ -68,6 +68,10 @@ export const folhaCalc = {
   calcularDSR,
   calcular13Salario,
 
+  /**
+   * Processamento completo da folha de pagamento de um colaborador.
+   * Realiza o cálculo de proventos, descontos, impostos e encargos.
+   */
   processar: (
     salarioBase: number,
     params: {
@@ -80,6 +84,8 @@ export const folhaCalc = {
       parcela13?: 1 | 2;
       jornada?: number;
       horasFalta?: number;
+      diasUteis?: number;
+      domingosFeriados?: number;
       eventos?: Array<{ codigo: string; descricao: string; tipo: 'provento' | 'desconto'; valor: number }>;
     } = {}
   ): CalculoResultado => {
@@ -93,15 +99,17 @@ export const folhaCalc = {
       parcela13,
       jornada = 220,
       horasFalta = 0,
+      diasUteis = 26,
+      domingosFeriados = 4,
       eventos = []
     } = params;
 
     const detalheEventos: Array<{ codigo: string; descricao: string; tipo: 'provento' | 'desconto'; valor: number }> = [];
 
-    // Salário Base
+    // 1. Proventos Fixos (Salário Base)
     detalheEventos.push({ codigo: '1000', descricao: 'Salário Base', tipo: 'provento', valor: salarioBase });
 
-    // Horas Extras
+    // 2. Verbas Variáveis (Horas Extras)
     const valorHE50 = calcularHorasExtras(salarioBase, jornada, horasExtras50, 0.5);
     if (valorHE50 > 0) detalheEventos.push({ codigo: '1001', descricao: 'Horas Extras 50%', tipo: 'provento', valor: valorHE50 });
     
@@ -110,11 +118,11 @@ export const folhaCalc = {
     
     const totalHE = valorHE50 + valorHE100;
     
-    // DSR sobre Horas Extras
-    const dsr = calcularDSR(totalHE);
+    // 3. DSR sobre Horas Extras
+    const dsr = calcularDSR(totalHE, diasUteis, domingosFeriados);
     if (dsr > 0) detalheEventos.push({ codigo: '1003', descricao: 'DSR sobre Horas Extras', tipo: 'provento', valor: dsr });
     
-    // 13º Salário
+    // 4. 13º Salário
     let decimoTerceiro = 0;
     if (parcela13) {
       decimoTerceiro = calcular13Salario(salarioBase, meses13 || 12, parcela13);
@@ -126,18 +134,23 @@ export const folhaCalc = {
       });
     }
 
-    // Faltas e Atrasos (Reduzem a base de cálculo)
-    const valorFaltas = (salarioBase / jornada) * horasFalta;
+    // 5. Adicionais Genéricos
+    if (adicionais > 0) {
+      detalheEventos.push({ codigo: '1050', descricao: 'Adicionais Diversos', tipo: 'provento', valor: adicionais });
+    }
+
+    // 6. Faltas e Atrasos (Reduzem a base de cálculo e são descontos)
+    const valorFaltas = Math.round(((salarioBase / jornada) * horasFalta) * 100) / 100;
     if (valorFaltas > 0) {
       detalheEventos.push({ 
         codigo: '5005', 
         descricao: 'Faltas e Atrasos', 
         tipo: 'desconto', 
-        valor: Math.round(valorFaltas * 100) / 100 
+        valor: valorFaltas 
       });
     }
 
-    // Eventos Adicionais
+    // 7. Eventos Customizados/Importados
     eventos.forEach(ev => {
       detalheEventos.push(ev);
     });
@@ -146,7 +159,8 @@ export const folhaCalc = {
       .filter(e => e.tipo === 'provento')
       .reduce((acc, curr) => acc + curr.valor, 0);
 
-    // Base de cálculo para INSS/FGTS/IRRF (Proventos - Faltas)
+    // 8. Cálculo de Impostos (Base = Proventos que incidem - Descontos que abatem base)
+    // Para simplificação, assumimos que todos os proventos atuais incidem e faltas abatem
     const baseTributavel = Math.max(0, proventos - valorFaltas);
 
     const { valor: inss, faixa: faixaInss } = folhaCalc.calcularINSS(baseTributavel);
@@ -155,16 +169,19 @@ export const folhaCalc = {
     const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(baseTributavel, inss, dependentes);
     if (irrf > 0) detalheEventos.push({ codigo: '5001', descricao: 'Desconto IRRF', tipo: 'desconto', valor: irrf });
 
+    // 9. FGTS (Encargo da Empresa, não desconta do colaborador)
     const fgts = folhaCalc.calcularFGTS(baseTributavel);
-    
+
+    // 10. Descontos Extras (Empréstimos, Mensalidades, etc)
+    if (descontosExtras > 0) {
+      detalheEventos.push({ codigo: '5099', descricao: 'Descontos Diversos', tipo: 'desconto', valor: descontosExtras });
+    }
+
     const descontos = detalheEventos
       .filter(e => e.tipo === 'desconto')
       .reduce((acc, curr) => acc + curr.valor, 0);
 
     const liquido = Math.round((proventos - descontos) * 100) / 100;
-
-    // Log de auditoria interna do cálculo
-    console.debug(`[folhaCalc] Processamento concluído: Bruto=${proventos}, Líquido=${liquido}, Eventos=${detalheEventos.length}`);
 
     return { 
       proventos, 
