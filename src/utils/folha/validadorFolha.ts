@@ -21,7 +21,7 @@ export const validadorFolha = {
       .from('folha_itens')
       .select(`
         *, 
-        colaborador:colaboradores(
+        colaborador:colaboradores!folha_itens_colaborador_id_fkey(
           id, 
           nome_completo, 
           salario_base, 
