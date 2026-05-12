@@ -10,6 +10,7 @@ import { S2306TSVAlteracao } from './S2306TSVAlteracao';
 import { S2399TSVTermino } from './S2399TSVTermino';
 import { S2400CDP } from './S2400CDP';
 import { S2210SST } from './S2210SST';
+import { S2220ASO, S2240AgentesNocivos } from './SSTEvents';
 
 const components: Record<string, any> = {
   'S-1200': S1200Remuneracao,
