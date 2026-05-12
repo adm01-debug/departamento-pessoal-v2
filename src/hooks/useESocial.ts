@@ -94,15 +94,49 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const configQuery = useQuery({
+    queryKey: ['esocial-config', empresaId],
+    queryFn: () => esocialService.getConfig(empresaId!),
+    enabled: !!empresaId,
+  });
+
+  const certificadosQuery = useQuery({
+    queryKey: ['esocial-certificados', empresaId],
+    queryFn: () => esocialService.listarCertificados(empresaId!),
+    enabled: !!empresaId,
+  });
+
+  const salvarConfigMutation = useMutation({
+    mutationFn: esocialService.salvarConfig,
+    onSuccess: () => {
+      toast.success('Configurações salvas');
+      queryClient.invalidateQueries({ queryKey: ['esocial-config'] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const addCertMutation = useMutation({
+    mutationFn: esocialService.adicionarCertificado,
+    onSuccess: () => {
+      toast.success('Certificado adicionado');
+      queryClient.invalidateQueries({ queryKey: ['esocial-certificados'] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
   return {
     eventos: eventosQuery.data || [],
     stats: statsQuery.data || { enviados: 0, pendentes: 0, erros: 0, conformidade: 100 },
-    isLoading: eventosQuery.isLoading,
+    config: configQuery.data,
+    certificados: certificadosQuery.data || [],
+    isLoading: eventosQuery.isLoading || configQuery.isLoading,
     criarEvento: criarMutation.mutate,
     enviarEvento: enviarMutation.mutate,
     reenviarEvento: reenviarMutation.mutate,
     gerarEventosPeriodo: gerarEventosMutation.mutate,
     enviarLote: enviarLoteMutation.mutate,
+    salvarConfig: salvarConfigMutation.mutate,
+    adicionarCertificado: addCertMutation.mutate,
     isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending || enviarLoteMutation.isPending,
   };
 }
