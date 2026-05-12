@@ -21,8 +21,8 @@ export function useEntrevistaDesligamento(desligamentoId?: string) {
 
   const salvarEntrevista = useMutation({
     mutationFn: async (dados: any) => {
-      const { data, error } = await supabase
-        .from('entrevistas_desligamento')
+      const { data, error } = await (supabase
+        .from('entrevistas_desligamento' as any) as any)
         .upsert({ ...dados, desligamento_id: desligamentoId })
         .select()
         .single();
