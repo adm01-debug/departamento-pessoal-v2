@@ -116,8 +116,12 @@ export function listarEventosValidaveis(): string[] {
 }
 
 export async function enviarEvento(eventoId: string, empresaId: string) {
+  // 1. Marcar como "processando" para feedback imediato na UI
+  await supabase.from('esocial_eventos').update({ status: 'processando' }).eq('id', eventoId);
+
   // Fetch the event to validate before sending
   const { data: evento } = await supabase.from('esocial_eventos').select('*').eq('id', eventoId).maybeSingle();
+
   if (evento?.dados && evento?.tipo_evento) {
     const validacao = validarEvento(evento.tipo_evento, evento.dados as Record<string, any>);
     if (!validacao.valid) {

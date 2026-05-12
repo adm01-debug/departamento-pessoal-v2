@@ -315,10 +315,18 @@ export default function ESocialPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 + i * 0.03 }}
-                    className="flex items-center justify-between p-3.5 rounded-xl glass hover:border-border/60 transition-all group"
+                    className={cn(
+                      "flex items-center justify-between p-3.5 rounded-xl glass hover:border-border/60 transition-all group",
+                      e.status === 'processando' && "border-primary/40 bg-primary/5 animate-pulse"
+                    )}
                   >
                     <div className="flex items-center gap-4">
-                      {statusIcon(e.status || 'pendente')}
+                      {e.status === 'processando' ? (
+                        <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                      ) : (
+                        statusIcon(e.status || 'pendente')
+                      )}
+
                       <div>
                         <p className="font-body font-medium flex items-center gap-2">
                           {e.tipo_evento} - {getEventoDescricao(e.tipo_evento)}
