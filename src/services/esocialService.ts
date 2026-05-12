@@ -151,19 +151,22 @@ export async function reenviarEvento(eventoId: string, empresaId: string) {
 
 
 export async function gerarEventosPeriodo(empresaId: string, competencia: string) {
-  // 1. Buscar Folhas de Pagamento do período
-  const { data: folhas, error: fError } = await supabase
-    .from('folhas_pagamento')
-    .select('*, folha_itens(*), colaboradores(*)')
-    .eq('empresa_id', empresaId)
-    .eq('competencia', competencia);
+  // 1. Buscar itens da folha do período
+  const { data: itens, error: iError } = await supabase
+    .from('folha_itens')
+    .select('*, colaboradores(*), folhas_pagamento!inner(*)')
+    .eq('folhas_pagamento.empresa_id', empresaId)
+    .eq('folhas_pagamento.competencia', competencia);
 
-  if (fError) throw fError;
+  if (iError) throw iError;
 
   const resultados = { criados: 0, pulados: 0, erros: 0 };
 
-  for (const folha of (folhas || [])) {
+  for (const item of (itens || [])) {
     try {
+      const colaborador = Array.isArray(item.colaboradores) ? item.colaboradores[0] : item.colaboradores;
+      if (!colaborador) continue;
+
       // Verificar se já existe S-1200 para este colaborador/competência
       const { data: existente } = await supabase
         .from('esocial_eventos')
@@ -171,7 +174,7 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
         .eq('empresa_id', empresaId)
         .eq('tipo_evento', 'S-1200')
         .eq('competencia', competencia)
-        .contains('dados', { cpfTrab: folha.colaboradores?.cpf })
+        .contains('dados', { cpfTrab: colaborador.cpf })
         .maybeSingle();
 
       if (existente) {
@@ -179,20 +182,21 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
         continue;
       }
 
-      // Montar dados do S-1200
+      // Montar dados do S-1200 (Remuneração)
       const dadosS1200 = {
-        cpfTrab: folha.colaboradores?.cpf,
+        cpfTrab: colaborador.cpf,
         perApur: competencia,
         dmDev: [{
-          ideDmDev: `DM${folha.id.slice(0, 5)}`,
+          ideDmDev: `DM${item.id.slice(0, 5)}`,
           infoPerApur: {
             ideEstabLot: [{
               tpInsc: 1,
-              nrInsc: folha.empresa_id, // Simplificado
-              detVerbas: folha.folha_itens?.map((item: any) => ({
-                codRubr: item.rubrica_id || '9999',
-                vrRubr: item.valor,
-              })) || []
+              nrInsc: empresaId.replace(/-/g, '').slice(0, 14), // Mock CNPJ
+              detVerbas: [
+                { codRubr: '1000', vrRubr: Number(item.salario_base || 0) },
+                { codRubr: '9201', vrRubr: Number(item.inss_mes || 0) },
+                { codRubr: '9202', vrRubr: Number(item.fgts_mes || 0) }
+              ]
             }]
           }
         }]
@@ -205,15 +209,15 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
         dados: dadosS1200
       });
 
-      // Se a folha estiver paga, criar S-1210
-      if (folha.status === 'pago') {
+      // Se o item estiver pago, criar S-1210 (Pagamento)
+      if (item.status_pagamento === 'pago') {
         const dadosS1210 = {
-          cpfTrab: folha.colaboradores?.cpf,
+          cpfTrab: colaborador.cpf,
           perApur: competencia,
           infoPgto: [{
-            dtPgto: folha.data_pagamento || new Date().toISOString().split('T')[0],
+            dtPgto: new Date().toISOString().split('T')[0],
             tpPgto: 1,
-            vlrLiq: folha.valor_liquido
+            vlrLiq: Number(item.total_liquido || 0)
           }]
         };
 
@@ -227,7 +231,7 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
 
       resultados.criados++;
     } catch (err) {
-      console.error('Erro ao gerar evento para folha:', folha.id, err);
+      console.error('Erro ao gerar evento para item da folha:', item.id, err);
       resultados.erros++;
     }
   }
