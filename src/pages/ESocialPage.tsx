@@ -19,11 +19,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 
 const tiposEvento = [
   'S-1000', 'S-1005', 'S-1010', 'S-1020',
   'S-1200', 'S-1210', 'S-1280',
-  'S-2200', 'S-2205', 'S-2206', 'S-2230', 'S-2299', 'S-2300', 'S-2399',
+  'S-2200', 'S-2205', 'S-2206', 'S-2210', 'S-2220', 'S-2230', 'S-2240', 'S-2299', 'S-2300', 'S-2306', 'S-2399', 'S-2400'
 ];
 
 export default function ESocialPage() {
@@ -396,6 +397,14 @@ export default function ESocialPage() {
             </div>
 
             <div className="space-y-4">
+              <div className="p-4 bg-background rounded-xl border shadow-sm">
+                <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3 block">Conteúdo Estruturado</Label>
+                <ESocialEventViewer 
+                  tipo={selectedEvento?.tipo_evento} 
+                  dados={selectedEvento?.dados_evento || selectedEvento?.dados || {}} 
+                />
+              </div>
+
               {selectedEvento?.mensagem_erro && (
                 <div className="p-4 rounded-xl border border-destructive/20 bg-destructive/5 text-destructive text-sm font-body">
                   <p className="font-bold flex items-center gap-1.5 mb-1"><AlertCircle className="h-4 w-4" /> Erro na Transmissão:</p>
