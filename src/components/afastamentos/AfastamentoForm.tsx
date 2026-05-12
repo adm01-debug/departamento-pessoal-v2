@@ -43,6 +43,8 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const [cidSearch, setCidSearch] = useState('');
   const [cidResults, setCidResults] = useState<any[]>([]);
   const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
+  const [historicoRecente, setHistoricoRecente] = useState<any[]>([]);
+  const [isVerificandoHistorico, setIsVerificandoHistorico] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
