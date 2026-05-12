@@ -24,7 +24,7 @@ import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 const tiposEvento = [
   'S-1000', 'S-1005', 'S-1010', 'S-1020',
   'S-1200', 'S-1210', 'S-1280',
-  'S-2200', 'S-2205', 'S-2206', 'S-2230', 'S-2299', 'S-2300', 'S-2399',
+  'S-2200', 'S-2205', 'S-2206', 'S-2210', 'S-2220', 'S-2230', 'S-2240', 'S-2299', 'S-2300', 'S-2306', 'S-2399', 'S-2400'
 ];
 
 export default function ESocialPage() {
