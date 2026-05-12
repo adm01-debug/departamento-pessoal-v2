@@ -34,13 +34,14 @@ const tiposEvento = [
 ];
 
 export default function ESocialPage() {
-  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, isSending } = useESocial();
+  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending } = useESocial();
   const { empresaAtual } = useEmpresas();
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedCompetencia, setSelectedCompetencia] = useState(new Date().toISOString().slice(0, 7));
   const [isValidating, setIsValidating] = useState<string | null>(null);
 
   const filteredEventos = useMemo(() => {
