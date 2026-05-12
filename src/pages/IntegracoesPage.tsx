@@ -418,6 +418,40 @@ export default function IntegracoesPage() {
           </Card>
         </motion.div>
 
+        {/* WhatsApp Card */}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="group border border-border/30 rounded-2xl hover:shadow-elevated hover:border-border/60 transition-all overflow-hidden relative">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-success to-success/60" />
+            <CardHeader className="pb-2">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">💬</span>
+                  <CardTitle className="font-display text-base">WhatsApp (Evolution)</CardTitle>
+                </div>
+                <Badge variant="outline" className="text-[10px] gap-1 bg-muted text-muted-foreground">
+                  <Settings className="h-3 w-3" />Configurável
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground font-body mb-4">Envio de holerites, alertas de ponto e notificações automáticas via WhatsApp</p>
+              <Dialog open={whatsappOpen} onOpenChange={setWhatsappOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full rounded-xl border-border/40 hover:bg-muted font-body transition-colors">
+                    Configurar Integração
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden rounded-2xl">
+                  <DialogHeader className="p-6 bg-muted/20 border-b border-border/10">
+                    <DialogTitle className="font-display">Integração WhatsApp — Evolution API</DialogTitle>
+                  </DialogHeader>
+                  <WhatsAppConfigPanel />
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Bancos (CNAB) Card */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="group border border-border/30 rounded-2xl hover:shadow-elevated hover:border-border/60 transition-all overflow-hidden relative">
