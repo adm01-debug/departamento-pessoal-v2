@@ -3,6 +3,7 @@ import { CheckCircle, Clock, AlertTriangle, HardHat, Users, TrendingUp } from 'l
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 
 interface SSTKPIsProps {
   validos: number;
