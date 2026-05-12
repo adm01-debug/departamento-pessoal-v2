@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { History, Search, Download, User, Calendar, Tag, ArrowRight } from 'lucide-react';
+import { History, Search, Download, User, Calendar, Tag, ArrowRight, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -118,6 +118,11 @@ export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) 
                       <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                         <Calendar className="h-3 w-3" /> {format(new Date(log.created_at), "dd 'de' MMM, HH:mm", { locale: ptBR })}
                       </span>
+                      {log.tabela === 'batidas_ponto' && (
+                        <Badge variant="outline" className="text-[9px] h-4 bg-success/5 text-success border-success/20 gap-1 px-1">
+                          <ShieldCheck className="h-2 w-2" /> 99.8% Confiança Biometria
+                        </Badge>
+                      )}
                     </div>
                     <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded border border-border/30">
                       REF: {log.registro_id.slice(0, 8)}

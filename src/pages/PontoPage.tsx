@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
 import { PontoStreakCard } from '@/components/ponto/PontoStreakCard';
@@ -23,6 +24,13 @@ import { PontoAdjustmentRequests } from '@/components/ponto/PontoAdjustmentReque
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
+import { CardSkeleton } from '@/components/ui/module-skeleton';
+
+interface BancoHorasResumo {
+  saldo: string;
+  saldoMinutos: number;
+  tipo: 'credito' | 'debito';
+}
 
 export default function PontoPage() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -57,6 +65,39 @@ export default function PontoPage() {
     queryKey: ['registros-semana', user?.id],
     queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', w.toISOString().split('T')[0]).order('data', { ascending: false }); if (error) throw error; return data || []; },
     enabled: !!user?.id,
+  });
+
+  const { data: bancoResumo } = useQuery({
+    queryKey: ['banco-horas-resumo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
+      if (!colab) return null;
+      
+      const { data: bancoData } = await supabase
+        .from('banco_horas')
+        .select('horas, tipo')
+        .eq('colaborador_id', colab.id);
+        
+      if (!bancoData) return { saldo: '00:00', saldoMinutos: 0, tipo: 'credito' };
+      
+      let totalMinutos = 0;
+      bancoData.forEach(b => {
+        const [h, m] = (b.horas || '00:00').split(':').map(Number);
+        const mins = (h * 60) + (m || 0);
+        totalMinutos += (b.tipo === 'credito' ? mins : -mins);
+      });
+      
+      const absMins = Math.abs(totalMinutos);
+      const h = Math.floor(absMins / 60);
+      const m = absMins % 60;
+      return {
+        saldo: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+        saldoMinutos: totalMinutos,
+        tipo: totalMinutos >= 0 ? 'credito' : 'debito'
+      } as BancoHorasResumo;
+    },
+    enabled: !!user?.id
   });
 
   const captureGeo = (): Promise<{ lat: number; lng: number, accuracy: number } | null> => new Promise((resolve) => {
@@ -163,7 +204,32 @@ export default function PontoPage() {
             <div className="grid gap-6 lg:grid-cols-3">
               <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
               <PontoTodayCard registroHoje={registroHoje} />
-              <PontoWeekSummary registrosSemana={registrosSemana} />
+              <div className="flex flex-col gap-4">
+                <PontoWeekSummary registrosSemana={registrosSemana} />
+                {bancoResumo && (
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}>
+                    <Card className="border border-border/30 shadow-sm rounded-2xl overflow-hidden bg-gradient-to-br from-card to-accent/5">
+                      <div className={cn("h-[2px]", bancoResumo.tipo === 'credito' ? "bg-success" : "bg-destructive")} />
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={cn("p-2 rounded-xl", bancoResumo.tipo === 'credito' ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}>
+                            <Clock className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase text-muted-foreground font-bold tracking-widest">Saldo Banco de Horas</p>
+                            <p className={cn("text-xl font-display font-bold", bancoResumo.tipo === 'credito' ? "text-success" : "text-destructive")}>
+                              {bancoResumo.tipo === 'credito' ? '+' : '-'}{bancoResumo.saldo}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className={cn("font-body text-[10px]", bancoResumo.tipo === 'credito' ? "text-success border-success/30" : "text-destructive border-destructive/30")}>
+                          {bancoResumo.tipo === 'credito' ? 'Credor' : 'Devedor'}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </div>
             </div>
             <div className="mt-6"><PontoStreakCard /></div>
             <PontoCharts />
