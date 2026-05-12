@@ -78,6 +78,19 @@ export default function AfastamentosPage() {
     return matchSearch && matchCID && matchTipo && matchStatus;
   });
 
+  const chartData = useMemo(() => {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const data = months.map(m => ({ name: m, total: 0 }));
+    
+    afastamentos.forEach((af: any) => {
+      const date = new Date(af.data_inicio);
+      const monthIndex = date.getMonth();
+      data[monthIndex].total += 1;
+    });
+    
+    return data;
+  }, [afastamentos]);
+
   const handleEdit = (af: any) => {
     setSelectedAfastamento(af);
     setIsFormOpen(true);
