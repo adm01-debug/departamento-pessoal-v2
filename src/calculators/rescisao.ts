@@ -97,19 +97,28 @@ export function calcularProvisao13(salarioBase: number, mesesTrabalhados: number
   return { provisao13, provisaoEncargos, total };
 }
 
-export function calcularEncargos(salarioBase: number) {
-  const inss = calcularINSS(salarioBase);
-  const irrf = calcularIRRF(salarioBase);
+export function calcularEncargos(salarioBase: number, percentualRAT: number = 0.03, percentualTerceiros: number = 0.058) {
+  const inssEmpregado = calcularINSS(salarioBase);
+  const irrfEmpregado = calcularIRRF(salarioBase);
   const fgts = calcularFGTS(salarioBase);
+  
   const inssPatronal = Math.round(salarioBase * 0.20 * 100) / 100;
-  const rat = Math.round(salarioBase * 0.03 * 100) / 100;
-  const salarioEducacao = Math.round(salarioBase * 0.025 * 100) / 100;
-  const senai = Math.round(salarioBase * 0.01 * 100) / 100;
-  const sesi = Math.round(salarioBase * 0.015 * 100) / 100;
-  const totalEmpregado = Math.round((inss + irrf) * 100) / 100;
-  const totalEmpregador = Math.round((fgts + inssPatronal + rat + salarioEducacao + senai + sesi) * 100) / 100;
-  const custoTotal = Math.round((salarioBase + totalEmpregador) * 100) / 100;
-  return { inss, irrf, fgts, inssPatronal, rat, salarioEducacao, senai, sesi, totalEmpregado, totalEmpregador, custoTotal };
+  const rat = Math.round(salarioBase * percentualRAT * 100) / 100;
+  const terceiros = Math.round(salarioBase * percentualTerceiros * 100) / 100;
+  
+  const totalEncargosPatronais = Math.round((inssPatronal + rat + terceiros + fgts) * 100) / 100;
+  const custoMensalTotal = Math.round((salarioBase + totalEncargosPatronais) * 100) / 100;
+  
+  return {
+    inssEmpregado,
+    irrfEmpregado,
+    fgts,
+    inssPatronal,
+    rat,
+    terceiros,
+    totalEncargosPatronais,
+    custoMensalTotal
+  };
 }
 
 export function calcularProRata(salarioBase: number, diasTrabalhados: number): number {
