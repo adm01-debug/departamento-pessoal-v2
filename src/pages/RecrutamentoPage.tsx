@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { recrutamentoService } from '@/services/recrutamentoService';
 import { useEmpresas } from '@/hooks';
-import { UserSearch, Plus, Briefcase, Users, Filter, BarChart3, ChevronRight, Mail, Phone, Calendar, Star, Trash2 } from 'lucide-react';
+import { UserSearch, Plus, Briefcase, Users, Filter, BarChart3, ChevronRight, Mail, Phone, Calendar, Star, Trash2, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Spinner } from '@/components/ui/spinner';
 import { useState } from 'react';
@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { CandidatoTimeline } from '@/components/recrutamento/CandidatoTimeline';
 
 const ETAPAS = [
   { id: 'triagem', label: 'Triagem', color: 'bg-slate-100 border-slate-200' },
@@ -31,6 +32,7 @@ export default function RecrutamentoPage() {
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState('pipeline');
   const [selectedVagaId, setSelectedVagaId] = useState<string>('all');
+  const [selectedCandidatura, setSelectedCandidatura] = useState<any>(null);
 
   const { data: vagas = [], isLoading: loadVagas } = useQuery({
     queryKey: ['vagas', empresaAtual?.id],
@@ -142,6 +144,7 @@ export default function RecrutamentoPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 className="bg-white p-4 rounded-xl shadow-sm border border-border/40 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group relative"
+                                onClick={() => setSelectedCandidatura(cand)}
                               >
                                 <div className="flex justify-between items-start mb-2">
                                   <div>
@@ -169,7 +172,7 @@ export default function RecrutamentoPage() {
                                     </div>
                                   </div>
                                   
-                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                                     <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-blue-50 hover:text-blue-600">
                                       <Mail className="h-3.5 w-3.5" />
                                     </Button>
@@ -308,21 +311,12 @@ export default function RecrutamentoPage() {
                                    {cand.pretensao_salarial ? `R$ ${cand.pretensao_salarial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'N/D'}
                                  </td>
                                  <td className="px-6 py-4 text-right">
-                                   <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                     <Button variant="outline" size="sm" className="h-8 rounded-lg text-xs font-bold border-primary/20 hover:bg-primary/5 hover:text-primary">Perfil</Button>
-                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/5"><Trash2 className="h-4 w-4" /></Button>
-                                   </div>
+                                   <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary opacity-0 group-hover:opacity-100 transition-all"><Plus className="h-4 w-4" /></Button>
                                  </td>
                                </tr>
                              ))}
                            </tbody>
                          </table>
-                         {candidatos.length === 0 && (
-                           <div className="py-20 text-center">
-                             <Users className="h-10 w-10 text-muted/20 mx-auto mb-3" />
-                             <p className="text-muted-foreground font-medium">Nenhum candidato cadastrado</p>
-                           </div>
-                         )}
                        </div>
                      </CardContent>
                    </Card>
@@ -330,51 +324,31 @@ export default function RecrutamentoPage() {
 
                 {/* ANALYTICS */}
                 <TabsContent value="analytics" className="mt-0">
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card className="rounded-2xl border-border/30 bg-gradient-to-br from-primary/5 to-transparent">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Time-to-Hire</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">18 dias</div>
-                        <p className="text-[10px] text-success mt-1">↑ 12% melhor que mês passado</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="rounded-2xl border-border/30 bg-gradient-to-br from-success/5 to-transparent">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Conversão de Funil</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">4.2%</div>
-                        <p className="text-[10px] text-muted-foreground mt-1">Visitantes vs Contratados</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="rounded-2xl border-border/30 bg-gradient-to-br from-info/5 to-transparent">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Candidatos Ativos</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">{candidatos.length}</div>
-                        <p className="text-[10px] text-muted-foreground mt-1">Em todas as etapas</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="rounded-2xl border-border/30 bg-gradient-to-br from-warning/5 to-transparent">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Custo por Contratação</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">R$ 1.250</div>
-                        <p className="text-[10px] text-destructive mt-1">↓ 5% aumento de custos</p>
-                      </CardContent>
-                    </Card>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                    {[
+                      { label: 'Vagas Abertas', value: vagas.length, icon: Briefcase, color: 'text-success' },
+                      { label: 'Total Candidatos', value: candidatos.length, icon: Users, color: 'text-info' },
+                      { label: 'Processos Ativos', value: candidaturas.length, icon: UserSearch, color: 'text-primary' },
+                      { label: 'Taxa de Conversão', value: '4.2%', icon: BarChart3, color: 'text-warning' },
+                    ].map((stat, i) => (
+                      <Card key={i} className="rounded-2xl border-border/40 shadow-sm">
+                        <CardContent className="p-6 flex items-center gap-4">
+                          <div className={cn("h-12 w-12 rounded-xl bg-muted/30 flex items-center justify-center", stat.color)}>
+                            <stat.icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{stat.label}</p>
+                            <p className="text-2xl font-display font-bold">{stat.value}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                  
-                  <Card className="mt-6 rounded-2xl border-border/30">
-                    <CardHeader>
-                      <CardTitle>Distribuição por Etapa</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-64 flex items-end gap-2 pb-6">
-                      {ETAPAS.map((e) => {
+
+                  <Card className="rounded-3xl border-border/40 overflow-hidden shadow-sm h-64">
+                    <CardHeader className="pb-0"><CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Distribuição por Etapa</CardTitle></CardHeader>
+                    <CardContent className="h-full flex items-end gap-2 px-8 pb-8 pt-4">
+                      {ETAPAS.map(e => {
                         const count = candidaturas.filter((c: any) => (c.etapa || 'triagem') === e.id).length;
                         const height = (count / (candidaturas.length || 1)) * 100 + 10;
                         return (
@@ -394,6 +368,60 @@ export default function RecrutamentoPage() {
             )}
           </AnimatePresence>
         </Tabs>
+
+        {/* Detalhes do Candidato */}
+        <Dialog open={!!selectedCandidatura} onOpenChange={(o) => { if(!o) setSelectedCandidatura(null); }}>
+          <DialogContent className="max-w-2xl rounded-3xl h-[85vh] flex flex-col p-0 overflow-hidden border-none shadow-elevated">
+            {selectedCandidatura && (
+              <>
+                <DialogHeader className="p-6 border-b bg-muted/20">
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+                      {selectedCandidatura.candidato?.nome?.charAt(0)}
+                    </div>
+                    <div>
+                      <DialogTitle className="text-2xl font-display font-bold">{selectedCandidatura.candidato?.nome}</DialogTitle>
+                      <p className="text-sm text-muted-foreground font-medium">{selectedCandidatura.vaga?.titulo} • {selectedCandidatura.vaga?.departamento}</p>
+                    </div>
+                  </div>
+                </DialogHeader>
+                <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="border-border/40 bg-muted/10 shadow-none">
+                      <CardContent className="p-4 flex flex-col gap-1">
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Contato</span>
+                        <p className="text-sm flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> {selectedCandidatura.candidato?.email}</p>
+                        <p className="text-sm flex items-center gap-2"><Phone className="h-3.5 w-3.5" /> {selectedCandidatura.candidato?.telefone || 'N/A'}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-border/40 bg-muted/10 shadow-none">
+                      <CardContent className="p-4 flex flex-col gap-1">
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Status Atual</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge className="rounded-lg px-2 bg-primary/10 text-primary border-primary/20 capitalize font-bold">
+                            {ETAPAS.find(e => e.id === (selectedCandidatura.etapa || 'triagem'))?.label}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground font-bold">Score: {selectedCandidatura.nota_geral || 'N/D'}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-primary" /> Timeline do Processo Seletivo
+                    </h3>
+                    <CandidatoTimeline candidaturaId={selectedCandidatura.id} />
+                  </div>
+                </div>
+                <div className="p-6 border-t bg-muted/10 flex justify-end gap-3">
+                  <Button variant="outline" className="rounded-xl font-bold" onClick={() => setSelectedCandidatura(null)}>Fechar Janela</Button>
+                  <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-bold shadow-lg">Avançar para Próxima Etapa</Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </PageLayout>
     </>
   );

@@ -83,4 +83,23 @@ export const recrutamentoService = {
     const { error } = await supabase.from('candidaturas').delete().eq('id', id);
     if (error) throw error;
   },
+
+  // ===== TESTES E ENTREVISTAS =====
+  async agendarEntrevista(d: Record<string, unknown>) {
+    const { data, error } = await supabase.from('recrutamento_entrevistas').insert(d as any).select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async registrarTeste(d: Record<string, unknown>) {
+    const { data, error } = await supabase.from('recrutamento_testes').insert(d as any).select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async adicionarAnotacao(d: Record<string, unknown>) {
+    const { data, error } = await supabase.from('recrutamento_anotacoes').insert(d as any).select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
 };

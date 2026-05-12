@@ -11992,6 +11992,141 @@ export type Database = {
           },
         ]
       }
+      recrutamento_anotacoes: {
+        Row: {
+          anotacao: string
+          candidatura_id: string | null
+          created_at: string
+          id: string
+          privada: boolean | null
+          usuario_id: string | null
+        }
+        Insert: {
+          anotacao: string
+          candidatura_id?: string | null
+          created_at?: string
+          id?: string
+          privada?: boolean | null
+          usuario_id?: string | null
+        }
+        Update: {
+          anotacao?: string
+          candidatura_id?: string | null
+          created_at?: string
+          id?: string
+          privada?: boolean | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recrutamento_anotacoes_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recrutamento_entrevistas: {
+        Row: {
+          candidatura_id: string | null
+          created_at: string
+          data_hora: string
+          entrevistador_id: string | null
+          feedback: string | null
+          id: string
+          local_link: string | null
+          nota: number | null
+          status: string | null
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          candidatura_id?: string | null
+          created_at?: string
+          data_hora: string
+          entrevistador_id?: string | null
+          feedback?: string | null
+          id?: string
+          local_link?: string | null
+          nota?: number | null
+          status?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          candidatura_id?: string | null
+          created_at?: string
+          data_hora?: string
+          entrevistador_id?: string | null
+          feedback?: string | null
+          id?: string
+          local_link?: string | null
+          nota?: number | null
+          status?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recrutamento_entrevistas_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recrutamento_testes: {
+        Row: {
+          candidatura_id: string | null
+          comentarios: string | null
+          created_at: string
+          data_entrega: string | null
+          data_envio: string | null
+          id: string
+          nome_teste: string
+          nota: number | null
+          status: string | null
+          updated_at: string
+          url_teste: string | null
+        }
+        Insert: {
+          candidatura_id?: string | null
+          comentarios?: string | null
+          created_at?: string
+          data_entrega?: string | null
+          data_envio?: string | null
+          id?: string
+          nome_teste: string
+          nota?: number | null
+          status?: string | null
+          updated_at?: string
+          url_teste?: string | null
+        }
+        Update: {
+          candidatura_id?: string | null
+          comentarios?: string | null
+          created_at?: string
+          data_entrega?: string | null
+          data_envio?: string | null
+          id?: string
+          nome_teste?: string
+          nota?: number | null
+          status?: string | null
+          updated_at?: string
+          url_teste?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recrutamento_testes_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registros_ponto: {
         Row: {
           aprovado: boolean | null
