@@ -4,7 +4,7 @@ export const auditLogger = {
   async log(params: {
     tabela: string;
     registro_id: string;
-    acao: 'INSERT' | 'UPDATE' | 'DELETE' | 'EXECUTE_CALC';
+    acao: 'INSERT' | 'UPDATE' | 'DELETE' | 'EXECUTE_CALC' | 'SIGN';
     dados_anteriores?: any;
     dados_novos?: any;
     user_id?: string;

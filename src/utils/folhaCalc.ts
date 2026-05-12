@@ -119,7 +119,7 @@ export const folhaCalc = {
     const totalHE = valorHE50 + valorHE100;
     
     // 3. DSR sobre Horas Extras
-    const dsr = calcularDSR(totalHE, diasUteis, domingosFeriados);
+    const dsr = diasUteis > 0 ? calcularDSR(totalHE, diasUteis, domingosFeriados) : 0;
     if (dsr > 0) detalheEventos.push({ codigo: '1003', descricao: 'DSR sobre Horas Extras', tipo: 'provento', valor: dsr });
     
     // 4. 13º Salário
@@ -140,7 +140,7 @@ export const folhaCalc = {
     }
 
     // 6. Faltas e Atrasos (Reduzem a base de cálculo e são descontos)
-    const valorFaltas = Math.round(((salarioBase / jornada) * horasFalta) * 100) / 100;
+    const valorFaltas = jornada > 0 ? Math.round(((salarioBase / jornada) * horasFalta) * 100) / 100 : 0;
     if (valorFaltas > 0) {
       detalheEventos.push({ 
         codigo: '5005', 

@@ -192,7 +192,50 @@ export const rescisaoService = {
     });
 
     return data;
-  }
+  async processarPagamento(id: string, comprovanteUrl?: string) {
+    const { data: d, error: fetchError } = await supabase
+      .from('desligamentos')
+      .select('colaborador_id, data_desligamento, valor_liquido')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) throw fetchError;
 
+    // 1. Atualizar o desligamento
+    const { data, error } = await supabase
+      .from('desligamentos')
+      .update({ 
+        status: 'pago', 
+        etapa: 'finalizado',
+        checklist_pagamento: true,
+        data_pagamento: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 2. IMPORTANTE: Atualizar o status do colaborador para 'desligado'
+    // Sem isso, o colaborador continuaria aparecendo na folha e ativos
+    const { error: colabError } = await supabase
+      .from('colaboradores')
+      .update({ 
+        status: 'desligado',
+        data_desligamento: d.data_desligamento
+      })
+      .eq('id', d.colaborador_id);
+
+    if (colabError) console.error('Erro ao desativar colaborador:', colabError);
+
+    await auditLogger.log({
+      tabela: 'desligamentos',
+      registro_id: id,
+      acao: 'UPDATE',
+      dados_novos: { status: 'pago', etapa: 'finalizado', colaborador_desativado: true },
+    });
+
+    return data;
+  }
 };
 
