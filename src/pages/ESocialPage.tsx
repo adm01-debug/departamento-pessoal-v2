@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
+import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 
 
 const tiposEvento = [
@@ -33,13 +34,14 @@ const tiposEvento = [
 ];
 
 export default function ESocialPage() {
-  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, isSending } = useESocial();
+  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending } = useESocial();
   const { empresaAtual } = useEmpresas();
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedCompetencia, setSelectedCompetencia] = useState(new Date().toISOString().slice(0, 7));
   const [isValidating, setIsValidating] = useState<string | null>(null);
 
   const filteredEventos = useMemo(() => {
@@ -132,12 +134,18 @@ export default function ESocialPage() {
            <Button 
              size="sm" 
              className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow"
+             disabled={isSending || !empresaAtual}
              onClick={() => {
-               toast.info("Iniciando processamento em lote de eventos periódicos...");
+               if (empresaAtual?.id) {
+                 gerarEventosPeriodo({ 
+                   empresaId: empresaAtual.id, 
+                   competencia: selectedCompetencia 
+                 });
+               }
              }}
            >
-              <RefreshCw className="h-4 w-4" />
-              Sincronizar Eventos Periódicos
+              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              Gerar Eventos Periódicos ({selectedCompetencia})
            </Button>
         </div>
       }
@@ -164,17 +172,26 @@ export default function ESocialPage() {
 
           <Tabs defaultValue="eventos" className="space-y-6">
 
-        <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20">
+        <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20 flex-wrap h-auto">
           <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <LayoutDashboard className="h-4 w-4" /> Eventos
           </TabsTrigger>
+          <TabsTrigger value="conciliacao" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <BarChart3 className="h-4 w-4" /> Conciliação S-5001/S-5002
+          </TabsTrigger>
           <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <History className="h-4 w-4" /> Timeline de Transmissão
+            <History className="h-4 w-4" /> Timeline
           </TabsTrigger>
           <TabsTrigger value="config" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <Settings2 className="h-4 w-4" /> Configurações & Certificados
+            <Settings2 className="h-4 w-4" /> Configurações
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="conciliacao" className="space-y-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <ESocialConciliacao />
+          </motion.div>
+        </TabsContent>
 
         <TabsContent value="eventos" className="space-y-6">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
@@ -190,11 +207,20 @@ export default function ESocialPage() {
             </div>
             
             <div className="flex flex-wrap items-center gap-2">
-              <div className="relative w-full md:w-64">
+              <div className="flex items-center gap-2 bg-muted/20 p-1 rounded-xl border">
+                <Calendar className="h-4 w-4 text-muted-foreground ml-2" />
+                <Input 
+                  type="month" 
+                  value={selectedCompetencia}
+                  onChange={(e) => setSelectedCompetencia(e.target.value)}
+                  className="border-none bg-transparent h-7 w-32 focus-visible:ring-0 text-xs font-bold"
+                />
+              </div>
+              <div className="relative w-full md:w-48">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Buscar evento ou protocolo..." 
-                  className="pl-9 rounded-xl h-9" 
+                  placeholder="Buscar evento..." 
+                  className="pl-9 rounded-xl h-9 text-xs" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />

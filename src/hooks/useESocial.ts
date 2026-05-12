@@ -61,6 +61,17 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+
+  const gerarEventosMutation = useMutation({
+    mutationFn: ({ empresaId, competencia }: { empresaId: string; competencia: string }) =>
+      esocialService.gerarEventosPeriodo(empresaId, competencia),
+    onSuccess: (data) => {
+      toast.success(`Geração concluída: ${data.criados} criados, ${data.pulados} já existentes.`);
+      invalidate();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
   return {
     eventos: eventosQuery.data || [],
     stats: statsQuery.data || { enviados: 0, pendentes: 0, erros: 0, conformidade: 100 },
@@ -68,6 +79,7 @@ export function useESocial() {
     criarEvento: criarMutation.mutate,
     enviarEvento: enviarMutation.mutate,
     reenviarEvento: reenviarMutation.mutate,
-    isSending: enviarMutation.isPending || reenviarMutation.isPending,
+    gerarEventosPeriodo: gerarEventosMutation.mutate,
+    isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending,
   };
 }
