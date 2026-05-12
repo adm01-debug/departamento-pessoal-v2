@@ -11,12 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { beneficioService } from '@/services';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { Edit, Gift, LayoutDashboard, List, History, Settings, TrendingUp } from 'lucide-react';
+import { Edit, Gift, LayoutDashboard, List, History, Settings, TrendingUp, ArrowRight } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BeneficiosDashboard } from '@/components/beneficios/BeneficiosDashboard';
+import { BeneficioHistorico } from '@/components/beneficios/BeneficioHistorico';
 
 
 export default function BeneficiosPage() {
@@ -134,19 +135,20 @@ export default function BeneficiosPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="auditoria">
+        <TabsContent value="auditoria" className="space-y-6">
            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
-             <CardHeader className="bg-muted/30">
-               <CardTitle className="text-sm font-display flex items-center gap-2">
-                 <History className="h-4 w-4 text-primary" /> Histórico de Alterações de Benefícios
+             <CardHeader className="bg-muted/30 pb-4">
+               <CardTitle className="text-sm font-display flex items-center justify-between">
+                 <div className="flex items-center gap-2">
+                   <History className="h-4 w-4 text-primary" /> Histórico de Movimentações de Benefícios
+                 </div>
+                 <Button variant="ghost" size="sm" className="text-[10px] h-7 gap-1" onClick={() => navigate('/configuracoes/logs')}>
+                   Auditoria Global <ArrowRight className="h-3 w-3" />
+                 </Button>
                </CardTitle>
              </CardHeader>
-             <CardContent className="py-8 text-center">
-                <History className="h-12 w-12 text-muted-foreground/20 mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">Consulte o módulo de Auditoria Global para ver todas as trilhas de benefícios.</p>
-                <Button variant="link" className="text-xs text-primary mt-2" onClick={() => navigate('/configuracoes/logs')}>
-                  Abrir Auditoria Global
-                </Button>
+             <CardContent className="pt-6">
+                <BeneficioHistorico />
              </CardContent>
            </Card>
         </TabsContent>
@@ -155,4 +157,3 @@ export default function BeneficiosPage() {
     </>
   );
 }
-
