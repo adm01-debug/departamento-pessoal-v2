@@ -2494,14 +2494,18 @@ export type Database = {
         Row: {
           agencia_favorecido: string | null
           banco_favorecido: string | null
+          codigo_ocorrencia: string | null
           colaborador_id: string | null
           conta_favorecido: string | null
           cpf_cnpj_favorecido: string
           created_at: string | null
           data_pagamento: string
+          folha_item_id: string | null
           id: string
+          mensagem_ocorrencia: string | null
           nome_favorecido: string
           remessa_id: string
+          seu_numero: string | null
           status: string | null
           tipo_pagamento: string | null
           valor_pagamento: number
@@ -2509,14 +2513,18 @@ export type Database = {
         Insert: {
           agencia_favorecido?: string | null
           banco_favorecido?: string | null
+          codigo_ocorrencia?: string | null
           colaborador_id?: string | null
           conta_favorecido?: string | null
           cpf_cnpj_favorecido: string
           created_at?: string | null
           data_pagamento: string
+          folha_item_id?: string | null
           id?: string
+          mensagem_ocorrencia?: string | null
           nome_favorecido: string
           remessa_id: string
+          seu_numero?: string | null
           status?: string | null
           tipo_pagamento?: string | null
           valor_pagamento: number
@@ -2524,14 +2532,18 @@ export type Database = {
         Update: {
           agencia_favorecido?: string | null
           banco_favorecido?: string | null
+          codigo_ocorrencia?: string | null
           colaborador_id?: string | null
           conta_favorecido?: string | null
           cpf_cnpj_favorecido?: string
           created_at?: string | null
           data_pagamento?: string
+          folha_item_id?: string | null
           id?: string
+          mensagem_ocorrencia?: string | null
           nome_favorecido?: string
           remessa_id?: string
+          seu_numero?: string | null
           status?: string | null
           tipo_pagamento?: string | null
           valor_pagamento?: number
@@ -2556,6 +2568,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cnab_itens_folha_item_id_fkey"
+            columns: ["folha_item_id"]
+            isOneToOne: false
+            referencedRelation: "folha_itens"
             referencedColumns: ["id"]
           },
           {
