@@ -1,27 +1,53 @@
 // Cálculos base: INSS, IRRF, FGTS
-import { FAIXAS_INSS_2026, FAIXAS_IRRF_2026, DEDUCAO_DEPENDENTE_IRRF, ALIQUOTA_FGTS } from './tabelas';
+import { 
+  FAIXAS_INSS_2026, 
+  FAIXAS_IRRF_2026, 
+  DEDUCAO_DEPENDENTE_IRRF, 
+  ALIQUOTA_FGTS,
+  DEDUCAO_SIMPLIFICADA_IRRF_2026,
+  TETO_INSS_2026
+} from './tabelas';
 
 export function calcularINSS(salarioBruto: number): number {
+  if (salarioBruto <= 0) return 0;
+  
   let descontoTotal = 0;
-  let baseRestante = salarioBruto;
+  let baseRestante = Math.min(salarioBruto, TETO_INSS_2026);
+  
   for (let i = 0; i < FAIXAS_INSS_2026.length; i++) {
     const faixa = FAIXAS_INSS_2026[i];
     const limiteAnterior = i === 0 ? 0 : FAIXAS_INSS_2026[i - 1].limite;
     const faixaCalculo = Math.min(baseRestante, faixa.limite - limiteAnterior);
+    
     if (faixaCalculo <= 0) break;
+    
     descontoTotal += faixaCalculo * faixa.aliquota;
     baseRestante -= faixaCalculo;
+    
+    // Se ainda restar base após a última faixa (devido ao teto), a última alíquota se aplica ao excedente até o teto
+    if (i === FAIXAS_INSS_2026.length - 1 && baseRestante > 0) {
+      descontoTotal += baseRestante * faixa.aliquota;
+    }
   }
+  
   return Math.round(descontoTotal * 100) / 100;
 }
 
 export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outrasDeducoes: number = 0): number {
   const descontoINSS = calcularINSS(salarioBruto);
-  const baseCalculo = salarioBruto - descontoINSS - (dependentes * DEDUCAO_DEPENDENTE_IRRF) - outrasDeducoes;
+  
+  // Opção 1: Deduções Legais
+  const baseCalculoLegal = salarioBruto - descontoINSS - (dependentes * DEDUCAO_DEPENDENTE_IRRF) - outrasDeducoes;
+  
+  // Opção 2: Desconto Simplificado
+  const baseCalculoSimplificado = salarioBruto - DEDUCAO_SIMPLIFICADA_IRRF_2026;
+  
+  // A Receita Federal utiliza a base que for mais benéfica para o contribuinte (menor imposto)
+  // Como as alíquotas são as mesmas, a menor base gera o menor imposto
+  const baseCalculo = Math.max(0, Math.min(baseCalculoLegal, baseCalculoSimplificado));
   
   if (baseCalculo <= 0) return 0;
 
-  // Cálculo por faixas progressivas (Simulando 2026)
   let impostoTotal = 0;
   for (let i = 0; i < FAIXAS_IRRF_2026.length; i++) {
     const faixa = FAIXAS_IRRF_2026[i];
