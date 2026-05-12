@@ -383,8 +383,68 @@ export default function ESocialPage() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
-      </PageLayout>
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="timeline">
+          <Card className="border border-border/30 rounded-2xl overflow-hidden p-12 text-center text-muted-foreground">
+             <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
+             <p className="font-bold">Timeline Auditável</p>
+             <p className="text-sm">Rastreabilidade completa de todas as transmissões e retornos do governo.</p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="config">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border border-border/30 rounded-2xl overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-display flex items-center gap-2">
+                    <Key className="h-5 w-5 text-primary" /> Certificado Digital
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="p-4 rounded-xl border border-success/20 bg-success/5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Key className="h-8 w-8 text-success" />
+                        <div>
+                          <p className="font-bold text-sm">e-CNPJ: {empresaAtual?.razao_social}</p>
+                          <p className="text-xs text-muted-foreground">Vencimento: 12/12/2026 (Em 224 dias)</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-success border-success/30">Ativo</Badge>
+                    </div>
+                    <Button variant="outline" className="w-full rounded-xl border-dashed">
+                      <Plus className="h-4 w-4 mr-2" /> Alterar Certificado
+                    </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-border/30 rounded-2xl overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-display flex items-center gap-2">
+                    <Settings2 className="h-5 w-5 text-primary" /> Parâmetros do Gateway
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm">
+                   <div className="flex justify-between items-center py-2 border-b border-border/10">
+                      <span className="text-muted-foreground">Ambiente</span>
+                      <Badge variant="secondary" className="bg-info/10 text-info border-info/20">Produção</Badge>
+                   </div>
+                   <div className="flex justify-between items-center py-2 border-b border-border/10">
+                      <span className="text-muted-foreground">Versão do Layout</span>
+                      <span className="font-medium">S-1.2</span>
+                   </div>
+                   <div className="flex justify-between items-center py-2">
+                      <span className="text-muted-foreground">Auto-Sincronização</span>
+                      <Badge variant="outline" className="text-success">Ativado</Badge>
+                   </div>
+                </CardContent>
+              </Card>
+           </div>
+        </TabsContent>
+      </Tabs>
+    </PageLayout>
+
 
       {/* Detalhes do Evento */}
       <Dialog open={!!selectedEvento} onOpenChange={(o) => { if(!o) setSelectedEvento(null); }}>
