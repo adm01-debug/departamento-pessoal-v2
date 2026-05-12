@@ -64,13 +64,13 @@ export function useAfastamentos() {
   };
 }
 
-export function useProrrogacoesAfastamento() {
+export function useProrrogacoesAfastamento(afastamentoId?: string) {
   const queryClient = useQueryClient();
   const { empresaAtual } = useEmpresas();
 
   const query = useQuery({
-    queryKey: ['prorrogacoes-afastamento', empresaAtual?.id],
-    queryFn: () => afastamentoService.listarProrrogacoes(),
+    queryKey: ['prorrogacoes-afastamento', empresaAtual?.id, afastamentoId],
+    queryFn: () => afastamentoService.listarProrrogacoes(afastamentoId),
     enabled: !!empresaAtual?.id,
   });
 

@@ -41,7 +41,7 @@ const tipoLabels: Record<string, string> = {
 
 export default function AfastamentosPage() {
   const { afastamentos, isLoading, filtros, setFeltros } = useAfastamentos();
-  const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento();
+  const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento(undefined);
   const { exportarPDF } = usePDFExport();
   
   const [activeTab, setActiveTab] = useState('afastamentos');
@@ -131,13 +131,13 @@ export default function AfastamentosPage() {
               />
             </div>
             
-            <div className="relative flex-1 min-w-[150px] md:w-48">
-              <div className="absolute left-3 top-2.5 h-4 w-4 text-primary/60">
+            <div className="relative flex-1 min-w-[150px] md:w-48 group">
+              <div className="absolute left-3 top-2.5 h-4 w-4 text-primary/60 group-focus-within:text-primary transition-colors">
                 <FileText className="h-4 w-4" />
               </div>
               <Input 
                 placeholder="Filtrar por CID-10..." 
-                className="pl-9 bg-card shadow-sm border-orange-200 focus:border-orange-500"
+                className="pl-9 bg-card shadow-sm border-orange-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
                 value={filtros.cid || ''}
                 onChange={(e) => setFeltros({ ...filtros, cid: e.target.value })}
               />
