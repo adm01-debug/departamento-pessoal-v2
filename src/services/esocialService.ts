@@ -243,4 +243,49 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
   return resultados;
 }
 
+export async function getConfig(empresaId: string) {
+  const { data, error } = await supabase
+    .from('configuracoes_esocial')
+    .select('*, certificado:certificados_digitais(*)')
+    .eq('empresa_id', empresaId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function salvarConfig(config: { empresa_id: string; ambiente: string; certificado_id?: string }) {
+  const { error } = await supabase
+    .from('configuracoes_esocial')
+    .upsert(config, { onConflict: 'empresa_id' });
+  if (error) throw error;
+}
+
+export async function listarCertificados(empresaId: string) {
+  const { data, error } = await supabase
+    .from('certificados_digitais')
+    .select('*')
+    .eq('empresa_id', empresaId);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adicionarCertificado(cert: {
+  empresa_id: string;
+  subject: string;
+  issuer: string;
+  valid_from: string;
+  valid_to: string;
+  arquivo_base64: string;
+  senha_encriptada: string;
+  cnpj_cpf: string;
+}) {
+  const { data, error } = await supabase
+    .from('certificados_digitais')
+    .insert([{ ...cert, ativo: true }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 export { type ValidationResult } from '@/validators/esocialValidators';
