@@ -4,40 +4,30 @@
  * Baseado na Lei 12.506/2011 (Aviso Prévio Proporcional) e Artigos 477 a 486 da CLT.
  */
 
-// Tabela INSS 2026 (Progressiva - Portaria Interministerial MPS/MF nº 2/2024)
-export function calcINSS(salario: number): number {
-  const faixas = [
-    { teto: 1518.00, aliq: 0.075, deducao: 0 },
-    { teto: 2793.88, aliq: 0.09, deducao: 22.77 },
-    { teto: 4190.83, aliq: 0.12, deducao: 106.59 },
-    { teto: 8157.41, aliq: 0.14, deducao: 190.41 },
-  ];
+import { calcularINSS, calcularIRRF } from '@/calculators/impostos';
 
-  let desc = 0;
-  if (salario <= faixas[0].teto) {
-    desc = salario * faixas[0].aliq;
-  } else if (salario <= faixas[1].teto) {
-    desc = (salario * faixas[1].aliq) - faixas[1].deducao;
-  } else if (salario <= faixas[2].teto) {
-    desc = (salario * faixas[2].aliq) - faixas[2].deducao;
-  } else if (salario <= faixas[3].teto) {
-    desc = (salario * faixas[3].aliq) - faixas[3].deducao;
-  } else {
-    desc = 951.62; // Teto máximo INSS 2026
+/**
+ * Calcula a quantidade de meses (avos) proporcionais entre duas datas.
+ * Considera a regra da CLT: fração igual ou superior a 15 dias conta como mês integral.
+ */
+function calcularAvos(inicio: Date, fim: Date): number {
+  let meses = (fim.getFullYear() - inicio.getFullYear()) * 12;
+  meses += fim.getMonth() - inicio.getMonth();
+  
+  const diaInicio = inicio.getDate();
+  const diaFim = fim.getDate();
+  
+  // Se o dia do fim é menor que o dia do início, o mês atual ainda não está completo
+  if (diaFim < diaInicio - 1) {
+    meses--;
   }
-  return Number(desc.toFixed(2));
-}
-
-// IRRF 2026 (Base Mensal - IN RFB nº 2110/2022 atualizada)
-export function calcIRRF(base: number, dependentes: number = 0): number {
-  const deducaoDependente = dependentes * 189.59;
-  const baseCalculo = Math.max(0, base - deducaoDependente);
-
-  if (baseCalculo <= 2259.20) return 0;
-  if (baseCalculo <= 2826.65) return Number(((baseCalculo * 0.075) - 169.44).toFixed(2));
-  if (baseCalculo <= 3751.05) return Number(((baseCalculo * 0.15) - 381.44).toFixed(2));
-  if (baseCalculo <= 4664.68) return Number(((baseCalculo * 0.225) - 662.77).toFixed(2));
-  return Number(((baseCalculo * 0.275) - 896.00).toFixed(2));
+  
+  // Cálculo dos dias restantes no último mês incompleto para ver se passa de 14 dias
+  let dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
+  const diffTime = fim.getTime() - dataReferencia.getTime();
+  const diasRestantes = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diasRestantes >= 15 ? meses + 1 : meses;
 }
 
 export interface RescisaoResult {
