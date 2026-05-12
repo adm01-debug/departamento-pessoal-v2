@@ -97,9 +97,13 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
       setFile(null);
       const input = document.getElementById('file-upload') as HTMLInputElement;
       if (input) input.value = '';
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error('Ocorreu um erro técnico ao realizar o upload.');
+      const message = error.message || 'Ocorreu um erro técnico ao realizar o upload.';
+      toast.error('Erro no Upload', {
+        description: message,
+        icon: <AlertTriangle className="h-4 w-4 text-destructive" />
+      });
     }
   };
 

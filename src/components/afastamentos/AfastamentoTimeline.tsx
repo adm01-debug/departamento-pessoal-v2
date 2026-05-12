@@ -14,12 +14,17 @@ interface AfastamentoTimelineProps {
 }
 
 export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps) {
-  const { prorrogacoes, isLoading } = useProrrogacoesAfastamento();
+  const { prorrogacoes, isLoading } = useProrrogacoesAfastamento(afastamentoId);
   const { afastamentos } = useAfastamentos();
   
   const afastamento = afastamentos.find((a: any) => a.id === afastamentoId);
 
-  if (isLoading) return <div className="flex justify-center p-8"><Spinner /></div>;
+  if (isLoading) return (
+    <div className="flex flex-col items-center justify-center p-12 space-y-4">
+      <Spinner size="lg" />
+      <p className="text-sm text-muted-foreground animate-pulse">Carregando histórico detalhado...</p>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
