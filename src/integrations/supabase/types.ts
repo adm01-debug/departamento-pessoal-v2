@@ -2320,33 +2320,42 @@ export type Database = {
       }
       certificados_digitais: {
         Row: {
+          arquivo_base64: string | null
           ativo: boolean | null
+          cnpj_cpf: string | null
           created_at: string | null
           empresa_id: string | null
           id: string
           issuer: string | null
+          senha_encriptada: string | null
           subject: string | null
           thumbprint: string | null
           valid_from: string | null
           valid_to: string | null
         }
         Insert: {
+          arquivo_base64?: string | null
           ativo?: boolean | null
+          cnpj_cpf?: string | null
           created_at?: string | null
           empresa_id?: string | null
           id?: string
           issuer?: string | null
+          senha_encriptada?: string | null
           subject?: string | null
           thumbprint?: string | null
           valid_from?: string | null
           valid_to?: string | null
         }
         Update: {
+          arquivo_base64?: string | null
           ativo?: boolean | null
+          cnpj_cpf?: string | null
           created_at?: string | null
           empresa_id?: string | null
           id?: string
           issuer?: string | null
+          senha_encriptada?: string | null
           subject?: string | null
           thumbprint?: string | null
           valid_from?: string | null
