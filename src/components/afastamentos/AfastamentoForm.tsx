@@ -158,7 +158,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
           {historicoRecente.length > 0 && (
             <div className="mt-2 p-3 bg-blue-50/50 border border-blue-100 rounded-lg animate-in fade-in slide-in-from-top-1">
               <div className="flex items-center gap-2 mb-2 text-blue-700">
-                <History className="h-3 w-3" />
+                <HistoryIcon className="h-3 w-3" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Afastamentos Recentes (60 dias)</span>
               </div>
               <div className="space-y-1.5">
