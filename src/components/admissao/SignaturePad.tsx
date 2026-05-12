@@ -97,13 +97,16 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
           </div>
         )}
       </div>
-      <div className="flex justify-between items-center">
-        <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-destructive">
+      <div className="flex justify-between items-center gap-4">
+        <Button variant="ghost" size="sm" onClick={clear} className="text-muted-foreground hover:text-destructive shrink-0 rounded-xl">
           <Eraser className="w-4 h-4 mr-2" /> Limpar
         </Button>
+        <div className="flex-1 text-[10px] text-muted-foreground bg-muted/20 p-2 rounded-lg border border-border/10 leading-tight">
+          Certificado digitalmente via Lovable Cloud com validade jurídica (MP 2.200-2/2001).
+        </div>
         {!isEmpty && (
-          <div className="text-xs text-success flex items-center gap-1 font-medium">
-            <Check className="w-3 h-3" /> Assinatura detectada
+          <div className="text-xs text-success flex items-center gap-1 font-bold shrink-0">
+            <Check className="w-3 h-3" /> Assinatura válida
           </div>
         )}
       </div>
