@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
 import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
+import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
 
 
 const tiposEvento = [
@@ -500,10 +501,17 @@ export default function ESocialPage() {
         </TabsContent>
 
         <TabsContent value="timeline">
-          <Card className="border border-border/30 rounded-2xl overflow-hidden p-12 text-center text-muted-foreground">
-             <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
-             <p className="font-bold">Timeline Auditável</p>
-             <p className="text-sm">Rastreabilidade completa de todas as transmissões e retornos do governo.</p>
+          <Card className="border border-border/30 rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+            <CardHeader>
+              <CardTitle className="font-display flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" /> Histórico de Eventos & Transmissões
+              </CardTitle>
+              <CardDescription>Rastreabilidade completa de todas as ações no módulo eSocial</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ESocialTimeline eventos={eventos} />
+            </CardContent>
           </Card>
         </TabsContent>
 
