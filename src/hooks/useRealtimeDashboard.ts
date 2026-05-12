@@ -15,6 +15,7 @@ const TABLE_LABELS: Record<string, string> = {
   folhas_pagamento: '💰 Folha atualizada',
   beneficios: '🎁 Benefício atualizado',
   metas_okrs: '🎯 Meta / OKR atualizada',
+  feedbacks_360: '📈 Novo feedback registrado',
 };
 
 export function useRealtimeDashboard() {
