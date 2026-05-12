@@ -10,7 +10,7 @@ export {
   validarS2190, validarS2200, validarS2205, validarS2206, 
   validarS2230, validarS2299, validarS2300, validarS2306, 
   validarS2399, validarS2400, validarS3000 
-} from './naoPeriodicosValidators';
+} from './naoPeriodicosValidators.tsx';
 export { validarS2210, validarS2220, validarS2240 } from './sstValidators';
 export { validarRubricaESocial, sugerirCorrecaoRubrica } from './rubricaValidator';
 
@@ -23,7 +23,7 @@ import {
   validarS2190, validarS2200, validarS2205, validarS2206, 
   validarS2230, validarS2299, validarS2300, validarS2306, 
   validarS2399, validarS2400, validarS3000 
-} from './naoPeriodicosValidators';
+} from './naoPeriodicosValidators.tsx';
 import { validarS2210, validarS2220, validarS2240 } from './sstValidators';
 
 const validadores: Record<string, (dados: Record<string, any>) => ValidationResult> = {
