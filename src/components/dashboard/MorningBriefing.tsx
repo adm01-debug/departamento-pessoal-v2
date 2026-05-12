@@ -49,6 +49,7 @@ function useMorningBriefing() {
         { data: asoData },
         { count: totalAtivos },
         { count: pontosHoje },
+        { data: esocialData },
       ] = await Promise.all([
         supabase.from('colaboradores').select('nome_completo, data_nascimento').eq('status', 'ativo').not('data_nascimento', 'is', null),
         supabase.from('ferias').select('data_inicio, data_fim, colaboradores!fk_ferias_colaborador(nome_completo)').in('status', ['aprovada', 'em_andamento']).lte('data_inicio', hojeStr).gte('data_fim', hojeStr),
