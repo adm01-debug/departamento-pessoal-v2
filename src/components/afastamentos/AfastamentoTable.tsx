@@ -156,9 +156,25 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onT
                 )}
               </TableCell>
               <TableCell>
-                <Badge className={`capitalize shadow-none ${statusColors[af.status] || 'bg-muted text-muted-foreground'}`}>
-                  {af.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className={`capitalize shadow-none ${statusColors[af.status] || 'bg-muted text-muted-foreground'}`}>
+                    {af.status}
+                  </Badge>
+                  {af.documentos_count > 0 && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary">
+                            <FileText className="h-3 w-3" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{af.documentos_count} documento(s) anexado(s)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 <DropdownMenu>
