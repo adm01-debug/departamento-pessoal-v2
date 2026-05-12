@@ -341,18 +341,46 @@ export default function AfastamentosPage() {
               </CardContent>
             </Card>
 
-            <Card className="border border-border/50 shadow-sm rounded-xl bg-muted/20">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">Resumo Mensal</CardTitle>
+            <Card className="border border-border/50 shadow-sm rounded-xl bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                  <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                  Volume Mensal
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground font-medium">Total de Dias Pagos</span>
-                  <span className="font-bold">{afastamentos.reduce((acc, a) => acc + (a.dias_empresa || 0), 0)} d</span>
+              <CardContent>
+                <div className="h-[120px] w-full mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{fontSize: 9, fill: '#888'}} 
+                        interval={1}
+                      />
+                      <RechartsTooltip 
+                        contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        cursor={{fill: '#f5f5f5'}}
+                      />
+                      <Bar dataKey="total" radius={[4, 4, 0, 0]}>
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index === new Date().getMonth() ? '#ef4444' : '#fca5a5'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground font-medium">Casos de INSS</span>
-                  <span className="text-warning font-bold">{afastamentos.filter(a => a.dias_inss > 0).length}</span>
+                <div className="mt-4 space-y-3 pt-2 border-t">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                    <span className="text-muted-foreground">Impacto Direto</span>
+                    <span className="text-foreground">{afastamentos.reduce((acc, a) => acc + (a.dias_empresa || 0), 0)} dias pagos</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                    <span className="text-muted-foreground">Previdência</span>
+                    <span className="text-orange-600">{afastamentos.filter(a => a.dias_inss > 0).length} casos ativos</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
