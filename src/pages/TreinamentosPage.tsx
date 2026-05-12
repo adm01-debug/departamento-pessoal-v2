@@ -19,7 +19,7 @@ import { catalogoCursoService } from '@/services/catalogoCursoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link, Calendar, CheckCircle2, Clock, Search, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link, Calendar, CheckCircle2, Clock, Search, ChevronRight, MoreHorizontal, Video, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -168,6 +168,7 @@ export default function TreinamentosPage() {
   const { data: cursos = [], isLoading: loadCursos } = useQuery({ queryKey: ['catalogo_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarCursos(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: trilhas = [], isLoading: loadTrilhas } = useQuery({ queryKey: ['trilhas', empresaAtual?.id], queryFn: () => catalogoCursoService.listarTrilhas(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: instancias = [], isLoading: loadInst } = useQuery({ queryKey: ['treinamento_instancias', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInstancias(), enabled: !!empresaAtual?.id });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   // === Treinamentos ===
@@ -192,10 +193,10 @@ export default function TreinamentosPage() {
 
   // === Trilhas ===
   const [openTrilha, setOpenTrilha] = useState(false);
-  const [trilhaForm, setTrilhaForm] = useState({ nome: '', descricao: '', nivel: 'basico' });
+  const [trilhaForm, setTrilhaForm] = useState({ titulo: '', descricao: '', nivel: 'basico' });
   const criarTrilha = useMutation({
     mutationFn: () => catalogoCursoService.criarTrilha({ ...trilhaForm, empresa_id: empresaAtual?.id }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); setOpenTrilha(false); setTrilhaForm({ nome: '', descricao: '', nivel: 'basico' }); toast.success('Trilha criada!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); setOpenTrilha(false); setTrilhaForm({ titulo: '', descricao: '', nivel: 'basico' }); toast.success('Trilha criada!'); },
     onError: () => toast.error('Erro ao criar trilha'),
   });
   const excluirTrilha = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirTrilha(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); toast.success('Trilha excluída'); } });
@@ -209,17 +210,18 @@ export default function TreinamentosPage() {
     onError: () => toast.error('Erro ao inscrever'),
   });
 
-  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc;
+  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc || loadInst;
 
   return (
-    <PageLayout title="Treinamentos" description="Gestão de treinamentos e desenvolvimento" icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary">
+    <PageLayout title="Treinamentos 10/10" description="Gestão de treinamentos e desenvolvimento" icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
         <Card><CardContent className="pt-4 text-center"><Calendar className="h-6 w-6 mx-auto text-accent mb-1" /><p className="text-2xl font-bold">{treinamentos.length}</p><p className="text-xs text-muted-foreground">Treinamentos</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><BookOpen className="h-6 w-6 mx-auto text-primary mb-1" /><p className="text-2xl font-bold">{cursos.length}</p><p className="text-xs text-muted-foreground">Cursos</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><Award className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{cursos.filter((c: any) => c.obrigatorio).length}</p><p className="text-xs text-muted-foreground">Obrigatórios</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><GraduationCap className="h-6 w-6 mx-auto text-warning mb-1" /><p className="text-2xl font-bold">{trilhas.length}</p><p className="text-xs text-muted-foreground">Trilhas</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><Users className="h-6 w-6 mx-auto text-info mb-1" /><p className="text-2xl font-bold">{inscricoes.length}</p><p className="text-xs text-muted-foreground">Inscrições</p></CardContent></Card>
+        <Card><CardContent className="pt-4 text-center"><Video className="h-6 w-6 mx-auto text-purple-500 mb-1" /><p className="text-2xl font-bold">{instancias.length}</p><p className="text-xs text-muted-foreground">Turmas</p></CardContent></Card>
       </div>
 
       {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : (
@@ -229,6 +231,7 @@ export default function TreinamentosPage() {
             <TabsTrigger value="catalogo">Catálogo</TabsTrigger>
             <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
             <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
+            <TabsTrigger value="turmas">Turmas / Instâncias</TabsTrigger>
           </TabsList>
 
           {/* TREINAMENTOS */}
@@ -326,7 +329,7 @@ export default function TreinamentosPage() {
                 <DialogContent>
                   <DialogHeader><DialogTitle>Nova Trilha de Aprendizado</DialogTitle></DialogHeader>
                   <div className="grid gap-3">
-                    <div><Label>Nome *</Label><Input value={trilhaForm.nome} onChange={e => setTrilhaForm(p => ({ ...p, nome: e.target.value }))} /></div>
+                    <div><Label>Título *</Label><Input value={trilhaForm.titulo} onChange={e => setTrilhaForm(p => ({ ...p, titulo: e.target.value }))} /></div>
                     <div><Label>Nível</Label>
                       <Select value={trilhaForm.nivel} onValueChange={v => setTrilhaForm(p => ({ ...p, nivel: v }))}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
@@ -334,7 +337,7 @@ export default function TreinamentosPage() {
                       </Select>
                     </div>
                     <div><Label>Descrição</Label><Textarea value={trilhaForm.descricao} onChange={e => setTrilhaForm(p => ({ ...p, descricao: e.target.value }))} /></div>
-                    <Button onClick={() => criarTrilha.mutate()} disabled={!trilhaForm.nome || criarTrilha.isPending}>{criarTrilha.isPending ? 'Salvando...' : 'Salvar'}</Button>
+                    <Button onClick={() => criarTrilha.mutate()} disabled={!trilhaForm.titulo || criarTrilha.isPending}>{criarTrilha.isPending ? 'Salvando...' : 'Salvar'}</Button>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -344,7 +347,7 @@ export default function TreinamentosPage() {
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="font-medium">{t.nome}</p>
+                      <p className="font-medium">{t.titulo}</p>
                       <p className="text-xs text-muted-foreground">{t.nivel || '—'} • {t.descricao || 'Sem descrição'}</p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => excluirTrilha.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -383,19 +386,37 @@ export default function TreinamentosPage() {
               </Dialog>
             </div>
             <Card><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Curso</TableHead><TableHead>Status</TableHead><TableHead>Data Início</TableHead><TableHead>Conclusão</TableHead></TableRow></TableHeader>
+              <Table><TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Curso</TableHead><TableHead>Status</TableHead><TableHead>Data Início</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {inscricoes.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma inscrição registrada</TableCell></TableRow> :
+                  {inscricoes.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma inscrição registrada</TableCell></TableRow> :
                     inscricoes.map((i: any) => (
                       <TableRow key={i.id}>
                         <TableCell>{i.colaborador?.nome_completo || '—'}</TableCell>
                         <TableCell>{i.curso?.nome || '—'}</TableCell>
                         <TableCell><Badge variant={i.status === 'concluido' ? 'default' : 'secondary'}>{i.status || 'inscrito'}</Badge></TableCell>
                         <TableCell>{i.data_inicio || '—'}</TableCell>
-                        <TableCell>{i.data_conclusao || '—'}</TableCell>
                       </TableRow>
                     ))
                   }
+                </TableBody>
+              </Table>
+            </CardContent></Card>
+          </TabsContent>
+
+          {/* TURMAS */}
+          <TabsContent value="turmas">
+            <Card><CardContent className="p-0">
+              <Table><TableHeader><TableRow><TableHead>Curso</TableHead><TableHead>Instrutor</TableHead><TableHead>Início</TableHead><TableHead>Status</TableHead><TableHead>Vagas</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {instancias.map((i: any) => (
+                    <TableRow key={i.id}>
+                      <TableCell className="font-medium">{i.curso?.nome || '—'}</TableCell>
+                      <TableCell>{i.instrutor?.nome_completo || '—'}</TableCell>
+                      <TableCell>{new Date(i.data_inicio).toLocaleDateString('pt-BR')}</TableCell>
+                      <TableCell><Badge variant="outline">{i.status}</Badge></TableCell>
+                      <TableCell>{i.capacidade_maxima || '—'}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent></Card>

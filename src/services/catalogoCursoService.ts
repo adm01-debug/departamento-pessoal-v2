@@ -25,7 +25,7 @@ export const catalogoCursoService = {
     if (error) throw error;
   },
   async listarTrilhas(empresaId?: string) {
-    let q = supabase.from('trilhas_aprendizado').select('*').order('nome');
+    let q = supabase.from('trilhas_aprendizado').select('*').order('titulo');
     if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
@@ -73,5 +73,31 @@ export const catalogoCursoService = {
   async desvincularCursoTrilha(id: string) {
     const { error } = await supabase.from('trilhas_cursos' as any).delete().eq('id', id);
     if (error) throw error;
+  },
+
+  // === Instâncias / Turmas ===
+  async listarInstancias(cursoId?: string) {
+    let q = supabase.from('treinamento_instancias').select('*, curso:catalogo_cursos!treinamento_instancias_curso_id_fkey(nome), instrutor:colaboradores!treinamento_instancias_instrutor_id_fkey(nome_completo)').order('data_inicio', { ascending: true });
+    if (cursoId) q = q.eq('curso_id', cursoId);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  },
+  async criarInstancia(d: any) {
+    const { data, error } = await supabase.from('treinamento_instancias').insert(d).select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+  async atualizarInstancia(id: string, d: any) {
+    const { data, error } = await supabase.from('treinamento_instancias').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  // === Feedback ===
+  async registrarFeedback(d: { inscricao_id: string; nota_satisfacao: number; comentario?: string; aplicabilidade_nota?: number }) {
+    const { data, error } = await supabase.from('treinamento_feedback').insert(d).select().maybeSingle();
+    if (error) throw error;
+    return data;
   },
 };

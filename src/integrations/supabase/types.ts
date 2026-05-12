@@ -13796,6 +13796,109 @@ export type Database = {
           },
         ]
       }
+      treinamento_feedback: {
+        Row: {
+          aplicabilidade_nota: number | null
+          comentario: string | null
+          created_at: string
+          id: string
+          inscricao_id: string | null
+          nota_satisfacao: number | null
+        }
+        Insert: {
+          aplicabilidade_nota?: number | null
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          inscricao_id?: string | null
+          nota_satisfacao?: number | null
+        }
+        Update: {
+          aplicabilidade_nota?: number | null
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          inscricao_id?: string | null
+          nota_satisfacao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinamento_feedback_inscricao_id_fkey"
+            columns: ["inscricao_id"]
+            isOneToOne: false
+            referencedRelation: "inscricoes_cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treinamento_instancias: {
+        Row: {
+          capacidade_maxima: number | null
+          created_at: string
+          curso_id: string | null
+          data_fim: string | null
+          data_inicio: string
+          id: string
+          instrutor_id: string | null
+          local_link: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          capacidade_maxima?: number | null
+          created_at?: string
+          curso_id?: string | null
+          data_fim?: string | null
+          data_inicio: string
+          id?: string
+          instrutor_id?: string | null
+          local_link?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          capacidade_maxima?: number | null
+          created_at?: string
+          curso_id?: string | null
+          data_fim?: string | null
+          data_inicio?: string
+          id?: string
+          instrutor_id?: string | null
+          local_link?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinamento_instancias_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "catalogo_cursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_instancias_instrutor_id_fkey"
+            columns: ["instrutor_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_instancias_instrutor_id_fkey"
+            columns: ["instrutor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_instancias_instrutor_id_fkey"
+            columns: ["instrutor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       treinamento_participantes: {
         Row: {
           colaborador_id: string
