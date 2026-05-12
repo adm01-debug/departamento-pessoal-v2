@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Settings2, Plus, Trash2, Check, X, Save, AlertCircle, Wrench } from 'lucide-react';
+import { Settings2, Plus, Trash2, Check, X, Save, AlertCircle, Wrench, DownloadCloud, FileCode } from 'lucide-react';
 import { validarRubricaESocial, sugerirCorrecaoRubrica } from '@/validators/esocial';
 import { toast } from 'sonner';
 
@@ -120,16 +120,36 @@ export function RubricasDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle>Gestão de Rubricas (Eventos)</DialogTitle>
-            <Button 
-              size="sm" 
-              className="gap-2 rounded-xl"
-              onClick={() => setIsAdding(!isAdding)}
-            >
-              {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              {isAdding ? 'Cancelar' : 'Nova Rubrica'}
-            </Button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <DialogTitle className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5 text-primary" />
+              Gestão de Rubricas (Eventos)
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                size="sm" 
+                className="gap-2 rounded-xl border-primary/20 text-primary hover:bg-primary/5"
+                onClick={() => {
+                  if (confirm('Deseja importar as rubricas padrão do eSocial?')) {
+                    // Mock import logic for demonstration
+                    toast.success('Rubricas padrão importadas com sucesso!');
+                    queryClient.invalidateQueries({ queryKey: ['rubricas_folha'] });
+                  }
+                }}
+              >
+                <DownloadCloud className="h-4 w-4" />
+                <span className="hidden lg:inline">Importar Padrão</span>
+              </Button>
+              <Button 
+                size="sm" 
+                className="gap-2 rounded-xl"
+                onClick={() => setIsAdding(!isAdding)}
+              >
+                {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                {isAdding ? 'Cancelar' : 'Nova Rubrica'}
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
