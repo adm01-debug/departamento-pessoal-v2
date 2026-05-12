@@ -207,11 +207,20 @@ export default function ESocialPage() {
             </div>
             
             <div className="flex flex-wrap items-center gap-2">
-              <div className="relative w-full md:w-64">
+              <div className="flex items-center gap-2 bg-muted/20 p-1 rounded-xl border">
+                <Calendar className="h-4 w-4 text-muted-foreground ml-2" />
+                <Input 
+                  type="month" 
+                  value={selectedCompetencia}
+                  onChange={(e) => setSelectedCompetencia(e.target.value)}
+                  className="border-none bg-transparent h-7 w-32 focus-visible:ring-0 text-xs font-bold"
+                />
+              </div>
+              <div className="relative w-full md:w-48">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Buscar evento ou protocolo..." 
-                  className="pl-9 rounded-xl h-9" 
+                  placeholder="Buscar evento..." 
+                  className="pl-9 rounded-xl h-9 text-xs" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
