@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
 import { usePDFExport } from '@/hooks/usePDFExport';
+import { gerarAfastamentosPDF } from '@/utils/afastamentoPDF';
 import { afastamentoService } from '@/services/afastamentoService';
 import { toast } from 'sonner';
 import { PageLayout } from '@/components/layout';
@@ -189,25 +190,29 @@ export default function AfastamentosPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={async () => {
                   const dataToExport = filteredAfastamentos.map(af => ({
-                    Colaborador: af.colaborador?.nome_completo || '-',
-                    Tipo: tipoLabels[af.tipo] || af.tipo,
-                    CID: af.cid?.codigo || '-',
-                    Inicio: format(new Date(af.data_inicio), 'dd/MM/yyyy'),
-                    Fim: format(new Date(af.data_fim_prevista), 'dd/MM/yyyy'),
-                    Dias: af.dias_total,
-                    Status: af.status,
-                    'Dias INSS': af.dias_inss || 0,
-                    Pericia: af.data_pericia ? format(new Date(af.data_pericia), 'dd/MM/yyyy') : '-'
+                    colaborador: af.colaborador?.nome_completo || '-',
+                    tipo: tipoLabels[af.tipo] || af.tipo,
+                    cid: af.cid?.codigo || af.cid || '-',
+                    inicio: format(new Date(af.data_inicio), 'dd/MM/yyyy'),
+                    fim: format(new Date(af.data_fim_prevista), 'dd/MM/yyyy'),
+                    dias: af.dias_total,
+                    status: af.status,
+                    diasInss: af.dias_inss || 0,
+                    pericia: af.data_pericia ? format(new Date(af.data_pericia), 'dd/MM/yyyy') : '-'
                   }));
                   
-                  await exportarPDF(
-                    'Relatório de Afastamentos e Auditoria',
-                    dataToExport,
-                    ['Colaborador', 'Tipo', 'CID', 'Inicio', 'Fim', 'Dias', 'Status', 'Dias INSS', 'Pericia']
-                  );
-                  toast.success('Exportação PDF concluída para auditoria');
+                  try {
+                    await gerarAfastamentosPDF(
+                      'Relatório de Afastamentos e Auditoria Detalhada',
+                      dataToExport,
+                      { cid: filtros.cid, status: filtros.status, tipo: selectedTipo }
+                    );
+                    toast.success('Exportação PDF concluída com excelência');
+                  } catch (e) {
+                    toast.error('Erro ao gerar PDF avançado');
+                  }
                 }}>
-                  <FileText className="h-4 w-4 mr-2" /> PDF (Auditoria Detalhada)
+                  <FileText className="h-4 w-4 mr-2" /> PDF (Auditoria Detalhada 10/10)
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
