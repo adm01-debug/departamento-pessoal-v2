@@ -149,13 +149,13 @@ export const pontoService = {
   },
 
   async buscarRegistroHoje(colaboradorId: string) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = format(new Date(), 'yyyy-MM-dd');
     const { data, error } = await supabase
-      .from('registros_ponto')
+      .from('batidas_ponto')
       .select('*')
       .eq('colaborador_id', colaboradorId)
       .eq('data', today)
-      .maybeSingle();
+      .order('ordem', { ascending: true });
     if (error) throw error;
     return data;
   },
