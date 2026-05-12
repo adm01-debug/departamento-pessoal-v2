@@ -98,15 +98,35 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
           )}
         </Button>
 
+        {Object.keys(fields).length > 0 && (
+          <div className="space-y-3 p-4 bg-muted/30 rounded-xl border border-border/10">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Check className="h-3 w-3 text-success" /> Campos Identificados
+            </h4>
+            <div className="grid gap-3">
+              {Object.entries(fields).map(([key, val]) => (
+                <div key={key} className="space-y-1">
+                  <Label className="text-[10px] uppercase opacity-60 capitalize">{key.replace(/_/g, ' ')}</Label>
+                  <Input 
+                    value={val} 
+                    onChange={(e) => setFields(p => ({ ...p, [key]: e.target.value }))}
+                    className="h-8 text-xs rounded-lg"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {extractedText && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="font-body flex items-center gap-1"><FileText className="h-4 w-4" /> Texto Extraído</Label>
+              <Label className="font-body flex items-center gap-1"><FileText className="h-4 w-4" /> Log do Processamento</Label>
               <Button variant="ghost" size="sm" onClick={copyText} className="gap-1 font-body">
                 <Copy className="h-3 w-3" />Copiar
               </Button>
             </div>
-            <Textarea value={extractedText} readOnly className="rounded-xl min-h-[120px] text-sm font-mono" />
+            <Textarea value={extractedText} readOnly className="rounded-xl min-h-[100px] text-xs font-mono opacity-60" />
           </div>
         )}
       </CardContent>
