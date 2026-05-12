@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Clock, Zap, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Clock, Zap, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Inconsistency {
   id: string;
   colaborador: string;
   data: string;
-  tipo: 'forgotten_out' | 'short_break' | 'geofence' | 'excessive_overtime';
+  tipo: 'forgotten_out' | 'short_break' | 'geofence' | 'excessive_overtime' | 'fatigue_risk';
   descricao: string;
   gravidade: 'high' | 'medium' | 'low';
 }
@@ -72,6 +72,34 @@ export function PontoInconsistencyPanel({ registros }: { registros: any[] }) {
         }
       }
     });
+    
+    // 4. Predictive Fatigue (Last 7 days excessive overtime)
+    const overtimeByColab: Record<string, { mins: number, count: number, name: string }> = {};
+    registros.forEach(r => {
+      if (r.horas_extras) {
+        const match = String(r.horas_extras).match(/(\d+):(\d+)/);
+        if (match) {
+          const mins = parseInt(match[1]) * 60 + parseInt(match[2]);
+          const colabId = r.colaborador_id;
+          if (!overtimeByColab[colabId]) overtimeByColab[colabId] = { mins: 0, count: 0, name: r.colaborador?.nome_completo || 'Colaborador' };
+          overtimeByColab[colabId].mins += mins;
+          overtimeByColab[colabId].count++;
+        }
+      }
+    });
+
+    Object.entries(overtimeByColab).forEach(([id, data]) => {
+      if (data.mins > 480) { // More than 8 hours of overtime in the filtered period
+        list.push({
+          id: `fatigue-${id}`,
+          colaborador: data.name,
+          data: 'Alertas IA',
+          tipo: 'fatigue_risk',
+          descricao: `Risco de Fadiga: ${Math.round(data.mins / 60)}h extras no período (Prevenção Burnout)`,
+          gravidade: 'medium'
+        });
+      }
+    });
 
     return list;
   };
@@ -101,9 +129,10 @@ export function PontoInconsistencyPanel({ registros }: { registros: any[] }) {
               className="bg-background/80 p-2 rounded-lg border border-border/40 flex items-start gap-3"
             >
               <div className={`mt-0.5 p-1.5 rounded-full ${
+                inc.tipo === 'fatigue_risk' ? 'bg-info/10 text-info' : 
                 inc.gravidade === 'high' ? 'bg-destructive/10 text-destructive' : 'bg-warning/10 text-warning'
               }`}>
-                <AlertTriangle className="h-3 w-3" />
+                {inc.tipo === 'fatigue_risk' ? <ShieldAlert className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between mb-0.5">
