@@ -24,6 +24,21 @@ export const afastamentoService = {
     if (error) throw error;
     return data || [];
   },
+  
+  async listarHistoricoRecente(colaboradorId: string, dias: number = 60) {
+    const dataLimite = new Date();
+    dataLimite.setDate(dataLimite.getDate() - dias);
+    
+    const { data, error } = await supabase
+      .from('afastamentos')
+      .select('*, cid:cid10(codigo, descricao)')
+      .eq('colaborador_id', colaboradorId)
+      .gte('data_inicio', dataLimite.toISOString().split('T')[0])
+      .order('data_inicio', { ascending: false });
+      
+    if (error) throw error;
+    return data || [];
+  },
 
   async buscarPorId(id: string) {
     const { data, error } = await supabase
