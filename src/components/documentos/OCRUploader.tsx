@@ -43,8 +43,9 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
 
       if (result.success && result.extractedText) {
         setExtractedText(result.extractedText);
+        setFields(result.mappedFields || {});
         onTextExtracted?.(result.extractedText, docType);
-        toast.success('Texto extraído com sucesso!');
+        toast.success('Texto extraído e mapeado com sucesso!');
       } else {
         throw new Error(result.error || 'Nenhum texto extraído');
       }
