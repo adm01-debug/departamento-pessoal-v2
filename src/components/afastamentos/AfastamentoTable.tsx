@@ -48,11 +48,18 @@ interface AfastamentoTableProps {
 
 export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onTimeline }: AfastamentoTableProps) {
   const { excluir } = useAfastamentos();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleExcluir = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este registro?')) {
       await excluir(id);
     }
+  };
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
