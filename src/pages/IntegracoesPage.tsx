@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { bitrix24Service } from '@/services/tabelasComplementaresService';
 import { cnabService, webhookService } from '@/services/integracaoService';
 import { toast } from 'sonner';
+import { whatsappService, WhatsAppConfig } from '@/services/whatsappService';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 interface Integracao {
   id: string;
@@ -284,10 +286,102 @@ function WebhookConfigPanel() {
   );
 }
 
+function WhatsAppConfigPanel() {
+  const { empresaAtual } = useEmpresas();
+  const [loading, setLoading] = useState(false);
+  const [config, setConfig] = useState<Partial<WhatsAppConfig>>({
+    instancia_url: '',
+    api_key: '',
+    instancia_nome: 'default',
+    notificar_ponto: true,
+    notificar_ferias: true,
+    notificar_holerite: true
+  });
+
+  const { data: existingConfig, isLoading } = useQuery({
+    queryKey: ['whatsapp_config', empresaAtual?.id],
+    queryFn: () => whatsappService.getConfig(empresaAtual!.id),
+    enabled: !!empresaAtual?.id
+  });
+
+  useState(() => {
+    if (existingConfig) setConfig(existingConfig);
+  });
+
+  const salvar = async () => {
+    if (!empresaAtual?.id) return;
+    setLoading(true);
+    try {
+      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id });
+      toast.success('Configuração de WhatsApp salva!');
+    } catch (e) {
+      toast.error('Erro ao salvar configuração');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isLoading) return <Spinner />;
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="grid gap-4 max-w-lg">
+        <div className="space-y-2">
+          <Label>URL da Instância (Evolution API)</Label>
+          <Input 
+            value={config.instancia_url || ''} 
+            onChange={e => setConfig(p => ({ ...p, instancia_url: e.target.value }))} 
+            placeholder="https://sua-api.com" 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>API Key</Label>
+          <Input 
+            type="password"
+            value={config.api_key || ''} 
+            onChange={e => setConfig(p => ({ ...p, api_key: e.target.value }))} 
+            placeholder="Sua chave secreta" 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Nome da Instância</Label>
+          <Input 
+            value={config.instancia_nome || ''} 
+            onChange={e => setConfig(p => ({ ...p, instancia_nome: e.target.value }))} 
+            placeholder="default" 
+          />
+        </div>
+        
+        <div className="pt-4 space-y-4">
+          <h4 className="text-sm font-semibold border-b pb-2">Notificações Automáticas</h4>
+          <div className="flex items-center justify-between">
+            <Label>Notificar registro de ponto</Label>
+            <Switch checked={config.notificar_ponto} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ponto: v }))} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Notificar aviso de férias</Label>
+            <Switch checked={config.notificar_ferias} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ferias: v }))} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Notificar liberação de holerite</Label>
+            <Switch checked={config.notificar_holerite} onCheckedChange={v => setConfig(p => ({ ...p, notificar_holerite: v }))} />
+          </div>
+        </div>
+
+        <Button onClick={salvar} disabled={loading} className="w-full rounded-xl mt-4">
+          {loading ? 'Salvando...' : 'Salvar e Ativar Integração'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function IntegracoesPage() {
   const [bitrixOpen, setBitrixOpen] = useState(false);
   const [cnabOpen, setCnabOpen] = useState(false);
   const [webhookOpen, setWebhookOpen] = useState(false);
+  const [whatsappOpen, setWhatsappOpen] = useState(false);
+  const { empresaAtual } = useEmpresas();
 
   return (
     <PageLayout title="Integrações" description="Conecte o sistema a serviços externos" icon={<Plug className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/80 to-primary">
@@ -318,6 +412,40 @@ export default function IntegracoesPage() {
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                   <DialogHeader><DialogTitle>Bitrix24 — Configuração</DialogTitle></DialogHeader>
                   <Bitrix24ConfigPanel />
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* WhatsApp Card */}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="group border border-border/30 rounded-2xl hover:shadow-elevated hover:border-border/60 transition-all overflow-hidden relative">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-success to-success/60" />
+            <CardHeader className="pb-2">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">💬</span>
+                  <CardTitle className="font-display text-base">WhatsApp (Evolution)</CardTitle>
+                </div>
+                <Badge variant="outline" className="text-[10px] gap-1 bg-muted text-muted-foreground">
+                  <Settings className="h-3 w-3" />Configurável
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground font-body mb-4">Envio de holerites, alertas de ponto e notificações automáticas via WhatsApp</p>
+              <Dialog open={whatsappOpen} onOpenChange={setWhatsappOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full rounded-xl border-border/40 hover:bg-muted font-body transition-colors">
+                    Configurar Integração
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden rounded-2xl">
+                  <DialogHeader className="p-6 bg-muted/20 border-b border-border/10">
+                    <DialogTitle className="font-display">Integração WhatsApp — Evolution API</DialogTitle>
+                  </DialogHeader>
+                  <WhatsAppConfigPanel />
                 </DialogContent>
               </Dialog>
             </CardContent>

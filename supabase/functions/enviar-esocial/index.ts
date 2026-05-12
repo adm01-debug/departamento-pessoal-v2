@@ -11,8 +11,7 @@ type EventoESocial = 'S-1000' | 'S-1005' | 'S-1010' | 'S-1020' | 'S-1200' | 'S-1
 
 interface EnviarESocialRequest {
   empresaId: string;
-  eventoId?: string; // If already created in DB
-  tipoEvento?: EventoESocial;
+  eventoId?: string;
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -22,6 +21,12 @@ serve(async (req: Request): Promise<Response> => {
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
     const { empresaId, eventoId }: EnviarESocialRequest = await req.json();
 
+    const { data: config } = await supabase
+      .from('configuracoes_esocial')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+
     const { data: evento, error: eError } = await supabase
       .from('esocial_eventos')
       .select('*, empresa:empresas(*)')
@@ -30,24 +35,25 @@ serve(async (req: Request): Promise<Response> => {
 
     if (eError || !evento) throw new Error('Evento não encontrado');
 
-    // Real-ish XML Generation and Signing
-    const xmlBase = montarXMLEvento(evento.tipo_evento, evento.empresa, evento.dados, evento.competencia);
-    const { xmlAssinado, assinatura, hash } = await assinarXMLEsocial(xmlBase, evento.empresa.id);
+    const ambiente = config?.ambiente || '2';
+    const certificadoId = config?.certificado_id || evento.empresa.id;
 
-    // Real Transmission to Gov (WS-Security / SOAP)
-    // In a real-world scenario, this would be an actual fetch to the eSocial WebService
-    // Using a sophisticated simulation that respects eSocial transmission patterns
-    const transmissionTime = 1500 + Math.random() * 2000;
+    // Real-ish XML Generation and Signing
+    const xmlBase = montarXMLEvento(evento.tipo_evento, evento.empresa, evento.dados, ambiente, evento.competencia);
+    const { xmlAssinado, assinatura, hash } = await assinarXMLEsocial(xmlBase, certificadoId);
+
+    // Simulation of transmission logic
+    const transmissionTime = 1000 + Math.random() * 1000;
     await new Promise(resolve => setTimeout(resolve, transmissionTime));
 
-    const success = Math.random() > 0.05; // 95% success rate for high-excellence simulation
+    const success = Math.random() > 0.05; 
     
     const status = success ? 'enviado' : 'erro';
     const protocolo = success ? `REC-${Date.now()}` : null;
     const erroGov = success ? null : { 
-      mensagem: 'Falha na recepção do evento. O servidor do eSocial retornou erro 401 (Assinatura Inválida ou Certificado Expirado).',
+      mensagem: 'Falha na recepção do evento. O servidor do eSocial retornou erro 401.',
       codigo: '401',
-      detalhes: 'O hash do XML assinado não corresponde aos padrões de segurança do ambiente de produção.'
+      detalhes: 'Assinatura inválida ou ambiente de transmissão incorreto.'
     };
 
     const { error: updError } = await supabase
@@ -61,7 +67,7 @@ serve(async (req: Request): Promise<Response> => {
         xml_retorno: success ? `<retorno><status>200</status><protocolo>${protocolo}</protocolo></retorno>` : null,
         erros: erroGov,
         data_envio: success ? new Date().toISOString() : null,
-      })
+      } as any)
       .eq('id', eventoId);
 
     if (updError) throw updError;
@@ -70,7 +76,7 @@ serve(async (req: Request): Promise<Response> => {
         success, 
         protocolo, 
         error: erroGov?.mensagem,
-        xml: xmlBase
+        xml: xmlAssinado
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (error: any) {
@@ -81,7 +87,7 @@ serve(async (req: Request): Promise<Response> => {
   }
 });
 
-function montarXMLEvento(tipo: string, empresa: any, dados: any, competencia?: string): string {
+function montarXMLEvento(tipo: string, empresa: any, dados: any, ambiente: string, competencia?: string): string {
   const perApur = competencia || new Date().toISOString().slice(0, 7);
   const id = `ID1${empresa.cnpj?.replace(/\D/g, '') || '00000000000000'}${new Date().toISOString().replace(/\D/g, '').slice(0, 14)}`;
   
@@ -99,42 +105,6 @@ function montarXMLEvento(tipo: string, empresa: any, dados: any, competencia?: s
         </infoCadastro>
       </infoEmpregador>`;
       break;
-    case 'S-1200':
-      conteudoEvento = `
-      <ideBenef><cpfBenef>${dados?.cpfTrab || ''}</cpfBenef></ideBenef>
-      <dmDev>
-        <ideDmDev>${dados?.dmDev?.[0]?.ideDmDev || 'DM001'}</ideDmDev>
-        <perApur>${perApur}</perApur>
-        <infoPerApur>
-          <ideEstabLot>
-            <tpInsc>1</tpInsc><nrInsc>${empresa.cnpj?.replace(/\D/g, '') || ''}</nrInsc>
-            <codLotacao>001</codLotacao>
-            ${(dados?.dmDev?.[0]?.infoPerApur?.ideEstabLot?.[0]?.detVerbas || []).map((v: any) => `
-            <detVerbas>
-              <codRubr>${v.codRubr}</codRubr><ideTabRubr>001</ideTabRubr><vrRubr>${v.vrRubr}</vrRubr>
-            </detVerbas>`).join('')}
-          </ideEstabLot>
-        </infoPerApur>
-      </dmDev>`;
-      break;
-    case 'S-2200':
-      conteudoEvento = `
-      <trabalhador>
-        <cpfTrab>${dados?.cpfTrab || ''}</cpfTrab><nmTrab>${dados?.nmTrab || ''}</nmTrab><sexo>M</sexo><racaCor>1</racaCor><estCiv>1</estCiv><grauInstr>01</grauInstr>
-        <nascimento><dtNascto>${dados?.dtNascto || ''}</dtNascto><paisNascto>105</paisNascto></nascimento>
-      </trabalhador>
-      <vinculo>
-        <matricula>${dados?.matricula || '001'}</matricula><tpRegTrab>1</tpRegTrab><tpRegPrev>1</tpRegPrev>
-        <infoPosest><dtAdm>${dados?.dtAdm || ''}</dtAdm></infoPosest>
-      </vinculo>`;
-      break;
-    case 'S-2230':
-      conteudoEvento = `
-      <ideTrabalhador><cpfTrab>${dados?.cpfTrab || ''}</cpfTrab></ideTrabalhador>
-      <infoAfastamento>
-        <dtIniAfast>${dados?.dtIniAfast || ''}</dtIniAfast><codMotAfast>${dados?.codMotAfast || '01'}</codMotAfast>
-      </infoAfastamento>`;
-      break;
     default:
       conteudoEvento = `<dados>${JSON.stringify(dados || {})}</dados>`;
   }
@@ -142,7 +112,7 @@ function montarXMLEvento(tipo: string, empresa: any, dados: any, competencia?: s
   return `<?xml version="1.0" encoding="UTF-8"?>
 <eSocial xmlns="http://www.esocial.gov.br/schema/evt/${tipo}/v_S_01_01_00">
   <evt${tipo.replace('-', '')} Id="${id}">
-    <ideEvento><tpAmb>2</tpAmb><procEmi>1</procEmi><verProc>1.0</verProc></ideEvento>
+    <ideEvento><tpAmb>${ambiente}</tpAmb><procEmi>1</procEmi><verProc>1.0</verProc></ideEvento>
     <ideEmpregador><tpInsc>1</tpInsc><nrInsc>${empresa.cnpj?.replace(/\D/g, '') || ''}</nrInsc></ideEmpregador>
     ${conteudoEvento}
   </evt${tipo.replace('-', '')}>

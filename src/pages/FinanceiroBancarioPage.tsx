@@ -3,7 +3,7 @@ import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Landmark, FileDown, History, Settings, CheckCircle, AlertCircle, Loader2, Download, Plus, Banknote, Globe } from 'lucide-react';
+import { Landmark, FileDown, History, Settings, CheckCircle, AlertCircle, Loader2, Download, Plus, Banknote, Globe, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -24,6 +24,7 @@ export default function FinanceiroBancarioPage() {
   const [folhas, setFolhas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [processingRetorno, setProcessingRetorno] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
@@ -136,6 +137,26 @@ export default function FinanceiroBancarioPage() {
     }
   };
 
+  const handleImportRetorno = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setProcessingRetorno(true);
+      const content = await file.text();
+      const results = await cnabService.parseRetornoCNAB(content);
+      
+      toast.success(`Retorno processado: ${results.sucesso} sucessos, ${results.erro} erros.`);
+      loadData();
+    } catch (error: any) {
+      toast.error('Erro ao processar arquivo de retorno: ' + error.message);
+    } finally {
+      setProcessingRetorno(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
   const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
@@ -221,7 +242,7 @@ export default function FinanceiroBancarioPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
               <div className="h-[2px] bg-gradient-to-r from-info to-primary" />
               <CardHeader>
@@ -229,9 +250,9 @@ export default function FinanceiroBancarioPage() {
                   <div className="p-2 rounded-lg bg-info/10 text-info">
                     <FileDown className="h-5 w-5" />
                   </div>
-                  CNAB 240
+                  Remessa CNAB
                 </CardTitle>
-                <CardDescription>Gere o arquivo de remessa para pagamento de salários via banco</CardDescription>
+                <CardDescription>Gerar arquivo para pagamento de salários</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button 
@@ -239,7 +260,7 @@ export default function FinanceiroBancarioPage() {
                   disabled={generating || !selectedFolha} 
                   className="w-full rounded-xl bg-gradient-to-r from-info to-primary text-primary-foreground font-body h-11"
                 >
-                  {generating ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Download className="h-4 w-4 mr-2" /> Gerar Remessa (CNAB 240)</>}
+                  {generating ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Download className="h-4 w-4 mr-2" /> Gerar Arquivo</>}
                 </Button>
               </CardContent>
             </Card>
@@ -253,7 +274,7 @@ export default function FinanceiroBancarioPage() {
                   </div>
                   PIX em Lote
                 </CardTitle>
-                <CardDescription>Gere o arquivo CSV para pagamento instantâneo em lote</CardDescription>
+                <CardDescription>Gere CSV para pagamento instantâneo</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button 
@@ -262,8 +283,38 @@ export default function FinanceiroBancarioPage() {
                   disabled={generating || !selectedFolha} 
                   className="w-full rounded-xl border-success/30 hover:bg-success/5 text-success font-body h-11"
                 >
-                  {generating ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Plus className="h-4 w-4 mr-2" /> Gerar Lote PIX (CSV)</>}
+                  {generating ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Plus className="h-4 w-4 mr-2" /> Gerar CSV PIX</>}
                 </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
+              <div className="h-[2px] bg-gradient-to-r from-warning to-warning/70" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-warning/10 text-warning">
+                    <Upload className="h-5 w-5" />
+                  </div>
+                  Retorno CNAB
+                </CardTitle>
+                <CardDescription>Importe o arquivo de retorno do banco</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="relative">
+                  <Input 
+                    type="file" 
+                    accept=".ret,.txt" 
+                    onChange={handleImportRetorno}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    disabled={processingRetorno}
+                  />
+                  <Button 
+                    variant="outline"
+                    className="w-full rounded-xl border-warning/30 hover:bg-warning/5 text-warning font-body h-11 pointer-events-none"
+                  >
+                    {processingRetorno ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Upload className="h-4 w-4 mr-2" /> Importar Retorno</>}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>

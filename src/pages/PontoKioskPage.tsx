@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import Webcam from 'react-webcam';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -194,14 +195,19 @@ export default function PontoKioskPage() {
         {step === 'facial_scan' && (
           <Card className="shadow-2xl border-primary/20 overflow-hidden relative group">
             <div className="h-80 bg-slate-900 relative flex items-center justify-center">
+              <Webcam
+                audio={false}
+                height={320}
+                screenshotFormat="image/jpeg"
+                width={448}
+                videoConstraints={{ facingMode: "user" }}
+                className="absolute inset-0 w-full h-full object-cover opacity-60"
+              />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-primary/10" />
               
-              {/* Scan Overlay */}
-              <div className="relative w-64 h-64 border-2 border-primary/30 rounded-3xl flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 border-[1px] border-primary/20 rounded-3xl scale-95 animate-pulse" />
-                <Camera className="h-16 w-16 text-primary/40" />
+              <div className="relative w-64 h-64 border-2 border-primary/40 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 border-[4px] border-primary/20 rounded-full scale-95 animate-pulse" />
                 
-                {/* Scanning Bar */}
                 <motion.div 
                   initial={{ top: 0 }}
                   animate={{ top: '100%' }}
@@ -209,29 +215,27 @@ export default function PontoKioskPage() {
                   className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_rgba(var(--primary),0.5)] z-10"
                 />
 
-                {/* Face Mapping Dots */}
-                <div className="absolute inset-0 grid grid-cols-6 grid-rows-6 opacity-20">
-                  {Array.from({ length: 36 }).map((_, i) => (
+                <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-30">
+                  {Array.from({ length: 64 }).map((_, i) => (
                     <div key={i} className="flex items-center justify-center">
-                      <div className="w-1 h-1 bg-primary rounded-full animate-pulse" style={{ animationDelay: `${i * 0.05}s` }} />
+                      <div className="w-0.5 h-0.5 bg-primary rounded-full" />
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="absolute bottom-6 left-0 right-0 text-center space-y-2">
+              <div className="absolute bottom-6 left-0 right-0 text-center space-y-1">
                 <div className="flex items-center justify-center gap-2">
-                  <span className="relative flex h-3 w-3">
+                  <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  <p className="text-white text-sm font-display font-medium tracking-widest uppercase">Processando Biometria</p>
+                  <p className="text-white text-[10px] font-display font-medium tracking-[0.2em] uppercase">Mapeando Pontos Faciais</p>
                 </div>
-                <p className="text-primary/60 text-[10px] font-mono tracking-tighter">HASH: {Math.random().toString(16).slice(2, 10).toUpperCase()}</p>
               </div>
             </div>
-            <div className="p-4 bg-white border-t border-primary/10 text-center">
-               <p className="text-xs text-muted-foreground animate-pulse">Aguarde o reconhecimento do sistema...</p>
+            <div className="p-4 bg-white dark:bg-slate-900 border-t border-primary/10 text-center">
+               <p className="text-xs text-muted-foreground animate-pulse font-medium">Posicione seu rosto dentro do círculo...</p>
             </div>
           </Card>
         )}

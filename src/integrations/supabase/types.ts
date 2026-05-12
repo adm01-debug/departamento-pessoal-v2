@@ -2320,33 +2320,42 @@ export type Database = {
       }
       certificados_digitais: {
         Row: {
+          arquivo_base64: string | null
           ativo: boolean | null
+          cnpj_cpf: string | null
           created_at: string | null
           empresa_id: string | null
           id: string
           issuer: string | null
+          senha_encriptada: string | null
           subject: string | null
           thumbprint: string | null
           valid_from: string | null
           valid_to: string | null
         }
         Insert: {
+          arquivo_base64?: string | null
           ativo?: boolean | null
+          cnpj_cpf?: string | null
           created_at?: string | null
           empresa_id?: string | null
           id?: string
           issuer?: string | null
+          senha_encriptada?: string | null
           subject?: string | null
           thumbprint?: string | null
           valid_from?: string | null
           valid_to?: string | null
         }
         Update: {
+          arquivo_base64?: string | null
           ativo?: boolean | null
+          cnpj_cpf?: string | null
           created_at?: string | null
           empresa_id?: string | null
           id?: string
           issuer?: string | null
+          senha_encriptada?: string | null
           subject?: string | null
           thumbprint?: string | null
           valid_from?: string | null
@@ -2494,14 +2503,18 @@ export type Database = {
         Row: {
           agencia_favorecido: string | null
           banco_favorecido: string | null
+          codigo_ocorrencia: string | null
           colaborador_id: string | null
           conta_favorecido: string | null
           cpf_cnpj_favorecido: string
           created_at: string | null
           data_pagamento: string
+          folha_item_id: string | null
           id: string
+          mensagem_ocorrencia: string | null
           nome_favorecido: string
           remessa_id: string
+          seu_numero: string | null
           status: string | null
           tipo_pagamento: string | null
           valor_pagamento: number
@@ -2509,14 +2522,18 @@ export type Database = {
         Insert: {
           agencia_favorecido?: string | null
           banco_favorecido?: string | null
+          codigo_ocorrencia?: string | null
           colaborador_id?: string | null
           conta_favorecido?: string | null
           cpf_cnpj_favorecido: string
           created_at?: string | null
           data_pagamento: string
+          folha_item_id?: string | null
           id?: string
+          mensagem_ocorrencia?: string | null
           nome_favorecido: string
           remessa_id: string
+          seu_numero?: string | null
           status?: string | null
           tipo_pagamento?: string | null
           valor_pagamento: number
@@ -2524,14 +2541,18 @@ export type Database = {
         Update: {
           agencia_favorecido?: string | null
           banco_favorecido?: string | null
+          codigo_ocorrencia?: string | null
           colaborador_id?: string | null
           conta_favorecido?: string | null
           cpf_cnpj_favorecido?: string
           created_at?: string | null
           data_pagamento?: string
+          folha_item_id?: string | null
           id?: string
+          mensagem_ocorrencia?: string | null
           nome_favorecido?: string
           remessa_id?: string
+          seu_numero?: string | null
           status?: string | null
           tipo_pagamento?: string | null
           valor_pagamento?: number
@@ -2556,6 +2577,13 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cnab_itens_folha_item_id_fkey"
+            columns: ["folha_item_id"]
+            isOneToOne: false
+            referencedRelation: "folha_itens"
             referencedColumns: ["id"]
           },
           {
@@ -3514,6 +3542,48 @@ export type Database = {
           valor?: Json | null
         }
         Relationships: []
+      }
+      configuracoes_esocial: {
+        Row: {
+          ambiente: string | null
+          certificado_id: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          ambiente?: string | null
+          certificado_id?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          ambiente?: string | null
+          certificado_id?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_esocial_certificado_id_fkey"
+            columns: ["certificado_id"]
+            isOneToOne: false
+            referencedRelation: "certificados_digitais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "configuracoes_esocial_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       configuracoes_intervalo: {
         Row: {
@@ -15076,6 +15146,56 @@ export type Database = {
             columns: ["webhook_id"]
             isOneToOne: false
             referencedRelation: "webhooks_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_config: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          instancia_nome: string | null
+          instancia_url: string | null
+          notificar_ferias: boolean | null
+          notificar_holerite: boolean | null
+          notificar_ponto: boolean | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          instancia_nome?: string | null
+          instancia_url?: string | null
+          notificar_ferias?: boolean | null
+          notificar_holerite?: boolean | null
+          notificar_ponto?: boolean | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          instancia_nome?: string | null
+          instancia_url?: string | null
+          notificar_ferias?: boolean | null
+          notificar_holerite?: boolean | null
+          notificar_ponto?: boolean | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_config_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
