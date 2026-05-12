@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { Target, Plus, Users, TrendingUp, Star, Trash2, LayoutGrid, History, BarChart2, Calendar, CheckCircle2, Clock } from 'lucide-react';
 import { PerformanceDashboard } from '@/components/avaliacao/PerformanceDashboard';
 import { NineBoxMatrix } from '@/components/avaliacao/NineBoxMatrix';
+import { PerformanceAuditTimeline } from '@/components/avaliacao/PerformanceAuditTimeline';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
