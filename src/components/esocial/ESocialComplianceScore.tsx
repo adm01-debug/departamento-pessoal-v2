@@ -1,59 +1,83 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { ShieldCheck, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ShieldCheck, AlertTriangle, FileText, Send, CheckCircle2, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function ESocialComplianceScore({ stats }: { stats: any }) {
   const score = stats.conformidade || 0;
   
   const getScoreColor = (s: number) => {
-    if (s >= 90) return 'text-success';
-    if (s >= 70) return 'text-warning';
+    if (s >= 95) return 'text-success';
+    if (s >= 80) return 'text-warning';
     return 'text-destructive';
   };
 
   const getScoreBg = (s: number) => {
-    if (s >= 90) return 'bg-success/10 border-success/20';
-    if (s >= 70) return 'bg-warning/10 border-warning/20';
-    return 'bg-destructive/10 border-destructive/20';
+    if (s >= 95) return 'bg-success/10';
+    if (s >= 80) return 'bg-warning/10';
+    return 'bg-destructive/10';
   };
 
   return (
     <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-gradient-to-br from-background to-muted/20">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
-          Compliance eSocial Score
+        <CardTitle className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest flex items-center justify-between">
+          <span>Score de Conformidade Fiscal</span>
+          <Zap className="h-3 w-3 text-primary animate-pulse" />
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex items-end justify-between mb-4">
-          <div className="space-y-1">
-            <span className={`text-5xl font-display font-bold ${getScoreColor(score)}`}>
-              {score}%
-            </span>
-            <p className="text-xs text-muted-foreground font-body">Índice de aceitação governamental</p>
-          </div>
-          <div className={`p-3 rounded-2xl border ${getScoreBg(score)}`}>
-            <ShieldCheck className={`h-8 w-8 ${getScoreColor(score)}`} />
-          </div>
-        </div>
-        
-        <Progress value={score} className="h-2 mb-6" />
-
-        <div className="grid grid-cols-1 gap-3">
-          <div className="flex items-start gap-3 p-3 rounded-xl bg-background/50 border border-border/20">
-            <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-bold">Eventos Periódicos Sincronizados</p>
-              <p className="text-[10px] text-muted-foreground">Competência atual sem pendências críticas de remuneração.</p>
+      <CardContent>
+        <div className="flex flex-col items-center justify-center py-4 space-y-4">
+          <div className="relative">
+            {/* Circular Progress Mockup */}
+            <svg className="w-32 h-32 transform -rotate-90">
+              <circle
+                cx="64" cy="64" r="58"
+                stroke="currentColor" strokeWidth="8" fill="transparent"
+                className="text-muted/20"
+              />
+              <motion.circle
+                cx="64" cy="64" r="58"
+                stroke="currentColor" strokeWidth="8" fill="transparent"
+                strokeDasharray={364}
+                initial={{ strokeDashoffset: 364 }}
+                animate={{ strokeDashoffset: 364 - (364 * score) / 100 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className={getScoreColor(score)}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={`text-3xl font-display font-bold ${getScoreColor(score)}`}>{score}%</span>
+              <span className="text-[9px] text-muted-foreground font-bold uppercase">Integridade</span>
             </div>
           </div>
-          
-          <div className="flex items-start gap-3 p-3 rounded-xl bg-background/50 border border-border/20">
-            <Info className="h-4 w-4 text-info shrink-0 mt-0.5" />
+
+          <div className="grid grid-cols-2 gap-2 w-full">
+            <div className="p-2 rounded-xl bg-background border border-border/40 text-center">
+              <p className="text-[9px] text-muted-foreground uppercase font-bold">Eventos S-1200</p>
+              <p className="text-sm font-bold">{stats.enviados}</p>
+            </div>
+            <div className="p-2 rounded-xl bg-background border border-border/40 text-center">
+              <p className="text-[9px] text-muted-foreground uppercase font-bold">Erros Retornados</p>
+              <p className="text-sm font-bold text-destructive">{stats.erros}</p>
+            </div>
+          </div>
+
+          <div className={`w-full p-3 rounded-xl border flex items-start gap-3 ${getScoreBg(score)} border-current/10`}>
+            {score >= 95 ? (
+              <ShieldCheck className="h-4 w-4 text-success mt-0.5" />
+            ) : (
+              <AlertTriangle className="h-4 w-4 text-warning mt-0.5" />
+            )}
             <div>
-              <p className="text-xs font-bold">Validação Antecipada Ativa</p>
-              <p className="text-[10px] text-muted-foreground">Sistema interceptou 12 possíveis erros de layout este mês.</p>
+              <p className={`text-[11px] font-bold ${getScoreColor(score)}`}>
+                {score >= 95 ? 'Ambiente Seguro' : 'Riscos Detectados'}
+              </p>
+              <p className="text-[10px] text-muted-foreground leading-tight">
+                {score >= 95 
+                  ? 'Sua empresa está em total conformidade com o layout S-1.2 do eSocial.' 
+                  : 'Existem pendências de cadastro que podem gerar multas. Revise o S-2200.'}
+              </p>
             </div>
           </div>
         </div>
