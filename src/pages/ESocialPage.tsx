@@ -532,37 +532,151 @@ export default function ESocialPage() {
               <Card className="border border-border/30 rounded-2xl overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg font-display flex items-center gap-2">
-                    <Key className="h-5 w-5 text-primary" /> Certificado Digital
+                    <Key className="h-5 w-5 text-primary" /> Certificado Digital (A1)
                   </CardTitle>
+                  <CardDescription>Gestão de certificados ICP-Brasil para assinatura</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="p-4 rounded-xl border border-success/20 bg-success/5 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Key className="h-8 w-8 text-success" />
-                        <div>
-                          <p className="font-bold text-sm">e-CNPJ: {empresaAtual?.razao_social}</p>
-                          <p className="text-xs text-muted-foreground">Vencimento: 12/12/2026 (Em 224 dias)</p>
-                        </div>
+                    {certificados.length === 0 ? (
+                      <div className="p-8 text-center border border-dashed rounded-xl text-muted-foreground italic text-sm">
+                        Nenhum certificado cadastrado
                       </div>
-                      <Badge variant="outline" className="text-success border-success/30">Ativo</Badge>
-                    </div>
-                    <Button variant="outline" className="w-full rounded-xl border-dashed">
-                      <Plus className="h-4 w-4 mr-2" /> Alterar Certificado
-                    </Button>
+                    ) : (
+                      certificados.map((c: any) => (
+                        <div key={c.id} className={cn(
+                          "p-4 rounded-xl border flex items-center justify-between transition-all",
+                          config?.certificado_id === c.id ? "border-primary bg-primary/5 shadow-sm" : "border-border/20"
+                        )}>
+                          <div className="flex items-center gap-3">
+                            <div className={cn("p-2 rounded-lg", c.ativo ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}>
+                              <ShieldCheck className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-sm">{c.subject}</p>
+                              <p className="text-[10px] text-muted-foreground uppercase">Expira em: {new Date(c.valid_to).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {config?.certificado_id === c.id ? (
+                              <Badge className="bg-primary text-primary-foreground">Padrão</Badge>
+                            ) : (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-xs h-7 px-2 rounded-lg"
+                                onClick={() => empresaAtual?.id && salvarConfig({ empresa_id: empresaAtual.id, ambiente: config?.ambiente || '2', certificado_id: c.id })}
+                              >
+                                Usar este
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full rounded-xl border-dashed">
+                          <Plus className="h-4 w-4 mr-2" /> Novo Certificado (.p12 / .pfx)
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Upload de Certificado A1</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={async (e) => {
+                          e.preventDefault();
+                          const formData = new FormData(e.currentTarget);
+                          const file = (formData.get('file') as File);
+                          if (!file) return;
+                          
+                          const reader = new FileReader();
+                          reader.onload = async () => {
+                            const base64 = (reader.result as string).split(',')[1];
+                            if (empresaAtual?.id) {
+                              adicionarCertificado({
+                                empresa_id: empresaAtual.id,
+                                subject: formData.get('subject') as string || file.name,
+                                issuer: 'Autoridade Certificadora',
+                                valid_from: new Date().toISOString(),
+                                valid_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                                arquivo_base64: base64,
+                                senha_encriptada: formData.get('password') as string,
+                                cnpj_cpf: empresaAtual.cnpj || ''
+                              });
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Arquivo (.pfx / .p12)</Label>
+                            <Input name="file" type="file" accept=".pfx,.p12" required />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Senha do Certificado</Label>
+                            <Input name="password" type="password" placeholder="Sua senha" required />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Identificação (Ex: e-CNPJ Empresa)</Label>
+                            <Input name="subject" placeholder="Nome para o certificado" required />
+                          </div>
+                          <Button type="submit" className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow">Salvar Certificado</Button>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                 </CardContent>
               </Card>
 
               <Card className="border border-border/30 rounded-2xl overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg font-display flex items-center gap-2">
-                    <Settings2 className="h-5 w-5 text-primary" /> Parâmetros do Gateway
+                    <Globe className="h-5 w-5 text-primary" /> Ambiente de Transmissão
                   </CardTitle>
+                  <CardDescription>Defina para onde os eventos serão enviados</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm">
-                   <div className="flex justify-between items-center py-2 border-b border-border/10">
-                      <span className="text-muted-foreground">Ambiente</span>
-                      <Badge variant="secondary" className="bg-info/10 text-info border-info/20">Produção</Badge>
+                <CardContent className="space-y-6">
+                   <RadioGroup 
+                     value={config?.ambiente || '2'} 
+                     onValueChange={(v) => empresaAtual?.id && salvarConfig({ empresa_id: empresaAtual.id, ambiente: v, certificado_id: config?.certificado_id })}
+                     className="grid gap-4"
+                   >
+                      <div className={cn(
+                        "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer",
+                        config?.ambiente === '2' ? "border-info bg-info/5" : "border-border/20"
+                      )}>
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="2" id="amb-2" />
+                          <Label htmlFor="amb-2" className="cursor-pointer">
+                            <p className="font-bold">Produção Restrita (Homologação)</p>
+                            <p className="text-xs text-muted-foreground">Ambiente de testes sem valor fiscal</p>
+                          </Label>
+                        </div>
+                        <Badge variant="outline" className="text-info border-info/30">Recomendado</Badge>
+                      </div>
+
+                      <div className={cn(
+                        "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer",
+                        config?.ambiente === '1' ? "border-warning bg-warning/5" : "border-border/20"
+                      )}>
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="1" id="amb-1" />
+                          <Label htmlFor="amb-1" className="cursor-pointer">
+                            <p className="font-bold">Produção Real</p>
+                            <p className="text-xs text-muted-foreground">Envio oficial ao Governo Federal</p>
+                          </Label>
+                        </div>
+                        <Badge variant="outline" className="text-warning border-warning/30">Oficial</Badge>
+                      </div>
+                   </RadioGroup>
+
+                   <div className="p-4 rounded-xl bg-muted/30 border border-border/10 flex gap-3 text-xs text-muted-foreground">
+                      <Info className="h-4 w-4 shrink-0 text-primary" />
+                      <p>A alteração para Produção Real requer que todos os eventos anteriores (S-1000) tenham sido enviados e aceitos no ambiente oficial.</p>
                    </div>
+                </CardContent>
+              </Card>
+           </div>
+        </TabsContent>
                    <div className="flex justify-between items-center py-2 border-b border-border/10">
                       <span className="text-muted-foreground">Versão do Layout</span>
                       <span className="font-medium">S-1.2</span>
