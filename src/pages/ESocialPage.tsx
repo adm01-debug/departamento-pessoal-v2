@@ -27,6 +27,7 @@ import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
 import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
+import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
 
 
 const tiposEvento = [
@@ -46,6 +47,7 @@ export default function ESocialPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCompetencia, setSelectedCompetencia] = useState(new Date().toISOString().slice(0, 7));
   const [isValidating, setIsValidating] = useState<string | null>(null);
+  const [auditOpen, setAuditOpen] = useState(false);
 
   const filteredEventos = useMemo(() => {
     return eventos.filter(e => {
@@ -150,7 +152,12 @@ export default function ESocialPage() {
       gradient="from-primary to-primary-glow"
       actions={
         <div className="flex gap-2">
-           <Button variant="outline" size="sm" className="rounded-xl gap-1.5 border-primary/20 hover:bg-primary/5">
+           <Button 
+             variant="outline" 
+             size="sm" 
+             className="rounded-xl gap-1.5 border-primary/20 hover:bg-primary/5"
+             onClick={() => setAuditOpen(true)}
+           >
               <ShieldAlert className="h-4 w-4" />
               Auditoria IA
            </Button>
@@ -712,6 +719,11 @@ export default function ESocialPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <ESocialAuditDialog 
+        open={auditOpen} 
+        onOpenChange={setAuditOpen} 
+        eventos={eventos} 
+      />
     </>
   );
 }
