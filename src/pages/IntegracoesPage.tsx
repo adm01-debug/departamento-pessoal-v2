@@ -380,6 +380,8 @@ export default function IntegracoesPage() {
   const [bitrixOpen, setBitrixOpen] = useState(false);
   const [cnabOpen, setCnabOpen] = useState(false);
   const [webhookOpen, setWebhookOpen] = useState(false);
+  const [whatsappOpen, setWhatsappOpen] = useState(false);
+  const { empresaAtual } = useEmpresas();
 
   return (
     <PageLayout title="Integrações" description="Conecte o sistema a serviços externos" icon={<Plug className="h-5 w-5 text-primary-foreground" />} gradient="from-primary/80 to-primary">
