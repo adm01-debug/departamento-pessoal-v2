@@ -441,7 +441,38 @@ export default function ESocialPage() {
            </div>
         </TabsContent>
       </Tabs>
-    </PageLayout>
+    </div>
+    
+    <div className="lg:col-span-1 space-y-6">
+      <ESocialComplianceScore stats={stats} />
+      <ESocialAIInsights />
+      
+      <Card className="border border-border/30 rounded-2xl overflow-hidden bg-gradient-to-br from-background to-muted/20">
+        <CardHeader className="pb-2">
+           <CardTitle className="text-sm font-display flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+             Status do Webservice
+           </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Gov.br Gateway</span>
+              <Badge variant="outline" className="text-[10px] bg-success/5 text-success border-success/20 gap-1.5">
+                 <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" /> Operacional
+              </Badge>
+           </div>
+           <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Latência de Resposta</span>
+              <span className="text-xs font-bold">124ms</span>
+           </div>
+           <Button variant="ghost" className="w-full text-[10px] h-8 text-muted-foreground hover:text-primary rounded-xl gap-2">
+              <Globe className="h-3 w-3" /> Ver Status da Infraestrutura
+           </Button>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+</PageLayout>
+
 
 
       {/* Detalhes do Evento */}
