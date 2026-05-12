@@ -58,7 +58,6 @@ export {
   useDeficiencia, useSalvarDeficiencia,
   usePeriodoExperiencia, useSalvarPeriodoExperiencia,
   useAnotacoes, useCriarAnotacao, useExcluirAnotacao,
-  usePeriodosAquisitivos,
   useEtnias, useIdentidadesGenero, useTiposAdmissao, useTiposEstabilidade,
   useTimes, useWebhooks, useCriarWebhook,
   useFeriasColetivas, useCriarFeriasColetivas,
