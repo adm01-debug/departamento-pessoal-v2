@@ -16,6 +16,8 @@ const TABLE_LABELS: Record<string, string> = {
   beneficios: '🎁 Benefício atualizado',
   metas_okrs: '🎯 Meta / OKR atualizada',
   feedbacks_360: '📈 Novo feedback registrado',
+  inscricoes_cursos: '🎓 Nova inscrição em curso',
+  treinamentos: '📚 Treinamento atualizado',
 };
 
 export function useRealtimeDashboard() {
