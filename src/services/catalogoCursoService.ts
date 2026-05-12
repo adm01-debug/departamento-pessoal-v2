@@ -77,7 +77,7 @@ export const catalogoCursoService = {
 
   // === Instâncias / Turmas ===
   async listarInstancias(cursoId?: string) {
-    let q = supabase.from('treinamento_instancias').select('*, curso:catalogo_cursos(nome), instrutor:colaboradores(nome_completo)').order('data_inicio', { ascending: true });
+    let q = supabase.from('treinamento_instancias').select('*, curso:catalogo_cursos!treinamento_instancias_curso_id_fkey(nome), instrutor:colaboradores!treinamento_instancias_instrutor_id_fkey(nome_completo)').order('data_inicio', { ascending: true });
     if (cursoId) q = q.eq('curso_id', cursoId);
     const { data, error } = await q;
     if (error) throw error;
