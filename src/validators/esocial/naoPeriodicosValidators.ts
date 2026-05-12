@@ -156,23 +156,6 @@ export function validarS2300(dados: Record<string, any>): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS3000(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.tpEvento, 'tpEvento', errors);
-  required(dados.nrRecEvt, 'nrRecEvt', errors);
-  maxLen(dados.nrRecEvt, 40, 'nrRecEvt', errors);
-  const eventosExcluiveis = ['S-1200','S-1210','S-1260','S-1270','S-1280','S-2190','S-2200','S-2205','S-2206','S-2230','S-2299','S-2300','S-2399'];
-  if (dados.tpEvento && !eventosExcluiveis.includes(dados.tpEvento)) {
-    errors.push({ campo: 'tpEvento', mensagem: 'Tipo de evento não suporta exclusão via S-3000', regra: 'REGRA_EVENTO_EXCLUSAO' });
-  }
-  if (dados.perApur) {
-    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dados.perApur)) {
-      errors.push({ campo: 'perApur', mensagem: 'Período de apuração inválido', regra: 'REGRA_PERIODO' });
-    }
-  }
-  warnings.push({ campo: 'tpEvento', mensagem: 'Exclusão é irreversível: confirme os dados antes de enviar' });
-  return { valid: errors.length === 0, errors, warnings };
 export function validarS2306(dados: Record<string, any>): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
@@ -203,3 +186,21 @@ export function validarS2400(dados: Record<string, any>): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
+export function validarS3000(dados: Record<string, any>): ValidationResult {
+  const errors: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
+  required(dados.tpEvento, 'tpEvento', errors);
+  required(dados.nrRecEvt, 'nrRecEvt', errors);
+  maxLen(dados.nrRecEvt, 40, 'nrRecEvt', errors);
+  const eventosExcluiveis = ['S-1200','S-1210','S-1260','S-1270','S-1280','S-2190','S-2200','S-2205','S-2206','S-2230','S-2299','S-2300','S-2399'];
+  if (dados.tpEvento && !eventosExcluiveis.includes(dados.tpEvento)) {
+    errors.push({ campo: 'tpEvento', mensagem: 'Tipo de evento não suporta exclusão via S-3000', regra: 'REGRA_EVENTO_EXCLUSAO' });
+  }
+  if (dados.perApur) {
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dados.perApur)) {
+      errors.push({ campo: 'perApur', mensagem: 'Período de apuração inválido', regra: 'REGRA_PERIODO' });
+    }
+  }
+  warnings.push({ campo: 'tpEvento', mensagem: 'Exclusão é irreversível: confirme os dados antes de enviar' });
+  return { valid: errors.length === 0, errors, warnings };
+}
