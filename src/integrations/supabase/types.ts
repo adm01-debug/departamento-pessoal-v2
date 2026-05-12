@@ -15150,6 +15150,56 @@ export type Database = {
           },
         ]
       }
+      whatsapp_config: {
+        Row: {
+          api_key: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          instancia_nome: string | null
+          instancia_url: string | null
+          notificar_ferias: boolean | null
+          notificar_holerite: boolean | null
+          notificar_ponto: boolean | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          instancia_nome?: string | null
+          instancia_url?: string | null
+          notificar_ferias?: boolean | null
+          notificar_holerite?: boolean | null
+          notificar_ponto?: boolean | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          instancia_nome?: string | null
+          instancia_url?: string | null
+          notificar_ferias?: boolean | null
+          notificar_holerite?: boolean | null
+          notificar_ponto?: boolean | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_config_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflows_definicoes: {
         Row: {
           ativo: boolean | null
