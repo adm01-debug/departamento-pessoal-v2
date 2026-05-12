@@ -17,6 +17,8 @@ export { useDepartamentos } from "./useDepartamentos";
 export { useFerias } from "./useFerias";
 export { useFolha } from "./useFolha";
 export { useBeneficios } from "./useBeneficios";
+export { useBeneficiosColaborador } from "./useBeneficiosColaborador";
+export { useValeTransporte } from "./useValeTransporte";
 export { useContratos } from "./useContratos";
 export { useDesligamentos } from "./useDesligamentos";
 export { usePonto } from "./usePonto";
