@@ -172,17 +172,26 @@ export default function ESocialPage() {
 
           <Tabs defaultValue="eventos" className="space-y-6">
 
-        <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20">
+        <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20 flex-wrap h-auto">
           <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <LayoutDashboard className="h-4 w-4" /> Eventos
           </TabsTrigger>
+          <TabsTrigger value="conciliacao" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <BarChart3 className="h-4 w-4" /> Conciliação S-5001/S-5002
+          </TabsTrigger>
           <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <History className="h-4 w-4" /> Timeline de Transmissão
+            <History className="h-4 w-4" /> Timeline
           </TabsTrigger>
           <TabsTrigger value="config" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <Settings2 className="h-4 w-4" /> Configurações & Certificados
+            <Settings2 className="h-4 w-4" /> Configurações
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="conciliacao" className="space-y-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <ESocialConciliacao />
+          </motion.div>
+        </TabsContent>
 
         <TabsContent value="eventos" className="space-y-6">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
