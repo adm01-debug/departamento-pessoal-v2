@@ -137,7 +137,7 @@ export default function ESocialPage() {
       }
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 space-y-6">
           <div className="grid gap-4 md:grid-cols-3">
             {statsData.slice(0, 3).map(({ label, value, gradient }, i) => (
               <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
@@ -155,13 +155,9 @@ export default function ESocialPage() {
               </motion.div>
             ))}
           </div>
-        </div>
-        <div className="lg:col-span-1">
-          <ESocialComplianceScore stats={stats} />
-        </div>
-      </div>
 
-      <Tabs defaultValue="eventos" className="space-y-6">
+          <Tabs defaultValue="eventos" className="space-y-6">
+
         <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20">
           <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <LayoutDashboard className="h-4 w-4" /> Eventos
