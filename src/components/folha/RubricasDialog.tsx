@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Settings2, Plus, Trash2, Check, X, Save, AlertCircle, Wrench, DownloadCloud, FileCode } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { validarRubricaESocial, sugerirCorrecaoRubrica } from '@/validators/esocial';
 import { toast } from 'sonner';
 
