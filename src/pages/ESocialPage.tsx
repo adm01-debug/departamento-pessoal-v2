@@ -134,12 +134,18 @@ export default function ESocialPage() {
            <Button 
              size="sm" 
              className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow"
+             disabled={isSending || !empresaAtual}
              onClick={() => {
-               toast.info("Iniciando processamento em lote de eventos periódicos...");
+               if (empresaAtual?.id) {
+                 gerarEventosPeriodo({ 
+                   empresaId: empresaAtual.id, 
+                   competencia: selectedCompetencia 
+                 });
+               }
              }}
            >
-              <RefreshCw className="h-4 w-4" />
-              Sincronizar Eventos Periódicos
+              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              Gerar Eventos Periódicos ({selectedCompetencia})
            </Button>
         </div>
       }
