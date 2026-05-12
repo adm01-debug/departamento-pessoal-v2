@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3 } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3, Calendar, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -14,6 +14,7 @@ import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ESocialComplianceScore } from '@/components/esocial/ESocialComplianceScore';
 
 import { Label } from '@/components/ui/label';
@@ -25,6 +26,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
 import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
+import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
+import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
 
 
 const tiposEvento = [
@@ -34,8 +37,9 @@ const tiposEvento = [
 ];
 
 export default function ESocialPage() {
-  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending } = useESocial();
+  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending, enviarLote } = useESocial();
   const { empresaAtual } = useEmpresas();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
@@ -43,6 +47,7 @@ export default function ESocialPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCompetencia, setSelectedCompetencia] = useState(new Date().toISOString().slice(0, 7));
   const [isValidating, setIsValidating] = useState<string | null>(null);
+  const [auditOpen, setAuditOpen] = useState(false);
 
   const filteredEventos = useMemo(() => {
     return eventos.filter(e => {
@@ -110,6 +115,26 @@ export default function ESocialPage() {
     setDialogOpen(false);
   };
 
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredEventos.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredEventos.map(e => e.id));
+    }
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleEnviarLote = () => {
+    if (selectedIds.length === 0 || !empresaAtual?.id) return;
+    enviarLote({ eventoIds: selectedIds, empresaId: empresaAtual.id });
+    setSelectedIds([]);
+  };
+
   const statsData = [
     { label: 'Enviados', value: String(stats.enviados), gradient: 'from-success to-success/70' },
     { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-warning to-warning/70' },
@@ -127,7 +152,12 @@ export default function ESocialPage() {
       gradient="from-primary to-primary-glow"
       actions={
         <div className="flex gap-2">
-           <Button variant="outline" size="sm" className="rounded-xl gap-1.5 border-primary/20 hover:bg-primary/5">
+           <Button 
+             variant="outline" 
+             size="sm" 
+             className="rounded-xl gap-1.5 border-primary/20 hover:bg-primary/5"
+             onClick={() => setAuditOpen(true)}
+           >
               <ShieldAlert className="h-4 w-4" />
               Auditoria IA
            </Button>
@@ -207,6 +237,38 @@ export default function ESocialPage() {
             </div>
             
             <div className="flex flex-wrap items-center gap-2">
+              <AnimatePresence>
+                {selectedIds.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="flex items-center gap-2 mr-2"
+                  >
+                    <Badge variant="secondary" className="rounded-lg h-9 px-3 bg-primary/10 text-primary border-primary/20">
+                      {selectedIds.length} selecionados
+                    </Badge>
+                    <Button 
+                      size="sm" 
+                      className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow"
+                      onClick={handleEnviarLote}
+                      disabled={isSending}
+                    >
+                      {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      Transmitir Lote
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-9 w-9 rounded-xl text-muted-foreground hover:text-destructive"
+                      onClick={() => setSelectedIds([])}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="flex items-center gap-2 bg-muted/20 p-1 rounded-xl border">
                 <Calendar className="h-4 w-4 text-muted-foreground ml-2" />
                 <Input 
@@ -309,6 +371,14 @@ export default function ESocialPage() {
               </div>
             ) : (
               <div className="space-y-3">
+                <div className="flex items-center gap-2 px-3.5 mb-2">
+                   <Checkbox 
+                     checked={selectedIds.length === filteredEventos.length && filteredEventos.length > 0}
+                     onCheckedChange={toggleSelectAll}
+                     className="rounded border-border/40 data-[state=checked]:bg-primary"
+                   />
+                   <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">Selecionar Todos</span>
+                </div>
                 {filteredEventos.map((e, i) => (
                   <motion.div
                     key={e.id}
@@ -321,6 +391,12 @@ export default function ESocialPage() {
                     )}
                   >
                     <div className="flex items-center gap-4">
+                      <Checkbox 
+                        checked={selectedIds.includes(e.id)}
+                        onCheckedChange={() => handleToggleSelect(e.id)}
+                        className="rounded border-border/40 data-[state=checked]:bg-primary"
+                        onClick={(ev) => ev.stopPropagation()}
+                      />
                       {e.status === 'processando' ? (
                         <Loader2 className="h-5 w-5 text-primary animate-spin" />
                       ) : (
@@ -432,10 +508,17 @@ export default function ESocialPage() {
         </TabsContent>
 
         <TabsContent value="timeline">
-          <Card className="border border-border/30 rounded-2xl overflow-hidden p-12 text-center text-muted-foreground">
-             <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
-             <p className="font-bold">Timeline Auditável</p>
-             <p className="text-sm">Rastreabilidade completa de todas as transmissões e retornos do governo.</p>
+          <Card className="border border-border/30 rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
+            <CardHeader>
+              <CardTitle className="font-display flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" /> Histórico de Eventos & Transmissões
+              </CardTitle>
+              <CardDescription>Rastreabilidade completa de todas as ações no módulo eSocial</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ESocialTimeline eventos={eventos} />
+            </CardContent>
           </Card>
         </TabsContent>
 
@@ -636,6 +719,11 @@ export default function ESocialPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <ESocialAuditDialog 
+        open={auditOpen} 
+        onOpenChange={setAuditOpen} 
+        eventos={eventos} 
+      />
     </>
   );
 }

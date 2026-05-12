@@ -62,6 +62,28 @@ export function useESocial() {
   });
 
 
+  const enviarLoteMutation = useMutation({
+    mutationFn: async ({ eventoIds, empresaId }: { eventoIds: string[]; empresaId: string }) => {
+      const results = [];
+      for (const id of eventoIds) {
+        const res = await esocialService.enviarEvento(id, empresaId);
+        results.push(res);
+      }
+      return results;
+    },
+    onSuccess: (results) => {
+      const successes = results.filter(r => r?.success).length;
+      const total = results.length;
+      if (successes === total) {
+        toast.success(`${successes} eventos enviados com sucesso.`);
+      } else {
+        toast.warning(`${successes} de ${total} eventos enviados. Verifique os erros.`);
+      }
+      invalidate();
+    },
+    onError: (err: Error) => toast.error(`Erro no processamento do lote: ${err.message}`),
+  });
+
   const gerarEventosMutation = useMutation({
     mutationFn: ({ empresaId, competencia }: { empresaId: string; competencia: string }) =>
       esocialService.gerarEventosPeriodo(empresaId, competencia),
@@ -80,6 +102,7 @@ export function useESocial() {
     enviarEvento: enviarMutation.mutate,
     reenviarEvento: reenviarMutation.mutate,
     gerarEventosPeriodo: gerarEventosMutation.mutate,
-    isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending,
+    enviarLote: enviarLoteMutation.mutate,
+    isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending || enviarLoteMutation.isPending,
   };
 }
