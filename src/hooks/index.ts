@@ -17,6 +17,8 @@ export { useDepartamentos } from "./useDepartamentos";
 export { useFerias } from "./useFerias";
 export { useFolha } from "./useFolha";
 export { useBeneficios } from "./useBeneficios";
+export { useBeneficiosColaborador } from "./useBeneficiosColaborador";
+export { useValeTransporte } from "./useValeTransporte";
 export { useContratos } from "./useContratos";
 export { useDesligamentos } from "./useDesligamentos";
 export { usePonto } from "./usePonto";
@@ -32,6 +34,7 @@ export { useConfiguracoesIntervalo } from "./useConfiguracoesIntervalo";
 export { useWebhooksAvancados, useWebhookLogs } from "./useWebhooksAvancados";
 export { usePontosAbertos } from "./usePontosAbertos";
 export { useNavigationGuard } from "./useNavigationGuard";
+export { usePeriodosAquisitivos } from "./usePeriodosAquisitivos";
 
 // Novas tabelas (doc externo)
 export {
@@ -55,7 +58,6 @@ export {
   useDeficiencia, useSalvarDeficiencia,
   usePeriodoExperiencia, useSalvarPeriodoExperiencia,
   useAnotacoes, useCriarAnotacao, useExcluirAnotacao,
-  usePeriodosAquisitivos,
   useEtnias, useIdentidadesGenero, useTiposAdmissao, useTiposEstabilidade,
   useTimes, useWebhooks, useCriarWebhook,
   useFeriasColetivas, useCriarFeriasColetivas,
