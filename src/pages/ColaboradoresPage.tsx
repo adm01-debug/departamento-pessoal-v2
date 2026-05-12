@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { PageTitle } from '@/components/PageTitle';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
-import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
+import { ColaboradorFilters } from '@/components/colaboradores/ColaboradorFilters';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ColaboradorStatus } from '@/components/ui/status-badge';
 import { EmptyList } from '@/components/ui/empty-state';
