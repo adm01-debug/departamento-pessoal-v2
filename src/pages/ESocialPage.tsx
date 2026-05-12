@@ -117,32 +117,64 @@ export default function ESocialPage() {
     <>
     <PageTitle title="eSocial" description="Gestão de eventos eSocial" />
     <PageLayout
-      title="eSocial"
-      description="Gestão de eventos eSocial"
+      title="Central eSocial 10/10"
+      description="Monitoramento proativo e conformidade total com o Governo Federal"
       icon={<FileCheck className="h-5 w-5 text-primary-foreground" />}
       gradient="from-primary to-primary-glow"
+      actions={
+        <div className="flex gap-2">
+           <Button variant="outline" size="sm" className="rounded-xl gap-1.5 border-primary/20 hover:bg-primary/5">
+              <ShieldAlert className="h-4 w-4" />
+              Auditoria IA
+           </Button>
+           <Button size="sm" className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow">
+              <RefreshCw className="h-4 w-4" />
+              Sincronizar Todos
+           </Button>
+        </div>
+      }
     >
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        {statsData.map(({ label, value, gradient }, i) => (
-          <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
-              <div className={cn("h-[2px] bg-gradient-to-r", gradient)} />
-              <CardContent className="pt-6">
-                {isLoading ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  <div className="text-3xl font-display font-bold">{value}</div>
-                )}
-                <p className="text-xs text-muted-foreground font-body mt-1">{label}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        <div className="lg:col-span-3">
+          <div className="grid gap-4 md:grid-cols-3">
+            {statsData.slice(0, 3).map(({ label, value, gradient }, i) => (
+              <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
+                <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
+                  <div className={cn("h-[2px] bg-gradient-to-r", gradient)} />
+                  <CardContent className="pt-6">
+                    {isLoading ? (
+                      <Skeleton className="h-8 w-16" />
+                    ) : (
+                      <div className="text-3xl font-display font-bold">{value}</div>
+                    )}
+                    <p className="text-xs text-muted-foreground font-body mt-1">{label}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        <div className="lg:col-span-1">
+          <ESocialComplianceScore stats={stats} />
+        </div>
       </div>
 
-      {/* Events */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+      <Tabs defaultValue="eventos" className="space-y-6">
+        <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20">
+          <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <LayoutDashboard className="h-4 w-4" /> Eventos
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <History className="h-4 w-4" /> Timeline de Transmissão
+          </TabsTrigger>
+          <TabsTrigger value="config" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <Settings2 className="h-4 w-4" /> Configurações & Certificados
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="eventos" className="space-y-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+
         <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
           <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
           <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
