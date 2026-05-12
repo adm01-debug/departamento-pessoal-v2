@@ -1,206 +1,116 @@
-/**
- * Validadores eSocial — Eventos Não-Periódicos (S-2xxx, S-3xxx)
- */
-import { ValidationResult, ValidationError, ValidationWarning, required, maxLen, cpfValido, enumValido, dataValida } from './helpers';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { User, Calendar, Briefcase, Banknote, ShieldCheck, Clock, MapPin, Activity } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export function validarS2190(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtNascto, 'dtNascto', errors);
-  dataValida(dados.dtNascto, 'dtNascto', errors);
-  required(dados.dtAdm, 'dtAdm', errors);
-  dataValida(dados.dtAdm, 'dtAdm', errors);
-  if (dados.dtAdm && dados.dtNascto) {
-    const nascimento = new Date(dados.dtNascto);
-    const admissao = new Date(dados.dtAdm);
-    const idade = (admissao.getTime() - nascimento.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
-    if (idade < 14) errors.push({ campo: 'dtNascto', mensagem: 'Trabalhador deve ter pelo menos 14 anos', regra: 'REGRA_IDADE_MINIMA' });
-    if (idade < 16) warnings.push({ campo: 'dtNascto', mensagem: 'Menor aprendiz requer contrato especial' });
-  }
-  return { valid: errors.length === 0, errors, warnings };
+export function S2200Admissao({ dados }: { dados: any }) {
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+  };
+
+  return (
+    <div className="space-y-4 font-body">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-border/30 shadow-sm bg-muted/5">
+          <CardContent className="p-4 flex items-start gap-3">
+            <User className="h-4 w-4 text-primary mt-1" />
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Identificação do Trabalhador</Label>
+              <p className="font-display font-bold text-sm">{dados.nmTrab || 'Não informado'}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">CPF: {dados.cpfTrab}</p>
+              <div className="flex gap-1.5 mt-2">
+                <Badge variant="secondary" className="text-[9px] h-4 rounded-md">Matrícula: {dados.matricula || '-'}</Badge>
+                <Badge variant="outline" className="text-[9px] h-4 rounded-md">Cat: {dados.codCateg || '-'}</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-primary/20 shadow-sm bg-primary/5">
+          <CardContent className="p-4 flex items-start gap-3">
+            <Calendar className="h-4 w-4 text-primary mt-1" />
+            <div>
+              <Label className="text-[10px] uppercase text-primary font-bold tracking-wider">Dados da Admissão</Label>
+              <p className="font-display font-bold text-sm text-primary">{dados.dtAdm || '-'}</p>
+              <p className="text-[10px] text-primary/70 italic mt-0.5">Vínculo: {dados.tpRegTrab === '1' ? 'CLT' : 'Estatutário'}</p>
+              <div className="flex gap-1.5 mt-2">
+                <Badge className="bg-primary/10 text-primary border-primary/20 text-[9px] h-4">Ativo</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="p-4 rounded-xl border border-primary/10 bg-primary/5">
+        <div className="flex items-center gap-2 mb-3">
+          <Briefcase className="h-4 w-4 text-primary" />
+          <span className="text-xs font-bold uppercase tracking-widest text-primary">Informações Contratuais</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <Label className="text-[10px] text-muted-foreground">Cargo / CBO</Label>
+            <p className="text-xs font-semibold">{dados.nmCargo || dados.codCargo || '-'}</p>
+            {dados.cbos && <p className="text-[10px] text-muted-foreground">CBO: {dados.cbos}</p>}
+          </div>
+          
+          <div className="space-y-1">
+            <Label className="text-[10px] text-muted-foreground">Remuneração Base</Label>
+            <p className="text-sm font-display font-bold text-primary">{dados.vrSalFx ? formatCurrency(dados.vrSalFx) : '-'}</p>
+            <p className="text-[10px] text-muted-foreground uppercase">Unidade: {dados.undSalFixo || 'Mensal'}</p>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-[10px] text-muted-foreground">Jornada Semanal</Label>
+            <p className="text-xs font-semibold">{dados.qtdHrsSem || '-'} Horas</p>
+            <p className="text-[10px] text-muted-foreground">Regime: {dados.tpRegPrev === '1' ? 'RGPS' : 'RPPS'}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-export function validarS2200(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.nmTrab, 'nmTrab', errors);
-  maxLen(dados.nmTrab, 70, 'nmTrab', errors);
-  required(dados.dtNascto, 'dtNascto', errors);
-  dataValida(dados.dtNascto, 'dtNascto', errors);
-  required(dados.dtAdm, 'dtAdm', errors);
-  dataValida(dados.dtAdm, 'dtAdm', errors);
-  required(dados.tpRegTrab, 'tpRegTrab', errors);
-  enumValido(dados.tpRegTrab?.toString(), ['1', '2'], 'tpRegTrab', errors);
-  required(dados.tpRegPrev, 'tpRegPrev', errors);
-  enumValido(dados.tpRegPrev?.toString(), ['1', '2', '3'], 'tpRegPrev', errors);
-  
-  if (dados.dtAdm && dados.dtNascto) {
-    const nascimento = new Date(dados.dtNascto);
-    const admissao = new Date(dados.dtAdm);
-    const idade = (admissao.getTime() - nascimento.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
-    if (idade < 14) errors.push({ campo: 'dtNascto', mensagem: 'Trabalhador deve ter pelo menos 14 anos', regra: 'REGRA_IDADE_MINIMA' });
-  }
+export function S2230Afastamento({ dados }: { dados: any }) {
+  return (
+    <div className="space-y-4 font-body">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-border/30 shadow-sm bg-muted/5">
+          <CardContent className="p-4 flex items-start gap-3">
+            <User className="h-4 w-4 text-primary mt-1" />
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Identificação do Trabalhador</Label>
+              <p className="font-display font-bold text-sm">CPF: {dados.cpfTrab}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Afastamento Temporário</p>
+            </div>
+          </CardContent>
+        </Card>
 
-  required(dados.codCargo, 'codCargo', errors);
-  required(dados.vrSalFx, 'vrSalFx', errors);
-  if (dados.vrSalFx !== undefined && dados.vrSalFx <= 0) {
-    errors.push({ campo: 'vrSalFx', mensagem: 'Salário deve ser maior que zero', regra: 'REGRA_VALOR_POSITIVO' });
-  }
+        <Card className="border-destructive/20 shadow-sm bg-destructive/5">
+          <CardContent className="p-4 flex items-start gap-3">
+            <Activity className="h-4 w-4 text-destructive mt-1" />
+            <div>
+              <Label className="text-[10px] uppercase text-destructive font-bold tracking-wider">Motivo do Afastamento</Label>
+              <p className="font-display font-bold text-sm text-destructive">Cód: {dados.codMotAfast}</p>
+              <p className="text-[10px] text-destructive/70 italic mt-0.5">Regra: eSocial S-2230</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2205(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtAlteracao, 'dtAlteracao', errors);
-  dataValida(dados.dtAlteracao, 'dtAlteracao', errors);
-  required(dados.nmTrab, 'nmTrab', errors);
-  maxLen(dados.nmTrab, 70, 'nmTrab', errors);
-  if (dados.grauInstr) {
-    const validos = ['01','02','03','04','05','06','07','08','09','10','11','12'];
-    enumValido(dados.grauInstr, validos, 'grauInstr', errors);
-  }
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2206(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtAlteracao, 'dtAlteracao', errors);
-  dataValida(dados.dtAlteracao, 'dtAlteracao', errors);
-  required(dados.vrSalFx, 'vrSalFx', errors);
-  if (dados.vrSalFx !== undefined && dados.vrSalFx <= 0) {
-    errors.push({ campo: 'vrSalFx', mensagem: 'Salário deve ser maior que zero', regra: 'REGRA_VALOR_POSITIVO' });
-  }
-  required(dados.undSalFixo, 'undSalFixo', errors);
-  enumValido(dados.undSalFixo?.toString(), ['1','2','3','4','5','6','7'], 'undSalFixo', errors);
-  required(dados.tpContr, 'tpContr', errors);
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2230(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtIniAfast, 'dtIniAfast', errors);
-  dataValida(dados.dtIniAfast, 'dtIniAfast', errors);
-  required(dados.codMotAfast, 'codMotAfast', errors);
-  const motivosValidos = ['01','03','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','33','34','35','36','37'];
-  enumValido(dados.codMotAfast, motivosValidos, 'codMotAfast', errors);
-  if (dados.dtTermAfast) {
-    dataValida(dados.dtTermAfast, 'dtTermAfast', errors);
-    if (dados.dtIniAfast && new Date(dados.dtTermAfast) < new Date(dados.dtIniAfast)) {
-      errors.push({ campo: 'dtTermAfast', mensagem: 'Data término não pode ser anterior ao início', regra: 'REGRA_DATA_ORDEM' });
-    }
-  }
-  if (['01','03'].includes(dados.codMotAfast) && dados.dtIniAfast && dados.dtTermAfast) {
-    const dias = Math.ceil((new Date(dados.dtTermAfast).getTime() - new Date(dados.dtIniAfast).getTime()) / (24*60*60*1000));
-    if (dias > 15) warnings.push({ campo: 'codMotAfast', mensagem: 'Afastamento > 15 dias: verificar encaminhamento ao INSS' });
-  }
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2299(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtDeslig, 'dtDeslig', errors);
-  dataValida(dados.dtDeslig, 'dtDeslig', errors);
-  required(dados.mtvDeslig, 'mtvDeslig', errors);
-  const motivosDeslig = ['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48'];
-  if (dados.mtvDeslig && !motivosDeslig.includes(dados.mtvDeslig)) {
-    errors.push({ campo: 'mtvDeslig', mensagem: 'Motivo de desligamento inválido', regra: 'REGRA_MOTIVO_DESLIG' });
-  }
-  required(dados.dtAvPrv, 'dtAvPrv', errors);
-  if (dados.indPagtoAPI) enumValido(dados.indPagtoAPI?.toString(), ['1','2','3'], 'indPagtoAPI', errors);
-  if (dados.verbasResc) {
-    for (let i = 0; i < dados.verbasResc.length; i++) {
-      required(dados.verbasResc[i].codRubr, `verbasResc[${i}].codRubr`, errors);
-      required(dados.verbasResc[i].vrRubr, `verbasResc[${i}].vrRubr`, errors);
-    }
-  }
-  if (['02','07'].includes(dados.mtvDeslig)) {
-    warnings.push({ campo: 'mtvDeslig', mensagem: 'Desligamento sem justa causa: verificar multa FGTS 40%' });
-  }
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2300(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.nmTrab, 'nmTrab', errors);
-  maxLen(dados.nmTrab, 70, 'nmTrab', errors);
-  required(dados.dtNascto, 'dtNascto', errors);
-  dataValida(dados.dtNascto, 'dtNascto', errors);
-  required(dados.dtInicio, 'dtInicio', errors);
-  dataValida(dados.dtInicio, 'dtInicio', errors);
-  required(dados.codCateg, 'codCateg', errors);
-  const catTSV = ['201','202','301','302','303','304','305','306','307','308','309','310','311','312','313','401','410','701','702','703','711','712','721','722','723','731','734','738','741','751','761','771','781','901','902','903','904'];
-  if (dados.codCateg && !catTSV.includes(dados.codCateg)) {
-    errors.push({ campo: 'codCateg', mensagem: 'Categoria TSV inválida', regra: 'REGRA_CATEGORIA_TSV' });
-  }
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2306(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtAlteracao, 'dtAlteracao', errors);
-  dataValida(dados.dtAlteracao, 'dtAlteracao', errors);
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2399(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  required(dados.dtTerm, 'dtTerm', errors);
-  dataValida(dados.dtTerm, 'dtTerm', errors);
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS2400(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.cpfBenef, 'cpfBenef', errors);
-  cpfValido(dados.cpfBenef, 'cpfBenef', errors);
-  required(dados.dtIniBenef, 'dtIniBenef', errors);
-  dataValida(dados.dtIniBenef, 'dtIniBenef', errors);
-  return { valid: errors.length === 0, errors, warnings };
-}
-
-export function validarS3000(dados: Record<string, any>): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
-  required(dados.tpEvento, 'tpEvento', errors);
-  required(dados.nrRecEvt, 'nrRecEvt', errors);
-  maxLen(dados.nrRecEvt, 40, 'nrRecEvt', errors);
-  const eventosExcluiveis = ['S-1200','S-1210','S-1260','S-1270','S-1280','S-2190','S-2200','S-2205','S-2206','S-2230','S-2299','S-2300','S-2399'];
-  if (dados.tpEvento && !eventosExcluiveis.includes(dados.tpEvento)) {
-    errors.push({ campo: 'tpEvento', mensagem: 'Tipo de evento não suporta exclusão via S-3000', regra: 'REGRA_EVENTO_EXCLUSAO' });
-  }
-  if (dados.perApur) {
-    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dados.perApur)) {
-      errors.push({ campo: 'perApur', mensagem: 'Período de apuração inválido', regra: 'REGRA_PERIODO' });
-    }
-  }
-  warnings.push({ campo: 'tpEvento', mensagem: 'Exclusão é irreversível: confirme os dados antes de enviar' });
-  return { valid: errors.length === 0, errors, warnings };
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
+          <Calendar className="h-5 w-5 text-primary mb-1.5" />
+          <Label className="text-[10px] text-primary uppercase font-bold tracking-wider">Início</Label>
+          <p className="text-lg font-display font-bold text-primary">{dados.dtIniAfast || '-'}</p>
+        </div>
+        
+        <div className="p-4 bg-muted/20 border border-border/30 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
+          <Clock className="h-5 w-5 text-muted-foreground mb-1.5" />
+          <Label className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Término Previsto</Label>
+          <p className="text-lg font-display font-bold text-muted-foreground">{dados.dtTermAfast || 'Em Aberto'}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
