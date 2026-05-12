@@ -9,8 +9,8 @@ export function useEntrevistaDesligamento(desligamentoId?: string) {
     queryKey: ['entrevista-desligamento', desligamentoId],
     enabled: !!desligamentoId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('entrevistas_desligamento')
+      const { data, error } = await (supabase
+        .from('entrevistas_desligamento' as any) as any)
         .select('*')
         .eq('desligamento_id', desligamentoId!)
         .maybeSingle();
