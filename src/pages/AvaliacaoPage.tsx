@@ -78,8 +78,9 @@ export default function AvaliacaoPage() {
             <TabsTrigger value="metas" className="rounded-lg gap-2"><Target className="h-4 w-4" /> Metas & OKRs</TabsTrigger>
             <TabsTrigger value="feedbacks" className="rounded-lg gap-2"><Users className="h-4 w-4" /> Feedbacks</TabsTrigger>
             <TabsTrigger value="pdis" className="rounded-lg gap-2"><TrendingUp className="h-4 w-4" /> PDI</TabsTrigger>
-            <TabsTrigger value="ninebox" className="rounded-lg gap-2"><LayoutGrid className="h-4 w-4" /> Nine-Box</TabsTrigger>
-          </TabsList>
+          <TabsTrigger value="ninebox" className="rounded-lg gap-2"><LayoutGrid className="h-4 w-4" /> Nine-Box</TabsTrigger>
+          <TabsTrigger value="auditoria" className="rounded-lg gap-2"><History className="h-4 w-4" /> Auditoria</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="ciclos" className="space-y-6">
             <PerformanceDashboard 
