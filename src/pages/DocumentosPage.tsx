@@ -39,6 +39,8 @@ export default function DocumentosPage() {
   const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
   const [ocrResult, setOcrResult] = useState<any>(null);
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
+  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<any>(null);
+  const [selectedDocForPreview, setSelectedDocForPreview] = useState<any>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -352,6 +354,26 @@ export default function DocumentosPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Timeline Dialog */}
+      <Dialog open={!!selectedDocForTimeline} onOpenChange={(o) => { if(!o) setSelectedDocForTimeline(null); }}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display">Histórico do Documento</DialogTitle>
+          </DialogHeader>
+          {selectedDocForTimeline && <DocumentoTimeline documentoId={selectedDocForTimeline.id} />}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedDocForTimeline(null)} className="rounded-xl">Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Component */}
+      <DocumentoPreview 
+        documento={selectedDocForPreview} 
+        isOpen={!!selectedDocForPreview} 
+        onClose={() => setSelectedDocForPreview(null)} 
+      />
 
       {/* Upload Dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
