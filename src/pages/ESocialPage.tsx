@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3 } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3, Calendar, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -14,6 +14,7 @@ import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ESocialComplianceScore } from '@/components/esocial/ESocialComplianceScore';
 
 import { Label } from '@/components/ui/label';
@@ -34,8 +35,9 @@ const tiposEvento = [
 ];
 
 export default function ESocialPage() {
-  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending } = useESocial();
+  const { eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, gerarEventosPeriodo, isSending, enviarLote } = useESocial();
   const { empresaAtual } = useEmpresas();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
@@ -108,6 +110,26 @@ export default function ESocialPage() {
     criarEvento({ empresa_id: empresaAtual.id, tipo_evento: novoTipo });
     setNovoTipo('');
     setDialogOpen(false);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredEventos.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredEventos.map(e => e.id));
+    }
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleEnviarLote = () => {
+    if (selectedIds.length === 0 || !empresaAtual?.id) return;
+    enviarLote({ eventoIds: selectedIds, empresaId: empresaAtual.id });
+    setSelectedIds([]);
   };
 
   const statsData = [
@@ -207,6 +229,38 @@ export default function ESocialPage() {
             </div>
             
             <div className="flex flex-wrap items-center gap-2">
+              <AnimatePresence>
+                {selectedIds.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="flex items-center gap-2 mr-2"
+                  >
+                    <Badge variant="secondary" className="rounded-lg h-9 px-3 bg-primary/10 text-primary border-primary/20">
+                      {selectedIds.length} selecionados
+                    </Badge>
+                    <Button 
+                      size="sm" 
+                      className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow"
+                      onClick={handleEnviarLote}
+                      disabled={isSending}
+                    >
+                      {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                      Transmitir Lote
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-9 w-9 rounded-xl text-muted-foreground hover:text-destructive"
+                      onClick={() => setSelectedIds([])}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="flex items-center gap-2 bg-muted/20 p-1 rounded-xl border">
                 <Calendar className="h-4 w-4 text-muted-foreground ml-2" />
                 <Input 
@@ -309,6 +363,14 @@ export default function ESocialPage() {
               </div>
             ) : (
               <div className="space-y-3">
+                <div className="flex items-center gap-2 px-3.5 mb-2">
+                   <Checkbox 
+                     checked={selectedIds.length === filteredEventos.length && filteredEventos.length > 0}
+                     onCheckedChange={toggleSelectAll}
+                     className="rounded border-border/40 data-[state=checked]:bg-primary"
+                   />
+                   <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">Selecionar Todos</span>
+                </div>
                 {filteredEventos.map((e, i) => (
                   <motion.div
                     key={e.id}
@@ -321,6 +383,12 @@ export default function ESocialPage() {
                     )}
                   >
                     <div className="flex items-center gap-4">
+                      <Checkbox 
+                        checked={selectedIds.includes(e.id)}
+                        onCheckedChange={() => handleToggleSelect(e.id)}
+                        className="rounded border-border/40 data-[state=checked]:bg-primary"
+                        onClick={(ev) => ev.stopPropagation()}
+                      />
                       {e.status === 'processando' ? (
                         <Loader2 className="h-5 w-5 text-primary animate-spin" />
                       ) : (
