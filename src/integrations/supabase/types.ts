@@ -3543,6 +3543,48 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracoes_esocial: {
+        Row: {
+          ambiente: string | null
+          certificado_id: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          ambiente?: string | null
+          certificado_id?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          ambiente?: string | null
+          certificado_id?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_esocial_certificado_id_fkey"
+            columns: ["certificado_id"]
+            isOneToOne: false
+            referencedRelation: "certificados_digitais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "configuracoes_esocial_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracoes_intervalo: {
         Row: {
           ativo: boolean | null
