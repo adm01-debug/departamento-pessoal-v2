@@ -57,6 +57,24 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const watchInicio = watch('data_inicio');
   const watchFim = watch('data_fim_prevista');
   const watchTipo = watch('tipo');
+  const watchColaboradorId = watch('colaborador_id');
+
+  useEffect(() => {
+    const carregarHistorico = async () => {
+      if (watchColaboradorId) {
+        setIsVerificandoHistorico(true);
+        try {
+          const historico = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
+          setHistoricoRecente(historico);
+        } catch (e) {
+          console.error('Erro ao carregar histórico:', e);
+        } finally {
+          setIsVerificandoHistorico(false);
+        }
+      }
+    };
+    carregarHistorico();
+  }, [watchColaboradorId]);
 
   useEffect(() => {
     if (watchInicio && watchFim) {
