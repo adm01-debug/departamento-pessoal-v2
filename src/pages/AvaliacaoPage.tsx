@@ -17,10 +17,11 @@ import { avaliacaoService } from '@/services/avaliacaoService';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Target, Plus, Users, TrendingUp, Star, Trash2, LayoutGrid, History, BarChart2, Calendar, CheckCircle2 } from 'lucide-react';
+import { Target, Plus, Users, TrendingUp, Star, Trash2, LayoutGrid, History, BarChart2, Calendar, CheckCircle2, Clock } from 'lucide-react';
 import { PerformanceDashboard } from '@/components/avaliacao/PerformanceDashboard';
 import { NineBoxMatrix } from '@/components/avaliacao/NineBoxMatrix';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const statusColors: Record<string, string> = { 
   rascunho: 'secondary', 
