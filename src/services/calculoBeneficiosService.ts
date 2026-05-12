@@ -4,6 +4,7 @@ import { auditLogger } from '@/utils/auditLogger';
 export const valeTransporteService = {
   /**
    * Calcula o custo de VT considerando o limite de 6% do salário base (Lei 7.418/85)
+   * Integração com Portaria 671 MTP para controle de dias úteis
    */
   async calcularCustoMensal(colaboradorId: string, diasUteis: number = 22) {
     const { data: colab, error: colabError } = await supabase
@@ -40,7 +41,8 @@ export const valeTransporteService = {
       descontoColaborador: descontoEfetivo,
       custoEmpresa,
       diasUteis,
-      aliquotaDesconto: 0.06
+      aliquotaDesconto: 0.06,
+      baseLegal: 'Lei 7.418/85'
     };
   }
 };
@@ -90,6 +92,7 @@ export const valeAlimentacaoService = {
 export const planoSaudeService = {
   /**
    * Calcula coparticipação retida em folha
+   * Compliance com ANS e regras de retenção 2026
    */
   async calcularCoparticipacao(colaboradorId: string, mesReferencia: string) {
     const { data, error } = await (supabase
@@ -114,6 +117,22 @@ export const planoSaudeService = {
     
     if (error) throw error;
     return data || [];
+  },
+
+  async calcularCustosEmpresa(empresaId: string, mesReferencia: string) {
+    const { data, error } = await supabase
+      .from('beneficios_colaborador')
+      .select(`
+        id,
+        valor_empresa,
+        beneficio:beneficios!inner (tipo, empresa_id)
+      `)
+      .eq('beneficio.empresa_id', empresaId)
+      .eq('beneficio.tipo', 'saude')
+      .eq('status_vinculo', 'ativo');
+
+    if (error) throw error;
+    return (data || []).reduce((acc: number, item: any) => acc + (Number(item.valor_empresa) || 0), 0);
   }
 };
 
