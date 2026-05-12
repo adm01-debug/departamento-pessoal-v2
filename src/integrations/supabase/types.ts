@@ -107,6 +107,7 @@ export type Database = {
           salario_proposto: number
           sexo: string | null
           telefone: string | null
+          template_contrato_id: string | null
           updated_at: string
         }
         Insert: {
@@ -136,6 +137,7 @@ export type Database = {
           salario_proposto: number
           sexo?: string | null
           telefone?: string | null
+          template_contrato_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -165,6 +167,7 @@ export type Database = {
           salario_proposto?: number
           sexo?: string | null
           telefone?: string | null
+          template_contrato_id?: string | null
           updated_at?: string
         }
         Relationships: [
