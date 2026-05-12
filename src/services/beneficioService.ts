@@ -88,5 +88,41 @@ export const beneficioService = {
       .eq('colaborador_id', colaboradorId);
     if (error) throw error;
     return data || [];
+  },
+
+  async obterResumoCustos(empresaId: string) {
+    const { data, error } = await supabase
+      .from('beneficios_colaborador')
+      .select(`
+        id,
+        valor_colaborador,
+        valor_empresa,
+        beneficio:beneficios!inner (
+          id,
+          nome,
+          tipo,
+          empresa_id
+        )
+      `)
+      .eq('beneficio.empresa_id', empresaId)
+      .eq('status_vinculo', 'ativo');
+
+    if (error) throw error;
+
+    const resumo = (data || []).reduce((acc: any, item: any) => {
+      const tipo = item.beneficio.tipo || 'Outros';
+      if (!acc[tipo]) acc[tipo] = { empresa: 0, colaborador: 0, total: 0 };
+      
+      const vEmpresa = Number(item.valor_empresa) || 0;
+      const vColab = Number(item.valor_colaborador) || 0;
+      
+      acc[tipo].empresa += vEmpresa;
+      acc[tipo].colaborador += vColab;
+      acc[tipo].total += (vEmpresa + vColab);
+      
+      return acc;
+    }, {});
+
+    return resumo;
   }
 };

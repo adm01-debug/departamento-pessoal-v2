@@ -14,10 +14,17 @@ export function useBeneficios() {
     enabled: !!empresaId,
   });
 
+  const resumoQuery = useQuery({
+    queryKey: ['beneficios-resumo', empresaId],
+    queryFn: () => beneficioService.obterResumoCustos(empresaId!),
+    enabled: !!empresaId,
+  });
+
   const criarBeneficio = useMutation({
     mutationFn: (dados: any) => beneficioService.criar({ ...dados, empresa_id: empresaId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
+      qc.invalidateQueries({ queryKey: ['beneficios-resumo', empresaId] });
       toast.success('Benefício criado com sucesso!');
     },
     onError: (err: Error) => toast.error(`Erro ao criar: ${err.message}`),
@@ -27,17 +34,29 @@ export function useBeneficios() {
     mutationFn: ({ id, dados }: { id: string, dados: any }) => beneficioService.atualizar(id, dados),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
+      qc.invalidateQueries({ queryKey: ['beneficios-resumo', empresaId] });
       toast.success('Benefício atualizado!');
+    },
+  });
+
+  const excluirBeneficio = useMutation({
+    mutationFn: (id: string) => beneficioService.excluir(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
+      qc.invalidateQueries({ queryKey: ['beneficios-resumo', empresaId] });
+      toast.success('Benefício excluído!');
     },
   });
 
   return {
     beneficios: query.data || [],
-    isLoading: query.isLoading,
+    resumo: resumoQuery.data || {},
+    isLoading: query.isLoading || resumoQuery.isLoading,
     error: query.error,
     refetch: query.refetch,
     criarBeneficio,
     atualizarBeneficio,
+    excluirBeneficio,
     tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
   };
 }
