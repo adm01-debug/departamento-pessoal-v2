@@ -3,11 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ScanLine, Upload, Loader2, FileText, Copy } from 'lucide-react';
+import { ScanLine, Upload, Loader2, FileText, Copy, Check } from 'lucide-react';
 
 interface OCRUploaderProps {
   onTextExtracted?: (text: string, docType: string) => void;
