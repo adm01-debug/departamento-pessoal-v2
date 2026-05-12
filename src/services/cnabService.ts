@@ -55,6 +55,17 @@ export const cnabService = {
     return data || [];
   },
 
+  async listPixLotes(empresaId: string) {
+    const { data, error } = await supabase
+      .from('pix_lotes' as any)
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  },
+
   async generateCNAB240(empresaId: string, folhaId: string): Promise<string> {
     const config = await this.getConfig(empresaId);
     if (!config) throw new Error('Configuração CNAB não encontrada para esta empresa.');
@@ -79,7 +90,6 @@ export const cnabService = {
 
     if (cError) throw cError;
 
-    // 1. Criar Remessa no Banco
     const { data: remessa, error: rError } = await supabase
       .from('cnab_remessas' as any)
       .insert([{
@@ -92,7 +102,7 @@ export const cnabService = {
       .select()
       .single();
 
-    if (rError) throw rError;
+    if (rError || !remessa) throw rError || new Error('Falha ao criar remessa');
 
     const lines: string[] = [];
     let sequence = 1;
@@ -108,7 +118,6 @@ export const cnabService = {
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
     const timeStr = today.toTimeString().slice(0, 8).replace(/:/g, '');
 
-    // Header Arquivo
     let header = pad(config.banco_codigo, 3, '0', 'left') + '00000' + pad('', 9) + '2' + pad('', 14, '0') + pad(config.convenio, 20) + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('BANCO', 30) + pad('', 10) + '1' + dateStr + timeStr + pad(sequence, 6, '0', 'left') + '081' + '00000' + pad('', 69);
     lines.push(header.padEnd(240, ' '));
 
@@ -121,10 +130,10 @@ export const cnabService = {
       if (!conta) continue;
 
       const valor = Number(item.total_liquido);
-      const seuNumero = `${remessa.id.substring(0, 8)}-${detailSequence}`;
+      const seuNumero = `${(remessa as any).id.substring(0, 8)}-${detailSequence}`;
 
       cnabItensToInsert.push({
-        remessa_id: remessa.id,
+        remessa_id: (remessa as any).id,
         colaborador_id: item.colaborador_id,
         folha_item_id: item.id,
         nome_favorecido: colab.nome_completo,
@@ -134,15 +143,12 @@ export const cnabService = {
         status: 'processando'
       });
 
-      // Segmento A
       let segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A000000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
       lines.push(segA.padEnd(240, ' '));
     }
 
-    // Salvar itens no banco
     await supabase.from('cnab_itens' as any).insert(cnabItensToInsert);
 
-    // Trailer Arquivo
     let trailer = pad(config.banco_codigo, 3, '0', 'left') + '99999' + pad('', 9) + '000001' + pad(lines.length + 1, 6, '0', 'left') + pad('', 6, '0') + pad('', 205);
     lines.push(trailer.padEnd(240, ' '));
 
@@ -165,10 +171,9 @@ export const cnabService = {
 
       if (tipoRegistro === '3' && segmento === 'A') {
         const seuNumero = line.substring(73, 93).trim();
-        const codigoOcorrencia = line.substring(230, 232); // Padrão FEBRABAN
+        const codigoOcorrencia = line.substring(230, 232);
         
-        // Buscar item correspondente
-        const { data: item, error } = await supabase
+        const { data: item } = await supabase
           .from('cnab_itens' as any)
           .select('id, folha_item_id, nome_favorecido')
           .eq('seu_numero', seuNumero)
@@ -185,20 +190,20 @@ export const cnabService = {
               codigo_ocorrencia: codigoOcorrencia,
               mensagem_ocorrencia: isSuccess ? 'Confirmado' : 'Rejeitado pelo banco'
             })
-            .eq('id', item.id);
+            .eq('id', (item as any).id);
 
-          if (isSuccess && item.folha_item_id) {
+          if (isSuccess && (item as any).folha_item_id) {
             await supabase
               .from('folha_itens')
-              .update({ status_pagamento: 'pago' })
-              .eq('id', item.folha_item_id);
+              .update({ status_pagamento: 'pago' } as any)
+              .eq('id', (item as any).folha_item_id);
             results.sucesso++;
           } else {
             results.erro++;
           }
 
           results.detalhes.push({
-            nome: item.nome_favorecido,
+            nome: (item as any).nome_favorecido,
             status,
             ocorrencia: codigoOcorrencia
           });
