@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert } from 'lucide-react';
+import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
+import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 
 
 const tiposEvento = [
