@@ -85,13 +85,18 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onT
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground cursor-help border border-border/50">
+                          <span className={`text-xs font-mono px-1.5 py-0.5 rounded cursor-help border transition-all duration-300 ${
+                            af.cid?.codigo?.toLowerCase().includes(window.location.search.toLowerCase()) || 
+                            af.cid?.descricao?.toLowerCase().includes(window.location.search.toLowerCase())
+                              ? "bg-orange-500 text-white border-orange-600 scale-110 shadow-sm"
+                              : "bg-muted text-muted-foreground border-border/50"
+                          }`}>
                             {af.cid?.codigo || af.cid}
                           </span>
                         </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="font-bold">{af.cid?.codigo}</p>
-                          <p className="text-xs max-w-[200px]">{af.cid?.descricao || 'Sem descrição detalhada'}</p>
+                        <TooltipContent side="top" className="bg-popover border-border shadow-xl">
+                          <p className="font-bold text-primary">{af.cid?.codigo}</p>
+                          <p className="text-xs max-w-[220px] leading-relaxed">{af.cid?.descricao || 'Sem descrição detalhada'}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
