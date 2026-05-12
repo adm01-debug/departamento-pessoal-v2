@@ -23,6 +23,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
+import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
+
 
 const tiposEvento = [
   'S-1000', 'S-1005', 'S-1010', 'S-1020',
