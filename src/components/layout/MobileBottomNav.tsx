@@ -19,7 +19,7 @@ export function MobileBottomNav() {
   const items = isAdmin ? mobileItems : mobileItems.filter(i => i.path !== '/configuracoes');
 
   return (
-    <nav aria-label="Navegação mobile" className="fixed bottom-0 left-0 right-0 z-sticky lg:hidden">
+    <nav aria-label="Navegação mobile" className="fixed bottom-0 left-0 right-0 z-sticky md:hidden">
       <div className="glass border-t border-border/50 px-2 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16" role="list">
           {items.map(({ path, label, icon: Icon, color }) => {
