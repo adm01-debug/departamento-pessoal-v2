@@ -141,8 +141,9 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
               <Input 
                 id="file-upload"
                 type="file" 
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="cursor-pointer"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+                className="cursor-pointer file:cursor-pointer hover:bg-muted/50 transition-colors"
               />
             </div>
           </div>
