@@ -286,6 +286,96 @@ function WebhookConfigPanel() {
   );
 }
 
+function WhatsAppConfigPanel() {
+  const { empresaAtual } = useEmpresas();
+  const [loading, setLoading] = useState(false);
+  const [config, setConfig] = useState<Partial<WhatsAppConfig>>({
+    instancia_url: '',
+    api_key: '',
+    instancia_nome: 'default',
+    notificar_ponto: true,
+    notificar_ferias: true,
+    notificar_holerite: true
+  });
+
+  const { data: existingConfig, isLoading } = useQuery({
+    queryKey: ['whatsapp_config', empresaAtual?.id],
+    queryFn: () => whatsappService.getConfig(empresaAtual!.id),
+    enabled: !!empresaAtual?.id
+  });
+
+  useState(() => {
+    if (existingConfig) setConfig(existingConfig);
+  });
+
+  const salvar = async () => {
+    if (!empresaAtual?.id) return;
+    setLoading(true);
+    try {
+      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id });
+      toast.success('Configuração de WhatsApp salva!');
+    } catch (e) {
+      toast.error('Erro ao salvar configuração');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isLoading) return <Spinner />;
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="grid gap-4 max-w-lg">
+        <div className="space-y-2">
+          <Label>URL da Instância (Evolution API)</Label>
+          <Input 
+            value={config.instancia_url || ''} 
+            onChange={e => setConfig(p => ({ ...p, instancia_url: e.target.value }))} 
+            placeholder="https://sua-api.com" 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>API Key</Label>
+          <Input 
+            type="password"
+            value={config.api_key || ''} 
+            onChange={e => setConfig(p => ({ ...p, api_key: e.target.value }))} 
+            placeholder="Sua chave secreta" 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Nome da Instância</Label>
+          <Input 
+            value={config.instancia_nome || ''} 
+            onChange={e => setConfig(p => ({ ...p, instancia_nome: e.target.value }))} 
+            placeholder="default" 
+          />
+        </div>
+        
+        <div className="pt-4 space-y-4">
+          <h4 className="text-sm font-semibold border-b pb-2">Notificações Automáticas</h4>
+          <div className="flex items-center justify-between">
+            <Label>Notificar registro de ponto</Label>
+            <Switch checked={config.notificar_ponto} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ponto: v }))} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Notificar aviso de férias</Label>
+            <Switch checked={config.notificar_ferias} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ferias: v }))} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Notificar liberação de holerite</Label>
+            <Switch checked={config.notificar_holerite} onCheckedChange={v => setConfig(p => ({ ...p, notificar_holerite: v }))} />
+          </div>
+        </div>
+
+        <Button onClick={salvar} disabled={loading} className="w-full rounded-xl mt-4">
+          {loading ? 'Salvando...' : 'Salvar e Ativar Integração'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function IntegracoesPage() {
   const [bitrixOpen, setBitrixOpen] = useState(false);
   const [cnabOpen, setCnabOpen] = useState(false);
