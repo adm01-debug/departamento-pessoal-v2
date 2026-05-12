@@ -8482,6 +8482,7 @@ export type Database = {
       }
       holerites: {
         Row: {
+          assinado: boolean | null
           base_fgts: number | null
           base_inss: number | null
           base_irrf: number | null
@@ -8492,9 +8493,11 @@ export type Database = {
           colaborador_matricula: string | null
           colaborador_nome: string
           created_at: string
+          data_assinatura: string | null
           dependentes_irrf: number | null
           faltas_dias: number | null
           folha_id: string
+          hash_assinatura: string | null
           horas_extras_100: number | null
           horas_extras_50: number | null
           id: string
@@ -8507,6 +8510,7 @@ export type Database = {
           valor_irrf: number | null
         }
         Insert: {
+          assinado?: boolean | null
           base_fgts?: number | null
           base_inss?: number | null
           base_irrf?: number | null
@@ -8517,9 +8521,11 @@ export type Database = {
           colaborador_matricula?: string | null
           colaborador_nome: string
           created_at?: string
+          data_assinatura?: string | null
           dependentes_irrf?: number | null
           faltas_dias?: number | null
           folha_id: string
+          hash_assinatura?: string | null
           horas_extras_100?: number | null
           horas_extras_50?: number | null
           id?: string
@@ -8532,6 +8538,7 @@ export type Database = {
           valor_irrf?: number | null
         }
         Update: {
+          assinado?: boolean | null
           base_fgts?: number | null
           base_inss?: number | null
           base_irrf?: number | null
@@ -8542,9 +8549,11 @@ export type Database = {
           colaborador_matricula?: string | null
           colaborador_nome?: string
           created_at?: string
+          data_assinatura?: string | null
           dependentes_irrf?: number | null
           faltas_dias?: number | null
           folha_id?: string
+          hash_assinatura?: string | null
           horas_extras_100?: number | null
           horas_extras_50?: number | null
           id?: string
