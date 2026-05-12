@@ -12,4 +12,5 @@ export { CalculoFolhaWizard } from './CalculoFolhaWizard';
 export { PagamentoBancarioWizard } from './PagamentoBancarioWizard';
 export { FolhaAuditTimeline } from './FolhaAuditTimeline';
 export { FolhaDashboard } from './FolhaDashboard';
+export { FolhaESocialSync } from './FolhaESocialSync';
 

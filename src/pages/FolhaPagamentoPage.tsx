@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
 import { Card, CardContent } from '@/components/ui/card';
-import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard } from '@/components/folha';
+import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard, FolhaESocialSync } from '@/components/folha';
 import { folhaCalc } from '@/utils/folhaCalc';
 
 
@@ -247,6 +247,7 @@ export default function FolhaPagamentoPage() {
           </div>
           
           <div className="space-y-6">
+            <FolhaESocialSync competencia={competencia} />
             <FolhaAuditTimeline competencia={competencia} />
             <Card className="border border-border/30 rounded-2xl bg-primary/5">
               <CardContent className="p-4 flex items-center gap-3">

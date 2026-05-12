@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAfastamentos, useProrrogacoesAfastamento } from '@/hooks/useAfastamentos';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { gerarAfastamentosPDF } from '@/utils/afastamentoPDF';
