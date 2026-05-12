@@ -172,7 +172,7 @@ export const calculoLoteService = {
 
           await (supabase as any)
             .from('folha_itens')
-            .upsert(itemData);
+            .upsert(itemData, { onConflict: 'folha_id,colaborador_id' });
 
           // Auditoria analítica
           await (supabase as any).from('folha_auditoria').insert({
