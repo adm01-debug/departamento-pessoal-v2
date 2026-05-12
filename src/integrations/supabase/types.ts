@@ -3229,6 +3229,47 @@ export type Database = {
           },
         ]
       }
+      competencias_config: {
+        Row: {
+          ativo: boolean | null
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nivel_esperado: number | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nivel_esperado?: number | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nivel_esperado?: number | null
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competencias_config_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competencias_matriz: {
         Row: {
           ativo: boolean | null
@@ -10335,6 +10376,77 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pdi_plano_desenvolvimento: {
+        Row: {
+          acao_desenvolvimento: string | null
+          colaborador_id: string | null
+          comentarios: string | null
+          competencia_foco: string | null
+          created_at: string
+          empresa_id: string | null
+          id: string
+          prazo: string | null
+          status: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          acao_desenvolvimento?: string | null
+          colaborador_id?: string | null
+          comentarios?: string | null
+          competencia_foco?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          prazo?: string | null
+          status?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          acao_desenvolvimento?: string | null
+          colaborador_id?: string | null
+          comentarios?: string | null
+          competencia_foco?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          prazo?: string | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdi_plano_desenvolvimento_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_plano_desenvolvimento_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_plano_desenvolvimento_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_plano_desenvolvimento_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pdis: {
         Row: {

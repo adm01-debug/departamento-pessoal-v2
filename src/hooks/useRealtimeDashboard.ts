@@ -14,6 +14,8 @@ const TABLE_LABELS: Record<string, string> = {
   comunicados: '📢 Novo comunicado',
   folhas_pagamento: '💰 Folha atualizada',
   beneficios: '🎁 Benefício atualizado',
+  metas_okrs: '🎯 Meta / OKR atualizada',
+  feedbacks_360: '📈 Novo feedback registrado',
 };
 
 export function useRealtimeDashboard() {
@@ -77,6 +79,15 @@ export function useRealtimeDashboard() {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficios' }, () => {
         queryClient.invalidateQueries({ queryKey: ['portal-completo'] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'metas_okrs' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['metas_okrs'] });
+        toast.info(TABLE_LABELS.metas_okrs);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'feedbacks_360' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['feedbacks_360'] });
+        queryClient.invalidateQueries({ queryKey: ['nine_box'] });
+        toast.info(TABLE_LABELS.feedbacks_360);
       })
       .subscribe();
 
