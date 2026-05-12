@@ -140,7 +140,7 @@ export const folhaCalc = {
     }
 
     // 6. Faltas e Atrasos (Reduzem a base de cálculo e são descontos)
-    const valorFaltas = Math.round(((salarioBase / jornada) * horasFalta) * 100) / 100;
+    const valorFaltas = jornada > 0 ? Math.round(((salarioBase / jornada) * horasFalta) * 100) / 100 : 0;
     if (valorFaltas > 0) {
       detalheEventos.push({ 
         codigo: '5005', 
