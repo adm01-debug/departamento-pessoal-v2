@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
 import { toast } from 'sonner';
 import { Shield, Plus } from 'lucide-react';
-import { SSTKPIs, SSTExamesTab, SSTEPIsTab, SSTProgramasTab, SSTRiscosTab, SSTNRsTab } from '@/components/sst';
+import { SSTKPIs, SSTExamesTab, SSTEPIsTab, SSTProgramasTab, SSTRiscosTab, SSTNRsTab, SSTIncidentesTab } from '@/components/sst';
 
 const RISCO_LEVELS = [
   { label: 'Trivial', value: 1 },
@@ -139,12 +139,14 @@ export default function SSTPage() {
             <TabsTrigger value="programas" className="rounded-lg font-body">📋 Programas</TabsTrigger>
             <TabsTrigger value="riscos" className="rounded-lg font-body">⚠️ Riscos</TabsTrigger>
             <TabsTrigger value="nrs" className="rounded-lg font-body">📑 NRs</TabsTrigger>
+            <TabsTrigger value="incidentes" className="rounded-lg font-body">🚨 Incidentes</TabsTrigger>
           </TabsList>
           <TabsContent value="exames"><SSTExamesTab asos={asos} porTipo={stats.porTipo} porDepartamento={stats.porDepartamento} isLoading={loadAsos} /></TabsContent>
           <TabsContent value="epis"><SSTEPIsTab epis={epis} entregas={entregas} /></TabsContent>
           <TabsContent value="programas"><SSTProgramasTab /></TabsContent>
           <TabsContent value="riscos"><SSTRiscosTab /></TabsContent>
           <TabsContent value="nrs"><SSTNRsTab /></TabsContent>
+          <TabsContent value="incidentes"><SSTIncidentesTab /></TabsContent>
         </Tabs>
       </PageLayout>
     </>

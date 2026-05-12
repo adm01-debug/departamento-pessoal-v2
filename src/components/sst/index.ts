@@ -4,3 +4,4 @@ export { SSTEPIsTab } from './SSTEPIsTab';
 export { SSTProgramasTab } from './SSTProgramasTab';
 export { SSTRiscosTab } from './SSTRiscosTab';
 export { SSTNRsTab } from './SSTNRsTab';
+export { SSTIncidentesTab } from './SSTIncidentesTab';
