@@ -27,10 +27,15 @@ const eventoDescricao: Record<string, string> = {
   'S-2200': 'Cadastramento Inicial / Admissão',
   'S-2205': 'Alteração de Dados Cadastrais',
   'S-2206': 'Alteração Contratual',
+  'S-2210': 'Comunicação de Acidente de Trabalho (CAT)',
+  'S-2220': 'Monitoramento da Saúde do Trabalhador (ASO)',
   'S-2230': 'Afastamento Temporário',
+  'S-2240': 'Condições Ambientais do Trabalho (Agentes Nocivos)',
   'S-2299': 'Desligamento',
   'S-2300': 'Trabalhador Sem Vínculo - Início',
+  'S-2306': 'Trabalhador Sem Vínculo - Alteração',
   'S-2399': 'Trabalhador Sem Vínculo - Término',
+  'S-2400': 'Cadastro de Beneficiário - Entes Federados',
 };
 
 export function getEventoDescricao(tipo: string): string {
