@@ -27,73 +27,85 @@ export function useCalculoFolha() {
     }) => {
       setIsCalculando(true);
       
-      const res = folhaCalc.processar(salarioBase, params);
-      setResultado(res);
+      try {
+        const res = folhaCalc.processar(salarioBase, params);
+        setResultado(res);
 
-      const { data: header, error: headerError } = await supabase
-        .from('folhas_pagamento')
-        .select('id')
-        .eq('empresa_id', empresaId)
-        .eq('competencia', competencia)
-        .maybeSingle();
-
-      if (headerError) throw headerError;
-
-      let folhaId = header?.id;
-
-      if (!folhaId) {
-        const { data: newHeader, error: createError } = await supabase
+        // 1. Garantir que o header da folha existe
+        const { data: header, error: headerError } = await supabase
           .from('folhas_pagamento')
-          .insert({
-            empresa_id: empresaId,
-            competencia,
-            status: 'aberta',
-            tipo: 'Mensal'
-          })
           .select('id')
-          .single();
-        
-        if (createError) throw createError;
-        folhaId = newHeader.id;
-      }
+          .eq('empresa_id', empresaId)
+          .eq('competencia', competencia)
+          .maybeSingle();
 
-      const { data, error } = await supabase
-        .from('folha_itens')
-        .upsert({
+        if (headerError) throw headerError;
+
+        let folhaId = header?.id;
+
+        if (!folhaId) {
+          const { data: newHeader, error: createError } = await supabase
+            .from('folhas_pagamento')
+            .insert({
+              empresa_id: empresaId,
+              competencia,
+              status: 'aberta',
+              tipo: 'Mensal'
+            })
+            .select('id')
+            .single();
+          
+          if (createError) throw createError;
+          folhaId = newHeader.id;
+        }
+
+        // 2. Salvar ou atualizar o item da folha
+        const { data, error } = await supabase
+          .from('folha_itens')
+          .upsert({
+            folha_id: folhaId,
+            colaborador_id: colaboradorId,
+            salario_base: salarioBase,
+            total_proventos: res.proventos,
+            total_descontos: res.descontos,
+            total_liquido: res.liquido,
+            inss_mes: res.inss,
+            irrf_mes: res.irrf,
+            fgts_mes: res.fgts,
+            detalhes: res as any
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // 3. Registrar auditoria
+        await supabase.from('folha_auditoria').insert({
           folha_id: folhaId,
           colaborador_id: colaboradorId,
-          salario_base: salarioBase,
-          total_proventos: res.proventos,
-          total_descontos: res.descontos,
-          total_liquido: res.liquido,
-          inss_mes: res.inss,
-          irrf_mes: res.irrf,
-          fgts_mes: res.fgts,
-          detalhes: res as any
-        })
-        .select()
-        .single();
+          tipo_evento: 'CALCULO',
+          mensagem: 'Cálculo de folha individual realizado com sucesso',
+          severidade: 'INFO',
+          detalhes: { 
+            liquido: res.liquido, 
+            base: salarioBase,
+            params_used: params 
+          } as any
+        });
 
-      if (error) throw error;
-
-      // Log de Auditoria para Cálculo Individual
-      await supabase.from('folha_auditoria').insert({
-        folha_id: folhaId,
-        colaborador_id: colaboradorId,
-        tipo_evento: 'CALCULO',
-        mensagem: 'Cálculo manual realizado',
-        severidade: 'INFO',
-        detalhes: { valor_liquido: res.liquido, manual: true } as any
-      });
-
-      return data;
+        return data;
+      } catch (err: any) {
+        console.error('Erro no cálculo de folha:', err);
+        throw err;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
-      toast.success('Cálculo individual realizado com sucesso.');
+      queryClient.invalidateQueries({ queryKey: ['folha_itens'] });
+      toast.success('Folha calculada e salva com sucesso.');
     },
     onError: (error: any) => {
-      toast.error(`Erro ao calcular: ${error.message}`);
+      toast.error(`Falha no processamento: ${error.message}`);
     },
     onSettled: () => setIsCalculando(false)
   });
@@ -107,12 +119,11 @@ export function useCalculoFolha() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
-      toast.success(`Processamento em lote concluído: ${data.success} sucessos, ${data.errors} erros.`);
+      toast.success(`Lote concluído: ${data.success} sucessos, ${data.errors} falhas.`);
     },
     onSettled: () => {
       setIsCalculando(false);
-      // Mantemos o progresso por 5 segundos para o usuário ver o 100%
-      setTimeout(() => setProgressoLote(null), 5000);
+      setTimeout(() => setProgressoLote(null), 3000);
     }
   });
 
@@ -122,5 +133,6 @@ export function useCalculoFolha() {
     progressoLote,
     executarCalculo: calcularEGuardar.mutateAsync,
     executarCalculoLote: calcularLote.mutateAsync,
+    resetResultado: () => setResultado(null)
   };
 }
