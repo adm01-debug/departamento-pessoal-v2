@@ -39,8 +39,14 @@ export function useAfastamentos() {
 
   const atualizarMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => afastamentoService.atualizar(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
+      auditLogger.log({
+        tabela: 'afastamentos',
+        registro_id: variables.id,
+        acao: 'UPDATE',
+        dados_novos: variables.data
+      });
       toast.success('Afastamento atualizado com sucesso');
     },
     onError: (err: Error) => toast.error(`Erro ao atualizar: ${err.message}`),
