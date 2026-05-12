@@ -14,15 +14,16 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { documentoService, colaboradorService } from '@/services';
-import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2, Search, Filter } from 'lucide-react';
+import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2, Search, Filter, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { DocumentoTimeline } from '@/components/documents/DocumentoTimeline';
+import { DocumentoPreview } from '@/components/documents/DocumentoPreview';
+import { useSearchParams } from 'react-router-dom';
 
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG', 'CPF', 'CTPS', 'Comprovante', 'Outro'];
-
-import { useSearchParams } from 'react-router-dom';
 
 export default function DocumentosPage() {
   const [searchParams] = useSearchParams();
@@ -39,6 +40,8 @@ export default function DocumentosPage() {
   const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
   const [ocrResult, setOcrResult] = useState<any>(null);
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
+  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<any>(null);
+  const [selectedDocForPreview, setSelectedDocForPreview] = useState<any>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -60,7 +63,6 @@ export default function DocumentosPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (doc: any) => {
-      // Delete from storage if url exists
       if (doc.url) {
         const path = doc.url.split(`${BUCKET}/`).pop();
         if (path) await supabase.storage.from(BUCKET).remove([path]);
@@ -92,7 +94,6 @@ export default function DocumentosPage() {
       const { error: uploadErr } = await supabase.storage.from(BUCKET).upload(storagePath, file);
       if (uploadErr) throw uploadErr;
 
-      // Get signed URL (private bucket)
       const { data: urlData } = await supabase.storage.from(BUCKET).createSignedUrl(storagePath, 60 * 60 * 24 * 365);
 
       await documentoService.criar({
@@ -158,16 +159,7 @@ export default function DocumentosPage() {
   };
 
   const handleView = async (doc: any) => {
-    try {
-      const path = doc.storage_path || doc.url?.split(`${BUCKET}/`).pop();
-      if (!path) { toast.error('Arquivo não encontrado'); return; }
-
-      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600);
-      if (error) throw error;
-      window.open(data.signedUrl, '_blank');
-    } catch (e: any) {
-      toast.error(e.message);
-    }
+    setSelectedDocForPreview(doc);
   };
 
   const formatSize = (bytes: number) => {
@@ -280,6 +272,9 @@ export default function DocumentosPage() {
                       <Button variant="ghost" size="icon" className="rounded-xl hover:bg-info/10" onClick={() => handleView(doc)} title="Visualizar">
                         <Eye className="h-4 w-4" />
                       </Button>
+                      <Button variant="ghost" size="icon" className="rounded-xl hover:bg-success/10" onClick={() => setSelectedDocForTimeline(doc)} title="Histórico">
+                        <History className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="rounded-xl hover:bg-success/10" onClick={() => handleDownload(doc)} title="Download">
                         <Download className="h-4 w-4" />
                       </Button>
@@ -353,6 +348,26 @@ export default function DocumentosPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Timeline Dialog */}
+      <Dialog open={!!selectedDocForTimeline} onOpenChange={(o) => { if(!o) setSelectedDocForTimeline(null); }}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display">Histórico do Documento</DialogTitle>
+          </DialogHeader>
+          {selectedDocForTimeline && <DocumentoTimeline documentoId={selectedDocForTimeline.id} />}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedDocForTimeline(null)} className="rounded-xl">Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Component */}
+      <DocumentoPreview 
+        documento={selectedDocForPreview} 
+        isOpen={!!selectedDocForPreview} 
+        onClose={() => setSelectedDocForPreview(null)} 
+      />
+
       {/* Upload Dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent className="rounded-2xl">
@@ -396,19 +411,20 @@ export default function DocumentosPage() {
                   </div>
                 ) : (
                   <div>
-                    <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="font-body text-sm text-muted-foreground">Clique para selecionar um arquivo</p>
-                    <p className="font-body text-xs text-muted-foreground/60 mt-1">Máximo 10MB</p>
+                    <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Arraste ou clique para selecionar</p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-1">PDF, PNG, JPG até 10MB</p>
                   </div>
                 )}
               </div>
-              <input ref={fileRef} type="file" className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
+              <input type="file" ref={fileRef} className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} accept=".pdf,.png,.jpg,.jpeg" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowUpload(false)} className="rounded-xl font-body">Cancelar</Button>
-            <Button onClick={handleUpload} disabled={uploading || !file || !tipo} className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body">
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}Enviar
+            <Button variant="outline" onClick={() => setShowUpload(false)} className="rounded-xl">Cancelar</Button>
+            <Button onClick={handleUpload} disabled={uploading} className="rounded-xl bg-gradient-to-r from-warning to-primary">
+              {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+              Enviar Documento
             </Button>
           </DialogFooter>
         </DialogContent>

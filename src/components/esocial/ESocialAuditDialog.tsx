@@ -5,6 +5,7 @@ import { ShieldAlert, CheckCircle, AlertTriangle, Loader2, Sparkles, ArrowRight,
 import { motion, AnimatePresence } from 'framer-motion';
 import { ESocialEvento } from '@/services/esocialService';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 interface ESocialAuditDialogProps {
   open: boolean;

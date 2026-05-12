@@ -54,5 +54,23 @@ export function useDocumentos(colaboradorId?: string) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  return { documentos, isLoading, criarDocumento, excluirDocumento };
+  const atualizarDocumento = useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string; [key: string]: any }) => {
+      const { data, error } = await supabase
+        .from('documentos')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documentos'] });
+      toast.success('Documento atualizado!');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return { documentos, isLoading, criarDocumento, excluirDocumento, atualizarDocumento };
 }
