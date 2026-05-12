@@ -50,9 +50,22 @@ export const pontoService = {
     if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
     
     const now = new Date();
-    // Ajuste para pegar a data e hora local correta, evitando o erro do toISOString() que usa UTC
     const data = format(now, 'yyyy-MM-dd');
     const hora = format(now, 'HH:mm');
+
+    // 1. Prevenção de duplicidade (mesmo tipo no mesmo minuto)
+    const { data: duplicate } = await supabase
+      .from('batidas_ponto')
+      .select('id')
+      .eq('colaborador_id', colaboradorId)
+      .eq('data', data)
+      .eq('hora', hora)
+      .eq('tipo', tipoMap[tipo] || 'entrada')
+      .maybeSingle();
+
+    if (duplicate) {
+      throw new Error('Já existe um registro idêntico para este horário. Aguarde um minuto.');
+    }
 
     // Get colaborador and workplace info
     const { data: colab, error: colabError } = await supabase
@@ -92,13 +105,6 @@ export const pontoService = {
 
     const hashPayload = `${colaboradorId}|${data}|${hora}|${options?.dispositivoId || 'web'}`;
     const hashIntegridade = CryptoJS.SHA256(hashPayload).toString();
-
-    const tipoMap: Record<string, string> = { 
-      entrada: 'entrada', 
-      saida_almoco: 'saida', 
-      retorno_almoco: 'entrada', 
-      saida: 'saida' 
-    };
 
     // Determine order - Buscar o último registro do dia para garantir a ordem correta
     const { data: lastPoint } = await supabase
