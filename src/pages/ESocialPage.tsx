@@ -129,9 +129,15 @@ export default function ESocialPage() {
               <ShieldAlert className="h-4 w-4" />
               Auditoria IA
            </Button>
-           <Button size="sm" className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow">
+           <Button 
+             size="sm" 
+             className="rounded-xl gap-1.5 bg-gradient-to-r from-primary to-primary-glow"
+             onClick={() => {
+               toast.info("Iniciando processamento em lote de eventos periódicos...");
+             }}
+           >
               <RefreshCw className="h-4 w-4" />
-              Sincronizar Todos
+              Sincronizar Eventos Periódicos
            </Button>
         </div>
       }
