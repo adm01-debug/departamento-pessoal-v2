@@ -335,10 +335,17 @@ export default function ESocialPage() {
                             </TooltipProvider>
                           )}
                         </p>
-                        <p className="text-sm text-muted-foreground font-body">
-                          {formatDate(e.data_envio || e.created_at)}
-                          {e.protocolo && <span className="ml-2 text-xs opacity-70">Protocolo: {e.protocolo}</span>}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                          <p className="text-[10px] text-muted-foreground font-body flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {e.status === 'enviado' ? 'Enviado em:' : 'Criado em:'} {formatDate(e.data_envio || e.created_at)}
+                          </p>
+                          {e.protocolo && (
+                            <p className="text-[10px] text-primary font-mono bg-primary/5 px-1.5 rounded border border-primary/10">
+                              Protocolo: {e.protocolo}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
