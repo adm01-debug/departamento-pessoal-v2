@@ -111,9 +111,9 @@ export default function ESocialPage() {
   };
 
   const statsData = [
-    { label: 'Eventos Enviados', value: String(stats.enviados), gradient: 'from-primary to-primary-glow' },
-    { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-primary-glow to-primary' },
-    { label: 'Com Erro', value: String(stats.erros), gradient: 'from-destructive to-destructive/70/70' },
+    { label: 'Enviados', value: String(stats.enviados), gradient: 'from-success to-success/70' },
+    { label: 'Pendentes', value: String(stats.pendentes), gradient: 'from-warning to-warning/70' },
+    { label: 'Com Erro', value: String(stats.erros), gradient: 'from-destructive to-destructive/70' },
     { label: 'Conformidade', value: `${stats.conformidade}%`, gradient: 'from-primary to-primary-glow' },
   ];
 
@@ -152,8 +152,8 @@ export default function ESocialPage() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
         <div className="lg:col-span-3 space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            {statsData.slice(0, 3).map(({ label, value, gradient }, i) => (
+          <div className="grid gap-4 md:grid-cols-4">
+            {statsData.map(({ label, value, gradient }, i) => (
               <motion.div key={label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
                 <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden group hover:shadow-glow transition-all">
                   <div className={cn("h-[2px] bg-gradient-to-r", gradient)} />
@@ -335,10 +335,17 @@ export default function ESocialPage() {
                             </TooltipProvider>
                           )}
                         </p>
-                        <p className="text-sm text-muted-foreground font-body">
-                          {formatDate(e.data_envio || e.created_at)}
-                          {e.protocolo && <span className="ml-2 text-xs opacity-70">Protocolo: {e.protocolo}</span>}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                          <p className="text-[10px] text-muted-foreground font-body flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {e.status === 'enviado' ? 'Enviado em:' : 'Criado em:'} {formatDate(e.data_envio || e.created_at)}
+                          </p>
+                          {e.protocolo && (
+                            <p className="text-[10px] text-primary font-mono bg-primary/5 px-1.5 rounded border border-primary/10">
+                              Protocolo: {e.protocolo}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
