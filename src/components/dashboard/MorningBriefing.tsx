@@ -27,6 +27,7 @@ interface BriefingData {
   vencimentosHoje: { descricao: string; tipo: string }[];
   totalAtivos: number;
   pontosRegistradosHoje: number;
+  esocialHealth: number;
 }
 
 function useMorningBriefing() {
@@ -48,6 +49,7 @@ function useMorningBriefing() {
         { data: asoData },
         { count: totalAtivos },
         { count: pontosHoje },
+        { data: esocialData },
       ] = await Promise.all([
         supabase.from('colaboradores').select('nome_completo, data_nascimento').eq('status', 'ativo').not('data_nascimento', 'is', null),
         supabase.from('ferias').select('data_inicio, data_fim, colaboradores!fk_ferias_colaborador(nome_completo)').in('status', ['aprovada', 'em_andamento']).lte('data_inicio', hojeStr).gte('data_fim', hojeStr),
@@ -56,7 +58,13 @@ function useMorningBriefing() {
         supabase.from('exames').select('data_validade, tipo, colaboradores!exames_colaborador_id_fkey(nome_completo)').gte('data_validade', hojeStr).lte('data_validade', em7Dias),
         supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
         supabase.from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
+        supabase.from('esocial_eventos').select('status'),
       ]);
+
+      const esocialEventos = esocialData || [];
+      const esocialTotal = esocialEventos.length;
+      const esocialErros = esocialEventos.filter((e: any) => e.status === 'erro').length;
+      const esocialHealth = esocialTotal > 0 ? Math.round(((esocialTotal - esocialErros) / esocialTotal) * 100) : 100;
 
       const aniversariantes = (colabs || [])
         .filter(c => {
@@ -78,6 +86,7 @@ function useMorningBriefing() {
       return {
         aniversariantes, feriasPeriodo, afastadosHoje, admissoesHoje, vencimentosHoje,
         totalAtivos: totalAtivos || 0, pontosRegistradosHoje: pontosHoje || 0,
+        esocialHealth,
       };
     },
   });
@@ -175,6 +184,10 @@ export function MorningBriefing() {
               {data.afastadosHoje.length} afastados
             </Badge>
           )}
+          <Badge variant="outline" className={cn("gap-1.5 py-1.5 rounded-xl font-body", data.esocialHealth < 90 ? "text-destructive border-destructive/30" : "text-success border-success/30")}>
+            <ShieldAlert className="h-3 w-3" />
+            Conformidade eSocial: {data.esocialHealth}%
+          </Badge>
         </div>
 
         {/* Aniversariantes de hoje */}
