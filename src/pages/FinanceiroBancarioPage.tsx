@@ -137,6 +137,26 @@ export default function FinanceiroBancarioPage() {
     }
   };
 
+  const handleImportRetorno = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setProcessingRetorno(true);
+      const content = await file.text();
+      const results = await cnabService.parseRetornoCNAB(content);
+      
+      toast.success(`Retorno processado: ${results.sucesso} sucessos, ${results.erro} erros.`);
+      loadData();
+    } catch (error: any) {
+      toast.error('Erro ao processar arquivo de retorno: ' + error.message);
+    } finally {
+      setProcessingRetorno(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
   const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
