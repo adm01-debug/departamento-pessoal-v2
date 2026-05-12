@@ -80,6 +80,15 @@ export function useRealtimeDashboard() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficios' }, () => {
         queryClient.invalidateQueries({ queryKey: ['portal-completo'] });
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'metas_okrs' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['metas_okrs'] });
+        toast.info(TABLE_LABELS.metas_okrs);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'feedbacks_360' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['feedbacks_360'] });
+        queryClient.invalidateQueries({ queryKey: ['nine_box'] });
+        toast.info(TABLE_LABELS.feedbacks_360);
+      })
       .subscribe();
 
     return () => {
