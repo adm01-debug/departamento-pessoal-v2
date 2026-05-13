@@ -94,6 +94,7 @@ export type Database = {
           created_by: string | null
           data_nascimento: string | null
           data_prevista: string
+          data_transmissao_esocial: string | null
           departamento: string
           email: string | null
           empresa_id: string | null
@@ -104,8 +105,10 @@ export type Database = {
           nome: string
           nome_mae: string | null
           observacoes: string | null
+          protocolo_esocial: string | null
           salario_proposto: number
           sexo: string | null
+          status_esocial: string | null
           telefone: string | null
           template_contrato_id: string | null
           updated_at: string
@@ -124,6 +127,7 @@ export type Database = {
           created_by?: string | null
           data_nascimento?: string | null
           data_prevista: string
+          data_transmissao_esocial?: string | null
           departamento: string
           email?: string | null
           empresa_id?: string | null
@@ -134,8 +138,10 @@ export type Database = {
           nome: string
           nome_mae?: string | null
           observacoes?: string | null
+          protocolo_esocial?: string | null
           salario_proposto: number
           sexo?: string | null
+          status_esocial?: string | null
           telefone?: string | null
           template_contrato_id?: string | null
           updated_at?: string
@@ -154,6 +160,7 @@ export type Database = {
           created_by?: string | null
           data_nascimento?: string | null
           data_prevista?: string
+          data_transmissao_esocial?: string | null
           departamento?: string
           email?: string | null
           empresa_id?: string | null
@@ -164,8 +171,10 @@ export type Database = {
           nome?: string
           nome_mae?: string | null
           observacoes?: string | null
+          protocolo_esocial?: string | null
           salario_proposto?: number
           sexo?: string | null
+          status_esocial?: string | null
           telefone?: string | null
           template_contrato_id?: string | null
           updated_at?: string
@@ -773,6 +782,58 @@ export type Database = {
           usuario_nome?: string | null
         }
         Relationships: []
+      }
+      auditoria_contratual: {
+        Row: {
+          alterado_por: string | null
+          campo_alterado: string | null
+          colaborador_id: string | null
+          created_at: string | null
+          id: string
+          valor_antigo: string | null
+          valor_novo: string | null
+        }
+        Insert: {
+          alterado_por?: string | null
+          campo_alterado?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          id?: string
+          valor_antigo?: string | null
+          valor_novo?: string | null
+        }
+        Update: {
+          alterado_por?: string | null
+          campo_alterado?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          id?: string
+          valor_antigo?: string | null
+          valor_novo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auditoria_contratual_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auditoria_contratual_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auditoria_contratual_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       auditoria_logs: {
         Row: {
@@ -5678,6 +5739,7 @@ export type Database = {
           status: string
           tipo_documento: string
           titulo: string
+          validade_assinatura: string | null
         }
         Insert: {
           assinado_em?: string | null
@@ -5694,6 +5756,7 @@ export type Database = {
           status?: string
           tipo_documento: string
           titulo: string
+          validade_assinatura?: string | null
         }
         Update: {
           assinado_em?: string | null
@@ -5710,6 +5773,7 @@ export type Database = {
           status?: string
           tipo_documento?: string
           titulo?: string
+          validade_assinatura?: string | null
         }
         Relationships: [
           {
@@ -5754,31 +5818,37 @@ export type Database = {
           colaborador_id: string
           created_at: string
           created_by: string | null
+          hash_validacao: string | null
           id: string
           nome_arquivo: string
           tamanho_bytes: number | null
           tipo: string
           url: string
+          verificado_ia: boolean | null
         }
         Insert: {
           colaborador_id: string
           created_at?: string
           created_by?: string | null
+          hash_validacao?: string | null
           id?: string
           nome_arquivo: string
           tamanho_bytes?: number | null
           tipo: string
           url: string
+          verificado_ia?: boolean | null
         }
         Update: {
           colaborador_id?: string
           created_at?: string
           created_by?: string | null
+          hash_validacao?: string | null
           id?: string
           nome_arquivo?: string
           tamanho_bytes?: number | null
           tipo?: string
           url?: string
+          verificado_ia?: boolean | null
         }
         Relationships: [
           {

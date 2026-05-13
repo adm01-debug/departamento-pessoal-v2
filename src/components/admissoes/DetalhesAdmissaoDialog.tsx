@@ -206,9 +206,18 @@ export function DetalhesAdmissaoDialog({ admissao, open, onOpenChange }: Detalhe
                     </div>
                     <div>
                       <h5 className="text-sm font-bold text-success">eSocial: Admissão (S-2200)</h5>
-                      <p className="text-xs text-muted-foreground">
-                        Sincronize os dados do colaborador com o Governo Federal.
-                      </p>
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-xs text-muted-foreground">
+                          {admissao.status_esocial === 'enviado' 
+                            ? `Protocolo: ${admissao.protocolo_esocial || 'Sincronizado'}` 
+                            : 'Sincronize os dados do colaborador com o Governo Federal.'}
+                        </p>
+                        {admissao.data_transmissao_esocial && (
+                          <p className="text-[10px] text-muted-foreground">
+                            Transmitido em: {new Date(admissao.data_transmissao_esocial).toLocaleString('pt-BR')}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <Button 
@@ -216,8 +225,10 @@ export function DetalhesAdmissaoDialog({ admissao, open, onOpenChange }: Detalhe
                     variant="outline" 
                     className="rounded-xl border-success/30 text-success hover:bg-success/10 h-10 gap-2 font-bold"
                     onClick={handleEnvioESocial}
+                    disabled={admissao.status_esocial === 'enviado'}
                   >
-                    <Send className="w-4 h-4" /> Transmitir Agora
+                    <Send className="w-4 h-4" /> 
+                    {admissao.status_esocial === 'enviado' ? 'Transmitido' : 'Transmitir Agora'}
                   </Button>
                 </div>
               </TabsContent>
