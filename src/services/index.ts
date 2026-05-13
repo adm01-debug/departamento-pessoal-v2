@@ -273,6 +273,16 @@ export const feriasService = {
     if (error) throw error;
   },
 
+  async getAprovacoesLog(feriasId: string) {
+    const { data, error } = await supabase
+      .from('ferias_aprovacoes_log' as any)
+      .select('*')
+      .eq('ferias_id', feriasId)
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
 };
 
 export const folhaService = {
@@ -290,17 +300,6 @@ export const folhaService = {
     if (error) throw error;
     return data;
   },
-  
-  async getAprovacoesLog(feriasId: string) {
-    const { data, error } = await supabase
-      .from('ferias_aprovacoes_log' as any)
-      .select('*')
-      .eq('ferias_id', feriasId)
-      .order('created_at', { ascending: true });
-    
-    if (error) throw error;
-    return data || [];
-  }
 };
 
 export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
