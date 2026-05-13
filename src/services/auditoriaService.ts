@@ -25,10 +25,29 @@ export const auditoriaService = {
     const { data, error } = await query;
     if (error) throw error;
     
-    // Filtro em memória para campos aninhados ou complexos se necessário futuramente
     return data || [];
   },
 
+  /** Registra log com suporte a versionamento (optimistic locking) */
+  async logComVersao(params: {
+    tabela: string;
+    registro_id: string;
+    acao: 'UPDATE' | 'DELETE';
+    dados_anteriores: any;
+    dados_novos?: any;
+  }) {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    await supabase.from('audit_log').insert({
+      tabela: params.tabela,
+      registro_id: params.registro_id,
+      acao: params.acao,
+      dados_anteriores: params.dados_anteriores,
+      dados_novos: params.dados_novos || null,
+      user_id: user?.id,
+      user_email: user?.email,
+    });
+  }
 };
 
 export const notificacaoService = {
