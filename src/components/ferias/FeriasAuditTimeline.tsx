@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { auditoriaService } from '@/services';
+import { auditoriaService, feriasService } from '@/services';
 import { 
   CheckCircle2, 
   Clock, 
