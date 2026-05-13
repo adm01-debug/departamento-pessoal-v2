@@ -2139,6 +2139,7 @@ export type Database = {
           requisitos: string | null
           salario_base: number | null
           updated_at: string
+          version: number | null
         }
         Insert: {
           ativo?: boolean | null
@@ -2153,6 +2154,7 @@ export type Database = {
           requisitos?: string | null
           salario_base?: number | null
           updated_at?: string
+          version?: number | null
         }
         Update: {
           ativo?: boolean | null
@@ -2167,6 +2169,7 @@ export type Database = {
           requisitos?: string | null
           salario_base?: number | null
           updated_at?: string
+          version?: number | null
         }
         Relationships: [
           {
