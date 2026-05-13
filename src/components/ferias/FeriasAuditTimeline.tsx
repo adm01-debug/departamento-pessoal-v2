@@ -7,10 +7,10 @@ import {
   User, 
   Building2, 
   Shield, 
-  ArrowRight,
-  Loader2,
   History,
-  Filter
+  Loader2,
+  XCircle,
+  Check
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
