@@ -41,7 +41,7 @@ export function ColaboradorHistory({ colaboradorId }: ColaboradorHistoryProps) {
       </CardHeader>
       <CardContent className="p-0">
         <ScrollArea className="h-[500px]">
-          {logs.length === 0 ? (
+          {(!logs || logs.length === 0) ? (
             <div className="p-12 text-center text-muted-foreground font-body italic">
               Nenhuma alteração registrada para este colaborador.
             </div>

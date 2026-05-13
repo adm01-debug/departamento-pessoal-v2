@@ -99,7 +99,7 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       auditLogger.log({
         tabela: 'prorrogacoes_afastamento',
-        registro_id: data.id,
+        registro_id: (data as any).id,
         acao: 'INSERT',
         dados_novos: data
       });

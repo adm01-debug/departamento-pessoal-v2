@@ -235,7 +235,7 @@ export const afastamentoService = {
     
     // Gerar CSV
     const headers = ["ID", "Colaborador", "Tipo", "CID", "Início", "Fim Previsto", "Dias Totais", "Empresa", "INSS", "Status"];
-    const rows = data.map(af => [
+    const rows = data.map((af: any) => [
       af.id.split('-')[0],
       af.colaborador?.nome_completo || '-',
       af.tipo,
@@ -250,7 +250,7 @@ export const afastamentoService = {
 
     const csvContent = [
       headers.join(","),
-      ...rows.map(e => e.join(","))
+      ...rows.map((e: any) => e.join(","))
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

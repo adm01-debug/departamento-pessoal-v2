@@ -109,7 +109,7 @@ export default function BeneficiosPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="font-body text-right text-sm font-bold text-success">
-                          {formatCurrency(b.valor * adesoes)}
+                          {formatCurrency((b.valor || 0) * adesoes)}
                         </TableCell>
                         <TableCell>
                           <Badge className={b.ativo ? 'bg-success/15 text-success border-0 text-[10px] rounded-full' : 'bg-muted text-muted-foreground border-0 text-[10px] rounded-full'}>

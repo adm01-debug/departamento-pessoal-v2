@@ -43,7 +43,7 @@ export default function PontoPage() {
   const { data: locaisTrabalho } = useQuery({
     queryKey: ['locais-trabalho-ponto', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('locais_trabalho').select('*').eq('empresa_id', empresaAtual?.id).eq('ativo', true);
+      const { data, error } = await supabase.from('locais_trabalho').select('*').eq('empresa_id', empresaAtual?.id || '').eq('ativo', true);
       if (error) throw error;
       return data;
     },

@@ -138,7 +138,7 @@ export function PontoCharts() {
                     }}
                   />
                   <Bar dataKey="time" radius={[4, 4, 0, 0]}>
-                    {checkInData.map((entry, i) => (
+                    {checkInData.map((entry: any, i: number) => (
                       <Cell
                         key={`cell-${i}`}
                         fill={entry.isPunctual ? 'hsl(var(--success))' : 'hsl(var(--destructive))'}

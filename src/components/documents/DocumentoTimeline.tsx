@@ -63,7 +63,7 @@ export function DocumentoTimeline({ documentoId }: DocumentoTimelineProps) {
                       </span>
                       <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                         <FileText className="h-3 w-3" />
-                        {(item.tamanho / 1024).toFixed(1)} KB
+                        {((item.tamanho || 0) / 1024).toFixed(1)} KB
                       </span>
                     </div>
                   </div>

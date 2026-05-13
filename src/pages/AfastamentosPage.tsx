@@ -203,7 +203,7 @@ export default function AfastamentosPage() {
                   <Download className="h-4 w-4 mr-2" /> CSV (Planilha)
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={async () => {
-                  const dataToExport = filteredAfastamentos.map(af => ({
+                  const dataToExport = filteredAfastamentos.map((af: any) => ({
                     colaborador: af.colaborador?.nome_completo || '-',
                     tipo: tipoLabels[af.tipo] || af.tipo,
                     cid: af.cid?.codigo || af.cid || '-',
@@ -375,11 +375,11 @@ export default function AfastamentosPage() {
                 <div className="mt-4 space-y-3 pt-2 border-t">
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
                     <span className="text-muted-foreground">Impacto Direto</span>
-                    <span className="text-foreground">{afastamentos.reduce((acc, a) => acc + (a.dias_empresa || 0), 0)} dias pagos</span>
+                    <span className="text-foreground">{afastamentos.reduce((acc: number, a: any) => acc + (a.dias_empresa || 0), 0)} dias pagos</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
                     <span className="text-muted-foreground">Previdência</span>
-                    <span className="text-orange-600">{afastamentos.filter(a => a.dias_inss > 0).length} casos ativos</span>
+                    <span className="text-orange-600">{afastamentos.filter((a: any) => (a.dias_inss || 0) > 0).length} casos ativos</span>
                   </div>
                 </div>
               </CardContent>

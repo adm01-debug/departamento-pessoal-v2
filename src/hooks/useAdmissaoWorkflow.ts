@@ -14,7 +14,7 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
       const { data, error } = await supabase
         .from('workflows_execucoes')
         .select('*, workflow:workflows_definicoes(*), historico:workflows_historico(*)')
-        .eq('entidade_id', admissaoId)
+        .eq('entidade_id', admissaoId || '')
         .eq('entidade_tipo', 'admissao')
         .maybeSingle();
       
@@ -30,12 +30,12 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
         .insert({
           workflow_id: dados.workflow_id,
           empresa_id: empresaAtualId,
-          entidade_id: admissaoId,
+          entidade_id: admissaoId || '',
           entidade_tipo: 'admissao',
           status: 'em_andamento',
           etapa_atual: 1,
           metadata: { iniciado_em: new Date().toISOString() }
-        })
+        } as any)
         .select()
         .single();
 
@@ -55,7 +55,7 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
       const { data: admissao } = await supabase
         .from('admissoes')
         .select('email')
-        .eq('id', admissaoId)
+        .eq('id', admissaoId || '')
         .single();
       
       if (admissao?.email) {
@@ -66,7 +66,7 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
         await supabase
           .from('admissao_tokens')
           .insert({
-            admissao_id: admissaoId,
+            admissao_id: admissaoId || '',
             token: token,
             email_candidato: admissao.email,
             data_expiracao: expiracao.toISOString(),

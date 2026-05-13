@@ -118,9 +118,9 @@ export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps)
                         <User className="h-3 w-3" />
                         <span className="truncate max-w-[150px]">{log.user_email || 'Sistema'}</span>
                       </div>
-                      {log.acao === 'UPDATE' && log.campos_alterados?.length > 0 && (
+                      {log.acao === 'UPDATE' && (log.campos_alterados as any)?.length > 0 && (
                         <Badge variant="outline" className="text-[9px] h-4 border-primary/20 text-primary/70">
-                          {log.campos_alterados.length} campos
+                          {(log.campos_alterados as any).length} campos
                         </Badge>
                       )}
                     </div>

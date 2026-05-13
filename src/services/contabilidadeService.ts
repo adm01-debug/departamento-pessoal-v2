@@ -64,7 +64,7 @@ export const contabilidadeService = {
 
     const { error: lError } = await supabase
       .from('lancamentos_contabeis')
-      .insert(lancamentos);
+      .insert(lancamentos as any);
     
     if (lError) throw lError;
   },

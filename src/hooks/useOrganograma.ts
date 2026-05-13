@@ -17,7 +17,7 @@ export function useOrganograma() {
           *,
           departamento_pai:departamentos!departamentos_departamento_pai_id_fkey(id, nome)
         `)
-        .eq('empresa_id', empresaId)
+        .eq('empresa_id', empresaId || '')
         .order('nome');
 
       if (depsError) throw depsError;
@@ -26,7 +26,7 @@ export function useOrganograma() {
       const { data: cols, error: colsError } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, cargo, departamento, email, foto_url')
-        .eq('empresa_id', empresaId)
+        .eq('empresa_id', empresaId || '')
         .eq('status', 'ativo');
 
       if (colsError) throw colsError;

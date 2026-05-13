@@ -70,8 +70,8 @@ export const folhaPagamentoService = {
       empresaNome: emp?.razao_social || 'N/A',
       cnpj: emp?.cnpj || 'N/A',
       assinado: holerite?.assinado || false,
-      hashAssinatura: holerite?.hash_assinatura,
-      dataAssinatura: holerite?.data_assinatura
+      hashAssinatura: holerite?.hash_assinatura ?? undefined,
+      dataAssinatura: holerite?.data_assinatura ?? undefined
     };
   },
 
@@ -144,7 +144,7 @@ export const folhaPagamentoService = {
     
     if (folhaData) {
       const { provisoesService } = await import('@/services/folha/provisoesService');
-      await provisoesService.calcularProvisoesMensais(folhaData.empresa_id, folhaData.competencia);
+      await provisoesService.calcularProvisoesMensais(folhaData.empresa_id || '', folhaData.competencia);
     }
 
     await supabase.from('folha_auditoria').insert({

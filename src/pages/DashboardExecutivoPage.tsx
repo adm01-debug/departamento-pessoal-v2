@@ -160,14 +160,14 @@ export default function DashboardExecutivoPage() {
   const navigate = useNavigate();
   const { empresaAtualId } = useEmpresas();
   const [periodo, setPeriodo] = useState('6');
-  const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId, periodo);
-  const { data: strategic, isLoading: isStrategicLoading } = useStrategicFinancials(empresaAtualId);
+  const { data, isLoading, refetch } = useExecutiveKPIs(empresaAtualId ?? undefined, periodo);
+  const { data: strategic, isLoading: isStrategicLoading } = useStrategicFinancials(empresaAtualId ?? undefined);
 
   // Subscribe to real-time updates for KPIs
-  useRealTimeSubscription('colaboradores', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
-  useRealTimeSubscription('folhas_pagamento', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
-  useRealTimeSubscription('ferias', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
-  useRealTimeSubscription('afastamentos', ['executive-kpis', empresaAtualId, periodo], empresaAtualId);
+  useRealTimeSubscription('colaboradores', ['executive-kpis', empresaAtualId, periodo], empresaAtualId ?? undefined);
+  useRealTimeSubscription('folhas_pagamento', ['executive-kpis', empresaAtualId, periodo], empresaAtualId ?? undefined);
+  useRealTimeSubscription('ferias', ['executive-kpis', empresaAtualId, periodo], empresaAtualId ?? undefined);
+  useRealTimeSubscription('afastamentos', ['executive-kpis', empresaAtualId, periodo], empresaAtualId ?? undefined);
 
   const kpis = [
     { label: 'Headcount', value: data?.totalAtivos || 0, icon: Users, gradient: 'from-primary to-primary-glow', format: 'number' },
@@ -479,7 +479,7 @@ export default function DashboardExecutivoPage() {
             isLoadingStats={isLoading}
             isLoadingPendencias={isLoading}
             isEmptySystem={!data?.totalAtivos}
-            empresaId={empresaAtualId}
+            empresaId={empresaAtualId ?? undefined}
           />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 border border-border/30 rounded-2xl">
@@ -489,7 +489,7 @@ export default function DashboardExecutivoPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <EventTimeline empresaId={empresaAtualId} />
+                <EventTimeline empresaId={empresaAtualId ?? undefined} />
               </CardContent>
             </Card>
             <Card className="border border-border/30 rounded-2xl">

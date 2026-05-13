@@ -75,7 +75,7 @@ export async function notificarAjustePonto(
         : `Seu ajuste de ponto foi recusado. Motivo: ${motivo || 'Não informado'}`,
       tipo: status === 'aprovado' ? 'sucesso' : 'erro',
       user_id: targetUserId,
-      empresa_id: colab.empresa_id
+      empresa_id: colab.empresa_id ?? undefined
     });
   }
 }
