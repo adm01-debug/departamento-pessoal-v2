@@ -17,6 +17,27 @@ interface SSTKPIsProps {
 }
 
 export function SSTKPIs({ validos, vencendo, vencidos, totalEpis, totalEntregas }: SSTKPIsProps) {
+  const { empresaAtual } = useEmpresa();
+  
+  const { data: incidentesMes = 0 } = useQuery({
+    queryKey: ['sst_kpi_incidentes', empresaAtual?.id],
+    enabled: !!empresaAtual?.id,
+    queryFn: async () => {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0,0,0,0);
+      
+      const { count, error } = await supabase
+        .from('sst_incidentes' as any)
+        .select('*', { count: 'exact', head: true })
+        .eq('empresa_id', empresaAtual!.id)
+        .gte('data_hora', startOfMonth.toISOString());
+      
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
   const totalAsos = validos + vencendo + vencidos;
   const healthRate = totalAsos > 0 ? (validos / totalAsos) * 100 : 100;
 
@@ -25,7 +46,7 @@ export function SSTKPIs({ validos, vencendo, vencidos, totalEpis, totalEntregas 
     { label: 'Vencendo 30d', value: vencendo, icon: Clock, gradient: 'from-amber-400 to-orange-500', shadow: 'shadow-amber-100' },
     { label: 'Vencidos', value: vencidos, icon: AlertTriangle, gradient: 'from-red-500 to-rose-600', shadow: 'shadow-red-100' },
     { label: 'EPIs Ativos', value: totalEpis, icon: HardHat, gradient: 'from-sky-500 to-blue-600', shadow: 'shadow-blue-100' },
-    { label: 'Entregas Realizadas', value: totalEntregas, icon: Users, gradient: 'from-indigo-500 to-violet-600', shadow: 'shadow-indigo-100' },
+    { label: 'Incidentes (Mês)', value: incidentesMes, icon: ShieldAlert, gradient: 'from-indigo-500 to-violet-600', shadow: 'shadow-indigo-100' },
   ];
 
   return (
