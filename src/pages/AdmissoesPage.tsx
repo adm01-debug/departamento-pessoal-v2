@@ -151,6 +151,10 @@ export default function AdmissoesPage() {
           )}
         </TabsContent>
 
+        <TabsContent value="onboarding" className="space-y-6">
+          <OnboardingPageContent />
+        </TabsContent>
+
         <TabsContent value="gestao" className="space-y-6">
           <div className="space-y-3">
             <div className="relative max-w-sm">
