@@ -7562,6 +7562,44 @@ export type Database = {
           },
         ]
       }
+      fgts_digital_logs: {
+        Row: {
+          acao: string
+          created_at: string | null
+          empresa_id: string
+          guia_id: string | null
+          id: string
+          request_payload: Json | null
+          response_payload: Json | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          empresa_id: string
+          guia_id?: string | null
+          id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          empresa_id?: string
+          guia_id?: string | null
+          id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fgts_digital_logs_guia_id_fkey"
+            columns: ["guia_id"]
+            isOneToOne: false
+            referencedRelation: "guias_fgts_digital"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fila_notificacoes: {
         Row: {
           conteudo: string
@@ -8094,6 +8132,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      guias_fgts_digital: {
+        Row: {
+          competencia: string
+          created_at: string | null
+          empresa_id: string
+          gfd_data_geracao: string | null
+          gfd_protocolo: string | null
+          id: string
+          pdf_url: string | null
+          qr_code_pix: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+          valor_total: number
+          vencimento: string
+        }
+        Insert: {
+          competencia: string
+          created_at?: string | null
+          empresa_id: string
+          gfd_data_geracao?: string | null
+          gfd_protocolo?: string | null
+          id?: string
+          pdf_url?: string | null
+          qr_code_pix?: string | null
+          status?: string | null
+          tipo: string
+          updated_at?: string | null
+          valor_total: number
+          vencimento: string
+        }
+        Update: {
+          competencia?: string
+          created_at?: string | null
+          empresa_id?: string
+          gfd_data_geracao?: string | null
+          gfd_protocolo?: string | null
+          id?: string
+          pdf_url?: string | null
+          qr_code_pix?: string | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+          valor_total?: number
+          vencimento?: string
+        }
+        Relationships: []
       }
       guias_inss: {
         Row: {
