@@ -196,20 +196,36 @@ export const feriasService = {
   },
   async aprovarGestor(id: string, userId?: string) {
     const { error } = await supabase.from('ferias').update({
+      status_aprovacao_gestor: 'aprovado',
       aprovado_gestor: true,
       aprovado_gestor_em: new Date().toISOString(),
       aprovado_gestor_por: userId || null,
     } as any).eq('id', id);
     if (error) throw error;
+
+    await supabase.from('ferias_aprovacoes_log' as any).insert({
+      ferias_id: id,
+      nivel: 'gestor',
+      aprovador_id: userId,
+      status: 'aprovado'
+    });
   },
   async aprovarRH(id: string, userId?: string) {
     const { error } = await supabase.from('ferias').update({
+      status_aprovacao_rh: 'aprovado',
       aprovado_rh: true,
       aprovado_rh_em: new Date().toISOString(),
       aprovado_rh_por: userId || null,
       status: 'aprovada',
     } as any).eq('id', id);
     if (error) throw error;
+
+    await supabase.from('ferias_aprovacoes_log' as any).insert({
+      ferias_id: id,
+      nivel: 'rh',
+      aprovador_id: userId,
+      status: 'aprovado'
+    });
   },
   async listPeriodosAquisitivos(colaboradorId: string) {
     const { data, error } = await supabase
