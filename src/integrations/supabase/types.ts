@@ -1017,6 +1017,8 @@ export type Database = {
         Row: {
           ajustado: boolean | null
           ajustado_por: string | null
+          biometria_score: number | null
+          biometria_status: string | null
           colaborador_id: string
           created_at: string | null
           data: string
@@ -1025,6 +1027,7 @@ export type Database = {
           dispositivo_id: string | null
           empresa_id: string | null
           foto_biometria_url: string | null
+          hash_biometrico: string | null
           hash_digital: string | null
           hash_integridade: string | null
           hora: string
@@ -1047,6 +1050,8 @@ export type Database = {
         Insert: {
           ajustado?: boolean | null
           ajustado_por?: string | null
+          biometria_score?: number | null
+          biometria_status?: string | null
           colaborador_id: string
           created_at?: string | null
           data: string
@@ -1055,6 +1060,7 @@ export type Database = {
           dispositivo_id?: string | null
           empresa_id?: string | null
           foto_biometria_url?: string | null
+          hash_biometrico?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora: string
@@ -1077,6 +1083,8 @@ export type Database = {
         Update: {
           ajustado?: boolean | null
           ajustado_por?: string | null
+          biometria_score?: number | null
+          biometria_status?: string | null
           colaborador_id?: string
           created_at?: string | null
           data?: string
@@ -1085,6 +1093,7 @@ export type Database = {
           dispositivo_id?: string | null
           empresa_id?: string | null
           foto_biometria_url?: string | null
+          hash_biometrico?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora?: string
@@ -2816,8 +2825,10 @@ export type Database = {
           experiencia_fim_1: string | null
           experiencia_fim_2: string | null
           experiencia_tipo: string | null
+          face_id: string | null
           facebook: string | null
           formacao: string | null
+          foto_referencia_url: string | null
           foto_url: string | null
           genero_documento_id: number | null
           gestor_ferias_id: string | null
@@ -2961,8 +2972,10 @@ export type Database = {
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
+          face_id?: string | null
           facebook?: string | null
           formacao?: string | null
+          foto_referencia_url?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
           gestor_ferias_id?: string | null
@@ -3106,8 +3119,10 @@ export type Database = {
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
+          face_id?: string | null
           facebook?: string | null
           formacao?: string | null
+          foto_referencia_url?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
           gestor_ferias_id?: string | null
