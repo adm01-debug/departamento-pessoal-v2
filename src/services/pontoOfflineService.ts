@@ -65,28 +65,30 @@ export const pontoOfflineService = {
     let errors = 0;
     const remaining: OfflineRegistro[] = [];
 
-    for (const item of queue) {
-      try {
-        const { error } = await supabase.from('batidas_ponto').insert({
-          colaborador_id: item.colaborador_id,
-          tipo: item.tipo,
-          data: item.timestamp.split('T')[0],
-          hora: item.timestamp.split('T')[1].split('.')[0],
-          latitude: item.latitude,
-          longitude: item.longitude,
-          precisao: item.precisao,
-          dispositivo_id: item.dispositivoId,
-          is_offline: true,
-          sync_at: new Date().toISOString(),
-          hash_integridade: item.hash,
-          metadata: {
-            sync_strategy: 'AES-256-Encrypted-Queue',
-            original_timestamp: item.timestamp
-          }
-        } as any);
+    // 1. Enviar lote para a Edge Function de processamento
+    try {
+      const { data, error } = await supabase.functions.invoke('processar-ponto-offline', {
+        body: { registros: queue }
+      });
 
-        if (error) throw error;
-        synced++;
+      if (error) throw error;
+      
+      if (data.success) {
+        synced = data.success_count || data.success;
+        errors = data.error_count || data.errors;
+        
+        // Se houver erros específicos de registros, mantemos apenas os que falharam na fila
+        if (data.details && data.details.length > 0) {
+          const failedIds = data.details.map((d: any) => d.id);
+          queue.forEach(item => {
+            if (failedIds.includes(item.id)) remaining.push(item);
+          });
+        }
+      }
+    } catch (err) {
+      console.error('[OfflineSync] Falha na comunicação com o servidor:', err);
+      return { synced: 0, errors: queue.length };
+    }
       } catch (err) {
         console.error('[OfflineSync] Erro na batida:', item.id, err);
         errors++;
