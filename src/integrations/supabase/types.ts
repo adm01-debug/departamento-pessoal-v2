@@ -1637,9 +1637,51 @@ export type Database = {
           },
         ]
       }
+      beneficio_utilizacao: {
+        Row: {
+          beneficio_colaborador_id: string | null
+          created_at: string | null
+          data_uso: string | null
+          estabelecimento: string | null
+          id: string
+          protocolo_autorizacao: string | null
+          valor_desconto_folha: number | null
+          valor_total: number
+        }
+        Insert: {
+          beneficio_colaborador_id?: string | null
+          created_at?: string | null
+          data_uso?: string | null
+          estabelecimento?: string | null
+          id?: string
+          protocolo_autorizacao?: string | null
+          valor_desconto_folha?: number | null
+          valor_total: number
+        }
+        Update: {
+          beneficio_colaborador_id?: string | null
+          created_at?: string | null
+          data_uso?: string | null
+          estabelecimento?: string | null
+          id?: string
+          protocolo_autorizacao?: string | null
+          valor_desconto_folha?: number | null
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficio_utilizacao_beneficio_colaborador_id_fkey"
+            columns: ["beneficio_colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "beneficios_colaborador"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficios: {
         Row: {
           ativo: boolean | null
+          carencia_dias: number | null
           categoria: string | null
           codigo_esocial: string | null
           colaborador_id: string | null
@@ -1648,13 +1690,16 @@ export type Database = {
           data_inicio: string | null
           descricao: string | null
           empresa_id: string | null
+          exige_anexo_comprovante: boolean | null
           id: string
           metodo_pagamento: string | null
           nome: string
           obrigatorio_por_lei: boolean | null
           observacoes: string | null
           operadora: string | null
+          percentual_subsidio_empresa: number | null
           status: string | null
+          teto_coparticipacao: number | null
           tipo: string | null
           updated_at: string
           valor: number | null
@@ -1663,6 +1708,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          carencia_dias?: number | null
           categoria?: string | null
           codigo_esocial?: string | null
           colaborador_id?: string | null
@@ -1671,13 +1717,16 @@ export type Database = {
           data_inicio?: string | null
           descricao?: string | null
           empresa_id?: string | null
+          exige_anexo_comprovante?: boolean | null
           id?: string
           metodo_pagamento?: string | null
           nome: string
           obrigatorio_por_lei?: boolean | null
           observacoes?: string | null
           operadora?: string | null
+          percentual_subsidio_empresa?: number | null
           status?: string | null
+          teto_coparticipacao?: number | null
           tipo?: string | null
           updated_at?: string
           valor?: number | null
@@ -1686,6 +1735,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          carencia_dias?: number | null
           categoria?: string | null
           codigo_esocial?: string | null
           colaborador_id?: string | null
@@ -1694,13 +1744,16 @@ export type Database = {
           data_inicio?: string | null
           descricao?: string | null
           empresa_id?: string | null
+          exige_anexo_comprovante?: boolean | null
           id?: string
           metodo_pagamento?: string | null
           nome?: string
           obrigatorio_por_lei?: boolean | null
           observacoes?: string | null
           operadora?: string | null
+          percentual_subsidio_empresa?: number | null
           status?: string | null
+          teto_coparticipacao?: number | null
           tipo?: string | null
           updated_at?: string
           valor?: number | null
@@ -1774,8 +1827,11 @@ export type Database = {
           created_by: string | null
           data_fim: string | null
           data_inicio: string
+          data_validacao_rh: string | null
           desconto: number | null
+          hash_autorizacao: string | null
           id: string
+          ip_adesao: string | null
           motivo_suspensao: string | null
           observacoes: string | null
           status_vinculo: string | null
@@ -1790,8 +1846,11 @@ export type Database = {
           created_by?: string | null
           data_fim?: string | null
           data_inicio?: string
+          data_validacao_rh?: string | null
           desconto?: number | null
+          hash_autorizacao?: string | null
           id?: string
+          ip_adesao?: string | null
           motivo_suspensao?: string | null
           observacoes?: string | null
           status_vinculo?: string | null
@@ -1806,8 +1865,11 @@ export type Database = {
           created_by?: string | null
           data_fim?: string | null
           data_inicio?: string
+          data_validacao_rh?: string | null
           desconto?: number | null
+          hash_autorizacao?: string | null
           id?: string
+          ip_adesao?: string | null
           motivo_suspensao?: string | null
           observacoes?: string | null
           status_vinculo?: string | null
