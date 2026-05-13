@@ -1,6 +1,53 @@
 import { supabase } from '@/integrations/supabase/client';
 
+export interface WhatsAppConfig {
+  empresa_id: string;
+  webhook_url?: string;
+  api_key?: string;
+  telefone_origem?: string;
+  habilitado: boolean;
+}
+
 export const whatsappService = {
+  async getConfig(empresaId: string): Promise<WhatsAppConfig | null> {
+    const { data, error } = await supabase
+      .from('whatsapp_config' as any)
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data as any;
+  },
+
+  async saveConfig(config: WhatsAppConfig) {
+    const { error } = await supabase
+      .from('whatsapp_config' as any)
+      .upsert(config, { onConflict: 'empresa_id' });
+    
+    if (error) throw error;
+  },
+
+  async sendMessage(params: {
+    empresaId: string;
+    colaboradorId?: string;
+    phone: string;
+    message: string;
+  }) {
+    // Legacy support or direct message
+    const { error } = await supabase
+      .from('whatsapp_mensagens_logs' as any)
+      .insert({
+        empresa_id: params.empresaId,
+        colaborador_id: params.colaboradorId,
+        telefone: params.phone,
+        status: 'sent',
+        mensagem_id_externo: `wa_direct_${Date.now()}`
+      });
+    
+    if (error) throw error;
+    return { success: true };
+  },
   async listTemplates(empresaId: string) {
     const { data, error } = await supabase
       .from('whatsapp_templates' as any)
