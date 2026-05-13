@@ -107,6 +107,30 @@ export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps)
           </div>
         ) : (
           <div className="space-y-6 relative ml-2 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-border/30">
+            {/* Logs de Aprovação Real */}
+            {aprovacoes?.map((aprov: any) => (
+              <div key={aprov.id} className="relative pl-12">
+                <div className={cn(
+                  "absolute left-0 p-2 rounded-full border shadow-sm z-10 transition-transform hover:scale-110 bg-background",
+                  aprov.status === 'aprovado' ? "border-green-500 text-green-500" : "border-destructive text-destructive"
+                )}>
+                  {aprov.status === 'aprovado' ? <Check className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                </div>
+                <div className="p-3 rounded-xl border border-border/20 bg-muted/10 hover:bg-muted/20 transition-colors space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold font-display uppercase tracking-tight">
+                      Aprovação {aprov.nivel}
+                    </p>
+                    <span className="text-[10px] text-muted-foreground font-body bg-background px-1.5 py-0.5 rounded-md border border-border/40">
+                      {format(new Date(aprov.created_at), "dd 'de' MMM, HH:mm", { locale: ptBR })}
+                    </span>
+                  </div>
+                  {aprov.observacao && <p className="text-xs text-muted-foreground bg-background/50 p-2 rounded-lg italic">"{aprov.observacao}"</p>}
+                </div>
+              </div>
+            ))}
+
+            {/* Logs de Auditoria de Sistema */}
             {filteredLogs.map((log, i) => {
               const dados = (log.dados_novos as any) || {};
               return (
@@ -126,11 +150,6 @@ export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps)
                         <User className="h-3 w-3" />
                         <span className="truncate max-w-[150px]">{log.user_email || 'Sistema'}</span>
                       </div>
-                      {log.acao === 'UPDATE' && (log.campos_alterados as any)?.length > 0 && (
-                        <Badge variant="outline" className="text-[9px] h-4 border-primary/20 text-primary/70">
-                          {(log.campos_alterados as any).length} campos
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 </div>
