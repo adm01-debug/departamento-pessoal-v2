@@ -25,6 +25,7 @@ import {
 import { contratacaoService } from '@/services/contratacaoService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { OnboardingDashboard } from '@/components/admissoes/OnboardingDashboard';
+import OnboardingPageContent from './OnboardingPage';
 
 
 const etapaLabels: Record<string, string> = {
