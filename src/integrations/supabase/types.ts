@@ -11857,6 +11857,8 @@ export type Database = {
           govbr_uid: string | null
           id: string
           nome: string
+          notificacoes_email: boolean | null
+          notificacoes_push: boolean | null
           role_display: string | null
           telefone: string | null
           updated_at: string
@@ -11873,6 +11875,8 @@ export type Database = {
           govbr_uid?: string | null
           id?: string
           nome?: string
+          notificacoes_email?: boolean | null
+          notificacoes_push?: boolean | null
           role_display?: string | null
           telefone?: string | null
           updated_at?: string
@@ -11889,6 +11893,8 @@ export type Database = {
           govbr_uid?: string | null
           id?: string
           nome?: string
+          notificacoes_email?: boolean | null
+          notificacoes_push?: boolean | null
           role_display?: string | null
           telefone?: string | null
           updated_at?: string
