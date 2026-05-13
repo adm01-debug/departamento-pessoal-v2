@@ -14,6 +14,7 @@ export const pontosService = {
   getSettings: pontoService.getSettings.bind(pontoService),
   buscarRegistroHoje: pontoService.buscarRegistroHoje.bind(pontoService),
   buscarRegistrosSemana: pontoService.buscarRegistrosSemana.bind(pontoService),
+  validarBiometria: pontoService.validarBiometria.bind(pontoService),
 
   // Management and Listing
   listar: batidasPontoService.listar.bind(batidasPontoService),

@@ -181,4 +181,13 @@ export const pontoService = {
     if (error) throw error;
     return data || [];
   },
+  
+  async validarBiometria(batidaId: string, colaboradorId: string, fotoBase64: string) {
+    const { data, error } = await supabase.functions.invoke('validar-biometria', {
+      body: { batidaId, colaboradorId, fotoBase64 }
+    });
+    
+    if (error) throw error;
+    return data;
+  }
 };

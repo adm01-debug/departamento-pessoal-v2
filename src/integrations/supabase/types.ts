@@ -816,6 +816,39 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_gov_br_sessions: {
+        Row: {
+          access_token: string
+          cpf: string | null
+          created_at: string | null
+          id: string
+          id_token: string | null
+          metadata: Json | null
+          nivel_autenticacao: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_token: string
+          cpf?: string | null
+          created_at?: string | null
+          id?: string
+          id_token?: string | null
+          metadata?: Json | null
+          nivel_autenticacao?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          cpf?: string | null
+          created_at?: string | null
+          id?: string
+          id_token?: string | null
+          metadata?: Json | null
+          nivel_autenticacao?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       automacao_logs: {
         Row: {
           created_at: string | null
@@ -1017,6 +1050,8 @@ export type Database = {
         Row: {
           ajustado: boolean | null
           ajustado_por: string | null
+          biometria_score: number | null
+          biometria_status: string | null
           colaborador_id: string
           created_at: string | null
           data: string
@@ -1025,6 +1060,7 @@ export type Database = {
           dispositivo_id: string | null
           empresa_id: string | null
           foto_biometria_url: string | null
+          hash_biometrico: string | null
           hash_digital: string | null
           hash_integridade: string | null
           hora: string
@@ -1047,6 +1083,8 @@ export type Database = {
         Insert: {
           ajustado?: boolean | null
           ajustado_por?: string | null
+          biometria_score?: number | null
+          biometria_status?: string | null
           colaborador_id: string
           created_at?: string | null
           data: string
@@ -1055,6 +1093,7 @@ export type Database = {
           dispositivo_id?: string | null
           empresa_id?: string | null
           foto_biometria_url?: string | null
+          hash_biometrico?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora: string
@@ -1077,6 +1116,8 @@ export type Database = {
         Update: {
           ajustado?: boolean | null
           ajustado_por?: string | null
+          biometria_score?: number | null
+          biometria_status?: string | null
           colaborador_id?: string
           created_at?: string | null
           data?: string
@@ -1085,6 +1126,7 @@ export type Database = {
           dispositivo_id?: string | null
           empresa_id?: string | null
           foto_biometria_url?: string | null
+          hash_biometrico?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora?: string
@@ -2816,8 +2858,10 @@ export type Database = {
           experiencia_fim_1: string | null
           experiencia_fim_2: string | null
           experiencia_tipo: string | null
+          face_id: string | null
           facebook: string | null
           formacao: string | null
+          foto_referencia_url: string | null
           foto_url: string | null
           genero_documento_id: number | null
           gestor_ferias_id: string | null
@@ -2961,8 +3005,10 @@ export type Database = {
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
+          face_id?: string | null
           facebook?: string | null
           formacao?: string | null
+          foto_referencia_url?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
           gestor_ferias_id?: string | null
@@ -3106,8 +3152,10 @@ export type Database = {
           experiencia_fim_1?: string | null
           experiencia_fim_2?: string | null
           experiencia_tipo?: string | null
+          face_id?: string | null
           facebook?: string | null
           formacao?: string | null
+          foto_referencia_url?: string | null
           foto_url?: string | null
           genero_documento_id?: number | null
           gestor_ferias_id?: string | null
@@ -7514,6 +7562,44 @@ export type Database = {
           },
         ]
       }
+      fgts_digital_logs: {
+        Row: {
+          acao: string
+          created_at: string | null
+          empresa_id: string
+          guia_id: string | null
+          id: string
+          request_payload: Json | null
+          response_payload: Json | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          empresa_id: string
+          guia_id?: string | null
+          id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          empresa_id?: string
+          guia_id?: string | null
+          id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fgts_digital_logs_guia_id_fkey"
+            columns: ["guia_id"]
+            isOneToOne: false
+            referencedRelation: "guias_fgts_digital"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fila_notificacoes: {
         Row: {
           conteudo: string
@@ -8046,6 +8132,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      guias_fgts_digital: {
+        Row: {
+          competencia: string
+          created_at: string | null
+          empresa_id: string
+          gfd_data_geracao: string | null
+          gfd_protocolo: string | null
+          id: string
+          pdf_url: string | null
+          qr_code_pix: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+          valor_total: number
+          vencimento: string
+        }
+        Insert: {
+          competencia: string
+          created_at?: string | null
+          empresa_id: string
+          gfd_data_geracao?: string | null
+          gfd_protocolo?: string | null
+          id?: string
+          pdf_url?: string | null
+          qr_code_pix?: string | null
+          status?: string | null
+          tipo: string
+          updated_at?: string | null
+          valor_total: number
+          vencimento: string
+        }
+        Update: {
+          competencia?: string
+          created_at?: string | null
+          empresa_id?: string
+          gfd_data_geracao?: string | null
+          gfd_protocolo?: string | null
+          id?: string
+          pdf_url?: string | null
+          qr_code_pix?: string | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string | null
+          valor_total?: number
+          vencimento?: string
+        }
+        Relationships: []
       }
       guias_inss: {
         Row: {
@@ -11838,10 +11972,14 @@ export type Database = {
           cpf_validado_govbr: boolean | null
           created_at: string
           departamento: string | null
+          gov_br_nivel: string | null
+          gov_br_vinculado: boolean | null
           govbr_nivel_autenticacao: string | null
           govbr_uid: string | null
           id: string
           nome: string
+          notificacoes_email: boolean | null
+          notificacoes_push: boolean | null
           role_display: string | null
           telefone: string | null
           updated_at: string
@@ -11854,10 +11992,14 @@ export type Database = {
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
+          gov_br_nivel?: string | null
+          gov_br_vinculado?: boolean | null
           govbr_nivel_autenticacao?: string | null
           govbr_uid?: string | null
           id?: string
           nome?: string
+          notificacoes_email?: boolean | null
+          notificacoes_push?: boolean | null
           role_display?: string | null
           telefone?: string | null
           updated_at?: string
@@ -11870,10 +12012,14 @@ export type Database = {
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
+          gov_br_nivel?: string | null
+          gov_br_vinculado?: boolean | null
           govbr_nivel_autenticacao?: string | null
           govbr_uid?: string | null
           id?: string
           nome?: string
+          notificacoes_email?: boolean | null
+          notificacoes_push?: boolean | null
           role_display?: string | null
           telefone?: string | null
           updated_at?: string
@@ -15471,6 +15617,104 @@ export type Database = {
           },
         ]
       }
+      whatsapp_mensagens_logs: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string | null
+          empresa_id: string
+          error_message: string | null
+          id: string
+          mensagem_id_externo: string | null
+          status: string | null
+          telefone: string
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          empresa_id: string
+          error_message?: string | null
+          id?: string
+          mensagem_id_externo?: string | null
+          status?: string | null
+          telefone: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          empresa_id?: string
+          error_message?: string | null
+          id?: string
+          mensagem_id_externo?: string | null
+          status?: string | null
+          telefone?: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_templates: {
+        Row: {
+          categoria: string | null
+          conteudo: string
+          created_at: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          status: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          conteudo: string
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          status?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          conteudo?: string
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       workflows_config: {
         Row: {
           acao_tipo: string
@@ -16829,6 +17073,10 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
+      fn_link_gov_br_account: {
+        Args: { _cpf: string; _nivel: string; _user_id: string }
+        Returns: undefined
+      }
       format_type_string: { Args: { "": string }; Returns: string }
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
