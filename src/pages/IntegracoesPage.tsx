@@ -312,7 +312,7 @@ function WhatsAppConfigPanel() {
     if (!empresaAtual?.id) return;
     setLoading(true);
     try {
-      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id });
+      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id, habilitado: config.habilitado || false } as WhatsAppConfig);
       toast.success('Configuração de WhatsApp salva!');
     } catch (e) {
       toast.error('Erro ao salvar configuração');

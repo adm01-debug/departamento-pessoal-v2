@@ -118,7 +118,11 @@ export const contratacaoService = {
       const { data: admissao } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).single();
       if (admissao?.empresa_id) {
         const { whatsappService } = await import('./whatsappService');
-        await whatsappService.sendMessage(admissao.empresa_id, telefone, `Olá! 👋 Boas-vindas!\n\nSeu processo de admissão digital está pronto: ${link}\n\nCódigo: *${token}*`);
+        await whatsappService.sendMessage({ 
+          empresaId: admissao.empresa_id, 
+          phone: telefone, 
+          message: `Olá! 👋 Boas-vindas!\n\nSeu processo de admissão digital está pronto: ${link}\n\nCódigo: *${token}*` 
+        });
       }
     } catch (e) {
       // Fallback para o link manual se o serviço falhar ou não estiver configurado

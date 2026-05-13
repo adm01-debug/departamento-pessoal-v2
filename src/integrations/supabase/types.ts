@@ -2107,9 +2107,12 @@ export type Database = {
           candidato_id: string
           created_at: string
           data_entrevista: string | null
+          data_proxima_etapa: string | null
           entrevistador: string | null
           etapa: string | null
           feedback: string | null
+          feedback_ia: string | null
+          historico_etapas: Json | null
           id: string
           motivo_rejeicao: string | null
           nota_geral: number | null
@@ -2121,9 +2124,12 @@ export type Database = {
           candidato_id: string
           created_at?: string
           data_entrevista?: string | null
+          data_proxima_etapa?: string | null
           entrevistador?: string | null
           etapa?: string | null
           feedback?: string | null
+          feedback_ia?: string | null
+          historico_etapas?: Json | null
           id?: string
           motivo_rejeicao?: string | null
           nota_geral?: number | null
@@ -2135,9 +2141,12 @@ export type Database = {
           candidato_id?: string
           created_at?: string
           data_entrevista?: string | null
+          data_proxima_etapa?: string | null
           entrevistador?: string | null
           etapa?: string | null
           feedback?: string | null
+          feedback_ia?: string | null
+          historico_etapas?: Json | null
           id?: string
           motivo_rejeicao?: string | null
           nota_geral?: number | null
@@ -12647,6 +12656,59 @@ export type Database = {
             columns: ["vale_id"]
             isOneToOne: false
             referencedRelation: "vales_alimentacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recrutamento_agendamentos: {
+        Row: {
+          candidatura_id: string | null
+          created_at: string | null
+          data_hora: string
+          duracao_minutos: number | null
+          empresa_id: string
+          feedback_entrevistador: string | null
+          id: string
+          local_link: string | null
+          responsavel_id: string | null
+          status: string | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          candidatura_id?: string | null
+          created_at?: string | null
+          data_hora: string
+          duracao_minutos?: number | null
+          empresa_id: string
+          feedback_entrevistador?: string | null
+          id?: string
+          local_link?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          candidatura_id?: string | null
+          created_at?: string | null
+          data_hora?: string
+          duracao_minutos?: number | null
+          empresa_id?: string
+          feedback_entrevistador?: string | null
+          id?: string
+          local_link?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recrutamento_agendamentos_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
             referencedColumns: ["id"]
           },
         ]
