@@ -1,9 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, Clock, AlertTriangle, HardHat, Users, TrendingUp } from 'lucide-react';
+import { CheckCircle, Clock, AlertTriangle, HardHat, Users, TrendingUp, ShieldAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useEmpresa } from '@/contexts';
 
 interface SSTKPIsProps {
   validos: number;
