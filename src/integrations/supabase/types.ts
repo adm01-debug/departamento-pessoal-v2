@@ -6311,6 +6311,7 @@ export type Database = {
           created_at: string
           dados: Json | null
           data_envio: string | null
+          data_processamento: string | null
           empresa_id: string | null
           erros: Json | null
           hash_seguranca: string | null
@@ -6321,6 +6322,7 @@ export type Database = {
           tipo_evento: string
           updated_at: string
           xml: string | null
+          xml_envio: string | null
           xml_retorno: string | null
         }
         Insert: {
@@ -6329,6 +6331,7 @@ export type Database = {
           created_at?: string
           dados?: Json | null
           data_envio?: string | null
+          data_processamento?: string | null
           empresa_id?: string | null
           erros?: Json | null
           hash_seguranca?: string | null
@@ -6339,6 +6342,7 @@ export type Database = {
           tipo_evento: string
           updated_at?: string
           xml?: string | null
+          xml_envio?: string | null
           xml_retorno?: string | null
         }
         Update: {
@@ -6347,6 +6351,7 @@ export type Database = {
           created_at?: string
           dados?: Json | null
           data_envio?: string | null
+          data_processamento?: string | null
           empresa_id?: string | null
           erros?: Json | null
           hash_seguranca?: string | null
@@ -6357,6 +6362,7 @@ export type Database = {
           tipo_evento?: string
           updated_at?: string
           xml?: string | null
+          xml_envio?: string | null
           xml_retorno?: string | null
         }
         Relationships: [
