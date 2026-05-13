@@ -133,7 +133,7 @@ export function PortalMeusDadosTab({ nome, email, profile, userId, navigate }: P
               </div>
             </div>
             <Switch 
-              checked={settings?.email_alertas} 
+              checked={settings?.email_alertas ?? false} 
               onCheckedChange={(v) => updateSettings.mutate({ ...settings, email_alertas: v })} 
             />
           </div>
@@ -147,7 +147,7 @@ export function PortalMeusDadosTab({ nome, email, profile, userId, navigate }: P
               </div>
             </div>
             <Switch 
-              checked={settings?.push_alertas} 
+              checked={settings?.push_alertas ?? false} 
               onCheckedChange={(v) => updateSettings.mutate({ ...settings, push_alertas: v })} 
             />
           </div>
@@ -159,14 +159,14 @@ export function PortalMeusDadosTab({ nome, email, profile, userId, navigate }: P
             <div className="flex items-center justify-between">
               <span className="text-xs font-body">Vencimento de Férias</span>
               <Switch 
-                checked={settings?.alertar_ferias} 
+                checked={settings?.alertar_ferias ?? false} 
                 onCheckedChange={(v) => updateSettings.mutate({ ...settings, alertar_ferias: v })} 
               />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-body">Novos Holerites</span>
               <Switch 
-                checked={settings?.alertar_holerite} 
+                checked={settings?.alertar_holerite ?? false} 
                 onCheckedChange={(v) => updateSettings.mutate({ ...settings, alertar_holerite: v })} 
               />
             </div>
