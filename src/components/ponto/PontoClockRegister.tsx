@@ -1,12 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle, Scan, Camera, ShieldCheck } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
-import { pontoMonitorService } from '@/services/pontoMonitorService';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts';
@@ -15,7 +14,7 @@ interface PontoClockRegisterProps {
   time: Date;
   loading: string | null;
   geoStatus: 'idle' | 'capturing' | 'success' | 'error' | 'out_of_range';
-  onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => void;
+  onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', options?: any) => void;
 }
 
 const buttons = [
@@ -99,6 +98,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
 
   const captureAndFinalize = async (tipo: any, mediaStream: MediaStream) => {
     let fotoUrl = null;
+    let fotoBase64 = null;
     
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
@@ -108,11 +108,12 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       const context = canvas.getContext('2d');
       context?.drawImage(video, 0, 0, canvas.width, canvas.height);
       
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+      fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
       
-      if (blob && user?.id) {
+      if (blob && user?.id && navigator.onLine) {
         const fileName = `${user.id}/${Date.now()}.jpg`;
-        const { data, error } = await (window as any).supabase.storage
+        const { error } = await (window as any).supabase.storage
           .from('ponto-biometria')
           .upload(fileName, blob);
           
@@ -129,15 +130,14 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
     mediaStream.getTracks().forEach(track => track.stop());
     setStream(null);
     setShowFaceScan(false);
-    finalizeRegister(tipo, fotoUrl);
+    finalizeRegister(tipo, fotoUrl, fotoBase64);
   };
 
-  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', fotoUrl: string | null) => {
+  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', fotoUrl: string | null, fotoBase64: string | null) => {
     if (!user) return;
     
     if (navigator.onLine) {
-      // Passar fotoUrl para o onRegistrar (precisamos atualizar o hook usePonto)
-      (onRegistrar as any)(tipo, { foto_biometria_url: fotoUrl });
+      onRegistrar(tipo, { foto_biometria_url: fotoUrl });
       return;
     }
 
@@ -150,7 +150,8 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
         tipo,
         colaborador_id: colab.id,
         timestamp: new Date().toISOString(),
-        dispositivoId: navigator.userAgent
+        dispositivoId: navigator.userAgent,
+        foto_base64: fotoBase64
       };
 
       await pontoOfflineService.queueRegistro({
