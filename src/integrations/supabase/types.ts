@@ -2862,6 +2862,7 @@ export type Database = {
           uniforme_calcado: string | null
           uniforme_camiseta: string | null
           updated_at: string
+          version: number | null
           whatsapp: string | null
         }
         Insert: {
@@ -3006,6 +3007,7 @@ export type Database = {
           uniforme_calcado?: string | null
           uniforme_camiseta?: string | null
           updated_at?: string
+          version?: number | null
           whatsapp?: string | null
         }
         Update: {
@@ -3150,6 +3152,7 @@ export type Database = {
           uniforme_calcado?: string | null
           uniforme_camiseta?: string | null
           updated_at?: string
+          version?: number | null
           whatsapp?: string | null
         }
         Relationships: [
@@ -7612,6 +7615,7 @@ export type Database = {
           total_liquido: number | null
           total_proventos: number | null
           updated_at: string
+          version: number | null
         }
         Insert: {
           alerta_calculo?: Json | null
@@ -7633,6 +7637,7 @@ export type Database = {
           total_liquido?: number | null
           total_proventos?: number | null
           updated_at?: string
+          version?: number | null
         }
         Update: {
           alerta_calculo?: Json | null
@@ -7654,6 +7659,7 @@ export type Database = {
           total_liquido?: number | null
           total_proventos?: number | null
           updated_at?: string
+          version?: number | null
         }
         Relationships: [
           {
@@ -12508,6 +12514,7 @@ export type Database = {
           total_batidas: number | null
           updated_at: string
           versao_app: string | null
+          version: number | null
         }
         Insert: {
           aprovado?: boolean | null
@@ -12552,6 +12559,7 @@ export type Database = {
           total_batidas?: number | null
           updated_at?: string
           versao_app?: string | null
+          version?: number | null
         }
         Update: {
           aprovado?: boolean | null
@@ -12596,6 +12604,7 @@ export type Database = {
           total_batidas?: number | null
           updated_at?: string
           versao_app?: string | null
+          version?: number | null
         }
         Relationships: [
           {
