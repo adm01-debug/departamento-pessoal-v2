@@ -274,6 +274,56 @@ export default function TreinamentosPage() {
             </CardContent></Card>
           </TabsContent>
 
+          {/* CERTIFICADOS */}
+          <TabsContent value="certificados">
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Colaborador</TableHead>
+                      <TableHead>Curso / Treinamento</TableHead>
+                      <TableHead>Emissão</TableHead>
+                      <TableHead>Validade</TableHead>
+                      <TableHead>Código Autenticação</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {certificados.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                          Nenhum certificado emitido ainda.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      certificados.map((cert: any) => (
+                        <TableRow key={cert.id} className="hover:bg-muted/30">
+                          <TableCell className="font-medium">{cert.colaborador?.nome_completo}</TableCell>
+                          <TableCell>{cert.curso?.nome}</TableCell>
+                          <TableCell>{new Date(cert.data_emissao).toLocaleDateString('pt-BR')}</TableCell>
+                          <TableCell>
+                            {cert.data_validade ? (
+                              <Badge variant={new Date(cert.data_validade) < new Date() ? 'destructive' : 'outline'} className="text-[10px]">
+                                {new Date(cert.data_validade).toLocaleDateString('pt-BR')}
+                              </Badge>
+                            ) : 'Vitalício'}
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-primary">{cert.codigo_autenticacao}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={() => toast.info('Impressão em breve')}>
+                              <Link className="h-3.5 w-3.5" /> Ver
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* CATÁLOGO */}
           <TabsContent value="catalogo">
             <div className="flex justify-end mb-4">
