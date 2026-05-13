@@ -231,6 +231,86 @@ export default function ESocialPage() {
           </motion.div>
         </TabsContent>
 
+        <TabsContent value="logs" className="space-y-6">
+          <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <div className="h-[2px] bg-gradient-to-r from-success to-primary-glow" />
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Histórico de Transmissão Real</CardTitle>
+                <CardDescription>Logs técnicos de comunicação com o servidor do eSocial</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={refreshLogs} className="rounded-xl">
+                <RefreshCw className="h-4 w-4 mr-2" /> Atualizar
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {logs.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">Nenhum log de transmissão encontrado.</div>
+                ) : (
+                  <div className="rounded-xl border overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50 border-b">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium">Data/Hora</th>
+                          <th className="px-4 py-3 text-left font-medium">Evento</th>
+                          <th className="px-4 py-3 text-left font-medium">Status</th>
+                          <th className="px-4 py-3 text-left font-medium">Duração</th>
+                          <th className="px-4 py-3 text-right font-medium">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {logs.map((log: any) => (
+                          <tr key={log.id} className="hover:bg-muted/30 transition-colors">
+                            <td className="px-4 py-3 font-mono text-xs">{new Date(log.created_at).toLocaleString('pt-BR')}</td>
+                            <td className="px-4 py-3 font-bold">{eventos.find(e => e.id === log.evento_id)?.tipo_evento || 'S-XXXX'}</td>
+                            <td className="px-4 py-3">
+                              <Badge variant={log.status === 'enviado' ? 'default' : 'destructive'} className="rounded-md">
+                                {log.status}
+                              </Badge>
+                            </td>
+                            <td className="px-4 py-3 text-muted-foreground">{log.duracao_ms}ms</td>
+                            <td className="px-4 py-3 text-right">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 rounded-lg">Ver Detalhes</Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                                  <DialogHeader>
+                                    <DialogTitle>Detalhes da Transmissão</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="space-y-6 pt-4">
+                                    <div>
+                                      <h4 className="text-sm font-bold mb-2">Request XML (Envio)</h4>
+                                      <pre className="p-3 bg-muted rounded-lg text-[10px] overflow-x-auto border">{log.request_xml}</pre>
+                                    </div>
+                                    <div>
+                                      <h4 className="text-sm font-bold mb-2">Response XML (Retorno Governo)</h4>
+                                      <pre className="p-3 bg-muted rounded-lg text-[10px] overflow-x-auto border">{log.response_xml}</pre>
+                                    </div>
+                                    {log.error_details && (
+                                      <div>
+                                        <h4 className="text-sm font-bold text-destructive mb-2">Detalhes do Erro</h4>
+                                        <div className="p-3 bg-destructive/5 rounded-lg border border-destructive/20 text-xs">
+                                          {JSON.stringify(log.error_details, null, 2)}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="eventos" className="space-y-6">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
 
