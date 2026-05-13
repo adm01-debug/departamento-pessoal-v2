@@ -4,7 +4,7 @@ import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { pontoMonitorService } from '@/services/pontoMonitorService';
 import { toast } from 'sonner';
@@ -242,7 +242,14 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
                 className="absolute left-0 right-0 h-1 bg-primary-glow/60 shadow-[0_0_15px_rgba(34,197,94,1)] z-10" 
               />
               
-              <Camera className="h-20 w-20 text-slate-600" />
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="w-full h-full object-cover rounded-full" 
+              />
+              <canvas ref={canvasRef} className="hidden" />
               
               {/* Progress Ring */}
               <svg className="absolute inset-0 w-full h-full -rotate-90">
