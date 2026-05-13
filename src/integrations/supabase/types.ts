@@ -10028,9 +10028,12 @@ export type Database = {
           dias_suspensao: number | null
           documento_url: string | null
           empresa_id: string | null
+          evidenciado_por: Json | null
           id: string
+          id_registro_anterior: string | null
           motivo_recusa: string | null
           numero_sequencial: number | null
+          recorrencia_infrafacao: boolean | null
           recusa_assinatura: boolean | null
           status: string | null
           testemunha_1: string | null
@@ -10055,9 +10058,12 @@ export type Database = {
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
+          evidenciado_por?: Json | null
           id?: string
+          id_registro_anterior?: string | null
           motivo_recusa?: string | null
           numero_sequencial?: number | null
+          recorrencia_infrafacao?: boolean | null
           recusa_assinatura?: boolean | null
           status?: string | null
           testemunha_1?: string | null
@@ -10082,9 +10088,12 @@ export type Database = {
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
+          evidenciado_por?: Json | null
           id?: string
+          id_registro_anterior?: string | null
           motivo_recusa?: string | null
           numero_sequencial?: number | null
+          recorrencia_infrafacao?: boolean | null
           recusa_assinatura?: boolean | null
           status?: string | null
           testemunha_1?: string | null
@@ -10151,6 +10160,44 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medidas_disciplinares_anexos: {
+        Row: {
+          created_at: string | null
+          id: string
+          medida_id: string | null
+          nome_arquivo: string
+          storage_path: string
+          tipo_arquivo: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          medida_id?: string | null
+          nome_arquivo: string
+          storage_path: string
+          tipo_arquivo?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          medida_id?: string | null
+          nome_arquivo?: string
+          storage_path?: string
+          tipo_arquivo?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_disciplinares_anexos_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
             referencedColumns: ["id"]
           },
         ]
@@ -14117,6 +14164,36 @@ export type Database = {
           tipo?: string
           titulo?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sst_regimento_interno: {
+        Row: {
+          artigo_clt_base: string | null
+          created_at: string | null
+          empresa_id: string
+          id: string
+          infracao_tipo: string
+          pontos_gravidade: number | null
+          puniciao_sugerida: string
+        }
+        Insert: {
+          artigo_clt_base?: string | null
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          infracao_tipo: string
+          pontos_gravidade?: number | null
+          puniciao_sugerida: string
+        }
+        Update: {
+          artigo_clt_base?: string | null
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          infracao_tipo?: string
+          pontos_gravidade?: number | null
+          puniciao_sugerida?: string
         }
         Relationships: []
       }
