@@ -3568,6 +3568,8 @@ export type Database = {
           id: string
           updated_at: string | null
           valor: Json | null
+          vapid_private_key: string | null
+          vapid_public_key: string | null
         }
         Insert: {
           chave: string
@@ -3575,6 +3577,8 @@ export type Database = {
           id?: string
           updated_at?: string | null
           valor?: Json | null
+          vapid_private_key?: string | null
+          vapid_public_key?: string | null
         }
         Update: {
           chave?: string
@@ -3582,6 +3586,8 @@ export type Database = {
           id?: string
           updated_at?: string | null
           valor?: Json | null
+          vapid_private_key?: string | null
+          vapid_public_key?: string | null
         }
         Relationships: []
       }
@@ -12170,6 +12176,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          device_info: string | null
+          id: string
+          subscription: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          device_info?: string | null
+          id?: string
+          subscription: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          device_info?: string | null
+          id?: string
+          subscription?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       query_telemetry: {
         Row: {
