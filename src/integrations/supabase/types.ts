@@ -816,6 +816,36 @@ export type Database = {
         }
         Relationships: []
       }
+      automacao_logs: {
+        Row: {
+          created_at: string | null
+          detalhes: Json | null
+          entidade_id: string | null
+          id: string
+          status: string | null
+          tipo_evento: string | null
+          workflow_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          detalhes?: Json | null
+          entidade_id?: string | null
+          id?: string
+          status?: string | null
+          tipo_evento?: string | null
+          workflow_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          detalhes?: Json | null
+          entidade_id?: string | null
+          id?: string
+          status?: string | null
+          tipo_evento?: string | null
+          workflow_id?: string | null
+        }
+        Relationships: []
+      }
       banco_horas: {
         Row: {
           colaborador_id: string

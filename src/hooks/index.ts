@@ -35,6 +35,7 @@ export { useWebhooksAvancados, useWebhookLogs } from "./useWebhooksAvancados";
 export { usePontosAbertos } from "./usePontosAbertos";
 export { useNavigationGuard } from "./useNavigationGuard";
 export { usePeriodosAquisitivos } from "./usePeriodosAquisitivos";
+export { usePontoOffline } from "./usePontoOffline";
 
 // Novas tabelas (doc externo)
 export {
