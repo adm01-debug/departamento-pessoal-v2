@@ -1137,10 +1137,12 @@ export type Database = {
           longitude: number | null
           motivo_ajuste: string | null
           offline: boolean | null
+          offset_timezone: number | null
           ordem: number
           origem: string | null
           precisao_metros: number | null
           sync_at: string | null
+          timestamp_dispositivo: string | null
           timezone: string | null
           tipo: string
           updated_at: string | null
@@ -1175,10 +1177,12 @@ export type Database = {
           longitude?: number | null
           motivo_ajuste?: string | null
           offline?: boolean | null
+          offset_timezone?: number | null
           ordem: number
           origem?: string | null
           precisao_metros?: number | null
           sync_at?: string | null
+          timestamp_dispositivo?: string | null
           timezone?: string | null
           tipo?: string
           updated_at?: string | null
@@ -1213,10 +1217,12 @@ export type Database = {
           longitude?: number | null
           motivo_ajuste?: string | null
           offline?: boolean | null
+          offset_timezone?: number | null
           ordem?: number
           origem?: string | null
           precisao_metros?: number | null
           sync_at?: string | null
+          timestamp_dispositivo?: string | null
           timezone?: string | null
           tipo?: string
           updated_at?: string | null
@@ -12517,6 +12523,55 @@ export type Database = {
         }
         Relationships: []
       }
+      ponto_seguranca_blacklist: {
+        Row: {
+          bloqueado_ate: string | null
+          bloqueado_em: string | null
+          colaborador_id: string | null
+          dispositivo_id: string
+          id: string
+          motivo: string | null
+        }
+        Insert: {
+          bloqueado_ate?: string | null
+          bloqueado_em?: string | null
+          colaborador_id?: string | null
+          dispositivo_id: string
+          id?: string
+          motivo?: string | null
+        }
+        Update: {
+          bloqueado_ate?: string | null
+          bloqueado_em?: string | null
+          colaborador_id?: string | null
+          dispositivo_id?: string
+          id?: string
+          motivo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ponto_seguranca_blacklist_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_seguranca_blacklist_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_seguranca_blacklist_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portal_notificacoes_settings: {
         Row: {
           alertar_ferias: boolean | null
@@ -18178,6 +18233,16 @@ export type Database = {
             }
             Returns: string
           }
+      detectar_fraude_ponto: {
+        Args: {
+          batida_id: string
+          colaborador_id: string
+          lat_nova: number
+          lng_nova: number
+          time_nova: string
+        }
+        Returns: undefined
+      }
       diag:
         | {
             Args: { msg: unknown }
