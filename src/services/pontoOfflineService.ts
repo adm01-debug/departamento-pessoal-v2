@@ -55,6 +55,7 @@ export const pontoOfflineService = {
       const bytes = CryptoJS.AES.decrypt(stored, CRYPTO_KEY);
       queue = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     } catch (e) {
+      localStorage.removeItem(PONTO_OFFLINE_STORAGE_KEY);
       return { synced: 0, errors: 1 };
     }
     
@@ -66,11 +67,7 @@ export const pontoOfflineService = {
 
     for (const item of queue) {
       try {
-        // Revalidação de Geofence em Background antes de sincronizar
-        // Se estiver muito longe da sede e a empresa exigir geofence estrito, logar aviso
-        console.log(`[OfflineSync] Validando batida ${item.id} - Geofence Check: ${item.latitude}, ${item.longitude}`);
-
-        const { error } = await (supabase as any).from('batidas_ponto').insert({
+        const { error } = await supabase.from('batidas_ponto').insert({
           colaborador_id: item.colaborador_id,
           tipo: item.tipo,
           data: item.timestamp.split('T')[0],
@@ -86,18 +83,23 @@ export const pontoOfflineService = {
             sync_strategy: 'AES-256-Encrypted-Queue',
             original_timestamp: item.timestamp
           }
-        });
+        } as any);
 
         if (error) throw error;
         synced++;
       } catch (err) {
+        console.error('[OfflineSync] Erro na batida:', item.id, err);
         errors++;
         remaining.push(item);
       }
     }
 
-    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(remaining), CRYPTO_KEY).toString();
-    localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
+    if (remaining.length === 0) {
+      localStorage.removeItem(PONTO_OFFLINE_STORAGE_KEY);
+    } else {
+      const encrypted = CryptoJS.AES.encrypt(JSON.stringify(remaining), CRYPTO_KEY).toString();
+      localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
+    }
     return { synced, errors };
   },
 
