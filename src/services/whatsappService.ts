@@ -6,6 +6,11 @@ export interface WhatsAppConfig {
   api_key?: string;
   telefone_origem?: string;
   habilitado: boolean;
+  instancia_url?: string;
+  instancia_nome?: string;
+  notificar_ponto?: boolean;
+  notificar_ferias?: boolean;
+  notificar_holerite?: boolean;
 }
 
 export const whatsappService = {
