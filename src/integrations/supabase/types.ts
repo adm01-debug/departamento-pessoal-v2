@@ -14694,6 +14694,78 @@ export type Database = {
           },
         ]
       }
+      treinamento_certificados: {
+        Row: {
+          arquivo_url: string | null
+          codigo_autenticacao: string | null
+          colaborador_id: string | null
+          created_at: string | null
+          curso_id: string | null
+          data_emissao: string
+          data_validade: string | null
+          id: string
+          inscricao_id: string | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          codigo_autenticacao?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          curso_id?: string | null
+          data_emissao?: string
+          data_validade?: string | null
+          id?: string
+          inscricao_id?: string | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          codigo_autenticacao?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          curso_id?: string | null
+          data_emissao?: string
+          data_validade?: string | null
+          id?: string
+          inscricao_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinamento_certificados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_certificados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_certificados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_certificados_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "catalogo_cursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_certificados_inscricao_id_fkey"
+            columns: ["inscricao_id"]
+            isOneToOne: false
+            referencedRelation: "inscricoes_cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       treinamento_feedback: {
         Row: {
           aplicabilidade_nota: number | null
@@ -14724,6 +14796,44 @@ export type Database = {
             foreignKeyName: "treinamento_feedback_inscricao_id_fkey"
             columns: ["inscricao_id"]
             isOneToOne: false
+            referencedRelation: "inscricoes_cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treinamento_feedbacks: {
+        Row: {
+          comentario: string | null
+          created_at: string | null
+          id: string
+          inscricao_id: string | null
+          nota_conteudo: number | null
+          nota_instrutor: number | null
+          sugestoes: string | null
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string
+          inscricao_id?: string | null
+          nota_conteudo?: number | null
+          nota_instrutor?: number | null
+          sugestoes?: string | null
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string
+          inscricao_id?: string | null
+          nota_conteudo?: number | null
+          nota_instrutor?: number | null
+          sugestoes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinamento_feedbacks_inscricao_id_fkey"
+            columns: ["inscricao_id"]
+            isOneToOne: true
             referencedRelation: "inscricoes_cursos"
             referencedColumns: ["id"]
           },

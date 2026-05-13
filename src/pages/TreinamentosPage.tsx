@@ -15,8 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { catalogoCursoService } from '@/services/catalogoCursoService';
-import { colaboradorService } from '@/services';
+import { catalogoCursoService, colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { GraduationCap, Plus, BookOpen, Award, Users, Trash2, Link, Calendar, CheckCircle2, Clock, Search, ChevronRight, MoreHorizontal, Video, MapPin } from 'lucide-react';
@@ -169,6 +168,7 @@ export default function TreinamentosPage() {
   const { data: trilhas = [], isLoading: loadTrilhas } = useQuery({ queryKey: ['trilhas', empresaAtual?.id], queryFn: () => catalogoCursoService.listarTrilhas(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: instancias = [], isLoading: loadInst } = useQuery({ queryKey: ['treinamento_instancias', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInstancias(), enabled: !!empresaAtual?.id });
+  const { data: certificados = [], isLoading: loadCert } = useQuery({ queryKey: ['treinamento_certificados', empresaAtual?.id], queryFn: () => (catalogoCursoService as any).listarCertificados(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   // === Treinamentos ===
@@ -210,7 +210,7 @@ export default function TreinamentosPage() {
     onError: () => toast.error('Erro ao inscrever'),
   });
 
-  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc || loadInst;
+  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc || loadInst || loadCert;
 
   return (
     <PageLayout title="Treinamentos 10/10" description="Gestão de treinamentos e desenvolvimento" icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary">
@@ -232,6 +232,7 @@ export default function TreinamentosPage() {
             <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
             <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
             <TabsTrigger value="turmas">Turmas / Instâncias</TabsTrigger>
+            <TabsTrigger value="certificados">Certificados</TabsTrigger>
           </TabsList>
 
           {/* TREINAMENTOS */}
@@ -270,6 +271,56 @@ export default function TreinamentosPage() {
                 </TableBody>
               </Table>
             </CardContent></Card>
+          </TabsContent>
+
+          {/* CERTIFICADOS */}
+          <TabsContent value="certificados">
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Colaborador</TableHead>
+                      <TableHead>Curso / Treinamento</TableHead>
+                      <TableHead>Emissão</TableHead>
+                      <TableHead>Validade</TableHead>
+                      <TableHead>Código Autenticação</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {certificados.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                          Nenhum certificado emitido ainda.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      certificados.map((cert: any) => (
+                        <TableRow key={cert.id} className="hover:bg-muted/30">
+                          <TableCell className="font-medium">{cert.colaborador?.nome_completo}</TableCell>
+                          <TableCell>{cert.curso?.nome}</TableCell>
+                          <TableCell>{new Date(cert.data_emissao).toLocaleDateString('pt-BR')}</TableCell>
+                          <TableCell>
+                            {cert.data_validade ? (
+                              <Badge variant={new Date(cert.data_validade) < new Date() ? 'destructive' : 'outline'} className="text-[10px]">
+                                {new Date(cert.data_validade).toLocaleDateString('pt-BR')}
+                              </Badge>
+                            ) : 'Vitalício'}
+                          </TableCell>
+                          <TableCell className="font-mono text-xs text-primary">{cert.codigo_autenticacao}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={() => toast.info('Impressão em breve')}>
+                              <Link className="h-3.5 w-3.5" /> Ver
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* CATÁLOGO */}
