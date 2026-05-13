@@ -1,20 +1,48 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileText, AlertTriangle } from 'lucide-react';
+import { FileText, AlertTriangle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
-const PROGRAMAS_SST = [
-  { sigla: 'PCMSO', nome: 'Programa de Controle Médico de Saúde Ocupacional', nr: 'NR-7', vigencia: '12 meses', responsavel: 'Médico do Trabalho' },
-  { sigla: 'PGR', nome: 'Programa de Gerenciamento de Riscos', nr: 'NR-1/NR-9', vigencia: '24 meses', responsavel: 'Engenheiro de Segurança' },
-  { sigla: 'LTCAT', nome: 'Laudo Técnico das Condições Ambientais', nr: 'NR-15/16', vigencia: 'Até alteração', responsavel: 'Engenheiro de Segurança' },
-  { sigla: 'PPP', nome: 'Perfil Profissiográfico Previdenciário', nr: 'IN 128', vigencia: 'Permanente', responsavel: 'RH / SST' },
-  { sigla: 'CIPA', nome: 'Comissão Interna de Prevenção de Acidentes', nr: 'NR-5', vigencia: '12 meses', responsavel: 'Eleitos + Indicados' },
-  { sigla: 'AET', nome: 'Análise Ergonômica do Trabalho', nr: 'NR-17', vigencia: '24 meses', responsavel: 'Ergonomista' },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useEmpresa } from '@/contexts';
 
 export function SSTProgramasTab() {
+  const { empresaAtual } = useEmpresa();
+  
+  const { data: programas = [], isLoading } = useQuery({
+    queryKey: ['sst_programas', empresaAtual?.id],
+    enabled: !!empresaAtual?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sst_programas' as any)
+        .select('*')
+        .eq('empresa_id', empresaAtual!.id)
+        .order('data_validade', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    }
+  });
+
+  const getSigla = (tipo: string) => {
+    switch (tipo) {
+      case 'PGR': return 'PGR';
+      case 'PCMSO': return 'PCMSO';
+      case 'LTCAT': return 'LTCAT';
+      case 'PPP': return 'PPP';
+      default: return tipo;
+    }
+  };
+
+  const getNR = (tipo: string) => {
+    switch (tipo) {
+      case 'PGR': return 'NR-1/9';
+      case 'PCMSO': return 'NR-7';
+      case 'LTCAT': return 'NR-15';
+      default: return 'NR-SST';
+    }
+  };
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
