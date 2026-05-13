@@ -28,6 +28,7 @@ import { validarRubricaESocial } from '@/validators/esocial';
 import { folhaPagamentoService } from '@/services/folhaPagamentoService';
 import { FolhaComposicao } from './FolhaComposicao';
 import { folhaCalc, CalculoResultado } from '@/utils/folhaCalc';
+import { cnabService } from '@/services/cnabService';
 
 interface StepProps {
   isActive: boolean;
