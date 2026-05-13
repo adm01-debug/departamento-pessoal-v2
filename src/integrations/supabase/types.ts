@@ -14399,6 +14399,150 @@ export type Database = {
           },
         ]
       }
+      sst_cat: {
+        Row: {
+          agente_causador: string | null
+          colaborador_id: string | null
+          created_at: string | null
+          created_by: string | null
+          data_acidente: string
+          empresa_id: string | null
+          houve_afastamento: boolean | null
+          houve_obito: boolean | null
+          id: string
+          local_acidente: string | null
+          parte_corpo_atingida: string | null
+          protocolo_esocial: string | null
+          status_esocial: string | null
+          tipo_acidente: string
+        }
+        Insert: {
+          agente_causador?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data_acidente: string
+          empresa_id?: string | null
+          houve_afastamento?: boolean | null
+          houve_obito?: boolean | null
+          id?: string
+          local_acidente?: string | null
+          parte_corpo_atingida?: string | null
+          protocolo_esocial?: string | null
+          status_esocial?: string | null
+          tipo_acidente: string
+        }
+        Update: {
+          agente_causador?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data_acidente?: string
+          empresa_id?: string | null
+          houve_afastamento?: boolean | null
+          houve_obito?: boolean | null
+          id?: string
+          local_acidente?: string | null
+          parte_corpo_atingida?: string | null
+          protocolo_esocial?: string | null
+          status_esocial?: string | null
+          tipo_acidente?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_cat_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_cat_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_cat_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_cat_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_exposicao_riscos: {
+        Row: {
+          agente_nocivo_codigo: string | null
+          ambiente_id: string | null
+          colaborador_id: string | null
+          created_at: string | null
+          data_fim_exposicao: string | null
+          data_inicio_exposicao: string
+          epi_eficaz: boolean | null
+          id: string
+          intensidade_concentracao: string | null
+          status_esocial: string | null
+          tecnica_utilizada: string | null
+        }
+        Insert: {
+          agente_nocivo_codigo?: string | null
+          ambiente_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          data_fim_exposicao?: string | null
+          data_inicio_exposicao: string
+          epi_eficaz?: boolean | null
+          id?: string
+          intensidade_concentracao?: string | null
+          status_esocial?: string | null
+          tecnica_utilizada?: string | null
+        }
+        Update: {
+          agente_nocivo_codigo?: string | null
+          ambiente_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          data_fim_exposicao?: string | null
+          data_inicio_exposicao?: string
+          epi_eficaz?: boolean | null
+          id?: string
+          intensidade_concentracao?: string | null
+          status_esocial?: string | null
+          tecnica_utilizada?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_exposicao_riscos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_exposicao_riscos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_exposicao_riscos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sst_incidentes: {
         Row: {
           colaborador_id: string | null
