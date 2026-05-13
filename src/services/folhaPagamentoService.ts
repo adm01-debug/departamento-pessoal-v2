@@ -126,13 +126,20 @@ export const folhaPagamentoService = {
     const totalFolha = itens?.reduce((acc, curr) => acc + Number(curr.total_liquido), 0) || 0;
     const hashIntegridade = btoa(`folha-${folhaId}-${totalFolha}-${new Date().toISOString()}`).substring(0, 32);
 
+    const { data: currentFolha } = await supabase
+      .from('folhas_pagamento')
+      .select('version')
+      .eq('id', folhaId)
+      .single();
+
     const { error } = await supabase
       .from('folhas_pagamento')
       .update({ 
         status: 'fechada',
         data_fechamento: new Date().toISOString()
       })
-      .eq('id', folhaId);
+      .eq('id', folhaId)
+      .eq('version', currentFolha?.version || 1);
 
     if (error) throw error;
     
