@@ -16,14 +16,14 @@ export function useRealTimeSubscription(
     const channel = supabase
       .channel(`rt-${table}-${empresaId}`)
       .on(
-        'postgres_changes',
+        'postgres_changes' as any,
         {
           event: options.event as any,
-          schema: options.schema,
+          schema: options.schema || 'public',
           table: table,
           filter: `empresa_id=eq.${empresaId}`,
         },
-        (payload) => {
+        (payload: any) => {
           console.log(`Real-time change in ${table}:`, payload);
           queryClient.invalidateQueries({ queryKey });
         }
