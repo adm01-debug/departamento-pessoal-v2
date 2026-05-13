@@ -15617,6 +15617,104 @@ export type Database = {
           },
         ]
       }
+      whatsapp_mensagens_logs: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string | null
+          empresa_id: string
+          error_message: string | null
+          id: string
+          mensagem_id_externo: string | null
+          status: string | null
+          telefone: string
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          empresa_id: string
+          error_message?: string | null
+          id?: string
+          mensagem_id_externo?: string | null
+          status?: string | null
+          telefone: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          empresa_id?: string
+          error_message?: string | null
+          id?: string
+          mensagem_id_externo?: string | null
+          status?: string | null
+          telefone?: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_mensagens_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_templates: {
+        Row: {
+          categoria: string | null
+          conteudo: string
+          created_at: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          status: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          conteudo: string
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          status?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          conteudo?: string
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       workflows_config: {
         Row: {
           acao_tipo: string
