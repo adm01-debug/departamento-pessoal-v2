@@ -1,6 +1,5 @@
-import { z } from 'zod';
+import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
 
-// For local development, we keep the schema here but it matches the shared version
 export const colaboradorSchema = z.object({
   nome_completo: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
   cpf: z.string().min(11, 'CPF inválido'),
@@ -28,5 +27,3 @@ export const colaboradorSchema = z.object({
   tipo_contrato: z.enum(['clt', 'pj', 'estagio', 'temporario', 'intermitente', 'jovem_aprendiz']),
   empresa_id: z.string().uuid().optional(),
 });
-
-export type ColaboradorSchema = z.infer<typeof colaboradorSchema>;
