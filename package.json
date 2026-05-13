@@ -66,6 +66,8 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "14.0.0",
+    "vite-plugin-pwa": "1.3.0",
+    "workbox-window": "7.4.1",
     "xlsx": "0.18.5",
     "zod": "^3.22.4",
     "zustand": "^4.5.0"

@@ -417,8 +417,10 @@ export default function ESocialPage() {
                                 <TooltipTrigger asChild>
                                   <AlertTriangle className="h-3.5 w-3.5 text-destructive animate-pulse cursor-help" />
                                 </TooltipTrigger>
-                                <TooltipContent className="bg-destructive text-destructive-foreground border-none">
-                                  <p className="max-w-xs text-xs">{(e.erros as any)?.mensagem || (e.erros as any)?.validacao?.[0]?.mensagem || 'Erro desconhecido na transmissão'}</p>
+                                <TooltipContent className="bg-destructive text-destructive-foreground border-none max-w-[300px] p-3 rounded-xl shadow-glow">
+                                  <p className="font-bold mb-1">Erro de Transmissão:</p>
+                                  <p className="max-w-xs text-xs">{(e.erros as any)?.mensagem || (e.erros as any)?.validacao?.[0]?.mensagem || (e.erros as any)?.detalhes || 'Falha na recepção pelo Governo'}</p>
+                                  {(e.erros as any)?.codigo && <p className="text-[10px] mt-2 opacity-80">Código: {(e.erros as any).codigo}</p>}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>

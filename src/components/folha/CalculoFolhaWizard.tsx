@@ -28,6 +28,7 @@ import { validarRubricaESocial } from '@/validators/esocial';
 import { folhaPagamentoService } from '@/services/folhaPagamentoService';
 import { FolhaComposicao } from './FolhaComposicao';
 import { folhaCalc, CalculoResultado } from '@/utils/folhaCalc';
+import { cnabService } from '@/services/cnabService';
 
 interface StepProps {
   isActive: boolean;
@@ -360,7 +361,29 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                     <Download className="h-4 w-4" />
                     <span className="text-[10px]">Holerites (PDF)</span>
                   </Button>
-                  <Button variant="outline" className="rounded-xl gap-2 h-16 flex-col">
+                  <Button 
+                    variant="outline" 
+                    className="rounded-xl gap-2 h-16 flex-col"
+                    onClick={async () => {
+                      if (currentFolhaId && empresaAtualId) {
+                        try {
+                          const cnab = await cnabService.generateCNAB240(empresaAtualId, currentFolhaId);
+                          const blob = new Blob([cnab], { type: 'text/plain' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `CNAB240_FOLHA_${competencia.replace('/', '_')}.txt`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                          toast.success('Arquivo CNAB gerado com sucesso!');
+                        } catch (err: any) {
+                          toast.error(err.message || 'Erro ao gerar CNAB');
+                        }
+                      }
+                    }}
+                  >
                     <Landmark className="h-4 w-4 text-primary" />
                     <span className="text-[10px]">Arquivo CNAB</span>
                   </Button>

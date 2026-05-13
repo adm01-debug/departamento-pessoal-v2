@@ -15340,6 +15340,47 @@ export type Database = {
           },
         ]
       }
+      workflows_config: {
+        Row: {
+          acao_tipo: string
+          ativo: boolean | null
+          configuracao: Json | null
+          created_at: string | null
+          empresa_id: string | null
+          evento_tipo: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          acao_tipo: string
+          ativo?: boolean | null
+          configuracao?: Json | null
+          created_at?: string | null
+          empresa_id?: string | null
+          evento_tipo: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          acao_tipo?: string
+          ativo?: boolean | null
+          configuracao?: Json | null
+          created_at?: string | null
+          empresa_id?: string | null
+          evento_tipo?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflows_config_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflows_definicoes: {
         Row: {
           ativo: boolean | null

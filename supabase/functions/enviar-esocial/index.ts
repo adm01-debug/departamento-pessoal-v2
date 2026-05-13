@@ -89,7 +89,8 @@ serve(async (req: Request): Promise<Response> => {
 
 function montarXMLEvento(tipo: string, empresa: any, dados: any, ambiente: string, competencia?: string): string {
   const perApur = competencia || new Date().toISOString().slice(0, 7);
-  const id = `ID1${empresa.cnpj?.replace(/\D/g, '') || '00000000000000'}${new Date().toISOString().replace(/\D/g, '').slice(0, 14)}`;
+  const timestamp = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+  const id = `ID1${empresa.cnpj?.replace(/\D/g, '') || '00000000000000'}${timestamp}`;
   
   let conteudoEvento = '';
   
@@ -97,13 +98,81 @@ function montarXMLEvento(tipo: string, empresa: any, dados: any, ambiente: strin
     case 'S-1000':
       conteudoEvento = `
       <infoEmpregador>
-        <idePeriodo><iniValid>${perApur}</iniValid></idePeriodo>
+        <idePeriodo>
+          <iniValid>${perApur}</iniValid>
+        </idePeriodo>
         <infoCadastro>
           <nmRazao>${empresa.razao_social || ''}</nmRazao>
-          <classTrib>01</classTrib><indCoop>0</indCoop><indConstr>0</indConstr><indDesFolha>0</indDesFolha><indOptRegEletr>1</indOptRegEletr>
-          <contato><nmCtto>${empresa.responsavel || 'RH'}</nmCtto><cpfCtto>00000000000</cpfCtto></contato>
+          <classTrib>${dados?.classTrib || '01'}</classTrib>
+          <indCoop>${dados?.indCoop || '0'}</indCoop>
+          <indConstr>${dados?.indConstr || '0'}</indConstr>
+          <indDesFolha>${dados?.indDesFolha || '0'}</indDesFolha>
+          <indOptRegEletr>${dados?.indOptRegEletr || '1'}</indOptRegEletr>
+          <contato>
+            <nmCtto>${empresa.responsavel || 'Responsável RH'}</nmCtto>
+            <cpfCtto>${dados?.cpfCtto || '00000000000'}</cpfCtto>
+          </contato>
         </infoCadastro>
       </infoEmpregador>`;
+      break;
+    case 'S-1200':
+      conteudoEvento = `
+      <dmDev>
+        <ideDmDev>${dados?.ideDmDev || 'DM' + timestamp.slice(-5)}</ideDmDev>
+        <codCateg>${dados?.codCateg || '101'}</codCateg>
+        <infoPerApur>
+          <ideEstabLot>
+            <tpInsc>1</tpInsc>
+            <nrInsc>${empresa.cnpj?.replace(/\D/g, '') || ''}</nrInsc>
+            <codLotacao>${dados?.codLotacao || '001'}</codLotacao>
+            <detVerbas>
+              ${(dados?.dmDev?.[0]?.infoPerApur?.ideEstabLot?.[0]?.detVerbas || []).map((v: any) => `
+              <detVerba>
+                <codRubr>${v.codRubr}</codRubr>
+                <ideTabRubr>${v.ideTabRubr || '001'}</ideTabRubr>
+                <vrRubr>${Number(v.vrRubr).toFixed(2)}</vrRubr>
+              </detVerba>`).join('')}
+            </detVerbas>
+          </ideEstabLot>
+        </infoPerApur>
+      </dmDev>`;
+      break;
+    case 'S-1210':
+      conteudoEvento = `
+      <ideBenef>
+        <cpfBenef>${dados?.cpfTrab || ''}</cpfBenef>
+        <infoPgto>
+          <dtPgto>${dados?.infoPgto?.[0]?.dtPgto || new Date().toISOString().split('T')[0]}</dtPgto>
+          <tpPgto>${dados?.infoPgto?.[0]?.tpPgto || '1'}</tpPgto>
+          <vlrLiq>${Number(dados?.infoPgto?.[0]?.vlrLiq || 0).toFixed(2)}</vlrLiq>
+        </infoPgto>
+      </ideBenef>`;
+      break;
+    case 'S-2200':
+      conteudoEvento = `
+      <trabalhador>
+        <cpfTrab>${dados?.cpfTrab || ''}</cpfTrab>
+        <nmTrab>${dados?.nmTrab || ''}</nmTrab>
+        <sexo>${dados?.sexo || 'M'}</sexo>
+        <racaCor>${dados?.racaCor || '1'}</racaCor>
+        <estCiv>${dados?.estCiv || '1'}</estCiv>
+        <grauInstr>${dados?.grauInstr || '01'}</grauInstr>
+      </trabalhador>
+      <vinculo>
+        <matricula>${dados?.matricula || timestamp}</matricula>
+        <tpRegTrab>1</tpRegTrab>
+        <tpRegPrev>1</tpRegPrev>
+        <cadIni>S</cadIni>
+        <infoRegime>
+          <regTrab><tpRegJor>1</tpRegJor></regTrab>
+          <regPrev><cnvPrev>N</cnvPrev></regPrev>
+        </infoRegime>
+        <infoContrato>
+          <codCargo>${dados?.codCargo || '001'}</codCargo>
+          <tpContr>1</tpContr>
+          <dtAdm>${dados?.dtAdm || new Date().toISOString().split('T')[0]}</dtAdm>
+        </infoContrato>
+      </vinculo>`;
       break;
     default:
       conteudoEvento = `<dados>${JSON.stringify(dados || {})}</dados>`;
@@ -112,8 +181,15 @@ function montarXMLEvento(tipo: string, empresa: any, dados: any, ambiente: strin
   return `<?xml version="1.0" encoding="UTF-8"?>
 <eSocial xmlns="http://www.esocial.gov.br/schema/evt/${tipo}/v_S_01_01_00">
   <evt${tipo.replace('-', '')} Id="${id}">
-    <ideEvento><tpAmb>${ambiente}</tpAmb><procEmi>1</procEmi><verProc>1.0</verProc></ideEvento>
-    <ideEmpregador><tpInsc>1</tpInsc><nrInsc>${empresa.cnpj?.replace(/\D/g, '') || ''}</nrInsc></ideEmpregador>
+    <ideEvento>
+      <tpAmb>${ambiente}</tpAmb>
+      <procEmi>1</procEmi>
+      <verProc>LovableV22</verProc>
+    </ideEvento>
+    <ideEmpregador>
+      <tpInsc>1</tpInsc>
+      <nrInsc>${empresa.cnpj?.replace(/\D/g, '') || ''}</nrInsc>
+    </ideEmpregador>
     ${conteudoEvento}
   </evt${tipo.replace('-', '')}>
 </eSocial>`;
