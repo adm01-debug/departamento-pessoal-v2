@@ -1111,6 +1111,7 @@ export type Database = {
         Row: {
           ajustado: boolean | null
           ajustado_por: string | null
+          anomalia_detectada: boolean | null
           biometria_score: number | null
           biometria_status: string | null
           colaborador_id: string
@@ -1119,15 +1120,19 @@ export type Database = {
           dentro_raio: boolean | null
           device_metadata: Json | null
           dispositivo_id: string | null
+          distancia_local_metros: number | null
           empresa_id: string | null
           foto_biometria_url: string | null
           hash_biometrico: string | null
+          hash_comprovante: string | null
           hash_digital: string | null
           hash_integridade: string | null
           hora: string
           id: string
+          id_fiscal_ponto: string | null
           ip_address: string | null
           is_offline: boolean | null
+          justificativa_anomalia: string | null
           latitude: number | null
           longitude: number | null
           motivo_ajuste: string | null
@@ -1144,6 +1149,7 @@ export type Database = {
         Insert: {
           ajustado?: boolean | null
           ajustado_por?: string | null
+          anomalia_detectada?: boolean | null
           biometria_score?: number | null
           biometria_status?: string | null
           colaborador_id: string
@@ -1152,15 +1158,19 @@ export type Database = {
           dentro_raio?: boolean | null
           device_metadata?: Json | null
           dispositivo_id?: string | null
+          distancia_local_metros?: number | null
           empresa_id?: string | null
           foto_biometria_url?: string | null
           hash_biometrico?: string | null
+          hash_comprovante?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora: string
           id?: string
+          id_fiscal_ponto?: string | null
           ip_address?: string | null
           is_offline?: boolean | null
+          justificativa_anomalia?: string | null
           latitude?: number | null
           longitude?: number | null
           motivo_ajuste?: string | null
@@ -1177,6 +1187,7 @@ export type Database = {
         Update: {
           ajustado?: boolean | null
           ajustado_por?: string | null
+          anomalia_detectada?: boolean | null
           biometria_score?: number | null
           biometria_status?: string | null
           colaborador_id?: string
@@ -1185,15 +1196,19 @@ export type Database = {
           dentro_raio?: boolean | null
           device_metadata?: Json | null
           dispositivo_id?: string | null
+          distancia_local_metros?: number | null
           empresa_id?: string | null
           foto_biometria_url?: string | null
           hash_biometrico?: string | null
+          hash_comprovante?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora?: string
           id?: string
+          id_fiscal_ponto?: string | null
           ip_address?: string | null
           is_offline?: boolean | null
+          justificativa_anomalia?: string | null
           latitude?: number | null
           longitude?: number | null
           motivo_ajuste?: string | null
@@ -12237,6 +12252,118 @@ export type Database = {
           usuario_id?: string | null
         }
         Relationships: []
+      }
+      ponto_auditoria_fraude: {
+        Row: {
+          batida_id: string | null
+          created_at: string | null
+          detalhes: Json | null
+          id: string
+          score_confianca: number | null
+          tipo_alerta: string | null
+        }
+        Insert: {
+          batida_id?: string | null
+          created_at?: string | null
+          detalhes?: Json | null
+          id?: string
+          score_confianca?: number | null
+          tipo_alerta?: string | null
+        }
+        Update: {
+          batida_id?: string | null
+          created_at?: string | null
+          detalhes?: Json | null
+          id?: string
+          score_confianca?: number | null
+          tipo_alerta?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ponto_auditoria_fraude_batida_id_fkey"
+            columns: ["batida_id"]
+            isOneToOne: false
+            referencedRelation: "batidas_ponto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_auditoria_fraude_batida_id_fkey"
+            columns: ["batida_id"]
+            isOneToOne: false
+            referencedRelation: "vw_batidas_dia"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ponto_espelhos_assinados: {
+        Row: {
+          arquivo_espelho_url: string | null
+          colaborador_id: string | null
+          created_at: string | null
+          data_assinatura_colaborador: string | null
+          data_assinatura_rh: string | null
+          hash_assinatura_colaborador: string | null
+          hash_assinatura_rh: string | null
+          id: string
+          periodo_fim: string
+          periodo_inicio: string
+          saldo_banco_horas_periodo: string | null
+          status_assinatura: string | null
+          total_horas_trabalhadas: string | null
+        }
+        Insert: {
+          arquivo_espelho_url?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          data_assinatura_colaborador?: string | null
+          data_assinatura_rh?: string | null
+          hash_assinatura_colaborador?: string | null
+          hash_assinatura_rh?: string | null
+          id?: string
+          periodo_fim: string
+          periodo_inicio: string
+          saldo_banco_horas_periodo?: string | null
+          status_assinatura?: string | null
+          total_horas_trabalhadas?: string | null
+        }
+        Update: {
+          arquivo_espelho_url?: string | null
+          colaborador_id?: string | null
+          created_at?: string | null
+          data_assinatura_colaborador?: string | null
+          data_assinatura_rh?: string | null
+          hash_assinatura_colaborador?: string | null
+          hash_assinatura_rh?: string | null
+          id?: string
+          periodo_fim?: string
+          periodo_inicio?: string
+          saldo_banco_horas_periodo?: string | null
+          status_assinatura?: string | null
+          total_horas_trabalhadas?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ponto_espelhos_assinados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_espelhos_assinados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_espelhos_assinados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ponto_regras_aprovacao: {
         Row: {
