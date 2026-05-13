@@ -24,7 +24,14 @@ export const cargoService = {
     return ensureSingleResult(data, 'cargo');
   },
   async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('cargos').update(d).eq('id', id).select().maybeSingle();
+    const { data: current } = await supabase.from('cargos').select('version').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('cargos')
+      .update(d)
+      .eq('id', id)
+      .eq('version', current?.version || 1)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'cargo');
   },

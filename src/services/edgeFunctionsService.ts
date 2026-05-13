@@ -1,10 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
+import { bitrixBreaker, resendBreaker } from '@/lib/circuitBreaker';
+import { v4 as uuidv4 } from 'uuid';
+
+const getCorrelationHeaders = () => ({
+  'x-request-id': uuidv4(),
+});
 
 export const edgeFunctionsService = {
   /** Dispara alertas automáticos de DP via email */
   dispararAlertasDP: async () => {
     const { data, error } = await supabase.functions.invoke('alertas-dp', {
       body: { trigger: 'manual' },
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -17,11 +24,14 @@ export const edgeFunctionsService = {
     empresaId: string;
     competencia?: string;
   }) => {
-    const { data, error } = await supabase.functions.invoke('enviar-relatorio', {
-      body: params,
+    return resendBreaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke('enviar-relatorio', {
+        body: params,
+        headers: getCorrelationHeaders(),
+      });
+      if (error) throw error;
+      return data;
     });
-    if (error) throw error;
-    return data;
   },
 
   /** Gera guias DARF/GPS/FGTS via edge function */
@@ -32,6 +42,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('gerar-guias', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -45,6 +56,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('processar-ponto', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -59,6 +71,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('calcular-ferias', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -71,6 +84,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('calcular-folha', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -89,6 +103,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('calcular-rescisao', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -102,6 +117,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('exportacao', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -111,6 +127,7 @@ export const edgeFunctionsService = {
   healthcheck: async () => {
     const { data, error } = await supabase.functions.invoke('healthcheck', {
       body: {},
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -120,6 +137,7 @@ export const edgeFunctionsService = {
   limpezaDados: async () => {
     const { data, error } = await supabase.functions.invoke('limpeza', {
       body: {},
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -129,6 +147,7 @@ export const edgeFunctionsService = {
   backupServidor: async (empresaId?: string) => {
     const { data, error } = await supabase.functions.invoke('backup', {
       body: { empresaId },
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -143,6 +162,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('OCR', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -152,6 +172,7 @@ export const edgeFunctionsService = {
   metricas: async (empresaId: string) => {
     const { data, error } = await supabase.functions.invoke('metricas', {
       body: { empresaId },
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -168,6 +189,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('notificacao', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -177,6 +199,7 @@ export const edgeFunctionsService = {
   processarAgendamentos: async () => {
     const { data, error } = await supabase.functions.invoke('processar-agendamentos', {
       body: {},
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -189,6 +212,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('gerar-holerite', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -204,6 +228,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('assinaturaDigital', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -219,6 +244,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('cache', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -232,6 +258,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('criptografia', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -248,6 +275,7 @@ export const edgeFunctionsService = {
   }) => {
     const { data, error } = await supabase.functions.invoke('importacao', {
       body: params,
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -257,10 +285,13 @@ export const edgeFunctionsService = {
   sincronizarBitrix: async (params: {
     action: 'sync_departamentos' | 'sync_colaboradores' | 'sync_cargos' | 'sync_all' | 'status';
   }) => {
-    const { data, error } = await supabase.functions.invoke('sincronizar-bitrix', {
-      body: params,
+    return bitrixBreaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke('sincronizar-bitrix', {
+        body: params,
+        headers: getCorrelationHeaders(),
+      });
+      if (error) throw error;
+      return data;
     });
-    if (error) throw error;
-    return data;
   },
 };

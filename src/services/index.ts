@@ -69,7 +69,14 @@ export const colaboradorService = {
   },
   async create(d: any) { return colaboradorService.criar(d); },
   async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('colaboradores').update(d).eq('id', id).select().maybeSingle();
+    const { data: current } = await supabase.from('colaboradores').select('version').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('colaboradores')
+      .update(d)
+      .eq('id', id)
+      .eq('version', current?.version || 1)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'colaborador');
   },
