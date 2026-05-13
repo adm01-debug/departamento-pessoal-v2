@@ -46,8 +46,12 @@ export function SSTProgramasTab() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {PROGRAMAS_SST.map((prog, i) => (
-          <motion.div key={prog.sigla} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
+        {isLoading ? (
+          <div className="col-span-full flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+        ) : programas.length === 0 ? (
+          <div className="col-span-full text-center py-12 text-muted-foreground font-body">Nenhum programa ou laudo cadastrado.</div>
+        ) : programas.map((prog: any, i: number) => (
+          <motion.div key={prog.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
             <Card className="border-border/30 rounded-2xl hover:shadow-elevated transition-all overflow-hidden">
               <div className="h-[2px] bg-gradient-to-r from-success to-info" />
               <CardContent className="p-4">
@@ -57,19 +61,19 @@ export function SSTProgramasTab() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-display font-bold text-sm">{prog.sigla}</p>
-                      <Badge variant="outline" className="text-[10px] font-body">{prog.nr}</Badge>
+                      <p className="font-display font-bold text-sm">{getSigla(prog.tipo)}</p>
+                      <Badge variant="outline" className="text-[10px] font-body">{getNR(prog.tipo)}</Badge>
                     </div>
-                    <p className="text-[10px] text-muted-foreground font-body truncate">{prog.nome}</p>
+                    <p className="text-[10px] text-muted-foreground font-body truncate">{prog.titulo}</p>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-body"><span className="text-muted-foreground">Vigência:</span><span className="font-medium">{prog.vigencia}</span></div>
-                  <div className="flex justify-between text-[10px] font-body"><span className="text-muted-foreground">Responsável:</span><span className="font-medium">{prog.responsavel}</span></div>
-                  <div className="flex justify-between text-[10px] font-body"><span className="text-muted-foreground">Status:</span><Badge className="bg-success/15 text-success border-0 text-[9px]">Vigente</Badge></div>
+                  <div className="flex justify-between text-[10px] font-body"><span className="text-muted-foreground">Vencimento:</span><span className="font-medium">{new Date(prog.data_validade).toLocaleDateString('pt-BR')}</span></div>
+                  <div className="flex justify-between text-[10px] font-body"><span className="text-muted-foreground">Responsável:</span><span className="font-medium truncate max-w-[120px]">{prog.responsavel_tecnico || 'N/A'}</span></div>
+                  <div className="flex justify-between text-[10px] font-body"><span className="text-muted-foreground">Status:</span><Badge className={cn("border-0 text-[9px]", new Date(prog.data_validade) < new Date() ? "bg-destructive/15 text-destructive" : "bg-success/15 text-success")}>{new Date(prog.data_validade) < new Date() ? 'Vencido' : 'Vigente'}</Badge></div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-border/20 flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1 text-[10px] h-7 rounded-lg font-body">Visualizar</Button>
+                  <Button size="sm" variant="outline" className="flex-1 text-[10px] h-7 rounded-lg font-body" onClick={() => prog.arquivo_url && window.open(prog.arquivo_url)}>Visualizar</Button>
                   <Button size="sm" variant="outline" className="flex-1 text-[10px] h-7 rounded-lg font-body">Renovar</Button>
                 </div>
               </CardContent>
