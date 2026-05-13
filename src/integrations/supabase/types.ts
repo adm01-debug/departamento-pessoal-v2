@@ -7784,6 +7784,50 @@ export type Database = {
         }
         Relationships: []
       }
+      folha_assinaturas: {
+        Row: {
+          assinante_id: string | null
+          cargo_assinante: string | null
+          created_at: string | null
+          data_assinatura: string | null
+          folha_id: string | null
+          hash_documento: string | null
+          id: string
+          ip_assinatura: string | null
+          status: string | null
+        }
+        Insert: {
+          assinante_id?: string | null
+          cargo_assinante?: string | null
+          created_at?: string | null
+          data_assinatura?: string | null
+          folha_id?: string | null
+          hash_documento?: string | null
+          id?: string
+          ip_assinatura?: string | null
+          status?: string | null
+        }
+        Update: {
+          assinante_id?: string | null
+          cargo_assinante?: string | null
+          created_at?: string | null
+          data_assinatura?: string | null
+          folha_id?: string | null
+          hash_documento?: string | null
+          id?: string
+          ip_assinatura?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folha_assinaturas_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       folha_auditoria: {
         Row: {
           colaborador_id: string | null
@@ -7842,6 +7886,41 @@ export type Database = {
           },
           {
             foreignKeyName: "folha_auditoria_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folha_eventos_auditoria: {
+        Row: {
+          created_at: string | null
+          detalhes: Json | null
+          folha_id: string | null
+          id: string
+          tipo_evento: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          detalhes?: Json | null
+          folha_id?: string | null
+          id?: string
+          tipo_evento?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          detalhes?: Json | null
+          folha_id?: string | null
+          id?: string
+          tipo_evento?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folha_eventos_auditoria_folha_id_fkey"
             columns: ["folha_id"]
             isOneToOne: false
             referencedRelation: "folhas_pagamento"
@@ -8898,13 +8977,16 @@ export type Database = {
           colaborador_nome: string
           created_at: string
           data_assinatura: string | null
+          data_visualizacao: string | null
           dependentes_irrf: number | null
           faltas_dias: number | null
           folha_id: string
           hash_assinatura: string | null
+          hash_validacao: string | null
           horas_extras_100: number | null
           horas_extras_50: number | null
           id: string
+          ip_visualizacao: string | null
           liquido: number
           salario_base: number
           total_descontos: number
@@ -8926,13 +9008,16 @@ export type Database = {
           colaborador_nome: string
           created_at?: string
           data_assinatura?: string | null
+          data_visualizacao?: string | null
           dependentes_irrf?: number | null
           faltas_dias?: number | null
           folha_id: string
           hash_assinatura?: string | null
+          hash_validacao?: string | null
           horas_extras_100?: number | null
           horas_extras_50?: number | null
           id?: string
+          ip_visualizacao?: string | null
           liquido?: number
           salario_base: number
           total_descontos?: number
@@ -8954,13 +9039,16 @@ export type Database = {
           colaborador_nome?: string
           created_at?: string
           data_assinatura?: string | null
+          data_visualizacao?: string | null
           dependentes_irrf?: number | null
           faltas_dias?: number | null
           folha_id?: string
           hash_assinatura?: string | null
+          hash_validacao?: string | null
           horas_extras_100?: number | null
           horas_extras_50?: number | null
           id?: string
+          ip_visualizacao?: string | null
           liquido?: number
           salario_base?: number
           total_descontos?: number
