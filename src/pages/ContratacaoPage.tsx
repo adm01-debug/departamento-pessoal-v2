@@ -254,13 +254,34 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       const result = await processDocument(file, docType);
       
       if (result.valid) {
+        // 1. Upload real para o storage
+        const ext = file.name.split('.').pop();
+        const storagePath = `admissao_${tokenData?.admissao_id}/${docType}_${Date.now()}.${ext}`;
+        
+        const { error: uploadErr } = await supabase.storage
+          .from('documentos')
+          .upload(storagePath, file);
+        
+        if (uploadErr) throw uploadErr;
+
+        // 2. Registrar na tabela documentos_admissao
+        const { error: dbErr } = await supabase
+          .from('documentos_admissao' as any)
+          .insert({
+            admissao_id: tokenData?.admissao_id,
+            tipo_documento: docType,
+            storage_path: storagePath,
+            status: 'pendente'
+          });
+
+        if (dbErr) throw dbErr;
+
         setUploadedDocs(prev => ({ 
           ...prev, 
           [docId]: { name: file.name, status: 'success', result } 
         }));
-        toast.success(`${docType.toUpperCase()} validado com sucesso!`);
+        toast.success(`${docType.toUpperCase()} enviado com sucesso!`);
         
-        // Auto-fill data if found and not yet filled
         if (result.extractedData) {
           const data = result.extractedData;
           if (data.nome && !formData.nome_completo) setFormData(p => ({ ...p, nome_completo: data.nome! }));
@@ -274,9 +295,10 @@ function ContratacaoWorkflow({ token }: { token: string }) {
         }));
         toast.error(`Atenção: ${result.error || 'Não foi possível validar o documento.'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error(error);
       setUploadedDocs(prev => ({ ...prev, [docId]: { name: file.name, status: 'error' } }));
-      toast.error('Erro no upload do documento.');
+      toast.error('Erro no upload do documento: ' + error.message);
     }
   };
 

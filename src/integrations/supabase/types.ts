@@ -10439,6 +10439,33 @@ export type Database = {
           },
         ]
       }
+      onboarding_kits: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          empresa_id: string
+          id: string
+          itens: Json
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          itens?: Json
+          nome: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          itens?: Json
+          nome?: string
+        }
+        Relationships: []
+      }
       onboarding_tarefas: {
         Row: {
           categoria: string
@@ -13911,6 +13938,50 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tarefas_onboarding: {
+        Row: {
+          admissao_id: string | null
+          concluida: boolean | null
+          concluida_em: string | null
+          created_at: string | null
+          descricao: string | null
+          id: string
+          prazo_dias: number | null
+          responsavel_id: string | null
+          titulo: string
+        }
+        Insert: {
+          admissao_id?: string | null
+          concluida?: boolean | null
+          concluida_em?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          prazo_dias?: number | null
+          responsavel_id?: string | null
+          titulo: string
+        }
+        Update: {
+          admissao_id?: string | null
+          concluida?: boolean | null
+          concluida_em?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          prazo_dias?: number | null
+          responsavel_id?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarefas_onboarding_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
             referencedColumns: ["id"]
           },
         ]

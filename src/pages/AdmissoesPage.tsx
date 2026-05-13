@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { DetalhesAdmissaoDialog } from '@/components/admissoes/DetalhesAdmissaoDialog';
-import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send, LayoutDashboard, List, History } from 'lucide-react';
+import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send, LayoutDashboard, List, History, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { motion } from 'framer-motion';
@@ -25,6 +25,7 @@ import {
 import { contratacaoService } from '@/services/contratacaoService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { OnboardingDashboard } from '@/components/admissoes/OnboardingDashboard';
+import OnboardingPageContent from '@/components/admissoes/OnboardingPageContent';
 
 
 const etapaLabels: Record<string, string> = {
@@ -135,6 +136,9 @@ export default function AdmissoesPage() {
           <TabsTrigger value="gestao" className="rounded-lg gap-2">
             <List className="h-4 w-4" /> Gestão de Candidatos
           </TabsTrigger>
+          <TabsTrigger value="onboarding" className="rounded-lg gap-2">
+            <Rocket className="h-4 w-4" /> Onboarding
+          </TabsTrigger>
           <TabsTrigger value="auditoria" className="rounded-lg gap-2">
             <History className="h-4 w-4" /> Auditoria
           </TabsTrigger>
@@ -146,6 +150,10 @@ export default function AdmissoesPage() {
           ) : (
             <OnboardingDashboard admissoes={admissoes || []} />
           )}
+        </TabsContent>
+
+        <TabsContent value="onboarding" className="space-y-6">
+          <OnboardingPageContent />
         </TabsContent>
 
         <TabsContent value="gestao" className="space-y-6">
