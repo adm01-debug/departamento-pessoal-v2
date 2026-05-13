@@ -133,19 +133,20 @@ export async function enviarEvento(eventoId: string, empresaId: string) {
     }
   }
 
+  // 2. Chamar a Edge Function Real para transmissão e assinatura
   const { data, error } = await supabase.functions.invoke('enviar-esocial', {
     body: { empresaId, eventoId },
   });
-  if (error) throw error;
+  
+  if (error) {
+    await supabase.from('esocial_eventos').update({
+      status: 'erro',
+      erros: { mensagem: error.message },
+    }).eq('id', eventoId);
+    throw error;
+  }
 
-  await supabase.from('esocial_eventos').update({
-    status: data?.success ? 'enviado' : 'erro',
-    protocolo: data?.protocolo || null,
-    xml: data?.xml || null,
-    data_envio: data?.success ? new Date().toISOString() : null,
-    erros: data?.success ? null : { mensagem: data?.error },
-  }).eq('id', eventoId);
-
+  // O status já é atualizado pela própria Edge Function, mas garantimos o retorno para a UI
   return data;
 }
 

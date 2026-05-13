@@ -151,7 +151,12 @@ export default function PontoPage() {
       if (!colab) throw new Error('Colaborador não encontrado');
 
       if (!navigator.onLine) {
-        await addOffline(tipo, colab.id, geo);
+        // Agora passando a foto para o modo offline (biometria real mesmo offline)
+        await addOffline(tipo, colab.id, { 
+          lat: geo?.lat, 
+          lng: geo?.lng, 
+          accuracy: geo?.accuracy 
+        });
       } else {
         await (pontoService as any).registrar(tipo, colab.id, {
           latitude: geo?.lat,
