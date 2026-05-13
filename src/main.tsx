@@ -20,6 +20,23 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
+// PWA Service Worker Registration
+const isInIframe = (() => {
+  try { return window.self !== window.top; } catch (e) { return true; }
+})();
+
+const isPreviewHost = 
+  window.location.hostname.includes("id-preview--") || 
+  window.location.hostname.includes("lovableproject.com");
+
+if (!isInIframe && !isPreviewHost && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw-custom.js')
+      .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+      .catch(err => console.error('Falha ao registrar Service Worker:', err));
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
