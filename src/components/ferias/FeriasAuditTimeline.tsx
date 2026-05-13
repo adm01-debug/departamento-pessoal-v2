@@ -29,7 +29,7 @@ interface FeriasAuditTimelineProps {
 export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps) {
   const [filtro, setFiltro] = React.useState<string>('all');
   
-  const { data: logs, isLoading } = useQuery({
+  const { data: logs, isLoading: loadingAudit } = useQuery({
     queryKey: ['ferias-audit', solicitacaoId],
     queryFn: () => auditoriaService.listar({ 
       registro_id: solicitacaoId,
@@ -38,6 +38,14 @@ export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps)
     }),
     enabled: !!solicitacaoId
   });
+
+  const { data: aprovacoes, isLoading: loadingAprov } = useQuery({
+    queryKey: ['ferias-aprovacoes-log', solicitacaoId],
+    queryFn: () => feriasService.getAprovacoesLog(solicitacaoId),
+    enabled: !!solicitacaoId
+  });
+
+  const isLoading = loadingAudit || loadingAprov;
 
   const filteredLogs = React.useMemo(() => {
     if (!logs) return [];
