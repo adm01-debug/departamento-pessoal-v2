@@ -15617,6 +15617,7 @@ export type Database = {
           etapa_atual_id: string | null
           id: string
           log_execucao: Json | null
+          metadata: Json | null
           metadata_automacao: Json | null
           solicitante_id: string | null
           status: string | null
@@ -15632,6 +15633,7 @@ export type Database = {
           etapa_atual_id?: string | null
           id?: string
           log_execucao?: Json | null
+          metadata?: Json | null
           metadata_automacao?: Json | null
           solicitante_id?: string | null
           status?: string | null
@@ -15647,6 +15649,7 @@ export type Database = {
           etapa_atual_id?: string | null
           id?: string
           log_execucao?: Json | null
+          metadata?: Json | null
           metadata_automacao?: Json | null
           solicitante_id?: string | null
           status?: string | null
