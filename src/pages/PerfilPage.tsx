@@ -138,6 +138,46 @@ export default function PerfilPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl space-y-6">
         <Card className="border border-border/30 rounded-2xl shadow-elevated">
           <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2"><Bell className="h-5 w-5 text-primary" />Notificações & Aplicativo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 font-body">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10">
+              <div className="flex items-center gap-3">
+                <Smartphone className="h-6 w-6 text-primary" />
+                <div>
+                  <p className="font-bold text-sm">Notificações Push (Navegador)</p>
+                  <p className="text-xs text-muted-foreground">Receba alertas em tempo real sobre holerites e avisos.</p>
+                </div>
+              </div>
+              {pushStatus === 'unsupported' ? (
+                <Badge variant="outline" className="text-muted-foreground">Não Suportado</Badge>
+              ) : (
+                <Button 
+                  variant={isSubscribed ? "outline" : "default"} 
+                  size="sm" 
+                  className={cn("rounded-lg text-xs", !isSubscribed && "bg-primary text-primary-foreground shadow-glow")}
+                  onClick={handleTogglePush}
+                >
+                  {isSubscribed ? 'Desativar' : 'Ativar Agora'}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10">
+              <div className="flex items-center gap-3">
+                <Monitor className="h-6 w-6 text-info" />
+                <div>
+                  <p className="font-bold text-sm">Aplicativo Web (PWA)</p>
+                  <p className="text-xs text-muted-foreground">Instale o sistema como um aplicativo no seu celular ou desktop.</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-success border-success/30">Pronto para Instalar</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border/30 rounded-2xl shadow-elevated">
+          <CardHeader>
             <CardTitle className="font-display flex items-center gap-2"><User className="h-5 w-5" />Dados Pessoais</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
