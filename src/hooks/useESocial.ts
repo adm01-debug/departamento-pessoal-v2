@@ -124,12 +124,19 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const logsQuery = useQuery({
+    queryKey: ['esocial-logs', empresaId],
+    queryFn: () => esocialService.listarTransmissaoLogs(empresaId!),
+    enabled: !!empresaId,
+  });
+
   return {
     eventos: eventosQuery.data || [],
     stats: statsQuery.data || { enviados: 0, pendentes: 0, erros: 0, conformidade: 100 },
     config: configQuery.data,
     certificados: certificadosQuery.data || [],
-    isLoading: eventosQuery.isLoading || configQuery.isLoading,
+    logs: logsQuery.data || [],
+    isLoading: eventosQuery.isLoading || configQuery.isLoading || logsQuery.isLoading,
     criarEvento: criarMutation.mutate,
     enviarEvento: enviarMutation.mutate,
     reenviarEvento: reenviarMutation.mutate,
@@ -138,5 +145,6 @@ export function useESocial() {
     salvarConfig: salvarConfigMutation.mutate,
     adicionarCertificado: addCertMutation.mutate,
     isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending || enviarLoteMutation.isPending,
+    refreshLogs: () => queryClient.invalidateQueries({ queryKey: ['esocial-logs'] }),
   };
 }
