@@ -7056,6 +7056,7 @@ export type Database = {
         Row: {
           abono_pecuniario: boolean | null
           adiantamento_13: boolean | null
+          adiantamento_13o: boolean | null
           aprovado_em: string | null
           aprovado_gestor: boolean | null
           aprovado_gestor_em: string | null
@@ -7087,10 +7088,15 @@ export type Database = {
           justificativa: string | null
           motivo_cancelamento: string | null
           observacoes: string | null
+          periodo_aquisitivo_fim: string | null
           periodo_aquisitivo_id: string | null
+          periodo_aquisitivo_inicio: string | null
           salario_base: number
           saldo_gasto: number | null
           status: string | null
+          status_aprovacao_contabilidade: string | null
+          status_aprovacao_gestor: string | null
+          status_aprovacao_rh: string | null
           updated_at: string
           valor_abono: number | null
           valor_abono_pecuniario: number | null
@@ -7105,6 +7111,7 @@ export type Database = {
         Insert: {
           abono_pecuniario?: boolean | null
           adiantamento_13?: boolean | null
+          adiantamento_13o?: boolean | null
           aprovado_em?: string | null
           aprovado_gestor?: boolean | null
           aprovado_gestor_em?: string | null
@@ -7136,10 +7143,15 @@ export type Database = {
           justificativa?: string | null
           motivo_cancelamento?: string | null
           observacoes?: string | null
+          periodo_aquisitivo_fim?: string | null
           periodo_aquisitivo_id?: string | null
+          periodo_aquisitivo_inicio?: string | null
           salario_base: number
           saldo_gasto?: number | null
           status?: string | null
+          status_aprovacao_contabilidade?: string | null
+          status_aprovacao_gestor?: string | null
+          status_aprovacao_rh?: string | null
           updated_at?: string
           valor_abono?: number | null
           valor_abono_pecuniario?: number | null
@@ -7154,6 +7166,7 @@ export type Database = {
         Update: {
           abono_pecuniario?: boolean | null
           adiantamento_13?: boolean | null
+          adiantamento_13o?: boolean | null
           aprovado_em?: string | null
           aprovado_gestor?: boolean | null
           aprovado_gestor_em?: string | null
@@ -7185,10 +7198,15 @@ export type Database = {
           justificativa?: string | null
           motivo_cancelamento?: string | null
           observacoes?: string | null
+          periodo_aquisitivo_fim?: string | null
           periodo_aquisitivo_id?: string | null
+          periodo_aquisitivo_inicio?: string | null
           salario_base?: number
           saldo_gasto?: number | null
           status?: string | null
+          status_aprovacao_contabilidade?: string | null
+          status_aprovacao_gestor?: string | null
+          status_aprovacao_rh?: string | null
           updated_at?: string
           valor_abono?: number | null
           valor_abono_pecuniario?: number | null
@@ -7310,6 +7328,51 @@ export type Database = {
           },
           {
             foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferias_aprovacoes_log: {
+        Row: {
+          aprovador_id: string | null
+          created_at: string | null
+          ferias_id: string | null
+          id: string
+          nivel: string
+          observacao: string | null
+          status: string
+        }
+        Insert: {
+          aprovador_id?: string | null
+          created_at?: string | null
+          ferias_id?: string | null
+          id?: string
+          nivel: string
+          observacao?: string | null
+          status: string
+        }
+        Update: {
+          aprovador_id?: string | null
+          created_at?: string | null
+          ferias_id?: string | null
+          id?: string
+          nivel?: string
+          observacao?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
@@ -17401,6 +17464,13 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
+      fn_calculate_periodo_aquisitivo: {
+        Args: { _colaborador_id: string }
+        Returns: {
+          fim: string
+          inicio: string
+        }[]
+      }
       fn_cleanup_old_logs: { Args: never; Returns: undefined }
       fn_link_gov_br_account: {
         Args: { _cpf: string; _nivel: string; _user_id: string }
