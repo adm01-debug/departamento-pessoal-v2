@@ -418,7 +418,7 @@ export default function ESocialPage() {
                                   <AlertTriangle className="h-3.5 w-3.5 text-destructive animate-pulse cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent className="bg-destructive text-destructive-foreground border-none">
-                                  <p className="max-w-xs text-xs">{e.erros?.mensagem || e.erros?.validacao?.[0]?.mensagem || 'Erro desconhecido na transmissão'}</p>
+                                  <p className="max-w-xs text-xs">{(e.erros as any)?.mensagem || (e.erros as any)?.validacao?.[0]?.mensagem || 'Erro desconhecido na transmissão'}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -637,7 +637,7 @@ export default function ESocialPage() {
                 <CardContent className="space-y-6">
                    <RadioGroup 
                      value={config?.ambiente || '2'} 
-                     onValueChange={(v) => empresaAtual?.id && salvarConfig({ empresa_id: empresaAtual.id, ambiente: v, certificado_id: config?.certificado_id })}
+                     onValueChange={(v) => empresaAtual?.id && salvarConfig({ empresa_id: empresaAtual.id, ambiente: v, certificado_id: config?.certificado_id ?? undefined })}
                      className="grid gap-4"
                    >
                       <div className={cn(
