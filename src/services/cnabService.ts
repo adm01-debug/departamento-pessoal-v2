@@ -121,6 +121,12 @@ export const cnabService = {
     let header = pad(config.banco_codigo, 3, '0', 'left') + '00000' + pad('', 9) + '2' + pad('', 14, '0') + pad(config.convenio, 20) + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('BANCO', 30) + pad('', 10) + '1' + dateStr + timeStr + pad(sequence, 6, '0', 'left') + '081' + '00000' + pad('', 69);
     lines.push(header.padEnd(240, ' '));
 
+    // Registrar o arquivo de remessa no banco para auditoria real
+    await supabase.from('cnab_remessas').update({ 
+      arquivo_remessa: lines[0],
+      status: 'enviado' 
+    }).eq('id', remessa.id);
+
     let detailSequence = 1;
     const cnabItensToInsert = [];
 
