@@ -24,20 +24,37 @@ export function usePonto(colaboradorId?: string) {
       tipo, 
       colaboradorId: colId, 
       geo,
-      foto_biometria_url
+      foto_biometria_url,
+      foto_base64
     }: { 
       tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida'; 
       colaboradorId: string;
       geo?: { latitude: number; longitude: number; accuracy: number };
       foto_biometria_url?: string | null;
+      foto_base64?: string | null;
     }) => {
-      return pontosService.registrar(tipo, colId, {
+      const batida = await pontosService.registrar(tipo, colId, {
         latitude: geo?.latitude,
         longitude: geo?.longitude,
         precisao: geo?.accuracy,
         dispositivoId: navigator.userAgent,
         foto_biometria_url
       });
+
+      // Se houver foto e for online, dispara a validação biométrica em background
+      if (batida && foto_base64 && navigator.onLine) {
+        pontosService.validarBiometria(batida.id, colId, foto_base64)
+          .then(res => {
+            if (res.valid) {
+              toast.success('Biometria validada com sucesso!');
+            } else {
+              toast.error('Atenção: Falha na validação biométrica!');
+            }
+          })
+          .catch(err => console.error('Erro na validação biométrica:', err));
+      }
+
+      return batida;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['registros-ponto'] });
