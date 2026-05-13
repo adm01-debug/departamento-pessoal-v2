@@ -14,6 +14,7 @@ export interface OfflineRegistro {
   precisao?: number;
   dispositivoId: string;
   hash?: string;
+  foto_base64?: string | null;
 }
 
 export const pontoOfflineService = {
@@ -89,16 +90,9 @@ export const pontoOfflineService = {
       console.error('[OfflineSync] Falha na comunicação com o servidor:', err);
       return { synced: 0, errors: queue.length };
     }
-      } catch (err) {
-        console.error('[OfflineSync] Erro na batida:', item.id, err);
-        errors++;
-        remaining.push(item);
-      }
-    }
-
-    if (remaining.length === 0) {
+    if (remaining.length === 0 && (synced > 0 || errors > 0)) {
       localStorage.removeItem(PONTO_OFFLINE_STORAGE_KEY);
-    } else {
+    } else if (remaining.length > 0) {
       const encrypted = CryptoJS.AES.encrypt(JSON.stringify(remaining), CRYPTO_KEY).toString();
       localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
     }

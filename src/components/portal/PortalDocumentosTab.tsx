@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, DollarSign, PenTool, Upload, ChevronRight, CheckCircle2, AlertCircle, File, Loader2, Download, Eye, Trash2 } from 'lucide-react';
+import { FileText, DollarSign, PenTool, Upload, ChevronRight, CheckCircle2, AlertCircle, File, Loader2, Download, Eye, Trash2, Check, Eraser } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentoService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SignatureCanvas } from '@/components/ui/signature/SignatureCanvas';
 
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Atestado', 'Certificado', 'Comprovante', 'Contrato', 'RG', 'CPF', 'Outro'];
@@ -25,6 +26,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [docToSign, setDocToSign] = useState<any>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -104,6 +106,37 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
     }
   };
 
+  const handleSaveSignature = async (base64: string) => {
+    if (!docToSign || !colaboradorId) return;
+    
+    try {
+      // 1. Upload signature image
+      const fileName = `assinaturas/doc_${docToSign.id}_${Date.now()}.png`;
+      const binary = Uint8Array.from(atob(base64.split(',')[1]), c => c.charCodeAt(0));
+      
+      const { error: uploadErr } = await supabase.storage.from(BUCKET).upload(fileName, binary, { contentType: 'image/png' });
+      if (uploadErr) throw uploadErr;
+
+      // 2. Mark document as signed
+      await (supabase as any).from('documentos_assinatura').insert({
+        documento_id: docToSign.id,
+        colaborador_id: colaboradorId,
+        assinatura_base64: base64,
+        ip_assinatura: '127.0.0.1', // Mock IP
+        assinado_em: new Date().toISOString()
+      });
+
+      // Update status if column exists
+      await (supabase as any).from('documentos').update({ status: 'assinado' }).eq('id', docToSign.id);
+
+      queryClient.invalidateQueries({ queryKey: ['portal-documentos'] });
+      toast.success('Documento assinado com sucesso!');
+      setDocToSign(null);
+    } catch (e: any) {
+      toast.error('Erro ao assinar documento: ' + e.message);
+    }
+  };
+
   const quickLinks = [
     { label: 'Documentos Pessoais', path: '/documentos', icon: FileText, desc: 'Consulte seus documentos' },
     { label: 'Assinar Docs', path: '/assinaturas', icon: PenTool, desc: 'Pendências de assinatura' },
@@ -171,6 +204,11 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
                     </div>
                   </div>
                   <div className="flex gap-1">
+                    {doc.tipo === 'Contrato' && doc.status !== 'assinado' && (
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-warning hover:bg-warning/10" onClick={() => setDocToSign(doc)} title="Assinar">
+                        <PenTool className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => handleDownload(doc)} title="Baixar">
                       <Download className="h-4 w-4 text-muted-foreground hover:text-success" />
                     </Button>
@@ -230,6 +268,25 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
               {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
               Enviar Documento
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Signature Dialog */}
+      <Dialog open={!!docToSign} onOpenChange={(o) => !o && setDocToSign(null)}>
+        <DialogContent className="sm:max-w-lg rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display">Assinatura de Documento</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground font-body">
+              Você está assinando digitalmente o documento: <span className="font-semibold text-foreground">{docToSign?.nome}</span>. 
+              Sua assinatura manuscrita será vinculada a este registro com validade jurídica interna.
+            </p>
+            <SignatureCanvas 
+              onSave={handleSaveSignature} 
+              onCancel={() => setDocToSign(null)} 
+            />
           </div>
         </DialogContent>
       </Dialog>

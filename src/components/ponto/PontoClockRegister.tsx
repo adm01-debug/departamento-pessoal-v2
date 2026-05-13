@@ -1,12 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, AlertTriangle, Scan, Camera, ShieldCheck } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
-import { pontoMonitorService } from '@/services/pontoMonitorService';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts';
@@ -15,7 +14,7 @@ interface PontoClockRegisterProps {
   time: Date;
   loading: string | null;
   geoStatus: 'idle' | 'capturing' | 'success' | 'error' | 'out_of_range';
-  onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => void;
+  onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', options?: any) => void;
 }
 
 const buttons = [
@@ -32,11 +31,13 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
   const [showFaceScan, setShowFaceScan] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [selectedTipo, setSelectedTipo] = useState<any>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
     
-    // Tenta sincronizar se estiver online
     if (navigator.onLine) {
       handleSync();
     }
@@ -45,8 +46,11 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(interval);
+      if (stream) stream.getTracks().forEach(track => track.stop());
+    };
+  }, [stream]);
 
   const handleSync = async () => {
     if (isSyncing || !navigator.onLine) return;
@@ -55,7 +59,6 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       const result = await pontoOfflineService.syncOfflineQueue();
       if (result.synced > 0) {
         toast.success(`${result.synced} registros offline sincronizados!`);
-        await pontoMonitorService.trackOfflineSync(result.synced, result.errors);
       }
     } catch (e) {
       console.error('Erro na sincronização automática', e);
@@ -65,32 +68,76 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
     }
   };
 
-  const startScan = (tipo: any) => {
+  const startScan = async (tipo: any) => {
     setSelectedTipo(tipo);
     setShowFaceScan(true);
     setScanProgress(0);
-    
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setShowFaceScan(false);
-            finalizeRegister(tipo);
-          }, 500);
-          return 100;
-        }
-        return prev + 10;
+
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user', width: 480, height: 480 } 
       });
-    }, 150);
+      setStream(mediaStream);
+      if (videoRef.current) videoRef.current.srcObject = mediaStream;
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        setScanProgress(progress);
+        if (progress >= 100) {
+          clearInterval(interval);
+          captureAndFinalize(tipo, mediaStream);
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Erro ao acessar câmera:', err);
+      toast.error('Acesso à câmera é obrigatório para biometria.');
+      setShowFaceScan(false);
+    }
   };
 
-  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
+  const captureAndFinalize = async (tipo: any, mediaStream: MediaStream) => {
+    let fotoUrl = null;
+    let fotoBase64 = null;
+    
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
+      
+      if (blob && user?.id && navigator.onLine) {
+        const fileName = `${user.id}/${Date.now()}.jpg`;
+        const { error } = await (window as any).supabase.storage
+          .from('ponto-biometria')
+          .upload(fileName, blob);
+          
+        if (!error) {
+          const { data: { publicUrl } } = (window as any).supabase.storage
+            .from('ponto-biometria')
+            .getPublicUrl(fileName);
+          fotoUrl = publicUrl;
+        }
+      }
+    }
+
+    // Stop camera
+    mediaStream.getTracks().forEach(track => track.stop());
+    setStream(null);
+    setShowFaceScan(false);
+    finalizeRegister(tipo, fotoUrl, fotoBase64);
+  };
+
+  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', fotoUrl: string | null, fotoBase64: string | null) => {
     if (!user) return;
     
-    // Se estiver online, usa o fluxo padrão
     if (navigator.onLine) {
-      onRegistrar(tipo);
+      onRegistrar(tipo, { foto_biometria_url: fotoUrl });
       return;
     }
 
@@ -103,7 +150,8 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
         tipo,
         colaborador_id: colab.id,
         timestamp: new Date().toISOString(),
-        dispositivoId: navigator.userAgent
+        dispositivoId: navigator.userAgent,
+        foto_base64: fotoBase64
       };
 
       await pontoOfflineService.queueRegistro({
@@ -195,7 +243,14 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
                 className="absolute left-0 right-0 h-1 bg-primary-glow/60 shadow-[0_0_15px_rgba(34,197,94,1)] z-10" 
               />
               
-              <Camera className="h-20 w-20 text-slate-600" />
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="w-full h-full object-cover rounded-full" 
+              />
+              <canvas ref={canvasRef} className="hidden" />
               
               {/* Progress Ring */}
               <svg className="absolute inset-0 w-full h-full -rotate-90">
