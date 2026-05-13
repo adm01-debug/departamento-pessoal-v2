@@ -2,19 +2,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertCircle, ShieldAlert, Plus, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ShieldAlert, Plus, CheckCircle2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-const INCIDENTES_MOCK = [
-  { id: '1', data: '2026-05-10', tipo: 'quase_acidente', local: 'Galpão 2', status: 'em_investigacao', gravidade: 2, descricao: 'Queda de material próximo a colaborador' },
-  { id: '2', data: '2026-05-08', tipo: 'acidente_leve', local: 'Refeitório', status: 'concluido', gravidade: 1, descricao: 'Corte superficial no dedo' },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useEmpresa } from '@/contexts';
 
 export function SSTIncidentesTab() {
-  const [incidentes] = useState(INCIDENTES_MOCK);
+  const { empresaAtual } = useEmpresa();
+  
+  const { data: incidentes = [], isLoading } = useQuery({
+    queryKey: ['sst_incidentes', empresaAtual?.id],
+    enabled: !!empresaAtual?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sst_incidentes' as any)
+        .select('*')
+        .eq('empresa_id', empresaAtual!.id)
+        .order('data_hora', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -81,9 +93,9 @@ export function SSTIncidentesTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {incidentes.map((inc, i) => (
+            {incidentes.map((inc: any, i: number) => (
               <motion.tr key={inc.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className="hover:bg-accent/30 transition-colors">
-                <TableCell className="font-body text-xs">{new Date(inc.data).toLocaleDateString('pt-BR')}</TableCell>
+                <TableCell className="font-body text-xs">{new Date(inc.data_hora || inc.data).toLocaleDateString('pt-BR')}</TableCell>
                 <TableCell>{getTipoBadge(inc.tipo)}</TableCell>
                 <TableCell className="font-body text-xs">{inc.local}</TableCell>
                 <TableCell className="font-body text-xs max-w-[200px] truncate">{inc.descricao}</TableCell>
