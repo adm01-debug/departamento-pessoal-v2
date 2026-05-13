@@ -816,6 +816,39 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_gov_br_sessions: {
+        Row: {
+          access_token: string
+          cpf: string | null
+          created_at: string | null
+          id: string
+          id_token: string | null
+          metadata: Json | null
+          nivel_autenticacao: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_token: string
+          cpf?: string | null
+          created_at?: string | null
+          id?: string
+          id_token?: string | null
+          metadata?: Json | null
+          nivel_autenticacao?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          cpf?: string | null
+          created_at?: string | null
+          id?: string
+          id_token?: string | null
+          metadata?: Json | null
+          nivel_autenticacao?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       automacao_logs: {
         Row: {
           created_at: string | null
@@ -11853,6 +11886,8 @@ export type Database = {
           cpf_validado_govbr: boolean | null
           created_at: string
           departamento: string | null
+          gov_br_nivel: string | null
+          gov_br_vinculado: boolean | null
           govbr_nivel_autenticacao: string | null
           govbr_uid: string | null
           id: string
@@ -11871,6 +11906,8 @@ export type Database = {
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
+          gov_br_nivel?: string | null
+          gov_br_vinculado?: boolean | null
           govbr_nivel_autenticacao?: string | null
           govbr_uid?: string | null
           id?: string
@@ -11889,6 +11926,8 @@ export type Database = {
           cpf_validado_govbr?: boolean | null
           created_at?: string
           departamento?: string | null
+          gov_br_nivel?: string | null
+          gov_br_vinculado?: boolean | null
           govbr_nivel_autenticacao?: string | null
           govbr_uid?: string | null
           id?: string
@@ -16850,6 +16889,10 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
+      fn_link_gov_br_account: {
+        Args: { _cpf: string; _nivel: string; _user_id: string }
+        Returns: undefined
+      }
       format_type_string: { Args: { "": string }; Returns: string }
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
