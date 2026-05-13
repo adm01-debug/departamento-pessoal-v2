@@ -302,6 +302,8 @@ export const folhaService = {
   },
 };
 
+export { catalogoCursoService } from './catalogoCursoService';
+
 export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 
 export const documentoService = {
