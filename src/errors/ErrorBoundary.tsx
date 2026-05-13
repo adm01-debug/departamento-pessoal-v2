@@ -1,5 +1,6 @@
 // V15-002: Error Boundary Component
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { loggerService } from '@/services/loggerService';
 
 interface Props {
   children: ReactNode;
