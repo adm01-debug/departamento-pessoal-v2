@@ -243,7 +243,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
                         {p.dias_direito} dias
                       </Badge>
                     </TableCell>
-                    <TableCell>{getStatusBadge(p.status)}</TableCell>
+                    <TableCell>{getStatusBadge(p.status || '')}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button variant="ghost" size="icon" onClick={() => openEdit(p)} className="h-8 w-8">
