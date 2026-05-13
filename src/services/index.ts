@@ -24,7 +24,6 @@ export { comunicacaoService } from './comunicacaoService';
 export { despesaService } from './despesaService';
 export { controleAcessoService } from './controleAcessoService';
 export { lgpdService } from './lgpdService';
-export { catalogoCursoService } from './catalogoCursoService';
 export { avaliacaoService } from './avaliacaoService';
 export { batidasPontoService } from './batidasPontoService';
 export { faltasService } from './faltasService';
