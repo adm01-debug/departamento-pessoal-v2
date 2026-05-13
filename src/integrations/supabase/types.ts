@@ -326,6 +326,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "afastamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "afastamentos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -352,6 +359,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_afastamentos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_afastamentos_empresa"
@@ -428,6 +442,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ajustes_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "ajustes_ponto_registro_ponto_id_fkey"
             columns: ["registro_ponto_id"]
             isOneToOne: false
@@ -461,6 +482,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ajustes_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -521,6 +549,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "anotacoes_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_anotacoes_colaborador_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -540,6 +575,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_anotacoes_colaborador_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -615,6 +657,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "asos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "asos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -641,6 +690,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_asos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_asos_empresa"
@@ -833,6 +889,13 @@ export type Database = {
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "auditoria_contratual_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       auditoria_logs: {
@@ -1006,6 +1069,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "banco_horas_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -1046,6 +1116,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_banco_horas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_banco_horas_empresa"
@@ -1251,6 +1328,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "batidas_ponto_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -1277,6 +1361,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_batidas_ponto_empresa"
@@ -1353,6 +1444,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "beneficiarios_plano_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "beneficiarios_plano_plano_saude_id_fkey"
             columns: ["plano_saude_id"]
             isOneToOne: false
@@ -1379,6 +1477,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_beneficiarios_plano_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1439,6 +1544,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "beneficiarios_seguro_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "beneficiarios_seguro_seguro_vida_id_fkey"
             columns: ["seguro_vida_id"]
             isOneToOne: false
@@ -1465,6 +1577,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_beneficiarios_seguro_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1575,6 +1694,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficio_movimentacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1789,6 +1915,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "beneficios_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "beneficios_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -1815,6 +1948,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_beneficios_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_beneficios_empresa"
@@ -1906,6 +2046,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "beneficios_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "beneficios_colaborador_tipo_beneficio_id_fkey"
             columns: ["tipo_beneficio_id"]
             isOneToOne: false
@@ -1932,6 +2079,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_beneficios_colaborador_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -2814,6 +2968,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "cnab_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "cnab_itens_folha_item_id_fkey"
             columns: ["folha_item_id"]
             isOneToOne: false
@@ -2928,6 +3089,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "colaborador_beneficios_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_colaborador_beneficios_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -2947,6 +3115,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_colaborador_beneficios_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -3443,6 +3618,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "colaboradores_gestor_ferias_id_fkey"
+            columns: ["gestor_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "colaboradores_nacionalidade_id_fkey"
             columns: ["nacionalidade_id"]
             isOneToOne: false
@@ -3469,6 +3651,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "colaboradores_tipo_pagamento_id_fkey"
@@ -4074,6 +4263,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "contas_bancarias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "contas_bancarias_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -4100,6 +4296,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_contas_bancarias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_contas_bancarias_empresa"
@@ -4173,6 +4376,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "contatos_emergencia_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "contatos_emergencia_relacionamento_id_fkey"
             columns: ["relacionamento_id"]
             isOneToOne: false
@@ -4199,6 +4409,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_contatos_emergencia_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -4262,6 +4479,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "contratos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "contratos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -4288,6 +4512,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_contratos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_contratos_empresa"
@@ -4364,6 +4595,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "controle_acesso_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "controle_acesso_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -4390,6 +4628,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_controle_acesso_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_controle_acesso_empresa"
@@ -4496,6 +4741,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "convenios_colaboradores_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "convenios_colaboradores_convenio_id_fkey"
             columns: ["convenio_id"]
             isOneToOne: false
@@ -4522,6 +4774,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_convenios_colaboradores_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -4636,6 +4895,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dados_estagiario_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "dados_estagiario_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -4664,6 +4930,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dados_estagiario_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_dados_estagiario_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -4683,6 +4956,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_dados_estagiario_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_dados_estagiario_empresa"
@@ -4780,6 +5060,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dados_estrangeiro_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: true
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "dados_estrangeiro_condicao_ingresso_id_fkey"
             columns: ["condicao_ingresso_id"]
             isOneToOne: false
@@ -4834,6 +5121,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_dados_estrangeiro_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: true
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -4954,6 +5248,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "deficiencias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: true
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_deficiencias_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: true
@@ -4973,6 +5274,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_deficiencias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: true
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -5048,6 +5356,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "departamentos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_departamentos_empresa"
@@ -5148,6 +5463,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dependentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "dependentes_genero_documento_id_fkey"
             columns: ["genero_documento_id"]
             isOneToOne: false
@@ -5181,6 +5503,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_dependentes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -5415,6 +5744,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "desligamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "desligamentos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -5455,6 +5791,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_desligamentos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_desligamentos_empresa"
@@ -5540,6 +5883,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "despesas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "despesas_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -5566,6 +5916,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_despesas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_despesas_empresa"
@@ -5696,6 +6053,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "documentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_documentos_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -5715,6 +6079,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_documentos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -5881,6 +6252,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "documentos_assinatura_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "documentos_assinatura_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -5956,6 +6334,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "documentos_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_documentos_colaborador_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -5975,6 +6360,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_documentos_colaborador_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -6088,6 +6480,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "documentos_pessoais_arquivos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_documentos_pessoais_arquivos_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -6107,6 +6506,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_documentos_pessoais_arquivos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -6311,6 +6717,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "epis_entregas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "epis_entregas_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -6344,6 +6757,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_epis_entregas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_epis_entregas_empresa"
@@ -6471,6 +6891,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "escalas_trabalho_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "escalas_trabalho_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -6504,6 +6931,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_escalas_trabalho_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_escalas_trabalho_empresa"
@@ -6777,6 +7211,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "eventos_variaveis_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "eventos_variaveis_rubrica_id_fkey"
             columns: ["rubrica_id"]
             isOneToOne: false
@@ -6803,6 +7244,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_eventos_variaveis_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -6866,6 +7314,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "exames_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_exames_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -6885,6 +7340,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_exames_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -6996,6 +7458,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "faltas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "faltas_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -7029,6 +7498,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_faltas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_faltas_empresa"
@@ -7114,6 +7590,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "feedbacks_360_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "feedbacks_360_avaliador_id_fkey"
             columns: ["avaliador_id"]
             isOneToOne: false
@@ -7133,6 +7616,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_360_avaliador_id_fkey"
+            columns: ["avaliador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "feedbacks_360_ciclo_id_fkey"
@@ -7394,6 +7884,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "ferias_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -7427,6 +7924,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_ferias_empresa"
@@ -7751,6 +8255,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ferias_solicitacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "ferias_solicitacoes_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -7777,6 +8288,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_solicitacoes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_ferias_solicitacoes_empresa"
@@ -7968,6 +8486,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "folha_auditoria_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "folha_auditoria_folha_id_fkey"
             columns: ["folha_id"]
             isOneToOne: false
@@ -8078,6 +8603,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "folha_itens_folha_id_fkey"
@@ -8229,6 +8761,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_formacoes_academicas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "formacoes_academicas_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -8248,6 +8787,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "formacoes_academicas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -8680,6 +9226,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_historico_cargo_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "historico_cargo_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -8699,6 +9252,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_cargo_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -8777,6 +9337,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_historico_contratos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_historico_contratos_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -8803,6 +9370,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_contratos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "historico_contratos_empresa_id_fkey"
@@ -9010,6 +9584,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_historico_salarial_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_historico_salarial_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -9036,6 +9617,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_salarial_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "historico_salarial_empresa_id_fkey"
@@ -9163,6 +9751,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_holerites_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "holerites_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -9182,6 +9777,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holerites_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "holerites_folha_id_fkey"
@@ -9229,6 +9831,44 @@ export type Database = {
             columns: ["desligamento_id"]
             isOneToOne: false
             referencedRelation: "desligamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ia_provisoes_alertas: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          impacto_financeiro_estimado: number | null
+          sugestao_acao: string | null
+          tipo_alerta: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          impacto_financeiro_estimado?: number | null
+          sugestao_acao?: string | null
+          tipo_alerta?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          impacto_financeiro_estimado?: number | null
+          sugestao_acao?: string | null
+          tipo_alerta?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ia_provisoes_alertas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
@@ -9314,6 +9954,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_inscricoes_cursos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_inscricoes_cursos_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -9340,6 +9987,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inscricoes_cursos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "inscricoes_cursos_curso_id_fkey"
@@ -9745,6 +10399,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_lgpd_consentimentos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_lgpd_consentimentos_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -9771,6 +10432,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lgpd_consentimentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "lgpd_consentimentos_empresa_id_fkey"
@@ -9901,6 +10569,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_lgpd_solicitacoes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_lgpd_solicitacoes_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -9927,6 +10602,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lgpd_solicitacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "lgpd_solicitacoes_empresa_id_fkey"
@@ -10273,6 +10955,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_lotacoes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_lotacoes_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -10299,6 +10988,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lotacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "lotacoes_empresa_id_fkey"
@@ -10423,6 +11119,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_medidas_disciplinares_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_medidas_disciplinares_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -10449,6 +11152,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "medidas_disciplinares_empresa_id_fkey"
@@ -10569,6 +11279,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_metas_okrs_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_metas_okrs_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -10602,6 +11319,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metas_okrs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "metas_okrs_empresa_id_fkey"
@@ -10815,6 +11539,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_onboarding_colaborador_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "onboarding_colaborador_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -10834,6 +11565,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "onboarding_colaborador_template_id_fkey"
@@ -11302,6 +12040,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pdi_plano_desenvolvimento_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "pdi_plano_desenvolvimento_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -11376,6 +12121,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_pdis_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_pdis_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -11402,6 +12154,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdis_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "pdis_empresa_id_fkey"
@@ -11528,6 +12287,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_pensoes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "pensoes_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -11547,6 +12313,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pensoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -11610,6 +12383,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_periodos_aquisitivos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "periodos_aquisitivos_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -11629,6 +12409,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "periodos_aquisitivos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -11695,6 +12482,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_periodos_experiencia_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "periodos_experiencia_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -11714,6 +12508,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "periodos_experiencia_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -11973,6 +12774,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_pesquisas_respostas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "pesquisas_respostas_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -11992,6 +12800,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pesquisas_respostas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "pesquisas_respostas_pergunta_id_fkey"
@@ -12067,6 +12882,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pix_itens_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "pix_itens_lote_id_fkey"
@@ -12237,6 +13059,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_planos_saude_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_planos_saude_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -12263,6 +13092,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "planos_saude_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "planos_saude_empresa_id_fkey"
@@ -12485,6 +13321,13 @@ export type Database = {
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ponto_espelhos_assinados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       ponto_regras_aprovacao: {
@@ -12569,6 +13412,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ponto_seguranca_blacklist_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -12722,6 +13572,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_promocoes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "promocoes_cargo_anterior_id_fkey"
             columns: ["cargo_anterior_id"]
             isOneToOne: false
@@ -12755,6 +13612,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promocoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -12934,6 +13798,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "provisoes_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "provisoes_folha_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -13006,6 +13877,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provisoes_mensais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "provisoes_mensais_empresa_id_fkey"
@@ -13224,6 +14102,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_recargas_vale_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "recargas_vale_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -13243,6 +14128,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recargas_vale_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "recargas_vale_vale_id_fkey"
@@ -13600,6 +14492,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_registros_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_registros_ponto_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -13626,6 +14525,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "registros_ponto_empresa_id_fkey"
@@ -14013,6 +14919,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_seguros_colaboradores_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "seguros_colaboradores_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -14032,6 +14945,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seguros_colaboradores_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "seguros_colaboradores_seguro_vida_id_fkey"
@@ -14114,6 +15034,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_seguros_vida_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_seguros_vida_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -14140,6 +15067,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seguros_vida_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "seguros_vida_empresa_id_fkey"
@@ -14278,6 +15212,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_sinistros_seguro_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "sinistros_seguro_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -14297,6 +15238,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sinistros_seguro_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "sinistros_seguro_seguro_vida_id_fkey"
@@ -14395,6 +15343,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "solicitacoes_ajuste_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "solicitacoes_ajuste_ponto_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -14472,6 +15427,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_solicitacoes_hora_extra_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_solicitacoes_hora_extra_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -14498,6 +15460,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitacoes_hora_extra_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "solicitacoes_hora_extra_empresa_id_fkey"
@@ -14580,6 +15549,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "sst_cat_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "sst_cat_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -14650,6 +15626,13 @@ export type Database = {
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "sst_exposicao_riscos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       sst_incidentes: {
@@ -14719,6 +15702,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_incidentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -15007,6 +15997,13 @@ export type Database = {
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "times_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       tipos_admissao: {
@@ -15258,6 +16255,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_transferencias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "transferencias_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -15277,6 +16281,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transferencias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "transferencias_departamento_anterior_id_fkey"
@@ -15349,6 +16360,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_certificados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "treinamento_certificados_curso_id_fkey"
@@ -15505,6 +16523,13 @@ export type Database = {
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "treinamento_instancias_instrutor_id_fkey"
+            columns: ["instrutor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       treinamento_participantes: {
@@ -15552,6 +16577,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_treinamento_participantes_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "treinamento_participantes_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -15571,6 +16603,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treinamento_participantes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "treinamento_participantes_treinamento_id_fkey"
@@ -16101,6 +17140,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_vales_alimentacao_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_vales_alimentacao_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -16127,6 +17173,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vales_alimentacao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "vales_alimentacao_empresa_id_fkey"
@@ -16200,6 +17253,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_vales_transporte_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "vales_transporte_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -16219,6 +17279,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vales_transporte_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -16270,6 +17337,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_valores_campos_customizados_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "valores_campos_customizados_campo_customizado_id_fkey"
             columns: ["campo_customizado_id"]
             isOneToOne: false
@@ -16296,6 +17370,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "valores_campos_customizados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -16443,6 +17524,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_vinculos_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "vinculos_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -16462,6 +17550,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vinculos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -16855,6 +17950,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "whatsapp_mensagens_logs_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "whatsapp_mensagens_logs_template_id_fkey"
             columns: ["template_id"]
             isOneToOne: false
@@ -17187,6 +18289,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_batidas_ponto_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -17206,6 +18315,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -17265,6 +18381,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_registros_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_registros_ponto_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -17291,6 +18414,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "registros_ponto_empresa_id_fkey"
@@ -17350,6 +18480,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "banco_horas_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -17376,6 +18513,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_banco_horas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_banco_horas_empresa"
@@ -17429,6 +18573,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "banco_horas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "colaboradores_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -17455,6 +18606,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_banco_horas_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_colaboradores_empresa"
@@ -17506,6 +18664,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "batidas_ponto_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -17532,6 +18697,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_batidas_ponto_empresa"
@@ -17576,6 +18748,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "batidas_ponto_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -17602,6 +18781,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_batidas_ponto_empresa"
@@ -17798,6 +18984,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "ferias_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -17824,6 +19017,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "fk_ferias_empresa"
@@ -17881,6 +19081,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_registros_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "registros_ponto_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -17900,6 +19107,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -18001,6 +19215,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_registros_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "registros_ponto_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -18020,6 +19241,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -18064,6 +19292,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "feedbacks_360_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "feedbacks_360_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -18078,6 +19313,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vw_passivo_trabalhista_consolidado: {
+        Row: {
+          colaborador_id: string | null
+          data_admissao: string | null
+          dias_direito: number | null
+          nome_completo: string | null
+          periodo_aquisitivo_fim: string | null
+          periodo_aquisitivo_inicio: string | null
+          salario_base: number | null
+          status_risco_ferias: string | null
+          valor_ferias_projetado: number | null
+        }
+        Relationships: []
       }
       vw_saldo_compensacao_mensal: {
         Row: {
@@ -18113,6 +19362,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_registros_ponto_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "fk_registros_ponto_empresa"
             columns: ["empresa_id"]
             isOneToOne: false
@@ -18139,6 +19395,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "registros_ponto_empresa_id_fkey"
@@ -18278,6 +19541,7 @@ export type Database = {
         Returns: undefined
       }
       format_type_string: { Args: { "": string }; Returns: string }
+      gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
         Returns: number
