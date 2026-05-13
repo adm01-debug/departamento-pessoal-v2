@@ -9775,6 +9775,60 @@ export type Database = {
           },
         ]
       }
+      lgpd_fila_limpeza: {
+        Row: {
+          created_at: string | null
+          data_programada: string
+          executado: boolean | null
+          id: string
+          registro_id: string
+          tabela: string
+        }
+        Insert: {
+          created_at?: string | null
+          data_programada: string
+          executado?: boolean | null
+          id?: string
+          registro_id: string
+          tabela: string
+        }
+        Update: {
+          created_at?: string | null
+          data_programada?: string
+          executado?: boolean | null
+          id?: string
+          registro_id?: string
+          tabela?: string
+        }
+        Relationships: []
+      }
+      lgpd_politicas_retencao: {
+        Row: {
+          acao_final: string | null
+          base_legal: string | null
+          categoria_dado: string
+          id: string
+          prazo_meses: number
+          updated_at: string | null
+        }
+        Insert: {
+          acao_final?: string | null
+          base_legal?: string | null
+          categoria_dado: string
+          id?: string
+          prazo_meses: number
+          updated_at?: string | null
+        }
+        Update: {
+          acao_final?: string | null
+          base_legal?: string | null
+          categoria_dado?: string
+          id?: string
+          prazo_meses?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       lgpd_solicitacoes: {
         Row: {
           colaborador_id: string | null
@@ -18058,6 +18112,10 @@ export type Database = {
       _table_privs: { Args: never; Returns: unknown[] }
       _temptypes: { Args: { "": string }; Returns: string }
       _todo: { Args: never; Returns: string }
+      anonimizar_dados_pessoais: {
+        Args: { target_id: string }
+        Returns: undefined
+      }
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
       calculate_lockout_duration: {
         Args: { attempts: number }
