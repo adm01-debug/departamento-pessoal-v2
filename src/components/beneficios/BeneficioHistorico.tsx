@@ -76,7 +76,7 @@ export function BeneficioHistorico({ beneficioId, colaboradorId }: BeneficioHist
                 <TableCell className="text-xs font-medium">
                   {colaboradorId ? mov.beneficios?.nome : mov.colaboradores?.nome_completo}
                 </TableCell>
-                <TableCell className="text-[10px] text-muted-foreground max-w-[150px] truncate" title={mov.motivo}>
+                <TableCell className="text-[10px] text-muted-foreground max-w-[150px] truncate" title={mov.motivo ?? undefined}>
                   {mov.motivo || '-'}
                 </TableCell>
                 <TableCell className="text-[10px] text-muted-foreground">
