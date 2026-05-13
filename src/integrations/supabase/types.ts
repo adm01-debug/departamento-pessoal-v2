@@ -16655,6 +16655,10 @@ export type Database = {
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
       format_type_string: { Args: { "": string }; Returns: string }
+      get_colaborador_banco_horas: {
+        Args: { p_colaborador_id: string }
+        Returns: number
+      }
       get_personnel_cost_projection: {
         Args: { p_empresa_id: string; p_months: number }
         Returns: {
