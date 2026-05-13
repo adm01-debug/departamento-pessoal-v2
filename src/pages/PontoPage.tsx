@@ -144,24 +144,27 @@ export default function PontoPage() {
         if (!isWithinRange) {
           setGeoStatus('out_of_range');
           toast.warning('Você está fora do raio permitido para registro de ponto presencial.');
-          // In a "10/10" app, we might still allow but flag it for review
         }
       }
       
       const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
       if (!colab) throw new Error('Colaborador não encontrado');
 
-      await pontoService.registrar(tipo, colab.id, {
-        latitude: geo?.lat,
-        longitude: geo?.lng,
-        precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
-        dispositivoId: navigator.userAgent,
-        metadata: geoStatus === 'out_of_range' ? { out_of_range: true } : undefined
-      }); 
-      
-      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
-      refetchRegistro(); 
-      refetchBatidas(); 
+      if (!navigator.onLine) {
+        await addOffline(tipo, colab.id, geo);
+      } else {
+        await (pontoService as any).registrar(tipo, colab.id, {
+          latitude: geo?.lat,
+          longitude: geo?.lng,
+          precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
+          dispositivoId: navigator.userAgent,
+          metadata: geoStatus === 'out_of_range' ? { out_of_range: true } : undefined
+        }); 
+        
+        toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
+        refetchRegistro(); 
+        refetchBatidas(); 
+      }
     } catch (e: any) { 
       toast.error(`Erro: ${e.message}`); 
     } finally { 
