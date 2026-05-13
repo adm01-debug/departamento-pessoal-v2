@@ -93,9 +93,9 @@ export function SSTIncidentesTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {incidentes.map((inc, i) => (
+            {incidentes.map((inc: any, i: number) => (
               <motion.tr key={inc.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className="hover:bg-accent/30 transition-colors">
-                <TableCell className="font-body text-xs">{new Date(inc.data).toLocaleDateString('pt-BR')}</TableCell>
+                <TableCell className="font-body text-xs">{new Date(inc.data_hora || inc.data).toLocaleDateString('pt-BR')}</TableCell>
                 <TableCell>{getTipoBadge(inc.tipo)}</TableCell>
                 <TableCell className="font-body text-xs">{inc.local}</TableCell>
                 <TableCell className="font-body text-xs max-w-[200px] truncate">{inc.descricao}</TableCell>
