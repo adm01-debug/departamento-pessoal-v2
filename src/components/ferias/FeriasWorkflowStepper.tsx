@@ -1,12 +1,12 @@
-import { UserCheck, Shield, Building2, Check } from 'lucide-react';
+import { UserCheck, Shield, Building2, Check, AlertCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 const steps = [
-  { key: 'aprovado_gestor', label: 'Gestor', icon: UserCheck },
-  { key: 'aprovado_rh', label: 'RH', icon: Shield },
-  { key: 'enviado_contabilidade', label: 'Contabilidade', icon: Building2 },
+  { key: 'aprovado_gestor', statusKey: 'status_aprovacao_gestor', label: 'Gestor', icon: UserCheck },
+  { key: 'aprovado_rh', statusKey: 'status_aprovacao_rh', label: 'RH', icon: Shield },
+  { key: 'enviado_contabilidade', statusKey: 'status_aprovacao_contabilidade', label: 'Contabilidade', icon: Building2 },
 ] as const;
 
 export function FeriasWorkflowStepper({ solicitacao }: { solicitacao: Record<string, any> }) {
