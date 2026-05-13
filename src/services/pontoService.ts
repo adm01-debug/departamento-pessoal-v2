@@ -45,6 +45,7 @@ export const pontoService = {
       precisao?: number;
       dispositivoId?: string;
       metadata?: Record<string, any>;
+      foto_biometria_url?: string | null;
     }
   ) {
     if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
@@ -146,6 +147,7 @@ export const pontoService = {
         hash_integridade: hashIntegridade,
         audit_sha256: hashIntegridade,
         audit_conformidade: true,
+        foto_biometria_url: options?.foto_biometria_url,
         metadata: options?.metadata
       } as any)
       .select()
