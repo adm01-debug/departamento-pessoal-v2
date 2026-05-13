@@ -1024,6 +1024,7 @@ export type Database = {
           device_metadata: Json | null
           dispositivo_id: string | null
           empresa_id: string | null
+          foto_biometria_url: string | null
           hash_digital: string | null
           hash_integridade: string | null
           hora: string
@@ -1053,6 +1054,7 @@ export type Database = {
           device_metadata?: Json | null
           dispositivo_id?: string | null
           empresa_id?: string | null
+          foto_biometria_url?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora: string
@@ -1082,6 +1084,7 @@ export type Database = {
           device_metadata?: Json | null
           dispositivo_id?: string | null
           empresa_id?: string | null
+          foto_biometria_url?: string | null
           hash_digital?: string | null
           hash_integridade?: string | null
           hora?: string
