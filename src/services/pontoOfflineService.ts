@@ -14,6 +14,7 @@ export interface OfflineRegistro {
   precisao?: number;
   dispositivoId: string;
   hash?: string;
+  foto_base64?: string | null;
 }
 
 export const pontoOfflineService = {

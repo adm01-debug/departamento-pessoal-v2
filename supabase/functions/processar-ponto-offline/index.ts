@@ -28,6 +28,22 @@ serve(async (req: Request): Promise<Response> => {
         // Validação de integridade do hash (simulada)
         // Em produção, compararíamos reg.hash com um novo hash gerado no servidor
 
+        // Se houver foto em base64, fazer upload para o storage no servidor
+        let finalFotoUrl = null;
+        if (reg.foto_base64 && reg.colaborador_id) {
+          const fileName = `${reg.colaborador_id}/offline-${Date.now()}.jpg`;
+          const binary = Uint8Array.from(atob(reg.foto_base64.split(',')[1]), c => c.charCodeAt(0));
+          
+          const { error: storageError } = await supabase.storage
+            .from('ponto-biometria')
+            .upload(fileName, binary, { contentType: 'image/jpeg' });
+            
+          if (!storageError) {
+            const { data: { publicUrl } } = supabase.storage.from('ponto-biometria').getPublicUrl(fileName);
+            finalFotoUrl = publicUrl;
+          }
+        }
+
         const { error } = await supabase.from('batidas_ponto').insert({
           colaborador_id: reg.colaborador_id,
           tipo: reg.tipo === 'entrada' || reg.tipo === 'retorno_almoco' ? 'entrada' : 'saida',
@@ -40,6 +56,7 @@ serve(async (req: Request): Promise<Response> => {
           is_offline: true,
           sync_at: new Date().toISOString(),
           hash_integridade: reg.hash,
+          foto_biometria_url: finalFotoUrl,
           metadata: {
             offline_original_type: reg.tipo,
             offline_timestamp: reg.timestamp
