@@ -1,11 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
 import { bitrixBreaker, resendBreaker } from '@/lib/circuitBreaker';
+import { v4 as uuidv4 } from 'uuid';
 
-export const edgeFunctionsService = {
+const getCorrelationHeaders = () => ({
+  'x-request-id': uuidv4(),
+});
   /** Dispara alertas automáticos de DP via email */
   dispararAlertasDP: async () => {
     const { data, error } = await supabase.functions.invoke('alertas-dp', {
       body: { trigger: 'manual' },
+      headers: getCorrelationHeaders(),
     });
     if (error) throw error;
     return data;
@@ -21,6 +25,7 @@ export const edgeFunctionsService = {
     return resendBreaker.execute(async () => {
       const { data, error } = await supabase.functions.invoke('enviar-relatorio', {
         body: params,
+        headers: getCorrelationHeaders(),
       });
       if (error) throw error;
       return data;
