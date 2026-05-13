@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin, RefreshCw, Loader2, AlertCircle, Settings } from 'lucide-react';
+import { Clock, MapPin, RefreshCw, Loader2, AlertCircle, Settings, WifiOff } from 'lucide-react';
 import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
-import { useEmpresas } from '@/hooks';
+import { useEmpresas, usePontoOffline } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,7 @@ export default function PontoPage() {
   const [geoStatus, setGeoStatus] = useState<'idle' | 'capturing' | 'success' | 'error' | 'out_of_range'>('idle');
   const [processando, setProcessando] = useState(false);
   const { user } = useAuth();
+  const { addOffline, offlineBatidasCount } = usePontoOffline();
   const { empresaAtual } = useEmpresas();
 
   const { data: locaisTrabalho } = useQuery({
@@ -143,24 +144,27 @@ export default function PontoPage() {
         if (!isWithinRange) {
           setGeoStatus('out_of_range');
           toast.warning('Você está fora do raio permitido para registro de ponto presencial.');
-          // In a "10/10" app, we might still allow but flag it for review
         }
       }
       
       const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle();
       if (!colab) throw new Error('Colaborador não encontrado');
 
-      await pontoService.registrar(tipo, colab.id, {
-        latitude: geo?.lat,
-        longitude: geo?.lng,
-        precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
-        dispositivoId: navigator.userAgent,
-        metadata: geoStatus === 'out_of_range' ? { out_of_range: true } : undefined
-      }); 
-      
-      toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
-      refetchRegistro(); 
-      refetchBatidas(); 
+      if (!navigator.onLine) {
+        await addOffline(tipo, colab.id, geo);
+      } else {
+        await (pontoService as any).registrar(tipo, colab.id, {
+          latitude: geo?.lat,
+          longitude: geo?.lng,
+          precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
+          dispositivoId: navigator.userAgent,
+          metadata: geoStatus === 'out_of_range' ? { out_of_range: true } : undefined
+        }); 
+        
+        toast.success(`Ponto registrado: ${tipo.replace(/_/g, ' ')} às ${new Date().toLocaleTimeString('pt-BR')}${geo ? ` (📍 ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)})` : ''}`); 
+        refetchRegistro(); 
+        refetchBatidas(); 
+      }
     } catch (e: any) { 
       toast.error(`Erro: ${e.message}`); 
     } finally { 
@@ -184,6 +188,12 @@ export default function PontoPage() {
         gradient="from-primary/60 to-primary/90"
         actions={
           <div className="flex items-center gap-2">
+            {offlineBatidasCount > 0 && (
+              <Badge variant="destructive" className="animate-pulse gap-1.5 py-1.5 px-3 rounded-xl">
+                <WifiOff className="h-3.5 w-3.5" />
+                {offlineBatidasCount} Aguardando Sincronização
+              </Badge>
+            )}
             <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={() => window.open('/ponto/kiosk', '_blank')}>
               <Settings className="h-4 w-4" /> Kiosk Mode
             </Button>

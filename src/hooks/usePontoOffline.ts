@@ -1,73 +1,75 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { pontoService } from '@/services';
-
-interface BatidaOffline {
-  id: string;
-  tipo: string;
-  colaboradorId: string;
-  timestamp: string;
-  geo: any;
-}
+import { pontoOfflineService } from '@/services/pontoOfflineService';
 
 export function usePontoOffline() {
-  const [offlineBatidas, setOfflineBatidas] = useState<BatidaOffline[]>([]);
+  const [queueSize, setQueueSize] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const updateSize = () => {
+    setQueueSize(pontoOfflineService.getQueueSize());
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('ponto_offline_queue');
-    if (saved) {
-      setOfflineBatidas(JSON.parse(saved));
-    }
+    updateSize();
+    // Listener para mudanças no localStorage (útil entre abas)
+    window.addEventListener('storage', updateSize);
+    return () => window.removeEventListener('storage', updateSize);
   }, []);
 
-  const addOffline = (tipo: string, colaboradorId: string, geo: any) => {
-    const nova: BatidaOffline = {
-      id: crypto.randomUUID(),
-      tipo,
-      colaboradorId,
-      timestamp: new Date().toISOString(),
-      geo
-    };
-    const updated = [...offlineBatidas, nova];
-    setOfflineBatidas(updated);
-    localStorage.setItem('ponto_offline_queue', JSON.stringify(updated));
-    toast.warning('Você está offline. O ponto foi salvo localmente e será sincronizado quando houver conexão.');
+  const addOffline = async (tipo: any, colaboradorId: string, geo: any) => {
+    try {
+      await pontoOfflineService.queueRegistro({
+        tipo,
+        colaborador_id: colaboradorId,
+        timestamp: new Date().toISOString(),
+        latitude: geo?.lat || geo?.latitude,
+        longitude: geo?.lng || geo?.longitude,
+        precisao: geo?.accuracy,
+        dispositivoId: navigator.userAgent
+      });
+      updateSize();
+      toast.warning('Você está offline. O ponto foi salvo localmente com criptografia e será sincronizado automaticamente quando houver conexão.');
+    } catch (error) {
+      console.error('Erro ao enfileirar ponto offline:', error);
+      toast.error('Falha ao salvar ponto offline.');
+    }
   };
 
   const sync = async () => {
-    if (offlineBatidas.length === 0 || !navigator.onLine) return;
-
-    let successCount = 0;
-    const remaining: BatidaOffline[] = [];
-
-    for (const batida of offlineBatidas) {
-      try {
-        await pontoService.registrar(batida.tipo as any, batida.colaboradorId, {
-          latitude: batida.geo?.lat,
-          longitude: batida.geo?.lng,
-          precisao: batida.geo?.accuracy,
-          dispositivoId: navigator.userAgent + ' (OFFLINE_SYNC)',
-          metadata: { offline_original_timestamp: batida.timestamp }
-        });
-        successCount++;
-      } catch (err) {
-        console.error('Erro ao sincronizar batida:', err);
-        remaining.push(batida);
+    if (isSyncing || !navigator.onLine) return;
+    
+    setIsSyncing(true);
+    try {
+      const result = await pontoOfflineService.syncOfflineQueue();
+      updateSize();
+      
+      if (result.synced > 0) {
+        toast.success(`${result.synced} batida(s) offline sincronizada(s) com sucesso!`);
       }
-    }
-
-    setOfflineBatidas(remaining);
-    localStorage.setItem('ponto_offline_queue', JSON.stringify(remaining));
-
-    if (successCount > 0) {
-      toast.success(`${successCount} batida(s) sincronizada(s) com sucesso!`);
+      if (result.errors > 0) {
+        toast.error(`${result.errors} batida(s) não puderam ser sincronizadas e permanecem na fila.`);
+      }
+    } catch (error) {
+      console.error('Erro durante sincronização de ponto:', error);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
   useEffect(() => {
     window.addEventListener('online', sync);
+    // Tenta sincronizar se já estiver online ao montar
+    if (navigator.onLine) {
+      sync();
+    }
     return () => window.removeEventListener('online', sync);
-  }, [offlineBatidas]);
+  }, []);
 
-  return { offlineBatidas, addOffline, sync };
+  return { 
+    offlineBatidasCount: queueSize, 
+    addOffline, 
+    sync,
+    isSyncing 
+  };
 }
