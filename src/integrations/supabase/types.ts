@@ -6314,11 +6314,15 @@ export type Database = {
           data_processamento: string | null
           empresa_id: string | null
           erros: Json | null
+          hash_arquivo: string | null
           hash_seguranca: string | null
           id: string
+          id_recibo: string | null
           protocolo: string | null
+          proxima_tentativa: string | null
           recibo: string | null
           status: string | null
+          tentativas_envio: number | null
           tipo_evento: string
           updated_at: string
           xml: string | null
@@ -6334,11 +6338,15 @@ export type Database = {
           data_processamento?: string | null
           empresa_id?: string | null
           erros?: Json | null
+          hash_arquivo?: string | null
           hash_seguranca?: string | null
           id?: string
+          id_recibo?: string | null
           protocolo?: string | null
+          proxima_tentativa?: string | null
           recibo?: string | null
           status?: string | null
+          tentativas_envio?: number | null
           tipo_evento: string
           updated_at?: string
           xml?: string | null
@@ -6354,11 +6362,15 @@ export type Database = {
           data_processamento?: string | null
           empresa_id?: string | null
           erros?: Json | null
+          hash_arquivo?: string | null
           hash_seguranca?: string | null
           id?: string
+          id_recibo?: string | null
           protocolo?: string | null
+          proxima_tentativa?: string | null
           recibo?: string | null
           status?: string | null
+          tentativas_envio?: number | null
           tipo_evento?: string
           updated_at?: string
           xml?: string | null
@@ -6429,6 +6441,50 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      esocial_transmissao_logs: {
+        Row: {
+          created_at: string | null
+          duracao_ms: number | null
+          empresa_id: string
+          error_details: Json | null
+          evento_id: string | null
+          id: string
+          request_xml: string | null
+          response_xml: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          duracao_ms?: number | null
+          empresa_id: string
+          error_details?: Json | null
+          evento_id?: string | null
+          id?: string
+          request_xml?: string | null
+          response_xml?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          duracao_ms?: number | null
+          empresa_id?: string
+          error_details?: Json | null
+          evento_id?: string | null
+          id?: string
+          request_xml?: string | null
+          response_xml?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "esocial_transmissao_logs_evento_id_fkey"
+            columns: ["evento_id"]
+            isOneToOne: false
+            referencedRelation: "esocial_eventos"
             referencedColumns: ["id"]
           },
         ]
@@ -15561,6 +15617,7 @@ export type Database = {
           etapa_atual_id: string | null
           id: string
           log_execucao: Json | null
+          metadata: Json | null
           metadata_automacao: Json | null
           solicitante_id: string | null
           status: string | null
@@ -15576,6 +15633,7 @@ export type Database = {
           etapa_atual_id?: string | null
           id?: string
           log_execucao?: Json | null
+          metadata?: Json | null
           metadata_automacao?: Json | null
           solicitante_id?: string | null
           status?: string | null
@@ -15591,6 +15649,7 @@ export type Database = {
           etapa_atual_id?: string | null
           id?: string
           log_execucao?: Json | null
+          metadata?: Json | null
           metadata_automacao?: Json | null
           solicitante_id?: string | null
           status?: string | null

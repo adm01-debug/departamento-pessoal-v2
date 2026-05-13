@@ -289,4 +289,21 @@ export async function adicionarCertificado(cert: {
   return data;
 }
 
+export async function listarTransmissaoLogs(empresaId: string, eventoId?: string) {
+  let query = supabase
+    .from('esocial_transmissao_logs' as any)
+    .select('*')
+    .eq('empresa_id', empresaId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (eventoId) {
+    query = query.eq('evento_id', eventoId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
 export { type ValidationResult } from '@/validators/esocialValidators';

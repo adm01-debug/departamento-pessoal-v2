@@ -122,13 +122,18 @@ export const cnabService = {
     lines.push(header.padEnd(240, ' '));
 
     // Registrar o arquivo de remessa no banco para auditoria real
-    await supabase.from('cnab_remessas').update({ 
+    await supabase.from('cnab_remessas' as any).update({ 
       arquivo_remessa: lines[0],
       status: 'enviado' 
-    }).eq('id', remessa.id);
+    } as any).eq('id', (remessa as any).id);
 
     let detailSequence = 1;
+    let totalValue = 0;
     const cnabItensToInsert = [];
+
+    // Header de Lote (Tipo 1)
+    let lotHeader = pad(config.banco_codigo, 3, '0', 'left') + '00011' + 'C' + '30' + '01' + ' ' + '040' + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('', 40) + pad('', 30) + pad('', 10) + dateStr + pad('', 8, '0') + pad('', 33);
+    lines.push(lotHeader.padEnd(240, ' '));
 
     for (const item of itens) {
       const colab = item.colaborador as any;
@@ -136,6 +141,7 @@ export const cnabService = {
       if (!conta) continue;
 
       const valor = Number(item.total_liquido);
+      totalValue += valor;
       const seuNumero = `${(remessa as any).id.substring(0, 8)}-${detailSequence}`;
 
       cnabItensToInsert.push({
@@ -149,16 +155,35 @@ export const cnabService = {
         status: 'processando'
       });
 
-      let segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A000000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
+      // Segmento A (Crédito em Conta)
+      let segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A' + '000' + '000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
       lines.push(segA.padEnd(240, ' '));
+
+      // Se tiver chave PIX, adiciona Segmento B (PIX)
+      if (conta.pix_chave) {
+        let segB = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'B' + pad('', 3) + '2' + pad(colab.cpf || '', 14, '0', 'left') + pad('', 30) + pad('', 30) + pad('', 30) + pad('', 30) + pad(conta.pix_chave, 60) + pad('', 25);
+        lines.push(segB.padEnd(240, ' '));
+      }
     }
+
+    // Trailer de Lote (Tipo 5)
+    let lotTrailer = pad(config.banco_codigo, 3, '0', 'left') + '00015' + pad('', 9) + pad(detailSequence + 1, 6, '0', 'left') + formatAmount(totalValue) + pad('', 18, '0') + pad('', 183);
+    lines.push(lotTrailer.padEnd(240, ' '));
 
     await supabase.from('cnab_itens' as any).insert(cnabItensToInsert);
 
+    // Trailer de Arquivo (Tipo 9)
     let trailer = pad(config.banco_codigo, 3, '0', 'left') + '99999' + pad('', 9) + '000001' + pad(lines.length + 1, 6, '0', 'left') + pad('', 6, '0') + pad('', 205);
     lines.push(trailer.padEnd(240, ' '));
 
-    return lines.join('\r\n');
+    const fullFile = lines.join('\r\n');
+    
+    // Atualiza com o arquivo completo
+    await supabase.from('cnab_remessas' as any).update({ 
+      arquivo_remessa: fullFile 
+    } as any).eq('id', (remessa as any).id);
+
+    return fullFile;
   },
 
   async parseRetornoCNAB(fileContent: string) {
