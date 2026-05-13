@@ -212,7 +212,10 @@ export default function ESocialPage() {
             <LayoutDashboard className="h-4 w-4" /> Eventos
           </TabsTrigger>
           <TabsTrigger value="conciliacao" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <BarChart3 className="h-4 w-4" /> Conciliação S-5001/S-5002
+            <BarChart3 className="h-4 w-4" /> Conciliação
+          </TabsTrigger>
+          <TabsTrigger value="logs" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <ShieldCheck className="h-4 w-4" /> Logs de Transmissão
           </TabsTrigger>
           <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
             <History className="h-4 w-4" /> Timeline
