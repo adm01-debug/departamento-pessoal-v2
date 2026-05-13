@@ -23,17 +23,20 @@ export function usePonto(colaboradorId?: string) {
     mutationFn: async ({ 
       tipo, 
       colaboradorId: colId, 
-      geo 
+      geo,
+      foto_biometria_url
     }: { 
       tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida'; 
       colaboradorId: string;
-      geo?: { latitude: number; longitude: number; accuracy: number }
+      geo?: { latitude: number; longitude: number; accuracy: number };
+      foto_biometria_url?: string | null;
     }) => {
       return pontosService.registrar(tipo, colId, {
         latitude: geo?.latitude,
         longitude: geo?.longitude,
         precisao: geo?.accuracy,
-        dispositivoId: navigator.userAgent
+        dispositivoId: navigator.userAgent,
+        foto_biometria_url
       });
     },
     onSuccess: () => {
