@@ -135,6 +135,9 @@ export default function AdmissoesPage() {
           <TabsTrigger value="gestao" className="rounded-lg gap-2">
             <List className="h-4 w-4" /> Gestão de Candidatos
           </TabsTrigger>
+          <TabsTrigger value="onboarding" className="rounded-lg gap-2">
+            <Rocket className="h-4 w-4" /> Onboarding
+          </TabsTrigger>
           <TabsTrigger value="auditoria" className="rounded-lg gap-2">
             <History className="h-4 w-4" /> Auditoria
           </TabsTrigger>
