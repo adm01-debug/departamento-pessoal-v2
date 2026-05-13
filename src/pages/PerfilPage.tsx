@@ -36,6 +36,39 @@ export default function PerfilPage() {
   const [departamento, setDepartamento] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [pushStatus, setPushStatus] = useState<'supported' | 'unsupported' | 'loading'>('loading');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    async function checkPush() {
+      const supported = await pushNotificationService.isSupported();
+      if (!supported) {
+        setPushStatus('unsupported');
+        return;
+      }
+      setPushStatus('supported');
+      const sub = await pushNotificationService.getSubscription();
+      setIsSubscribed(!!sub);
+    }
+    checkPush();
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (!user) return;
+    try {
+      if (isSubscribed) {
+        await pushNotificationService.unsubscribeUser(user.id);
+        setIsSubscribed(false);
+        toast.info('Notificações push desativadas.');
+      } else {
+        await pushNotificationService.subscribeUser(user.id);
+        setIsSubscribed(true);
+        toast.success('Notificações push ativadas com sucesso!');
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
 
   useEffect(() => {
     if (profile) {
