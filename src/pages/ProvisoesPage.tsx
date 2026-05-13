@@ -328,7 +328,7 @@ export default function ProvisoesPage() {
                         <TableCell className="text-right font-body tabular-nums text-xs">{formatCurrency(p.valor_principal)}</TableCell>
                         <TableCell className="text-right font-body text-muted-foreground tabular-nums text-[10px]">{formatCurrency(p.encargos_inss)}</TableCell>
                         <TableCell className="text-right font-body text-muted-foreground tabular-nums text-[10px]">{formatCurrency(p.encargos_fgts)}</TableCell>
-                        <TableCell className="text-right font-display font-bold tabular-nums text-primary">{formatCurrency(p.total)}</TableCell>
+                        <TableCell className="text-right font-display font-bold tabular-nums text-primary">{formatCurrency(p.total || 0)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
