@@ -9813,6 +9813,42 @@ export type Database = {
           },
         ]
       }
+      logs_sistema: {
+        Row: {
+          contexto: Json | null
+          created_at: string | null
+          id: string
+          mensagem: string
+          nivel: string
+          stack_trace: string | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contexto?: Json | null
+          created_at?: string | null
+          id?: string
+          mensagem: string
+          nivel: string
+          stack_trace?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contexto?: Json | null
+          created_at?: string | null
+          id?: string
+          mensagem?: string
+          nivel?: string
+          stack_trace?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       lotacoes: {
         Row: {
           ativa: boolean | null
@@ -17073,6 +17109,7 @@ export type Database = {
         | { Args: { "": string }; Returns: string }
       findfuncs: { Args: { "": string }; Returns: string[] }
       finish: { Args: { exception_on_failure?: boolean }; Returns: string[] }
+      fn_cleanup_old_logs: { Args: never; Returns: undefined }
       fn_link_gov_br_account: {
         Args: { _cpf: string; _nivel: string; _user_id: string }
         Returns: undefined

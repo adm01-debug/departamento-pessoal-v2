@@ -1,4 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
+import { cn } from '@/lib/utils';
 import { useState, useEffect, useRef } from 'react';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, ShieldCheck, History } from 'lucide-react';
+import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, ShieldCheck, History, Bell, Smartphone, Monitor } from 'lucide-react';
+import { pushNotificationService } from '@/services/pushNotificationService';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,6 +37,39 @@ export default function PerfilPage() {
   const [departamento, setDepartamento] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [pushStatus, setPushStatus] = useState<'supported' | 'unsupported' | 'loading'>('loading');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    async function checkPush() {
+      const supported = await pushNotificationService.isSupported();
+      if (!supported) {
+        setPushStatus('unsupported');
+        return;
+      }
+      setPushStatus('supported');
+      const sub = await pushNotificationService.getSubscription();
+      setIsSubscribed(!!sub);
+    }
+    checkPush();
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (!user) return;
+    try {
+      if (isSubscribed) {
+        await pushNotificationService.unsubscribeUser(user.id);
+        setIsSubscribed(false);
+        toast.info('Notificações push desativadas.');
+      } else {
+        await pushNotificationService.subscribeUser(user.id);
+        setIsSubscribed(true);
+        toast.success('Notificações push ativadas com sucesso!');
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -102,6 +137,46 @@ export default function PerfilPage() {
     <PageTitle title="Meu Perfil" description="Configurações do perfil do usuário" />
     <PageLayout title="Meu Perfil" description="Gerencie seus dados pessoais" icon={<User className="h-5 w-5 text-primary-foreground" />} gradient="from-primary to-primary-glow">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl space-y-6">
+        <Card className="border border-border/30 rounded-2xl shadow-elevated">
+          <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2"><Bell className="h-5 w-5 text-primary" />Notificações & Aplicativo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 font-body">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10">
+              <div className="flex items-center gap-3">
+                <Smartphone className="h-6 w-6 text-primary" />
+                <div>
+                  <p className="font-bold text-sm">Notificações Push (Navegador)</p>
+                  <p className="text-xs text-muted-foreground">Receba alertas em tempo real sobre holerites e avisos.</p>
+                </div>
+              </div>
+              {pushStatus === 'unsupported' ? (
+                <Badge variant="outline" className="text-muted-foreground">Não Suportado</Badge>
+              ) : (
+                <Button 
+                  variant={isSubscribed ? "outline" : "default"} 
+                  size="sm" 
+                  className={cn("rounded-lg text-xs", !isSubscribed && "bg-primary text-primary-foreground shadow-glow")}
+                  onClick={handleTogglePush}
+                >
+                  {isSubscribed ? 'Desativar' : 'Ativar Agora'}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border/10">
+              <div className="flex items-center gap-3">
+                <Monitor className="h-6 w-6 text-info" />
+                <div>
+                  <p className="font-bold text-sm">Aplicativo Web (PWA)</p>
+                  <p className="text-xs text-muted-foreground">Instale o sistema como um aplicativo no seu celular ou desktop.</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-success border-success/30">Pronto para Instalar</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="border border-border/30 rounded-2xl shadow-elevated">
           <CardHeader>
             <CardTitle className="font-display flex items-center gap-2"><User className="h-5 w-5" />Dados Pessoais</CardTitle>

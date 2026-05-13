@@ -1,5 +1,6 @@
 // V15-002: Error Boundary Component
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { loggerService } from '@/services/loggerService';
 
 interface Props {
   children: ReactNode;
@@ -22,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    loggerService.fatal('Erro capturado pelo ErrorBoundary', { componentStack: errorInfo.componentStack }, error);
   }
 
   handleReset = () => {

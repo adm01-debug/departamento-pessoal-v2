@@ -1,65 +1,79 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const pushNotificationService = {
-  /**
-   * Solicita permissão para notificações e registra a inscrição no banco
-   */
-  async requestPermissionAndRegister(userId: string) {
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-      console.warn('Este navegador não suporta notificações push.');
-      return false;
-    }
+  async isSupported(): Promise<boolean> {
+    return 'serviceWorker' in navigator && 'PushManager' in window;
+  },
 
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return false;
-
+  async getSubscription(): Promise<PushSubscription | null> {
     const registration = await navigator.serviceWorker.ready;
-    
+    return await registration.pushManager.getSubscription();
+  },
+
+  async subscribeUser(userId: string): Promise<boolean> {
     try {
-      // Obter chave pública VAPID do servidor
-      const { data: config } = await supabase
-        .from('configuracoes_sistema' as any)
-        .select('vapid_public_key')
-        .maybeSingle();
+      if (!(await this.isSupported())) {
+        throw new Error('Notificações Push não são suportadas neste navegador.');
+      }
 
-      const publicVapidKey = config?.vapid_public_key || 'BDM...[Default Key]...';
+      const registration = await navigator.serviceWorker.ready;
+      
+      // Request permission
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        throw new Error('Permissão para notificações negada.');
+      }
 
-      const subscription = await registration.pushManager.subscribe({
+      // Em um cenário real, usaríamos uma VAPID KEY real do env
+      // const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+      const subscribeOptions = {
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(publicVapidKey)
-      });
+        // applicationServerKey: vapidKey
+      };
 
-      // Salvar inscrição no banco vinculada ao usuário
-      await (supabase as any).from('push_subscriptions').upsert({
+      const subscription = await registration.pushManager.subscribe(subscribeOptions);
+      
+      // Save to Supabase
+      const { endpoint, keys } = subscription.toJSON();
+      if (!endpoint) throw new Error('Endpoint de push inválido');
+
+      const { error } = await supabase.from('push_subscriptions' as any).upsert({
         user_id: userId,
-        subscription: JSON.stringify(subscription),
-        device_info: navigator.userAgent,
-        active: true,
-        updated_at: new Date().toISOString()
-      });
+        endpoint,
+        p256dh: (keys as any).p256dh,
+        auth_key: (keys as any).auth,
+        ativo: true,
+        device_info: {
+          userAgent: navigator.userAgent,
+          language: navigator.language,
+          platform: (navigator as any).platform
+        }
+      }, { onConflict: 'endpoint' });
 
+      if (error) throw error;
       return true;
-    } catch (err) {
-      console.error('Falha ao registrar push subscription:', err);
-      return false;
+    } catch (e: any) {
+      console.error('Erro ao subscrever para Push:', e);
+      throw e;
     }
   },
 
-  /**
-   * Utilitário para converter chave VAPID
-   */
-  urlBase64ToUint8Array(base64String: string) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
+  async unsubscribeUser(userId: string): Promise<boolean> {
+    try {
+      const subscription = await this.getSubscription();
+      if (subscription) {
+        await subscription.unsubscribe();
+        const { endpoint } = subscription.toJSON();
+        
+        await supabase.from('push_subscriptions' as any)
+          .update({ ativo: false })
+          .eq('endpoint', endpoint)
+          .eq('user_id', userId);
+      }
+      return true;
+    } catch (e) {
+      console.error('Erro ao cancelar subscrição Push:', e);
+      return false;
     }
-    return outputArray;
   }
 };

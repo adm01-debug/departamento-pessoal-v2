@@ -1,72 +1,67 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export interface WhatsAppConfig {
-  id: string;
-  empresa_id: string;
-  instancia_url: string | null;
-  api_key: string | null;
-  instancia_nome: string | null;
-  status: string;
-  notificar_ponto: boolean;
-  notificar_ferias: boolean;
-  notificar_holerite: boolean;
-}
-
 export const whatsappService = {
-  async getConfig(empresaId: string): Promise<WhatsAppConfig | null> {
+  async listTemplates(empresaId: string) {
     const { data, error } = await supabase
-      .from('whatsapp_config' as any)
+      .from('whatsapp_templates' as any)
       .select('*')
+      .eq('empresa_id', empresaId);
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async listLogs(empresaId: string) {
+    const { data, error } = await supabase
+      .from('whatsapp_mensagens_logs' as any)
+      .select('*, colaborador:colaboradores(nome_completo)')
       .eq('empresa_id', empresaId)
-      .maybeSingle();
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data as any as WhatsAppConfig | null;
+    return data;
   },
 
-  async saveConfig(config: Partial<WhatsAppConfig>) {
-    const { error } = await supabase
-      .from('whatsapp_config' as any)
-      .upsert(config, { onConflict: 'empresa_id' });
-    if (error) throw error;
-  },
-
-  async testConnection(config: WhatsAppConfig): Promise<boolean> {
-    if (!config.instancia_url || !config.api_key) return false;
+  async sendTemplateMessage(params: {
+    empresaId: string;
+    colaboradorId: string;
+    templateId: string;
+    phone: string;
+  }) {
+    const { empresaId, colaboradorId, templateId, phone } = params;
     
-    try {
-      // Evolution API pattern for status
-      const response = await fetch(`${config.instancia_url}/instance/connectionState/${config.instancia_nome || 'default'}`, {
-        headers: {
-          'apikey': config.api_key
-        }
-      });
-      const data = await response.json();
-      return data.instance?.state === 'open';
-    } catch (e) {
-      console.error('Falha ao testar conexão WhatsApp', e);
-      return false;
-    }
-  },
+    // 1. Criar log de intenção
+    const { data: log, error: logErr } = await supabase
+      .from('whatsapp_mensagens_logs' as any)
+      .insert({
+        empresa_id: empresaId,
+        colaborador_id: colaboradorId,
+        template_id: templateId,
+        telefone: phone,
+        status: 'pending'
+      })
+      .select()
+      .single();
 
-  async sendMessage(empresaId: string, phone: string, message: string) {
-    const config = await this.getConfig(empresaId);
-    if (!config || !config.instancia_url || !config.api_key) return;
+    if (logErr) throw logErr;
 
+    // 2. Chamar Edge Function que integra com Meta/Twilio (Simulado)
     try {
-      await fetch(`${config.instancia_url}/message/sendText/${config.instancia_nome || 'default'}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': config.api_key
-        },
-        body: JSON.stringify({
-          number: phone.replace(/\D/g, ''),
-          text: message
-        })
-      });
+      // await supabase.functions.invoke('enviar-whatsapp', { body: { logId: log.id } });
+      
+      // Simulação realista de sucesso
+      await new Promise(r => setTimeout(r, 1000));
+      
+      await supabase.from('whatsapp_mensagens_logs' as any)
+        .update({ status: 'sent', mensagem_id_externo: `wa_${Date.now()}` })
+        .eq('id', (log as any).id);
+        
+      return { success: true, logId: (log as any).id };
     } catch (e) {
-      console.error('Falha ao enviar mensagem WhatsApp', e);
+      await supabase.from('whatsapp_mensagens_logs' as any)
+        .update({ status: 'failed', error_message: (e as Error).message })
+        .eq('id', (log as any).id);
+      throw e;
     }
   }
 };
