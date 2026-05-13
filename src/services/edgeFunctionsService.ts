@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { bitrixBreaker, resendBreaker } from '@/lib/circuitBreaker';
 
 export const edgeFunctionsService = {
   /** Dispara alertas automáticos de DP via email */
@@ -17,11 +18,13 @@ export const edgeFunctionsService = {
     empresaId: string;
     competencia?: string;
   }) => {
-    const { data, error } = await supabase.functions.invoke('enviar-relatorio', {
-      body: params,
+    return resendBreaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke('enviar-relatorio', {
+        body: params,
+      });
+      if (error) throw error;
+      return data;
     });
-    if (error) throw error;
-    return data;
   },
 
   /** Gera guias DARF/GPS/FGTS via edge function */
@@ -257,10 +260,12 @@ export const edgeFunctionsService = {
   sincronizarBitrix: async (params: {
     action: 'sync_departamentos' | 'sync_colaboradores' | 'sync_cargos' | 'sync_all' | 'status';
   }) => {
-    const { data, error } = await supabase.functions.invoke('sincronizar-bitrix', {
-      body: params,
+    return bitrixBreaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke('sincronizar-bitrix', {
+        body: params,
+      });
+      if (error) throw error;
+      return data;
     });
-    if (error) throw error;
-    return data;
   },
 };
