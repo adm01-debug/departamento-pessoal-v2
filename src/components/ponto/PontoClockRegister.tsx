@@ -32,11 +32,13 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
   const [showFaceScan, setShowFaceScan] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [selectedTipo, setSelectedTipo] = useState<any>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
     
-    // Tenta sincronizar se estiver online
     if (navigator.onLine) {
       handleSync();
     }
@@ -45,8 +47,11 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(interval);
+      if (stream) stream.getTracks().forEach(track => track.stop());
+    };
+  }, [stream]);
 
   const handleSync = async () => {
     if (isSyncing || !navigator.onLine) return;
@@ -55,7 +60,6 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
       const result = await pontoOfflineService.syncOfflineQueue();
       if (result.synced > 0) {
         toast.success(`${result.synced} registros offline sincronizados!`);
-        await pontoMonitorService.trackOfflineSync(result.synced, result.errors);
       }
     } catch (e) {
       console.error('Erro na sincronização automática', e);
@@ -65,32 +69,75 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
     }
   };
 
-  const startScan = (tipo: any) => {
+  const startScan = async (tipo: any) => {
     setSelectedTipo(tipo);
     setShowFaceScan(true);
     setScanProgress(0);
-    
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setShowFaceScan(false);
-            finalizeRegister(tipo);
-          }, 500);
-          return 100;
-        }
-        return prev + 10;
+
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user', width: 480, height: 480 } 
       });
-    }, 150);
+      setStream(mediaStream);
+      if (videoRef.current) videoRef.current.srcObject = mediaStream;
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        setScanProgress(progress);
+        if (progress >= 100) {
+          clearInterval(interval);
+          captureAndFinalize(tipo, mediaStream);
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Erro ao acessar câmera:', err);
+      toast.error('Acesso à câmera é obrigatório para biometria.');
+      setShowFaceScan(false);
+    }
   };
 
-  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida') => {
+  const captureAndFinalize = async (tipo: any, mediaStream: MediaStream) => {
+    let fotoUrl = null;
+    
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+      
+      if (blob && user?.id) {
+        const fileName = `${user.id}/${Date.now()}.jpg`;
+        const { data, error } = await (window as any).supabase.storage
+          .from('ponto-biometria')
+          .upload(fileName, blob);
+          
+        if (!error) {
+          const { data: { publicUrl } } = (window as any).supabase.storage
+            .from('ponto-biometria')
+            .getPublicUrl(fileName);
+          fotoUrl = publicUrl;
+        }
+      }
+    }
+
+    // Stop camera
+    mediaStream.getTracks().forEach(track => track.stop());
+    setStream(null);
+    setShowFaceScan(false);
+    finalizeRegister(tipo, fotoUrl);
+  };
+
+  const finalizeRegister = async (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', fotoUrl: string | null) => {
     if (!user) return;
     
-    // Se estiver online, usa o fluxo padrão
     if (navigator.onLine) {
-      onRegistrar(tipo);
+      // Passar fotoUrl para o onRegistrar (precisamos atualizar o hook usePonto)
+      (onRegistrar as any)(tipo, { foto_biometria_url: fotoUrl });
       return;
     }
 
