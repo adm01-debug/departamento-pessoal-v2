@@ -122,10 +122,10 @@ export const cnabService = {
     lines.push(header.padEnd(240, ' '));
 
     // Registrar o arquivo de remessa no banco para auditoria real
-    await supabase.from('cnab_remessas').update({ 
+    await supabase.from('cnab_remessas' as any).update({ 
       arquivo_remessa: lines[0],
       status: 'enviado' 
-    }).eq('id', remessa.id);
+    } as any).eq('id', (remessa as any).id);
 
     let detailSequence = 1;
     const cnabItensToInsert = [];
