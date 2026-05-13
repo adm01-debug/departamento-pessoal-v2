@@ -233,6 +233,7 @@ export default function TreinamentosPage() {
             <TabsTrigger value="trilhas">Trilhas</TabsTrigger>
             <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
             <TabsTrigger value="turmas">Turmas / Instâncias</TabsTrigger>
+            <TabsTrigger value="certificados">Certificados</TabsTrigger>
           </TabsList>
 
           {/* TREINAMENTOS */}
