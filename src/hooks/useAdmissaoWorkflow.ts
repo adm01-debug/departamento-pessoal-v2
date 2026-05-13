@@ -30,12 +30,12 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
         .insert({
           workflow_id: dados.workflow_id,
           empresa_id: empresaAtualId,
-          entidade_id: admissaoId,
+          entidade_id: admissaoId || '',
           entidade_tipo: 'admissao',
           status: 'em_andamento',
           etapa_atual: 1,
           metadata: { iniciado_em: new Date().toISOString() }
-        })
+        } as any)
         .select()
         .single();
 
