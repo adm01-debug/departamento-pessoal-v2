@@ -8,22 +8,18 @@ Este guia cobre os principais aspectos de Folha de Pagamento no sistema de Depar
 - Permissões adequadas
 - Conhecimento básico de DP
 
-## Passo a Passo
+## Operações de Folha
+### 1. Cálculo de Impostos (2026)
+O sistema calcula automaticamente INSS e IRRF seguindo as tabelas vigentes de 2026. Os cálculos utilizam a biblioteca `Decimal.js` para garantir precisão centesimal, evitando erros acumulados.
 
-### 1. Acessando o Módulo
-Navegue até o menu principal e selecione a opção correspondente.
+### 2. Integração com Ponto
+Horas extras e faltas aprovadas são integradas automaticamente no fechamento da folha. O saldo do Banco de Horas é calculado diretamente no banco de dados para garantir integridade.
 
-### 2. Configuração Inicial
-Configure os parâmetros básicos conforme as necessidades da empresa.
+### 3. Fechamento e Assinatura
+Após a conferência, a folha deve ser fechada. O sistema gera uma assinatura SHA-256 do resultado para garantir que o holerite emitido seja idêntico ao calculado originalmente.
 
-### 3. Operações Básicas
-- Cadastro de registros
-- Consulta de dados
-- Edição de informações
-- Exclusão quando necessário
-
-### 4. Relatórios
-Gere relatórios personalizados para análise.
+### 4. Relatórios e Guias
+Gere SEFIP, CAGED (histórico) e guias de DARF diretamente pelo módulo de obrigações fiscais.
 
 ## Dicas e Melhores Práticas
 - Mantenha os dados atualizados
