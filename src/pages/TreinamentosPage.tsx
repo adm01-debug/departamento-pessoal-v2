@@ -211,7 +211,7 @@ export default function TreinamentosPage() {
     onError: () => toast.error('Erro ao inscrever'),
   });
 
-  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc || loadInst;
+  const isLoading = loadTrein || loadCursos || loadTrilhas || loadInsc || loadInst || loadCert;
 
   return (
     <PageLayout title="Treinamentos 10/10" description="Gestão de treinamentos e desenvolvimento" icon={<GraduationCap className="h-5 w-5 text-primary-foreground" />} gradient="from-info to-primary">
