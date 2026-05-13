@@ -40,8 +40,8 @@ const tiposEvento = [
 export default function ESocialPage() {
   const { 
     eventos, stats, isLoading, criarEvento, enviarEvento, reenviarEvento, 
-    gerarEventosPeriodo, isSending, enviarLote, config, certificados, 
-    salvarConfig, adicionarCertificado 
+    gerarEventosPeriodo, isSending, enviarLote, config, certificados, logs,
+    salvarConfig, adicionarCertificado, refreshLogs
   } = useESocial();
   const { empresaAtual } = useEmpresas();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
