@@ -13942,6 +13942,165 @@ export type Database = {
           },
         ]
       }
+      sst_incidentes: {
+        Row: {
+          colaborador_id: string | null
+          created_at: string | null
+          data_hora: string
+          descricao: string
+          empresa_id: string
+          gravidade: number | null
+          id: string
+          local: string
+          medidas_tomadas: string | null
+          status: string | null
+          testemunhas: Json | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          data_hora?: string
+          descricao: string
+          empresa_id: string
+          gravidade?: number | null
+          id?: string
+          local: string
+          medidas_tomadas?: string | null
+          status?: string | null
+          testemunhas?: Json | null
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          created_at?: string | null
+          data_hora?: string
+          descricao?: string
+          empresa_id?: string
+          gravidade?: number | null
+          id?: string
+          local?: string
+          medidas_tomadas?: string | null
+          status?: string | null
+          testemunhas?: Json | null
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_incidentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_incidentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_incidentes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_programas: {
+        Row: {
+          arquivo_url: string | null
+          created_at: string | null
+          data_emissao: string
+          data_validade: string
+          empresa_id: string
+          id: string
+          registro_profissional: string | null
+          responsavel_tecnico: string | null
+          status: string | null
+          tipo: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          arquivo_url?: string | null
+          created_at?: string | null
+          data_emissao: string
+          data_validade: string
+          empresa_id: string
+          id?: string
+          registro_profissional?: string | null
+          responsavel_tecnico?: string | null
+          status?: string | null
+          tipo: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          arquivo_url?: string | null
+          created_at?: string | null
+          data_emissao?: string
+          data_validade?: string
+          empresa_id?: string
+          id?: string
+          registro_profissional?: string | null
+          responsavel_tecnico?: string | null
+          status?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sst_riscos_ambientais: {
+        Row: {
+          agente: string
+          categoria: string
+          created_at: string | null
+          empresa_id: string
+          id: string
+          intensidade_concentracao: string | null
+          limite_tolerancia: string | null
+          local_id: string | null
+          tecnica_utilizada: string | null
+        }
+        Insert: {
+          agente: string
+          categoria: string
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          intensidade_concentracao?: string | null
+          limite_tolerancia?: string | null
+          local_id?: string | null
+          tecnica_utilizada?: string | null
+        }
+        Update: {
+          agente?: string
+          categoria?: string
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          intensidade_concentracao?: string | null
+          limite_tolerancia?: string | null
+          local_id?: string | null
+          tecnica_utilizada?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_riscos_ambientais_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locais_trabalho"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tarefas_onboarding: {
         Row: {
           admissao_id: string | null
