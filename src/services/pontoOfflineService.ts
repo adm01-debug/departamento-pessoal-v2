@@ -47,6 +47,7 @@ export const pontoOfflineService = {
       }
     }
     
+    const id = crypto.randomUUID();
     const hash = registro.hash || pontoOfflineService.generateIntegrityHash(registro);
     const entryWithId: OfflineRegistro = { ...registro, id, hash };
     
@@ -67,7 +68,7 @@ export const pontoOfflineService = {
     
     const encrypted = CryptoJS.AES.encrypt(JSON.stringify(queue), CRYPTO_KEY).toString();
     localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
-    return newEntry;
+    return entryWithId;
   },
 
   syncOfflineQueue: async () => {
