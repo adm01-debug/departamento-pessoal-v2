@@ -36,10 +36,10 @@ describe('loggerService', () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it('should flush info logs after timeout', async () => {
-    await loggerService.info('Test log 1');
-    
-    vi.runAllTimers();
+  it('should flush info logs after 50 logs', async () => {
+    for (let i = 0; i < 50; i++) {
+      await loggerService.info(`Log ${i}`);
+    }
     
     // Aguardar o flush async
     await vi.waitFor(() => expect(mockFrom).toHaveBeenCalledWith('logs_sistema'));
