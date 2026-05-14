@@ -18,7 +18,7 @@ describe('folhaCalc Performance and Stress Tests', () => {
 
   it('should handle extreme salary values correctly', () => {
     const resultHigh = folhaCalc.processar(1000000); // 1 Million
-    expect(resultHigh.inss).toBeCloseTo(1142.04, 0); // Teto
+    expect(resultHigh.inss).toBeCloseTo(951.63, 0); // Teto corrigido (Progressivo)
     expect(resultHigh.liquido).toBeLessThan(1000000);
     
     const resultLow = folhaCalc.processar(0);
