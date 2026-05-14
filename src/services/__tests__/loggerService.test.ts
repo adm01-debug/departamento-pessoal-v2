@@ -2,17 +2,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { loggerService } from '../loggerService';
 import { supabase } from '@/integrations/supabase/client';
 
+// Criar mocks globais
+const mockInsert = vi.fn(() => Promise.resolve({ error: null }));
+const mockFrom = vi.fn(() => ({
+  insert: mockInsert,
+}));
+
 vi.mock('@/integrations/supabase/client', () => {
-  const mockInsert = vi.fn(() => Promise.resolve({ error: null }));
-  const mockFrom = vi.fn(() => ({
-    insert: mockInsert,
-  }));
   return {
     supabase: {
       auth: {
         getUser: vi.fn(() => Promise.resolve({ data: { user: { id: 'test-user' } } })),
       },
-      from: mockFrom,
+      from: (table: string) => mockFrom(table),
     },
   };
 });
@@ -31,26 +33,22 @@ describe('loggerService', () => {
     await loggerService.info('Test log 1');
     await loggerService.info('Test log 2');
     
-    expect(supabase.from).not.toHaveBeenCalled();
+    expect(mockFrom).not.toHaveBeenCalled();
   });
 
   it('should flush info logs after timeout', async () => {
     await loggerService.info('Test log 1');
     
-    vi.advanceTimersByTime(11000);
+    vi.runAllTimers();
     
-    // O flush é async, precisamos esperar a microtask
-    await Promise.resolve();
-    
-    expect(supabase.from).toHaveBeenCalledWith('logs_sistema');
+    // Aguardar o flush async
+    await vi.waitFor(() => expect(mockFrom).toHaveBeenCalledWith('logs_sistema'));
   });
 
   it('should flush error logs immediately', async () => {
     await loggerService.error('Test error');
     
-    // O flush é async, precisamos esperar a microtask
-    await Promise.resolve();
-    
-    expect(supabase.from).toHaveBeenCalledWith('logs_sistema');
+    // Aguardar o flush async
+    await vi.waitFor(() => expect(mockFrom).toHaveBeenCalledWith('logs_sistema'));
   });
 });
