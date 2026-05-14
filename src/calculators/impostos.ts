@@ -24,10 +24,7 @@ export function calcularINSS(salarioBruto: number): number {
     descontoTotal += faixaCalculo * faixa.aliquota;
     baseRestante -= faixaCalculo;
     
-    // Se ainda restar base após a última faixa (devido ao teto), a última alíquota se aplica ao excedente até o teto
-    if (i === FAIXAS_INSS_2026.length - 1 && baseRestante > 0) {
-      descontoTotal += baseRestante * faixa.aliquota;
-    }
+    // Removido o bloco duplicado que adicionava a última alíquota novamente
   }
   
   return Math.round(descontoTotal * 100) / 100;

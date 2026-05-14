@@ -18,6 +18,17 @@ export interface OfflineRegistro {
 }
 
 export const pontoOfflineService = {
+  openDB: async () => {
+    const { openDB } = await import('idb');
+    return openDB('ponto-offline-db', 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('photos')) {
+          db.createObjectStore('photos');
+        }
+      },
+    });
+  },
+
   generateIntegrityHash: (data: any) => {
     const payload = `${data.colaborador_id}|${data.timestamp}|${data.tipo}|${data.dispositivoId}`;
     return CryptoJS.SHA256(payload).toString();
@@ -38,13 +49,26 @@ export const pontoOfflineService = {
     
     const id = crypto.randomUUID();
     const hash = registro.hash || pontoOfflineService.generateIntegrityHash(registro);
+    const entryWithId: OfflineRegistro = { ...registro, id, hash };
     
-    const newEntry: OfflineRegistro = { ...registro, id, hash };
-    queue.push(newEntry);
+    // Armazenar foto no IndexedDB se existir (localStorage tem limite de ~5MB)
+    if (registro.foto_base64) {
+      try {
+        const db = await pontoOfflineService.openDB();
+        await db.put('photos', registro.foto_base64, id);
+        // Não salvar o base64 no localStorage para economizar espaço
+        entryWithId.foto_base64 = null;
+        (entryWithId as any).has_photo_in_idb = true;
+      } catch (e) {
+        console.error('Falha ao salvar foto no IndexedDB:', e);
+      }
+    }
+    
+    queue.push(entryWithId);
     
     const encrypted = CryptoJS.AES.encrypt(JSON.stringify(queue), CRYPTO_KEY).toString();
     localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
-    return newEntry;
+    return entryWithId;
   },
 
   syncOfflineQueue: async () => {
@@ -65,11 +89,28 @@ export const pontoOfflineService = {
     let synced = 0;
     let errors = 0;
     const remaining: OfflineRegistro[] = [];
+    
+    // Notificar monitoramento sobre início do sync
+    const startSyncTime = Date.now();
+    await (await import('./pontoMonitorService')).pontoMonitorService.logEvent('OFFLINE_SYNC_START', {
+      queueSize: queue.length,
+      timestamp: new Date().toISOString()
+    });
+
+    // Re-anexar fotos do IndexedDB antes do sync
+    const db = await pontoOfflineService.openDB();
+    const queueWithPhotos = await Promise.all(queue.map(async (item) => {
+      if ((item as any).has_photo_in_idb) {
+        const photo = await db.get('photos', item.id);
+        return { ...item, foto_base64: photo };
+      }
+      return item;
+    }));
 
     // 1. Enviar lote para a Edge Function de processamento
     try {
       const { data, error } = await supabase.functions.invoke('processar-ponto-offline', {
-        body: { registros: queue }
+        body: { registros: queueWithPhotos }
       });
 
       if (error) throw error;
@@ -90,9 +131,21 @@ export const pontoOfflineService = {
       console.error('[OfflineSync] Falha na comunicação com o servidor:', err);
       return { synced: 0, errors: queue.length };
     }
+    // Notificar monitoramento sobre conclusão
+    await (await import('./pontoMonitorService')).pontoMonitorService.trackOfflineSync(synced, errors);
+    
     if (remaining.length === 0 && (synced > 0 || errors > 0)) {
       localStorage.removeItem(PONTO_OFFLINE_STORAGE_KEY);
+      // Limpar fotos do IndexedDB após sync total
+      await db.clear('photos');
     } else if (remaining.length > 0) {
+      // Limpar fotos apenas dos itens sincronizados
+      const failedIds = remaining.map(r => r.id);
+      for (const item of queue) {
+        if (!failedIds.includes(item.id)) {
+          await db.delete('photos', item.id);
+        }
+      }
       const encrypted = CryptoJS.AES.encrypt(JSON.stringify(remaining), CRYPTO_KEY).toString();
       localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
     }

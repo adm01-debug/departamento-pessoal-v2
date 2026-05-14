@@ -27,6 +27,25 @@ serve(async (req: Request): Promise<Response> => {
       try {
         // Validação de integridade do hash (simulada)
         // Em produção, compararíamos reg.hash com um novo hash gerado no servidor
+        
+        // 1. Prevenção de duplicidade offline (mesmo colaborador, data e hora)
+        const timestampDate = reg.timestamp.split('T')[0];
+        const timestampTime = reg.timestamp.split('T')[1].split('.')[0].substring(0, 5);
+        const tipoMapped = reg.tipo === 'entrada' || reg.tipo === 'retorno_almoco' ? 'entrada' : 'saida';
+
+        const { data: duplicate } = await supabase
+          .from('batidas_ponto')
+          .select('id')
+          .eq('colaborador_id', reg.colaborador_id)
+          .eq('data', timestampDate)
+          .eq('hora', timestampTime)
+          .eq('tipo', tipoMapped)
+          .maybeSingle();
+
+        if (duplicate) {
+          results.success++; // Já existe, consideramos sucesso para limpar da fila
+          continue;
+        }
 
         // Se houver foto em base64, fazer upload para o storage no servidor
         let finalFotoUrl = null;
@@ -46,9 +65,9 @@ serve(async (req: Request): Promise<Response> => {
 
         const { error } = await supabase.from('batidas_ponto').insert({
           colaborador_id: reg.colaborador_id,
-          tipo: reg.tipo === 'entrada' || reg.tipo === 'retorno_almoco' ? 'entrada' : 'saida',
-          data: reg.timestamp.split('T')[0],
-          hora: reg.timestamp.split('T')[1].split('.')[0].substring(0, 5),
+          tipo: tipoMapped,
+          data: timestampDate,
+          hora: timestampTime,
           latitude: reg.latitude,
           longitude: reg.longitude,
           precisao_metros: reg.precisao,
