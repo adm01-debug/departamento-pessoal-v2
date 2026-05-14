@@ -89,6 +89,13 @@ export const pontoOfflineService = {
     let synced = 0;
     let errors = 0;
     const remaining: OfflineRegistro[] = [];
+    
+    // Notificar monitoramento sobre início do sync
+    const startSyncTime = Date.now();
+    await (await import('./pontoMonitorService')).pontoMonitorService.logEvent('OFFLINE_SYNC_START', {
+      queueSize: queue.length,
+      timestamp: new Date().toISOString()
+    });
 
     // Re-anexar fotos do IndexedDB antes do sync
     const db = await pontoOfflineService.openDB();
@@ -124,6 +131,9 @@ export const pontoOfflineService = {
       console.error('[OfflineSync] Falha na comunicação com o servidor:', err);
       return { synced: 0, errors: queue.length };
     }
+    // Notificar monitoramento sobre conclusão
+    await (await import('./pontoMonitorService')).pontoMonitorService.trackOfflineSync(synced, errors);
+    
     if (remaining.length === 0 && (synced > 0 || errors > 0)) {
       localStorage.removeItem(PONTO_OFFLINE_STORAGE_KEY);
       // Limpar fotos do IndexedDB após sync total
