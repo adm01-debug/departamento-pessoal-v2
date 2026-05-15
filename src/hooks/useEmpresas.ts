@@ -111,13 +111,22 @@ export function useEmpresas(): UseEmpresasReturn {
 
   // Se não há empresa selecionada, usar a padrão
   const empresaDefault = userEmpresas?.find((ue) => ue.is_default)?.empresa;
+  
+  // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista)
   const empresaEfetiva = empresaAtual || empresaDefault || userEmpresas?.[0]?.empresa;
 
   useEffect(() => {
-    if (empresaEfetiva?.id && empresaAtualId !== empresaEfetiva.id) {
-      setEmpresaAtual(empresaEfetiva.id);
+    // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
+    // Isso evita o loop infinito de re-renderização ao navegar.
+    // Usamos um timeout curto para garantir que o estado do store esteja pronto.
+    if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
+      const targetId = empresaDefault?.id || userEmpresas[0]?.empresa?.id;
+      if (targetId) {
+        const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [empresaEfetiva?.id, empresaAtualId, setEmpresaAtual]);
+  }, [userEmpresas?.length, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
 
   // Listar todas as empresas (para admin)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
@@ -254,17 +263,28 @@ export function useEmpresas(): UseEmpresasReturn {
     },
   });
 
-  // Trocar empresa atual
   const trocarEmpresa = (empresaId: string) => {
+    if (empresaId === empresaAtualId) return;
+    
     setEmpresaAtual(empresaId);
-    // Invalidate only tenant-scoped queries, preserve auth/session caches
+    
+    // Invalida apenas queries que dependem de empresa (tenant-scoped)
+    // Preserva dados de sessão/auth para evitar logouts ou loadings globais
     queryClient.invalidateQueries({
       predicate: (query) => {
         const key = query.queryKey[0];
-        return key !== 'auth' && key !== 'session';
+        // Adicionamos aqui chaves que sabemos que DEVEM ser invalidadas ao trocar de contexto
+        const tenantKeys = [
+          'colaboradores', 'colaborador', 'folhas', 'folha', 
+          'registros-ponto', 'batidas-ponto', 'ferias', 
+          'afastamentos', 'beneficios', 'admissoes',
+          'notificacoes', 'relatorios_analytics'
+        ];
+        return tenantKeys.includes(key as string);
       },
     });
-    toast.success("Empresa alterada!");
+    
+    toast.success("Contexto de empresa alterado");
   };
 
   return {

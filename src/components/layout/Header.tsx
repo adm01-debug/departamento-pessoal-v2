@@ -5,8 +5,9 @@ import { NotificationCenter } from '@/components/ui/notification-center';
 import { UserProfileMenu } from '@/components/ui/user-profile-menu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Breadcrumbs } from './Breadcrumbs';
-import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
+import { EmpresaSelector } from './EmpresaSelector';
 import { useAuth } from '@/hooks/useAuth';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -16,6 +17,7 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, user, className }: HeaderProps) {
   const { isAdmin } = useAuth();
+  const { empresaAtual, userEmpresas, temMultiplasEmpresas, trocarEmpresa } = useEmpresas();
   const handleSearchClick = () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
   };
@@ -51,7 +53,13 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
       <div className="flex items-center gap-1.5">
         {/* Company badge in header (mobile-visible) */}
         <div className="lg:hidden">
-          <EmpresaSelector />
+          <EmpresaSelector 
+            collapsed={false}
+            empresaAtual={empresaAtual}
+            userEmpresas={userEmpresas}
+            temMultiplasEmpresas={temMultiplasEmpresas}
+            trocarEmpresa={trocarEmpresa}
+          />
         </div>
         <ThemeToggle />
         <NotificationCenter />
