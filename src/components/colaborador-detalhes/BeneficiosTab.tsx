@@ -31,14 +31,14 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
   });
 
   const selectedPlanId = watch('beneficio_id');
-  const selectedPlan = Array.isArray(planosDisponiveis) ? planosDisponiveis.find((p: any) => p.id === selectedPlanId) : null;
+  const selectedPlan = Array.isArray(planosDisponiveis) ? (planosDisponiveis as any[]).find((p: any) => p.id === selectedPlanId) : null;
 
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const onVincular = async (data: any) => {
     await vincularBeneficio({
       ...data,
-      valor: data.valor || selectedPlan?.valor || 0,
+      valor: data.valor || (selectedPlan as any)?.valor || 0,
       status_vinculo: 'ativo'
     });
     setIsDialogOpen(false);
@@ -80,13 +80,13 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormField label="Valor (R$)" type="number" step="0.01" {...register('valor')} placeholder={selectedPlan?.valor?.toString()} />
+                <FormField label="Valor (R$)" type="number" step="0.01" {...register('valor')} placeholder={(selectedPlan as any)?.valor?.toString()} />
                 <FormField label="Desconto (R$)" type="number" step="0.01" {...register('desconto')} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Data Início" type="date" {...register('data_inicio')} />
-                {selectedPlan?.tipo === 'transporte' && (
+                {(selectedPlan as any)?.tipo === 'transporte' && (
                   <FormField label="Passagens/Dia" type="number" {...register('quantidade_diaria')} />
                 )}
               </div>
