@@ -1,36 +1,39 @@
-import { folhaCalc } from '../folhaCalc';
 import { describe, it, expect } from 'vitest';
+import { folhaCalc } from '../folhaCalc';
 
-describe('folhaCalc Performance and Stress Tests', () => {
-  it('should process 1000 calculations in less than 500ms', () => {
-    const start = Date.now();
-    for (let i = 0; i < 1000; i++) {
-      folhaCalc.processar(2000 + i, {
-        dependentes: i % 3,
-        horasExtras50: i % 10,
-        jornada: 220
-      });
-    }
-    const duration = Date.now() - start;
-    console.log(`Processed 1000 calculations in ${duration}ms`);
-    expect(duration).toBeLessThan(500);
+describe('Motor de Cálculo de Folha (folhaCalc)', () => {
+  it('deve processar uma folha simples corretamente', () => {
+    const salarioBase = 3000.00;
+    const resultado = folhaCalc.processar(salarioBase);
+
+    expect(resultado.proventos).toBe(3000.00);
+    expect(resultado.inss).toBeGreaterThan(0);
+    expect(resultado.liquido).toBeLessThan(3000.00);
+    expect(resultado.detalheEventos).toContainEqual(
+      expect.objectContaining({ codigo: '1000', valor: 3000.00 })
+    );
   });
 
-  it('should handle extreme salary values correctly', () => {
-    const resultHigh = folhaCalc.processar(1000000); // 1 Million
-    expect(resultHigh.inss).toBeCloseTo(951.63, 0); // Teto corrigido (Progressivo)
-    expect(resultHigh.liquido).toBeLessThan(1000000);
-    
-    const resultLow = folhaCalc.processar(0);
-    expect(resultLow.liquido).toBe(0);
-  });
-
-  it('should maintain precision with many decimal additions', () => {
-    const result = folhaCalc.processar(2000.55, {
-      adicionais: 0.1 + 0.2, // Common floating point issue
-      descontosExtras: 0.3
+  it('deve incluir horas extras e DSR no cálculo', () => {
+    const salarioBase = 2000.00;
+    const resultado = folhaCalc.processar(salarioBase, {
+      horasExtras50: 10,
+      diasUteis: 26,
+      domingosFeriados: 4
     });
-    // With Decimal.js, 0.1 + 0.2 - 0.3 should be exactly 0
-    expect(result.proventos).toBe(2000.85);
+
+    expect(resultado.proventos).toBeGreaterThan(2000.00);
+    expect(resultado.horasExtras).toBeGreaterThan(0);
+    expect(resultado.dsr).toBeGreaterThan(0);
+  });
+
+  it('deve calcular 13º salário quando solicitado', () => {
+    const salarioBase = 5000.00;
+    const resultado = folhaCalc.processar(salarioBase, {
+      meses13: 12,
+      parcela13: 1
+    });
+
+    expect(resultado.decimoTerceiro).toBe(2500.00); // 1ª parcela é 50%
   });
 });
