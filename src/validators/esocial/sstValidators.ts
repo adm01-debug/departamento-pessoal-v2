@@ -1,7 +1,7 @@
 /**
  * Validadores eSocial — Eventos SST (S-2210, S-2220, S-2240)
  */
-import { ValidationResult, ValidationError, ValidationWarning, required, maxLen, cpfValido, enumValido, dataValida } from './helpers';
+import { ValidationResult, ValidationError, ValidationWarning, required, maxLen, cpfValido, enumValido, dataValida, ESocialData } from './helpers';
 
 export function validarS2210(dados: Record<string, any>): ValidationResult {
   const errors: ValidationError[] = [];
