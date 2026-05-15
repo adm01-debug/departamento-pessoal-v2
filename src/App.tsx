@@ -6,10 +6,9 @@ import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Eager-loaded core pages
+// Core pages with optimized pre-loading
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
-import NotFoundPage from '@/pages/NotFoundPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
 
 // Lazy-loaded pages
