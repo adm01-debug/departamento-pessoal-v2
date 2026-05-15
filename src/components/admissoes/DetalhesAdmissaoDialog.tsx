@@ -37,25 +37,15 @@ interface DetalhesAdmissaoDialogProps {
 export function DetalhesAdmissaoDialog({ admissao, open, onOpenChange }: DetalhesAdmissaoDialogProps) {
   const { validarDocumento } = useContratacaoDigital();
   const { workflow } = useAdmissaoWorkflow(admissao?.id);
-  const { criarEvento } = useESocial();
+  const { enviarEvento } = useESocial();
   const { empresaAtual } = useEmpresas();
 
   const handleEnvioESocial = () => {
     if (!empresaAtual?.id || !admissao) return;
     
-    criarEvento({
-      empresa_id: empresaAtual.id,
-      tipo_evento: 'S-2200',
-      dados: {
-        cpfTrab: admissao.cpf,
-        nmTrab: admissao.nome,
-        dtNascto: admissao.data_nascimento,
-        dtAdm: admissao.data_prevista,
-        tpRegTrab: 1, // Exemplo: CLT
-        tpRegPrev: 1, // Exemplo: RGPS
-        codCargo: admissao.cargo,
-        vrSalFx: admissao.salario_proposto
-      }
+    enviarEvento({
+      eventoId: admissao.id,
+      empresaId: empresaAtual.id
     });
   };
 
