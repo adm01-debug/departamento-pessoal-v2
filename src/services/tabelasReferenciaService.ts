@@ -131,7 +131,7 @@ export async function obterDadosEstagiario(colaboradorId: string): Promise<any |
 export async function salvarDadosEstagiario(colaboradorId: string, dados: Record<string, unknown>): Promise<any> {
   try {
     const res = await obterDadosEstagiario(colaboradorId);
-    const existing = res.ok ? res.value : null;
+    const existing = (res ?? null);
 
     if (existing) {
       const { data, error } = await supabase

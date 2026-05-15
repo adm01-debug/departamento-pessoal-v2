@@ -81,7 +81,7 @@ export const pontoService = {
       if (!colab) throw new Error('Colaborador não encontrado.');
 
       const settingsRes = await this.getSettings(colab.empresa_id || '');
-      const settings = settingsRes.ok ? settingsRes.value : null;
+      const settings = (settingsRes ?? null);
       let dentroRaio = true;
 
       if (settings?.exige_geolocalizacao && colab.locais_trabalho) {

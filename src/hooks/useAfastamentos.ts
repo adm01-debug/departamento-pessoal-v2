@@ -155,8 +155,7 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
   const excluirMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await afastamentoService.excluir(id); // Using service delete for general deletion is common but usually documents have specific ones, service check needed if specialized
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });

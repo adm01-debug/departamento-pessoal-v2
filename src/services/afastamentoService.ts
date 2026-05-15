@@ -255,8 +255,7 @@ export const afastamentoService = {
   async exportarRelatorio(empresaId: string, filtros?: any): Promise<any[]> {
     try {
       const result = await this.listar(empresaId, filtros);
-      if (!result.ok) return result;
-      const data = result.value;
+      const data = result;
       
       const headers = ["ID", "Colaborador", "Tipo", "CID", "Início", "Fim Previsto", "Dias Totais", "Empresa", "INSS", "Status"];
       const rows = data.map((af: any) => [

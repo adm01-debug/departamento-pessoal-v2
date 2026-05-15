@@ -67,7 +67,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
         setIsVerificandoHistorico(true);
         try {
           const res = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
-          if (res.ok) setHistoricoRecente(res.value);
+          setHistoricoRecente(res);
         } catch (e) {
 
           console.error('Erro ao carregar histórico:', e);
@@ -91,7 +91,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
     const searchCID = async () => {
       if (cidSearch.length > 2) {
         const res = await afastamentoService.buscarCID(cidSearch);
-        if (res.ok) setCidResults(res.value);
+        setCidResults(res);
       }
     };
 

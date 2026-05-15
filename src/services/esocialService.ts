@@ -79,8 +79,7 @@ export async function listarEventosPorCompetencia(empresaId: string | null, comp
 export async function obterEstatisticas(empresaId: string | null): Promise<any> {
   try {
     const res = await listarEventos(empresaId);
-    if (!res.ok) return res;
-    const eventos = res.value;
+    const eventos = res;
 
     const enviados = eventos.filter(e => e.status === 'enviado').length;
     const pendentes = eventos.filter(e => e.status === 'pendente').length;

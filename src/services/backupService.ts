@@ -52,7 +52,7 @@ export async function exportarBackupCSV(
 
   for (const result of results) {
     if (result.status === 'fulfilled') {
-      const { table, data, count } = result.value;
+      const { table, data, count } = result;
       totalRecords += count;
 
       if (data.length > 0) {
@@ -97,8 +97,8 @@ export async function exportarBackupJSON(
 
   for (const result of results) {
     if (result.status === 'fulfilled') {
-      output[result.value.table] = result.value.data;
-      totalRecords += result.value.count;
+      output[result.table] = result.data;
+      totalRecords += result.count;
     }
   }
 

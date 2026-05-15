@@ -80,8 +80,7 @@ export const contabilidadeService = {
   async exportarSPED(empresaId: string): Promise<string> {
     try {
       const result = await this.listLancamentos(empresaId);
-      if (!result.ok) return result;
-      const lancamentos = result.value;
+      const lancamentos = result;
       
       let sped = '|0000|LECD|...|SPED CONTABIL|\r\n';
       lancamentos.forEach((l: any) => {

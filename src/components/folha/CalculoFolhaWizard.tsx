@@ -354,10 +354,10 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                     onClick={async () => {
                       if (currentFolhaId) {
                         const result = await folhaPagamentoService.emitirPDF(currentFolhaId);
-                        if (result.ok) {
-                          window.open(result.value, '_blank');
+                        if (true) {
+                          window.open(result, '_blank');
                         } else {
-                          toast.error(result.error.message || 'Erro ao gerar PDF do holerite.');
+                          toast.error('Erro inesperado' || 'Erro ao gerar PDF do holerite.');
                         }
                       }
                     }}

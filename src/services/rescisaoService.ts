@@ -47,7 +47,6 @@ export const rescisaoService = {
 
       // Validar se pode ir para a etapa de cálculo
       const transitionResult = await this.validarTransicao(id, 'calculo');
-      if (!transitionResult.ok) return transitionResult;
 
       // 2. Realizar o cálculo
       const result = await calcularRescisao({
@@ -60,9 +59,7 @@ export const rescisaoService = {
         saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as any).saldo_fgts || 0),
         dependentes: (anterior.colaborador as any)?.dependentes_irrf || 0,
       });
-
-      if (!result.ok) return result;
-      const resultado = result.value;
+      const resultado = result;
 
       // 3. Atualizar o registro de desligamento com os valores calculados
       const dadosAtualizados = {
