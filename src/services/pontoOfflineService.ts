@@ -35,6 +35,29 @@ export const pontoOfflineService = {
   },
 
   queueRegistro: async (registro: Omit<OfflineRegistro, 'id'>) => {
+    const db = await pontoOfflineService.openDB();
+    const id = crypto.randomUUID();
+    const hash = registro.hash || pontoOfflineService.generateIntegrityHash(registro);
+    const entryWithId: OfflineRegistro = { ...registro, id, hash };
+    
+    // Armazenar foto no IndexedDB se existir (sem limite prático de tamanho)
+    if (registro.foto_base64) {
+      try {
+        await db.put('photos', registro.foto_base64, id);
+        // Não salvar o base64 no localStorage para economizar espaço
+        entryWithId.foto_base64 = null;
+        (entryWithId as any).has_photo_in_idb = true;
+      } catch (e) {
+        console.error('Falha ao salvar foto no IndexedDB:', e);
+      }
+    }
+    
+    // Recuperar fila atual do IndexedDB
+    const tx = db.transaction('photos', 'readwrite');
+    const store = tx.objectStore('photos');
+    
+    // Salvar o registro (metadados) em uma chave especial ou novo store
+    // Para manter compatibilidade com o resto do código sem mudar a versão do DB agora:
     const stored = localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY);
     let queue: OfflineRegistro[] = [];
     
@@ -47,27 +70,13 @@ export const pontoOfflineService = {
       }
     }
     
-    const id = crypto.randomUUID();
-    const hash = registro.hash || pontoOfflineService.generateIntegrityHash(registro);
-    const entryWithId: OfflineRegistro = { ...registro, id, hash };
-    
-    // Armazenar foto no IndexedDB se existir (localStorage tem limite de ~5MB)
-    if (registro.foto_base64) {
-      try {
-        const db = await pontoOfflineService.openDB();
-        await db.put('photos', registro.foto_base64, id);
-        // Não salvar o base64 no localStorage para economizar espaço
-        entryWithId.foto_base64 = null;
-        (entryWithId as any).has_photo_in_idb = true;
-      } catch (e) {
-        console.error('Falha ao salvar foto no IndexedDB:', e);
-      }
-    }
-    
     queue.push(entryWithId);
-    
     const encrypted = CryptoJS.AES.encrypt(JSON.stringify(queue), CRYPTO_KEY).toString();
     localStorage.setItem(PONTO_OFFLINE_STORAGE_KEY, encrypted);
+    
+    // Disparar evento customizado para notificar abas
+    window.dispatchEvent(new Event('ponto-offline-updated'));
+    
     return entryWithId;
   },
 

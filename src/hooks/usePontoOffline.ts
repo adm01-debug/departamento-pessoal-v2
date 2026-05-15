@@ -12,9 +12,13 @@ export function usePontoOffline() {
 
   useEffect(() => {
     updateSize();
-    // Listener para mudanças no localStorage (útil entre abas)
+    // Listeners para mudanças (Storage API e Custom Event)
     window.addEventListener('storage', updateSize);
-    return () => window.removeEventListener('storage', updateSize);
+    window.addEventListener('ponto-offline-updated', updateSize);
+    return () => {
+      window.removeEventListener('storage', updateSize);
+      window.removeEventListener('ponto-offline-updated', updateSize);
+    };
   }, []);
 
   const addOffline = async (tipo: any, colaboradorId: string, geo: any) => {

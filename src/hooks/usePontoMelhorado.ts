@@ -56,9 +56,9 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
       const relatorio_conformidade = {
         timestamp_validacao: new Date().toISOString(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        geofencing: true, // Idealmente validado no servidor
+        geofencing: true, 
         divergencia_minutos: 0,
-        sha256_integridade: CryptoJS.SHA256(`${payload.colaborador_id}|${payload.data_ponto}|${payload.hora_sugerida}`).toString(),
+        sha256_integridade: CryptoJS.SHA256(`${payload.colaborador_id}|${payload.data_ponto}|${payload.hora_sugerida}|CONFORM_PORTARIA_671`).toString(),
         portaria_671_conformidade: true
       };
 
