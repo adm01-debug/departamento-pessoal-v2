@@ -32,13 +32,13 @@ export function validarS2240(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
+  cpfValido(dados.cpfTrab as string, 'cpfTrab', errors);
   required(dados.dtIniCondic, 'dtIniCondic', errors);
-  dataValida(dados.dtIniCondic, 'dtIniCondic', errors);
-  if (dados.infoExpRisco) {
-    for (let i = 0; i < dados.infoExpRisco.length; i++) {
-      required(dados.infoExpRisco[i].codAgNoc, `infoExpRisco[${i}].codAgNoc`, errors);
-    }
+  dataValida(dados.dtIniCondic as string, 'dtIniCondic', errors);
+  if (Array.isArray(dados.infoExpRisco)) {
+    dados.infoExpRisco.forEach((item: any, i: number) => {
+      required(item.codAgNoc, `infoExpRisco[${i}].codAgNoc`, errors);
+    });
   }
   return { valid: errors.length === 0, errors, warnings };
 }
