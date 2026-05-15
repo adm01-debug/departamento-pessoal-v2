@@ -294,4 +294,13 @@ export const edgeFunctionsService = {
       return data;
     });
   },
+
+  /** Verifica rate limit */
+  checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) => {
+    const { data, error } = await supabase.functions.invoke('rateLimit', {
+      body: { key, limit, window_seconds: windowSeconds },
+    });
+    if (error) throw error;
+    return data;
+  },
 };
