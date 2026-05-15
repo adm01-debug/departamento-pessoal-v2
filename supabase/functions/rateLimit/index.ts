@@ -6,8 +6,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
  * Edge Function otimizada para baixa latência
  */
 
-interface RequestBody { data?: any; action?: string; }
-interface ResponseBody { success: boolean; data?: any; error?: string; }
+interface RequestBody { 
+  key: string; 
+  limit: number; 
+  window_seconds: number; 
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,16 +25,47 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body: RequestBody = await req.json();
+    const { key, limit, window_seconds }: RequestBody = await req.json();
     
-    // Lógica da função rateLimit
-    const result = await processrateLimit(body, supabase);
+    if (!key) throw new Error('Key is required');
+
+    const now = Math.floor(Date.now() / 1000);
+    const windowStart = now - (window_seconds || 60);
+
+    // Limpa registros antigos (Buckets deslizantes)
+    await supabase.from('rate_limits')
+      .delete()
+      .lt('timestamp', windowStart);
+
+    // Conta requisições na janela atual
+    const { count, error: countError } = await supabase
+      .from('rate_limits')
+      .select('id', { count: 'exact', head: true })
+      .eq('key', key)
+      .gte('timestamp', windowStart);
+
+    if (countError) throw countError;
+
+    const currentCount = count || 0;
+    const allowed = currentCount < (limit || 100);
+
+    if (allowed) {
+      await supabase.from('rate_limits').insert({
+        key,
+        timestamp: now
+      });
+    }
 
     return new Response(
-      JSON.stringify({ success: true, data: result }),
+      JSON.stringify({ 
+        success: true, 
+        allowed, 
+        remaining: Math.max(0, (limit || 100) - currentCount - (allowed ? 1 : 0)),
+        reset: windowStart + (window_seconds || 60)
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
@@ -42,8 +76,3 @@ serve(async (req: Request): Promise<Response> => {
     );
   }
 });
-
-async function processrateLimit(body: RequestBody, supabase: any) {
-  console.log('Processing rateLimit:', body);
-  return { processed: true, timestamp: new Date().toISOString() };
-}
