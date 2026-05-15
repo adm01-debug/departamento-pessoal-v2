@@ -74,7 +74,7 @@ export default function CalculadoraRescisaoPage() {
     }
     setCalcServidor(true);
     try {
-      const data = await edgeFunctionsService.calcularRescisao({
+      const result = await edgeFunctionsService.calcularRescisao({
         salario_base: Number(form.salario),
         data_admissao: form.dataAdmissao,
         data_demissao: form.dataDesligamento,
@@ -84,8 +84,16 @@ export default function CalculadoraRescisaoPage() {
         ferias_vencidas: form.feriasVencidas ? 1 : 0,
         dependentes_irrf: 0,
       });
-      if (data?.resultado) setResult(data.resultado);
-      toast.success('Rescisão calculada no servidor!');
+
+      if (result.ok) {
+        const data = result.value as any;
+        if (data?.resultado) {
+          setResult(data.resultado);
+          toast.success('Rescisão calculada no servidor!');
+        }
+      } else {
+        toast.error(`Erro: ${result.error.message}`);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
