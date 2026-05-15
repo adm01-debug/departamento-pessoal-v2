@@ -153,7 +153,8 @@ export const calculoLoteService = {
             eventos: [...eventosVariaveis, ...beneficiosEventos],
             horasExtras50: totalHE,
             horasFalta: totalFaltas,
-            jornada
+            jornada,
+            descontosExtras: 0 // Podem ser outros descontos manuais
           });
 
           // Salva o item da folha
