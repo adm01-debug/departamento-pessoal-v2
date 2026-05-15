@@ -106,6 +106,7 @@ export const calculoLoteService = {
           }
 
           // 3.2 Buscar Benefícios Ativos (Vale Transporte / Vale Alimentação / Refeição)
+          // Tenta na tabela unificada 'beneficios_colaborador'
           const { data: beneficiosVinculos } = await (supabase as any)
             .from('beneficios_colaborador')
             .select(`
@@ -143,6 +144,7 @@ export const calculoLoteService = {
               }
             });
           } else {
+            // Fallback para tabelas individuais legacy
             const { data: vtLegacy } = await (supabase as any)
               .from('vales_transporte')
               .select('*')
@@ -191,7 +193,7 @@ export const calculoLoteService = {
             horasExtras50: totalHE,
             horasFalta: totalFaltas,
             jornada,
-            descontosExtras: 0 // Podem ser outros descontos manuais
+            descontosExtras: 0
           });
 
           // Salva o item da folha
