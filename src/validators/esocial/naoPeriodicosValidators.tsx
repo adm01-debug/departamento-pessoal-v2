@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { User, Calendar, Briefcase, Banknote, ShieldCheck, Clock, MapPin, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ValidationResult, ValidationError, required, cpfValido, dataValida, enumValido } from './helpers';
+import { ValidationResult, ValidationError, required, cpfValido, dataValida, enumValido, ESocialData } from './helpers';
 
 const baseValidation = (): ValidationResult => ({ valid: true, errors: [], warnings: [] });
 const finishValidation = (errors: ValidationError[]): ValidationResult => ({
