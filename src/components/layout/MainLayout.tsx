@@ -17,7 +17,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isReady } = useAuth();
 
   return (
     <div className="flex h-screen bg-background">
