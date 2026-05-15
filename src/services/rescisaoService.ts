@@ -48,7 +48,7 @@ export const rescisaoService = {
     await this.validarTransicao(id, 'calculo');
 
     // 2. Realizar o cálculo
-    const resultado = calcularRescisao({
+    const result = await calcularRescisao({
       salario: params.salario_base || (anterior as any).salario_base,
       dataAdmissao: (anterior.colaborador as any)?.data_admissao || params.data_admissao,
       dataDesligamento: params.data_desligamento || (anterior as any).data_desligamento,
@@ -58,6 +58,9 @@ export const rescisaoService = {
       saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as any).saldo_fgts || 0),
       dependentes: (anterior.colaborador as any)?.dependentes_irrf || 0,
     });
+
+    if (!result.ok) throw new Error(result.error.message);
+    const resultado = result.value;
 
     // 3. Atualizar o registro de desligamento com os valores calculados
     const dadosAtualizados = {
