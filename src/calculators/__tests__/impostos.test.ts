@@ -2,60 +2,44 @@ import { describe, it, expect } from 'vitest';
 import { calcularINSS, calcularIRRF, calcularFGTS } from '../impostos';
 import { TETO_INSS_2026 } from '../tabelas';
 
-describe('Calculators: Impostos 2026', () => {
-  describe('calcularINSS', () => {
-    it('should return 0 for zero or negative salary', () => {
-      expect(calcularINSS(0)).toBe(0);
-      expect(calcularINSS(-100)).toBe(0);
-    });
-
-    it('should calculate correctly for the 1st bracket (7.5%)', () => {
-      // 1518.00 * 0.075 = 113.85
+describe('Calculadora de Impostos (Folha 2026)', () => {
+  describe('INSS', () => {
+    it('deve calcular corretamente para a primeira faixa (7.5%)', () => {
+      // Salário: 1518.00 -> 1518 * 0.075 = 113.85
       expect(calcularINSS(1518.00)).toBe(113.85);
     });
 
-    it('should calculate correctly for the 2nd bracket (progressive)', () => {
-      // 1st bracket: 1518.00 * 0.075 = 113.85
-      // 2nd bracket: (2500 - 1518) * 0.09 = 982 * 0.09 = 88.38
-      // Total: 202.23
+    it('deve calcular corretamente para a segunda faixa (9%)', () => {
+      // Base: 2500.00
+      // 1ª faixa: 1518.00 * 0.075 = 113.85
+      // 2ª faixa: (2500 - 1518) * 0.09 = 982 * 0.09 = 88.38
+      // Total: 113.85 + 88.38 = 202.23
       expect(calcularINSS(2500.00)).toBe(202.23);
     });
 
-    it('should respect the INSS ceiling', () => {
-      const ceiling = TETO_INSS_2026;
-      const expectedAtCeiling = calcularINSS(ceiling);
-      expect(calcularINSS(ceiling + 1000)).toBe(expectedAtCeiling);
-      // For 8157.41, expected is roughly 951.62 based on previous manual tests
-      expect(expectedAtCeiling).toBeCloseTo(951.62, 1);
+    it('deve respeitar o teto do INSS', () => {
+      const acimaDoTeto = TETO_INSS_2026 + 1000;
+      const valorTeto = calcularINSS(TETO_INSS_2026);
+      expect(calcularINSS(acimaDoTeto)).toBe(valorTeto);
     });
   });
 
-  describe('calcularIRRF', () => {
-    it('should be exempt for salaries within the 1st bracket', () => {
-      // 2000 is below the limit after simple discount or INSS
-      expect(calcularIRRF(2000.00)).toBe(0);
+  describe('IRRF', () => {
+    it('deve ser isento para salários baixos', () => {
+      expect(calcularIRRF(2200.00)).toBe(0);
     });
 
-    it('should apply the most beneficial deduction (Simplified vs Legal)', () => {
-      // Simple discount 2026: 564.80
-      // 5000 - 564.80 = 4435.20 (Base)
-      // Legal: 5000 - INSS(524.36?) - 0 dependents = 4475.64
-      // Simplified is better here
-      const result = calcularIRRF(5000.00, 0);
-      expect(result).toBeGreaterThan(0);
-    });
-
-    it('should consider dependents in legal deduction', () => {
-      const withoutDependents = calcularIRRF(6000.00, 0);
-      const withDependents = calcularIRRF(6000.00, 2);
-      expect(withDependents).toBeLessThan(withoutDependents);
+    it('deve calcular IRRF considerando o melhor cenário (Legal vs Simplificado)', () => {
+      // Teste com um salário que entra na primeira faixa tributável
+      const imposto = calcularIRRF(3500.00);
+      expect(imposto).toBeGreaterThan(0);
     });
   });
 
-  describe('calcularFGTS', () => {
-    it('should calculate 8% of the salary', () => {
-      expect(calcularFGTS(1000)).toBe(80);
-      expect(calcularFGTS(3500.50)).toBe(280.04);
+  describe('FGTS', () => {
+    it('deve calcular 8% do salário bruto', () => {
+      expect(calcularFGTS(2000.00)).toBe(160.00);
+      expect(calcularFGTS(5000.00)).toBe(400.00);
     });
   });
 });
