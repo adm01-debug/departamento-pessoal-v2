@@ -98,13 +98,13 @@ export const empresaService = {
     if (error) throw error;
     return data;
   },
-  async criar(d: any) {
-    const { data, error } = await supabase.from('empresas').insert(d).select().maybeSingle();
+  async criar(d: Partial<Database['public']['Tables']['empresas']['Insert']>) {
+    const { data, error } = await supabase.from('empresas').insert(d as any).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'empresa');
   },
-  async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('empresas').update(d).eq('id', id).select().maybeSingle();
+  async atualizar(id: string, d: Partial<Database['public']['Tables']['empresas']['Update']>) {
+    const { data, error } = await supabase.from('empresas').update(d as any).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'empresa');
   },
