@@ -52,11 +52,11 @@ export function validarS1010(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.codRubr, 'codRubr', errors);
-  maxLen(dados.codRubr, 30, 'codRubr', errors);
+  maxLen(dados.codRubr as string, 30, 'codRubr', errors);
   required(dados.ideTabRubr, 'ideTabRubr', errors);
   required(dados.iniValid, 'iniValid', errors);
   required(dados.dscRubr, 'dscRubr', errors);
-  maxLen(dados.dscRubr, 100, 'dscRubr', errors);
+  maxLen(dados.dscRubr as string, 100, 'dscRubr', errors);
   required(dados.natRubr, 'natRubr', errors);
   required(dados.tpRubr, 'tpRubr', errors);
   enumValido(dados.tpRubr?.toString(), ['1', '2', '3', '4'], 'tpRubr', errors);
@@ -66,20 +66,20 @@ export function validarS1010(dados: ESocialData): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1020(dados: Record<string, any>): ValidationResult {
+export function validarS1020(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.codLotacao, 'codLotacao', errors);
-  maxLen(dados.codLotacao, 30, 'codLotacao', errors);
+  maxLen(dados.codLotacao as string, 30, 'codLotacao', errors);
   required(dados.iniValid, 'iniValid', errors);
   required(dados.tpLotacao, 'tpLotacao', errors);
-  if (dados.tpLotacao && !['01','02','03','04','05','06','07','08','09','10','21','22','23','24','25','61','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','90','91','92','99'].includes(dados.tpLotacao)) {
+  if (typeof dados.tpLotacao === 'string' && !['01','02','03','04','05','06','07','08','09','10','21','22','23','24','25','61','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','90','91','92','99'].includes(dados.tpLotacao)) {
     errors.push({ campo: 'tpLotacao', mensagem: 'Tipo de lotação inválido', regra: 'REGRA_ENUM' });
   }
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1070(dados: Record<string, any>): ValidationResult {
+export function validarS1070(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.tpProc, 'tpProc', errors);
