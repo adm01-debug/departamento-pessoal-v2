@@ -17,6 +17,9 @@ export function MobileBottomNav() {
   const { isAdmin } = useAuth();
   
   const items = isAdmin ? mobileItems : mobileItems.filter(i => i.path !== '/configuracoes');
+  
+  // Se a rota atual não estiver no menu inferior (ex: edição de colaborador),
+  // o menu inferior deve continuar visível para permitir a volta rápida.
 
   return (
     <nav aria-label="Navegação mobile" className="fixed bottom-0 left-0 right-0 z-sticky md:hidden">
