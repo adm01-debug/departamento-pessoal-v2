@@ -1,4 +1,4 @@
-import { ValidationResult, ValidationError, required, enumValido } from './helpers';
+import { ValidationResult, ValidationError, required, enumValido, ESocialData } from './helpers';
 import { RUBRICAS_PADRAO } from '@/constants/rubricas';
 
 /**
