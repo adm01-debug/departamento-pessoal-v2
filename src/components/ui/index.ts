@@ -30,3 +30,4 @@ export * from './stat-card';
 export * from './spinner';
 export * from './empty-state';
 export * from './status-badge';
+export * from './collapsible';
