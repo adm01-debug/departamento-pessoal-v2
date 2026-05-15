@@ -17,13 +17,13 @@ export function useRealTimeSubscription(
     const channel = supabase
       .channel(`rt-${table}-${empresaId}`)
       .on(
-        'postgres_changes',
+        'postgres_changes' as any,
         {
           event: options.event || '*',
           schema: options.schema || 'public',
           table: table,
           filter: `empresa_id=eq.${empresaId}`,
-        },
+        } as any,
         (payload: RealtimePostgresChangesPayload<any>) => {
           // Log only in dev mode
           if (import.meta.env.DEV) {
