@@ -37,8 +37,9 @@ export function BeneficiosPortal({ colaboradorId }: { colaboradorId: string }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {todosBeneficios.map((b: any, idx: number) => {
-          const jaPossui = meusBeneficios.find((mb: any) => mb.beneficio_id === b.id);
+        {Array.isArray(todosBeneficios) && todosBeneficios.map((b: any, idx: number) => {
+          const jaPossui = Array.isArray(meusBeneficios) ? meusBeneficios.find((mb: any) => mb.beneficio_id === b.id) : null;
+
           
           return (
             <motion.div
