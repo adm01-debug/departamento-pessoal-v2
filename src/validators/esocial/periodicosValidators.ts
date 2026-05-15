@@ -34,20 +34,21 @@ export function validarS1005(dados: ESocialData): ValidationResult {
   required(dados.tpInsc, 'tpInsc', errors);
   required(dados.nrInsc, 'nrInsc', errors);
   required(dados.iniValid, 'iniValid', errors);
-  if (dados.tpInsc === 1) cnpjValido(dados.nrInsc, 'nrInsc', errors);
+  if (dados.tpInsc === 1) cnpjValido(dados.nrInsc as string, 'nrInsc', errors);
   required(dados.cnaePrep, 'cnaePrep', errors);
-  if (dados.cnaePrep && !/^\d{7}$/.test(dados.cnaePrep)) {
+  if (typeof dados.cnaePrep === 'string' && !/^\d{7}$/.test(dados.cnaePrep)) {
     errors.push({ campo: 'cnaePrep', mensagem: 'CNAE deve ter 7 dígitos', regra: 'REGRA_CNAE' });
   }
   required(dados.aliqRat, 'aliqRat', errors);
   enumValido(dados.aliqRat?.toString(), ['1', '2', '3'], 'aliqRat', errors);
-  if (dados.fap !== undefined && (dados.fap < 0.5 || dados.fap > 2.0)) {
+  const fap = dados.fap as number | undefined;
+  if (fap !== undefined && (fap < 0.5 || fap > 2.0)) {
     errors.push({ campo: 'fap', mensagem: 'FAP deve estar entre 0.50 e 2.00', regra: 'REGRA_FAP' });
   }
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1010(dados: Record<string, any>): ValidationResult {
+export function validarS1010(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.codRubr, 'codRubr', errors);
