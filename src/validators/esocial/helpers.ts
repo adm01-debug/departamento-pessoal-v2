@@ -2,6 +2,8 @@
  * Helpers de validação eSocial
  */
 
+export type ESocialData = Record<string, unknown>;
+
 export interface ValidationResult {
   valid: boolean;
   errors: ValidationError[];
