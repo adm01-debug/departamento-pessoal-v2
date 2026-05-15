@@ -1,5 +1,6 @@
 // Services Index - Complete
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 import { contratacaoService } from './contratacaoService';
 export { contratacaoService };
 
