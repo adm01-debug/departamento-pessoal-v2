@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { bitrixBreaker, resendBreaker } from '@/lib/circuitBreaker';
+import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
 import { v4 as uuidv4 } from 'uuid';
 
 const getCorrelationHeaders = () => ({
