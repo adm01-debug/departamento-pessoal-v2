@@ -112,7 +112,7 @@ export const folhaCalc = {
     const totalHE = new Decimal(valorHE50).plus(valorHE100).toNumber();
     
     // 3. DSR
-    const dsr = diasUteis > 0 ? calcularDSR(totalHE, diasUteis, domingosFeriados) : 0;
+    const dsr = (diasUteis > 0 && domingosFeriados > 0) ? calcularDSR(totalHE, diasUteis, domingosFeriados) : 0;
     if (dsr > 0) detalheEventos.push({ codigo: '1003', descricao: 'DSR sobre Horas Extras', tipo: 'provento', valor: dsr });
     
     // 4. 13º Salário

@@ -116,15 +116,13 @@ export const calculoLoteService = {
             .eq('ativo', true);
 
           const beneficiosEventos: any[] = [];
-          if (beneficiosVinculos) {
+          if (beneficiosVinculos && beneficiosVinculos.length > 0) {
             beneficiosVinculos.forEach((v: any) => {
               if (v.beneficio) {
-                // Cálculo de desconto de VT (6% sobre salário base limitado ao custo do benefício)
                 if (v.beneficio.tipo === 'VT') {
                   const custoVT = Number(v.valor || 0);
                   const descontoMaximoVT = Number(colab.salario_base || 0) * 0.06;
                   const valorDescontoVT = Math.min(custoVT, descontoMaximoVT);
-                  
                   if (valorDescontoVT > 0) {
                     beneficiosEventos.push({
                       codigo: '5010',
@@ -134,8 +132,6 @@ export const calculoLoteService = {
                     });
                   }
                 }
-                
-                // Outros descontos de benefícios (PAT, etc.)
                 if (v.desconto && v.beneficio.tipo !== 'VT') {
                    beneficiosEventos.push({
                       codigo: '5020',
@@ -146,6 +142,47 @@ export const calculoLoteService = {
                 }
               }
             });
+          } else {
+            const { data: vtLegacy } = await (supabase as any)
+              .from('vales_transporte')
+              .select('*')
+              .eq('colaborador_id', colab.id)
+              .eq('optante', true)
+              .maybeSingle();
+
+            if (vtLegacy) {
+              const custoVT = Number(vtLegacy.valor_mensal || 0);
+              const descontoMaximoVT = Number(colab.salario_base || 0) * 0.06;
+              const valorDescontoVT = Math.min(custoVT, descontoMaximoVT);
+              if (valorDescontoVT > 0) {
+                beneficiosEventos.push({
+                  codigo: '5010',
+                  descricao: 'Desconto Vale Transporte (Legacy)',
+                  tipo: 'desconto',
+                  valor: Math.round(valorDescontoVT * 100) / 100
+                });
+              }
+            }
+
+            const { data: vaLegacy } = await (supabase as any)
+              .from('vales_alimentacao')
+              .select('*')
+              .eq('colaborador_id', colab.id)
+              .eq('ativo', true);
+
+            if (vaLegacy) {
+              vaLegacy.forEach((v: any) => {
+                const desc = v.valor_mensal ? v.valor_mensal * 0.20 : 0;
+                if (desc > 0) {
+                  beneficiosEventos.push({
+                    codigo: '5020',
+                    descricao: `Coparticipação ${v.tipo || 'Ticket'} (Legacy)`,
+                    tipo: 'desconto',
+                    valor: Math.round(desc * 100) / 100
+                  });
+                }
+              });
+            }
           }
 
           const res = folhaCalc.processar(Number(colab.salario_base || 0), {
