@@ -19,6 +19,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { user, isReady } = useAuth();
 
+  if (!isReady) return null; // Prevenção de flash de layout antes do carregamento da sessão
+
   return (
     <div className="flex h-screen bg-background">
       {/* Command Palette (global) */}
