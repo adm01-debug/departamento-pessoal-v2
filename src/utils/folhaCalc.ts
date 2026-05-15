@@ -53,9 +53,9 @@ export const folhaCalc = {
     faixa: descreverFaixaInss(salarioBruto),
   }),
 
-  calcularIRRF: (salarioBruto: number, inss: number, dependentes: number = 0): { valor: number; faixa: string } => {
-    const valor = _irrf(salarioBruto, dependentes);
-    const base = salarioBruto - inss - dependentes * DEDUCAO_DEPENDENTE_IRRF;
+  calcularIRRF: (salarioBruto: number, inss: number, dependentes: number = 0, outrasDeducoes: number = 0): { valor: number; faixa: string } => {
+    const valor = _irrf(salarioBruto, dependentes, outrasDeducoes);
+    const base = salarioBruto - inss - dependentes * DEDUCAO_DEPENDENTE_IRRF - outrasDeducoes;
     return { valor, faixa: descreverFaixaIrrf(base) };
   },
 
@@ -154,7 +154,7 @@ export const folhaCalc = {
     const { valor: inss, faixa: faixaInss } = folhaCalc.calcularINSS(baseTributavel);
     detalheEventos.push({ codigo: '5000', descricao: 'Desconto INSS', tipo: 'desconto', valor: inss });
 
-    const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(baseTributavel, inss, dependentes);
+    const { valor: irrf, faixa: faixaIrrf } = folhaCalc.calcularIRRF(baseTributavel, inss, dependentes, descontosExtras);
     if (irrf > 0) detalheEventos.push({ codigo: '5001', descricao: 'Desconto IRRF', tipo: 'desconto', valor: irrf });
 
     // 9. FGTS (Encargo)

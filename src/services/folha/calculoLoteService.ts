@@ -29,7 +29,7 @@ export const calculoLoteService = {
         .from('colaboradores')
         .select(`
           *,
-          dependentes (id),
+          dependentes (id, tipo),
           eventos_variaveis (codigo, descricao, tipo, valor),
           contratos:contratos_trabalho(jornada_mensal, tipo_contrato)
         `)
