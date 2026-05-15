@@ -7,12 +7,15 @@ interface AdminRouteProps {
 }
 
 export function AdminRoute({ children }: AdminRouteProps) {
-  const { user, isReady, isAdmin } = useAuth();
+  const { user, isReady, isAdmin, loading } = useAuth();
 
-  if (!isReady) {
+  if (!isReady || (loading && !user)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Verificando privilégios...</p>
+        </div>
       </div>
     );
   }
