@@ -20,9 +20,13 @@ export function SystemHealthTab() {
   const runHealthcheck = async () => {
     setLoading('health');
     try {
-      const data = await edgeFunctionsService.healthcheck();
-      setHealthData(data);
-      toast.success(`Sistema: ${data.status}`);
+      const result = await edgeFunctionsService.healthcheck();
+      if (result.ok) {
+        setHealthData(result.value);
+        toast.success(`Sistema: ${(result.value as any).status}`);
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -33,9 +37,13 @@ export function SystemHealthTab() {
   const runCleanup = async () => {
     setLoading('cleanup');
     try {
-      const data = await edgeFunctionsService.limpezaDados();
-      setCleanupResult(data);
-      toast.success(`${data.total_cleaned} registros limpos!`);
+      const result = await edgeFunctionsService.limpezaDados();
+      if (result.ok) {
+        setCleanupResult(result.value);
+        toast.success(`${(result.value as any).total_cleaned} registros limpos!`);
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -46,9 +54,13 @@ export function SystemHealthTab() {
   const runBackup = async () => {
     setLoading('backup');
     try {
-      const data = await edgeFunctionsService.backupServidor();
-      setBackupResult(data);
-      toast.success(data.message);
+      const result = await edgeFunctionsService.backupServidor();
+      if (result.ok) {
+        setBackupResult(result.value);
+        toast.success((result.value as any).message);
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -59,8 +71,12 @@ export function SystemHealthTab() {
   const runAlertasDP = async () => {
     setLoading('alertas');
     try {
-      await edgeFunctionsService.dispararAlertasDP();
-      toast.success('Alertas de DP disparados com sucesso!');
+      const result = await edgeFunctionsService.dispararAlertasDP();
+      if (result.ok) {
+        toast.success('Alertas de DP disparados com sucesso!');
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -71,8 +87,12 @@ export function SystemHealthTab() {
   const runAgendamentos = async () => {
     setLoading('agendamentos');
     try {
-      const data = await edgeFunctionsService.processarAgendamentos();
-      toast.success(`${data.processados || 0} agendamentos processados!`);
+      const result = await edgeFunctionsService.processarAgendamentos();
+      if (result.ok) {
+        toast.success(`${(result.value as any).processados || 0} agendamentos processados!`);
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -83,8 +103,12 @@ export function SystemHealthTab() {
   const runSincronizarBitrix = async () => {
     setLoading('bitrix');
     try {
-      await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
-      toast.success('Sincronização Bitrix24 iniciada!');
+      const result = await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
+      if (result.ok) {
+        toast.success('Sincronização Bitrix24 iniciada!');
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -95,8 +119,12 @@ export function SystemHealthTab() {
   const runLimparCache = async () => {
     setLoading('cache');
     try {
-      await edgeFunctionsService.cache({ action: 'invalidate' });
-      toast.success('Cache do sistema limpo com sucesso!');
+      const result = await edgeFunctionsService.cache({ action: 'invalidate' });
+      if (result.ok) {
+        toast.success('Cache do sistema limpo com sucesso!');
+      } else {
+        toast.error(result.error.message);
+      }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
