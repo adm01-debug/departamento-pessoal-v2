@@ -8,8 +8,8 @@ const corsHeaders = {
 const FAIXAS_INSS = [
   { limite: 1518.00, aliquota: 0.075 },
   { limite: 2793.88, aliquota: 0.09 },
-  { limite: 5563.80, aliquota: 0.12 },
-  { limite: 7786.93, aliquota: 0.14 },
+  { limite: 4190.83, aliquota: 0.12 },
+  { limite: 8157.41, aliquota: 0.14 },
 ];
 
 const FAIXAS_IRRF = [
@@ -20,8 +20,14 @@ const FAIXAS_IRRF = [
   { limite: Infinity, aliquota: 0.275, deducao: 896.00 },
 ];
 
+const TETO_INSS = 8157.41;
+
 function calcINSS(salario: number): number {
-  let desc = 0, rest = salario;
+  if (salario <= 0) return 0;
+  let desc = 0;
+  const baseCalculo = Math.min(salario, TETO_INSS);
+  let rest = baseCalculo;
+  
   for (let i = 0; i < FAIXAS_INSS.length; i++) {
     const limAnt = i === 0 ? 0 : FAIXAS_INSS[i - 1].limite;
     const f = Math.min(rest, FAIXAS_INSS[i].limite - limAnt);
