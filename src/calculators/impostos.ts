@@ -30,7 +30,7 @@ export function calcularINSS(salarioBruto: number): number {
   return Math.round(descontoTotal * 100) / 100;
 }
 
-export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outrasDeducoes: number = 0): number {
+export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outrasDeducoes: number = 0, isPensaoAlimenticia: boolean = false): number {
   const descontoINSS = calcularINSS(salarioBruto);
   
   // Opção 1: Deduções Legais

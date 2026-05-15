@@ -28,7 +28,7 @@ export function FolhaComposicao({
   horasExtras = 0, dsr = 0, decimoTerceiro = 0, horasFalta = 0,
   faixaInss, faixaIrrf
 }: FolhaComposicaoProps) {
-  const valorFaltas = (totalProventos / 220) * horasFalta;
+  const valorFaltas = (totalProventos / 220) * (horasFalta || 0);
   
   const items = [
     { label: 'Salário Base + Adicionais', value: totalProventos - horasExtras - dsr - decimoTerceiro, color: 'bg-success', pct: totalProventos > 0 ? ((totalProventos - horasExtras - dsr - decimoTerceiro) / totalProventos) * 100 : 0 },
@@ -39,7 +39,7 @@ export function FolhaComposicao({
     { label: `INSS (Faixa: ${faixaInss})`, value: inss, color: 'bg-info', pct: totalProventos > 0 ? (inss / totalProventos) * 100 : 0 },
     { label: `IRRF (Faixa: ${faixaIrrf})`, value: irrf, color: 'bg-warning', pct: totalProventos > 0 ? (irrf / totalProventos) * 100 : 0 },
     { label: 'FGTS (Patronal)', value: fgts, color: 'bg-primary', pct: totalProventos > 0 ? (fgts / totalProventos) * 100 : 0 },
-    { label: 'Vale Transporte / PAT', value: totalDescontos - inss - irrf - valorFaltas, color: 'bg-destructive', pct: totalProventos > 0 ? ((totalDescontos - inss - irrf - valorFaltas) / totalProventos) * 100 : 0 },
+    { label: 'Vale Transporte / Benefícios', value: Math.max(0, totalDescontos - inss - irrf - valorFaltas), color: 'bg-destructive', pct: totalProventos > 0 ? (Math.max(0, totalDescontos - inss - irrf - valorFaltas) / totalProventos) * 100 : 0 },
   ].filter(item => item.value > 0 || ['Salário Base + Adicionais', 'FGTS (Patronal)'].includes(item.label));
 
   return (

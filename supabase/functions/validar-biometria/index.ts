@@ -29,7 +29,21 @@ serve(async (req: Request): Promise<Response> => {
       .single();
 
     if (cError || !colaborador?.foto_referencia_url) {
-      console.warn(`Colaborador ${colaboradorId} sem foto de referência. Pulando validação estrita.`);
+      console.warn(`Colaborador ${colaboradorId} sem foto de referência. Batida aceita condicionalmente.`);
+      
+      // Mesmo sem foto, registramos a falha de biometria para auditoria
+      await supabase
+        .from('batidas_ponto')
+        .update({
+          biometria_status: 'pendente',
+          biometria_score: 0,
+          device_metadata: { 
+            biometria_analise: 'Aviso: Foto de referência não cadastrada. Necessário atualização cadastral.',
+            validado_por: 'System Guard'
+          }
+        })
+        .eq('id', batidaId);
+
       return new Response(JSON.stringify({ 
         valid: true, 
         message: 'Aviso: Foto de referência não cadastrada. Batida aceita, mas pendente de auditoria.' 

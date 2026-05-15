@@ -29,7 +29,7 @@ export const calculoLoteService = {
         .from('colaboradores')
         .select(`
           *,
-          dependentes (id),
+          dependentes (id, tipo),
           eventos_variaveis (codigo, descricao, tipo, valor),
           contratos:contratos_trabalho(jornada_mensal, tipo_contrato)
         `)
@@ -82,7 +82,7 @@ export const calculoLoteService = {
       // 3. Processar cada colaborador
       for (const colab of colaboradores) {
         try {
-          const dependentesCount = colab.dependentes?.length || 0;
+          const dependentesCount = colab.dependentes?.filter((d: any) => d.tipo === 'filho' || d.tipo === 'enteado').length || 0;
           const eventosVariaveis = colab.eventos_variaveis || [];
           const jornada = colab.contratos?.[0]?.jornada_mensal || 220;
 
@@ -106,25 +106,24 @@ export const calculoLoteService = {
           }
 
           // 3.2 Buscar Benefícios Ativos (Vale Transporte / Vale Alimentação / Refeição)
+          // Tenta na tabela unificada 'beneficios_colaborador'
           const { data: beneficiosVinculos } = await (supabase as any)
-            .from('colaborador_beneficios')
+            .from('beneficios_colaborador')
             .select(`
               *,
-              beneficio:beneficios(*)
+              beneficio:tipos_beneficio(*)
             `)
             .eq('colaborador_id', colab.id)
-            .eq('status', 'ativo');
+            .eq('ativo', true);
 
           const beneficiosEventos: any[] = [];
-          if (beneficiosVinculos) {
+          if (beneficiosVinculos && beneficiosVinculos.length > 0) {
             beneficiosVinculos.forEach((v: any) => {
               if (v.beneficio) {
-                // Cálculo de desconto de VT (6% sobre salário base limitado ao custo do benefício)
                 if (v.beneficio.tipo === 'VT') {
-                  const custoVT = Number(v.valor_colaborador || 0);
+                  const custoVT = Number(v.valor || 0);
                   const descontoMaximoVT = Number(colab.salario_base || 0) * 0.06;
                   const valorDescontoVT = Math.min(custoVT, descontoMaximoVT);
-                  
                   if (valorDescontoVT > 0) {
                     beneficiosEventos.push({
                       codigo: '5010',
@@ -134,18 +133,58 @@ export const calculoLoteService = {
                     });
                   }
                 }
-                
-                // Outros descontos de benefícios (PAT, etc.)
-                if (v.valor_colaborador && v.beneficio.tipo !== 'VT') {
+                if (v.desconto && v.beneficio.tipo !== 'VT') {
                    beneficiosEventos.push({
                       codigo: '5020',
                       descricao: `Coparticipação ${v.beneficio.nome}`,
                       tipo: 'desconto',
-                      valor: Number(v.valor_colaborador)
+                      valor: Number(v.desconto)
                    });
                 }
               }
             });
+          } else {
+            // Fallback para tabelas individuais legacy
+            const { data: vtLegacy } = await (supabase as any)
+              .from('vales_transporte')
+              .select('*')
+              .eq('colaborador_id', colab.id)
+              .eq('optante', true)
+              .maybeSingle();
+
+            if (vtLegacy) {
+              const custoVT = Number(vtLegacy.valor_mensal || 0);
+              const descontoMaximoVT = Number(colab.salario_base || 0) * 0.06;
+              const valorDescontoVT = Math.min(custoVT, descontoMaximoVT);
+              if (valorDescontoVT > 0) {
+                beneficiosEventos.push({
+                  codigo: '5010',
+                  descricao: 'Desconto Vale Transporte (Legacy)',
+                  tipo: 'desconto',
+                  valor: Math.round(valorDescontoVT * 100) / 100
+                });
+              }
+            }
+
+            const { data: vaLegacy } = await (supabase as any)
+              .from('vales_alimentacao')
+              .select('*')
+              .eq('colaborador_id', colab.id)
+              .eq('ativo', true);
+
+            if (vaLegacy) {
+              vaLegacy.forEach((v: any) => {
+                const desc = v.valor_mensal ? v.valor_mensal * 0.20 : 0;
+                if (desc > 0) {
+                  beneficiosEventos.push({
+                    codigo: '5020',
+                    descricao: `Coparticipação ${v.tipo || 'Ticket'} (Legacy)`,
+                    tipo: 'desconto',
+                    valor: Math.round(desc * 100) / 100
+                  });
+                }
+              });
+            }
           }
 
           const res = folhaCalc.processar(Number(colab.salario_base || 0), {
@@ -153,7 +192,8 @@ export const calculoLoteService = {
             eventos: [...eventosVariaveis, ...beneficiosEventos],
             horasExtras50: totalHE,
             horasFalta: totalFaltas,
-            jornada
+            jornada,
+            descontosExtras: 0
           });
 
           // Salva o item da folha
