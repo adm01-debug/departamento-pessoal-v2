@@ -76,10 +76,10 @@ export function useESocial() {
   });
 
   const enviarLoteMutation = useMutation({
-    mutationFn: async (eventoIds: string[]) => {
+    mutationFn: async ({ eventoIds, empresaId }: { eventoIds: string[]; empresaId: string }) => {
       const results: any[] = [];
       for (const id of eventoIds) {
-        results.push(await esocialService.enviarEvento(id, ''));
+        results.push(await esocialService.enviarEvento(id, empresaId));
       }
       return results;
     },
