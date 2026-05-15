@@ -48,318 +48,318 @@ export * from './calculoBeneficiosService';
 
 
 export const colaboradorService = {
-  async list(empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let query = supabase.from('colaboradores').select('*').order('nome_completo');
-      if (empresaId) query = query.eq('empresa_id', empresaId);
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    })());
+  async list(empresaId?: string): Promise<any[]> {
+    
+    let query = supabase.from('colaboradores').select('*').order('nome_completo');
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  
   },
   listar: async (empresaId?: string) => colaboradorService.list(empresaId),
-  async buscarPorId(id: string): Promise<Result<any | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('colaboradores').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    })());
+  async buscarPorId(id: string): Promise<any | null> {
+    
+    const { data, error } = await supabase.from('colaboradores').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  
   },
   async getById(id: string) { return colaboradorService.buscarPorId(id); },
-  async criar(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('colaboradores').insert(d as any).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de colaborador foi retornado.');
-      return data;
-    })());
+  async criar(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>): Promise<any> {
+    
+    const { data, error } = await supabase.from('colaboradores').insert(d as any).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de colaborador foi retornado.');
+    return data;
+  
   },
   async create(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>) { return colaboradorService.criar(d); },
-  async atualizar(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data: current } = await supabase.from('colaboradores').select('version').eq('id', id).single();
-      const { data, error } = await supabase
-        .from('colaboradores')
-        .update(d as any)
-        .eq('id', id)
-        .eq('version', current?.version || 1)
-        .select()
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Falha ao atualizar colaborador.');
-      return data;
-    })());
+  async atualizar(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>): Promise<any> {
+    
+    const { data: current } = await supabase.from('colaboradores').select('version').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('colaboradores')
+      .update(d as any)
+      .eq('id', id)
+      .eq('version', current?.version || 1)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Falha ao atualizar colaborador.');
+    return data;
+  
   },
   async update(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>) { return colaboradorService.atualizar(id, d); },
-  async excluir(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('colaboradores').delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluir(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('colaboradores').delete().eq('id', id);
+    if (error) throw error;
+  
   },
 };
 
 export const empresaService = {
-  async list(): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('empresas').select('*').order('razao_social');
-      if (error) throw error;
-      return data || [];
-    })());
+  async list(): Promise<any[]> {
+    
+    const { data, error } = await supabase.from('empresas').select('*').order('razao_social');
+    if (error) throw error;
+    return data || [];
+  
   },
   listar: async () => empresaService.list(),
-  async buscarPorId(id: string): Promise<Result<any | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('empresas').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    })());
+  async buscarPorId(id: string): Promise<any | null> {
+    
+    const { data, error } = await supabase.from('empresas').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  
   },
-  async criar(d: Partial<Database['public']['Tables']['empresas']['Insert']>): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('empresas').insert(d as any).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de empresa foi retornado.');
-      return data;
-    })());
+  async criar(d: Partial<Database['public']['Tables']['empresas']['Insert']>): Promise<any> {
+    
+    const { data, error } = await supabase.from('empresas').insert(d as any).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de empresa foi retornado.');
+    return data;
+  
   },
-  async atualizar(id: string, d: Partial<Database['public']['Tables']['empresas']['Update']>): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('empresas').update(d as any).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Falha ao atualizar empresa.');
-      return data;
-    })());
+  async atualizar(id: string, d: Partial<Database['public']['Tables']['empresas']['Update']>): Promise<any> {
+    
+    const { data, error } = await supabase.from('empresas').update(d as any).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Falha ao atualizar empresa.');
+    return data;
+  
   },
-  async excluir(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('empresas').delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluir(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('empresas').delete().eq('id', id);
+    if (error) throw error;
+  
   },
 };
 
 export const feriasService = {
-  async listSolicitacoes(empresaId?: string, params?: { page?: number; limit?: number; search?: string; status?: string }): Promise<Result<{ data: any[]; count: number }>> {
-    return toResult((async () => {
-      const { page = 1, limit = 10, search, status } = params || {};
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+  async listSolicitacoes(empresaId?: string, params?: { page?: number; limit?: number; search?: string; status?: string }): Promise<{ data: any[]; count: number }> {
+    
+    const { page = 1, limit = 10, search, status } = params || {};
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-      let query = supabase
+    let query = supabase
+      .from('ferias')
+      .select('*, colaborador:colaboradores(nome_completo, avatar_url)', { count: 'exact' });
+
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    if (status && status !== 'all') query = query.eq('status', status);
+    
+    if (search && search.length >= 3) {
+      query = supabase
         .from('ferias')
-        .select('*, colaborador:colaboradores(nome_completo, avatar_url)', { count: 'exact' });
-
+        .select('*, colaborador:colaboradores!inner(nome_completo, avatar_url)', { count: 'exact' })
+        .ilike('colaborador.nome_completo', `%${search}%`);
+      
       if (empresaId) query = query.eq('empresa_id', empresaId);
       if (status && status !== 'all') query = query.eq('status', status);
-      
-      if (search && search.length >= 3) {
-        query = supabase
-          .from('ferias')
-          .select('*, colaborador:colaboradores!inner(nome_completo, avatar_url)', { count: 'exact' })
-          .ilike('colaborador.nome_completo', `%${search}%`);
-        
-        if (empresaId) query = query.eq('empresa_id', empresaId);
-        if (status && status !== 'all') query = query.eq('status', status);
-      }
+    }
 
-      const { data, error, count } = await query
-        .order('data_inicio', { ascending: false })
-        .range(from, to);
-        
-      if (error) throw error;
+    const { data, error, count } = await query
+      .order('data_inicio', { ascending: false })
+      .range(from, to);
       
-      return { data: (data as any[]) || [], count: count || 0 };
-    })());
+    if (error) throw error;
+    
+    return { data: (data as any[]) || [], count: count || 0 };
+  
   },
-  async syncWithHub(empresaId: string): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('ferias')
-        .select('id, updated_at')
-        .eq('empresa_id', empresaId)
-        .order('updated_at', { ascending: false })
-        .limit(1);
-      
-      if (error) throw error;
-      
-      const hasChanges = Math.random() > 0.7; 
-      await new Promise(resolve => setTimeout(resolve, 800)); 
-      
-      return { 
-        success: true, 
-        lastSync: new Date().toISOString(),
-        recordsUpdated: hasChanges ? Math.floor(Math.random() * 3) + 1 : 0 
-      };
-    })());
+  async syncWithHub(empresaId: string): Promise<any> {
+    
+    const { data, error } = await supabase
+      .from('ferias')
+      .select('id, updated_at')
+      .eq('empresa_id', empresaId)
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    
+    if (error) throw error;
+    
+    const hasChanges = Math.random() > 0.7; 
+    await new Promise(resolve => setTimeout(resolve, 800)); 
+    
+    return { 
+      success: true, 
+      lastSync: new Date().toISOString(),
+      recordsUpdated: hasChanges ? Math.floor(Math.random() * 3) + 1 : 0 
+    };
+  
   },
   listar: async (empresaId?: string) => feriasService.listSolicitacoes(empresaId),
-  async buscarPorId(id: string): Promise<Result<any | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('ferias').select('*, colaborador:colaboradores(nome_completo)').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    })());
+  async buscarPorId(id: string): Promise<any | null> {
+    
+    const { data, error } = await supabase.from('ferias').select('*, colaborador:colaboradores(nome_completo)').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  
   },
-  async criar(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('ferias').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de férias foi retornado.');
-      return data;
-    })());
+  async criar(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('ferias').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de férias foi retornado.');
+    return data;
+  
   },
-  async atualizar(id: string, d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('ferias').update(d).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Falha ao atualizar férias.');
-      return data;
-    })());
+  async atualizar(id: string, d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('ferias').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Falha ao atualizar férias.');
+    return data;
+  
   },
-  async excluir(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluir(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').delete().eq('id', id);
+    if (error) throw error;
+  
   },
-  async aprovar(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').update({ status: 'aprovada' } as any).eq('id', id);
-      if (error) throw error;
-    })());
+  async aprovar(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').update({ status: 'aprovada' } as any).eq('id', id);
+    if (error) throw error;
+  
   },
-  async aprovarGestor(id: string, userId?: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').update({
-        status_aprovacao_gestor: 'aprovado',
-        aprovado_gestor: true,
-        aprovado_gestor_em: new Date().toISOString(),
-        aprovado_gestor_por: userId || null,
-      } as any).eq('id', id);
-      if (error) throw error;
+  async aprovarGestor(id: string, userId?: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').update({
+      status_aprovacao_gestor: 'aprovado',
+      aprovado_gestor: true,
+      aprovado_gestor_em: new Date().toISOString(),
+      aprovado_gestor_por: userId || null,
+    } as any).eq('id', id);
+    if (error) throw error;
 
-      await supabase.from('ferias_aprovacoes_log' as any).insert({
-        ferias_id: id,
-        nivel: 'gestor',
-        aprovador_id: userId,
-        status: 'aprovado'
-      });
-    })());
+    await supabase.from('ferias_aprovacoes_log' as any).insert({
+      ferias_id: id,
+      nivel: 'gestor',
+      aprovador_id: userId,
+      status: 'aprovado'
+    });
+  
   },
-  async aprovarRH(id: string, userId?: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').update({
-        status_aprovacao_rh: 'aprovado',
-        aprovado_rh: true,
-        aprovado_rh_em: new Date().toISOString(),
-        aprovado_rh_por: userId || null,
-        status: 'aprovada',
-      } as any).eq('id', id);
-      if (error) throw error;
+  async aprovarRH(id: string, userId?: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').update({
+      status_aprovacao_rh: 'aprovado',
+      aprovado_rh: true,
+      aprovado_rh_em: new Date().toISOString(),
+      aprovado_rh_por: userId || null,
+      status: 'aprovada',
+    } as any).eq('id', id);
+    if (error) throw error;
 
-      await supabase.from('ferias_aprovacoes_log' as any).insert({
-        ferias_id: id,
-        nivel: 'rh',
-        aprovador_id: userId,
-        status: 'aprovado'
-      });
-    })());
+    await supabase.from('ferias_aprovacoes_log' as any).insert({
+      ferias_id: id,
+      nivel: 'rh',
+      aprovador_id: userId,
+      status: 'aprovado'
+    });
+  
   },
-  async listPeriodosAquisitivos(colaboradorId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('periodos_aquisitivos')
-        .select('*')
-        .eq('colaborador_id', colaboradorId)
-        .order('data_inicio', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    })());
+  async listPeriodosAquisitivos(colaboradorId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase
+      .from('periodos_aquisitivos')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .order('data_inicio', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  
   },
-  async criarPeriodoAquisitivo(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('periodos_aquisitivos').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de período aquisitivo foi retornado.');
-      return data;
-    })());
+  async criarPeriodoAquisitivo(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('periodos_aquisitivos').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de período aquisitivo foi retornado.');
+    return data;
+  
   },
-  async atualizarPeriodoAquisitivo(id: string, d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Falha ao atualizar período aquisitivo.');
-      return data;
-    })());
+  async atualizarPeriodoAquisitivo(id: string, d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Falha ao atualizar período aquisitivo.');
+    return data;
+  
   },
-  async excluirPeriodoAquisitivo(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('periodos_aquisitivos').delete().eq('id', id);
-      if (error) throw error;
-    })());
-  },
-
-  async enviarContabilidade(id: string, userId?: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').update({
-        enviado_contabilidade: true,
-        enviado_contabilidade_em: new Date().toISOString(),
-        enviado_contabilidade_por: userId || null,
-      } as any).eq('id', id);
-      if (error) throw error;
-    })());
-  },
-  async rejeitar(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').update({ status: 'rejeitada' } as any).eq('id', id);
-      if (error) throw error;
-    })());
-  },
-  async cancelar(id: string, userId?: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('ferias').update({
-        cancelado: true,
-        cancelado_em: new Date().toISOString(),
-        cancelado_por: userId || null,
-        status: 'cancelada',
-      } as any).eq('id', id);
-      if (error) throw error;
-    })());
+  async excluirPeriodoAquisitivo(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('periodos_aquisitivos').delete().eq('id', id);
+    if (error) throw error;
+  
   },
 
-  async getAprovacoesLog(feriasId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('ferias_aprovacoes_log' as any)
-        .select('*')
-        .eq('ferias_id', feriasId)
-        .order('created_at', { ascending: true });
-      
-      if (error) throw error;
-      return data || [];
-    })());
+  async enviarContabilidade(id: string, userId?: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').update({
+      enviado_contabilidade: true,
+      enviado_contabilidade_em: new Date().toISOString(),
+      enviado_contabilidade_por: userId || null,
+    } as any).eq('id', id);
+    if (error) throw error;
+  
+  },
+  async rejeitar(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').update({ status: 'rejeitada' } as any).eq('id', id);
+    if (error) throw error;
+  
+  },
+  async cancelar(id: string, userId?: string): Promise<void> {
+    
+    const { error } = await supabase.from('ferias').update({
+      cancelado: true,
+      cancelado_em: new Date().toISOString(),
+      cancelado_por: userId || null,
+      status: 'cancelada',
+    } as any).eq('id', id);
+    if (error) throw error;
+  
+  },
+
+  async getAprovacoesLog(feriasId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase
+      .from('ferias_aprovacoes_log' as any)
+      .select('*')
+      .eq('ferias_id', feriasId)
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  
   }
 };
 
 export const folhaService = {
-  async list(competencia?: string, empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false }).limit(500);
-      if (empresaId) query = query.eq('empresa_id', empresaId);
-      if (competencia) query = query.eq('competencia', competencia);
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    })());
+  async list(competencia?: string, empresaId?: string): Promise<any[]> {
+    
+    let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false }).limit(500);
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    if (competencia) query = query.eq('competencia', competencia);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  
   },
   listar: async (competencia?: string, empresaId?: string) => folhaService.list(competencia, empresaId),
-  async buscarPorId(id: string): Promise<Result<any | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('folhas_pagamento').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    })());
+  async buscarPorId(id: string): Promise<any | null> {
+    
+    const { data, error } = await supabase.from('folhas_pagamento').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  
   },
 };
 
@@ -368,67 +368,67 @@ export { catalogoCursoService } from './catalogoCursoService';
 export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
 
 export const documentoService = {
-  async listar(colaboradorId?: string, empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let query: any = supabase.from('documentos').select('*, colaborador:colaboradores(id, nome_completo, cpf)').order('created_at', { ascending: false }).limit(500);
-      if (empresaId) query = query.eq('empresa_id', empresaId);
-      if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    })());
+  async listar(colaboradorId?: string, empresaId?: string): Promise<any[]> {
+    
+    let query: any = supabase.from('documentos').select('*, colaborador:colaboradores(id, nome_completo, cpf)').order('created_at', { ascending: false }).limit(500);
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    if (colaboradorId) query = query.eq('colaborador_id', colaboradorId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  
   },
-  async criar(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('documentos').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de documento foi retornado.');
-      return data;
-    })());
+  async criar(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('documentos').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de documento foi retornado.');
+    return data;
+  
   },
-  async excluir(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('documentos').delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluir(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('documentos').delete().eq('id', id);
+    if (error) throw error;
+  
   },
 };
 
 export const admissaoService = {
-  async listar(empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let query = supabase.from('admissoes').select('*').order('data_prevista', { ascending: false });
-      if (empresaId) query = query.eq('empresa_id', empresaId);
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    })());
+  async listar(empresaId?: string): Promise<any[]> {
+    
+    let query = supabase.from('admissoes').select('*').order('data_prevista', { ascending: false });
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  
   },
   async getAll(empresaId?: string) { return admissaoService.listar(empresaId); },
-  async getById(id: string): Promise<Result<any | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('admissoes').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    })());
+  async getById(id: string): Promise<any | null> {
+    
+    const { data, error } = await supabase.from('admissoes').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  
   },
   async buscarPorId(id: string) { return admissaoService.getById(id); },
-  async criar(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('admissoes').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de admissão foi retornado.');
-      return data;
-    })());
+  async criar(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('admissoes').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de admissão foi retornado.');
+    return data;
+  
   },
   async create(d: any) { return admissaoService.criar(d); },
-  async atualizar(id: string, d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('admissoes').update(d).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Falha ao atualizar admissão.');
-      return data;
-    })());
+  async atualizar(id: string, d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('admissoes').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Falha ao atualizar admissão.');
+    return data;
+  
   },
   async update(id: string, d: any) { return admissaoService.atualizar(id, d); },
   async concluir(id: string) { return admissaoService.atualizar(id, { etapa: 'concluida' }); },

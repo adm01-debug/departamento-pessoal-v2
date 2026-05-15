@@ -2,8 +2,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { pontoMonitorService } from './pontoMonitorService';
 import CryptoJS from 'crypto-js';
 import { format } from 'date-fns';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3;
   const φ1 = (lat1 * Math.PI) / 180;
@@ -20,17 +18,17 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number): nu
 }
 
 export const pontoService = {
-  async getSettings(empresaId: string): Promise<Result<any | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('configuracoes_ponto')
-        .select('*')
-        .eq('empresa_id', empresaId)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data;
-    })());
+  async getSettings(empresaId: string): Promise<any | null> {
+    
+    const { data, error } = await supabase
+      .from('configuracoes_ponto')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  
   },
 
   async registrar(
@@ -44,13 +42,8 @@ export const pontoService = {
       metadata?: Record<string, any>;
       foto_biometria_url?: string | null;
     }
-  ): Promise<Result<any>> {
-    if (!colaboradorId) return Err({
-      type: 'VALIDATION_ERROR',
-      severity: 'error',
-      message: 'Colaborador é obrigatório para registrar ponto.',
-      timestamp: new Date()
-    });
+  ): Promise<any> {
+    if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
     
     try {
       const now = new Date();
@@ -75,12 +68,7 @@ export const pontoService = {
         .maybeSingle();
 
       if (duplicate) {
-        return Err({
-          type: 'VALIDATION_ERROR',
-          severity: 'warning',
-          message: 'Já existe um registro idêntico para este horário. Aguarde um minuto.',
-          timestamp: new Date()
-        });
+        throw new Error('Já existe um registro idêntico para este horário. Aguarde um minuto.');
       }
 
       const { data: colab, error: colabError } = await supabase
@@ -160,54 +148,49 @@ export const pontoService = {
 
       if (insertError) throw insertError;
       if (!batida) throw new Error('Nenhum registro de batida de ponto foi retornado.');
-      return Ok(batida);
+      return (batida);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: e.message || 'Falha ao registrar ponto',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Falha ao registrar ponto');
     }
   },
 
-  async buscarRegistroHoje(colaboradorId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const today = format(new Date(), 'yyyy-MM-dd');
-      const { data, error } = await supabase
-        .from('batidas_ponto')
-        .select('*')
-        .eq('colaborador_id', colaboradorId)
-        .eq('data', today)
-        .order('ordem', { ascending: true });
-      if (error) throw error;
-      return data || [];
-    })());
+  async buscarRegistroHoje(colaboradorId: string): Promise<any[]> {
+    
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const { data, error } = await supabase
+      .from('batidas_ponto')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .eq('data', today)
+      .order('ordem', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  
   },
 
-  async buscarRegistrosSemana(colaboradorId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      const { data, error } = await supabase
-        .from('registros_ponto')
-        .select('*')
-        .eq('colaborador_id', colaboradorId)
-        .gte('data', weekAgo.toISOString().split('T')[0])
-        .order('data', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    })());
+  async buscarRegistrosSemana(colaboradorId: string): Promise<any[]> {
+    
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const { data, error } = await supabase
+      .from('registros_ponto')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .gte('data', weekAgo.toISOString().split('T')[0])
+      .order('data', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  
   },
   
-  async validarBiometria(batidaId: string, colaboradorId: string, fotoBase64: string): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.functions.invoke('validar-biometria', {
-        body: { batidaId, colaboradorId, fotoBase64 }
-      });
-      if (error) throw error;
-      return data;
-    })());
+  async validarBiometria(batidaId: string, colaboradorId: string, fotoBase64: string): Promise<any> {
+    
+    const { data, error } = await supabase.functions.invoke('validar-biometria', {
+      body: { batidaId, colaboradorId, fotoBase64 }
+    });
+    if (error) throw error;
+    return data;
+  
   }
 };
 

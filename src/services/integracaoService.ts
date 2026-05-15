@@ -1,6 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export interface CnabConfig {
   id: string;
   empresa_id: string;
@@ -23,59 +21,59 @@ export interface WebhookConfig {
 }
 
 export const cnabService = {
-  async getConfig(): Promise<Result<CnabConfig | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('cnab_configuracoes' as any).select('*').limit(1).maybeSingle();
-      if (error) throw error;
-      return data as unknown as CnabConfig;
-    })());
+  async getConfig(): Promise<CnabConfig | null> {
+    
+    const { data, error } = await supabase.from('cnab_configuracoes' as any).select('*').limit(1).maybeSingle();
+    if (error) throw error;
+    return data as unknown as CnabConfig;
+  
   },
   
-  async saveConfig(d: any): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('cnab_configuracoes' as any).upsert(d);
-      if (error) throw error;
-    })());
+  async saveConfig(d: any): Promise<void> {
+    
+    const { error } = await supabase.from('cnab_configuracoes' as any).upsert(d);
+    if (error) throw error;
+  
   },
   
-  async getRemessas(): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('cnab_remessas' as any).select('*').order('created_at', { ascending: false }).limit(50);
-      if (error) throw error;
-      return data || [];
-    })());
+  async getRemessas(): Promise<any[]> {
+    
+    const { data, error } = await supabase.from('cnab_remessas' as any).select('*').order('created_at', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data || [];
+  
   }
 };
 
 export const webhookService = {
-  async listar(): Promise<Result<WebhookConfig[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('webhooks_config' as any).select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      return (data || []) as unknown as WebhookConfig[];
-    })());
+  async listar(): Promise<WebhookConfig[]> {
+    
+    const { data, error } = await supabase.from('webhooks_config' as any).select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as unknown as WebhookConfig[];
+  
   },
   
-  async criar(d: any): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('webhooks_config' as any).insert(d);
-      if (error) throw error;
-    })());
+  async criar(d: any): Promise<void> {
+    
+    const { error } = await supabase.from('webhooks_config' as any).insert(d);
+    if (error) throw error;
+  
   },
   
-  async excluir(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('webhooks_config' as any).delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluir(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('webhooks_config' as any).delete().eq('id', id);
+    if (error) throw error;
+  
   },
   
-  async getLogs(): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('webhook_logs' as any).select('*').order('created_at', { ascending: false }).limit(50);
-      if (error) throw error;
-      return data || [];
-    })());
+  async getLogs(): Promise<any[]> {
+    
+    const { data, error } = await supabase.from('webhook_logs' as any).select('*').order('created_at', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data || [];
+  
   }
 };
 

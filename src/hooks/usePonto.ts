@@ -11,9 +11,7 @@ export function usePonto(colaboradorId?: string) {
     queryKey: ['registros-ponto', empresaAtual?.id, colaboradorId],
     enabled: !!empresaAtual?.id && !!colaboradorId,
     queryFn: async () => {
-      const res = await pontosService.listar(colaboradorId!, undefined, undefined);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await pontosService.listar(colaboradorId!, undefined, undefined);
     },
   });
 
@@ -21,9 +19,7 @@ export function usePonto(colaboradorId?: string) {
     queryKey: ['ponto-hoje', colaboradorId],
     enabled: !!colaboradorId,
     queryFn: async () => {
-      const res = await pontosService.buscarRegistroHoje(colaboradorId!);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await pontosService.buscarRegistroHoje(colaboradorId!);
     },
   });
 

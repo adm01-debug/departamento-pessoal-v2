@@ -8,9 +8,7 @@ const useResultQuery = (key: any[], fn: () => Promise<any>, enabled: boolean = t
   useQuery({
     queryKey: key,
     queryFn: async () => {
-      const res = await fn();
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await fn();
     },
     enabled
   });
@@ -46,9 +44,7 @@ export function useCriarCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await service.criarCentroCusto(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.criarCentroCusto(data);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
@@ -58,9 +54,7 @@ export function useAtualizarCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
-      const res = await service.atualizarCentroCusto(id, dados);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.atualizarCentroCusto(id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
@@ -70,9 +64,7 @@ export function useExcluirCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await service.excluirCentroCusto(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.excluirCentroCusto(id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
@@ -89,9 +81,7 @@ export function useCriarContaBancaria() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await service.criarContaBancaria(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.criarContaBancaria(data);
     },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['contas-bancarias', vars.colaborador_id] }),
   });
@@ -101,9 +91,7 @@ export function useAtualizarContaBancaria() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
-      const res = await service.atualizarContaBancaria(id, dados);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.atualizarContaBancaria(id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias'] }),
   });
@@ -113,9 +101,7 @@ export function useExcluirContaBancaria(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await service.excluirContaBancaria(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.excluirContaBancaria(id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias', colaboradorId] }),
   });
@@ -132,9 +118,7 @@ export function useSalvarDadosEstagiario() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ colaboradorId, dados }: { colaboradorId: string; dados: Record<string, unknown> }) => {
-      const res = await service.salvarDadosEstagiario(colaboradorId, dados);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.salvarDadosEstagiario(colaboradorId, dados);
     },
     onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['dados-estagiario', vars.colaboradorId] }),
   });
@@ -151,9 +135,7 @@ export function useCriarDocumentoPessoal() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await service.criarDocumentoPessoal(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.criarDocumentoPessoal(data);
     },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['documentos-pessoais', vars.colaborador_id] }),
   });
@@ -163,9 +145,7 @@ export function useExcluirDocumentoPessoal(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await service.excluirDocumentoPessoal(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.excluirDocumentoPessoal(id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['documentos-pessoais', colaboradorId] }),
   });
@@ -182,9 +162,7 @@ export function useCriarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await service.criarFeriasAprovacao(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.criarFeriasAprovacao(data);
     },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes', vars.ferias_id] }),
   });
@@ -194,9 +172,7 @@ export function useAtualizarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
-      const res = await service.atualizarFeriasAprovacao(id, dados);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.atualizarFeriasAprovacao(id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes'] }),
   });
@@ -213,9 +189,7 @@ export function useCriarFeriasArquivo() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await service.criarFeriasArquivo(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.criarFeriasArquivo(data);
     },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['ferias-arquivos', vars.ferias_id] }),
   });
@@ -232,9 +206,7 @@ export function useVincularDependenteBeneficio() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const res = await service.vincularDependenteBeneficio(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.vincularDependenteBeneficio(data);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes-beneficios'] }),
   });
@@ -244,9 +216,7 @@ export function useDesvincularDependenteBeneficio() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ dependenteId, beneficioId }: { dependenteId: string; beneficioId: string }) => {
-      const res = await service.desvincularDependenteBeneficio(dependenteId, beneficioId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await service.desvincularDependenteBeneficio(dependenteId, beneficioId);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes-beneficios'] }),
   });

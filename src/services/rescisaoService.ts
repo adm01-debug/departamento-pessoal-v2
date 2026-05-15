@@ -1,13 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { calcularRescisao } from '@/utils/rescisaoCalc';
 import { auditLogger } from '@/utils/auditLogger';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 // Ordem lógica das etapas para validação
 const ORDEM_ETAPAS = ['comunicacao', 'documentacao', 'calculo', 'homologacao', 'pagamento', 'finalizado'];
 
 export const rescisaoService = {
-  async validarTransicao(id: string, novaEtapa: string): Promise<Result<boolean>> {
+  async validarTransicao(id: string, novaEtapa: string): Promise<boolean> {
     try {
       const { data: atual, error } = await supabase
         .from('desligamentos')
@@ -15,52 +13,27 @@ export const rescisaoService = {
         .eq('id', id)
         .single();
       
-      if (error) return Err({
-        type: 'DATABASE_ERROR',
-        severity: 'error',
-        message: 'Erro ao buscar dados do desligamento',
-        timestamp: new Date()
-      });
+      if (error) throw new Error('Erro ao buscar dados do desligamento');
       
       const indexAtual = ORDEM_ETAPAS.indexOf(atual.etapa || 'comunicacao');
       const indexNova = ORDEM_ETAPAS.indexOf(novaEtapa);
       
       if (indexNova > indexAtual + 1) {
-        return Err({
-          type: 'VALIDATION_ERROR',
-          severity: 'warning',
-          message: `Transição bloqueada: Você deve concluir a etapa '${ORDEM_ETAPAS[indexAtual]}' e passar por '${ORDEM_ETAPAS[indexAtual + 1]}' antes de chegar em '${novaEtapa}'.`,
-          timestamp: new Date()
-        });
+        throw new Error(`Transição bloqueada: Você deve concluir a etapa '${ORDEM_ETAPAS[indexAtual]}' e passar por '${ORDEM_ETAPAS[indexAtual + 1]}' antes de chegar em '${novaEtapa}'.`);
       }
       
       if (novaEtapa === 'homologacao' && atual.status !== 'calculado') {
-        return Err({
-          type: 'VALIDATION_ERROR',
-          severity: 'warning',
-          message: 'A rescisão precisa estar com status "calculado" para prosseguir para a homologação.',
-          timestamp: new Date()
-        });
+        throw new Error('A rescisão precisa estar com status "calculado" para prosseguir para a homologação.');
       }
 
-      return Ok(true);
+      return (true);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: e.message || 'Erro inesperado na validação de transição',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Erro inesperado na validação de transição');
     }
   },
 
-  async calcularESalvar(id: string, params: any): Promise<Result<any>> {
-    if (!id) return Err({
-      type: 'VALIDATION_ERROR',
-      severity: 'error',
-      message: 'ID do desligamento é obrigatório',
-      timestamp: new Date()
-    });
+  async calcularESalvar(id: string, params: any): Promise<any> {
+    if (!id) throw new Error('ID do desligamento é obrigatório');
 
     try {
       // 1. Buscar dados atuais para o log e validar transição
@@ -132,18 +105,13 @@ export const rescisaoService = {
         },
       });
 
-      return Ok(novo);
+      return (novo);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: e.message || 'Erro crítico ao processar cálculo de rescisão',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Erro crítico ao processar cálculo de rescisão');
     }
   },
 
-  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<Result<any>> {
+  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<any> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -153,12 +121,7 @@ export const rescisaoService = {
       
       if (fetchError) throw fetchError;
       if (!d.valor_liquido || !d.checklist_calculo_rescisao) {
-        return Err({
-          type: 'VALIDATION_ERROR',
-          severity: 'warning',
-          message: 'A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.',
-          timestamp: new Date()
-        });
+        throw new Error('A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.');
       }
 
       // Registrar aprovação
@@ -203,18 +166,13 @@ export const rescisaoService = {
         },
       });
 
-      return Ok(data);
+      return (data);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: e.message || 'Erro ao processar homologação',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Erro ao processar homologação');
     }
   },
 
-  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<Result<any>> {
+  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<any> {
     try {
       const hash = btoa(`rescisao-${id}-${tipo}-${new Date().getTime()}`).slice(0, 32);
       const updateData: any = {};
@@ -245,18 +203,13 @@ export const rescisaoService = {
         dados_novos: { tipo_assinatura: tipo, hash }
       });
 
-      return Ok(data);
+      return (data);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao realizar assinatura digital',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao realizar assinatura digital');
     }
   },
 
-  async processarPagamento(id: string, comprovanteUrl?: string): Promise<Result<any>> {
+  async processarPagamento(id: string, comprovanteUrl?: string): Promise<any> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -297,14 +250,9 @@ export const rescisaoService = {
         dados_novos: { status: 'pago', etapa: 'finalizado', colaborador_desativado: true },
       });
 
-      return Ok(data);
+      return (data);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: 'Erro ao processar pagamento de rescisão',
-        timestamp: new Date()
-      });
+      throw new Error('Erro ao processar pagamento de rescisão');
     }
   }
 };

@@ -1,7 +1,5 @@
 // V22: NotificacoesService - Real implementation
 import { supabase } from '@/integrations/supabase/client';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export interface NotificationPayload {
   titulo: string;
   mensagem: string;
@@ -12,29 +10,29 @@ export interface NotificationPayload {
   entidade_tipo?: string;
 }
 
-export async function criarNotificacao(payload: NotificationPayload): Promise<Result<void>> {
-  return toResult((async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { error } = await supabase.from('notificacoes').insert({
-      titulo: payload.titulo,
-      mensagem: payload.mensagem,
-      tipo: payload.tipo,
-      user_id: payload.user_id || user?.id,
-      empresa_id: payload.empresa_id,
-      entidade_id: payload.entidade_id,
-      entidade_tipo: payload.entidade_tipo,
-      lida: false,
-    });
-    if (error) throw error;
-  })());
+export async function criarNotificacao(payload: NotificationPayload): Promise<void> {
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  const { error } = await supabase.from('notificacoes').insert({
+    titulo: payload.titulo,
+    mensagem: payload.mensagem,
+    tipo: payload.tipo,
+    user_id: payload.user_id || user?.id,
+    empresa_id: payload.empresa_id,
+    entidade_id: payload.entidade_id,
+    entidade_tipo: payload.entidade_tipo,
+    lida: false,
+  });
+  if (error) throw error;
+  
 }
 
 export async function notificarResultadoSync(
   sucesso: boolean,
   registrosSincronizados: number,
   erros: string[]
-): Promise<Result<void>> {
+): Promise<void> {
   return criarNotificacao({
     titulo: sucesso ? 'Sincronização concluída' : 'Erro na sincronização',
     mensagem: sucesso
@@ -48,7 +46,7 @@ export async function notificarAjustePonto(
   colaboradorId: string,
   status: 'aprovado' | 'recusado',
   motivo?: string
-): Promise<Result<void>> {
+): Promise<void> {
   try {
     const { data: colab } = await supabase
       .from('colaboradores')
@@ -77,14 +75,9 @@ export async function notificarAjustePonto(
         empresa_id: colab.empresa_id ?? undefined
       });
     }
-    return Ok(undefined);
+    return (undefined);
   } catch (e: any) {
-    return Err({
-      type: 'SERVER_ERROR',
-      severity: 'error',
-      message: 'Falha ao notificar ajuste de ponto',
-      timestamp: new Date()
-    });
+    throw new Error('Falha ao notificar ajuste de ponto');
   }
 }
 

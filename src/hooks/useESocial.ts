@@ -8,18 +8,14 @@ export function useESocial() {
   const eventosQuery = useQuery({
     queryKey: ['esocial-eventos'],
     queryFn: async () => {
-      const res = await esocialService.listarEventos(null);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await esocialService.listarEventos(null);
     },
   });
 
   const statsQuery = useQuery({
     queryKey: ['esocial-stats'],
     queryFn: async () => {
-      const res = await esocialService.obterEstatisticas(null);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await esocialService.obterEstatisticas(null);
     },
   });
 
@@ -30,9 +26,7 @@ export function useESocial() {
 
   const enviarMutation = useMutation({
     mutationFn: async ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) => {
-      const res = await esocialService.enviarEvento(eventoId, empresaId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await esocialService.enviarEvento(eventoId, empresaId);
     },
     onSuccess: (data) => {
       if (data?.success) {
@@ -47,9 +41,7 @@ export function useESocial() {
 
   const reenviarMutation = useMutation({
     mutationFn: async ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) => {
-      const res = await esocialService.reenviarEvento(eventoId, empresaId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await esocialService.reenviarEvento(eventoId, empresaId);
     },
     onSuccess: (data) => {
       if (data?.success) toast.success('Evento reenviado com sucesso');
@@ -61,9 +53,7 @@ export function useESocial() {
 
   const gerarEventosMutation = useMutation({
     mutationFn: async ({ empresaId, competencia }: { empresaId: string; competencia: string }) => {
-      const res = await esocialService.gerarEventosPeriodo(empresaId, competencia);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await esocialService.gerarEventosPeriodo(empresaId, competencia);
     },
     onSuccess: (data) => {
       toast.success(`Geração concluída: ${data.criados} criados, ${data.pulados} já existentes.`);

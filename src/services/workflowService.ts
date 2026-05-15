@@ -1,101 +1,99 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export const workflowService = {
-  async listarDefinicoes(empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let q = supabase.from('workflows_definicoes').select('*').order('created_at', { ascending: false });
-      if (empresaId) q = q.eq('empresa_id', empresaId);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data || [];
-    })());
+  async listarDefinicoes(empresaId?: string): Promise<any[]> {
+    
+    let q = supabase.from('workflows_definicoes').select('*').order('created_at', { ascending: false });
+    if (empresaId) q = q.eq('empresa_id', empresaId);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  
   },
   
-  async criarDefinicao(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_definicoes').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de workflow foi retornado.');
-      return data;
-    })());
+  async criarDefinicao(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('workflows_definicoes').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de workflow foi retornado.');
+    return data;
+  
   },
   
-  async atualizarDefinicao(id: string, d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_definicoes').update(d).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de workflow foi retornado.');
-      return data;
-    })());
+  async atualizarDefinicao(id: string, d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('workflows_definicoes').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de workflow foi retornado.');
+    return data;
+  
   },
   
-  async excluirDefinicao(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('workflows_definicoes').delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluirDefinicao(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('workflows_definicoes').delete().eq('id', id);
+    if (error) throw error;
+  
   },
   
-  async listarEtapas(workflowId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_etapas').select('*').eq('workflow_id', workflowId).order('ordem');
-      if (error) throw error;
-      return data || [];
-    })());
+  async listarEtapas(workflowId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase.from('workflows_etapas').select('*').eq('workflow_id', workflowId).order('ordem');
+    if (error) throw error;
+    return data || [];
+  
   },
   
-  async criarEtapa(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_etapas').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de etapa foi retornado.');
-      return data;
-    })());
+  async criarEtapa(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('workflows_etapas').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de etapa foi retornado.');
+    return data;
+  
   },
   
-  async excluirEtapa(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase.from('workflows_etapas').delete().eq('id', id);
-      if (error) throw error;
-    })());
+  async excluirEtapa(id: string): Promise<void> {
+    
+    const { error } = await supabase.from('workflows_etapas').delete().eq('id', id);
+    if (error) throw error;
+  
   },
   
-  async listarExecucoes(empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let q = supabase.from('workflows_execucoes').select('*, workflow:workflows_definicoes(nome, tipo)').order('created_at', { ascending: false });
-      if (empresaId) q = q.eq('empresa_id', empresaId);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data || [];
-    })());
+  async listarExecucoes(empresaId?: string): Promise<any[]> {
+    
+    let q = supabase.from('workflows_execucoes').select('*, workflow:workflows_definicoes(nome, tipo)').order('created_at', { ascending: false });
+    if (empresaId) q = q.eq('empresa_id', empresaId);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  
   },
   
-  async criarExecucao(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_execucoes').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de execução foi retornado.');
-      return data;
-    })());
+  async criarExecucao(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('workflows_execucoes').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de execução foi retornado.');
+    return data;
+  
   },
   
-  async atualizarExecucao(id: string, d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_execucoes').update(d).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de execução foi retornado.');
-      return data;
-    })());
+  async atualizarExecucao(id: string, d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('workflows_execucoes').update(d).eq('id', id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de execução foi retornado.');
+    return data;
+  
   },
   
-  async registrarHistorico(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await supabase.from('workflows_historico').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de histórico foi retornado.');
-      return data;
-    })());
+  async registrarHistorico(d: any): Promise<any> {
+    
+    const { data, error } = await supabase.from('workflows_historico').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de histórico foi retornado.');
+    return data;
+  
   },
 };
 

@@ -1,38 +1,31 @@
 import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export const desligamentoService = {
-  async listar(empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let query = supabase
-        .from('desligamentos')
-        .select('*, colaborador:colaboradores(nome_completo)')
-        .order('data_desligamento', { ascending: false })
-        .limit(500);
-      if (empresaId) query = query.eq('empresa_id', empresaId);
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    })());
-  },
-  
-  async buscarPorId(id: string): Promise<Result<any | null>> {
-    if (!id) return Err({
-      type: 'VALIDATION_ERROR',
-      severity: 'error',
-      message: 'ID é obrigatório',
-      timestamp: new Date()
-    });
+  async listar(empresaId?: string): Promise<any[]> {
     
-    return toResult((async () => {
-      const { data, error } = await supabase.from('desligamentos').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    })());
+    let query = supabase
+      .from('desligamentos')
+      .select('*, colaborador:colaboradores(nome_completo)')
+      .order('data_desligamento', { ascending: false })
+      .limit(500);
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  
   },
   
-  async criar(d: any): Promise<Result<any>> {
+  async buscarPorId(id: string): Promise<any | null> {
+    if (!id) throw new Error('ID é obrigatório');
+    
+    
+    const { data, error } = await supabase.from('desligamentos').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  
+  },
+  
+  async criar(d: any): Promise<any> {
     try {
       if (!d.colaborador_id) throw new Error('Colaborador é obrigatório');
       if (!d.data_desligamento) throw new Error('Data de desligamento é obrigatória');
@@ -58,24 +51,14 @@ export const desligamentoService = {
         });
       }
 
-      return Ok(data);
+      return (data);
     } catch (e: any) {
-      return Err({
-        type: 'VALIDATION_ERROR',
-        severity: 'error',
-        message: e.message || 'Erro ao criar desligamento',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Erro ao criar desligamento');
     }
   },
   
-  async atualizar(id: string, d: any): Promise<Result<any>> {
-    if (!id) return Err({
-      type: 'VALIDATION_ERROR',
-      severity: 'error',
-      message: 'ID é obrigatório',
-      timestamp: new Date()
-    });
+  async atualizar(id: string, d: any): Promise<any> {
+    if (!id) throw new Error('ID é obrigatório');
 
     try {
       const { data: anterior } = await supabase.from('desligamentos').select('*').eq('id', id).single();
@@ -93,24 +76,14 @@ export const desligamentoService = {
         });
       }
 
-      return Ok(data);
+      return (data);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao atualizar desligamento',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao atualizar desligamento');
     }
   },
   
-  async excluir(id: string): Promise<Result<void>> {
-    if (!id) return Err({
-      type: 'VALIDATION_ERROR',
-      severity: 'error',
-      message: 'ID é obrigatório',
-      timestamp: new Date()
-    });
+  async excluir(id: string): Promise<void> {
+    if (!id) throw new Error('ID é obrigatório');
     
     try {
       const { data: anterior } = await supabase.from('desligamentos').select('*').eq('id', id).single();
@@ -124,14 +97,9 @@ export const desligamentoService = {
         acao: 'DELETE',
         dados_anteriores: anterior,
       });
-      return Ok(undefined);
+      return (undefined);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao excluir desligamento',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao excluir desligamento');
     }
   },
 };

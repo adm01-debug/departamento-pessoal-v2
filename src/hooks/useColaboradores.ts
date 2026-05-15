@@ -11,18 +11,14 @@ export function useColaboradores() {
   const query = useQuery({
     queryKey: ['colaboradores', empresaId],
     queryFn: async () => {
-      const res = await colaboradorService.list(empresaId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await colaboradorService.list(empresaId);
     },
     enabled: !!empresaId,
   });
 
   const criarMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await colaboradorService.criar({ ...data, empresa_id: empresaId });
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await colaboradorService.criar({ ...data, empresa_id: empresaId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
@@ -33,9 +29,7 @@ export function useColaboradores() {
 
   const atualizarMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await colaboradorService.atualizar(id, data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await colaboradorService.atualizar(id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
@@ -46,9 +40,7 @@ export function useColaboradores() {
 
   const excluirMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await colaboradorService.excluir(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await colaboradorService.excluir(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });

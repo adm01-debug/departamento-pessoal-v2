@@ -1,7 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CalculoResultado } from '@/utils/folhaCalc';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export interface HoleriteData extends CalculoResultado {
   colaboradorNome: string;
   cpf: string;
@@ -19,7 +17,7 @@ export const folhaPagamentoService = {
   /**
    * Gera os dados para um holerite (contracheque)
    */
-  gerarDadosHolerite: async (folhaId: string, colaboradorId: string): Promise<Result<HoleriteData>> => {
+  gerarDadosHolerite: async (folhaId: string, colaboradorId: string): Promise<HoleriteData> => {
     try {
       const { data: item, error: itemError } = await supabase
         .from('folha_itens')
@@ -29,12 +27,7 @@ export const folhaPagamentoService = {
         .single();
 
       if (itemError || !item) {
-        return Err({
-          type: 'NOT_FOUND',
-          severity: 'error',
-          message: 'Dados da folha não encontrados',
-          timestamp: new Date()
-        });
+        throw new Error('Dados da folha não encontrados');
       }
 
       const folhaHeader = item.folha as any;
@@ -55,7 +48,7 @@ export const folhaPagamentoService = {
         .eq('colaborador_id', colaboradorId)
         .maybeSingle();
 
-      return Ok({
+      return ({
         proventos: item.total_proventos || 0,
         descontos: item.total_descontos || 0,
         liquido: item.total_liquido || 0,
@@ -80,19 +73,14 @@ export const folhaPagamentoService = {
         dataAssinatura: holerite?.data_assinatura ?? undefined
       });
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: e.message || 'Falha ao gerar holerite',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Falha ao gerar holerite');
     }
   },
 
   /**
    * Assina digitalmente um holerite
    */
-  assinarHolerite: async (folhaId: string, colaboradorId: string): Promise<Result<string>> => {
+  assinarHolerite: async (folhaId: string, colaboradorId: string): Promise<string> => {
     try {
       const hash = btoa(`assinatura-${folhaId}-${colaboradorId}-${new Date().getTime()}`).substring(0, 32);
       
@@ -116,33 +104,23 @@ export const folhaPagamentoService = {
         } as any);
 
       if (error) throw error;
-      return Ok(hash);
+      return (hash);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao assinar holerite digitalmente',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao assinar holerite digitalmente');
     }
   },
 
   /**
    * Finaliza e fecha a folha de competência
    */
-  fecharFolha: async (folhaId: string): Promise<Result<{ success: boolean; hash?: string }>> => {
+  fecharFolha: async (folhaId: string): Promise<{ success: boolean; hash?: string }> => {
     try {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
       const alertas = await validadorFolha.validarFolha(folhaId);
       
       const alertasCriticos = alertas.filter(a => a.gravidade === 'alta');
       if (alertasCriticos.length > 0) {
-        return Err({
-          type: 'VALIDATION_ERROR',
-          severity: 'warning',
-          message: `Não é possível fechar a folha: existem ${alertasCriticos.length} alertas críticos.`,
-          timestamp: new Date()
-        });
+        throw new Error(`Não é possível fechar a folha: existem ${alertasCriticos.length} alertas críticos.`);
       }
 
       const { data: itens } = await supabase
@@ -189,21 +167,16 @@ export const folhaPagamentoService = {
         detalhes: { hashIntegridade, totalLiquidoGlobal: totalFolha } as any
       });
 
-      return Ok({ success: true, hash: hashIntegridade });
+      return ({ success: true, hash: hashIntegridade });
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: e.message || 'Erro crítico ao fechar folha',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Erro crítico ao fechar folha');
     }
   },
 
-  emitirPDF: async (folhaId: string): Promise<Result<string>> => {
-    return toResult((async () => {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      return `https://storage.lovable.dev/holerites/holerite_${folhaId}.pdf`;
-    })());
+  emitirPDF: async (folhaId: string): Promise<string> => {
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    return `https://storage.lovable.dev/holerites/holerite_${folhaId}.pdf`;
+  
   }
 };
