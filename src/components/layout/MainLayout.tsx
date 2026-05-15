@@ -2,7 +2,7 @@
 import { useState, type ReactNode, memo, useMemo, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Sidebar } from './Sidebar';
+import { Sidebar } from './index';
 import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
 import { PageTransition } from './PageTransition';
