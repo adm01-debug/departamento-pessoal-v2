@@ -49,14 +49,14 @@ export function MainLayout({ children }: MainLayoutProps) {
       <GuidedTour />
 
       <div className={cn('hidden md:block transition-all duration-500 ease-in-out', sidebarOpen ? 'w-64' : 'w-16')}>
-        <MemoizedSidebar collapsed={!sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <MemoizedSidebar onSearchOpen={() => {}} />
       </div>
 
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileSidebarOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="absolute left-0 top-0 h-full w-64" onClick={(e) => e.stopPropagation()}>
-            <MemoizedSidebar />
+            <MemoizedSidebar onSearchOpen={() => {}} />
           </div>
         </div>
       )}
