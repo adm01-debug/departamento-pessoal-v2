@@ -1,5 +1,5 @@
 // src/components/layout/MainLayout.tsx
-import { useState, type ReactNode } from 'react';
+import { useState, type ReactNode, memo, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sidebar } from './Sidebar';
@@ -13,6 +13,9 @@ import { useAuth } from '@/contexts/AuthContext';
 interface MainLayoutProps {
   children?: ReactNode;
 }
+
+const MemoizedSidebar = memo(Sidebar);
+const MemoizedHeader = memo(Header);
 
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
