@@ -85,48 +85,47 @@ export function validarS1070(dados: ESocialData): ValidationResult {
   required(dados.tpProc, 'tpProc', errors);
   enumValido(dados.tpProc?.toString(), ['1', '2', '3', '4'], 'tpProc', errors);
   required(dados.nrProc, 'nrProc', errors);
-  maxLen(dados.nrProc, 21, 'nrProc', errors);
+  maxLen(dados.nrProc as string, 21, 'nrProc', errors);
   required(dados.iniValid, 'iniValid', errors);
   required(dados.indAutoria, 'indAutoria', errors);
   enumValido(dados.indAutoria?.toString(), ['1', '2'], 'indAutoria', errors);
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1200(dados: Record<string, any>): ValidationResult {
+export function validarS1200(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.perApur, 'perApur', errors);
-  if (dados.perApur && !/^\d{4}-(0[1-9]|1[0-2])$/.test(dados.perApur)) {
+  if (typeof dados.perApur === 'string' && !/^\d{4}-(0[1-9]|1[0-2])$/.test(dados.perApur)) {
     errors.push({ campo: 'perApur', mensagem: 'Período deve estar no formato AAAA-MM', regra: 'REGRA_PERIODO' });
   }
   required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  if (dados.dmDev) {
-    for (let i = 0; i < dados.dmDev.length; i++) {
-      const dm = dados.dmDev[i];
+  cpfValido(dados.cpfTrab as string, 'cpfTrab', errors);
+  if (Array.isArray(dados.dmDev)) {
+    dados.dmDev.forEach((dm: any, i: number) => {
       required(dm.ideDmDev, `dmDev[${i}].ideDmDev`, errors);
       if (dm.infoPerApur?.ideEstabLot) {
-        for (const estab of dm.infoPerApur.ideEstabLot) {
+        dm.infoPerApur.ideEstabLot.forEach((estab: any) => {
           required(estab.codLotacao, `dmDev[${i}].codLotacao`, errors);
           if (estab.detVerbas) {
-            for (const verba of estab.detVerbas) {
+            estab.detVerbas.forEach((verba: any) => {
               required(verba.codRubr, `verba.codRubr`, errors);
               required(verba.vrRubr, `verba.vrRubr`, errors);
-              if (verba.vrRubr !== undefined && verba.vrRubr < 0) {
+              if (typeof verba.vrRubr === 'number' && verba.vrRubr < 0) {
                 errors.push({ campo: 'vrRubr', mensagem: 'Valor da rubrica não pode ser negativo', regra: 'REGRA_VALOR' });
               }
-            }
+            });
           }
-        }
+        });
       }
-    }
+    });
   } else {
     errors.push({ campo: 'dmDev', mensagem: 'Demonstrativo obrigatório', regra: 'REGRA_OBRIGATORIO' });
   }
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1210(dados: Record<string, any>): ValidationResult {
+export function validarS1210(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.perApur, 'perApur', errors);
