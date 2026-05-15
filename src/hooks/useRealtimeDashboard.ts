@@ -57,7 +57,7 @@ export function useRealtimeDashboard() {
         queryClient.invalidateQueries({ queryKey: ['portal-completo'] });
         const nova = payload.new as any;
         if (nova?.titulo && payload.eventType === 'INSERT') {
-          toast.info(`🔔 ${nova.titulo}`, { description: nova.mensagem?.slice(0, 60) });
+          toast.info(`🔔 ${nova.titulo}`, { description: (nova.mensagem as string)?.slice(0, 60) });
         }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'colaboradores' }, () => {

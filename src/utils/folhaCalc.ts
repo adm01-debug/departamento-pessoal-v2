@@ -1,6 +1,6 @@
 import { Decimal } from 'decimal.js';
 import { calcularINSS as _inss, calcularIRRF as _irrf, calcularFGTS as _fgts } from '@/calculators/impostos';
-import { calcularHorasExtras, calcularDSR, calcular13Salario } from '@/calculators/trabalhista';
+import { calcularHorasExtras, calcularDSR, calcular13Salario } from '@/calculators';
 import { FAIXAS_INSS_2026, FAIXAS_IRRF_2026, DEDUCAO_DEPENDENTE_IRRF } from '@/calculators/tabelas';
 
 // Configure Decimal for financial precision

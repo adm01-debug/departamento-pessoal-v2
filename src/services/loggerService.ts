@@ -2,13 +2,24 @@ import { supabase } from '@/integrations/supabase/client';
 
 type LogLevel = 'info' | 'warn' | 'error' | 'fatal';
 
+interface LogEntry {
+  nivel: LogLevel;
+  mensagem: string;
+  contexto: Record<string, unknown>;
+  stack_trace?: string;
+  url: string;
+  user_agent: string;
+  created_at: string;
+  user_id?: string;
+}
+
 const MAX_LOGS_BUFFER = 50;
-const logBuffer: any[] = [];
+const logBuffer: LogEntry[] = [];
 let flushTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const loggerService = {
-  async log(nivel: LogLevel, mensagem: string, contexto: Record<string, any> = {}, stackTrace?: string) {
-    const logEntry = {
+  async log(nivel: LogLevel, mensagem: string, contexto: Record<string, unknown> = {}, stackTrace?: string) {
+    const logEntry: LogEntry = {
       nivel,
       mensagem,
       contexto,
@@ -21,14 +32,18 @@ export const loggerService = {
     logBuffer.push(logEntry);
 
     if (nivel === 'error' || nivel === 'fatal') {
-      console.error(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
-      this.flush(); // Erros são enviados imediatamente
+      if (import.meta.env.DEV) {
+        console.error(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
+      }
+      this.flush(); // Errors are sent immediately
     } else {
-      console.log(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
+      if (import.meta.env.DEV) {
+        console.debug(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
+      }
       if (logBuffer.length >= MAX_LOGS_BUFFER) {
         this.flush();
       } else if (!flushTimeout) {
-        flushTimeout = setTimeout(() => this.flush(), 10000); // Flush a cada 10s se não atingir limite
+        flushTimeout = setTimeout(() => this.flush(), 10000); // Flush every 10s if limit not reached
       }
     }
   },
@@ -44,31 +59,32 @@ export const loggerService = {
     logBuffer.length = 0;
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const logsWithUser = logsToSend.map(l => ({ ...l, user_id: user?.id }));
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      const logsWithUser = logsToSend.map(l => ({ ...l, user_id: userId }));
       
-      const { error } = await supabase.from('logs_sistema' as any).insert(logsWithUser);
+      const { error } = await supabase.from('logs_sistema').insert(logsWithUser as any);
       if (error) throw error;
     } catch (e) {
-      console.warn('Falha ao enviar lote de logs para o banco:', e);
-      // Opcional: Re-inserir logs no buffer se falhar conexão? 
-      // Para evitar loop infinito em falha de DB, apenas descartamos após logar no console.
+      if (import.meta.env.DEV) {
+        console.warn('Failed to send logs to DB:', e);
+      }
     }
   },
 
-  info(mensagem: string, contexto?: Record<string, any>) {
+  info(mensagem: string, contexto?: Record<string, unknown>) {
     return this.log('info', mensagem, contexto);
   },
 
-  warn(mensagem: string, contexto?: Record<string, any>) {
+  warn(mensagem: string, contexto?: Record<string, unknown>) {
     return this.log('warn', mensagem, contexto);
   },
 
-  error(mensagem: string, contexto?: Record<string, any>, error?: any) {
+  error(mensagem: string, contexto?: Record<string, unknown>, error?: Error) {
     return this.log('error', mensagem, contexto, error?.stack);
   },
 
-  fatal(mensagem: string, contexto?: Record<string, any>, error?: any) {
+  fatal(mensagem: string, contexto?: Record<string, unknown>, error?: Error) {
     return this.log('fatal', mensagem, contexto, error?.stack);
   }
 };

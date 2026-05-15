@@ -1,5 +1,6 @@
 // Services Index - Complete
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 import { contratacaoService } from './contratacaoService';
 export { contratacaoService };
 
@@ -61,17 +62,17 @@ export const colaboradorService = {
     return data;
   },
   async getById(id: string) { return colaboradorService.buscarPorId(id); },
-  async criar(d: any) {
-    const { data, error } = await supabase.from('colaboradores').insert(d).select().maybeSingle();
+  async criar(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>) {
+    const { data, error } = await supabase.from('colaboradores').insert(d as any).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'colaborador');
   },
-  async create(d: any) { return colaboradorService.criar(d); },
-  async atualizar(id: string, d: any) {
+  async create(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>) { return colaboradorService.criar(d); },
+  async atualizar(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>) {
     const { data: current } = await supabase.from('colaboradores').select('version').eq('id', id).single();
     const { data, error } = await supabase
       .from('colaboradores')
-      .update(d)
+      .update(d as any)
       .eq('id', id)
       .eq('version', current?.version || 1)
       .select()
@@ -79,7 +80,7 @@ export const colaboradorService = {
     if (error) throw error;
     return ensureSingleResult(data, 'colaborador');
   },
-  async update(id: string, d: any) { return colaboradorService.atualizar(id, d); },
+  async update(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>) { return colaboradorService.atualizar(id, d); },
   async excluir(id: string) {
     const { error } = await supabase.from('colaboradores').delete().eq('id', id);
     if (error) throw error;
@@ -98,13 +99,13 @@ export const empresaService = {
     if (error) throw error;
     return data;
   },
-  async criar(d: any) {
-    const { data, error } = await supabase.from('empresas').insert(d).select().maybeSingle();
+  async criar(d: Partial<Database['public']['Tables']['empresas']['Insert']>) {
+    const { data, error } = await supabase.from('empresas').insert(d as any).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'empresa');
   },
-  async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('empresas').update(d).eq('id', id).select().maybeSingle();
+  async atualizar(id: string, d: Partial<Database['public']['Tables']['empresas']['Update']>) {
+    const { data, error } = await supabase.from('empresas').update(d as any).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return ensureSingleResult(data, 'empresa');
   },
@@ -148,7 +149,7 @@ export const feriasService = {
     return { data: (data as any[]) || [], count: count || 0 };
   },
   async syncWithHub(empresaId: string) {
-    console.log('Iniciando sincronização incremental com o hub unificado...');
+    // Sincronização incremental com o hub unificado
     const { data, error } = await supabase
       .from('ferias')
       .select('id, updated_at')
