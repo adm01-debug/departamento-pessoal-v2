@@ -168,15 +168,25 @@ export function Sidebar({ collapsed = false, className, pendingCounts, onToggle 
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     menuGroups.forEach(g => {
+      // Começa aberto apenas o grupo ativo para reduzir carga visual
       initial[g.label] = g.label !== activeGroupLabel;
     });
     return initial;
   });
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const toggleGroup = (label: string) => {
     if (collapsed) return;
     setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
   };
+
+  const filteredGroups = menuGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => 
+      item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(group => group.items.length > 0);
 
   const getBadge = (path: string): number | undefined => pendingCounts?.[path];
 
