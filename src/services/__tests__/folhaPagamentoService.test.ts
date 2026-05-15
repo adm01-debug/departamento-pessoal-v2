@@ -102,7 +102,10 @@ describe('folhaPagamentoService', () => {
       });
 
       const result = await folhaPagamentoService.fecharFolha('folha-1');
-      expect(result.success).toBe(true);
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value.success).toBe(true);
+      }
       expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ status: 'fechada' }));
     });
   });
