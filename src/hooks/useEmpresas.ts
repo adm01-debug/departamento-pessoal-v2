@@ -111,6 +111,7 @@ export function useEmpresas(): UseEmpresasReturn {
 
   // Se não há empresa selecionada, usar a padrão
   const empresaDefault = userEmpresas?.find((ue) => ue.is_default)?.empresa;
+  // We use current selection (persisted) first, fallback to default, then first available
   const empresaEfetiva = empresaAtual || empresaDefault || userEmpresas?.[0]?.empresa;
 
   useEffect(() => {
