@@ -45,11 +45,12 @@ function useDashboardStats(enabled: boolean) {
     queryKey: ["dashboard-stats"],
     enabled,
     queryFn: async () => {
-      const mesAtual = new Date().toISOString().slice(0, 7);
-      const hoje = new Date();
-      const em30Dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+      const mesAtual = now.toISOString().slice(0, 7);
+      const em30Dias = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
       const inicioMes = `${mesAtual}-01`;
 
+      // Executing queries in parallel but with optimized selection
       const [
         { count: colaboradoresAtivos },
         { data: folhaData },
@@ -58,26 +59,24 @@ function useDashboardStats(enabled: boolean) {
         { count: admissoesMes },
         { count: demissoesMes },
         { data: deptData },
-        { data: viewTurnover },
-        { data: viewAbsenteismo },
-        { data: viewPonto },
+        { data: turnoverData },
+        { data: absenteismoData },
       ] = await Promise.all([
-        supabase.from("colaboradores").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+        supabase.from("colaboradores").select("id", { count: "exact", head: true }).eq("status", "ativo"),
         supabase.from("folhas_pagamento").select("total_liquido").eq("competencia", mesAtual),
-        supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "aprovado").gte("data_inicio", hoje.toISOString()).lte("data_inicio", em30Dias.toISOString()),
+        supabase.from("ferias").select("id", { count: "exact", head: true }).eq("status", "aprovado").gte("data_inicio", now.toISOString()).lte("data_inicio", em30Dias),
         supabase.from("banco_horas").select("horas, tipo"),
-        supabase.from("admissoes").select("*", { count: "exact", head: true }).gte("data_prevista", inicioMes),
-        supabase.from("desligamentos").select("*", { count: "exact", head: true }).gte("data_desligamento", inicioMes),
+        supabase.from("admissoes").select("id", { count: "exact", head: true }).gte("data_prevista", inicioMes),
+        supabase.from("desligamentos").select("id", { count: "exact", head: true }).gte("data_desligamento", inicioMes),
         supabase.from("colaboradores").select("departamento").eq("status", "ativo"),
-        supabase.from("vw_kpi_turnover" as any).select("*"),
-        supabase.from("vw_kpi_absenteismo" as any).select("*"),
-        supabase.from("vw_kpi_ponto_resumo" as any).select("*"),
+        supabase.from("vw_kpi_turnover" as any).select("taxa_turnover").limit(1),
+        supabase.from("vw_kpi_absenteismo" as any).select("taxa_absenteismo").limit(1),
       ]);
 
       const folhaMensal = folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
       const bancoHoras = bancoData?.reduce((acc, b) => {
         const [h, m] = (b.horas || "00:00").split(":").map(Number);
-        const mins = h * 60 + (m || 0);
+        const mins = (h || 0) * 60 + (m || 0);
         return acc + (b.tipo === "credito" ? mins : -mins);
       }, 0) || 0;
 
@@ -91,8 +90,8 @@ function useDashboardStats(enabled: boolean) {
         .sort((a, b) => b.count - a.count)
         .slice(0, 6);
 
-      const turnoverVal = (viewTurnover as any)?.[0]?.taxa_turnover ?? ((demissoesMes || 0) / (colaboradoresAtivos || 1)) * 100;
-      const absenteismoVal = (viewAbsenteismo as any)?.[0]?.taxa_absenteismo ?? 0;
+      const turnoverVal = (turnoverData as any)?.[0]?.taxa_turnover ?? ((demissoesMes || 0) / (colaboradoresAtivos || 1)) * 100;
+      const absenteismoVal = (absenteismoData as any)?.[0]?.taxa_absenteismo ?? 0;
 
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
@@ -108,6 +107,7 @@ function useDashboardStats(enabled: boolean) {
       };
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 }

@@ -56,8 +56,8 @@ function useMorningBriefing() {
         supabase.from('afastamentos').select('tipo, colaboradores!afastamentos_colaborador_id_fkey(nome_completo)').eq('status', 'ativo').lte('data_inicio', hojeStr).gte('data_fim_prevista', hojeStr),
         supabase.from('admissoes').select('nome, cargo').eq('data_prevista', hojeStr),
         supabase.from('exames').select('data_validade, tipo, colaboradores!exames_colaborador_id_fkey(nome_completo)').gte('data_validade', hojeStr).lte('data_validade', em7Dias),
-        supabase.from('colaboradores').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
-        supabase.from('batidas_ponto').select('*', { count: 'exact', head: true }).eq('data', hojeStr),
+        supabase.from('colaboradores').select('id', { count: 'exact', head: true }).eq('status', 'ativo'),
+        supabase.from('batidas_ponto').select('id', { count: 'exact', head: true }).eq('data', hojeStr),
         supabase.from('esocial_eventos').select('status'),
       ]);
 

@@ -7,7 +7,6 @@ export const automacaoService = {
    * Monitora eventos críticos e dispara automações (Notificações + WhatsApp)
    */
   async processarAutomacoes(empresaId: string) {
-    console.log(`[AutomacaoService] Iniciando processamento para empresa: ${empresaId}`);
     
     // 1. Notificar Aniversariantes do Dia
     await this.notificarAniversariantes(empresaId);
