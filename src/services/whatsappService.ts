@@ -1,6 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export interface WhatsAppConfig {
   empresa_id: string;
   webhook_url?: string;
@@ -15,27 +13,27 @@ export interface WhatsAppConfig {
 }
 
 export const whatsappService = {
-  async getConfig(empresaId: string): Promise<Result<WhatsAppConfig | null>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('whatsapp_config' as any)
-        .select('*')
-        .eq('empresa_id', empresaId)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data as any;
-    })());
+  async getConfig(empresaId: string): Promise<WhatsAppConfig | null> {
+    
+    const { data, error } = await supabase
+      .from('whatsapp_config' as any)
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data as any;
+  
   },
 
-  async saveConfig(config: WhatsAppConfig): Promise<Result<void>> {
-    return toResult((async () => {
-      const { error } = await supabase
-        .from('whatsapp_config' as any)
-        .upsert(config, { onConflict: 'empresa_id' });
-      
-      if (error) throw error;
-    })());
+  async saveConfig(config: WhatsAppConfig): Promise<void> {
+    
+    const { error } = await supabase
+      .from('whatsapp_config' as any)
+      .upsert(config, { onConflict: 'empresa_id' });
+    
+    if (error) throw error;
+  
   },
 
   async sendMessage(params: {
@@ -43,46 +41,46 @@ export const whatsappService = {
     colaboradorId?: string;
     phone: string;
     message: string;
-  }): Promise<Result<any>> {
-    return toResult((async () => {
-      const { error } = await supabase
-        .from('whatsapp_mensagens_logs' as any)
-        .insert({
-          empresa_id: params.empresaId,
-          colaborador_id: params.colaboradorId,
-          telefone: params.phone,
-          status: 'sent',
-          mensagem_id_externo: `wa_direct_${Date.now()}`
-        });
-      
-      if (error) throw error;
-      return { success: true };
-    })());
+  }): Promise<any> {
+    
+    const { error } = await supabase
+      .from('whatsapp_mensagens_logs' as any)
+      .insert({
+        empresa_id: params.empresaId,
+        colaborador_id: params.colaboradorId,
+        telefone: params.phone,
+        status: 'sent',
+        mensagem_id_externo: `wa_direct_${Date.now()}`
+      });
+    
+    if (error) throw error;
+    return { success: true };
+  
   },
   
-  async listTemplates(empresaId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('whatsapp_templates' as any)
-        .select('*')
-        .eq('empresa_id', empresaId);
-      
-      if (error) throw error;
-      return data || [];
-    })());
+  async listTemplates(empresaId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase
+      .from('whatsapp_templates' as any)
+      .select('*')
+      .eq('empresa_id', empresaId);
+    
+    if (error) throw error;
+    return data || [];
+  
   },
 
-  async listLogs(empresaId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('whatsapp_mensagens_logs' as any)
-        .select('*, colaborador:colaboradores(nome_completo)')
-        .eq('empresa_id', empresaId)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    })());
+  async listLogs(empresaId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase
+      .from('whatsapp_mensagens_logs' as any)
+      .select('*, colaborador:colaboradores(nome_completo)')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  
   },
 
   async sendTemplateMessage(params: {
@@ -90,7 +88,7 @@ export const whatsappService = {
     colaboradorId: string;
     templateId: string;
     phone: string;
-  }): Promise<Result<any>> {
+  }): Promise<any> {
     try {
       const { empresaId, colaboradorId, templateId, phone } = params;
       
@@ -114,14 +112,9 @@ export const whatsappService = {
         .update({ status: 'sent', mensagem_id_externo: `wa_${Date.now()}` })
         .eq('id', (log as any).id);
         
-      return Ok({ success: true, logId: (log as any).id });
+      return ({ success: true, logId: (log as any).id });
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao enviar mensagem de template do WhatsApp',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao enviar mensagem de template do WhatsApp');
     }
   }
 };

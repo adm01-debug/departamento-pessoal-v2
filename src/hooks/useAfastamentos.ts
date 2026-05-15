@@ -14,9 +14,7 @@ export function useAfastamentos() {
   const query = useQuery({
     queryKey: ['afastamentos', empresaId, filtros],
     queryFn: async () => {
-      const res = await afastamentoService.listar(empresaId, filtros);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.listar(empresaId, filtros);
     },
     enabled: !!empresaId,
   });
@@ -24,17 +22,13 @@ export function useAfastamentos() {
   const configsQuery = useQuery({
     queryKey: ['afastamentos-configs'],
     queryFn: async () => {
-      const res = await afastamentoService.listarConfiguracoes();
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.listarConfiguracoes();
     },
   });
 
   const criarMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await afastamentoService.criar({ ...data, empresa_id: empresaId });
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.criar({ ...data, empresa_id: empresaId });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
@@ -51,9 +45,7 @@ export function useAfastamentos() {
 
   const atualizarMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await afastamentoService.atualizar(id, data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.atualizar(id, data);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
@@ -70,9 +62,7 @@ export function useAfastamentos() {
 
   const excluirMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await afastamentoService.excluir(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.excluir(id);
     },
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
@@ -109,18 +99,14 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
   const query = useQuery({
     queryKey: ['prorrogacoes-afastamento', empresaAtual?.id, afastamentoId],
     queryFn: async () => {
-      const res = await afastamentoService.listarProrrogacoes(afastamentoId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.listarProrrogacoes(afastamentoId);
     },
     enabled: !!empresaAtual?.id,
   });
 
   const criarMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await afastamentoService.criarProrrogacao(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.criarProrrogacao(data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['prorrogacoes-afastamento'] });
@@ -150,18 +136,14 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
   const query = useQuery({
     queryKey: ['documentos-afastamento', afastamentoId],
     queryFn: async () => {
-      const res = await afastamentoService.listarDocumentos(afastamentoId!);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.listarDocumentos(afastamentoId!);
     },
     enabled: !!afastamentoId,
   });
 
   const uploadMutation = useMutation({
     mutationFn: async ({ file, tipo }: { file: File; tipo: string }) => {
-      const res = await afastamentoService.uploadDocumento(afastamentoId!, file, tipo);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await afastamentoService.uploadDocumento(afastamentoId!, file, tipo);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });
@@ -173,8 +155,7 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
   const excluirMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await afastamentoService.excluir(id); // Using service delete for general deletion is common but usually documents have specific ones, service check needed if specialized
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });

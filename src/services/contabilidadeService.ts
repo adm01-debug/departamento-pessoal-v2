@@ -1,34 +1,32 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export const contabilidadeService = {
-  async listLancamentos(empresaId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('lancamentos_contabeis')
-        .select('*, conta_debito:plano_contas!lancamentos_contabeis_conta_debito_id_fkey(*), conta_credito:plano_contas!lancamentos_contabeis_conta_credito_id_fkey(*)')
-        .eq('empresa_id', empresaId)
-        .order('data_lancamento', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    })());
+  async listLancamentos(empresaId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase
+      .from('lancamentos_contabeis')
+      .select('*, conta_debito:plano_contas!lancamentos_contabeis_conta_debito_id_fkey(*), conta_credito:plano_contas!lancamentos_contabeis_conta_credito_id_fkey(*)')
+      .eq('empresa_id', empresaId)
+      .order('data_lancamento', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  
   },
 
-  async listPlanoContas(empresaId: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      const { data, error } = await supabase
-        .from('plano_contas')
-        .select('*')
-        .eq('empresa_id', empresaId)
-        .order('codigo');
-      
-      if (error) throw error;
-      return data || [];
-    })());
+  async listPlanoContas(empresaId: string): Promise<any[]> {
+    
+    const { data, error } = await supabase
+      .from('plano_contas')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('codigo');
+    
+    if (error) throw error;
+    return data || [];
+  
   },
 
-  async gerarLancamentosFolha(empresaId: string, folhaId: string): Promise<Result<void>> {
+  async gerarLancamentosFolha(empresaId: string, folhaId: string): Promise<void> {
     try {
       // Fetch folha summary
       const { data: folha, error: fError } = await supabase
@@ -51,12 +49,7 @@ export const contabilidadeService = {
       const contaDespesaSalarios = plano?.find(c => c.codigo === '3.1.01.001');
 
       if (!contaSalariosPagar || !contaDespesaSalarios) {
-        return Err({
-          type: 'VALIDATION_ERROR',
-          severity: 'error',
-          message: 'Plano de contas incompleto. Certifique-se de que as contas padrões existem.',
-          timestamp: new Date()
-        });
+        throw new Error('Plano de contas incompleto. Certifique-se de que as contas padrões existem.');
       }
 
       const lancamentos = [
@@ -78,22 +71,16 @@ export const contabilidadeService = {
         .insert(lancamentos as any);
       
       if (lError) throw lError;
-      return Ok(undefined);
+      return (undefined);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'critical',
-        message: e.message || 'Falha ao gerar lançamentos contábeis',
-        timestamp: new Date()
-      });
+      throw new Error(e.message || 'Falha ao gerar lançamentos contábeis');
     }
   },
 
-  async exportarSPED(empresaId: string): Promise<Result<string>> {
+  async exportarSPED(empresaId: string): Promise<string> {
     try {
       const result = await this.listLancamentos(empresaId);
-      if (!result.ok) return result;
-      const lancamentos = result.value;
+      const lancamentos = result;
       
       let sped = '|0000|LECD|...|SPED CONTABIL|\r\n';
       lancamentos.forEach((l: any) => {
@@ -103,14 +90,9 @@ export const contabilidadeService = {
       });
       sped += '|9999|...|END|\r\n';
 
-      return Ok(sped);
+      return (sped);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao exportar SPED',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao exportar SPED');
     }
   }
 };

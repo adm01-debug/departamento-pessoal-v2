@@ -1,13 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
 import { v4 as uuidv4 } from 'uuid';
-import { Result, Ok, Err } from '@/types/result';
-
 const getCorrelationHeaders = () => ({
   'x-request-id': uuidv4(),
 });
 
-const handleInvoke = async <T>(name: string, options: any, breaker = genericBreaker): Promise<Result<T>> => {
+const handleInvoke = async <T>(name: string, options: any, breaker = genericBreaker): Promise<T> => {
   try {
     return await breaker.execute(async () => {
       const { data, error } = await supabase.functions.invoke(name, {
@@ -15,22 +13,12 @@ const handleInvoke = async <T>(name: string, options: any, breaker = genericBrea
         headers: { ...getCorrelationHeaders(), ...options.headers },
       });
       if (error) {
-        return Err({
-          type: 'SERVER_ERROR',
-          severity: 'error' as const,
-          message: error.message || `Erro ao chamar função ${name}`,
-          timestamp: new Date(),
-        });
+        throw new Error(error.message || `Erro ao chamar função ${name}`);
       }
-      return Ok(data as T);
+      return (data as T);
     });
   } catch (e: any) {
-    return Err({
-      type: 'SERVER_ERROR',
-      severity: 'critical' as const,
-      message: e.message || `Falha crítica na comunicação com ${name}`,
-      timestamp: new Date(),
-    });
+    throw new Error(e.message || `Falha crítica na comunicação com ${name}`);
   }
 };
 

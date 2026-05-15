@@ -8,18 +8,14 @@ export function useHistoricoContratos(colaboradorId: string) {
   const query = useQuery({
     queryKey: ['historico_contratos', colaboradorId],
     queryFn: async () => {
-      const res = await historicoContratoService.listar(colaboradorId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await historicoContratoService.listar(colaboradorId);
     },
     enabled: !!colaboradorId,
   });
 
   const criarMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await historicoContratoService.criar({ ...data, colaborador_id: colaboradorId });
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await historicoContratoService.criar({ ...data, colaborador_id: colaboradorId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });
@@ -30,9 +26,7 @@ export function useHistoricoContratos(colaboradorId: string) {
 
   const excluirMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await historicoContratoService.excluir(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await historicoContratoService.excluir(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });

@@ -23,7 +23,6 @@ export function FGTSDigitalDashboard() {
         competencia,
         tipo: 'fgts_digital'
       });
-      if (!result.ok) throw new Error(result.error.message);
       toast.success('Sincronizado com FGTS Digital via API Caixa!');
     } catch (err: any) {
       toast.error('Falha na sincronização: ' + err.message);

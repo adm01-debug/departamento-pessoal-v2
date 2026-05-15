@@ -1,16 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 // Helper genérico para listar tabelas de referência
-async function listarReferencia(tabela: string, orderBy = 'nome'): Promise<Result<any[]>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from(tabela as any)
-      .select('*')
-      .order(orderBy);
-    if (error) throw error;
-    return data || [];
-  })());
+async function listarReferencia(tabela: string, orderBy = 'nome'): Promise<any[]> {
+  
+  const { data, error } = await supabase
+    .from(tabela as any)
+    .select('*')
+    .order(orderBy);
+  if (error) throw error;
+  return data || [];
+  
 }
 
 // =============================================
@@ -36,104 +34,104 @@ export const listarMotivosAfastamento = () => listarReferencia('motivos_afastame
 // =============================================
 // Centros de Custo (CRUD completo)
 // =============================================
-export async function listarCentrosCusto(empresaId?: string): Promise<Result<any[]>> {
-  return toResult((async () => {
-    let query = supabase.from('centros_custo' as any).select('*').order('nome');
-    if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  })());
+export async function listarCentrosCusto(empresaId?: string): Promise<any[]> {
+  
+  let query = supabase.from('centros_custo' as any).select('*').order('nome');
+  if (empresaId) query = query.eq('empresa_id', empresaId);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+  
 }
 
-export async function criarCentroCusto(centro: Record<string, unknown>): Promise<Result<any>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('centros_custo' as any)
-      .insert([centro])
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de centro de custo foi retornado.');
-    return data;
-  })());
+export async function criarCentroCusto(centro: Record<string, unknown>): Promise<any> {
+  
+  const { data, error } = await supabase
+    .from('centros_custo' as any)
+    .insert([centro])
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Nenhum registro de centro de custo foi retornado.');
+  return data;
+  
 }
 
-export async function atualizarCentroCusto(id: string, dados: Record<string, unknown>): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase.from('centros_custo' as any).update(dados).eq('id', id);
-    if (error) throw error;
-  })());
+export async function atualizarCentroCusto(id: string, dados: Record<string, unknown>): Promise<void> {
+  
+  const { error } = await supabase.from('centros_custo' as any).update(dados).eq('id', id);
+  if (error) throw error;
+  
 }
 
-export async function excluirCentroCusto(id: string): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase.from('centros_custo' as any).delete().eq('id', id);
-    if (error) throw error;
-  })());
+export async function excluirCentroCusto(id: string): Promise<void> {
+  
+  const { error } = await supabase.from('centros_custo' as any).delete().eq('id', id);
+  if (error) throw error;
+  
 }
 
 // =============================================
 // Contas Bancárias
 // =============================================
-export async function listarContasBancarias(colaboradorId: string): Promise<Result<any[]>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('contas_bancarias' as any)
-      .select('*')
-      .eq('colaborador_id', colaboradorId)
-      .order('principal', { ascending: false });
-    if (error) throw error;
-    return data || [];
-  })());
+export async function listarContasBancarias(colaboradorId: string): Promise<any[]> {
+  
+  const { data, error } = await supabase
+    .from('contas_bancarias' as any)
+    .select('*')
+    .eq('colaborador_id', colaboradorId)
+    .order('principal', { ascending: false });
+  if (error) throw error;
+  return data || [];
+  
 }
 
-export async function criarContaBancaria(conta: Record<string, unknown>): Promise<Result<any>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('contas_bancarias' as any)
-      .insert([conta])
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de conta bancária foi retornado.');
-    return data;
-  })());
+export async function criarContaBancaria(conta: Record<string, unknown>): Promise<any> {
+  
+  const { data, error } = await supabase
+    .from('contas_bancarias' as any)
+    .insert([conta])
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Nenhum registro de conta bancária foi retornado.');
+  return data;
+  
 }
 
-export async function atualizarContaBancaria(id: string, dados: Record<string, unknown>): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase.from('contas_bancarias' as any).update(dados).eq('id', id);
-    if (error) throw error;
-  })());
+export async function atualizarContaBancaria(id: string, dados: Record<string, unknown>): Promise<void> {
+  
+  const { error } = await supabase.from('contas_bancarias' as any).update(dados).eq('id', id);
+  if (error) throw error;
+  
 }
 
-export async function excluirContaBancaria(id: string): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase.from('contas_bancarias' as any).delete().eq('id', id);
-    if (error) throw error;
-  })());
+export async function excluirContaBancaria(id: string): Promise<void> {
+  
+  const { error } = await supabase.from('contas_bancarias' as any).delete().eq('id', id);
+  if (error) throw error;
+  
 }
 
 // =============================================
 // Dados de Estagiário
 // =============================================
-export async function obterDadosEstagiario(colaboradorId: string): Promise<Result<any | null>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('dados_estagiario' as any)
-      .select('*')
-      .eq('colaborador_id', colaboradorId)
-      .maybeSingle();
-    if (error) throw error;
-    return data;
-  })());
+export async function obterDadosEstagiario(colaboradorId: string): Promise<any | null> {
+  
+  const { data, error } = await supabase
+    .from('dados_estagiario' as any)
+    .select('*')
+    .eq('colaborador_id', colaboradorId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+  
 }
 
-export async function salvarDadosEstagiario(colaboradorId: string, dados: Record<string, unknown>): Promise<Result<any>> {
+export async function salvarDadosEstagiario(colaboradorId: string, dados: Record<string, unknown>): Promise<any> {
   try {
     const res = await obterDadosEstagiario(colaboradorId);
-    const existing = res.ok ? res.value : null;
+    const existing = (res ?? null);
 
     if (existing) {
       const { data, error } = await supabase
@@ -143,7 +141,7 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: Record
         .select()
         .maybeSingle();
       if (error) throw error;
-      return Ok(data);
+      return (data);
     } else {
       const { data, error } = await supabase
         .from('dados_estagiario' as any)
@@ -151,151 +149,146 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: Record
         .select()
         .maybeSingle();
       if (error) throw error;
-      return Ok(data);
+      return (data);
     }
   } catch (e: any) {
-    return Err({
-      type: 'SERVER_ERROR',
-      severity: 'error',
-      message: 'Falha ao salvar dados de estagiário',
-      timestamp: new Date()
-    });
+    throw new Error('Falha ao salvar dados de estagiário');
   }
 }
 
 // =============================================
 // Documentos Pessoais Arquivos
 // =============================================
-export async function listarDocumentosPessoais(colaboradorId: string): Promise<Result<any[]>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('documentos_pessoais_arquivos' as any)
-      .select('*')
-      .eq('colaborador_id', colaboradorId)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
-  })());
+export async function listarDocumentosPessoais(colaboradorId: string): Promise<any[]> {
+  
+  const { data, error } = await supabase
+    .from('documentos_pessoais_arquivos' as any)
+    .select('*')
+    .eq('colaborador_id', colaboradorId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+  
 }
 
-export async function criarDocumentoPessoal(doc: Record<string, unknown>): Promise<Result<any>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('documentos_pessoais_arquivos' as any)
-      .insert([doc])
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de documento pessoal foi retornado.');
-    return data;
-  })());
+export async function criarDocumentoPessoal(doc: Record<string, unknown>): Promise<any> {
+  
+  const { data, error } = await supabase
+    .from('documentos_pessoais_arquivos' as any)
+    .insert([doc])
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Nenhum registro de documento pessoal foi retornado.');
+  return data;
+  
 }
 
-export async function excluirDocumentoPessoal(id: string): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase.from('documentos_pessoais_arquivos' as any).delete().eq('id', id);
-    if (error) throw error;
-  })());
+export async function excluirDocumentoPessoal(id: string): Promise<void> {
+  
+  const { error } = await supabase.from('documentos_pessoais_arquivos' as any).delete().eq('id', id);
+  if (error) throw error;
+  
 }
 
 // =============================================
 // Férias - Workflow de Aprovação
 // =============================================
-export async function listarFeriasAprovacoes(feriasId: string): Promise<Result<any[]>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('ferias_aprovacoes' as any)
-      .select('*')
-      .eq('ferias_id', feriasId)
-      .order('created_at');
-    if (error) throw error;
-    return data || [];
-  })());
+export async function listarFeriasAprovacoes(feriasId: string): Promise<any[]> {
+  
+  const { data, error } = await supabase
+    .from('ferias_aprovacoes' as any)
+    .select('*')
+    .eq('ferias_id', feriasId)
+    .order('created_at');
+  if (error) throw error;
+  return data || [];
+  
 }
 
-export async function criarFeriasAprovacao(aprovacao: Record<string, unknown>): Promise<Result<any>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('ferias_aprovacoes' as any)
-      .insert([aprovacao])
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de aprovação de férias foi retornado.');
-    return data;
-  })());
+export async function criarFeriasAprovacao(aprovacao: Record<string, unknown>): Promise<any> {
+  
+  const { data, error } = await supabase
+    .from('ferias_aprovacoes' as any)
+    .insert([aprovacao])
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Nenhum registro de aprovação de férias foi retornado.');
+  return data;
+  
 }
 
-export async function atualizarFeriasAprovacao(id: string, dados: Record<string, unknown>): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase.from('ferias_aprovacoes' as any).update(dados).eq('id', id);
-    if (error) throw error;
-  })());
+export async function atualizarFeriasAprovacao(id: string, dados: Record<string, unknown>): Promise<void> {
+  
+  const { error } = await supabase.from('ferias_aprovacoes' as any).update(dados).eq('id', id);
+  if (error) throw error;
+  
 }
 
 // =============================================
 // Férias - Arquivos
 // =============================================
-export async function listarFeriasArquivos(feriasId: string): Promise<Result<any[]>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('ferias_arquivos' as any)
-      .select('*')
-      .eq('ferias_id', feriasId)
-      .order('created_at');
-    if (error) throw error;
-    return data || [];
-  })());
+export async function listarFeriasArquivos(feriasId: string): Promise<any[]> {
+  
+  const { data, error } = await supabase
+    .from('ferias_arquivos' as any)
+    .select('*')
+    .eq('ferias_id', feriasId)
+    .order('created_at');
+  if (error) throw error;
+  return data || [];
+  
 }
 
-export async function criarFeriasArquivo(arquivo: Record<string, unknown>): Promise<Result<any>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('ferias_arquivos' as any)
-      .insert([arquivo])
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de arquivo de férias foi retornado.');
-    return data;
-  })());
+export async function criarFeriasArquivo(arquivo: Record<string, unknown>): Promise<any> {
+  
+  const { data, error } = await supabase
+    .from('ferias_arquivos' as any)
+    .insert([arquivo])
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Nenhum registro de arquivo de férias foi retornado.');
+  return data;
+  
 }
 
 // =============================================
 // Dependentes - Benefícios (vinculação)
 // =============================================
-export async function listarDependentesBeneficios(dependenteId: string): Promise<Result<any[]>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('dependentes_beneficios' as any)
-      .select('*')
-      .eq('dependente_id', dependenteId);
-    if (error) throw error;
-    return data || [];
-  })());
+export async function listarDependentesBeneficios(dependenteId: string): Promise<any[]> {
+  
+  const { data, error } = await supabase
+    .from('dependentes_beneficios' as any)
+    .select('*')
+    .eq('dependente_id', dependenteId);
+  if (error) throw error;
+  return data || [];
+  
 }
 
-export async function vincularDependenteBeneficio(vinculo: Record<string, unknown>): Promise<Result<any>> {
-  return toResult((async () => {
-    const { data, error } = await supabase
-      .from('dependentes_beneficios' as any)
-      .upsert([vinculo], { onConflict: 'dependente_id,beneficio_id' })
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Falha ao vincular dependente ao benefício.');
-    return data;
-  })());
+export async function vincularDependenteBeneficio(vinculo: Record<string, unknown>): Promise<any> {
+  
+  const { data, error } = await supabase
+    .from('dependentes_beneficios' as any)
+    .upsert([vinculo], { onConflict: 'dependente_id,beneficio_id' })
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Falha ao vincular dependente ao benefício.');
+  return data;
+  
 }
 
-export async function desvincularDependenteBeneficio(dependenteId: string, beneficioId: string): Promise<Result<void>> {
-  return toResult((async () => {
-    const { error } = await supabase
-      .from('dependentes_beneficios' as any)
-      .delete()
-      .eq('dependente_id', dependenteId)
-      .eq('beneficio_id', beneficioId);
-    if (error) throw error;
-  })());
+export async function desvincularDependenteBeneficio(dependenteId: string, beneficioId: string): Promise<void> {
+  
+  const { error } = await supabase
+    .from('dependentes_beneficios' as any)
+    .delete()
+    .eq('dependente_id', dependenteId)
+    .eq('beneficio_id', beneficioId);
+  if (error) throw error;
+  
 }
 

@@ -1,36 +1,34 @@
 import { supabase } from '@/integrations/supabase/client';
 import { pontoAuditService } from './pontoAuditService';
-import { Result, Ok, Err, toResult } from '@/types/result';
-
 export const batidasPontoService = {
-  async listar(colaboradorId: string, dataInicio?: string, dataFim?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let q = (supabase as any).from('batidas_ponto').select('*').eq('colaborador_id', colaboradorId).order('data').order('ordem');
-      if (dataInicio) q = q.gte('data', dataInicio);
-      if (dataFim) q = q.lte('data', dataFim);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data || [];
-    })());
+  async listar(colaboradorId: string, dataInicio?: string, dataFim?: string): Promise<any[]> {
+    
+    let q = (supabase as any).from('batidas_ponto').select('*').eq('colaborador_id', colaboradorId).order('data').order('ordem');
+    if (dataInicio) q = q.gte('data', dataInicio);
+    if (dataFim) q = q.lte('data', dataFim);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  
   },
-  async listarPorData(data: string, empresaId?: string): Promise<Result<any[]>> {
-    return toResult((async () => {
-      let q = (supabase as any).from('batidas_ponto').select('*, colaborador:colaboradores(nome_completo, foto_url)').eq('data', data).order('ordem');
-      if (empresaId) q = q.eq('empresa_id', empresaId);
-      const { data: result, error } = await q;
-      if (error) throw error;
-      return result || [];
-    })());
+  async listarPorData(data: string, empresaId?: string): Promise<any[]> {
+    
+    let q = (supabase as any).from('batidas_ponto').select('*, colaborador:colaboradores(nome_completo, foto_url)').eq('data', data).order('ordem');
+    if (empresaId) q = q.eq('empresa_id', empresaId);
+    const { data: result, error } = await q;
+    if (error) throw error;
+    return result || [];
+  
   },
-  async registrar(d: any): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await (supabase as any).from('batidas_ponto').insert(d).select().maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Nenhum registro de batida de ponto foi retornado.');
-      return data;
-    })());
+  async registrar(d: any): Promise<any> {
+    
+    const { data, error } = await (supabase as any).from('batidas_ponto').insert(d).select().maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Nenhum registro de batida de ponto foi retornado.');
+    return data;
+  
   },
-  async ajustar(id: string, d: any): Promise<Result<any>> {
+  async ajustar(id: string, d: any): Promise<any> {
     try {
       const { data: anterior } = await (supabase as any).from('batidas_ponto').select('*').eq('id', id).single();
       
@@ -42,43 +40,38 @@ export const batidasPontoService = {
       }
       
       if (!data) throw new Error('Nenhum registro de batida de ponto foi retornado.');
-      return Ok(data);
+      return (data);
     } catch (e: any) {
-      return Err({
-        type: 'SERVER_ERROR',
-        severity: 'error',
-        message: 'Falha ao ajustar batida de ponto',
-        timestamp: new Date()
-      });
+      throw new Error('Falha ao ajustar batida de ponto');
     }
   },
-  async excluir(id: string): Promise<Result<void>> {
-    return toResult((async () => {
-      const { data: anterior } = await (supabase as any).from('batidas_ponto').select('*').eq('id', id).single();
-      
-      const { error } = await (supabase as any).from('batidas_ponto').delete().eq('id', id);
-      if (error) throw error;
-      
-      if (anterior) {
-        await pontoAuditService.logExclusion(id, anterior);
-      }
-    })());
+  async excluir(id: string): Promise<void> {
+    
+    const { data: anterior } = await (supabase as any).from('batidas_ponto').select('*').eq('id', id).single();
+    
+    const { error } = await (supabase as any).from('batidas_ponto').delete().eq('id', id);
+    if (error) throw error;
+    
+    if (anterior) {
+      await pontoAuditService.logExclusion(id, anterior);
+    }
+  
   },
-  async fecharPeriodo(empresaId: string, dataInicio: string, dataFim: string): Promise<Result<any>> {
-    return toResult((async () => {
-      const { data, error } = await (supabase as any).from('periodos_ponto').insert({
-        empresa_id: empresaId,
-        data_inicio: dataInicio,
-        data_fim: dataFim,
-        status: 'fechado',
-        fechado_em: new Date().toISOString()
-      }).select().single();
-      
-      if (error) throw error;
-      
-      await pontoAuditService.logMassAction(empresaId, 'FECHAMENTO_PERIODO', { dataInicio, dataFim });
-      return data;
-    })());
+  async fecharPeriodo(empresaId: string, dataInicio: string, dataFim: string): Promise<any> {
+    
+    const { data, error } = await (supabase as any).from('periodos_ponto').insert({
+      empresa_id: empresaId,
+      data_inicio: dataInicio,
+      data_fim: dataFim,
+      status: 'fechado',
+      fechado_em: new Date().toISOString()
+    }).select().single();
+    
+    if (error) throw error;
+    
+    await pontoAuditService.logMassAction(empresaId, 'FECHAMENTO_PERIODO', { dataInicio, dataFim });
+    return data;
+  
   }
 };
 

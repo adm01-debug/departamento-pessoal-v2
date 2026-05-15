@@ -42,8 +42,8 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
         documentType: docType as any,
       });
 
-      if (result.ok) {
-        const data = result.value as any;
+      if (true) {
+        const data = result as any;
         if (data.success && data.extractedText) {
           setExtractedText(data.extractedText);
           setFields(data.mappedFields || {});
@@ -53,7 +53,7 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
           throw new Error(data.error || 'Nenhum texto extraído');
         }
       } else {
-        throw new Error(result.error.message || 'Nenhum texto extraído');
+        throw new Error('Nenhum texto extraído');
       }
     } catch (err: any) {
       toast.error(`Erro no OCR: ${err.message}`);

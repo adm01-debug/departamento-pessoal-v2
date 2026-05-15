@@ -11,9 +11,7 @@ export function useBeneficios() {
   const query = useQuery({
     queryKey: ['beneficios', empresaId],
     queryFn: async () => {
-      const res = await beneficioService.list(empresaId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await beneficioService.list(empresaId);
     },
     enabled: !!empresaId,
   });
@@ -21,18 +19,14 @@ export function useBeneficios() {
   const resumoQuery = useQuery({
     queryKey: ['beneficios-resumo', empresaId],
     queryFn: async () => {
-      const res = await beneficioService.obterResumoCustos(empresaId!);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await beneficioService.obterResumoCustos(empresaId!);
     },
     enabled: !!empresaId,
   });
 
   const criarBeneficio = useMutation({
     mutationFn: async (dados: any) => {
-      const res = await beneficioService.criar({ ...dados, empresa_id: empresaId });
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await beneficioService.criar({ ...dados, empresa_id: empresaId });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
@@ -44,9 +38,7 @@ export function useBeneficios() {
 
   const atualizarBeneficio = useMutation({
     mutationFn: async ({ id, dados }: { id: string, dados: any }) => {
-      const res = await beneficioService.atualizar(id, dados);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await beneficioService.atualizar(id, dados);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
@@ -57,9 +49,7 @@ export function useBeneficios() {
 
   const excluirBeneficio = useMutation({
     mutationFn: async (id: string) => {
-      const res = await beneficioService.excluir(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await beneficioService.excluir(id);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });

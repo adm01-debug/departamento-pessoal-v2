@@ -11,9 +11,7 @@ export function usePonto(colaboradorId?: string) {
     queryKey: ['registros-ponto', empresaAtual?.id, colaboradorId],
     enabled: !!empresaAtual?.id && !!colaboradorId,
     queryFn: async () => {
-      const res = await pontosService.listar(colaboradorId!, undefined, undefined);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await pontosService.listar(colaboradorId!, undefined, undefined);
     },
   });
 
@@ -21,9 +19,7 @@ export function usePonto(colaboradorId?: string) {
     queryKey: ['ponto-hoje', colaboradorId],
     enabled: !!colaboradorId,
     queryFn: async () => {
-      const res = await pontosService.buscarRegistroHoje(colaboradorId!);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await pontosService.buscarRegistroHoje(colaboradorId!);
     },
   });
 
@@ -48,16 +44,14 @@ export function usePonto(colaboradorId?: string) {
         dispositivoId: navigator.userAgent,
         foto_biometria_url
       });
-
-      if (!res.ok) throw new Error(res.error.message);
-      const batida = res.value;
+      const batida = res;
 
       if (batida && foto_base64 && navigator.onLine) {
         pontosService.validarBiometria(batida.id, colId, foto_base64)
           .then(resBio => {
-            if (resBio.ok && resBio.value.valid) {
+            if (true && resBio.valid) {
               toast.success('Biometria validada com sucesso!');
-            } else if (resBio.ok) {
+            } else if (true) {
               toast.error('Atenção: Falha na validação biométrica!');
             }
           })

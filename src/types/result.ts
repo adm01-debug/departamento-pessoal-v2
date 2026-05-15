@@ -1,22 +1,10 @@
-import { ErrorDetails } from '@/errors/types';
+// Compatibility shim: Result type now passes through values directly.
+// Services throw on error; consumers await values directly.
+export type Result<T, _E = unknown> = T;
 
-export type Result<T, E = ErrorDetails> = 
-  | { ok: true; value: T }
-  | { ok: false; error: E };
-
-export const Ok = <T>(value: T): Result<T, never> => ({ ok: true, value });
-export const Err = <E>(error: E): Result<never, E> => ({ ok: false, error });
-
-export const toResult = async <T>(promise: Promise<T>): Promise<Result<T>> => {
-  try {
-    const value = await promise;
-    return Ok(value);
-  } catch (e: any) {
-    return Err({
-      type: 'SERVER_ERROR',
-      severity: 'error',
-      message: e.message || 'Erro inesperado',
-      timestamp: new Date(),
-    });
-  }
+export const Ok = <T>(value: T): T => value;
+export const Err = (error: any): never => {
+  throw error instanceof Error ? error : new Error(error?.message || 'Erro inesperado');
 };
+
+export const toResult = async <T>(promise: Promise<T>): Promise<T> => promise;

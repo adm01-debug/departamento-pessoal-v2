@@ -12,9 +12,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
   const query = useQuery({
     queryKey: ['ferias', empresaId, params],
     queryFn: async () => {
-      const res = await feriasService.listSolicitacoes(empresaId, params);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await feriasService.listSolicitacoes(empresaId, params);
     },
     enabled: !!empresaId,
     placeholderData: (previousData) => previousData,
@@ -22,9 +20,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await feriasService.criar({ ...data, empresa_id: empresaId });
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await feriasService.criar({ ...data, empresa_id: empresaId });
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
@@ -42,9 +38,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await feriasService.atualizar(id, data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await feriasService.atualizar(id, data);
     },
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
@@ -62,9 +56,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await feriasService.excluir(id);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await feriasService.excluir(id);
     },
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
@@ -81,9 +73,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
 
   const aprovarGestorMutation = useMutation({
     mutationFn: async ({ id, userId }: { id: string; userId?: string }) => {
-      const res = await feriasService.aprovarGestor(id, userId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await feriasService.aprovarGestor(id, userId);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
@@ -94,9 +84,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
 
   const aprovarRHMutation = useMutation({
     mutationFn: async ({ id, userId }: { id: string; userId?: string }) => {
-      const res = await feriasService.aprovarRH(id, userId);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
+      return await feriasService.aprovarRH(id, userId);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });

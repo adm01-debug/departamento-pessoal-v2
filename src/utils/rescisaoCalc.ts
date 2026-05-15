@@ -5,7 +5,6 @@
  */
 
 import { calcularINSS, calcularIRRF } from '@/calculators/impostos';
-import { Result, Ok, Err } from '@/types/result';
 import { signCalculation } from '@/calculators/auditHelper';
 
 /**
@@ -68,21 +67,21 @@ export interface RescisaoParams {
 /**
  * Motor de Cálculo CLT com Assinatura Digital e Tratamento de Erros
  */
-export async function calcularRescisao(params: RescisaoParams): Promise<Result<RescisaoResult>> {
+export async function calcularRescisao(params: RescisaoParams): Promise<RescisaoResult> {
   try {
     const { salario, dataAdmissao, dataDesligamento, tipo, avisoTrabalhado, feriasVencidas, saldoFGTS, dependentes = 0 } = params;
     
-    if (salario <= 0) return Err({ type: 'VALIDATION_ERROR', severity: 'error', message: 'Salário deve ser maior que zero', timestamp: new Date() });
+    if (salario <= 0) throw new Error('Salário deve ser maior que zero');
     
     const admissao = new Date(dataAdmissao);
     const desligamento = new Date(dataDesligamento);
     
     if (isNaN(admissao.getTime()) || isNaN(desligamento.getTime())) {
-      return Err({ type: 'VALIDATION_ERROR', severity: 'error', message: 'Datas inválidas', timestamp: new Date() });
+      throw new Error('Datas inválidas');
     }
 
     if (desligamento < admissao) {
-      return Err({ type: 'VALIDATION_ERROR', severity: 'error', message: 'Data de desligamento não pode ser anterior à admissão', timestamp: new Date() });
+      throw new Error('Data de desligamento não pode ser anterior à admissão');
     }
 
     // 1. Saldo de Salário (Art. 4º CLT)
@@ -176,14 +175,9 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Result<R
     // Assinatura digital do resultado para auditoria e integridade
     result.assinaturaDigital = await signCalculation(result);
 
-    return Ok(result);
+    return (result);
   } catch (e: any) {
-    return Err({
-      type: 'SERVER_ERROR',
-      severity: 'critical',
-      message: e.message || 'Erro inesperado no motor de cálculo de rescisão',
-      timestamp: new Date()
-    });
+    throw new Error(e.message || 'Erro inesperado no motor de cálculo de rescisão');
   }
 }
 
