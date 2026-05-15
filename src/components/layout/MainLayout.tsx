@@ -27,7 +27,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Guided Tour (first visit) */}
       <GuidedTour />
 
-      <div className={cn('hidden md:block transition-all duration-300', sidebarOpen ? 'w-64' : 'w-16')}>
+      <div className={cn('hidden md:block transition-all duration-500 ease-in-out', sidebarOpen ? 'w-64' : 'w-16')}>
         <Sidebar collapsed={!sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       </div>
 
