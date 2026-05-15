@@ -1,5 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
+import { Database } from '@/integrations/supabase/types';
+
+type Empresa = Database['public']['Tables']['empresas']['Row'];
+type Admissao = Database['public']['Tables']['admissoes']['Row'];
+
 export const contratacaoService = {
   async gerarTemplateContrato(admissaoId: string): Promise<string> {
     
@@ -12,7 +17,7 @@ export const contratacaoService = {
     if (error) throw error;
     if (!admissao) throw new Error('Admissão não encontrada');
 
-    const empresa: any = admissao.empresa;
+    const empresa = admissao.empresa as unknown as Empresa;
 
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: auto; padding: 40px; border: 1px solid #eee; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
@@ -31,7 +36,7 @@ export const contratacaoService = {
 
           <p><strong>EMPREGADO:</strong> ${admissao.nome}<br>
           <strong>CPF:</strong> ${admissao.cpf || '—'}<br>
-          <strong>ENDEREÇO:</strong> ${(admissao.metadata as any)?.endereco || 'Residência informada no cadastro'}</p>
+          <strong>ENDEREÇO:</strong> {(admissao.metadata as Record<string, any>)?.endereco || 'Residência informada no cadastro'}</p>
         </div>
 
         <p>As partes acima qualificadas celebram o presente contrato sob as cláusulas seguintes:</p>

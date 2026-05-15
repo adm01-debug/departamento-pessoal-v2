@@ -18553,15 +18553,60 @@ export type Database = {
       }
       vw_alertas_rh: {
         Row: {
-          colaborador_id: string | null
+          created_at: string | null
           data_referencia: string | null
           empresa_id: string | null
+          entidade_id: string | null
+          entidade_tipo: string | null
+          id: string | null
+          lida: boolean | null
           mensagem: string | null
-          nome_completo: string | null
-          severidade: string | null
-          tipo_alerta: string | null
+          tipo: string | null
+          titulo: string | null
+          user_id: string | null
         }
-        Relationships: []
+        Insert: {
+          created_at?: string | null
+          data_referencia?: string | null
+          empresa_id?: string | null
+          entidade_id?: string | null
+          entidade_tipo?: string | null
+          id?: string | null
+          lida?: boolean | null
+          mensagem?: string | null
+          tipo?: string | null
+          titulo?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_referencia?: string | null
+          empresa_id?: string | null
+          entidade_id?: string | null
+          entidade_tipo?: string | null
+          id?: string | null
+          lida?: boolean | null
+          mensagem?: string | null
+          tipo?: string | null
+          titulo?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_notificacoes_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notificacoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vw_banco_horas_saldo: {
         Row: {
@@ -18863,55 +18908,574 @@ export type Database = {
       }
       vw_colaboradores_completo: {
         Row: {
+          agencia: string | null
+          aposentado: boolean | null
+          bairro: string | null
+          banco_codigo: string | null
+          banco_nome: string | null
+          bitrix_id: string | null
+          bitrix_sync_status: string | null
+          bitrix_ultima_sync: string | null
           cargo: string | null
+          cargo_confianca: boolean | null
+          categoria_trabalhador: string | null
+          categoria_trabalhador_id: number | null
+          cbo: string | null
+          celular: string | null
+          centro_custo: string | null
+          centro_custo_id: string | null
+          cep: string | null
+          certificado_reservista: string | null
+          cidade: string | null
+          cipa: boolean | null
+          cnh_categoria: string | null
+          cnh_data_emissao: string | null
+          cnh_numero: string | null
+          cnh_validade: string | null
+          codigo_firebird: number | null
+          complemento: string | null
+          conjuge_cpf: string | null
+          conjuge_data_nascimento: string | null
+          conjuge_nome: string | null
+          conjuge_telefone: string | null
+          conselho_profissional: string | null
+          conta: string | null
           cpf: string | null
+          created_at: string | null
+          created_by: string | null
+          ctps_data_emissao: string | null
+          ctps_numero: string | null
+          ctps_serie: string | null
+          ctps_uf: string | null
+          cursos_certificacoes: string | null
           data_admissao: string | null
+          data_chegada_pais: string | null
           data_desligamento: string | null
+          data_exame_admissional: string | null
+          data_nascimento: string | null
+          data_saida_pais: string | null
+          data_senioridade: string | null
           departamento: string | null
           email: string | null
+          email_corporativo: string | null
+          email_pessoal: string | null
           empresa_id: string | null
+          escolaridade: Database["public"]["Enums"]["escolaridade"] | null
+          estado_civil: Database["public"]["Enums"]["estado_civil"] | null
+          etnia: string | null
+          expatriado: boolean | null
+          experiencia_fim_1: string | null
+          experiencia_fim_2: string | null
+          experiencia_tipo: string | null
+          face_id: string | null
+          facebook: string | null
+          formacao: string | null
+          foto_referencia_url: string | null
           foto_url: string | null
+          genero_documento_id: number | null
+          gestor_ferias_id: string | null
+          horario_entrada: string | null
+          horario_saida: string | null
           id: string | null
+          identidade_genero: string | null
+          identificador_tipo: string | null
+          identificador_validade: string | null
+          inscricao_orgao_classe: string | null
+          instagram: string | null
+          intervalo_minutos: number | null
+          jornada_horas_mensais: string | null
+          jornada_semanal: number | null
+          linkedin: string | null
+          local_trabalho: string | null
+          local_trabalho_id: string | null
+          logradouro: string | null
+          matricula: string | null
+          moeda: string | null
+          moeda_base: string | null
+          nacionalidade: string | null
+          nacionalidade_id: number | null
+          naturalidade_cidade: string | null
+          naturalidade_uf: string | null
           nome_completo: string | null
-          salario: number | null
+          nome_mae: string | null
+          nome_nascimento: string | null
+          nome_pai: string | null
+          nome_social: string | null
+          numero: string | null
+          observacoes: string | null
+          pais_nascimento: string | null
+          pais_origem: string | null
+          pais_residencia_fiscal: string | null
+          pis_pasep: string | null
+          pix_chave: string | null
+          pix_tipo: string | null
+          primeiro_emprego: boolean | null
+          pronomes: string | null
+          regime_fiscal_especial: boolean | null
+          reservista: string | null
+          reservista_ra: string | null
+          reservista_serie: string | null
+          rg: string | null
+          rg_data_emissao: string | null
+          rg_data_validade: string | null
+          rg_orgao_emissor: string | null
+          rg_uf: string | null
+          salario_base: number | null
+          seguro_desemprego: boolean | null
+          sexo: Database["public"]["Enums"]["sexo"] | null
           status: Database["public"]["Enums"]["status_colaborador"] | null
-          telefone_celular: string | null
-          tempo_casa: string | null
+          supervisor_id: string | null
+          telefone: string | null
+          telefone_residencial: string | null
+          tiktok: string | null
+          time_id: string | null
+          timeman_ultima_sync: string | null
+          timeman_ultimo_status: string | null
+          tipo_admissao: string | null
+          tipo_conta: Database["public"]["Enums"]["tipo_conta"] | null
           tipo_contrato: Database["public"]["Enums"]["tipo_contrato"] | null
+          tipo_estabilidade: string | null
+          tipo_pagamento: string | null
+          tipo_pagamento_id: number | null
+          tipo_salario: string | null
+          tipo_salario_descricao: string | null
+          tipo_salario_id: number | null
+          tipo_sanguineo: string | null
+          titulo_eleitor: string | null
+          titulo_eleitor_uf: string | null
+          titulo_secao: string | null
+          titulo_zona: string | null
+          uf: string | null
+          unidade: string | null
+          uniforme_calca: string | null
+          uniforme_calcado: string | null
+          uniforme_camiseta: string | null
+          updated_at: string | null
+          version: number | null
+          whatsapp: string | null
         }
         Insert: {
+          agencia?: string | null
+          aposentado?: boolean | null
+          bairro?: string | null
+          banco_codigo?: string | null
+          banco_nome?: string | null
+          bitrix_id?: string | null
+          bitrix_sync_status?: string | null
+          bitrix_ultima_sync?: string | null
           cargo?: string | null
+          cargo_confianca?: boolean | null
+          categoria_trabalhador?: string | null
+          categoria_trabalhador_id?: number | null
+          cbo?: string | null
+          celular?: string | null
+          centro_custo?: string | null
+          centro_custo_id?: string | null
+          cep?: string | null
+          certificado_reservista?: string | null
+          cidade?: string | null
+          cipa?: boolean | null
+          cnh_categoria?: string | null
+          cnh_data_emissao?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          codigo_firebird?: number | null
+          complemento?: string | null
+          conjuge_cpf?: string | null
+          conjuge_data_nascimento?: string | null
+          conjuge_nome?: string | null
+          conjuge_telefone?: string | null
+          conselho_profissional?: string | null
+          conta?: string | null
           cpf?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          ctps_data_emissao?: string | null
+          ctps_numero?: string | null
+          ctps_serie?: string | null
+          ctps_uf?: string | null
+          cursos_certificacoes?: string | null
           data_admissao?: string | null
+          data_chegada_pais?: string | null
           data_desligamento?: string | null
+          data_exame_admissional?: string | null
+          data_nascimento?: string | null
+          data_saida_pais?: string | null
+          data_senioridade?: string | null
           departamento?: string | null
           email?: string | null
+          email_corporativo?: string | null
+          email_pessoal?: string | null
           empresa_id?: string | null
+          escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
+          estado_civil?: Database["public"]["Enums"]["estado_civil"] | null
+          etnia?: string | null
+          expatriado?: boolean | null
+          experiencia_fim_1?: string | null
+          experiencia_fim_2?: string | null
+          experiencia_tipo?: string | null
+          face_id?: string | null
+          facebook?: string | null
+          formacao?: string | null
+          foto_referencia_url?: string | null
           foto_url?: string | null
+          genero_documento_id?: number | null
+          gestor_ferias_id?: string | null
+          horario_entrada?: string | null
+          horario_saida?: string | null
           id?: string | null
+          identidade_genero?: string | null
+          identificador_tipo?: string | null
+          identificador_validade?: string | null
+          inscricao_orgao_classe?: string | null
+          instagram?: string | null
+          intervalo_minutos?: number | null
+          jornada_horas_mensais?: string | null
+          jornada_semanal?: number | null
+          linkedin?: string | null
+          local_trabalho?: string | null
+          local_trabalho_id?: string | null
+          logradouro?: string | null
+          matricula?: string | null
+          moeda?: string | null
+          moeda_base?: string | null
+          nacionalidade?: string | null
+          nacionalidade_id?: number | null
+          naturalidade_cidade?: string | null
+          naturalidade_uf?: string | null
           nome_completo?: string | null
-          salario?: number | null
+          nome_mae?: string | null
+          nome_nascimento?: string | null
+          nome_pai?: string | null
+          nome_social?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          pais_nascimento?: string | null
+          pais_origem?: string | null
+          pais_residencia_fiscal?: string | null
+          pis_pasep?: string | null
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          primeiro_emprego?: boolean | null
+          pronomes?: string | null
+          regime_fiscal_especial?: boolean | null
+          reservista?: string | null
+          reservista_ra?: string | null
+          reservista_serie?: string | null
+          rg?: string | null
+          rg_data_emissao?: string | null
+          rg_data_validade?: string | null
+          rg_orgao_emissor?: string | null
+          rg_uf?: string | null
+          salario_base?: number | null
+          seguro_desemprego?: boolean | null
+          sexo?: Database["public"]["Enums"]["sexo"] | null
           status?: Database["public"]["Enums"]["status_colaborador"] | null
-          telefone_celular?: string | null
-          tempo_casa?: never
+          supervisor_id?: string | null
+          telefone?: string | null
+          telefone_residencial?: string | null
+          tiktok?: string | null
+          time_id?: string | null
+          timeman_ultima_sync?: string | null
+          timeman_ultimo_status?: string | null
+          tipo_admissao?: string | null
+          tipo_conta?: Database["public"]["Enums"]["tipo_conta"] | null
           tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"] | null
+          tipo_estabilidade?: string | null
+          tipo_pagamento?: string | null
+          tipo_pagamento_id?: number | null
+          tipo_salario?: string | null
+          tipo_salario_descricao?: string | null
+          tipo_salario_id?: number | null
+          tipo_sanguineo?: string | null
+          titulo_eleitor?: string | null
+          titulo_eleitor_uf?: string | null
+          titulo_secao?: string | null
+          titulo_zona?: string | null
+          uf?: string | null
+          unidade?: string | null
+          uniforme_calca?: string | null
+          uniforme_calcado?: string | null
+          uniforme_camiseta?: string | null
+          updated_at?: string | null
+          version?: number | null
+          whatsapp?: string | null
         }
         Update: {
+          agencia?: string | null
+          aposentado?: boolean | null
+          bairro?: string | null
+          banco_codigo?: string | null
+          banco_nome?: string | null
+          bitrix_id?: string | null
+          bitrix_sync_status?: string | null
+          bitrix_ultima_sync?: string | null
           cargo?: string | null
+          cargo_confianca?: boolean | null
+          categoria_trabalhador?: string | null
+          categoria_trabalhador_id?: number | null
+          cbo?: string | null
+          celular?: string | null
+          centro_custo?: string | null
+          centro_custo_id?: string | null
+          cep?: string | null
+          certificado_reservista?: string | null
+          cidade?: string | null
+          cipa?: boolean | null
+          cnh_categoria?: string | null
+          cnh_data_emissao?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          codigo_firebird?: number | null
+          complemento?: string | null
+          conjuge_cpf?: string | null
+          conjuge_data_nascimento?: string | null
+          conjuge_nome?: string | null
+          conjuge_telefone?: string | null
+          conselho_profissional?: string | null
+          conta?: string | null
           cpf?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          ctps_data_emissao?: string | null
+          ctps_numero?: string | null
+          ctps_serie?: string | null
+          ctps_uf?: string | null
+          cursos_certificacoes?: string | null
           data_admissao?: string | null
+          data_chegada_pais?: string | null
           data_desligamento?: string | null
+          data_exame_admissional?: string | null
+          data_nascimento?: string | null
+          data_saida_pais?: string | null
+          data_senioridade?: string | null
           departamento?: string | null
           email?: string | null
+          email_corporativo?: string | null
+          email_pessoal?: string | null
           empresa_id?: string | null
+          escolaridade?: Database["public"]["Enums"]["escolaridade"] | null
+          estado_civil?: Database["public"]["Enums"]["estado_civil"] | null
+          etnia?: string | null
+          expatriado?: boolean | null
+          experiencia_fim_1?: string | null
+          experiencia_fim_2?: string | null
+          experiencia_tipo?: string | null
+          face_id?: string | null
+          facebook?: string | null
+          formacao?: string | null
+          foto_referencia_url?: string | null
           foto_url?: string | null
+          genero_documento_id?: number | null
+          gestor_ferias_id?: string | null
+          horario_entrada?: string | null
+          horario_saida?: string | null
           id?: string | null
+          identidade_genero?: string | null
+          identificador_tipo?: string | null
+          identificador_validade?: string | null
+          inscricao_orgao_classe?: string | null
+          instagram?: string | null
+          intervalo_minutos?: number | null
+          jornada_horas_mensais?: string | null
+          jornada_semanal?: number | null
+          linkedin?: string | null
+          local_trabalho?: string | null
+          local_trabalho_id?: string | null
+          logradouro?: string | null
+          matricula?: string | null
+          moeda?: string | null
+          moeda_base?: string | null
+          nacionalidade?: string | null
+          nacionalidade_id?: number | null
+          naturalidade_cidade?: string | null
+          naturalidade_uf?: string | null
           nome_completo?: string | null
-          salario?: number | null
+          nome_mae?: string | null
+          nome_nascimento?: string | null
+          nome_pai?: string | null
+          nome_social?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          pais_nascimento?: string | null
+          pais_origem?: string | null
+          pais_residencia_fiscal?: string | null
+          pis_pasep?: string | null
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          primeiro_emprego?: boolean | null
+          pronomes?: string | null
+          regime_fiscal_especial?: boolean | null
+          reservista?: string | null
+          reservista_ra?: string | null
+          reservista_serie?: string | null
+          rg?: string | null
+          rg_data_emissao?: string | null
+          rg_data_validade?: string | null
+          rg_orgao_emissor?: string | null
+          rg_uf?: string | null
+          salario_base?: number | null
+          seguro_desemprego?: boolean | null
+          sexo?: Database["public"]["Enums"]["sexo"] | null
           status?: Database["public"]["Enums"]["status_colaborador"] | null
-          telefone_celular?: string | null
-          tempo_casa?: never
+          supervisor_id?: string | null
+          telefone?: string | null
+          telefone_residencial?: string | null
+          tiktok?: string | null
+          time_id?: string | null
+          timeman_ultima_sync?: string | null
+          timeman_ultimo_status?: string | null
+          tipo_admissao?: string | null
+          tipo_conta?: Database["public"]["Enums"]["tipo_conta"] | null
           tipo_contrato?: Database["public"]["Enums"]["tipo_contrato"] | null
+          tipo_estabilidade?: string | null
+          tipo_pagamento?: string | null
+          tipo_pagamento_id?: number | null
+          tipo_salario?: string | null
+          tipo_salario_descricao?: string | null
+          tipo_salario_id?: number | null
+          tipo_sanguineo?: string | null
+          titulo_eleitor?: string | null
+          titulo_eleitor_uf?: string | null
+          titulo_secao?: string | null
+          titulo_zona?: string | null
+          uf?: string | null
+          unidade?: string | null
+          uniforme_calca?: string | null
+          uniforme_calcado?: string | null
+          uniforme_camiseta?: string | null
+          updated_at?: string | null
+          version?: number | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_categoria_trabalhador_id_fkey"
+            columns: ["categoria_trabalhador_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_trabalhador"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_centro_custo_id_fkey"
+            columns: ["centro_custo_id"]
+            isOneToOne: false
+            referencedRelation: "centros_custo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_genero_documento_id_fkey"
+            columns: ["genero_documento_id"]
+            isOneToOne: false
+            referencedRelation: "generos_documento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_gestor_ferias_id_fkey"
+            columns: ["gestor_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_gestor_ferias_id_fkey"
+            columns: ["gestor_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_gestor_ferias_id_fkey"
+            columns: ["gestor_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_gestor_ferias_id_fkey"
+            columns: ["gestor_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "colaboradores_nacionalidade_id_fkey"
+            columns: ["nacionalidade_id"]
+            isOneToOne: false
+            referencedRelation: "nacionalidades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "colaboradores_tipo_pagamento_id_fkey"
+            columns: ["tipo_pagamento_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_pagamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "colaboradores_tipo_salario_id_fkey"
+            columns: ["tipo_salario_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_salario"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_colaboradores_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_colaboradores_local_trabalho"
+            columns: ["local_trabalho_id"]
+            isOneToOne: false
+            referencedRelation: "locais_trabalho"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_dashboard_time: {
+        Row: {
+          afastados: number | null
+          ativos: number | null
+          empresa_id: string | null
+          total_colaboradores: number | null
         }
         Relationships: [
           {
@@ -18929,16 +19493,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      vw_dashboard_time: {
-        Row: {
-          afastados: number | null
-          desligados: number | null
-          em_ferias: number | null
-          total_ativos: number | null
-          total_geral: number | null
-        }
-        Relationships: []
       }
       vw_faltas_mensal: {
         Row: {
