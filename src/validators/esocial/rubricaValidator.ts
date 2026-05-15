@@ -65,10 +65,10 @@ export function sugerirCorrecaoRubrica(rubrica: ESocialData) {
 
   return {
     ...rubrica,
-    tipo: padrao.tipo,
+    tipo: (padrao.tipo === 'informativa' ? 'informativo' : padrao.tipo) as any,
     incide_inss: padrao.incide_inss,
     incide_fgts: padrao.incide_fgts,
     incide_irrf: padrao.incide_irrf,
-    descricao: padrao.descricao // Opcional: forçar descrição padrão
+    descricao: padrao.descricao
   };
 }
