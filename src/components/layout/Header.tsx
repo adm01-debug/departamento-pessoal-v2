@@ -7,6 +7,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Breadcrumbs } from './Breadcrumbs';
 import { EmpresaSelector } from './EmpresaSelector';
 import { useAuth } from '@/hooks/useAuth';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 interface HeaderProps {
   onMenuClick?: () => void;
