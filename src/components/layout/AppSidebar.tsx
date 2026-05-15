@@ -220,8 +220,8 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
                   <Users className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h1 className="font-display font-bold text-foreground text-sm">Sistema DP</h1>
-                  <p className="text-[10px] text-muted-foreground">Departamento Pessoal</p>
+                  <h1 className="font-display font-bold text-foreground text-sm">TIME | PROMO BRINDES</h1>
+                  <p className="text-[10px] text-muted-foreground">Sistema de Gestão de Pessoas</p>
                 </div>
               </div>
             )}
