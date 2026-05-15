@@ -10,7 +10,7 @@ export function validarRubricaESocial(rubrica: ESocialData): ValidationResult {
   required(rubrica.codigo, 'codigo', errors);
   required(rubrica.descricao, 'descricao', errors);
   required(rubrica.tipo, 'tipo', errors);
-  enumValido(rubrica.tipo, ['provento', 'desconto', 'informativa'], 'tipo', errors);
+  enumValido(rubrica.tipo as string, ['provento', 'desconto', 'informativa', 'informativo'], 'tipo', errors);
 
   // Validação contra rubricas padrão (se o código for um dos conhecidos)
   const padrao = RUBRICAS_PADRAO.find(r => r.codigo === rubrica.codigo);
