@@ -18,12 +18,12 @@ export function FGTSDigitalDashboard() {
     setLoading(true);
     try {
       const competencia = format(new Date(), 'yyyy-MM');
-      const { data, error } = await edgeFunctionsService.gerarGuias({
+      const result = await edgeFunctionsService.gerarGuias({
         empresaId: empresaAtual.id,
         competencia,
         tipo: 'fgts_digital'
       });
-      if (error) throw error;
+      if (!result.ok) throw new Error(result.error.message);
       toast.success('Sincronizado com FGTS Digital via API Caixa!');
     } catch (err: any) {
       toast.error('Falha na sincronização: ' + err.message);

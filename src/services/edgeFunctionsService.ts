@@ -1,21 +1,43 @@
 import { supabase } from '@/integrations/supabase/client';
 import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
 import { v4 as uuidv4 } from 'uuid';
+import { Result, Ok, Err } from '@/types/result';
 
 const getCorrelationHeaders = () => ({
   'x-request-id': uuidv4(),
 });
 
+const handleInvoke = async <T>(name: string, options: any, breaker = genericBreaker): Promise<Result<T>> => {
+  try {
+    return await breaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke(name, {
+        ...options,
+        headers: { ...getCorrelationHeaders(), ...options.headers },
+      });
+      if (error) {
+        return Err({
+          type: 'SERVER_ERROR',
+          severity: 'error' as const,
+          message: error.message || `Erro ao chamar função ${name}`,
+          timestamp: new Date(),
+        });
+      }
+      return Ok(data as T);
+    });
+  } catch (e: any) {
+    return Err({
+      type: 'SERVER_ERROR',
+      severity: 'critical' as const,
+      message: e.message || `Falha crítica na comunicação com ${name}`,
+      timestamp: new Date(),
+    });
+  }
+};
+
 export const edgeFunctionsService = {
   /** Dispara alertas automáticos de DP via email */
-  dispararAlertasDP: async () => {
-    const { data, error } = await supabase.functions.invoke('alertas-dp', {
-      body: { trigger: 'manual' },
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  dispararAlertasDP: async () => 
+    handleInvoke('alertas-dp', { body: { trigger: 'manual' } }),
 
   /** Envia relatório por email via Resend */
   enviarRelatorioEmail: async (params: {
@@ -23,44 +45,21 @@ export const edgeFunctionsService = {
     destinatarios: string[];
     empresaId: string;
     competencia?: string;
-  }) => {
-    return resendBreaker.execute(async () => {
-      const { data, error } = await supabase.functions.invoke('enviar-relatorio', {
-        body: params,
-        headers: getCorrelationHeaders(),
-      });
-      if (error) throw error;
-      return data;
-    });
-  },
+  }) => handleInvoke('enviar-relatorio', { body: params }, resendBreaker),
 
   /** Gera guias DARF/GPS/FGTS via edge function */
   gerarGuias: async (params: {
     empresaId: string;
     competencia: string;
     tipo: 'darf' | 'gps' | 'fgts' | 'fgts_digital' | 'todos';
-  }) => {
-    const { data, error } = await supabase.functions.invoke('gerar-guias', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('gerar-guias', { body: params }),
 
   /** Processa ponto do período via edge function */
   processarPonto: async (params: {
     empresaId: string;
     dataInicio: string;
     dataFim: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('processar-ponto', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('processar-ponto', { body: params }),
 
   /** Calcula férias via edge function */
   calcularFerias: async (params: {
@@ -68,29 +67,13 @@ export const edgeFunctionsService = {
     dias_ferias?: number;
     dias_abono?: number;
     colaborador_id?: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('calcular-ferias', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('calcular-ferias', { body: params }),
 
   /** Calcula folha via edge function server-side com resiliência */
   calcularFolha: async (params: {
     empresaId: string;
     competencia: string;
-  }) => {
-    return genericBreaker.execute(async () => {
-      const { data, error } = await supabase.functions.invoke('calcular-folha', {
-        body: params,
-        headers: getCorrelationHeaders(),
-      });
-      if (error) throw error;
-      return data;
-    });
-  },
+  }) => handleInvoke('calcular-folha', { body: params }),
 
   /** Calcula rescisão via edge function */
   calcularRescisao: async (params: {
@@ -102,58 +85,24 @@ export const edgeFunctionsService = {
     saldo_fgts: number;
     ferias_vencidas: number;
     dependentes_irrf: number;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('calcular-rescisao', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('calcular-rescisao', { body: params }),
 
   /** Exportação server-side */
   exportarDados: async (params: {
     tabela: string;
     formato: 'csv' | 'json';
     filtros?: Record<string, any>;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('exportacao', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('exportacao', { body: params }),
 
   /** Health check do sistema */
-  healthcheck: async () => {
-    const { data, error } = await supabase.functions.invoke('healthcheck', {
-      body: {},
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  healthcheck: async () => handleInvoke('healthcheck', { body: {} }),
 
   /** Limpeza de dados expirados */
-  limpezaDados: async () => {
-    const { data, error } = await supabase.functions.invoke('limpeza', {
-      body: {},
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  limpezaDados: async () => handleInvoke('limpeza', { body: {} }),
 
   /** Backup server-side */
-  backupServidor: async (empresaId?: string) => {
-    const { data, error } = await supabase.functions.invoke('backup', {
-      body: { empresaId },
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  backupServidor: async (empresaId?: string) => 
+    handleInvoke('backup', { body: { empresaId } }),
 
   /** OCR de documentos via AI */
   ocrDocumento: async (params: {
@@ -161,24 +110,11 @@ export const edgeFunctionsService = {
     bucket?: string;
     filePath?: string;
     documentType?: 'cpf' | 'rg' | 'ctps' | 'comprovante_endereco';
-  }) => {
-    const { data, error } = await supabase.functions.invoke('OCR', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('OCR', { body: params }),
 
   /** Métricas do sistema */
-  metricas: async (empresaId: string) => {
-    const { data, error } = await supabase.functions.invoke('metricas', {
-      body: { empresaId },
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  metricas: async (empresaId: string) => 
+    handleInvoke('metricas', { body: { empresaId } }),
 
   /** Notificações */
   enviarNotificacao: async (params: {
@@ -188,37 +124,17 @@ export const edgeFunctionsService = {
     destinatarios?: { user_id: string }[];
     assunto?: string;
     conteudo?: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('notificacao', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('notificacao', { body: params }),
 
   /** Processar agendamentos de relatórios */
-  processarAgendamentos: async () => {
-    const { data, error } = await supabase.functions.invoke('processar-agendamentos', {
-      body: {},
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  processarAgendamentos: async () => 
+    handleInvoke('processar-agendamentos', { body: {} }),
 
   /** Gerar holerite server-side */
   gerarHolerite: async (params: {
     colaboradorId: string;
     competencia: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('gerar-holerite', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('gerar-holerite', { body: params }),
 
   /** Assinatura digital */
   assinaturaDigital: async (params: {
@@ -227,14 +143,7 @@ export const edgeFunctionsService = {
     admissaoId?: string;
     assinaturaBase64?: string;
     ipAddress?: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('assinaturaDigital', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('assinaturaDigital', { body: params }),
 
   /** Cache de dados */
   cache: async (params: {
@@ -243,28 +152,14 @@ export const edgeFunctionsService = {
     ttlSeconds?: number;
     table?: string;
     query?: Record<string, any>;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('cache', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('cache', { body: params }),
 
   /** Criptografia */
   criptografia: async (params: {
     action: 'encrypt' | 'decrypt' | 'hash' | 'generate_token';
     data?: any;
     password?: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('criptografia', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('criptografia', { body: params }),
 
   /** Importação de dados */
   importacao: async (params: {
@@ -274,35 +169,14 @@ export const edgeFunctionsService = {
     csvContent?: string;
     dados?: any;
     empresaId?: string;
-  }) => {
-    const { data, error } = await supabase.functions.invoke('importacao', {
-      body: params,
-      headers: getCorrelationHeaders(),
-    });
-    if (error) throw error;
-    return data;
-  },
+  }) => handleInvoke('importacao', { body: params }),
 
   /** Sincronizar Bitrix24 */
   sincronizarBitrix: async (params: {
     action: 'sync_departamentos' | 'sync_colaboradores' | 'sync_cargos' | 'sync_all' | 'status';
-  }) => {
-    return bitrixBreaker.execute(async () => {
-      const { data, error } = await supabase.functions.invoke('sincronizar-bitrix', {
-        body: params,
-        headers: getCorrelationHeaders(),
-      });
-      if (error) throw error;
-      return data;
-    });
-  },
+  }) => handleInvoke('sincronizar-bitrix', { body: params }, bitrixBreaker),
 
   /** Verifica rate limit */
-  checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) => {
-    const { data, error } = await supabase.functions.invoke('rateLimit', {
-      body: { key, limit, window_seconds: windowSeconds },
-    });
-    if (error) throw error;
-    return data;
-  },
+  checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) => 
+    handleInvoke('rateLimit', { body: { key, limit, window_seconds: windowSeconds } }),
 };
