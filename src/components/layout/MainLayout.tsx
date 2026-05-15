@@ -20,7 +20,23 @@ const MemoizedHeader = memo(Header);
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { user, isReady } = useAuth();
+  const { user, isReady, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleInactivity = () => {
+      // Opcional: Implementar logout automático por inatividade se necessário para compliance
+    };
+    
+    const channel = (window as any).supabase?.channel('system-health')
+      .on('presence', { event: 'sync' }, () => {
+        // Telemetria silenciosa de sessão ativa
+      })
+      .subscribe();
+
+    return () => {
+      channel?.unsubscribe();
+    };
+  }, []);
 
   if (!isReady) return null; // Prevenção de flash de layout antes do carregamento da sessão
 
