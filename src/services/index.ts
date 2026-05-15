@@ -148,7 +148,7 @@ export const feriasService = {
     return { data: (data as any[]) || [], count: count || 0 };
   },
   async syncWithHub(empresaId: string) {
-    console.log('Iniciando sincronização incremental com o hub unificado...');
+    // Sincronização incremental com o hub unificado
     const { data, error } = await supabase
       .from('ferias')
       .select('id, updated_at')
