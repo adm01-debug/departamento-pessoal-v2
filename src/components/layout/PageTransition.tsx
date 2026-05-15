@@ -73,6 +73,7 @@ export function PageTransition({ children }: PageTransitionProps) {
   const direction = currentIndex >= prevIndex.current ? 1 : -1;
   prevIndex.current = currentIndex;
 
+  return (
     <AnimatePresence mode="popLayout" initial={false} custom={direction}>
       <motion.div
         key={location.key}
@@ -87,4 +88,5 @@ export function PageTransition({ children }: PageTransitionProps) {
         {children}
       </motion.div>
     </AnimatePresence>
+  );
 }
