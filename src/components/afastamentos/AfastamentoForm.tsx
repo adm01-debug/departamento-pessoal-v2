@@ -144,7 +144,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                 <CommandList>
                   <CommandEmpty>Nenhum colaborador encontrado.</CommandEmpty>
                   <CommandGroup>
-                    {Array.isArray(colaboradores) && colaboradores.map((c: any) => (
+                    {Array.isArray(colaboradores) && (colaboradores as any[]).map((c: any) => (
                       <CommandItem
                         key={c.id}
                         onSelect={() => setValue('colaborador_id', c.id)}
@@ -152,6 +152,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                         {c.nome_completo}
                       </CommandItem>
                     ))}
+
                   </CommandGroup>
                 </CommandList>
               </Command>
