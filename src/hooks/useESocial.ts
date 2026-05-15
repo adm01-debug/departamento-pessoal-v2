@@ -62,13 +62,46 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const configQuery = useQuery({
+    queryKey: ['esocial-config'],
+    queryFn: async () => esocialService.getConfig(''),
+  });
+  const certificadosQuery = useQuery({
+    queryKey: ['esocial-certificados'],
+    queryFn: async () => esocialService.listarCertificados(''),
+  });
+  const logsQuery = useQuery({
+    queryKey: ['esocial-logs'],
+    queryFn: async () => esocialService.listarTransmissaoLogs(''),
+  });
+
+  const enviarLoteMutation = useMutation({
+    mutationFn: async (eventoIds: string[]) => {
+      const results: any[] = [];
+      for (const id of eventoIds) {
+        results.push(await esocialService.enviarEvento(id, ''));
+      }
+      return results;
+    },
+    onSuccess: () => { toast.success('Lote enviado'); invalidate(); },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
   return {
     eventos: eventosQuery.data || [],
     stats: statsQuery.data || { enviados: 0, pendentes: 0, erros: 0, conformidade: 100 },
+    config: configQuery.data,
+    certificados: certificadosQuery.data || [],
+    logs: logsQuery.data || [],
     isLoading: eventosQuery.isLoading || statsQuery.isLoading,
+    criarEvento: esocialService.criarEvento,
     enviarEvento: enviarMutation.mutate,
+    enviarLote: enviarLoteMutation.mutate,
     reenviarEvento: reenviarMutation.mutate,
     gerarEventosPeriodo: gerarEventosMutation.mutate,
+    salvarConfig: esocialService.salvarConfig,
+    adicionarCertificado: esocialService.adicionarCertificado,
+    refreshLogs: () => queryClient.invalidateQueries({ queryKey: ['esocial-logs'] }),
     isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending,
   };
 }
