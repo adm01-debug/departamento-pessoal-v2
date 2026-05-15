@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { esocialService } from '@/services/esocialService';
+import * as esocialService from '@/services/esocialService';
 import { toast } from 'sonner';
 
 export function useESocial() {
@@ -8,7 +8,7 @@ export function useESocial() {
   const eventosQuery = useQuery({
     queryKey: ['esocial-eventos'],
     queryFn: async () => {
-      const res = await esocialService.listarEventos();
+      const res = await esocialService.listarEventos(null);
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
@@ -17,7 +17,7 @@ export function useESocial() {
   const statsQuery = useQuery({
     queryKey: ['esocial-stats'],
     queryFn: async () => {
-      const res = await esocialService.obterEstatisticas();
+      const res = await esocialService.obterEstatisticas(null);
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
@@ -27,19 +27,6 @@ export function useESocial() {
     queryClient.invalidateQueries({ queryKey: ['esocial-eventos'] });
     queryClient.invalidateQueries({ queryKey: ['esocial-stats'] });
   };
-
-  const criarMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const res = await esocialService.criarEvento(data);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
-    },
-    onSuccess: () => {
-      toast.success('Evento criado com sucesso');
-      invalidate();
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
 
   const enviarMutation = useMutation({
     mutationFn: async ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) => {
@@ -72,28 +59,6 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const enviarLoteMutation = useMutation({
-    mutationFn: async ({ eventoIds, empresaId }: { eventoIds: string[]; empresaId: string }) => {
-      const results = [];
-      for (const id of eventoIds) {
-        const res = await esocialService.enviarEvento(id, empresaId);
-        results.push(res.ok ? res.value : { success: false, error: res.error.message });
-      }
-      return results;
-    },
-    onSuccess: (results) => {
-      const successes = results.filter(r => r?.success).length;
-      const total = results.length;
-      if (successes === total) {
-        toast.success(`${successes} eventos enviados com sucesso.`);
-      } else {
-        toast.warning(`${successes} de ${total} eventos enviados. Verifique os erros.`);
-      }
-      invalidate();
-    },
-    onError: (err: Error) => toast.error(`Erro no processamento do lote: ${err.message}`),
-  });
-
   const gerarEventosMutation = useMutation({
     mutationFn: async ({ empresaId, competencia }: { empresaId: string; competencia: string }) => {
       const res = await esocialService.gerarEventosPeriodo(empresaId, competencia);
@@ -107,74 +72,13 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const configQuery = useQuery({
-    queryKey: ['esocial-config'],
-    queryFn: async () => {
-      const res = await esocialService.getConfig();
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
-    },
-  });
-
-  const certificadosQuery = useQuery({
-    queryKey: ['esocial-certificados'],
-    queryFn: async () => {
-      const res = await esocialService.listarCertificados();
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
-    },
-  });
-
-  const salvarConfigMutation = useMutation({
-    mutationFn: async (config: any) => {
-      const res = await esocialService.salvarConfig(config);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
-    },
-    onSuccess: () => {
-      toast.success('Configurações salvas');
-      queryClient.invalidateQueries({ queryKey: ['esocial-config'] });
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const addCertMutation = useMutation({
-    mutationFn: async (cert: any) => {
-      const res = await esocialService.adicionarCertificado(cert);
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
-    },
-    onSuccess: () => {
-      toast.success('Certificado adicionado');
-      queryClient.invalidateQueries({ queryKey: ['esocial-certificados'] });
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const logsQuery = useQuery({
-    queryKey: ['esocial-logs'],
-    queryFn: async () => {
-      const res = await esocialService.listarTransmissaoLogs();
-      if (!res.ok) throw new Error(res.error.message);
-      return res.value;
-    },
-  });
-
   return {
     eventos: eventosQuery.data || [],
     stats: statsQuery.data || { enviados: 0, pendentes: 0, erros: 0, conformidade: 100 },
-    config: configQuery.data,
-    certificados: certificadosQuery.data || [],
-    logs: logsQuery.data || [],
-    isLoading: eventosQuery.isLoading || configQuery.isLoading || logsQuery.isLoading,
-    criarEvento: criarMutation.mutate,
+    isLoading: eventosQuery.isLoading || statsQuery.isLoading,
     enviarEvento: enviarMutation.mutate,
     reenviarEvento: reenviarMutation.mutate,
     gerarEventosPeriodo: gerarEventosMutation.mutate,
-    enviarLote: enviarLoteMutation.mutate,
-    salvarConfig: salvarConfigMutation.mutate,
-    adicionarCertificado: addCertMutation.mutate,
-    isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending || enviarLoteMutation.isPending,
-    refreshLogs: () => queryClient.invalidateQueries({ queryKey: ['esocial-logs'] }),
+    isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending,
   };
 }
