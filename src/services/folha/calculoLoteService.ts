@@ -82,7 +82,7 @@ export const calculoLoteService = {
       // 3. Processar cada colaborador
       for (const colab of colaboradores) {
         try {
-          const dependentesCount = colab.dependentes?.length || 0;
+          const dependentesCount = colab.dependentes?.filter((d: any) => d.tipo === 'filho' || d.tipo === 'enteado').length || 0;
           const eventosVariaveis = colab.eventos_variaveis || [];
           const jornada = colab.contratos?.[0]?.jornada_mensal || 220;
 
@@ -107,13 +107,13 @@ export const calculoLoteService = {
 
           // 3.2 Buscar Benefícios Ativos (Vale Transporte / Vale Alimentação / Refeição)
           const { data: beneficiosVinculos } = await (supabase as any)
-            .from('colaborador_beneficios')
+            .from('beneficios_colaborador')
             .select(`
               *,
-              beneficio:beneficios(*)
+              beneficio:tipos_beneficio(*)
             `)
             .eq('colaborador_id', colab.id)
-            .eq('status', 'ativo');
+            .eq('ativo', true);
 
           const beneficiosEventos: any[] = [];
           if (beneficiosVinculos) {
@@ -121,7 +121,7 @@ export const calculoLoteService = {
               if (v.beneficio) {
                 // Cálculo de desconto de VT (6% sobre salário base limitado ao custo do benefício)
                 if (v.beneficio.tipo === 'VT') {
-                  const custoVT = Number(v.valor_colaborador || 0);
+                  const custoVT = Number(v.valor || 0);
                   const descontoMaximoVT = Number(colab.salario_base || 0) * 0.06;
                   const valorDescontoVT = Math.min(custoVT, descontoMaximoVT);
                   
@@ -136,12 +136,12 @@ export const calculoLoteService = {
                 }
                 
                 // Outros descontos de benefícios (PAT, etc.)
-                if (v.valor_colaborador && v.beneficio.tipo !== 'VT') {
+                if (v.desconto && v.beneficio.tipo !== 'VT') {
                    beneficiosEventos.push({
                       codigo: '5020',
                       descricao: `Coparticipação ${v.beneficio.nome}`,
                       tipo: 'desconto',
-                      valor: Number(v.valor_colaborador)
+                      valor: Number(v.desconto)
                    });
                 }
               }
