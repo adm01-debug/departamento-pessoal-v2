@@ -21,7 +21,7 @@ export interface ValidationWarning {
   mensagem: string;
 }
 
-export function required(val: any, campo: string, errors: ValidationError[]) {
+export function required(val: unknown, campo: string, errors: ValidationError[]) {
   if (val === null || val === undefined || val === '') {
     errors.push({ campo, mensagem: `${campo} é obrigatório`, regra: 'REGRA_OBRIGATORIO' });
   }
