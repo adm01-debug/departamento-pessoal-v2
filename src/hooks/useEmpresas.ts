@@ -117,14 +117,16 @@ export function useEmpresas(): UseEmpresasReturn {
 
   useEffect(() => {
     // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
-    // Isso evita o loop infinito de re-renderização ao navegar
+    // Isso evita o loop infinito de re-renderização ao navegar.
+    // Usamos um timeout curto para garantir que o estado do store esteja pronto.
     if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
       const targetId = empresaDefault?.id || userEmpresas[0]?.empresa?.id;
       if (targetId) {
-        setEmpresaAtual(targetId);
+        const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
+        return () => clearTimeout(timer);
       }
     }
-  }, [userEmpresas, empresaAtualId, empresaDefault, setEmpresaAtual]);
+  }, [userEmpresas?.length, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
 
   // Listar todas as empresas (para admin)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
