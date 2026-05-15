@@ -31,6 +31,11 @@ import {
 export default function ColaboradorDetalhesPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [activeMainTab, setActiveMainTab] = useState('geral');
+  const [activePessoalTab, setActivePessoalTab] = useState('dependentes');
+  const [activeProfissionalTab, setActiveProfissionalTab] = useState('historico');
+  const [activeFinanceiroTab, setActiveFinanceiroTab] = useState('contas');
+  const [activeDocumentosTab, setActiveDocumentosTab] = useState('pessoais');
 
   const { data: colaborador, isLoading } = useQuery({
     queryKey: ['colaborador', id],
