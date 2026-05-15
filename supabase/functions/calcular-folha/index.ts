@@ -76,13 +76,18 @@ Deno.serve(async (req) => {
     });
 
     const totais = { bruto: 0, descontos: 0, liquido: 0, fgts: 0 };
-    itens.forEach(i => { totais.bruto += i.salario_bruto; totais.descontos += i.total_descontos; totais.liquido += i.salario_liquido; totais.fgts += i.fgts; });
+    itens.forEach(i => { 
+      totais.bruto = Number((totais.bruto + i.salario_bruto).toFixed(2));
+      totais.descontos = Number((totais.descontos + i.total_descontos).toFixed(2));
+      totais.liquido = Number((totais.liquido + i.salario_liquido).toFixed(2));
+      totais.fgts = Number((totais.fgts + i.fgts).toFixed(2));
+    });
 
     await supabase.from('folhas_pagamento').upsert({
       empresa_id, competencia, status: 'calculada',
-      total_bruto: Math.round(totais.bruto * 100) / 100,
-      total_descontos: Math.round(totais.descontos * 100) / 100,
-      total_liquido: Math.round(totais.liquido * 100) / 100,
+      total_bruto: totais.bruto,
+      total_descontos: totais.descontos,
+      total_liquido: totais.liquido,
       total_colaboradores: colaboradores.length,
     }, { onConflict: 'empresa_id,competencia' });
 
