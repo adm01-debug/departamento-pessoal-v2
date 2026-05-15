@@ -73,8 +73,7 @@ export function PageTransition({ children }: PageTransitionProps) {
   const direction = currentIndex >= prevIndex.current ? 1 : -1;
   prevIndex.current = currentIndex;
 
-  return (
-    <AnimatePresence mode="wait" initial={false} custom={direction}>
+    <AnimatePresence mode="popLayout" initial={false} custom={direction}>
       <motion.div
         key={location.key}
         custom={direction}
@@ -83,10 +82,9 @@ export function PageTransition({ children }: PageTransitionProps) {
         animate="center"
         exit="exit"
         transition={transition}
-        className="flex-1"
+        className="flex-1 w-full"
       >
         {children}
       </motion.div>
     </AnimatePresence>
-  );
 }
