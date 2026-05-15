@@ -59,7 +59,7 @@ export function validarRubricaESocial(rubrica: ESocialData): ValidationResult {
 /**
  * Sugere correções automáticas para uma rubrica com base no eSocial
  */
-export function sugerirCorrecaoRubrica(rubrica: any) {
+export function sugerirCorrecaoRubrica(rubrica: ESocialData) {
   const padrao = RUBRICAS_PADRAO.find(r => r.codigo === rubrica.codigo);
   if (!padrao) return null;
 
