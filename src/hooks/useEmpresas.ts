@@ -114,10 +114,14 @@ export function useEmpresas(): UseEmpresasReturn {
   const empresaEfetiva = empresaAtual || empresaDefault || userEmpresas?.[0]?.empresa;
 
   useEffect(() => {
-    if (empresaEfetiva?.id && empresaAtualId !== empresaEfetiva.id) {
-      setEmpresaAtual(empresaEfetiva.id);
+    // Only attempt to set initial company if we have data and NO current selection
+    if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
+      const empresaEfetiva = empresaDefault || userEmpresas[0]?.empresa;
+      if (empresaEfetiva?.id) {
+        setEmpresaAtual(empresaEfetiva.id);
+      }
     }
-  }, [empresaEfetiva?.id, empresaAtualId, setEmpresaAtual]);
+  }, [userEmpresas, empresaAtualId, empresaDefault, setEmpresaAtual]);
 
   // Listar todas as empresas (para admin)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
