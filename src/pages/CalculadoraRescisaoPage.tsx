@@ -101,12 +101,13 @@ export default function CalculadoraRescisaoPage() {
     }
   };
 
-  const handleCalc = useCallback(() => {
+  const handleCalc = useCallback(async () => {
     if (!form.salario || !form.dataAdmissao || !form.dataDesligamento) {
       toast.error('Preencha salário, data de admissão e desligamento');
       return;
     }
-    setResult(calcularRescisao({
+    
+    const result = await calcularRescisao({
       salario: Number(form.salario),
       dataAdmissao: form.dataAdmissao,
       dataDesligamento: form.dataDesligamento,
@@ -114,7 +115,14 @@ export default function CalculadoraRescisaoPage() {
       avisoTrabalhado: form.avisoTrabalhado,
       feriasVencidas: form.feriasVencidas,
       saldoFGTS: Number(form.saldoFGTS || 0),
-    }));
+    });
+
+    if (result.ok) {
+      setResult(result.value);
+      toast.success('Rescisão calculada com sucesso!');
+    } else {
+      toast.error(`Erro no cálculo: ${result.error.message}`);
+    }
   }, [form]);
 
   const salvarHistorico = useCallback(async () => {
