@@ -94,7 +94,21 @@ const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
 
 
 function PageLoader() {
-  return <div className="p-6"><Skeleton className="h-64 w-full" /></div>;
+  return (
+    <div className="flex flex-col space-y-4 p-6 animate-pulse">
+      <div className="flex justify-between items-center mb-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="h-10 w-32 rounded-xl" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+      </div>
+      <Skeleton className="h-96 w-full rounded-2xl" />
+    </div>
+  );
 }
 
 function LazyPage({ Component }: { Component: React.LazyExoticComponent<() => React.ReactElement> }) {
