@@ -61,8 +61,11 @@ describe('folhaPagamentoService', () => {
         { gravidade: 'alta', mensagem: 'Erro crítico' }
       ]);
 
-      await expect(folhaPagamentoService.fecharFolha('folha-1'))
-        .rejects.toThrow(/existem 1 alertas críticos/);
+      const result = await folhaPagamentoService.fecharFolha('folha-1');
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.message).toMatch(/existem 1 alertas críticos/);
+      }
     });
 
     it('should update folha status to fechada if no critical alerts', async () => {
