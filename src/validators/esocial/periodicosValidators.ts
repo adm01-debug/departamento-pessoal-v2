@@ -130,22 +130,21 @@ export function validarS1210(dados: ESocialData): ValidationResult {
   const warnings: ValidationWarning[] = [];
   required(dados.perApur, 'perApur', errors);
   required(dados.cpfTrab, 'cpfTrab', errors);
-  cpfValido(dados.cpfTrab, 'cpfTrab', errors);
-  if (dados.infoPgto) {
-    for (let i = 0; i < dados.infoPgto.length; i++) {
-      const pgto = dados.infoPgto[i];
+  cpfValido(dados.cpfTrab as string, 'cpfTrab', errors);
+  if (Array.isArray(dados.infoPgto)) {
+    dados.infoPgto.forEach((pgto: any, i: number) => {
       required(pgto.dtPgto, `infoPgto[${i}].dtPgto`, errors);
-      dataValida(pgto.dtPgto, `infoPgto[${i}].dtPgto`, errors);
+      dataValida(pgto.dtPgto as string, `infoPgto[${i}].dtPgto`, errors);
       required(pgto.tpPgto, `infoPgto[${i}].tpPgto`, errors);
       enumValido(pgto.tpPgto?.toString(), ['1', '2', '3', '4', '5', '6', '9'], `infoPgto[${i}].tpPgto`, errors);
-    }
+    });
   } else {
     errors.push({ campo: 'infoPgto', mensagem: 'Informação de pagamento obrigatória', regra: 'REGRA_OBRIGATORIO' });
   }
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1260(dados: Record<string, any>): ValidationResult {
+export function validarS1260(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.perApur, 'perApur', errors);
@@ -156,7 +155,7 @@ export function validarS1260(dados: Record<string, any>): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1270(dados: Record<string, any>): ValidationResult {
+export function validarS1270(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.perApur, 'perApur', errors);
@@ -165,14 +164,15 @@ export function validarS1270(dados: Record<string, any>): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1280(dados: Record<string, any>): ValidationResult {
+export function validarS1280(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.perApur, 'perApur', errors);
   required(dados.indSubstPatr, 'indSubstPatr', errors);
   enumValido(dados.indSubstPatr?.toString(), ['1', '2'], 'indSubstPatr', errors);
-  if (dados.percRedContrib !== undefined) {
-    if (dados.percRedContrib < 0 || dados.percRedContrib > 100) {
+  const percRedContrib = dados.percRedContrib as number | undefined;
+  if (percRedContrib !== undefined) {
+    if (percRedContrib < 0 || percRedContrib > 100) {
       errors.push({ campo: 'percRedContrib', mensagem: 'Percentual deve estar entre 0 e 100', regra: 'REGRA_PERCENTUAL' });
     }
   }
