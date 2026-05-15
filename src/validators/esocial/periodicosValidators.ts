@@ -3,16 +3,16 @@
  */
 import { ValidationResult, ValidationError, ValidationWarning, required, maxLen, cpfValido, cnpjValido, enumValido, dataValida, ESocialData } from './helpers';
 
-export function validarS1000(dados: Record<string, any>): ValidationResult {
+export function validarS1000(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.tpInsc, 'tpInsc', errors);
   enumValido(dados.tpInsc?.toString(), ['1', '2', '3', '4'], 'tpInsc', errors);
   required(dados.nrInsc, 'nrInsc', errors);
-  if (dados.tpInsc === 1) cnpjValido(dados.nrInsc, 'nrInsc', errors);
-  if (dados.tpInsc === 2) cpfValido(dados.nrInsc, 'nrInsc', errors);
+  if (dados.tpInsc === 1) cnpjValido(dados.nrInsc as string, 'nrInsc', errors);
+  if (dados.tpInsc === 2) cpfValido(dados.nrInsc as string, 'nrInsc', errors);
   required(dados.nmRazao, 'nmRazao', errors);
-  maxLen(dados.nmRazao, 115, 'nmRazao', errors);
+  maxLen(dados.nmRazao as string, 115, 'nmRazao', errors);
   required(dados.classTrib, 'classTrib', errors);
   required(dados.natJurid, 'natJurid', errors);
   required(dados.indCoop, 'indCoop', errors);
