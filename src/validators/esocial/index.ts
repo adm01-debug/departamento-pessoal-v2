@@ -26,7 +26,7 @@ import {
 } from './naoPeriodicosValidators';
 import { validarS2210, validarS2220, validarS2240 } from './sstValidators';
 
-const validadores: Record<string, (dados: Record<string, any>) => ValidationResult> = {
+const validadores: Record<string, (dados: ESocialData) => ValidationResult> = {
   'S-1000': validarS1000, 'S-1005': validarS1005, 'S-1010': validarS1010,
   'S-1020': validarS1020, 'S-1070': validarS1070, 'S-1200': validarS1200,
   'S-1210': validarS1210, 'S-1260': validarS1260, 'S-1270': validarS1270,
@@ -37,7 +37,7 @@ const validadores: Record<string, (dados: Record<string, any>) => ValidationResu
   'S-2399': validarS2399, 'S-2400': validarS2400, 'S-3000': validarS3000,
 };
 
-export function validarEvento(tipo: string, dados: Record<string, any>): ValidationResult {
+export function validarEvento(tipo: string, dados: ESocialData): ValidationResult {
   const fn = validadores[tipo];
   if (!fn) {
     return { 
