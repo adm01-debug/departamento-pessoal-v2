@@ -1,16 +1,16 @@
-import { ValidationResult, ValidationError, required, enumValido } from './helpers';
+import { ValidationResult, ValidationError, required, enumValido, ESocialData } from './helpers';
 import { RUBRICAS_PADRAO } from '@/constants/rubricas';
 
 /**
  * Validação de Rubricas vs Tabela de Referência do eSocial
  */
-export function validarRubricaESocial(rubrica: any): ValidationResult {
+export function validarRubricaESocial(rubrica: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   
   required(rubrica.codigo, 'codigo', errors);
   required(rubrica.descricao, 'descricao', errors);
   required(rubrica.tipo, 'tipo', errors);
-  enumValido(rubrica.tipo, ['provento', 'desconto', 'informativa'], 'tipo', errors);
+  enumValido(rubrica.tipo as string, ['provento', 'desconto', 'informativa', 'informativo'], 'tipo', errors);
 
   // Validação contra rubricas padrão (se o código for um dos conhecidos)
   const padrao = RUBRICAS_PADRAO.find(r => r.codigo === rubrica.codigo);
@@ -59,16 +59,16 @@ export function validarRubricaESocial(rubrica: any): ValidationResult {
 /**
  * Sugere correções automáticas para uma rubrica com base no eSocial
  */
-export function sugerirCorrecaoRubrica(rubrica: any) {
+export function sugerirCorrecaoRubrica(rubrica: ESocialData) {
   const padrao = RUBRICAS_PADRAO.find(r => r.codigo === rubrica.codigo);
   if (!padrao) return null;
 
   return {
     ...rubrica,
-    tipo: padrao.tipo,
+    tipo: (padrao.tipo === 'informativa' ? 'informativo' : padrao.tipo) as any,
     incide_inss: padrao.incide_inss,
     incide_fgts: padrao.incide_fgts,
     incide_irrf: padrao.incide_irrf,
-    descricao: padrao.descricao // Opcional: forçar descrição padrão
+    descricao: padrao.descricao
   };
 }

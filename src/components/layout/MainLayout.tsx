@@ -1,8 +1,8 @@
 // src/components/layout/MainLayout.tsx
-import { useState, type ReactNode, memo, useMemo } from 'react';
+import { useState, type ReactNode, memo, useMemo, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Sidebar } from './Sidebar';
+import { Sidebar } from './index';
 import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
 import { PageTransition } from './PageTransition';
@@ -20,7 +20,23 @@ const MemoizedHeader = memo(Header);
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { user, isReady } = useAuth();
+  const { user, isReady, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleInactivity = () => {
+      // Opcional: Implementar logout automático por inatividade se necessário para compliance
+    };
+    
+    const channel = (window as any).supabase?.channel('system-health')
+      .on('presence', { event: 'sync' }, () => {
+        // Telemetria silenciosa de sessão ativa
+      })
+      .subscribe();
+
+    return () => {
+      channel?.unsubscribe();
+    };
+  }, []);
 
   if (!isReady) return null; // Prevenção de flash de layout antes do carregamento da sessão
 
@@ -33,14 +49,14 @@ export function MainLayout({ children }: MainLayoutProps) {
       <GuidedTour />
 
       <div className={cn('hidden md:block transition-all duration-500 ease-in-out', sidebarOpen ? 'w-64' : 'w-16')}>
-        <MemoizedSidebar collapsed={!sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <MemoizedSidebar onSearchOpen={() => {}} />
       </div>
 
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileSidebarOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="absolute left-0 top-0 h-full w-64" onClick={(e) => e.stopPropagation()}>
-            <MemoizedSidebar />
+            <MemoizedSidebar onSearchOpen={() => {}} />
           </div>
         </div>
       )}

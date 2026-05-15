@@ -6,10 +6,9 @@ import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Eager-loaded core pages
+// Core pages with optimized pre-loading
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
-import NotFoundPage from '@/pages/NotFoundPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
 
 // Lazy-loaded pages
@@ -91,6 +90,7 @@ const FinanceiroBancarioPage = lazy(() => import('@/pages/FinanceiroBancarioPage
 const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
 const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 
 function PageLoader() {
