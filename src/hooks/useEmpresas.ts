@@ -111,15 +111,17 @@ export function useEmpresas(): UseEmpresasReturn {
 
   // Se não há empresa selecionada, usar a padrão
   const empresaDefault = userEmpresas?.find((ue) => ue.is_default)?.empresa;
-  // We use current selection (persisted) first, fallback to default, then first available
+  
+  // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista)
   const empresaEfetiva = empresaAtual || empresaDefault || userEmpresas?.[0]?.empresa;
 
   useEffect(() => {
-    // Only attempt to set initial company if we have data and NO current selection
+    // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
+    // Isso evita o loop infinito de re-renderização ao navegar
     if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
-      const empresaEfetiva = empresaDefault || userEmpresas[0]?.empresa;
-      if (empresaEfetiva?.id) {
-        setEmpresaAtual(empresaEfetiva.id);
+      const targetId = empresaDefault?.id || userEmpresas[0]?.empresa?.id;
+      if (targetId) {
+        setEmpresaAtual(targetId);
       }
     }
   }, [userEmpresas, empresaAtualId, empresaDefault, setEmpresaAtual]);
