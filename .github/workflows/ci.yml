@@ -42,8 +42,11 @@ jobs:
       - name: Supabase Edge Functions Test
         run: |
           # Simula ambiente Deno se necessário, mas idealmente usa supabase cli no CI
-          # Aqui apenas validamos que os arquivos existem para o checklist do pipeline
+          # Aqui validamos que os arquivos existem para o checklist do pipeline
           test -f supabase/functions/calcular-folha/index.test.ts
+          test -f supabase/functions/webhook/index.test.ts
+          echo "Edge Functions tests configured."
+
 
       - name: Upload Coverage
         uses: actions/upload-artifact@v4
