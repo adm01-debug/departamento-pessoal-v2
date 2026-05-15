@@ -1,33 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEmpresas } from '@/hooks/useEmpresas';
-import { useAuth } from '@/hooks/useAuth';
-import * as esocialService from '@/services/esocialService';
+import { esocialService } from '@/services/esocialService';
 import { toast } from 'sonner';
 
 export function useESocial() {
-  const { user } = useAuth();
-  const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
-  const empresaId = empresaAtual?.id || null;
 
   const eventosQuery = useQuery({
-    queryKey: ['esocial-eventos', empresaId],
+    queryKey: ['esocial-eventos'],
     queryFn: async () => {
-      const res = await esocialService.listarEventos(empresaId);
+      const res = await esocialService.listarEventos();
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
-    enabled: !!user,
   });
 
   const statsQuery = useQuery({
-    queryKey: ['esocial-stats', empresaId],
+    queryKey: ['esocial-stats'],
     queryFn: async () => {
-      const res = await esocialService.obterEstatisticas(empresaId);
+      const res = await esocialService.obterEstatisticas();
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
-    enabled: !!user,
   });
 
   const invalidate = () => {
@@ -115,23 +108,21 @@ export function useESocial() {
   });
 
   const configQuery = useQuery({
-    queryKey: ['esocial-config', empresaId],
+    queryKey: ['esocial-config'],
     queryFn: async () => {
-      const res = await esocialService.getConfig(empresaId!);
+      const res = await esocialService.getConfig();
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
-    enabled: !!empresaId,
   });
 
   const certificadosQuery = useQuery({
-    queryKey: ['esocial-certificados', empresaId],
+    queryKey: ['esocial-certificados'],
     queryFn: async () => {
-      const res = await esocialService.listarCertificados(empresaId!);
+      const res = await esocialService.listarCertificados();
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
-    enabled: !!empresaId,
   });
 
   const salvarConfigMutation = useMutation({
@@ -161,13 +152,12 @@ export function useESocial() {
   });
 
   const logsQuery = useQuery({
-    queryKey: ['esocial-logs', empresaId],
+    queryKey: ['esocial-logs'],
     queryFn: async () => {
-      const res = await esocialService.listarTransmissaoLogs(empresaId!);
+      const res = await esocialService.listarTransmissaoLogs();
       if (!res.ok) throw new Error(res.error.message);
       return res.value;
     },
-    enabled: !!empresaId,
   });
 
   return {
@@ -188,4 +178,3 @@ export function useESocial() {
     refreshLogs: () => queryClient.invalidateQueries({ queryKey: ['esocial-logs'] }),
   };
 }
-

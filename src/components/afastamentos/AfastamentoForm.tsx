@@ -131,9 +131,10 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                 role="combobox"
                 className="w-full justify-between"
               >
-                {watch('colaborador_id') 
-                  ? colaboradores.find(c => c.id === watch('colaborador_id'))?.nome_completo 
+                {watch('colaborador_id') && Array.isArray(colaboradores)
+                  ? (colaboradores as any[]).find((c: any) => c.id === watch('colaborador_id'))?.nome_completo 
                   : "Selecionar colaborador..."}
+
                 <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
