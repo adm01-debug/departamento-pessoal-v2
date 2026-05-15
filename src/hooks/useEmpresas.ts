@@ -261,17 +261,28 @@ export function useEmpresas(): UseEmpresasReturn {
     },
   });
 
-  // Trocar empresa atual
   const trocarEmpresa = (empresaId: string) => {
+    if (empresaId === empresaAtualId) return;
+    
     setEmpresaAtual(empresaId);
-    // Invalidate only tenant-scoped queries, preserve auth/session caches
+    
+    // Invalida apenas queries que dependem de empresa (tenant-scoped)
+    // Preserva dados de sessão/auth para evitar logouts ou loadings globais
     queryClient.invalidateQueries({
       predicate: (query) => {
         const key = query.queryKey[0];
-        return key !== 'auth' && key !== 'session';
+        // Adicionamos aqui chaves que sabemos que DEVEM ser invalidadas ao trocar de contexto
+        const tenantKeys = [
+          'colaboradores', 'colaborador', 'folhas', 'folha', 
+          'registros-ponto', 'batidas-ponto', 'ferias', 
+          'afastamentos', 'beneficios', 'admissoes',
+          'notificacoes', 'relatorios_analytics'
+        ];
+        return tenantKeys.includes(key as string);
       },
     });
-    toast.success("Empresa alterada!");
+    
+    toast.success("Contexto de empresa alterado");
   };
 
   return {
