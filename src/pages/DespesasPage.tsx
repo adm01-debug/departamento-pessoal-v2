@@ -26,11 +26,8 @@ export default function DespesasPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ colaborador_id: '', categoria: 'transporte', descricao: '', valor: '', data_despesa: '' });
 
-  const { data: despesasRaw, isLoading } = useQuery({ queryKey: ['despesas', empresaAtual?.id], queryFn: () => despesaService.listar(empresaAtual?.id), enabled: !!empresaAtual?.id });
-  const { data: colaboradoresRaw } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
-
-  const despesas: any[] = Array.isArray(despesasRaw) ? despesasRaw : (despesasRaw && typeof despesasRaw === 'object' && 'value' in despesasRaw ? (despesasRaw as any).value : []);
-  const colaboradores: any[] = Array.isArray(colaboradoresRaw) ? colaboradoresRaw : (colaboradoresRaw && typeof colaboradoresRaw === 'object' && 'value' in colaboradoresRaw ? (colaboradoresRaw as any).value : []);
+  const { data: despesas = [], isLoading } = useQuery({ queryKey: ['despesas', empresaAtual?.id], queryFn: () => despesaService.listar(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   const criar = useMutation({
     mutationFn: () => despesaService.criar({ ...form, valor: Number(form.valor), empresa_id: empresaAtual?.id }),
