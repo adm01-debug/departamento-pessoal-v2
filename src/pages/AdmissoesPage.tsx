@@ -84,8 +84,11 @@ export default function AdmissoesPage() {
     }
     setSendingLink(admissao.id);
     try {
-      const tokenData = await contratacaoService.enviarLinkCandidato(admissao.id, admissao.email || '');
+      const tokenDataRes = await contratacaoService.enviarLinkCandidato(admissao.id, admissao.email || '');
+      if (!tokenDataRes.ok) throw new Error(tokenDataRes.error.message);
+      const tokenData = tokenDataRes.value;
       await contratacaoService.enviarWhatsApp(admissao.id, admissao.telefone, tokenData.token);
+
       toast.success('Link gerado para WhatsApp!');
     } catch (error: any) {
       toast.error('Erro ao gerar link: ' + error.message);
@@ -95,7 +98,7 @@ export default function AdmissoesPage() {
   };
 
   const filtered = useMemo(() => {
-    let result = admissoes || [];
+    let result = (admissoes as any[]) || [];
     if (etapaFilter !== 'todos') {
       result = result.filter((a: any) => a.etapa === etapaFilter);
     }
@@ -111,8 +114,8 @@ export default function AdmissoesPage() {
   }, [admissoes, search, etapaFilter]);
 
   const etapaCounts = useMemo(() => {
-    const counts: Record<string, number> = { todos: admissoes?.length || 0 };
-    admissoes?.forEach((a: any) => {
+    const counts: Record<string, number> = { todos: (admissoes as any[])?.length || 0 };
+    (admissoes as any[])?.forEach((a: any) => {
       counts[a.etapa] = (counts[a.etapa] || 0) + 1;
     });
     return counts;

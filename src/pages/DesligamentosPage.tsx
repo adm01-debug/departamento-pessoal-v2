@@ -40,7 +40,7 @@ export default function DesligamentosPage() {
   const [showChart, setShowChart] = useState(true);
 
   const filtered = useMemo(() => {
-    return desligamentos.filter((d: any) => {
+    return (desligamentos as any[]).filter((d: any) => {
       const matchSearch = !search || 
         (d.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase()) ||
         (d.motivo || '').toLowerCase().includes(search.toLowerCase());
