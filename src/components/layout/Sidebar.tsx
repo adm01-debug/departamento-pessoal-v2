@@ -168,15 +168,25 @@ export function Sidebar({ collapsed = false, className, pendingCounts, onToggle 
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     menuGroups.forEach(g => {
+      // Começa aberto apenas o grupo ativo para reduzir carga visual
       initial[g.label] = g.label !== activeGroupLabel;
     });
     return initial;
   });
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const toggleGroup = (label: string) => {
     if (collapsed) return;
     setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
   };
+
+  const filteredGroups = menuGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => 
+      item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(group => group.items.length > 0);
 
   const getBadge = (path: string): number | undefined => pendingCounts?.[path];
 
@@ -231,10 +241,38 @@ export function Sidebar({ collapsed = false, className, pendingCounts, onToggle 
           trocarEmpresa={trocarEmpresa}
         />
 
+        {/* ─── Search Box ─── */}
+        {!collapsed && (
+          <div className="px-4 py-2">
+            <div className="relative">
+              <BarChart3 className={cn(
+                "absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground transition-opacity",
+                searchQuery ? "opacity-0" : "opacity-100"
+              )} />
+              <input
+                type="text"
+                placeholder="Buscar módulo..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-9 pl-9 pr-3 rounded-xl bg-muted/40 border-none text-xs font-body focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/60"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full"
+                >
+                  <UserMinus className="h-3 w-3 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* ─── Navigation ─── */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar" aria-label="Módulos do sistema">
-          {menuGroups.map((group, gi) => {
-            const isGroupCollapsed = collapsedGroups[group.label];
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto no-scrollbar scroll-smooth" aria-label="Módulos do sistema">
+          {filteredGroups.map((group, gi) => {
+            // Se houver busca, forçamos os grupos a expandirem
+            const isGroupCollapsed = searchQuery ? false : collapsedGroups[group.label];
 
             return (
               <div key={group.label} className={cn(gi > 0 && 'mt-2')}>
