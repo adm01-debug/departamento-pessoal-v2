@@ -55,3 +55,4 @@ export class CircuitBreaker {
 // Singleton instances for specific services
 export const bitrixBreaker = new CircuitBreaker();
 export const resendBreaker = new CircuitBreaker();
+export const genericBreaker = new CircuitBreaker({ failureThreshold: 3, resetTimeout: 15000 });

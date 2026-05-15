@@ -14045,6 +14045,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          timestamp: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          timestamp: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          timestamp?: number
+        }
+        Relationships: []
+      }
       recargas_vale: {
         Row: {
           colaborador_id: string | null

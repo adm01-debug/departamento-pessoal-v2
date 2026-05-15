@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { bitrixBreaker, resendBreaker } from '@/lib/circuitBreaker';
+import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
 import { v4 as uuidv4 } from 'uuid';
 
 const getCorrelationHeaders = () => ({
@@ -77,17 +77,19 @@ export const edgeFunctionsService = {
     return data;
   },
 
-  /** Calcula folha via edge function server-side */
+  /** Calcula folha via edge function server-side com resiliência */
   calcularFolha: async (params: {
     empresaId: string;
     competencia: string;
   }) => {
-    const { data, error } = await supabase.functions.invoke('calcular-folha', {
-      body: params,
-      headers: getCorrelationHeaders(),
+    return genericBreaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke('calcular-folha', {
+        body: params,
+        headers: getCorrelationHeaders(),
+      });
+      if (error) throw error;
+      return data;
     });
-    if (error) throw error;
-    return data;
   },
 
   /** Calcula rescisão via edge function */
@@ -293,5 +295,14 @@ export const edgeFunctionsService = {
       if (error) throw error;
       return data;
     });
+  },
+
+  /** Verifica rate limit */
+  checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) => {
+    const { data, error } = await supabase.functions.invoke('rateLimit', {
+      body: { key, limit, window_seconds: windowSeconds },
+    });
+    if (error) throw error;
+    return data;
   },
 };
