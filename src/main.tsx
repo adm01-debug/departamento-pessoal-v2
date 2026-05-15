@@ -34,7 +34,7 @@ const isPreviewHost =
 if (!isInIframe && !isPreviewHost && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw-custom.js')
-      .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+      .then(reg => { if (import.meta.env.DEV) console.debug('Service Worker registrado:', reg.scope); })
       .catch(err => console.error('Falha ao registrar Service Worker:', err));
   });
 }
