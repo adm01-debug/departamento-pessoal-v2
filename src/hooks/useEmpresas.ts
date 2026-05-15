@@ -65,10 +65,10 @@ export interface UseEmpresasReturn {
   empresaAtualId: string | null;
   loadingEmpresas: boolean;
   loadingTodas: boolean;
-  criarEmpresa: ReturnType<typeof useMutation>;
-  atualizarEmpresa: ReturnType<typeof useMutation>;
-  associarUsuario: ReturnType<typeof useMutation>;
-  definirEmpresaPadrao: ReturnType<typeof useMutation>;
+  criarEmpresa: any;
+  atualizarEmpresa: any;
+  associarUsuario: any;
+  definirEmpresaPadrao: any;
   trocarEmpresa: (empresaId: string) => void;
   temMultiplasEmpresas: boolean;
 }
