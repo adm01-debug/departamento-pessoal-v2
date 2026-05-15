@@ -40,7 +40,9 @@ describe('folhaPagamentoService', () => {
         return {};
       });
 
-      const hash = await folhaPagamentoService.assinarHolerite('folha-1', 'colab-1');
+      const result = await folhaPagamentoService.assinarHolerite('folha-1', 'colab-1');
+      if (!result.ok) throw new Error('Result failed');
+      const hash = result.value;
 
       expect(hash).toBeDefined();
       expect(hash.length).toBe(32);
