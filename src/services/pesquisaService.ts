@@ -1,51 +1,81 @@
 import { supabase } from '@/integrations/supabase/client';
-
-const ensure = <T>(d: T | null, e: string): T => { if (!d) throw new Error(`Nenhum registro de ${e} retornado.`); return d; };
+import { Result, Ok, Err, toResult } from '@/types/result';
 
 export const pesquisaService = {
-  async listar(empresaId?: string) {
-    let q = supabase.from('pesquisas').select('*').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
+  async listar(empresaId?: string): Promise<Result<any[]>> {
+    return toResult((async () => {
+      let q = supabase.from('pesquisas').select('*').order('created_at', { ascending: false });
+      if (empresaId) q = q.eq('empresa_id', empresaId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return data || [];
+    })());
   },
-  async criar(d: any) {
-    const { data, error } = await supabase.from('pesquisas').insert(d).select().maybeSingle();
-    if (error) throw error;
-    return ensure(data, 'pesquisa');
+  
+  async criar(d: any): Promise<Result<any>> {
+    return toResult((async () => {
+      const { data, error } = await supabase.from('pesquisas').insert(d).select().maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('Nenhum registro de pesquisa foi retornado.');
+      return data;
+    })());
   },
-  async atualizar(id: string, d: any) {
-    const { data, error } = await supabase.from('pesquisas').update(d).eq('id', id).select().maybeSingle();
-    if (error) throw error;
-    return ensure(data, 'pesquisa');
+  
+  async atualizar(id: string, d: any): Promise<Result<any>> {
+    return toResult((async () => {
+      const { data, error } = await supabase.from('pesquisas').update(d).eq('id', id).select().maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('Nenhum registro de pesquisa foi retornado.');
+      return data;
+    })());
   },
-  async excluir(id: string) {
-    const { error } = await supabase.from('pesquisas').delete().eq('id', id);
-    if (error) throw error;
+  
+  async excluir(id: string): Promise<Result<void>> {
+    return toResult((async () => {
+      const { error } = await supabase.from('pesquisas').delete().eq('id', id);
+      if (error) throw error;
+    })());
   },
-  async listarPerguntas(pesquisaId: string) {
-    const { data, error } = await supabase.from('pesquisas_perguntas').select('*').eq('pesquisa_id', pesquisaId).order('ordem');
-    if (error) throw error;
-    return data || [];
+  
+  async listarPerguntas(pesquisaId: string): Promise<Result<any[]>> {
+    return toResult((async () => {
+      const { data, error } = await supabase.from('pesquisas_perguntas').select('*').eq('pesquisa_id', pesquisaId).order('ordem');
+      if (error) throw error;
+      return data || [];
+    })());
   },
-  async criarPergunta(d: any) {
-    const { data, error } = await supabase.from('pesquisas_perguntas').insert(d).select().maybeSingle();
-    if (error) throw error;
-    return ensure(data, 'pergunta');
+  
+  async criarPergunta(d: any): Promise<Result<any>> {
+    return toResult((async () => {
+      const { data, error } = await supabase.from('pesquisas_perguntas').insert(d).select().maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('Nenhum registro de pergunta foi retornado.');
+      return data;
+    })());
   },
-  async excluirPergunta(id: string) {
-    const { error } = await supabase.from('pesquisas_perguntas').delete().eq('id', id);
-    if (error) throw error;
+  
+  async excluirPergunta(id: string): Promise<Result<void>> {
+    return toResult((async () => {
+      const { error } = await supabase.from('pesquisas_perguntas').delete().eq('id', id);
+      if (error) throw error;
+    })());
   },
-  async enviarResposta(d: any) {
-    const { data, error } = await supabase.from('pesquisas_respostas').insert(d).select().maybeSingle();
-    if (error) throw error;
-    return ensure(data, 'resposta');
+  
+  async enviarResposta(d: any): Promise<Result<any>> {
+    return toResult((async () => {
+      const { data, error } = await supabase.from('pesquisas_respostas').insert(d).select().maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('Nenhum registro de resposta foi retornado.');
+      return data;
+    })());
   },
-  async listarRespostas(pesquisaId: string) {
-    const { data, error } = await supabase.from('pesquisas_respostas').select('*').eq('pesquisa_id', pesquisaId);
-    if (error) throw error;
-    return data || [];
+  
+  async listarRespostas(pesquisaId: string): Promise<Result<any[]>> {
+    return toResult((async () => {
+      const { data, error } = await supabase.from('pesquisas_respostas').select('*').eq('pesquisa_id', pesquisaId);
+      if (error) throw error;
+      return data || [];
+    })());
   },
 };
+
