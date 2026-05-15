@@ -23,11 +23,12 @@ export function validarS1000(dados: ESocialData): ValidationResult {
   enumValido(dados.indDesFolha?.toString(), ['0', '1'], 'indDesFolha', errors);
   required(dados.indOptRegEletron, 'indOptRegEletron', errors);
   required(dados.iniValid, 'iniValid', errors);
-  if (!dados.contato?.nmCtt) warnings.push({ campo: 'contato.nmCtt', mensagem: 'Contato recomendado' });
+  const contato = dados.contato as any;
+  if (!contato?.nmCtt) warnings.push({ campo: 'contato.nmCtt', mensagem: 'Contato recomendado' });
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function validarS1005(dados: Record<string, any>): ValidationResult {
+export function validarS1005(dados: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationWarning[] = [];
   required(dados.tpInsc, 'tpInsc', errors);
