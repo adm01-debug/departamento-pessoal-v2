@@ -97,8 +97,8 @@ export async function exportarBackupJSON(
 
   for (const result of results) {
     if (result.status === 'fulfilled') {
-      output[result.table] = result.data;
-      totalRecords += result.count;
+      output[result.value.table] = result.value.data;
+      totalRecords += result.value.count;
     }
   }
 
