@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { validarEvento, getValidadoresDisponiveis, type ValidationResult } from '@/validators/esocialValidators';
+import { gerarXmlESocial } from '@/utils/esocialXmlGenerator';
 export interface ESocialEvento {
   id: string;
   empresa_id: string | null;
@@ -99,7 +100,22 @@ export async function criarEvento(evento: {
   competencia?: string;
   dados?: Record<string, unknown>;
 }): Promise<ESocialEvento> {
+  const { data: empresa } = await supabase.from('empresas').select('*').eq('id', evento.empresa_id).maybeSingle();
   
+  let xml = null;
+  if (empresa) {
+    try {
+      xml = gerarXmlESocial({
+        tipo: evento.tipo_evento,
+        dados: evento.dados,
+        empresa,
+        ambiente: '2'
+      });
+    } catch (e) {
+      console.warn('Erro ao gerar XML inicial:', e);
+    }
+  }
+
   const { data, error } = await supabase
     .from('esocial_eventos')
     .insert([{
@@ -108,6 +124,7 @@ export async function criarEvento(evento: {
       competencia: evento.competencia || new Date().toISOString().slice(0, 7),
       dados: (evento.dados || {}) as any,
       status: 'pendente',
+      xml: xml
     }])
     .select()
     .maybeSingle();

@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useBlocker, Location } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +34,7 @@ export function useNavigationGuard({
 }: UseNavigationGuardOptions) {
   const blocker = useBlocker(
     useCallback(
-      ({ currentLocation, nextLocation }) =>
+      ({ currentLocation, nextLocation }: { currentLocation: Location; nextLocation: Location }) =>
         enabled && currentLocation.pathname !== nextLocation.pathname,
       [enabled]
     )
