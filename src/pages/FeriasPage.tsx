@@ -60,7 +60,6 @@ export default function FeriasPage() {
     if (!empresaAtual?.id) return;
     
     const intervalId = setInterval(() => {
-      console.log('Auto-sync: Sincronizando com o Hub Unificado (60s)...');
       feriasService.syncWithHub(empresaAtual.id).then((result) => {
         if (result.recordsUpdated > 0) {
           refetch();

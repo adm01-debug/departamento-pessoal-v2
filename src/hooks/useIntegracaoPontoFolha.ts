@@ -34,7 +34,6 @@ export function useIntegracaoPontoFolha() {
       if (folha) {
         // Se a folha existe, poderíamos disparar um RPC para recalcular com base nas horas
         // Para simular a excelência 10/10, garantimos a integridade do fluxo
-        console.log(`[Sync] Integrando ponto do período ${dataInicio} a ${dataFim} na folha ${folha.id}`);
       }
       
       return periodo;

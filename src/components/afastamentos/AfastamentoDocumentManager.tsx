@@ -72,7 +72,6 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
       }
 
       // Feedback de Qualidade
-      console.log(`[Validation 10/10] Arquivo: ${file.name} | Tipo: ${fileDescription}`);
     } catch (e) {
       console.error('Erro na validação de metadados:', e);
       return false;
