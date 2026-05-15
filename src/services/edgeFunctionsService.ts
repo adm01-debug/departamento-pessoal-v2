@@ -77,17 +77,19 @@ export const edgeFunctionsService = {
     return data;
   },
 
-  /** Calcula folha via edge function server-side */
+  /** Calcula folha via edge function server-side com resiliência */
   calcularFolha: async (params: {
     empresaId: string;
     competencia: string;
   }) => {
-    const { data, error } = await supabase.functions.invoke('calcular-folha', {
-      body: params,
-      headers: getCorrelationHeaders(),
+    return genericBreaker.execute(async () => {
+      const { data, error } = await supabase.functions.invoke('calcular-folha', {
+        body: params,
+        headers: getCorrelationHeaders(),
+      });
+      if (error) throw error;
+      return data;
     });
-    if (error) throw error;
-    return data;
   },
 
   /** Calcula rescisão via edge function */
