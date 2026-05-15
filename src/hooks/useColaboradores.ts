@@ -10,12 +10,20 @@ export function useColaboradores() {
 
   const query = useQuery({
     queryKey: ['colaboradores', empresaId],
-    queryFn: () => colaboradorService.list(empresaId),
+    queryFn: async () => {
+      const res = await colaboradorService.list(empresaId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!empresaId,
   });
 
   const criarMutation = useMutation({
-    mutationFn: (data: any) => colaboradorService.criar({ ...data, empresa_id: empresaId }),
+    mutationFn: async (data: any) => {
+      const res = await colaboradorService.criar({ ...data, empresa_id: empresaId });
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
       toast.success('Colaborador criado com sucesso');
@@ -24,7 +32,11 @@ export function useColaboradores() {
   });
 
   const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => colaboradorService.atualizar(id, data),
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const res = await colaboradorService.atualizar(id, data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
       toast.success('Colaborador atualizado');
@@ -33,7 +45,11 @@ export function useColaboradores() {
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => colaboradorService.excluir(id),
+    mutationFn: async (id: string) => {
+      const res = await colaboradorService.excluir(id);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
       toast.success('Colaborador excluído');
@@ -51,3 +67,4 @@ export function useColaboradores() {
     refetch: query.refetch,
   };
 }
+
