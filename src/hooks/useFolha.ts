@@ -28,7 +28,9 @@ export function useFolha(competencia?: string) {
   const fecharFolha = useMutation({
     mutationFn: async (id: string) => {
       const { folhaPagamentoService } = await import('@/services/folhaPagamentoService');
-      return await folhaPagamentoService.fecharFolha(id);
+      const result = await folhaPagamentoService.fecharFolha(id);
+      if (!result.ok) throw new Error(result.error.message);
+      return result.value;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['folhas'] });
