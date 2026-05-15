@@ -1,1 +1,1 @@
-export { calcularDSR as default } from '@/calculators/trabalhista';
+export { calcularDSR as default } from '@/calculators';

@@ -1,1 +1,1 @@
-export { calcularHorasExtras as default } from '@/calculators/trabalhista';
+export { calcularHorasExtras as default } from '@/calculators';

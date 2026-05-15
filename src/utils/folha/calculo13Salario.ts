@@ -1,1 +1,1 @@
-export { calcular13Salario as default } from '@/calculators/trabalhista';
+export { calcular13Salario as default } from '@/calculators';
