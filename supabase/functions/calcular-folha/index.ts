@@ -70,9 +70,9 @@ Deno.serve(async (req) => {
       const bruto = c.salario_base || 0;
       const inss = calcINSS(bruto);
       const irrf = calcIRRF(bruto - inss);
-      const fgts = Math.round(bruto * 0.08 * 100) / 100;
-      const descontos = Math.round((inss + irrf) * 100) / 100;
-      return { colaborador_id: c.id, nome: c.nome_completo, cargo: c.cargo, salario_bruto: bruto, inss, irrf, fgts, total_descontos: descontos, salario_liquido: Math.round((bruto - descontos) * 100) / 100 };
+      const fgts = Number((bruto * 0.08).toFixed(2));
+      const descontos = Number((inss + irrf).toFixed(2));
+      return { colaborador_id: c.id, nome: c.nome_completo, cargo: c.cargo, salario_bruto: bruto, inss, irrf, fgts, total_descontos: descontos, salario_liquido: Number((bruto - descontos).toFixed(2)) };
     });
 
     const totais = { bruto: 0, descontos: 0, liquido: 0, fgts: 0 };
