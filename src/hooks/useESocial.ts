@@ -12,13 +12,21 @@ export function useESocial() {
 
   const eventosQuery = useQuery({
     queryKey: ['esocial-eventos', empresaId],
-    queryFn: () => esocialService.listarEventos(empresaId),
+    queryFn: async () => {
+      const res = await esocialService.listarEventos(empresaId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!user,
   });
 
   const statsQuery = useQuery({
     queryKey: ['esocial-stats', empresaId],
-    queryFn: () => esocialService.obterEstatisticas(empresaId),
+    queryFn: async () => {
+      const res = await esocialService.obterEstatisticas(empresaId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!user,
   });
 
@@ -28,7 +36,11 @@ export function useESocial() {
   };
 
   const criarMutation = useMutation({
-    mutationFn: esocialService.criarEvento,
+    mutationFn: async (data: any) => {
+      const res = await esocialService.criarEvento(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       toast.success('Evento criado com sucesso');
       invalidate();
@@ -37,8 +49,11 @@ export function useESocial() {
   });
 
   const enviarMutation = useMutation({
-    mutationFn: ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) =>
-      esocialService.enviarEvento(eventoId, empresaId),
+    mutationFn: async ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) => {
+      const res = await esocialService.enviarEvento(eventoId, empresaId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (data) => {
       if (data?.success) {
         toast.success(`Evento enviado — Protocolo: ${data.protocolo}`);
@@ -51,8 +66,11 @@ export function useESocial() {
   });
 
   const reenviarMutation = useMutation({
-    mutationFn: ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) =>
-      esocialService.reenviarEvento(eventoId, empresaId),
+    mutationFn: async ({ eventoId, empresaId }: { eventoId: string; empresaId: string }) => {
+      const res = await esocialService.reenviarEvento(eventoId, empresaId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (data) => {
       if (data?.success) toast.success('Evento reenviado com sucesso');
       else toast.error(`Falha ao reenviar: ${data?.error}`);
@@ -61,13 +79,12 @@ export function useESocial() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-
   const enviarLoteMutation = useMutation({
     mutationFn: async ({ eventoIds, empresaId }: { eventoIds: string[]; empresaId: string }) => {
       const results = [];
       for (const id of eventoIds) {
         const res = await esocialService.enviarEvento(id, empresaId);
-        results.push(res);
+        results.push(res.ok ? res.value : { success: false, error: res.error.message });
       }
       return results;
     },
@@ -85,8 +102,11 @@ export function useESocial() {
   });
 
   const gerarEventosMutation = useMutation({
-    mutationFn: ({ empresaId, competencia }: { empresaId: string; competencia: string }) =>
-      esocialService.gerarEventosPeriodo(empresaId, competencia),
+    mutationFn: async ({ empresaId, competencia }: { empresaId: string; competencia: string }) => {
+      const res = await esocialService.gerarEventosPeriodo(empresaId, competencia);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (data) => {
       toast.success(`Geração concluída: ${data.criados} criados, ${data.pulados} já existentes.`);
       invalidate();
@@ -96,18 +116,30 @@ export function useESocial() {
 
   const configQuery = useQuery({
     queryKey: ['esocial-config', empresaId],
-    queryFn: () => esocialService.getConfig(empresaId!),
+    queryFn: async () => {
+      const res = await esocialService.getConfig(empresaId!);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!empresaId,
   });
 
   const certificadosQuery = useQuery({
     queryKey: ['esocial-certificados', empresaId],
-    queryFn: () => esocialService.listarCertificados(empresaId!),
+    queryFn: async () => {
+      const res = await esocialService.listarCertificados(empresaId!);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!empresaId,
   });
 
   const salvarConfigMutation = useMutation({
-    mutationFn: esocialService.salvarConfig,
+    mutationFn: async (config: any) => {
+      const res = await esocialService.salvarConfig(config);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       toast.success('Configurações salvas');
       queryClient.invalidateQueries({ queryKey: ['esocial-config'] });
@@ -116,7 +148,11 @@ export function useESocial() {
   });
 
   const addCertMutation = useMutation({
-    mutationFn: esocialService.adicionarCertificado,
+    mutationFn: async (cert: any) => {
+      const res = await esocialService.adicionarCertificado(cert);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       toast.success('Certificado adicionado');
       queryClient.invalidateQueries({ queryKey: ['esocial-certificados'] });
@@ -126,7 +162,11 @@ export function useESocial() {
 
   const logsQuery = useQuery({
     queryKey: ['esocial-logs', empresaId],
-    queryFn: () => esocialService.listarTransmissaoLogs(empresaId!),
+    queryFn: async () => {
+      const res = await esocialService.listarTransmissaoLogs(empresaId!);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!empresaId,
   });
 
@@ -148,3 +188,4 @@ export function useESocial() {
     refreshLogs: () => queryClient.invalidateQueries({ queryKey: ['esocial-logs'] }),
   };
 }
+
