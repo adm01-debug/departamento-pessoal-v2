@@ -17,14 +17,14 @@ export const provisoesService = {
     for (const colab of colaboradores) {
       const salario = Number(colab.salario_base || 0);
       
-      // Provisão 13º (1/12 do salário) - Arredondado para 2 casas decimais
-      const provisao13 = Math.round((salario / 12) * 100) / 100;
+      // Provisão 13º (1/12 do salário)
+      const provisao13 = Number((salario / 12).toFixed(2));
       
       // Provisão Férias (1/12 do salário + 1/3 constitucional)
-      const provisaoFerias = Math.round(((salario / 12) * (4/3)) * 100) / 100;
+      const provisaoFerias = Number(((salario / 12) * (4/3)).toFixed(2));
 
       // FGTS sobre as provisões (8%)
-      const fgtsProvisao = Math.round(((provisao13 + provisaoFerias) * 0.08) * 100) / 100;
+      const fgtsProvisao = Number(((provisao13 + provisaoFerias) * 0.08).toFixed(2));
 
       await (supabase as any).from('provisoes_folha').upsert({
         colaborador_id: colab.id,

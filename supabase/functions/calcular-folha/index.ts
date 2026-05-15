@@ -8,8 +8,8 @@ const corsHeaders = {
 const FAIXAS_INSS = [
   { limite: 1518.00, aliquota: 0.075 },
   { limite: 2793.88, aliquota: 0.09 },
-  { limite: 5563.80, aliquota: 0.12 },
-  { limite: 7786.93, aliquota: 0.14 },
+  { limite: 4190.83, aliquota: 0.12 },
+  { limite: 8157.41, aliquota: 0.14 },
 ];
 
 const FAIXAS_IRRF = [
@@ -20,8 +20,14 @@ const FAIXAS_IRRF = [
   { limite: Infinity, aliquota: 0.275, deducao: 896.00 },
 ];
 
+const TETO_INSS = 8157.41;
+
 function calcINSS(salario: number): number {
-  let desc = 0, rest = salario;
+  if (salario <= 0) return 0;
+  let desc = 0;
+  const baseCalculo = Math.min(salario, TETO_INSS);
+  let rest = baseCalculo;
+  
   for (let i = 0; i < FAIXAS_INSS.length; i++) {
     const limAnt = i === 0 ? 0 : FAIXAS_INSS[i - 1].limite;
     const f = Math.min(rest, FAIXAS_INSS[i].limite - limAnt);
@@ -64,19 +70,24 @@ Deno.serve(async (req) => {
       const bruto = c.salario_base || 0;
       const inss = calcINSS(bruto);
       const irrf = calcIRRF(bruto - inss);
-      const fgts = Math.round(bruto * 0.08 * 100) / 100;
-      const descontos = Math.round((inss + irrf) * 100) / 100;
-      return { colaborador_id: c.id, nome: c.nome_completo, cargo: c.cargo, salario_bruto: bruto, inss, irrf, fgts, total_descontos: descontos, salario_liquido: Math.round((bruto - descontos) * 100) / 100 };
+      const fgts = Number((bruto * 0.08).toFixed(2));
+      const descontos = Number((inss + irrf).toFixed(2));
+      return { colaborador_id: c.id, nome: c.nome_completo, cargo: c.cargo, salario_bruto: bruto, inss, irrf, fgts, total_descontos: descontos, salario_liquido: Number((bruto - descontos).toFixed(2)) };
     });
 
     const totais = { bruto: 0, descontos: 0, liquido: 0, fgts: 0 };
-    itens.forEach(i => { totais.bruto += i.salario_bruto; totais.descontos += i.total_descontos; totais.liquido += i.salario_liquido; totais.fgts += i.fgts; });
+    itens.forEach(i => { 
+      totais.bruto = Number((totais.bruto + i.salario_bruto).toFixed(2));
+      totais.descontos = Number((totais.descontos + i.total_descontos).toFixed(2));
+      totais.liquido = Number((totais.liquido + i.salario_liquido).toFixed(2));
+      totais.fgts = Number((totais.fgts + i.fgts).toFixed(2));
+    });
 
     await supabase.from('folhas_pagamento').upsert({
       empresa_id, competencia, status: 'calculada',
-      total_bruto: Math.round(totais.bruto * 100) / 100,
-      total_descontos: Math.round(totais.descontos * 100) / 100,
-      total_liquido: Math.round(totais.liquido * 100) / 100,
+      total_bruto: totais.bruto,
+      total_descontos: totais.descontos,
+      total_liquido: totais.liquido,
       total_colaboradores: colaboradores.length,
     }, { onConflict: 'empresa_id,competencia' });
 
