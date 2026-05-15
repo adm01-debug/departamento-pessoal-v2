@@ -40,7 +40,9 @@ describe('folhaPagamentoService', () => {
         return {};
       });
 
-      const hash = await folhaPagamentoService.assinarHolerite('folha-1', 'colab-1');
+      const result = await folhaPagamentoService.assinarHolerite('folha-1', 'colab-1');
+      if (!result.ok) throw new Error('Result failed');
+      const hash = result.value;
 
       expect(hash).toBeDefined();
       expect(hash.length).toBe(32);
@@ -59,8 +61,11 @@ describe('folhaPagamentoService', () => {
         { gravidade: 'alta', mensagem: 'Erro crítico' }
       ]);
 
-      await expect(folhaPagamentoService.fecharFolha('folha-1'))
-        .rejects.toThrow(/existem 1 alertas críticos/);
+      const result = await folhaPagamentoService.fecharFolha('folha-1');
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.message).toMatch(/existem 1 alertas críticos/);
+      }
     });
 
     it('should update folha status to fechada if no critical alerts', async () => {
@@ -97,7 +102,10 @@ describe('folhaPagamentoService', () => {
       });
 
       const result = await folhaPagamentoService.fecharFolha('folha-1');
-      expect(result.success).toBe(true);
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value.success).toBe(true);
+      }
       expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ status: 'fechada' }));
     });
   });

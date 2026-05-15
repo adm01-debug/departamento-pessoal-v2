@@ -353,9 +353,12 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                     className="rounded-xl gap-2 h-16 flex-col"
                     onClick={async () => {
                       if (currentFolhaId) {
-                        const url = await folhaPagamentoService.emitirPDF(currentFolhaId);
-                        if (url) window.open(url, '_blank');
-                        else toast.error('Erro ao gerar PDF do holerite.');
+                        const result = await folhaPagamentoService.emitirPDF(currentFolhaId);
+                        if (result.ok) {
+                          window.open(result.value, '_blank');
+                        } else {
+                          toast.error(result.error.message || 'Erro ao gerar PDF do holerite.');
+                        }
                       }
                     }}
                   >
