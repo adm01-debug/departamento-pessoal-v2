@@ -57,8 +57,9 @@ export function HistoricoContratosTab({ colaboradorId }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {historico.length === 0 && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground">Nenhuma alteração contratual</TableCell></TableRow>}
-            {historico.map((h: any) => (
+            {(!historico || historico.length === 0) && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground">Nenhuma alteração contratual</TableCell></TableRow>}
+            {historico?.map((h: any) => (
+
               <TableRow key={h.id}>
                 <TableCell>{h.data_inicio}</TableCell>
                 <TableCell>{h.cargo || '—'}</TableCell>

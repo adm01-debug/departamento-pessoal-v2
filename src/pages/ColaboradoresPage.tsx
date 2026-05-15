@@ -66,7 +66,7 @@ export default function ColaboradoresPage() {
   ];
 
   const filtered = useMemo(() => {
-    return colaboradores?.filter((c) => {
+    return (colaboradores as any[])?.filter((c: any) => {
       const matchSearch = !search || 
         c.nome_completo.toLowerCase().includes(search.toLowerCase()) || 
         c.cpf?.includes(search) ||
@@ -221,7 +221,7 @@ export default function ColaboradoresPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginated.map((c, idx) => (
+              {(paginated as any[]).map((c: any, idx: number) => (
                 <TableRow
                   key={c.id}
                   className="hover:bg-primary/5 border-b border-border/10 last:border-0 transition-colors cursor-pointer group"

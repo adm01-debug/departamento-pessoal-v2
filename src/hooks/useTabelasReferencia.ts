@@ -2,70 +2,54 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as service from '@/services/tabelasReferenciaService';
 
 // =============================================
+// Helper for Result Pattern hooks
+// =============================================
+const useResultQuery = (key: any[], fn: () => Promise<any>, enabled: boolean = true) => 
+  useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const res = await fn();
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
+    enabled
+  });
+
+// =============================================
 // Tabelas de Referência (read-only)
 // =============================================
-export const useNacionalidades = () =>
-  useQuery({ queryKey: ['nacionalidades'], queryFn: service.listarNacionalidades });
-
-export const useTiposDesligamento = () =>
-  useQuery({ queryKey: ['tipos-desligamento'], queryFn: service.listarTiposDesligamento });
-
-export const useTiposAvisoPrevio = () =>
-  useQuery({ queryKey: ['tipos-aviso-previo'], queryFn: service.listarTiposAvisoPrevio });
-
-export const useTiposDeficiencia = () =>
-  useQuery({ queryKey: ['tipos-deficiencia'], queryFn: service.listarTiposDeficiencia });
-
-export const useTiposPagamento = () =>
-  useQuery({ queryKey: ['tipos-pagamento'], queryFn: service.listarTiposPagamento });
-
-export const useTiposSalario = () =>
-  useQuery({ queryKey: ['tipos-salario'], queryFn: service.listarTiposSalario });
-
-export const useRelacionamentosDependentes = () =>
-  useQuery({ queryKey: ['relacionamentos-dependentes'], queryFn: service.listarRelacionamentosDependentes });
-
-export const useGenerosDocumento = () =>
-  useQuery({ queryKey: ['generos-documento'], queryFn: service.listarGenerosDocumento });
-
-export const useTiposVisto = () =>
-  useQuery({ queryKey: ['tipos-visto'], queryFn: service.listarTiposVisto });
-
-export const useCondicoesIngresso = () =>
-  useQuery({ queryKey: ['condicoes-ingresso'], queryFn: service.listarCondicoesIngresso });
-
-export const useTemposResidencia = () =>
-  useQuery({ queryKey: ['tempos-residencia'], queryFn: service.listarTemposResidencia });
-
-export const useDescricoesLogradouro = () =>
-  useQuery({ queryKey: ['descricoes-logradouro'], queryFn: service.listarDescricoesLogradouro });
-
-export const usePaises = () =>
-  useQuery({ queryKey: ['paises'], queryFn: service.listarPaises });
-
-export const useCategoriasTrabalhador = () =>
-  useQuery({ queryKey: ['categorias-trabalhador'], queryFn: service.listarCategoriasTrabalhador });
-
-export const useRelacionamentosContatoEmergencia = () =>
-  useQuery({ queryKey: ['relacionamentos-contato-emergencia'], queryFn: service.listarRelacionamentosContatoEmergencia });
-
-export const useMotivosAfastamento = () =>
-  useQuery({ queryKey: ['motivos-afastamento'], queryFn: service.listarMotivosAfastamento });
+export const useNacionalidades = () => useResultQuery(['nacionalidades'], service.listarNacionalidades);
+export const useTiposDesligamento = () => useResultQuery(['tipos-desligamento'], service.listarTiposDesligamento);
+export const useTiposAvisoPrevio = () => useResultQuery(['tipos-aviso-previo'], service.listarTiposAvisoPrevio);
+export const useTiposDeficiencia = () => useResultQuery(['tipos-deficiencia'], service.listarTiposDeficiencia);
+export const useTiposPagamento = () => useResultQuery(['tipos-pagamento'], service.listarTiposPagamento);
+export const useTiposSalario = () => useResultQuery(['tipos-salario'], service.listarTiposSalario);
+export const useRelacionamentosDependentes = () => useResultQuery(['relacionamentos-dependentes'], service.listarRelacionamentosDependentes);
+export const useGenerosDocumento = () => useResultQuery(['generos-documento'], service.listarGenerosDocumento);
+export const useTiposVisto = () => useResultQuery(['tipos-visto'], service.listarTiposVisto);
+export const useCondicoesIngresso = () => useResultQuery(['condicoes-ingresso'], service.listarCondicoesIngresso);
+export const useTemposResidencia = () => useResultQuery(['tempos-residencia'], service.listarTemposResidencia);
+export const useDescricoesLogradouro = () => useResultQuery(['descricoes-logradouro'], service.listarDescricoesLogradouro);
+export const usePaises = () => useResultQuery(['paises'], service.listarPaises);
+export const useCategoriasTrabalhador = () => useResultQuery(['categorias-trabalhador'], service.listarCategoriasTrabalhador);
+export const useRelacionamentosContatoEmergencia = () => useResultQuery(['relacionamentos-contato-emergencia'], service.listarRelacionamentosContatoEmergencia);
+export const useMotivosAfastamento = () => useResultQuery(['motivos-afastamento'], service.listarMotivosAfastamento);
 
 // =============================================
 // Centros de Custo (CRUD)
 // =============================================
 export function useCentrosCusto(empresaId?: string) {
-  return useQuery({
-    queryKey: ['centros-custo', empresaId],
-    queryFn: () => service.listarCentrosCusto(empresaId),
-  });
+  return useResultQuery(['centros-custo', empresaId], () => service.listarCentrosCusto(empresaId), !!empresaId);
 }
 
 export function useCriarCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.criarCentroCusto,
+    mutationFn: async (data: any) => {
+      const res = await service.criarCentroCusto(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
 }
@@ -73,8 +57,11 @@ export function useCriarCentroCusto() {
 export function useAtualizarCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, dados }: { id: string; dados: Record<string, unknown> }) =>
-      service.atualizarCentroCusto(id, dados),
+    mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
+      const res = await service.atualizarCentroCusto(id, dados);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
 }
@@ -82,7 +69,11 @@ export function useAtualizarCentroCusto() {
 export function useExcluirCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirCentroCusto,
+    mutationFn: async (id: string) => {
+      const res = await service.excluirCentroCusto(id);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
 }
@@ -91,17 +82,17 @@ export function useExcluirCentroCusto() {
 // Contas Bancárias (CRUD)
 // =============================================
 export function useContasBancarias(colaboradorId: string) {
-  return useQuery({
-    queryKey: ['contas-bancarias', colaboradorId],
-    queryFn: () => service.listarContasBancarias(colaboradorId),
-    enabled: !!colaboradorId,
-  });
+  return useResultQuery(['contas-bancarias', colaboradorId], () => service.listarContasBancarias(colaboradorId), !!colaboradorId);
 }
 
 export function useCriarContaBancaria() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.criarContaBancaria,
+    mutationFn: async (data: any) => {
+      const res = await service.criarContaBancaria(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['contas-bancarias', vars.colaborador_id] }),
   });
 }
@@ -109,8 +100,11 @@ export function useCriarContaBancaria() {
 export function useAtualizarContaBancaria() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, dados }: { id: string; dados: Record<string, unknown> }) =>
-      service.atualizarContaBancaria(id, dados),
+    mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
+      const res = await service.atualizarContaBancaria(id, dados);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias'] }),
   });
 }
@@ -118,7 +112,11 @@ export function useAtualizarContaBancaria() {
 export function useExcluirContaBancaria(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirContaBancaria,
+    mutationFn: async (id: string) => {
+      const res = await service.excluirContaBancaria(id);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias', colaboradorId] }),
   });
 }
@@ -127,18 +125,17 @@ export function useExcluirContaBancaria(colaboradorId: string) {
 // Dados de Estagiário
 // =============================================
 export function useDadosEstagiario(colaboradorId: string) {
-  return useQuery({
-    queryKey: ['dados-estagiario', colaboradorId],
-    queryFn: () => service.obterDadosEstagiario(colaboradorId),
-    enabled: !!colaboradorId,
-  });
+  return useResultQuery(['dados-estagiario', colaboradorId], () => service.obterDadosEstagiario(colaboradorId), !!colaboradorId);
 }
 
 export function useSalvarDadosEstagiario() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ colaboradorId, dados }: { colaboradorId: string; dados: Record<string, unknown> }) =>
-      service.salvarDadosEstagiario(colaboradorId, dados),
+    mutationFn: async ({ colaboradorId, dados }: { colaboradorId: string; dados: Record<string, unknown> }) => {
+      const res = await service.salvarDadosEstagiario(colaboradorId, dados);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['dados-estagiario', vars.colaboradorId] }),
   });
 }
@@ -147,17 +144,17 @@ export function useSalvarDadosEstagiario() {
 // Documentos Pessoais (upload tipado)
 // =============================================
 export function useDocumentosPessoais(colaboradorId: string) {
-  return useQuery({
-    queryKey: ['documentos-pessoais', colaboradorId],
-    queryFn: () => service.listarDocumentosPessoais(colaboradorId),
-    enabled: !!colaboradorId,
-  });
+  return useResultQuery(['documentos-pessoais', colaboradorId], () => service.listarDocumentosPessoais(colaboradorId), !!colaboradorId);
 }
 
 export function useCriarDocumentoPessoal() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.criarDocumentoPessoal,
+    mutationFn: async (data: any) => {
+      const res = await service.criarDocumentoPessoal(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['documentos-pessoais', vars.colaborador_id] }),
   });
 }
@@ -165,7 +162,11 @@ export function useCriarDocumentoPessoal() {
 export function useExcluirDocumentoPessoal(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirDocumentoPessoal,
+    mutationFn: async (id: string) => {
+      const res = await service.excluirDocumentoPessoal(id);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['documentos-pessoais', colaboradorId] }),
   });
 }
@@ -174,17 +175,17 @@ export function useExcluirDocumentoPessoal(colaboradorId: string) {
 // Férias - Workflow
 // =============================================
 export function useFeriasAprovacoes(feriasId: string) {
-  return useQuery({
-    queryKey: ['ferias-aprovacoes', feriasId],
-    queryFn: () => service.listarFeriasAprovacoes(feriasId),
-    enabled: !!feriasId,
-  });
+  return useResultQuery(['ferias-aprovacoes', feriasId], () => service.listarFeriasAprovacoes(feriasId), !!feriasId);
 }
 
 export function useCriarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.criarFeriasAprovacao,
+    mutationFn: async (data: any) => {
+      const res = await service.criarFeriasAprovacao(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes', vars.ferias_id] }),
   });
 }
@@ -192,8 +193,11 @@ export function useCriarFeriasAprovacao() {
 export function useAtualizarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, dados }: { id: string; dados: Record<string, unknown> }) =>
-      service.atualizarFeriasAprovacao(id, dados),
+    mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
+      const res = await service.atualizarFeriasAprovacao(id, dados);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes'] }),
   });
 }
@@ -202,17 +206,17 @@ export function useAtualizarFeriasAprovacao() {
 // Férias - Arquivos
 // =============================================
 export function useFeriasArquivos(feriasId: string) {
-  return useQuery({
-    queryKey: ['ferias-arquivos', feriasId],
-    queryFn: () => service.listarFeriasArquivos(feriasId),
-    enabled: !!feriasId,
-  });
+  return useResultQuery(['ferias-arquivos', feriasId], () => service.listarFeriasArquivos(feriasId), !!feriasId);
 }
 
 export function useCriarFeriasArquivo() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.criarFeriasArquivo,
+    mutationFn: async (data: any) => {
+      const res = await service.criarFeriasArquivo(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['ferias-arquivos', vars.ferias_id] }),
   });
 }
@@ -221,17 +225,17 @@ export function useCriarFeriasArquivo() {
 // Dependentes - Benefícios
 // =============================================
 export function useDependentesBeneficios(dependenteId: string) {
-  return useQuery({
-    queryKey: ['dependentes-beneficios', dependenteId],
-    queryFn: () => service.listarDependentesBeneficios(dependenteId),
-    enabled: !!dependenteId,
-  });
+  return useResultQuery(['dependentes-beneficios', dependenteId], () => service.listarDependentesBeneficios(dependenteId), !!dependenteId);
 }
 
 export function useVincularDependenteBeneficio() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.vincularDependenteBeneficio,
+    mutationFn: async (data: any) => {
+      const res = await service.vincularDependenteBeneficio(data);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes-beneficios'] }),
   });
 }
@@ -239,8 +243,12 @@ export function useVincularDependenteBeneficio() {
 export function useDesvincularDependenteBeneficio() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ dependenteId, beneficioId }: { dependenteId: string; beneficioId: string }) =>
-      service.desvincularDependenteBeneficio(dependenteId, beneficioId),
+    mutationFn: async ({ dependenteId, beneficioId }: { dependenteId: string; beneficioId: string }) => {
+      const res = await service.desvincularDependenteBeneficio(dependenteId, beneficioId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes-beneficios'] }),
   });
 }
+

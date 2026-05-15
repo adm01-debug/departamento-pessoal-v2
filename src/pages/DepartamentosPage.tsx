@@ -18,7 +18,7 @@ export default function DepartamentosPage() {
   const { departamentos, isLoading } = useDepartamentos();
   const navigate = useNavigate();
 
-  const filtered = departamentos.filter((d: any) => !search || d.nome.toLowerCase().includes(search.toLowerCase()));
+  const filtered = (departamentos as any[]).filter((d: any) => !search || d.nome.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <>

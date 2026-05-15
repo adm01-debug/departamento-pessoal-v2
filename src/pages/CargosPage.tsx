@@ -16,10 +16,11 @@ export default function CargosPage() {
   const [search, setSearch] = useState('');
   const { cargos, isLoading } = useCargos();
 
-  const filtered = cargos.filter((c: any) => !search || 
+  const filtered = Array.isArray(cargos) ? cargos.filter((c: any) => !search || 
     c.nome.toLowerCase().includes(search.toLowerCase()) ||
     (c.cbo && c.cbo.includes(search))
-  );
+  ) : [];
+
 
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -40,12 +41,12 @@ export default function CargosPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
           <Card className="border-border/30 rounded-2xl"><CardContent className="p-4">
             <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Total Cargos</p>
-            <h3 className="text-2xl font-display font-bold">{cargos.length}</h3>
+            <h3 className="text-2xl font-display font-bold">{cargos?.length || 0}</h3>
           </CardContent></Card>
           <Card className="border-border/30 rounded-2xl"><CardContent className="p-4">
             <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Média Salarial</p>
             <h3 className="text-2xl font-display font-bold">
-              {formatCurrency(cargos.reduce((acc: number, c: any) => acc + (Number(c.salario_base) || 0), 0) / (cargos.length || 1))}
+              {formatCurrency((Array.isArray(cargos) ? cargos.reduce((acc: number, c: any) => acc + (Number(c.salario_base) || 0), 0) : 0) / (cargos?.length || 1))}
             </h3>
           </CardContent></Card>
         </div>

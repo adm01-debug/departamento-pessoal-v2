@@ -7,12 +7,20 @@ export function useHistoricoContratos(colaboradorId: string) {
 
   const query = useQuery({
     queryKey: ['historico_contratos', colaboradorId],
-    queryFn: () => historicoContratoService.listar(colaboradorId),
+    queryFn: async () => {
+      const res = await historicoContratoService.listar(colaboradorId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!colaboradorId,
   });
 
   const criarMutation = useMutation({
-    mutationFn: (data: any) => historicoContratoService.criar({ ...data, colaborador_id: colaboradorId }),
+    mutationFn: async (data: any) => {
+      const res = await historicoContratoService.criar({ ...data, colaborador_id: colaboradorId });
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });
       toast.success('Alteração contratual registrada');
@@ -21,7 +29,11 @@ export function useHistoricoContratos(colaboradorId: string) {
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => historicoContratoService.excluir(id),
+    mutationFn: async (id: string) => {
+      const res = await historicoContratoService.excluir(id);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });
       toast.success('Registro excluído');
@@ -36,3 +48,4 @@ export function useHistoricoContratos(colaboradorId: string) {
     excluir: excluirMutation.mutateAsync,
   };
 }
+

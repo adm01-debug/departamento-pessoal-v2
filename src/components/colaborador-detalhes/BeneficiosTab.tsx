@@ -31,14 +31,14 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
   });
 
   const selectedPlanId = watch('beneficio_id');
-  const selectedPlan = planosDisponiveis.find(p => p.id === selectedPlanId);
+  const selectedPlan = Array.isArray(planosDisponiveis) ? (planosDisponiveis as any[]).find((p: any) => p.id === selectedPlanId) : null;
 
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const onVincular = async (data: any) => {
     await vincularBeneficio({
       ...data,
-      valor: data.valor || selectedPlan?.valor || 0,
+      valor: data.valor || (selectedPlan as any)?.valor || 0,
       status_vinculo: 'ativo'
     });
     setIsDialogOpen(false);
@@ -72,7 +72,7 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
                 render={({ field }) => (
                   <FormSelect 
                     label="Plano de Benefício" 
-                    options={planosDisponiveis.map(p => ({ value: p.id, label: `${p.nome} (${p.tipo})` }))}
+                    options={Array.isArray(planosDisponiveis) ? planosDisponiveis.map((p: any) => ({ value: p.id, label: `${p.nome} (${p.tipo})` })) : []}
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -80,13 +80,13 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormField label="Valor (R$)" type="number" step="0.01" {...register('valor')} placeholder={selectedPlan?.valor?.toString()} />
+                <FormField label="Valor (R$)" type="number" step="0.01" {...register('valor')} placeholder={(selectedPlan as any)?.valor?.toString()} />
                 <FormField label="Desconto (R$)" type="number" step="0.01" {...register('desconto')} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Data Início" type="date" {...register('data_inicio')} />
-                {selectedPlan?.tipo === 'transporte' && (
+                {(selectedPlan as any)?.tipo === 'transporte' && (
                   <FormField label="Passagens/Dia" type="number" {...register('quantidade_diaria')} />
                 )}
               </div>
@@ -123,14 +123,14 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {beneficios.length === 0 ? (
+              {!beneficios || beneficios.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-32 text-center text-muted-foreground font-body">
                     Nenhum benefício vinculado a este colaborador.
                   </TableCell>
                 </TableRow>
               ) : (
-                beneficios.map((b: any) => (
+                beneficios?.map((b: any) => (
                   <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
                     <TableCell className="font-body font-medium">{b.beneficio?.nome}</TableCell>
                     <TableCell className="font-body capitalize text-xs">

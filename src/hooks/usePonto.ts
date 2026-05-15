@@ -9,14 +9,22 @@ export function usePonto(colaboradorId?: string) {
 
   const { data: registros = [], isLoading } = useQuery({
     queryKey: ['registros-ponto', empresaAtual?.id, colaboradorId],
-    enabled: !!empresaAtual?.id,
-    queryFn: () => pontosService.listar(colaboradorId!, undefined, undefined),
+    enabled: !!empresaAtual?.id && !!colaboradorId,
+    queryFn: async () => {
+      const res = await pontosService.listar(colaboradorId!, undefined, undefined);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
   });
 
   const { data: hoje } = useQuery({
     queryKey: ['ponto-hoje', colaboradorId],
     enabled: !!colaboradorId,
-    queryFn: () => pontosService.buscarRegistroHoje(colaboradorId!),
+    queryFn: async () => {
+      const res = await pontosService.buscarRegistroHoje(colaboradorId!);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
   });
 
   const registrarPonto = useMutation({
@@ -33,7 +41,7 @@ export function usePonto(colaboradorId?: string) {
       foto_biometria_url?: string | null;
       foto_base64?: string | null;
     }) => {
-      const batida = await pontosService.registrar(tipo, colId, {
+      const res = await pontosService.registrar(tipo, colId, {
         latitude: geo?.latitude,
         longitude: geo?.longitude,
         precisao: geo?.accuracy,
@@ -41,13 +49,15 @@ export function usePonto(colaboradorId?: string) {
         foto_biometria_url
       });
 
-      // Se houver foto e for online, dispara a validação biométrica em background
+      if (!res.ok) throw new Error(res.error.message);
+      const batida = res.value;
+
       if (batida && foto_base64 && navigator.onLine) {
         pontosService.validarBiometria(batida.id, colId, foto_base64)
-          .then(res => {
-            if (res.valid) {
+          .then(resBio => {
+            if (resBio.ok && resBio.value.valid) {
               toast.success('Biometria validada com sucesso!');
-            } else {
+            } else if (resBio.ok) {
               toast.error('Atenção: Falha na validação biométrica!');
             }
           })
@@ -65,10 +75,11 @@ export function usePonto(colaboradorId?: string) {
   });
 
   return { 
-    registros, 
-    hoje,
+    registros: registros || [], 
+    hoje: hoje || [],
     isLoading, 
     registrarPonto: registrarPonto.mutateAsync,
     isRegistering: registrarPonto.isPending
   };
 }
+

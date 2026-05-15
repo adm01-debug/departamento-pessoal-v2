@@ -40,7 +40,7 @@ export default function DesligamentosPage() {
   const [showChart, setShowChart] = useState(true);
 
   const filtered = useMemo(() => {
-    return desligamentos.filter((d: any) => {
+    return (desligamentos as any[]).filter((d: any) => {
       const matchSearch = !search || 
         (d.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase()) ||
         (d.motivo || '').toLowerCase().includes(search.toLowerCase());
@@ -122,16 +122,18 @@ export default function DesligamentosPage() {
           <div className="space-y-6">
             {/* KPIs */}
             <AnimatePresence>
-              {!isLoading && desligamentos.length > 0 && (
+              {!isLoading && Array.isArray(desligamentos) && desligamentos.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                  <DesligamentoKPIs desligamentos={desligamentos} />
+                  <DesligamentoKPIs desligamentos={desligamentos as any[]} />
+
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* Turnover Chart */}
-            {!isLoading && desligamentos.length > 0 && showChart && (
-              <TurnoverChart desligamentos={desligamentos} />
+            {!isLoading && Array.isArray(desligamentos) && desligamentos.length > 0 && showChart && (
+              <TurnoverChart desligamentos={desligamentos as any[]} />
+
             )}
 
             {/* Filters */}
@@ -266,7 +268,7 @@ export default function DesligamentosPage() {
 
                     {/* Pagination info */}
                     <div className="px-4 py-3 border-t border-border/20 text-xs font-body text-muted-foreground">
-                      Exibindo {filtered.length} de {desligamentos.length} desligamentos
+                      Exibindo {filtered.length} de {(desligamentos as any[])?.length || 0} desligamentos
                     </div>
                   </CardContent>
                 </Card>

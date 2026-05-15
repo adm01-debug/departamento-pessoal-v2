@@ -45,6 +45,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const [cidResults, setCidResults] = useState<any[]>([]);
   const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
   const [historicoRecente, setHistoricoRecente] = useState<any[]>([]);
+
   const [isVerificandoHistorico, setIsVerificandoHistorico] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
@@ -65,9 +66,10 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
       if (watchColaboradorId) {
         setIsVerificandoHistorico(true);
         try {
-          const historico = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
-          setHistoricoRecente(historico);
+          const res = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
+          if (res.ok) setHistoricoRecente(res.value);
         } catch (e) {
+
           console.error('Erro ao carregar histórico:', e);
         } finally {
           setIsVerificandoHistorico(false);
@@ -88,10 +90,11 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   useEffect(() => {
     const searchCID = async () => {
       if (cidSearch.length > 2) {
-        const results = await afastamentoService.buscarCID(cidSearch);
-        setCidResults(results);
+        const res = await afastamentoService.buscarCID(cidSearch);
+        if (res.ok) setCidResults(res.value);
       }
     };
+
     const timer = setTimeout(searchCID, 300);
     return () => clearTimeout(timer);
   }, [cidSearch]);
@@ -128,9 +131,10 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                 role="combobox"
                 className="w-full justify-between"
               >
-                {watch('colaborador_id') 
-                  ? colaboradores.find(c => c.id === watch('colaborador_id'))?.nome_completo 
+                {watch('colaborador_id') && Array.isArray(colaboradores)
+                  ? (colaboradores as any[]).find((c: any) => c.id === watch('colaborador_id'))?.nome_completo 
                   : "Selecionar colaborador..."}
+
                 <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -140,7 +144,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                 <CommandList>
                   <CommandEmpty>Nenhum colaborador encontrado.</CommandEmpty>
                   <CommandGroup>
-                    {colaboradores.map((c) => (
+                    {Array.isArray(colaboradores) && (colaboradores as any[]).map((c: any) => (
                       <CommandItem
                         key={c.id}
                         onSelect={() => setValue('colaborador_id', c.id)}
@@ -148,6 +152,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                         {c.nome_completo}
                       </CommandItem>
                     ))}
+
                   </CommandGroup>
                 </CommandList>
               </Command>

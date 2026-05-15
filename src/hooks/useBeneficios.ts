@@ -10,18 +10,30 @@ export function useBeneficios() {
 
   const query = useQuery({
     queryKey: ['beneficios', empresaId],
-    queryFn: () => beneficioService.list(empresaId),
+    queryFn: async () => {
+      const res = await beneficioService.list(empresaId);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!empresaId,
   });
 
   const resumoQuery = useQuery({
     queryKey: ['beneficios-resumo', empresaId],
-    queryFn: () => beneficioService.obterResumoCustos(empresaId!),
+    queryFn: async () => {
+      const res = await beneficioService.obterResumoCustos(empresaId!);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     enabled: !!empresaId,
   });
 
   const criarBeneficio = useMutation({
-    mutationFn: (dados: any) => beneficioService.criar({ ...dados, empresa_id: empresaId }),
+    mutationFn: async (dados: any) => {
+      const res = await beneficioService.criar({ ...dados, empresa_id: empresaId });
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
       qc.invalidateQueries({ queryKey: ['beneficios-resumo', empresaId] });
@@ -31,7 +43,11 @@ export function useBeneficios() {
   });
 
   const atualizarBeneficio = useMutation({
-    mutationFn: ({ id, dados }: { id: string, dados: any }) => beneficioService.atualizar(id, dados),
+    mutationFn: async ({ id, dados }: { id: string, dados: any }) => {
+      const res = await beneficioService.atualizar(id, dados);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
       qc.invalidateQueries({ queryKey: ['beneficios-resumo', empresaId] });
@@ -40,7 +56,11 @@ export function useBeneficios() {
   });
 
   const excluirBeneficio = useMutation({
-    mutationFn: (id: string) => beneficioService.excluir(id),
+    mutationFn: async (id: string) => {
+      const res = await beneficioService.excluir(id);
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['beneficios', empresaId] });
       qc.invalidateQueries({ queryKey: ['beneficios-resumo', empresaId] });
@@ -60,3 +80,4 @@ export function useBeneficios() {
     tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
   };
 }
+

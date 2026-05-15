@@ -177,18 +177,19 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
       <div className="space-y-3">
         <h4 className="text-sm font-semibold flex items-center gap-2">
           <FileText className="h-4 w-4" />
-          Documentos Anexados ({documentos.length})
+          Documentos Anexados ({documentos?.length || 0})
         </h4>
+
         
         {isLoading ? (
           <div className="flex justify-center p-4"><Spinner /></div>
-        ) : documentos.length === 0 ? (
+        ) : !documentos || documentos.length === 0 ? (
           <div className="text-center py-8 border rounded-lg bg-card text-muted-foreground text-sm">
             Nenhum documento anexado.
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-2">
-            {documentos.map((doc) => (
+            {documentos?.map((doc: any) => (
               <div 
                 key={doc.id} 
                 className="flex items-center justify-between p-3 border rounded-lg bg-card hover:bg-accent/5 transition-colors"
