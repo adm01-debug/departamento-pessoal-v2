@@ -17,7 +17,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
   const { prorrogacoes, isLoading } = useProrrogacoesAfastamento(afastamentoId);
   const { afastamentos } = useAfastamentos();
   
-  const afastamento = afastamentos.find((a: any) => a.id === afastamentoId);
+  const afastamento = Array.isArray(afastamentos) ? afastamentos.find((a: any) => a.id === afastamentoId) : null;
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center p-12 space-y-4">
@@ -72,7 +72,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
         </div>
 
         {/* Prorrogações */}
-        {prorrogacoes.map((prorr: any, index: number) => (
+        {Array.isArray(prorrogacoes) && prorrogacoes.map((prorr: any, index: number) => (
           <div key={prorr.id} className="relative">
             <div className="absolute -left-[25px] top-1 h-4 w-4 rounded-full border-2 border-orange-500 bg-background flex items-center justify-center">
               <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />
@@ -81,7 +81,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
               <CardHeader className="py-3 px-4 bg-orange-50/50">
                 <div className="flex justify-between items-center">
                   <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 border-none text-[10px] uppercase font-bold">
-                    Prorrogação #{prorrogacoes.length - index}
+                    Prorrogação #{(prorrogacoes?.length || 0) - index}
                   </Badge>
                   <span className="text-[10px] text-muted-foreground italic">
                     {format(new Date(prorr.created_at), "dd 'de' MMMM, yyyy", { locale: ptBR })}

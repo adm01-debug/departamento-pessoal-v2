@@ -45,6 +45,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const [cidResults, setCidResults] = useState<any[]>([]);
   const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
   const [historicoRecente, setHistoricoRecente] = useState<any[]>([]);
+
   const [isVerificandoHistorico, setIsVerificandoHistorico] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
@@ -65,9 +66,10 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
       if (watchColaboradorId) {
         setIsVerificandoHistorico(true);
         try {
-          const historico = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
-          setHistoricoRecente(historico);
+          const res = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
+          if (res.ok) setHistoricoRecente(res.value);
         } catch (e) {
+
           console.error('Erro ao carregar histórico:', e);
         } finally {
           setIsVerificandoHistorico(false);
@@ -88,10 +90,11 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   useEffect(() => {
     const searchCID = async () => {
       if (cidSearch.length > 2) {
-        const results = await afastamentoService.buscarCID(cidSearch);
-        setCidResults(results);
+        const res = await afastamentoService.buscarCID(cidSearch);
+        if (res.ok) setCidResults(res.value);
       }
     };
+
     const timer = setTimeout(searchCID, 300);
     return () => clearTimeout(timer);
   }, [cidSearch]);
