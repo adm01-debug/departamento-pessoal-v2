@@ -53,7 +53,7 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
           throw new Error(data.error || 'Nenhum texto extraído');
         }
       } else {
-        throw new Error('Erro inesperado' || 'Nenhum texto extraído');
+        throw new Error('Nenhum texto extraído');
       }
     } catch (err: any) {
       toast.error(`Erro no OCR: ${err.message}`);
