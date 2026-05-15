@@ -4,7 +4,7 @@ import { RUBRICAS_PADRAO } from '@/constants/rubricas';
 /**
  * Validação de Rubricas vs Tabela de Referência do eSocial
  */
-export function validarRubricaESocial(rubrica: any): ValidationResult {
+export function validarRubricaESocial(rubrica: ESocialData): ValidationResult {
   const errors: ValidationError[] = [];
   
   required(rubrica.codigo, 'codigo', errors);
