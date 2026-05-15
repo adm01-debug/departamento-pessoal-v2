@@ -7,13 +7,16 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isReady } = useAuth();
+  const { user, isReady, loading } = useAuth();
 
-  // Wait for auth to fully restore from storage before deciding
-  if (!isReady) {
+  // Espera a inicialização completa (RESTORE SESSION) antes de decidir
+  if (!isReady || (loading && !user)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Iniciando sessão segura...</p>
+        </div>
       </div>
     );
   }
