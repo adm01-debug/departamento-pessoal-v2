@@ -13515,6 +13515,39 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_brindes: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          estoque: number | null
+          id: string
+          nome: string
+          preco: number | null
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          estoque?: number | null
+          id?: string
+          nome: string
+          preco?: number | null
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          estoque?: number | null
+          id?: string
+          nome?: string
+          preco?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       promocoes: {
         Row: {
           cargo_anterior_id: string | null
