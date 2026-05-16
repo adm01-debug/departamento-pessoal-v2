@@ -63,7 +63,12 @@ export function DashboardHeader({ greeting, isLoading, onRefresh }: DashboardHea
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="premium" size="sm" className="h-10 rounded-xl px-5 shadow-glow">
+          <Button 
+            variant="premium" 
+            size="sm" 
+            className="h-10 rounded-xl px-5 shadow-glow"
+            onClick={() => window.location.assign('/configuracoes')}
+          >
             Configurações
           </Button>
         </div>
