@@ -2497,6 +2497,7 @@ export type Database = {
           created_at: string
           data_entrevista: string | null
           data_proxima_etapa: string | null
+          empresa_id: string | null
           entrevistador: string | null
           etapa: string | null
           feedback: string | null
@@ -2514,6 +2515,7 @@ export type Database = {
           created_at?: string
           data_entrevista?: string | null
           data_proxima_etapa?: string | null
+          empresa_id?: string | null
           entrevistador?: string | null
           etapa?: string | null
           feedback?: string | null
@@ -2531,6 +2533,7 @@ export type Database = {
           created_at?: string
           data_entrevista?: string | null
           data_proxima_etapa?: string | null
+          empresa_id?: string | null
           entrevistador?: string | null
           etapa?: string | null
           feedback?: string | null
@@ -2549,6 +2552,13 @@ export type Database = {
             columns: ["candidato_id"]
             isOneToOne: false
             referencedRelation: "candidatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidaturas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
           {
@@ -4872,6 +4882,45 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
+          },
+        ]
+      }
+      curriculos_arquivos: {
+        Row: {
+          candidato_id: string
+          created_at: string | null
+          empresa_id: string
+          file_path: string
+          id: string
+        }
+        Insert: {
+          candidato_id: string
+          created_at?: string | null
+          empresa_id: string
+          file_path: string
+          id?: string
+        }
+        Update: {
+          candidato_id?: string
+          created_at?: string | null
+          empresa_id?: string
+          file_path?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculos_arquivos_candidato_id_fkey"
+            columns: ["candidato_id"]
+            isOneToOne: false
+            referencedRelation: "candidatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculos_arquivos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -11697,6 +11746,7 @@ export type Database = {
           created_by: string | null
           data_conclusao: string | null
           data_inicio: string
+          empresa_id: string | null
           id: string
           progresso: number | null
           status: string
@@ -11709,6 +11759,7 @@ export type Database = {
           created_by?: string | null
           data_conclusao?: string | null
           data_inicio?: string
+          empresa_id?: string | null
           id?: string
           progresso?: number | null
           status?: string
@@ -11721,6 +11772,7 @@ export type Database = {
           created_by?: string | null
           data_conclusao?: string | null
           data_inicio?: string
+          empresa_id?: string | null
           id?: string
           progresso?: number | null
           status?: string
@@ -11785,10 +11837,62 @@ export type Database = {
             referencedColumns: ["colaborador_id"]
           },
           {
+            foreignKeyName: "onboarding_colaborador_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "onboarding_colaborador_template_id_fkey"
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_documentos_obrigatorios: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          entregue: boolean | null
+          id: string
+          nome_documento: string
+          onboarding_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          entregue?: boolean | null
+          id?: string
+          nome_documento: string
+          onboarding_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          entregue?: boolean | null
+          id?: string
+          nome_documento?: string
+          onboarding_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_documentos_obrigatorios_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_documentos_obrigatorios_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_colaborador"
             referencedColumns: ["id"]
           },
         ]
@@ -11829,6 +11933,7 @@ export type Database = {
           data_conclusao: string | null
           data_prazo: string | null
           descricao: string | null
+          empresa_id: string | null
           id: string
           observacoes: string | null
           onboarding_id: string
@@ -11844,6 +11949,7 @@ export type Database = {
           data_conclusao?: string | null
           data_prazo?: string | null
           descricao?: string | null
+          empresa_id?: string | null
           id?: string
           observacoes?: string | null
           onboarding_id: string
@@ -11859,6 +11965,7 @@ export type Database = {
           data_conclusao?: string | null
           data_prazo?: string | null
           descricao?: string | null
+          empresa_id?: string | null
           id?: string
           observacoes?: string | null
           onboarding_id?: string
@@ -11867,6 +11974,13 @@ export type Database = {
           titulo?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "onboarding_tarefas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "onboarding_tarefas_onboarding_id_fkey"
             columns: ["onboarding_id"]
@@ -17072,6 +17186,48 @@ export type Database = {
           },
         ]
       }
+      triagem_notas: {
+        Row: {
+          candidatura_id: string
+          comentario: string | null
+          created_at: string | null
+          empresa_id: string
+          id: string
+          nota: number | null
+        }
+        Insert: {
+          candidatura_id: string
+          comentario?: string | null
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          nota?: number | null
+        }
+        Update: {
+          candidatura_id?: string
+          comentario?: string | null
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          nota?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triagem_notas_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "triagem_notas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trilha_auditoria_ponto: {
         Row: {
           acao: string
@@ -17406,6 +17562,106 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vaga_entrevistas: {
+        Row: {
+          candidatura_id: string
+          created_at: string | null
+          data_hora: string
+          empresa_id: string
+          etapa_id: string
+          feedback: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          candidatura_id: string
+          created_at?: string | null
+          data_hora: string
+          empresa_id: string
+          etapa_id: string
+          feedback?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          candidatura_id?: string
+          created_at?: string | null
+          data_hora?: string
+          empresa_id?: string
+          etapa_id?: string
+          feedback?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaga_entrevistas_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaga_entrevistas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaga_entrevistas_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "vaga_etapas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vaga_etapas: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          ordem: number
+          updated_at: string | null
+          vaga_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          ordem: number
+          updated_at?: string | null
+          vaga_id: string
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          updated_at?: string | null
+          vaga_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaga_etapas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaga_etapas_vaga_id_fkey"
+            columns: ["vaga_id"]
+            isOneToOne: false
+            referencedRelation: "vagas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vagas: {
         Row: {
