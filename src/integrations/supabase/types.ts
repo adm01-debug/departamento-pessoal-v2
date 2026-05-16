@@ -19125,15 +19125,33 @@ export type Database = {
       }
       vw_colaboradores_completo: {
         Row: {
+          cargo_nome: string | null
           cpf: string | null
           data_admissao: string | null
-          email: string | null
+          departamento_nome: string | null
+          email_corporativo: string | null
+          empresa_id: string | null
           empresa_nome: string | null
           id: string | null
           nome_completo: string | null
           status: Database["public"]["Enums"]["status_colaborador"] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_colaboradores_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vw_dashboard_time: {
         Row: {
@@ -19162,66 +19180,82 @@ export type Database = {
       vw_espelho_ponto_mensal: {
         Row: {
           colaborador_id: string | null
-          colaborador_nome: string | null
-          competencia: string | null
-          dias_registrados: number | null
+          data: string | null
+          empresa_id: string | null
+          entrada_1: string | null
+          saida_1: string | null
+          total_batidas: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "fk_registros_ponto_colaborador"
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_registros_ponto_colaborador"
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_cadastro_incompleto"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_registros_ponto_colaborador"
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_registros_ponto_colaborador"
+            foreignKeyName: "batidas_ponto_colaborador_id_fkey"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
           },
           {
-            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            foreignKeyName: "colaboradores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_batidas_ponto_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            foreignKeyName: "fk_batidas_ponto_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_cadastro_incompleto"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            foreignKeyName: "fk_batidas_ponto_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_colaboradores_completo"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "registros_ponto_colaborador_id_fkey"
+            foreignKeyName: "fk_batidas_ponto_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "fk_colaboradores_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
           },
         ]
       }
