@@ -11007,6 +11007,50 @@ export type Database = {
           },
         ]
       }
+      logs_sincronizacao: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          id: string
+          mensagem: string | null
+          payload_enviado: Json | null
+          resposta_recebida: Json | null
+          sistema_externo: string
+          status: string
+          tipo_entidade: string
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          mensagem?: string | null
+          payload_enviado?: Json | null
+          resposta_recebida?: Json | null
+          sistema_externo: string
+          status: string
+          tipo_entidade: string
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          mensagem?: string | null
+          payload_enviado?: Json | null
+          resposta_recebida?: Json | null
+          sistema_externo?: string
+          status?: string
+          tipo_entidade?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_sincronizacao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       logs_sistema: {
         Row: {
           contexto: Json | null
@@ -11975,6 +12019,44 @@ export type Database = {
         }
         Relationships: []
       }
+      parametros_sistema: {
+        Row: {
+          created_at: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          tipo_dado: string | null
+          updated_at: string | null
+          valor: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          tipo_dado?: string | null
+          updated_at?: string | null
+          valor?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          tipo_dado?: string | null
+          updated_at?: string | null
+          valor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parametros_sistema_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       password_history: {
         Row: {
           created_at: string | null
@@ -12693,6 +12775,71 @@ export type Database = {
           fechado_por?: string | null
           id?: string
           status?: string | null
+        }
+        Relationships: []
+      }
+      permissao_perfis: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string
+          id: string
+          is_admin: boolean | null
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          is_admin?: boolean | null
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          is_admin?: boolean | null
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permissao_perfis_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      permissao_recursos: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          id: string
+          modulo: string | null
+          nome: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          modulo?: string | null
+          nome: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          modulo?: string | null
+          nome?: string
+          slug?: string
         }
         Relationships: []
       }
@@ -17702,6 +17849,27 @@ export type Database = {
           type?: string
           used_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      versao_banco: {
+        Row: {
+          descricao: string | null
+          executado_em: string | null
+          id: string
+          versao: string
+        }
+        Insert: {
+          descricao?: string | null
+          executado_em?: string | null
+          id?: string
+          versao: string
+        }
+        Update: {
+          descricao?: string | null
+          executado_em?: string | null
+          id?: string
+          versao?: string
         }
         Relationships: []
       }
