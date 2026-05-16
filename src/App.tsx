@@ -180,6 +180,7 @@ export default function App() {
         <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
         <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
         <Route path="times" element={<LazyPage Component={TimesPage} />} />
+        <Route path="promo-brindes" element={<LazyPage Component={PromoBrindesPage} />} />
         <Route path="organograma" element={<LazyPage Component={OrganogramaPage} />} />
         
         {/* Gestão e Performance */}
