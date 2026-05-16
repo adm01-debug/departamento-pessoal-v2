@@ -38,7 +38,7 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         <div className="flex items-center gap-2">
           <BackButton />
           <div className="h-4 w-[1px] bg-border/40 mx-1 hidden md:block" />
-          <Breadcrumbs className="hidden md:flex" />
+          <Breadcrumbs className="md:flex" />
         </div>
 
         {/* Compact search trigger */}
