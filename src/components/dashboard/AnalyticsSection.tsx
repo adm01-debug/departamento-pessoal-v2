@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -317,6 +317,10 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
 
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
   const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
+
+  // Stats for the visual widgets
+  const totalPendentes = (dbPendencias?.length || 0) + (pontoSolicitacoes?.filter((s: any) => s.status === 'enviado').length || 0);
+  const highPriorityCount = dbPendencias?.filter(p => p.prioridade === 'alta').length || 0;
 
   // Real-time Subscriptions for Auto-refresh
   useRealTimeSubscription('solicitacoes_ajuste_ponto', ['solicitacoes-ajuste-ponto', empresaId], empresaId);
