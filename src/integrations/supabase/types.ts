@@ -756,6 +756,7 @@ export type Database = {
         Row: {
           action: string
           created_at: string
+          empresa_id: string | null
           entity: string
           entity_id: string | null
           id: string
@@ -769,6 +770,7 @@ export type Database = {
         Insert: {
           action: string
           created_at?: string
+          empresa_id?: string | null
           entity: string
           entity_id?: string | null
           id?: string
@@ -782,6 +784,7 @@ export type Database = {
         Update: {
           action?: string
           created_at?: string
+          empresa_id?: string | null
           entity?: string
           entity_id?: string | null
           id?: string
@@ -792,7 +795,15 @@ export type Database = {
           user_email?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       auditoria: {
         Row: {
@@ -905,6 +916,7 @@ export type Database = {
           dados_anteriores: Json | null
           dados_novos: Json | null
           descricao: string | null
+          empresa_id: string | null
           entidade: string
           entidade_id: string | null
           id: string
@@ -918,6 +930,7 @@ export type Database = {
           dados_anteriores?: Json | null
           dados_novos?: Json | null
           descricao?: string | null
+          empresa_id?: string | null
           entidade: string
           entidade_id?: string | null
           id?: string
@@ -931,6 +944,7 @@ export type Database = {
           dados_anteriores?: Json | null
           dados_novos?: Json | null
           descricao?: string | null
+          empresa_id?: string | null
           entidade?: string
           entidade_id?: string | null
           id?: string
@@ -938,7 +952,15 @@ export type Database = {
           user_email?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "auditoria_logs_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       auth_gov_br_sessions: {
         Row: {
