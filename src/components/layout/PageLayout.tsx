@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Breadcrumbs } from './Breadcrumbs';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -63,39 +64,42 @@ export function PageLayout({
       className={cn('space-y-6 max-w-[1400px] mx-auto', className)}
     >
       {(title || actions) && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            {showBack && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleBack}
-                      className="h-9 w-9 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-primary/5 shrink-0 transition-all"
-                      aria-label="Voltar à página anterior"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="text-xs">
-                    Voltar
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            {icon && (
-              <div className={cn('p-2.5 rounded-xl bg-gradient-to-br shadow-lg', gradient)}>
-                {icon}
+        <div className="space-y-2">
+          <Breadcrumbs className="mb-2" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {showBack && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleBack}
+                        className="h-9 w-9 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-primary/5 shrink-0 transition-all"
+                        aria-label="Voltar à página anterior"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      Voltar
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {icon && (
+                <div className={cn('p-2.5 rounded-xl bg-gradient-to-br shadow-lg', gradient)}>
+                  {icon}
+                </div>
+              )}
+              <div>
+                {title && <h1 className="text-2xl font-display font-bold tracking-tight">{title}</h1>}
+                {description && <p className="text-muted-foreground font-body mt-0.5">{description}</p>}
               </div>
-            )}
-            <div>
-              {title && <h1 className="text-2xl font-display font-bold tracking-tight">{title}</h1>}
-              {description && <p className="text-muted-foreground font-body mt-0.5">{description}</p>}
             </div>
+            {actions && <div className="flex items-center gap-2">{actions}</div>}
           </div>
-          {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
       )}
       {children}
