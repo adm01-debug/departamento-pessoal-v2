@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
+import { useFormGuard } from '@/hooks/useFormGuard';
 
 const schema = z.object({
   // Geral
@@ -93,7 +94,7 @@ export default function ColaboradorFormPage() {
     enabled: isEditing,
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, reset, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { 
       status: 'ativo', 
@@ -102,6 +103,9 @@ export default function ColaboradorFormPage() {
       sexo: 'masculino'
     },
   });
+
+  // Proteção contra perda de dados
+  useFormGuard(isDirty);
 
   useEffect(() => {
     if (colaborador) {
