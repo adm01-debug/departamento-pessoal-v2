@@ -11,11 +11,11 @@ const MotionCard = motion.create(Card);
 
 const actions = [
   { label: 'Novo Colaborador', icon: UserPlus, gradient: 'from-primary to-primary-glow', path: '/colaboradores/novo', desc: 'Cadastrar funcionário' },
-  { label: 'Calcular Folha', icon: DollarSign, gradient: 'from-primary/80 to-primary', path: '/folha/calcular', desc: 'Processamento mensal' },
-  { label: 'Registrar Ponto', icon: Clock, gradient: 'from-primary/60 to-primary/90', path: '/ponto', desc: 'Batida manual' },
-  { label: 'Solicitar Férias', icon: Calendar, gradient: 'from-primary-glow to-primary', path: '/ferias', desc: 'Nova solicitação' },
-  { label: 'Obrigações Fiscais', icon: FileText, gradient: 'from-info to-info/70', path: '/obrigacoes-fiscais', desc: 'S-1000, S-2200, etc' },
-  { label: 'Relatórios DP', icon: BarChart3, gradient: 'from-primary to-primary-glow', path: '/relatorios', desc: 'Extração de dados' },
+  { label: 'Lançar Ponto', icon: Clock, gradient: 'from-primary/80 to-primary', path: '/ponto', desc: 'Batida manual' },
+  { label: 'Calcular Folha', icon: DollarSign, gradient: 'from-primary/60 to-primary/90', path: '/folha/calcular', desc: 'Processamento mensal' },
+  { label: 'Férias / Ausências', icon: Calendar, gradient: 'from-primary-glow to-primary', path: '/ferias', desc: 'Gestão de tempo' },
+  { label: 'Obrigações Fiscais', icon: FileText, gradient: 'from-info to-info/70', path: '/obrigacoes-fiscais', desc: 'Compliance eSocial' },
+  { label: 'Relatórios DP', icon: BarChart3, gradient: 'from-primary to-primary-glow', path: '/relatorios', desc: 'Extração de BI' },
 ];
 
 export function QuickActionsGrid() {
