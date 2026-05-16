@@ -63,7 +63,9 @@ export function PageLayout({
       className={cn('space-y-6 max-w-[1400px] mx-auto', className)}
     >
       {(title || actions) && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-4">
+          <Breadcrumbs className="mb-2" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {showBack && (
               <TooltipProvider>
