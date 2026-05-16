@@ -5,6 +5,7 @@ import { NotificationCenter } from '@/components/ui/notification-center';
 import { UserProfileMenu } from '@/components/ui/user-profile-menu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Breadcrumbs } from './Breadcrumbs';
+import { BackButton } from './BackButton';
 import { EmpresaSelector } from './EmpresaSelector';
 import { useAuth } from '@/hooks/useAuth';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -32,9 +33,13 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         <Button variant="ghost" size="icon" onClick={onMenuClick} className="lg:hidden hover:bg-accent/50 rounded-lg" aria-label="Abrir menu">
           <Menu className="h-5 w-5" />
         </Button>
-
-        {/* Breadcrumbs */}
-        <Breadcrumbs className="hidden md:flex" />
+        
+        {/* Navigation Control */}
+        <div className="flex items-center gap-2">
+          <BackButton />
+          <div className="h-4 w-[1px] bg-border/40 mx-1 hidden md:block" />
+          <Breadcrumbs className="hidden md:flex" />
+        </div>
 
         {/* Compact search trigger */}
         <button

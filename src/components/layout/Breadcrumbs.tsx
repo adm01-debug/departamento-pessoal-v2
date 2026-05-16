@@ -81,8 +81,16 @@ export function Breadcrumbs({ className }: { className?: string }) {
   const crumbs = segments.map((seg, i) => {
     const path = '/' + segments.slice(0, i + 1).join('/');
     const isLast = i === segments.length - 1;
-    const isUuid = /^[0-9a-f]{8}-/.test(seg);
-    const label = isUuid ? '...' : routeLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
+    // Melhorado: detecção de UUID e limpeza de IDs numéricos para breadcrumbs mais limpos
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(seg);
+    const isNumericId = /^\d+$/.test(seg);
+    
+    let label = seg;
+    if (isUuid || isNumericId) {
+      label = 'Detalhes';
+    } else {
+      label = routeLabels[seg] || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
+    }
 
     return { path, label, isLast };
   }).filter(c => c.label);
