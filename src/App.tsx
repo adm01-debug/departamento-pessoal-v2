@@ -95,18 +95,35 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 function PageLoader() {
   return (
-    <div className="flex flex-col space-y-4 p-6 animate-pulse">
+    <div className="flex flex-col space-y-6 p-6 animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-6">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-32" />
+        <div className="space-y-3">
+          <Skeleton className="h-9 w-64 rounded-xl bg-muted/50" />
+          <Skeleton className="h-4 w-40 rounded-lg bg-muted/30" />
         </div>
-        <Skeleton className="h-10 w-32 rounded-xl" />
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-28 rounded-xl bg-muted/40" />
+          <Skeleton className="h-10 w-36 rounded-xl bg-primary/20" />
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="p-4 rounded-2xl border border-border/20 bg-card/30 space-y-3">
+            <Skeleton className="h-4 w-24 bg-muted/40" />
+            <Skeleton className="h-8 w-16 bg-muted/60" />
+            <Skeleton className="h-3 w-32 bg-muted/20" />
+          </div>
+        ))}
       </div>
-      <Skeleton className="h-96 w-full rounded-2xl" />
+
+      <div className="space-y-4">
+        <div className="flex items-center gap-4 mb-2">
+          <Skeleton className="h-8 w-32 rounded-lg bg-muted/40" />
+          <Skeleton className="h-8 w-32 rounded-lg bg-muted/20" />
+        </div>
+        <Skeleton className="h-[400px] w-full rounded-2xl border border-border/10 bg-card/20" />
+      </div>
     </div>
   );
 }
