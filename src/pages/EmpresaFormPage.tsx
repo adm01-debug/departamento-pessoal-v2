@@ -24,6 +24,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { useFormGuard } from '@/hooks/useFormGuard';
 
 export default function EmpresaFormPage() {
   const { id } = useParams();
@@ -39,10 +40,13 @@ export default function EmpresaFormPage() {
     enabled: isEditing,
   });
 
-  const { register, handleSubmit, setValue, reset, watch, formState: { errors } } = useForm<EmpresaSchema>({
+  const { register, handleSubmit, setValue, reset, watch, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
     resolver: zodResolver(empresaSchema),
     defaultValues: { ativa: true },
   });
+
+  // Proteção contra perda de dados
+  useFormGuard(isDirty);
 
   useEffect(() => {
     if (empresa) {
