@@ -35,13 +35,23 @@ export default function TimesPage() {
     enabled: !!empresaAtual?.id,
   });
 
-  const criar = useMutation({
+  const handleSubmit = useMutation({
     mutationFn: async (d: any) => {
-      const { data, error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id }).select().maybeSingle();
-      if (error) throw error;
-      return data;
+      if (editingItem) {
+        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id });
+        if (error) throw error;
+      }
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['times'] }); setOpen(false); toast.success('Time criado!'); },
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ['times'] }); 
+      setOpen(false); 
+      setEditingItem(null);
+      setForm({ nome: '', descricao: '' });
+      toast.success(editingItem ? 'Time atualizado!' : 'Time criado!'); 
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
