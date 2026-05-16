@@ -9,6 +9,7 @@ import { PageTransition } from './PageTransition';
 import { CommandPalette } from '@/components/ui/command-palette';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBackGesture } from '@/hooks/useBackGesture';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -21,6 +22,9 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { user, isReady, signOut } = useAuth();
+
+  // Ativa o gesto de swipe para voltar em mobile
+  useBackGesture();
 
   useEffect(() => {
     const handleInactivity = () => {
