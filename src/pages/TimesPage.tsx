@@ -91,13 +91,28 @@ export default function TimesPage() {
           </Dialog>
         </div>
         <Table>
-          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Descrição</TableHead><TableHead>Ações</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Descrição</TableHead><TableHead className="text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>
             {times.map((t: any) => (
               <TableRow key={t.id}>
                 <TableCell className="font-medium">{t.nome}</TableCell>
                 <TableCell>{t.descricao || '—'}</TableCell>
-                <TableCell><Button size="icon" variant="ghost" onClick={() => excluir.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button size="icon" variant="ghost" onClick={() => {
+                      setEditingItem(t);
+                      setForm({ nome: t.nome, descricao: t.descricao || '' });
+                      setOpen(true);
+                    }}>
+                      <Edit2 className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => {
+                      if (confirm('Deseja excluir este time?')) excluir.mutate(t.id);
+                    }}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
             {times.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">Nenhum time cadastrado</TableCell></TableRow>}
