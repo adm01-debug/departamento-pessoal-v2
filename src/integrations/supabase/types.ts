@@ -20094,7 +20094,6 @@ export type Database = {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: {
           is_locked: boolean
-          locked_until_ts: string
           remaining_seconds: number
         }[]
       }
@@ -20244,7 +20243,6 @@ export type Database = {
         Returns: {
           attempts: number
           is_locked: boolean
-          locked_until_ts: string
           lockout_minutes: number
         }[]
       }
