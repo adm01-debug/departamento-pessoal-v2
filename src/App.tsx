@@ -64,6 +64,7 @@ const MedidasDisciplinaresPage = lazy(() => import('@/pages/MedidasDisciplinares
 const JornadasPage = lazy(() => import('@/pages/JornadasPage'));
 const CentrosCustoPage = lazy(() => import('@/pages/CentrosCustoPage'));
 const TimesPage = lazy(() => import('@/pages/TimesPage'));
+const PromoBrindesPage = lazy(() => import('@/pages/PromoBrindesPage'));
 const MovimentacoesPage = lazy(() => import('@/pages/MovimentacoesPage'));
 const SindicatosPage = lazy(() => import('@/pages/SindicatosPage'));
 const ObrigacoesFiscaisPage = lazy(() => import('@/pages/ObrigacoesFiscaisPage'));
@@ -179,6 +180,7 @@ export default function App() {
         <Route path="lotacoes" element={<LazyPage Component={LotacoesPage} />} />
         <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
         <Route path="times" element={<LazyPage Component={TimesPage} />} />
+        <Route path="promo-brindes" element={<LazyPage Component={PromoBrindesPage} />} />
         <Route path="organograma" element={<LazyPage Component={OrganogramaPage} />} />
         
         {/* Gestão e Performance */}

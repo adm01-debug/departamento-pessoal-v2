@@ -11,14 +11,16 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, Users, Trash2 } from 'lucide-react';
+import { Plus, Users, Trash2, Edit2 } from 'lucide-react';
 
 export default function TimesPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
   const [form, setForm] = useState({ nome: '', descricao: '' });
 
   const { data: times = [], isLoading } = useQuery({
@@ -33,13 +35,23 @@ export default function TimesPage() {
     enabled: !!empresaAtual?.id,
   });
 
-  const criar = useMutation({
+  const handleSubmit = useMutation({
     mutationFn: async (d: any) => {
-      const { data, error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id }).select().maybeSingle();
-      if (error) throw error;
-      return data;
+      if (editingItem) {
+        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id });
+        if (error) throw error;
+      }
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['times'] }); setOpen(false); toast.success('Time criado!'); },
+    onSuccess: () => { 
+      qc.invalidateQueries({ queryKey: ['times'] }); 
+      setOpen(false); 
+      setEditingItem(null);
+      setForm({ nome: '', descricao: '' });
+      toast.success(editingItem ? 'Time atualizado!' : 'Time criado!'); 
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -57,26 +69,50 @@ export default function TimesPage() {
       <Card><CardContent className="pt-6">
         <div className="flex justify-between mb-4">
           <h3 className="text-lg font-semibold">Times ({times.length})</h3>
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(val) => {
+            setOpen(val);
+            if (!val) {
+              setEditingItem(null);
+              setForm({ nome: '', descricao: '' });
+            }
+          }}>
             <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-1" />Novo Time</Button></DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Novo Time</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingItem ? 'Editar Time' : 'Novo Time'}</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div><Label>Nome *</Label><Input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} /></div>
                 <div><Label>Descrição</Label><Textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} /></div>
-                <Button className="w-full" onClick={() => criar.mutate(form)} disabled={!form.nome}>Salvar</Button>
+                <Button className="w-full" onClick={() => handleSubmit.mutate(form)} disabled={!form.nome || handleSubmit.isPending}>
+                  {handleSubmit.isPending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                  {editingItem ? 'Salvar Alterações' : 'Salvar'}
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
         <Table>
-          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Descrição</TableHead><TableHead>Ações</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Descrição</TableHead><TableHead className="text-right">Ações</TableHead></TableRow></TableHeader>
           <TableBody>
             {times.map((t: any) => (
               <TableRow key={t.id}>
                 <TableCell className="font-medium">{t.nome}</TableCell>
                 <TableCell>{t.descricao || '—'}</TableCell>
-                <TableCell><Button size="icon" variant="ghost" onClick={() => excluir.mutate(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button size="icon" variant="ghost" onClick={() => {
+                      setEditingItem(t);
+                      setForm({ nome: t.nome, descricao: t.descricao || '' });
+                      setOpen(true);
+                    }}>
+                      <Edit2 className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => {
+                      if (confirm('Deseja excluir este time?')) excluir.mutate(t.id);
+                    }}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
             {times.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">Nenhum time cadastrado</TableCell></TableRow>}
