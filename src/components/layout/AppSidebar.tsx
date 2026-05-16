@@ -120,6 +120,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Megaphone, label: 'Comunicação', path: '/comunicacao', color: 'text-warning' },
       { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
       { icon: Settings, label: 'Configurações', path: '/configuracoes', color: 'text-muted-foreground' },
+      { icon: Gift, label: 'Promo Brindes', path: '/promo-brindes', color: 'text-warning' },
       { icon: ClipboardList, label: 'Integrações', path: '/integracoes', color: 'text-info' },
     ]
   },
