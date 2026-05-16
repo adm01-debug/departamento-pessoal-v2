@@ -40,7 +40,17 @@ export function MetricCard({
       initial="hidden"
       animate="visible"
       whileHover={{ y: -2, transition: { duration: 0.2 } }}
-      className="group relative overflow-hidden border border-border/30 hover:border-border/60 shadow-elevated hover:shadow-float transition-all duration-500 rounded-2xl"
+      className="group relative overflow-hidden border border-border/30 hover:border-primary/40 shadow-elevated hover:shadow-glow transition-all duration-500 rounded-2xl cursor-pointer"
+      onClick={() => {
+        const routes: Record<string, string> = {
+          "Colaboradores Ativos": "/colaboradores",
+          "Folha Mensal": "/folha",
+          "Férias Pendentes": "/ferias",
+          "Banco de Horas": "/ponto"
+        };
+        const path = routes[title];
+        if (path) window.location.assign(path);
+      }}
     >
       <div className={cn("absolute inset-0 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500 bg-gradient-to-br", gradient)} />
       <div className={cn("absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r", gradient)} />

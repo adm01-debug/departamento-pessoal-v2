@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -318,6 +318,10 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   const { data: dbPendencias, isLoading: isLoadingDB, updateStatus } = usePendencias(empresaId);
   const { solicitacoes: pontoSolicitacoes, isLoading: isLoadingPonto, responderSolicitacao } = usePontoMelhorado(empresaId);
 
+  // Stats for the visual widgets
+  const totalPendentes = (dbPendencias?.length || 0) + (pontoSolicitacoes?.filter((s: any) => s.status === 'enviado').length || 0);
+  const highPriorityCount = dbPendencias?.filter(p => p.prioridade === 'alta').length || 0;
+
   // Real-time Subscriptions for Auto-refresh
   useRealTimeSubscription('solicitacoes_ajuste_ponto', ['solicitacoes-ajuste-ponto', empresaId], empresaId);
   useRealTimeSubscription('notificacoes', ['notificacoes', empresaId], empresaId);
@@ -493,50 +497,54 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
         <MotionCard 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+          onClick={() => navigate('/workflows')}
           className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-primary/30 transition-all"
         >
           <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
             <Layers className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-bold font-display">Fluxos de Trabalho</p>
-            <p className="text-[10px] text-muted-foreground">3 processos ativos</p>
+            <p className="text-sm font-bold font-display">Workflows</p>
+            <p className="text-[10px] text-muted-foreground">Otimização de processos</p>
           </div>
         </MotionCard>
         <MotionCard 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}
+          onClick={() => navigate('/relatorios')}
           className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-info/30 transition-all"
         >
           <div className="p-3 rounded-xl bg-info/10 text-info group-hover:scale-110 transition-transform">
             <Target className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-bold font-display">Metas de RH</p>
-            <p className="text-[10px] text-muted-foreground">85% concluídas</p>
+            <p className="text-sm font-bold font-display">BI e Metas</p>
+            <p className="text-[10px] text-muted-foreground">Indicadores estratégicos</p>
           </div>
         </MotionCard>
         <MotionCard 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.51 }}
+          onClick={() => navigate('/auditoria')}
           className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-success/30 transition-all"
         >
           <div className="p-3 rounded-xl bg-success/10 text-success group-hover:scale-110 transition-transform">
             <Database className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-bold font-display">Auditoria Digital</p>
-            <p className="text-[10px] text-muted-foreground">Tudo em dia</p>
+            <p className="text-sm font-bold font-display">Auditoria</p>
+            <p className="text-[10px] text-muted-foreground">Conformidade de dados</p>
           </div>
         </MotionCard>
         <MotionCard 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.54 }}
+          onClick={() => navigate('/assistente-ia')}
           className="border border-border/20 bg-gradient-to-br from-card/50 to-accent/5 rounded-2xl p-4 flex items-center gap-4 group cursor-pointer hover:border-warning/30 transition-all"
         >
           <div className="p-3 rounded-xl bg-warning/10 text-warning group-hover:scale-110 transition-transform">
             <Zap className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-bold font-display">Insights de IA</p>
-            <p className="text-[10px] text-muted-foreground">2 novas sugestões</p>
+            <p className="text-sm font-bold font-display">IA Insights</p>
+            <p className="text-[10px] text-muted-foreground">Análise preditiva</p>
           </div>
         </MotionCard>
       </div>
