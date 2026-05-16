@@ -121,6 +121,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
       { icon: Settings, label: 'Configurações', path: '/configuracoes', color: 'text-muted-foreground' },
       { icon: Gift, label: 'Promo Brindes', path: '/promo-brindes', color: 'text-warning' },
+      { icon: GitBranch, label: 'Vínculos Promo', path: '/promo-brindes/vinculos', color: 'text-info' },
       { icon: ClipboardList, label: 'Integrações', path: '/integracoes', color: 'text-info' },
     ]
   },
