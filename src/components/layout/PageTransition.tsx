@@ -5,25 +5,28 @@ import { type ReactNode, useRef } from 'react';
 const variants = {
   enter: (direction: number) => ({
     opacity: 0,
-    x: direction > 0 ? 16 : -16,
-    y: 4,
+    x: direction > 0 ? 12 : -12,
+    y: 0,
+    filter: 'blur(4px)',
   }),
   center: {
     opacity: 1,
     x: 0,
     y: 0,
+    filter: 'blur(0px)',
   },
   exit: (direction: number) => ({
     opacity: 0,
-    x: direction > 0 ? -16 : 16,
-    y: -4,
+    x: direction > 0 ? -12 : 12,
+    y: 0,
+    filter: 'blur(4px)',
   }),
 };
 
 const transition = {
   type: 'tween' as const,
-  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
-  duration: 0.22,
+  ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
+  duration: 0.35,
 };
 
 const routeOrder = [
