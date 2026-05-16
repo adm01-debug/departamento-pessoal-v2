@@ -182,6 +182,7 @@ export default function App() {
         <Route path="locais-trabalho" element={<LazyPage Component={LocaisTrabalhoPage} />} />
         <Route path="times" element={<LazyPage Component={TimesPage} />} />
         <Route path="promo-brindes" element={<LazyPage Component={PromoBrindesPage} />} />
+        <Route path="promo-brindes/vinculos" element={<LazyPage Component={VinculosPromoPage} />} />
         <Route path="organograma" element={<LazyPage Component={OrganogramaPage} />} />
         
         {/* Gestão e Performance */}
