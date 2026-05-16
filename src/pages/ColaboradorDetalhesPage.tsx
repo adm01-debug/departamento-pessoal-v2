@@ -57,9 +57,6 @@ export default function ColaboradorDetalhesPage() {
         gradient="from-primary to-primary-glow"
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => navigate('/colaboradores')}>
-              <ArrowLeft className="h-4 w-4 mr-1.5" /> Voltar
-            </Button>
             <Button 
               variant="outline" 
               size="sm" 
