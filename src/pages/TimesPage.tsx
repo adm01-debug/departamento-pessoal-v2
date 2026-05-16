@@ -69,14 +69,23 @@ export default function TimesPage() {
       <Card><CardContent className="pt-6">
         <div className="flex justify-between mb-4">
           <h3 className="text-lg font-semibold">Times ({times.length})</h3>
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(val) => {
+            setOpen(val);
+            if (!val) {
+              setEditingItem(null);
+              setForm({ nome: '', descricao: '' });
+            }
+          }}>
             <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-1" />Novo Time</Button></DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Novo Time</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingItem ? 'Editar Time' : 'Novo Time'}</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div><Label>Nome *</Label><Input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} /></div>
                 <div><Label>Descrição</Label><Textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} /></div>
-                <Button className="w-full" onClick={() => criar.mutate(form)} disabled={!form.nome}>Salvar</Button>
+                <Button className="w-full" onClick={() => handleSubmit.mutate(form)} disabled={!form.nome || handleSubmit.isPending}>
+                  {handleSubmit.isPending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                  {editingItem ? 'Salvar Alterações' : 'Salvar'}
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
