@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Plus, Gift, Trash2, Edit2, Search, Package } from 'lucide-react';
 
