@@ -16060,6 +16060,45 @@ export type Database = {
           },
         ]
       }
+      times_brindes: {
+        Row: {
+          brinde_id: string
+          created_at: string
+          id: string
+          quantidade_alocada: number | null
+          time_id: string
+        }
+        Insert: {
+          brinde_id: string
+          created_at?: string
+          id?: string
+          quantidade_alocada?: number | null
+          time_id: string
+        }
+        Update: {
+          brinde_id?: string
+          created_at?: string
+          id?: string
+          quantidade_alocada?: number | null
+          time_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "times_brindes_brinde_id_fkey"
+            columns: ["brinde_id"]
+            isOneToOne: false
+            referencedRelation: "promo_brindes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "times_brindes_time_id_fkey"
+            columns: ["time_id"]
+            isOneToOne: false
+            referencedRelation: "times"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tipos_admissao: {
         Row: {
           codigo_esocial: number | null
