@@ -312,7 +312,7 @@ function WhatsAppConfigPanel() {
     if (!empresaAtual?.id) return;
     setLoading(true);
     try {
-      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id, habilitado: config.habilitado || false } as WhatsAppConfig);
+      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id, status: (config as any).status || 'active' } as any);
       toast.success('Configuração de WhatsApp salva!');
     } catch (e) {
       toast.error('Erro ao salvar configuração');
@@ -356,15 +356,15 @@ function WhatsAppConfigPanel() {
           <h4 className="text-sm font-semibold border-b pb-2">Notificações Automáticas</h4>
           <div className="flex items-center justify-between">
             <Label>Notificar registro de ponto</Label>
-            <Switch checked={config.notificar_ponto} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ponto: v }))} />
+            <Switch checked={!!config.notificar_ponto} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ponto: v }))} />
           </div>
           <div className="flex items-center justify-between">
             <Label>Notificar aviso de férias</Label>
-            <Switch checked={config.notificar_ferias} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ferias: v }))} />
+            <Switch checked={!!config.notificar_ferias} onCheckedChange={v => setConfig(p => ({ ...p, notificar_ferias: v }))} />
           </div>
           <div className="flex items-center justify-between">
             <Label>Notificar liberação de holerite</Label>
-            <Switch checked={config.notificar_holerite} onCheckedChange={v => setConfig(p => ({ ...p, notificar_holerite: v }))} />
+            <Switch checked={!!config.notificar_holerite} onCheckedChange={v => setConfig(p => ({ ...p, notificar_holerite: v }))} />
           </div>
         </div>
 

@@ -8,7 +8,8 @@ type WhatsAppTemplateTable = Database['public']['Tables']['whatsapp_templates'];
 export type WhatsAppConfig = WhatsAppConfigTable['Row'];
 export type WhatsAppLog = WhatsAppLogTable['Row'];
 export type WhatsAppTemplate = WhatsAppTemplateTable['Row'];
-export interface WhatsAppConfig {
+
+export interface WhatsAppConfigData {
   empresa_id: string;
   webhook_url?: string;
   api_key?: string;
