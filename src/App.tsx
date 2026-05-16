@@ -64,6 +64,7 @@ const MedidasDisciplinaresPage = lazy(() => import('@/pages/MedidasDisciplinares
 const JornadasPage = lazy(() => import('@/pages/JornadasPage'));
 const CentrosCustoPage = lazy(() => import('@/pages/CentrosCustoPage'));
 const TimesPage = lazy(() => import('@/pages/TimesPage'));
+const PromoBrindesPage = lazy(() => import('@/pages/PromoBrindesPage'));
 const MovimentacoesPage = lazy(() => import('@/pages/MovimentacoesPage'));
 const SindicatosPage = lazy(() => import('@/pages/SindicatosPage'));
 const ObrigacoesFiscaisPage = lazy(() => import('@/pages/ObrigacoesFiscaisPage'));
