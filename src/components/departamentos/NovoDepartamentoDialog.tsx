@@ -82,15 +82,6 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
           </div>
 
           <div className="space-y-2">
-            <Label>Código do Centro de Custo</Label>
-            <Input
-              value={form.codigo_centro_custo}
-              onChange={(e) => setForm(p => ({ ...p, codigo_centro_custo: e.target.value }))}
-              placeholder="Ex: CC-001"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label>Descrição</Label>
             <Textarea
               value={form.descricao}
