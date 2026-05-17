@@ -21,6 +21,7 @@ import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
+import { useColaboradores } from '@/hooks/useColaboradores';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,11 +44,7 @@ export default function ColaboradoresPage() {
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
 
-  const { data: colaboradores, isLoading } = useQuery({
-    queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
-    enabled: !!empresaAtual?.id,
-  });
+  const { colaboradores, isLoading } = useColaboradores();
 
   const statusCounts = useMemo(() => {
     if (!colaboradores) return {};

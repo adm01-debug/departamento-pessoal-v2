@@ -87,6 +87,19 @@ function emitTelemetry(meta: TelemetryMeta) {
   }
 }
 
+function sanitizeData(val: any): any {
+  if (val === "undefined" || val === "null" || val === undefined) return null;
+  if (Array.isArray(val)) return val.map(sanitizeData);
+  if (val !== null && typeof val === "object") {
+    const obj: any = {};
+    for (const key in val) {
+      obj[key] = sanitizeData(val[key]);
+    }
+    return obj;
+  }
+  return val;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -94,20 +107,26 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+    console.log("[external-db-bridge] Request body:", JSON.stringify(body));
     const {
       action,
       table,
       columns,
-      filters,
+      filters: rawFilters,
       limit,
       offset,
       countMode,
-      data,
+      data: rawData,
       userId,
     } = body;
     // Aliases: client may send `fn` for rpc and `params` for rpc args.
     const rpcName = body.rpcName || body.fn;
-    const rpcArgs = body.params ?? data;
+    const rpcArgs = sanitizeData(body.params ?? rawData);
+    const data = sanitizeData(rawData);
+    const filters = rawFilters?.map((f: any) => ({
+      ...f,
+      value: sanitizeData(f.value)
+    }));
 
     // Removed tolerant mode: errors will now be returned as 400 to the client
     // for immediate visibility of schema issues.
