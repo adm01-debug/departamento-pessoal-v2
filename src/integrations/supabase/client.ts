@@ -15,6 +15,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 const supabaseBase = createClient<Database>(
   SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co',
   SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE',
+
   {
     auth: {
       storage: localStorage,

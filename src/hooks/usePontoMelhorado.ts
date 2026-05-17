@@ -32,7 +32,7 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
 
   const { data: solicitacoes = [], isLoading } = useQuery({
     queryKey: ['solicitacoes-ajuste-ponto', empresaId, colaboradorId],
-    enabled: !!empresaId,
+    enabled: true,
     queryFn: async () => {
       let query = supabase
         .from('solicitacoes_ajuste_ponto')

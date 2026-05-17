@@ -49,14 +49,18 @@ export * from './calculoBeneficiosService';
 
 export const colaboradorService = {
   async list(empresaId?: string): Promise<any[]> {
-    
     let query = supabase.from('colaboradores').select('*').order('nome_completo');
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    
+    // Se empresaId for fornecido, filtra. Se não, traz tudo (útil para admins ou dados sem vínculo).
+    if (empresaId) {
+      query = query.eq('empresa_id', empresaId);
+    }
+    
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
-  
   },
+
   listar: async (empresaId?: string) => colaboradorService.list(empresaId),
   async buscarPorId(id: string): Promise<any | null> {
     
@@ -350,15 +354,16 @@ export const feriasService = {
 
 export const folhaService = {
   async list(competencia?: string, empresaId?: string): Promise<any[]> {
-    
     let query = supabase.from('folhas_pagamento').select('*').order('competencia', { ascending: false }).limit(500);
+    
     if (empresaId) query = query.eq('empresa_id', empresaId);
     if (competencia) query = query.eq('competencia', competencia);
+    
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
-  
   },
+
   listar: async (competencia?: string, empresaId?: string) => folhaService.list(competencia, empresaId),
   async buscarPorId(id: string): Promise<any | null> {
     

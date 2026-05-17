@@ -13,8 +13,11 @@ export function useColaboradores() {
     queryFn: async () => {
       return await colaboradorService.list(empresaId);
     },
-    enabled: !!empresaId,
+    // Removido a trava de enabled: !!empresaId para permitir visualização global 
+    // ou de registros sem empresa_id vinculado (comum em migrações iniciais)
+    enabled: true, 
   });
+
 
   const criarMutation = useMutation({
     mutationFn: async (data: any) => {

@@ -9,13 +9,15 @@ export function useFolha(competencia?: string) {
 
   const query = useQuery({
     queryKey: ['folhas', empresaAtualId, competencia],
-    enabled: !!empresaAtualId,
+    enabled: true,
     queryFn: async () => {
       let q = supabase
         .from('folhas_pagamento')
         .select('*')
-        .eq('empresa_id', empresaAtualId!)
         .order('competencia', { ascending: false });
+      
+      if (empresaAtualId) q = q.eq('empresa_id', empresaAtualId);
+
       
       if (competencia) q = q.eq('competencia', competencia);
       

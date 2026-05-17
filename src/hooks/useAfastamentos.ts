@@ -16,7 +16,7 @@ export function useAfastamentos() {
     queryFn: async () => {
       return await afastamentoService.listar(empresaId, filtros);
     },
-    enabled: !!empresaId,
+    enabled: true,
   });
 
   const configsQuery = useQuery({

@@ -13,7 +13,7 @@ export function useBeneficios() {
     queryFn: async () => {
       return await beneficioService.list(empresaId);
     },
-    enabled: !!empresaId,
+    enabled: true,
   });
 
   const resumoQuery = useQuery({
@@ -21,7 +21,7 @@ export function useBeneficios() {
     queryFn: async () => {
       return await beneficioService.obterResumoCustos(empresaId!);
     },
-    enabled: !!empresaId,
+    enabled: true,
   });
 
   const criarBeneficio = useMutation({

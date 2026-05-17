@@ -8,7 +8,7 @@ export function useOrganograma() {
 
   const query = useQuery({
     queryKey: ['organograma_hierarquico', empresaId],
-    enabled: !!empresaId,
+    enabled: true,
     queryFn: async () => {
       // Buscar departamentos com informações de parentesco
       const { data: deps, error: depsError } = await supabase

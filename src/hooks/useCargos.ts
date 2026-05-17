@@ -11,7 +11,7 @@ export function useCargos() {
   const query = useQuery({
     queryKey: ['cargos', empresaId],
     queryFn: () => cargoService.listar(empresaId),
-    enabled: !!empresaId,
+    enabled: true,
   });
 
   const criarMutation = useMutation({

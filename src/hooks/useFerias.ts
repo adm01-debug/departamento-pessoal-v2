@@ -14,7 +14,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
     queryFn: async () => {
       return await feriasService.listSolicitacoes(empresaId, params);
     },
-    enabled: !!empresaId,
+    enabled: true,
     placeholderData: (previousData) => previousData,
   });
 
