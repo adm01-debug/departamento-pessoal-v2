@@ -116,23 +116,16 @@ Deno.serve(async (req) => {
       limit,
       offset,
       countMode,
-      data,
+      data: rawData,
       userId,
     } = body;
     // Aliases: client may send `fn` for rpc and `params` for rpc args.
     const rpcName = body.rpcName || body.fn;
-    const rpcArgs = body.params ?? data;
-
-    // Sanitize filters to handle accidental "undefined" strings from frontend
+    const rpcArgs = sanitizeData(body.params ?? rawData);
+    const data = sanitizeData(rawData);
     const filters = rawFilters?.map((f: any) => ({
       ...f,
-      value: (f.value === "undefined" || f.value === "null") ? null : f.value
-    }));
-
-    // Sanitize filters to handle accidental "undefined" strings
-    const sanitizedFilters = filters?.map((f: any) => ({
-      ...f,
-      value: f.value === "undefined" ? null : f.value
+      value: sanitizeData(f.value)
     }));
 
     // Removed tolerant mode: errors will now be returned as 400 to the client
