@@ -54,7 +54,8 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.error) {
-      return { data: null, error: { message: json.error || `HTTP ${res.status}` } };
+      console.error('[bridge] Error:', json.error || `HTTP ${res.status}`);
+      throw new Error(json.error || `Erro na ponte (HTTP ${res.status})`);
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
