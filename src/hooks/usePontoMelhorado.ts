@@ -34,7 +34,7 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
     queryKey: ['solicitacoes-ajuste-ponto', empresaId, colaboradorId],
     enabled: !!empresaId,
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('solicitacoes_ajuste_ponto')
         .select('*, colaborador:colaboradores(nome_completo)')
         .eq('empresa_id', empresaId!)
@@ -62,7 +62,7 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
         portaria_671_conformidade: true
       };
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('solicitacoes_ajuste_ponto')
         .insert({
           ...payload,
@@ -87,7 +87,7 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
     mutationFn: async ({ id, status, observacoes }: { id: string; status: 'aprovado' | 'recusado'; observacoes?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('solicitacoes_ajuste_ponto')
         .update({
           status,
