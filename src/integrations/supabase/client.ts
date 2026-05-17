@@ -3,15 +3,82 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+// Base client for auth and basic operations
+const supabaseBase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
   }
 });
+
+/**
+ * Proxy handler to redirect all database operations through the Edge Function bridge.
+ */
+const dbBridgeProxy = {
+  get(target: any, prop: string) {
+    if (prop === 'from') {
+      return (table: string) => ({
+        select: (columns = '*') => ({
+          eq: (column: string, value: any) => executeBridge('SELECT', table, { columns, filters: { [column]: value } }),
+          order: (column: string, options: any) => executeBridge('SELECT', table, { columns, order: { column, ...options } }),
+          limit: (n: number) => executeBridge('SELECT', table, { columns, limit: n }),
+          maybeSingle: () => executeBridge('SELECT', table, { columns, single: true }),
+          single: () => executeBridge('SELECT', table, { columns, single: true }),
+          // Default select without filters
+          then: (onfulfilled: any) => executeBridge('SELECT', table, { columns }).then(onfulfilled)
+        }),
+        insert: (values: any) => ({
+          select: () => ({
+            maybeSingle: () => executeBridge('INSERT', table, { values, single: true }),
+            single: () => executeBridge('INSERT', table, { values, single: true }),
+          }),
+          then: (onfulfilled: any) => executeBridge('INSERT', table, { values }).then(onfulfilled)
+        }),
+        update: (values: any) => ({
+          eq: (column: string, value: any) => ({
+            select: () => ({
+              maybeSingle: () => executeBridge('UPDATE', table, { values, filters: { [column]: value }, single: true }),
+            }),
+            then: (onfulfilled: any) => executeBridge('UPDATE', table, { values, filters: { [column]: value } }).then(onfulfilled)
+          })
+        }),
+        delete: () => ({
+          eq: (column: string, value: any) => executeBridge('DELETE', table, { filters: { [column]: value } })
+        })
+      });
+    }
+    if (prop === 'rpc') {
+      return (fn: string, params: any) => executeBridge('RPC', fn, { params });
+    }
+    return target[prop];
+  }
+};
+
+async function executeBridge(method: string, target: string, payload: any = {}) {
+  const { data: { session } } = await supabaseBase.auth.getSession();
+  
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/external-db-bridge`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+      'X-Customer-Auth': session?.access_token || '',
+    },
+    body: JSON.stringify({
+      method,
+      target,
+      ...payload
+    })
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    return { data: null, error: result.error || { message: 'Unknown bridge error' } };
+  }
+  return { data: result.data, error: null };
+}
+
+export const supabase = new Proxy(supabaseBase, dbBridgeProxy) as any;
