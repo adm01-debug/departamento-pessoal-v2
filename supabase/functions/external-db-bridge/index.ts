@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       action,
       table,
       columns,
-      filters,
+      filters: rawFilters,
       limit,
       offset,
       countMode,
@@ -109,6 +109,12 @@ Deno.serve(async (req) => {
     // Aliases: client may send `fn` for rpc and `params` for rpc args.
     const rpcName = body.rpcName || body.fn;
     const rpcArgs = body.params ?? data;
+
+    // Sanitize filters to handle accidental "undefined" strings from frontend
+    const filters = rawFilters?.map((f: any) => ({
+      ...f,
+      value: (f.value === "undefined" || f.value === "null") ? null : f.value
+    }));
 
     // Sanitize filters to handle accidental "undefined" strings
     const sanitizedFilters = filters?.map((f: any) => ({
