@@ -5,7 +5,7 @@ import type { Database } from './types';
 
 // Configurações do Supabase EXTERNO (hncgwjbzdajfdztqgefe) via .env
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   console.warn("Supabase env variables are missing. Using defaults for hncgwjbzdajfdztqgefe.");
