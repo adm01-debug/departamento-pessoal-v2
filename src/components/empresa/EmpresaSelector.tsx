@@ -13,28 +13,34 @@ import { Badge } from "@/components/ui/badge";
 
 
 export const EmpresaSelector = memo(function EmpresaSelector() {
-  const { userEmpresas, empresaAtual, trocarEmpresa, temMultiplasEmpresas } = useEmpresas();
+  const { userEmpresas, todasEmpresas, empresaAtual, trocarEmpresa } = useEmpresas();
   
+  // Lista unificada: empresas vinculadas + empresas globais (removendo duplicatas)
+  const empresasVisiveis = Array.from(new Map([
+    ...(todasEmpresas || []).map(e => [e.id, { empresa: e, is_default: false, vinculada: false }]),
+    ...(userEmpresas || []).map(ue => [ue.empresa_id, { empresa: ue.empresa!, is_default: ue.is_default, vinculada: true }])
+  ]).values());
 
-  if (!userEmpresas || userEmpresas.length === 0) {
+  if (empresasVisiveis.length === 0) {
     return (
-      <Button variant="outline" size="sm" disabled>
+      <Button variant="outline" size="sm" disabled className="bg-destructive/10 text-destructive border-destructive/20">
         <Building2 className="h-4 w-4 mr-2" />
-        Sem Empresa
+        Nenhuma Empresa
       </Button>
     );
   }
 
-  if (!temMultiplasEmpresas && empresaAtual) {
+  if (empresasVisiveis.length === 1 && empresaAtual) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50">
-        <Building2 className="h-4 w-4 text-muted-foreground" />
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50">
+        <Building2 className="h-4 w-4 text-primary" />
         <span className="text-sm font-medium truncate max-w-[150px]">
           {empresaAtual.nome_fantasia || empresaAtual.razao_social}
         </span>
       </div>
     );
   }
+
 
   return (
     <>
