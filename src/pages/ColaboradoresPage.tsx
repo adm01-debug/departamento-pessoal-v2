@@ -44,11 +44,7 @@ export default function ColaboradoresPage() {
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
 
-  const { data: colaboradores, isLoading } = useQuery({
-    queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
-    enabled: !!empresaAtual?.id,
-  });
+  const { colaboradores, isLoading } = useColaboradores();
 
   const statusCounts = useMemo(() => {
     if (!colaboradores) return {};
