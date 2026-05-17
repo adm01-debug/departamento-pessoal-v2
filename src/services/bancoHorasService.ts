@@ -7,12 +7,12 @@ export const bancoHorasService = {
     return data || [];
   },
   async getSaldo(colaboradorId: string): Promise<number> {
-    const { data, error } = await supabase.from('banco_horas').select('tipo, horas').eq('colaborador_id', colaboradorId);
+    const { data, error } = await supabase.from('banco_horas').select('tipo, quantidade_horas').eq('colaborador_id', colaboradorId);
     if (error) throw error;
     if (!data) return 0;
     return data.reduce((saldo, item) => {
-      const horas = parseFloat(item.horas) || 0;
-      return item.tipo === 'credito' ? saldo + horas : saldo - horas;
+      const horas = parseFloat((item as any).quantidade_horas) || 0;
+      return (item as any).tipo === 'credito' ? saldo + horas : saldo - horas;
     }, 0);
   },
   async registrar(d: any) {

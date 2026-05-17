@@ -5,8 +5,7 @@ export const afastamentoService = {
     
     const selectStr = `
       *,
-      colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo, departamento:departamentos(nome)),
-      cid:cid10(codigo, descricao)
+      colaborador:colaboradores(nome_completo, departamento)
     `;
     
     let query = (supabase.from('afastamentos') as any).select(selectStr);
@@ -27,7 +26,7 @@ export const afastamentoService = {
     
     const { data, error } = await supabase
       .from('afastamentos')
-      .select('*, cid:cid10(codigo, descricao)')
+      .select('*')
       .eq('colaborador_id', colaboradorId)
       .gte('data_inicio', dataLimite.toISOString().split('T')[0])
       .order('data_inicio', { ascending: false });
@@ -41,7 +40,7 @@ export const afastamentoService = {
     
     const { data, error } = await supabase
       .from('afastamentos')
-      .select('*, colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo), cid:cid10(*)')
+      .select('*, colaborador:colaboradores(nome_completo)')
       .eq('id', id)
       .maybeSingle();
     
@@ -90,7 +89,7 @@ export const afastamentoService = {
   async buscarCID(termo: string): Promise<any[]> {
     
     const { data, error } = await supabase
-      .from('cid10')
+      .from('afastamentos')
       .select('*')
       .or(`codigo.ilike.%${termo}%,descricao.ilike.%${termo}%`)
       .limit(10);
@@ -189,7 +188,7 @@ export const afastamentoService = {
     
     let query = supabase
       .from('prorrogacoes_afastamento')
-      .select('*, documento:documentos_afastamento(*), afastamento:afastamentos!prorrogacoes_afastamento_afastamento_id_fkey(*, colaborador:colaboradores!afastamentos_colaborador_id_fkey(nome_completo))');
+      .select('*, afastamento:afastamentos(*, colaborador:colaboradores(nome_completo))');
     
     if (afastamentoId) query = query.eq('afastamento_id', afastamentoId);
     
