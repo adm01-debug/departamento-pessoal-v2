@@ -32,10 +32,7 @@ function classifySeverity(durationMs: number, hasError: boolean): "ok" | "error"
 
 function emitTelemetry(meta: TelemetryMeta) {
   const icon =
-    meta.status === "very_slow" ? "🔴"
-    : meta.status === "slow" ? "🟡"
-    : meta.status === "error" ? "❌"
-    : "✅";
+    meta.status === "very_slow" ? "🔴" : meta.status === "slow" ? "🟡" : meta.status === "error" ? "❌" : "✅";
 
   const target = meta.rpcName || meta.table || "unknown";
   const line =
@@ -108,25 +105,20 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     console.log("[external-db-bridge] Request body:", JSON.stringify(body));
-    const {
-      action,
-      table,
-      columns,
-      filters: rawFilters,
-      limit,
-      offset,
-      countMode,
-      data: rawData,
-      userId,
-    } = body;
+    const { action, table, columns, filters: rawFilters, limit, offset, countMode, data: rawData, userId } = body;
     // Aliases: client may send `fn` for rpc and `params` for rpc args.
     const rpcName = body.rpcName || body.fn;
     const rpcArgs = sanitizeData(body.params ?? rawData);
     const data = sanitizeData(rawData);
-    const filters = rawFilters?.map((f: any) => ({
-      ...f,
-      value: sanitizeData(f.value)
-    })).filter((f: any) => f.value !== null && f.value !== undefined);
+    const filters = rawFilters
+      ?.map((f: any) => ({
+        ...f,
+        value: sanitizeData(f.value),
+      }))
+      .filter(
+        (f: any) =>
+          f.value !== null && f.value !== undefined && f.value !== "" && f.value !== "null" && f.value !== "undefined",
+      );
 
     // Removed tolerant mode: errors will now be returned as 400 to the client
     // for immediate visibility of schema issues.
@@ -135,10 +127,10 @@ Deno.serve(async (req) => {
     const externalKey = Deno.env.get("EXTERNAL_DB_KEY");
 
     if (!externalUrl || !externalKey) {
-      return new Response(
-        JSON.stringify({ error: "External database not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "External database not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const externalClient = createClient(externalUrl, externalKey);
@@ -191,25 +183,21 @@ Deno.serve(async (req) => {
       });
 
       if (selectError) {
-        return new Response(
-          JSON.stringify({ error: selectError.message }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: selectError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      return new Response(
-        JSON.stringify({ data: selectData, count, duration_ms: durationMs }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ data: selectData, count, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // INSERT
     if (action === "insert") {
       const startTime = performance.now();
-      const { data: insertData, error: insertError } = await externalClient
-        .from(table)
-        .insert(data)
-        .select();
+      const { data: insertData, error: insertError } = await externalClient.from(table).insert(data).select();
       const durationMs = Math.round(performance.now() - startTime);
 
       const status = classifySeverity(durationMs, !!insertError);
@@ -224,16 +212,15 @@ Deno.serve(async (req) => {
       });
 
       if (insertError) {
-        return new Response(
-          JSON.stringify({ error: insertError.message }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: insertError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      return new Response(
-        JSON.stringify({ data: insertData, duration_ms: durationMs }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ data: insertData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // UPDATE
@@ -260,16 +247,15 @@ Deno.serve(async (req) => {
       });
 
       if (updateError) {
-        return new Response(
-          JSON.stringify({ error: updateError.message }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: updateError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      return new Response(
-        JSON.stringify({ data: updateData, duration_ms: durationMs }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ data: updateData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // DELETE
@@ -296,26 +282,25 @@ Deno.serve(async (req) => {
       });
 
       if (deleteError) {
-        return new Response(
-          JSON.stringify({ error: deleteError.message }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: deleteError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      return new Response(
-        JSON.stringify({ data: deleteData, duration_ms: durationMs }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ data: deleteData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // RPC
     if (action === "rpc") {
       const startTime = performance.now();
       if (!rpcName) {
-        return new Response(
-          JSON.stringify({ error: "rpc action requires 'rpcName' or 'fn'" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: "rpc action requires 'rpcName' or 'fn'" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       const { data: rpcData, error: rpcError } = await externalClient.rpc(rpcName, rpcArgs || {});
       const durationMs = Math.round(performance.now() - startTime);
@@ -332,27 +317,26 @@ Deno.serve(async (req) => {
       });
 
       if (rpcError) {
-        return new Response(
-          JSON.stringify({ error: rpcError.message }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: rpcError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      return new Response(
-        JSON.stringify({ data: rpcData, duration_ms: durationMs }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ data: rpcData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    return new Response(
-      JSON.stringify({ error: `Unknown action: ${action}` }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("[external-db-bridge] Error:", err);
-    return new Response(
-      JSON.stringify({ error: err.message || "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: err.message || "Internal server error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
