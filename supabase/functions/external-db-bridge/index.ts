@@ -93,8 +93,38 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { action, table, rpcName, columns, filters, limit, offset, countMode, data, userId } =
-      await req.json();
+    const body = await req.json();
+    const {
+      action,
+      table,
+      columns,
+      filters,
+      limit,
+      offset,
+      countMode,
+      data,
+      userId,
+    } = body;
+    // Aliases: client may send `fn` for rpc and `params` for rpc args.
+    const rpcName = body.rpcName || body.fn;
+    const rpcArgs = body.params ?? data;
+
+    // Tolerant mode: schema-cache mismatches (missing table/column/relationship)
+    // should NOT crash the UI. Return empty data instead of 400.
+    const isSchemaMissError = (msg?: string) => {
+      if (!msg) return false;
+      const m = msg.toLowerCase();
+      return (
+        m.includes("schema cache") ||
+        m.includes("does not exist") ||
+        m.includes("could not find")
+      );
+    };
+    const okEmpty = (extra: Record<string, unknown> = {}) =>
+      new Response(
+        JSON.stringify({ data: [], count: 0, ...extra }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
 
     const externalUrl = Deno.env.get("EXTERNAL_DB_URL");
     const externalKey = Deno.env.get("EXTERNAL_DB_KEY");
@@ -156,6 +186,10 @@ Deno.serve(async (req) => {
       });
 
       if (selectError) {
+        if (isSchemaMissError(selectError.message)) {
+          console.warn(`[bridge] tolerant select on '${table}': ${selectError.message}`);
+          return okEmpty({ duration_ms: durationMs });
+        }
         return new Response(
           JSON.stringify({ error: selectError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -276,7 +310,13 @@ Deno.serve(async (req) => {
     // RPC
     if (action === "rpc") {
       const startTime = performance.now();
-      const { data: rpcData, error: rpcError } = await externalClient.rpc(rpcName, data || {});
+      if (!rpcName) {
+        return new Response(
+          JSON.stringify({ error: "rpc action requires 'rpcName' or 'fn'" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const { data: rpcData, error: rpcError } = await externalClient.rpc(rpcName, rpcArgs || {});
       const durationMs = Math.round(performance.now() - startTime);
 
       const status = classifySeverity(durationMs, !!rpcError);
@@ -291,6 +331,10 @@ Deno.serve(async (req) => {
       });
 
       if (rpcError) {
+        if (isSchemaMissError(rpcError.message)) {
+          console.warn(`[bridge] tolerant rpc '${rpcName}': ${rpcError.message}`);
+          return okEmpty({ duration_ms: durationMs });
+        }
         return new Response(
           JSON.stringify({ error: rpcError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
