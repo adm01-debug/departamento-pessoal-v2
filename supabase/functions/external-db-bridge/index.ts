@@ -172,10 +172,6 @@ Deno.serve(async (req) => {
       });
 
       if (selectError) {
-        if (isSchemaMissError(selectError.message)) {
-          console.warn(`[bridge] tolerant select on '${table}': ${selectError.message}`);
-          return okEmpty({ duration_ms: durationMs });
-        }
         return new Response(
           JSON.stringify({ error: selectError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
