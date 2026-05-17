@@ -123,15 +123,18 @@ export function useEmpresas(): UseEmpresasReturn {
 
   // Empresa atual - buscamos os dados da empresa separadamente se necessário
   const empresaVinculo = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId);
-  const empresaAtual = todasEmpresas?.find(e => e.id === empresaVinculo?.empresa_id);
+  // Se não encontrar vínculo, mas houver ID selecionado, buscamos em todas as empresas
+  const empresaAtual = todasEmpresas?.find(e => e.id === (empresaVinculo?.empresa_id || empresaAtualId));
 
   // Se não há empresa selecionada, usar a padrão
   const empresaDefaultVinculo = userEmpresas?.find((ue) => ue.is_default);
   const empresaDefault = todasEmpresas?.find(e => e.id === empresaDefaultVinculo?.empresa_id);
   
-  // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista)
-  const empresaPrimeira = todasEmpresas?.find(e => userEmpresas && userEmpresas[0] && e.id === userEmpresas[0].empresa_id);
-  const empresaEfetiva = empresaAtual || empresaDefault || empresaPrimeira;
+  // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista vinculada > Primeira da lista global)
+  const empresaPrimeiraVinculada = todasEmpresas?.find(e => userEmpresas && userEmpresas[0] && e.id === userEmpresas[0].empresa_id);
+  const empresaPrimeiraGlobal = todasEmpresas?.[0];
+  const empresaEfetiva = empresaAtual || empresaDefault || empresaPrimeiraVinculada || empresaPrimeiraGlobal;
+
 
   useEffect(() => {
     // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
