@@ -117,7 +117,7 @@ function BriefingItem({ icon: Icon, label, count, gradient, onClick }: {
 }
 
 export function MorningBriefing() {
-  const { data, isLoading } = useMorningBriefing();
+  const { data, isLoading, error } = useMorningBriefing();
   const [runningAction, setRunningAction] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -139,6 +139,28 @@ export function MorningBriefing() {
   const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
 
   if (isLoading) return <CardSkeleton className="h-64" />;
+  
+  if (error) {
+    return (
+      <Card className="border-destructive/50 bg-destructive/5 shadow-none">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-destructive flex items-center gap-2 text-base">
+            <ShieldAlert className="h-5 w-5" />
+            Erro de Esquema (Banco Externo)
+          </CardTitle>
+          <CardDescription className="text-destructive/80 font-mono text-xs">
+            {(error as any).message}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-muted-foreground">
+            Verifique se a tabela ou coluna existe no seu banco de dados externo.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!data) return null;
 
   const hasContent = data.aniversariantes.length > 0 || data.feriasPeriodo.length > 0 ||

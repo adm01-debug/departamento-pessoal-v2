@@ -109,29 +109,8 @@ Deno.serve(async (req) => {
     const rpcName = body.rpcName || body.fn;
     const rpcArgs = body.params ?? data;
 
-    // Tolerant mode: schema-cache mismatches (missing table/column/relationship)
-    // should NOT crash the UI. Return empty data instead of 400.
-    const isSchemaMissError = (msg?: string) => {
-      if (!msg) return false;
-      const m = msg.toLowerCase();
-      // Track schema misses in logs for the user to see what's missing
-      const isMiss = (
-        m.includes("schema cache") ||
-        m.includes("does not exist") ||
-        m.includes("could not find") ||
-        m.includes("column") ||
-        m.includes("relationship")
-      );
-      if (isMiss) {
-        console.log(`[SCHEMA_MISS] ${msg}`);
-      }
-      return isMiss;
-    };
-    const okEmpty = (extra: Record<string, unknown> = {}) =>
-      new Response(
-        JSON.stringify({ data: [], count: 0, ...extra }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Removed tolerant mode: errors will now be returned as 400 to the client
+    // for immediate visibility of schema issues.
 
     const externalUrl = Deno.env.get("EXTERNAL_DB_URL");
     const externalKey = Deno.env.get("EXTERNAL_DB_KEY");
@@ -193,10 +172,6 @@ Deno.serve(async (req) => {
       });
 
       if (selectError) {
-        if (isSchemaMissError(selectError.message)) {
-          console.warn(`[bridge] tolerant select on '${table}': ${selectError.message}`);
-          return okEmpty({ duration_ms: durationMs });
-        }
         return new Response(
           JSON.stringify({ error: selectError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -338,10 +313,6 @@ Deno.serve(async (req) => {
       });
 
       if (rpcError) {
-        if (isSchemaMissError(rpcError.message)) {
-          console.warn(`[bridge] tolerant rpc '${rpcName}': ${rpcError.message}`);
-          return okEmpty({ duration_ms: durationMs });
-        }
         return new Response(
           JSON.stringify({ error: rpcError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
