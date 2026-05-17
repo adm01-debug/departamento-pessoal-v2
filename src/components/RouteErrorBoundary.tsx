@@ -44,8 +44,8 @@ export class RouteErrorBoundary extends Component<Props, State> {
             <p className="text-sm text-muted-foreground font-body">
               Um erro inesperado ocorreu. Você pode tentar recarregar a página ou voltar ao início.
             </p>
-            {import.meta.env.DEV && this.state.error && (
-              <pre className="mt-4 p-3 bg-muted rounded-lg text-xs text-left overflow-auto max-h-32">
+            {this.state.error && (
+              <pre className="mt-4 p-3 bg-destructive/5 text-destructive border border-destructive/20 rounded-lg text-xs text-left overflow-auto max-h-48 font-mono">
                 {this.state.error.message}
               </pre>
             )}
