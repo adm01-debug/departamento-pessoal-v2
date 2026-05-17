@@ -14,71 +14,108 @@ const supabaseBase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_K
   }
 });
 
-/**
- * Proxy handler to redirect all database operations through the Edge Function bridge.
- */
-const dbBridgeProxy = {
-  get(target: any, prop: string) {
+// --- Proxy Definitions ---
+
+type BridgeMethod = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'RPC';
+
+interface BridgePayload {
+  columns?: string;
+  filters?: Record<string, any>;
+  order?: { column: string; ascending?: boolean; [key: string]: any };
+  limit?: number;
+  single?: boolean;
+  values?: any;
+  params?: any;
+}
+
+const executeBridge = async (method: BridgeMethod, target: string, payload: BridgePayload = {}) => {
+  const { data: { session } } = await supabaseBase.auth.getSession();
+  
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/external-db-bridge`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        'X-Customer-Auth': session?.access_token || '',
+      },
+      body: JSON.stringify({
+        method,
+        target,
+        ...payload
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      return { data: null, error: result.error || { message: 'Unknown bridge error' } };
+    }
+    return { data: result.data, error: null };
+  } catch (err) {
+    return { data: null, error: err };
+  }
+};
+
+const createQueryBuilder = (table: string) => {
+  const builder: any = {
+    select: (columns = '*') => {
+      builder._payload = { ...builder._payload, columns };
+      return builder;
+    },
+    insert: (values: any) => {
+      builder._method = 'INSERT';
+      builder._payload = { ...builder._payload, values };
+      return builder;
+    },
+    update: (values: any) => {
+      builder._method = 'UPDATE';
+      builder._payload = { ...builder._payload, values };
+      return builder;
+    },
+    delete: () => {
+      builder._method = 'DELETE';
+      return builder;
+    },
+    eq: (column: string, value: any) => {
+      builder._payload.filters = { ...builder._payload.filters, [column]: value };
+      return builder;
+    },
+    order: (column: string, options: any) => {
+      builder._payload.order = { column, ...options };
+      return builder;
+    },
+    limit: (n: number) => {
+      builder._payload.limit = n;
+      return builder;
+    },
+    single: () => {
+      builder._payload.single = true;
+      return builder;
+    },
+    maybeSingle: () => {
+      builder._payload.single = true;
+      return builder;
+    },
+    // Support for direct .then() for .select()
+    then: (onfulfilled: any, onrejected: any) => {
+      return executeBridge(builder._method || 'SELECT', table, builder._payload).then(onfulfilled, onrejected);
+    }
+  };
+  builder._method = null;
+  builder._payload = {};
+  return builder;
+};
+
+const dbBridgeProxy: ProxyHandler<any> = {
+  get(target, prop) {
     if (prop === 'from') {
-      return (table: string) => ({
-        select: (columns = '*') => ({
-          eq: (column: string, value: any) => executeBridge('SELECT', table, { columns, filters: { [column]: value } }),
-          order: (column: string, options: any) => executeBridge('SELECT', table, { columns, order: { column, ...options } }),
-          limit: (n: number) => executeBridge('SELECT', table, { columns, limit: n }),
-          maybeSingle: () => executeBridge('SELECT', table, { columns, single: true }),
-          single: () => executeBridge('SELECT', table, { columns, single: true }),
-          // Default select without filters
-          then: (onfulfilled: any) => executeBridge('SELECT', table, { columns }).then(onfulfilled)
-        }),
-        insert: (values: any) => ({
-          select: () => ({
-            maybeSingle: () => executeBridge('INSERT', table, { values, single: true }),
-            single: () => executeBridge('INSERT', table, { values, single: true }),
-          }),
-          then: (onfulfilled: any) => executeBridge('INSERT', table, { values }).then(onfulfilled)
-        }),
-        update: (values: any) => ({
-          eq: (column: string, value: any) => ({
-            select: () => ({
-              maybeSingle: () => executeBridge('UPDATE', table, { values, filters: { [column]: value }, single: true }),
-            }),
-            then: (onfulfilled: any) => executeBridge('UPDATE', table, { values, filters: { [column]: value } }).then(onfulfilled)
-          })
-        }),
-        delete: () => ({
-          eq: (column: string, value: any) => executeBridge('DELETE', table, { filters: { [column]: value } })
-        })
-      });
+      return (table: string) => createQueryBuilder(table);
     }
     if (prop === 'rpc') {
       return (fn: string, params: any) => executeBridge('RPC', fn, { params });
     }
-    return target[prop];
+    return (target as any)[prop];
   }
 };
 
-async function executeBridge(method: string, target: string, payload: any = {}) {
-  const { data: { session } } = await supabaseBase.auth.getSession();
-  
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/external-db-bridge`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
-      'X-Customer-Auth': session?.access_token || '',
-    },
-    body: JSON.stringify({
-      method,
-      target,
-      ...payload
-    })
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    return { data: null, error: result.error || { message: 'Unknown bridge error' } };
-  }
-  return { data: result.data, error: null };
-}
-
-export const supabase = new Proxy(supabaseBase, dbBridgeProxy) as any;
+export const supabase = new Proxy(supabaseBase, dbBridgeProxy) as unknown as typeof supabaseBase;
