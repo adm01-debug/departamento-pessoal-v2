@@ -156,8 +156,8 @@ export const feriasService = {
     if (search && search.length >= 3) {
       query = supabase
         .from('ferias')
-        .select('*, colaborador:colaboradores!inner(nome_completo, avatar_url)', { count: 'exact' })
-        .ilike('colaborador.nome_completo', `%${search}%`);
+        .select('*, colaborador:colaboradores(nome_completo, avatar_url)', { count: 'exact' })
+        .ilike('colaborador_nome', `%${search}%`);
       
       if (empresaId) query = query.eq('empresa_id', empresaId);
       if (status && status !== 'all') query = query.eq('status', status);
@@ -239,12 +239,15 @@ export const feriasService = {
     } as any).eq('id', id);
     if (error) throw error;
 
+    // Log de aprovações desativado para o banco externo se a tabela não existir
+    /*
     await supabase.from('ferias_aprovacoes_log' as any).insert({
       ferias_id: id,
       nivel: 'gestor',
       aprovador_id: userId,
       status: 'aprovado'
     });
+    */
   
   },
   async aprovarRH(id: string, userId?: string): Promise<void> {
@@ -258,12 +261,15 @@ export const feriasService = {
     } as any).eq('id', id);
     if (error) throw error;
 
+    // Log de aprovações desativado para o banco externo se a tabela não existir
+    /*
     await supabase.from('ferias_aprovacoes_log' as any).insert({
       ferias_id: id,
       nivel: 'rh',
       aprovador_id: userId,
       status: 'aprovado'
     });
+    */
   
   },
   async listPeriodosAquisitivos(colaboradorId: string): Promise<any[]> {

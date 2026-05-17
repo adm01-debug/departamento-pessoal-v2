@@ -95,10 +95,7 @@ export function useEmpresas(): UseEmpresasReturn {
 
       const { data, error } = await supabase
         .from("user_empresas")
-        .select(`
-          *,
-          empresa:empresas(*)
-        `)
+        .select(`*`)
         .eq("user_id", userData.user.id);
 
       if (error) throw error;
@@ -106,21 +103,24 @@ export function useEmpresas(): UseEmpresasReturn {
     },
   });
 
-  // Empresa atual
-  const empresaAtual = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId)?.empresa;
+  // Empresa atual - buscamos os dados da empresa separadamente se necessário
+  const empresaVinculo = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId);
+  const empresaAtual = todasEmpresas?.find(e => e.id === empresaVinculo?.empresa_id);
 
   // Se não há empresa selecionada, usar a padrão
-  const empresaDefault = userEmpresas?.find((ue) => ue.is_default)?.empresa;
+  const empresaDefaultVinculo = userEmpresas?.find((ue) => ue.is_default);
+  const empresaDefault = todasEmpresas?.find(e => e.id === empresaDefaultVinculo?.empresa_id);
   
   // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista)
-  const empresaEfetiva = empresaAtual || empresaDefault || userEmpresas?.[0]?.empresa;
+  const empresaPrimeira = todasEmpresas?.find(e => userEmpresas && userEmpresas[0] && e.id === userEmpresas[0].empresa_id);
+  const empresaEfetiva = empresaAtual || empresaDefault || empresaPrimeira;
 
   useEffect(() => {
     // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
     // Isso evita o loop infinito de re-renderização ao navegar.
     // Usamos um timeout curto para garantir que o estado do store esteja pronto.
     if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
-      const targetId = empresaDefault?.id || userEmpresas[0]?.empresa?.id;
+      const targetId = empresaDefault?.id || (userEmpresas[0] ? userEmpresas[0].empresa_id : null);
       if (targetId) {
         const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
         return () => clearTimeout(timer);

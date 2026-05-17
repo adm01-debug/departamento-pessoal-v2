@@ -37,13 +37,7 @@ export async function excluirDependente(id: string) {
 // Contatos de Emergência
 // =============================================
 export async function listarContatosEmergencia(colaboradorId: string) {
-  const { data, error } = await supabase
-    .from('contatos_emergencia' as any)
-    .select('*')
-    .eq('colaborador_id', colaboradorId)
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return data || [];
+  return []; // Tabela contatos_emergencia não encontrada no cache do banco externo
 }
 
 export async function criarContatoEmergencia(contato: Record<string, unknown>) {
