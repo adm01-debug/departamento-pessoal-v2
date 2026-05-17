@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
     const filters = rawFilters?.map((f: any) => ({
       ...f,
       value: sanitizeData(f.value)
-    }));
+    })).filter((f: any) => f.value !== null && f.value !== undefined);
 
     // Removed tolerant mode: errors will now be returned as 400 to the client
     // for immediate visibility of schema issues.
