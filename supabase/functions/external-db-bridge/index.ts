@@ -313,10 +313,6 @@ Deno.serve(async (req) => {
       });
 
       if (rpcError) {
-        if (isSchemaMissError(rpcError.message)) {
-          console.warn(`[bridge] tolerant rpc '${rpcName}': ${rpcError.message}`);
-          return okEmpty({ duration_ms: durationMs });
-        }
         return new Response(
           JSON.stringify({ error: rpcError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
