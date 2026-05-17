@@ -95,7 +95,7 @@ export default function DepartamentosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button onClick={() => abrirEditar(dept)} variant="ghost" size="sm" className="h-7 text-[10px] font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         DETALHES <ArrowRight className="h-3 w-3" />
                       </Button>
                     </TableCell>
@@ -106,6 +106,7 @@ export default function DepartamentosPage() {
           </motion.div>
         )}
       </PageLayout>
+      <NovoDepartamentoDialog open={dialogOpen} onOpenChange={setDialogOpen} departamento={editando} />
     </>
   );
 }
