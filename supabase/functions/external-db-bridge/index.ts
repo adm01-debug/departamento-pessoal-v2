@@ -87,6 +87,19 @@ function emitTelemetry(meta: TelemetryMeta) {
   }
 }
 
+function sanitizeData(val: any): any {
+  if (val === "undefined" || val === "null") return null;
+  if (Array.isArray(val)) return val.map(sanitizeData);
+  if (val !== null && typeof val === "object") {
+    const obj: any = {};
+    for (const key in val) {
+      obj[key] = sanitizeData(val[key]);
+    }
+    return obj;
+  }
+  return val;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
