@@ -88,7 +88,7 @@ function emitTelemetry(meta: TelemetryMeta) {
 }
 
 function sanitizeData(val: any): any {
-  if (val === "undefined" || val === "null") return null;
+  if (val === "undefined" || val === "null" || val === undefined) return null;
   if (Array.isArray(val)) return val.map(sanitizeData);
   if (val !== null && typeof val === "object") {
     const obj: any = {};
