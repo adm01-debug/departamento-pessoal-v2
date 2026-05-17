@@ -1,14 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 // Helper genérico para listar tabelas de referência
 async function listarReferencia(tabela: string, orderBy = 'nome'): Promise<any[]> {
-  
-  const { data, error } = await supabase
-    .from(tabela)
+  const { data, error } = await (supabase.from(tabela as any) as any)
     .select('*')
     .order(orderBy);
   if (error) throw error;
   return data || [];
-  
 }
 
 // =============================================
