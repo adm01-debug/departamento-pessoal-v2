@@ -117,7 +117,7 @@ function BriefingItem({ icon: Icon, label, count, gradient, onClick }: {
 }
 
 export function MorningBriefing() {
-  const { data, isLoading } = useMorningBriefing();
+  const { data, isLoading, error } = useMorningBriefing();
   const [runningAction, setRunningAction] = useState<string | null>(null);
   const navigate = useNavigate();
 
