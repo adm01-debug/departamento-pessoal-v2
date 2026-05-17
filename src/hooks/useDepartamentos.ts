@@ -15,7 +15,7 @@ export function useDepartamentos() {
   });
 
   const criarMutation = useMutation({
-    mutationFn: (data: any) => departamentoService.criar({ ...data, empresa_id: empresaId }),
+    mutationFn: (data: any) => departamentoService.criar(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departamentos'] });
       toast.success('Departamento criado');

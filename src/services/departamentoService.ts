@@ -1,13 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
 export const departamentoService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
-    let query = supabase.from('departamentos').select('*').order('nome');
-    if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
+  async listar(_empresaId?: string): Promise<any[]> {
+    // Schema externo não possui empresa_id em `departamentos` — listamos todos.
+    const { data, error } = await supabase.from('departamentos').select('*').order('nome', { ascending: true });
     if (error) throw error;
-    return data || [];
-  
+    return (data as any[]) || [];
   },
   
   async buscarPorId(id: string): Promise<any | null> {

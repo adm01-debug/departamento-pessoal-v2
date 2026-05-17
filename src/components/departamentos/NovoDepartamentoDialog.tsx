@@ -22,7 +22,6 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
   const [form, setForm] = useState({
     nome: '',
     descricao: '',
-    codigo_centro_custo: '',
     ativo: true,
   });
 
@@ -31,11 +30,10 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
       setForm({
         nome: departamento.nome || '',
         descricao: departamento.descricao || '',
-        codigo_centro_custo: departamento.codigo_centro_custo || '',
         ativo: departamento.ativo !== false,
       });
     } else {
-      setForm({ nome: '', descricao: '', codigo_centro_custo: '', ativo: true });
+      setForm({ nome: '', descricao: '', ativo: true });
     }
   }, [departamento, open]);
 
@@ -80,15 +78,6 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
               onChange={(e) => setForm(p => ({ ...p, nome: e.target.value }))}
               placeholder="Ex: Recursos Humanos"
               autoFocus
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Código do Centro de Custo</Label>
-            <Input
-              value={form.codigo_centro_custo}
-              onChange={(e) => setForm(p => ({ ...p, codigo_centro_custo: e.target.value }))}
-              placeholder="Ex: CC-001"
             />
           </div>
 
