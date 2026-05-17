@@ -12,11 +12,17 @@ import { Building2, Plus, GitBranch, ArrowRight, Wallet } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { NovoDepartamentoDialog } from '@/components/departamentos/NovoDepartamentoDialog';
 
 export default function DepartamentosPage() {
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editando, setEditando] = useState<any>(null);
   const { departamentos, isLoading } = useDepartamentos();
   const navigate = useNavigate();
+
+  const abrirNovo = () => { setEditando(null); setDialogOpen(true); };
+  const abrirEditar = (d: any) => { setEditando(d); setDialogOpen(true); };
 
   const filtered = (departamentos as any[]).filter((d: any) => !search || d.nome.toLowerCase().includes(search.toLowerCase()));
 
@@ -33,7 +39,7 @@ export default function DepartamentosPage() {
             <Button variant="outline" className="rounded-xl font-bold" onClick={() => navigate('/organograma')}>
               <GitBranch className="h-4 w-4 mr-2" />Ver Organograma
             </Button>
-            <Button className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-bold">
+            <Button onClick={abrirNovo} className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-bold">
               <Plus className="h-4 w-4 mr-2" />Novo Departamento
             </Button>
           </div>
@@ -89,7 +95,7 @@ export default function DepartamentosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button onClick={() => abrirEditar(dept)} variant="ghost" size="sm" className="h-7 text-[10px] font-bold gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         DETALHES <ArrowRight className="h-3 w-3" />
                       </Button>
                     </TableCell>
@@ -100,6 +106,7 @@ export default function DepartamentosPage() {
           </motion.div>
         )}
       </PageLayout>
+      <NovoDepartamentoDialog open={dialogOpen} onOpenChange={setDialogOpen} departamento={editando} />
     </>
   );
 }
