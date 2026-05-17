@@ -4,7 +4,7 @@ import type { Database } from './types';
 
 // HARDCODED para Supabase EXTERNO (hncgwjbzdajfdztqgefe). O .env aponta para Lovable Cloud e não pode ser editado.
 const SUPABASE_URL = 'https://hncgwjbzdajfdztqgefe.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzY2NDg4MiwiZXhwIjoyMDg5MjQwODgyfQ.dD-ckMSddVxACuQlm6rmp26AFoRDxV-ebcxGL63Uwyw';
 
 // Base client used apenas para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
