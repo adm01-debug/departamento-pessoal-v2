@@ -310,7 +310,13 @@ Deno.serve(async (req) => {
     // RPC
     if (action === "rpc") {
       const startTime = performance.now();
-      const { data: rpcData, error: rpcError } = await externalClient.rpc(rpcName, data || {});
+      if (!rpcName) {
+        return new Response(
+          JSON.stringify({ error: "rpc action requires 'rpcName' or 'fn'" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const { data: rpcData, error: rpcError } = await externalClient.rpc(rpcName, rpcArgs || {});
       const durationMs = Math.round(performance.now() - startTime);
 
       const status = classifySeverity(durationMs, !!rpcError);
@@ -325,6 +331,10 @@ Deno.serve(async (req) => {
       });
 
       if (rpcError) {
+        if (isSchemaMissError(rpcError.message)) {
+          console.warn(`[bridge] tolerant rpc '${rpcName}': ${rpcError.message}`);
+          return okEmpty({ duration_ms: durationMs });
+        }
         return new Response(
           JSON.stringify({ error: rpcError.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
