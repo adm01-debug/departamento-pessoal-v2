@@ -9,9 +9,8 @@ export function useDepartamentos() {
   const empresaId = empresaAtual?.id;
 
   const query = useQuery({
-    queryKey: ['departamentos', empresaId],
-    queryFn: () => departamentoService.listar(empresaId),
-    enabled: !!empresaId,
+    queryKey: ['departamentos'],
+    queryFn: () => departamentoService.listar(),
   });
 
   const criarMutation = useMutation({
