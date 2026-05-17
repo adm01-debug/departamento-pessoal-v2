@@ -39,7 +39,7 @@ export default function DepartamentosPage() {
             <Button variant="outline" className="rounded-xl font-bold" onClick={() => navigate('/organograma')}>
               <GitBranch className="h-4 w-4 mr-2" />Ver Organograma
             </Button>
-            <Button className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-bold">
+            <Button onClick={abrirNovo} className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-bold">
               <Plus className="h-4 w-4 mr-2" />Novo Departamento
             </Button>
           </div>
