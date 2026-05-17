@@ -103,31 +103,6 @@ export function useEmpresas(): UseEmpresasReturn {
     },
   });
 
-  // Empresa atual - buscamos os dados da empresa separadamente se necessário
-  const empresaVinculo = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId);
-  const empresaAtual = todasEmpresas?.find(e => e.id === empresaVinculo?.empresa_id);
-
-  // Se não há empresa selecionada, usar a padrão
-  const empresaDefaultVinculo = userEmpresas?.find((ue) => ue.is_default);
-  const empresaDefault = todasEmpresas?.find(e => e.id === empresaDefaultVinculo?.empresa_id);
-  
-  // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista)
-  const empresaPrimeira = todasEmpresas?.find(e => userEmpresas && userEmpresas[0] && e.id === userEmpresas[0].empresa_id);
-  const empresaEfetiva = empresaAtual || empresaDefault || empresaPrimeira;
-
-  useEffect(() => {
-    // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
-    // Isso evita o loop infinito de re-renderização ao navegar.
-    // Usamos um timeout curto para garantir que o estado do store esteja pronto.
-    if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
-      const targetId = empresaDefault?.id || (userEmpresas[0] ? userEmpresas[0].empresa_id : null);
-      if (targetId) {
-        const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [userEmpresas?.length, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
-
   // Listar todas as empresas (para admin)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
     queryKey: ["todas-empresas"],
@@ -145,6 +120,29 @@ export function useEmpresas(): UseEmpresasReturn {
       return data as Empresa[];
     },
   });
+
+  // Empresa atual - buscamos os dados da empresa separadamente se necessário
+  const empresaVinculo = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId);
+  const empresaAtual = todasEmpresas?.find(e => e.id === empresaVinculo?.empresa_id);
+
+  // Se não há empresa selecionada, usar a padrão
+  const empresaDefaultVinculo = userEmpresas?.find((ue) => ue.is_default);
+  const empresaDefault = todasEmpresas?.find(e => e.id === empresaDefaultVinculo?.empresa_id);
+  
+  // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista)
+  const empresaPrimeira = todasEmpresas?.find(e => userEmpresas && userEmpresas[0] && e.id === userEmpresas[0].empresa_id);
+  const empresaEfetiva = empresaAtual || empresaDefault || empresaPrimeira;
+
+  useEffect(() => {
+    // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
+    if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
+      const targetId = empresaDefault?.id || (userEmpresas[0] ? userEmpresas[0].empresa_id : null);
+      if (targetId) {
+        const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [userEmpresas?.length, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
 
   // Criar empresa
   const criarEmpresa = useMutation({
