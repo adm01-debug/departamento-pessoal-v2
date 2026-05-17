@@ -9,7 +9,7 @@ export function useDesligamentos() {
   const query = useQuery({
     queryKey: ['desligamentos', empresaId],
     queryFn: () => desligamentoService.listar(empresaId),
-    enabled: !!empresaId,
+    enabled: true,
     staleTime: 5 * 60 * 1000, // 5min cache
     gcTime: 10 * 60 * 1000,   // 10min garbage collection
     refetchOnWindowFocus: false,

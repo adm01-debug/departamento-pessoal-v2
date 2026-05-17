@@ -11,7 +11,7 @@ export function useLocaisTrabalho() {
   const query = useQuery({
     queryKey: ['locais_trabalho', empresaId],
     queryFn: () => localTrabalhoService.listar(empresaId),
-    enabled: !!empresaId,
+    enabled: true,
   });
 
   const criarMutation = useMutation({
