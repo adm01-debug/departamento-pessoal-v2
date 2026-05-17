@@ -21,6 +21,7 @@ import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
+import { useColaboradores } from '@/hooks/useColaboradores';
 import {
   DropdownMenu,
   DropdownMenuContent,
