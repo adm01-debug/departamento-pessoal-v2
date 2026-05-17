@@ -92,7 +92,10 @@ const createQueryBuilder = (table: string) => {
   const exec = () => callBridge(state.action, table, state.payload);
 
   const addFilter = (column: string, op: string, value: any) => {
-    state.payload.filters = [...(state.payload.filters || []), { column, op, value }];
+    // Se o valor for "undefined" ou "null" como string (comum em erros de template string), 
+    // converte para null real. Se for undefined real, JSON.stringify o removerá.
+    const cleanValue = (value === "undefined" || value === "null") ? null : value;
+    state.payload.filters = [...(state.payload.filters || []), { column, op, value: cleanValue }];
     return builder;
   };
 
