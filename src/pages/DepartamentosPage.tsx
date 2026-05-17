@@ -12,11 +12,17 @@ import { Building2, Plus, GitBranch, ArrowRight, Wallet } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { NovoDepartamentoDialog } from '@/components/departamentos/NovoDepartamentoDialog';
 
 export default function DepartamentosPage() {
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editando, setEditando] = useState<any>(null);
   const { departamentos, isLoading } = useDepartamentos();
   const navigate = useNavigate();
+
+  const abrirNovo = () => { setEditando(null); setDialogOpen(true); };
+  const abrirEditar = (d: any) => { setEditando(d); setDialogOpen(true); };
 
   const filtered = (departamentos as any[]).filter((d: any) => !search || d.nome.toLowerCase().includes(search.toLowerCase()));
 
