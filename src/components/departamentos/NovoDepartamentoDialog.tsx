@@ -22,7 +22,6 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
   const [form, setForm] = useState({
     nome: '',
     descricao: '',
-    codigo_centro_custo: '',
     ativo: true,
   });
 
@@ -31,11 +30,10 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
       setForm({
         nome: departamento.nome || '',
         descricao: departamento.descricao || '',
-        codigo_centro_custo: departamento.codigo_centro_custo || '',
         ativo: departamento.ativo !== false,
       });
     } else {
-      setForm({ nome: '', descricao: '', codigo_centro_custo: '', ativo: true });
+      setForm({ nome: '', descricao: '', ativo: true });
     }
   }, [departamento, open]);
 
