@@ -94,6 +94,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+    console.log("[external-db-bridge] Request body:", JSON.stringify(body));
     const {
       action,
       table,
@@ -108,6 +109,12 @@ Deno.serve(async (req) => {
     // Aliases: client may send `fn` for rpc and `params` for rpc args.
     const rpcName = body.rpcName || body.fn;
     const rpcArgs = body.params ?? data;
+
+    // Sanitize filters to handle accidental "undefined" strings
+    const sanitizedFilters = filters?.map((f: any) => ({
+      ...f,
+      value: f.value === "undefined" ? null : f.value
+    }));
 
     // Removed tolerant mode: errors will now be returned as 400 to the client
     // for immediate visibility of schema issues.
