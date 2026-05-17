@@ -33,7 +33,7 @@ export const listarMotivosAfastamento = () => listarReferencia('motivos_afastame
 // =============================================
 export async function listarCentrosCusto(empresaId?: string): Promise<any[]> {
   
-  let query = supabase.from('centros_custo').select('*').order('nome');
+  let query = (supabase.from('centros_custo' as any) as any).select('*').order('nome');
   if (empresaId) query = query.eq('empresa_id', empresaId);
   const { data, error } = await query;
   if (error) throw error;
