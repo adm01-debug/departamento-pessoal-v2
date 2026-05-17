@@ -49,14 +49,18 @@ export * from './calculoBeneficiosService';
 
 export const colaboradorService = {
   async list(empresaId?: string): Promise<any[]> {
-    
     let query = supabase.from('colaboradores').select('*').order('nome_completo');
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    
+    // Se empresaId for fornecido, filtra. Se não, traz tudo (útil para admins ou dados sem vínculo).
+    if (empresaId) {
+      query = query.eq('empresa_id', empresaId);
+    }
+    
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
-  
   },
+
   listar: async (empresaId?: string) => colaboradorService.list(empresaId),
   async buscarPorId(id: string): Promise<any | null> {
     
