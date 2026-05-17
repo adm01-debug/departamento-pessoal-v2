@@ -55,8 +55,16 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.error) {
-      console.error('[bridge] Error:', json.error || `HTTP ${res.status}`);
-      throw new Error(json.error || `Erro na ponte (HTTP ${res.status})`);
+      const errorMsg = json.error || `Erro HTTP ${res.status}`;
+      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', errorMsg);
+      
+      // Grita no UI para o desenvolvedor ver exatamente o que falta
+      toast.error(`ERRO DE BANCO: ${errorMsg}`, {
+        duration: 10000, // 10 segundos para dar tempo de ler
+        style: { background: '#fee2e2', color: '#991b1b', border: '1px solid #f87171' },
+      });
+
+      throw new Error(errorMsg);
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
