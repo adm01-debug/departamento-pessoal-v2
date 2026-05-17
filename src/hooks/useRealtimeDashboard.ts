@@ -36,49 +36,9 @@ export function useRealtimeDashboard() {
   };
 
   useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'admissoes' }, () => {
-        debounceInvalidate([['dashboard-stats'], ['dashboard-pendencias'], ['morning-briefing'], ['executive-kpis']]);
-        toast.info(TABLE_LABELS.admissoes);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'desligamentos' }, () => {
-        debounceInvalidate([['dashboard-stats'], ['morning-briefing'], ['executive-kpis']]);
-        toast.info(TABLE_LABELS.desligamentos);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ferias' }, () => {
-        debounceInvalidate([['dashboard-stats'], ['dashboard-pendencias'], ['morning-briefing'], ['executive-kpis']]);
-        toast.info(TABLE_LABELS.ferias);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'afastamentos' }, () => {
-        debounceInvalidate([['dashboard-pendencias'], ['morning-briefing']]);
-        toast.info(TABLE_LABELS.afastamentos);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'notificacoes' }, (payload) => {
-        debounceInvalidate([['notificacoes'], ['notificacoes-db'], ['portal-completo']]);
-        const nova = payload.new as any;
-        if (nova?.titulo && payload.eventType === 'INSERT') {
-          toast.info(`🔔 ${nova.titulo}`, { description: (nova.mensagem as string)?.slice(0, 60) });
-        }
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'colaboradores' }, () => {
-        debounceInvalidate([['dashboard-stats'], ['vw-cadastro-incompleto'], ['executive-kpis']]);
-        toast.info(TABLE_LABELS.colaboradores);
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'batidas_ponto' }, () => {
-        debounceInvalidate([['morning-briefing'], ['portal-completo']]);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'comunicados' }, () => {
-        debounceInvalidate([['comunicados'], ['portal-completo']]);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'folhas_pagamento' }, () => {
-        debounceInvalidate([['executive-kpis'], ['dashboard-stats'], ['portal-completo']]);
-      })
-      .subscribe();
-
+    // Realtime desativado temporariamente para compatibilidade com banco externo via bridge
     return () => {
       Object.values(timeouts.current).forEach(clearTimeout);
-      supabase.removeChannel(channel);
     };
   }, [queryClient]);
 }

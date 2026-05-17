@@ -51,7 +51,7 @@ export const folhaPagamentoService = {
       return ({
         proventos: item.total_proventos || 0,
         descontos: item.total_descontos || 0,
-        liquido: item.valor_liquido || 0,
+        liquido: (item as any).valor_liquido || 0,
         inss: item.inss_mes || 0,
         irrf: item.irrf_mes || 0,
         fgts: item.fgts_mes || 0,
@@ -128,7 +128,7 @@ export const folhaPagamentoService = {
         .select('*')
         .eq('folha_id', folhaId);
       
-      const totalFolha = itens?.reduce((acc, curr) => acc + Number(curr.valor_liquido || 0), 0) || 0;
+      const totalFolha = itens?.reduce((acc, curr) => acc + Number((curr as any).valor_liquido || 0), 0) || 0;
       const hashIntegridade = btoa(`folha-${folhaId}-${totalFolha}-${new Date().toISOString()}`).substring(0, 32);
 
       const { data: currentFolha } = await supabase
