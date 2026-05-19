@@ -32,10 +32,13 @@ export function useAfastamentos() {
     afastamentos: crud.items,
     configs: configsQuery.data || [],
     isLoading: crud.isLoading || configsQuery.isLoading,
+    isCriando: crud.isCreating,
+    isAtualizando: crud.isUpdating,
     filtros,
     setFiltros,
   };
 }
+
 
 
 export function useProrrogacoesAfastamento(afastamentoId?: string) {
