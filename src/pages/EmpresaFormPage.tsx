@@ -36,11 +36,12 @@ export default function EmpresaFormPage() {
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
-  const { data: empresa, isLoading } = useQuery({
+  const { data: empresa, isLoading } = useQuery<Empresa>({
     queryKey: ['empresa', id],
-    queryFn: () => empresaService.buscarPorId(id!),
+    queryFn: () => (empresaService as any).buscarPorId(id!),
     enabled: isEditing,
   });
+
 
   const { register, handleSubmit, setValue, reset, watch, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
     resolver: zodResolver(empresaSchema),
