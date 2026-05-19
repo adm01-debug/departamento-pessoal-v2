@@ -3,12 +3,13 @@ import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableHeader, TableRow, TableHead } from '@/components/ui/table';
-import { EmptyList } from '@/components/ui/empty-state';
+import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
-import { FilterX } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { FilterX, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { TableSkeleton } from '@/components/ui/module-skeleton';
 import { Button } from '@/components/ui/button';
 
 interface EntityPageContainerProps<T> {
@@ -32,6 +33,8 @@ interface EntityPageContainerProps<T> {
   onPageChange: (page: number) => void;
   onSearchChange: (search: string) => void;
   onRefetch: () => void;
+  onAdd?: () => void;
+  addLabel?: string;
   
   // Customization
   searchPlaceholder?: string;
@@ -67,7 +70,9 @@ export function EntityPageContainer<T extends { id: string | number }>({
   columns,
   renderRow,
   stats,
-  customFilters
+  customFilters,
+  onAdd,
+  addLabel
 }: EntityPageContainerProps<T>) {
 
   const totalPages = Math.ceil(total / pageSize);
@@ -89,7 +94,10 @@ export function EntityPageContainer<T extends { id: string | number }>({
           <DataTableToolbar 
             search={search} 
             onSearchChange={onSearchChange} 
-            searchPlaceholder={searchPlaceholder || `Buscar por nome...`} 
+            searchPlaceholder={searchPlaceholder || `Buscar por nome...`}
+            onRefresh={onRefetch}
+            onAdd={onAdd}
+            addLabel={addLabel}
           />
         )}
 
@@ -97,21 +105,15 @@ export function EntityPageContainer<T extends { id: string | number }>({
         {error ? (
           <SyncErrorState error={error} onRetry={onRefetch} entityName={entityName + 's'} />
         ) : isLoading ? (
-          <div className="flex flex-col items-center justify-center p-12 gap-4">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground animate-pulse">Carregando {entityName}s...</p>
+          <div className="space-y-4">
+            <TableSkeleton columns={columns.filter(c => !c.hidden).length} rows={pageSize} />
           </div>
         ) : total === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/10">
+          <div className="flex flex-col items-center justify-center border border-dashed rounded-2xl bg-muted/10 p-4">
             {hasFilters ? (
-              <>
-                <FilterX className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
-                <h3 className="text-lg font-display font-bold">Nenhum {entityName} encontrado</h3>
-                <p className="text-muted-foreground mb-6">Tente ajustar seus termos de busca.</p>
-                <Button variant="outline" onClick={() => onSearchChange('')} className="rounded-xl">Limpar Busca</Button>
-              </>
+              <EmptySearch search={search} onClear={() => onSearchChange('')} />
             ) : (
-              <EmptyList entityName={entityName} />
+              <EmptyList entityName={entityName} onCreate={onAdd} />
             )}
           </div>
         ) : (

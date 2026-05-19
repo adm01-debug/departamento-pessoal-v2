@@ -2,7 +2,7 @@
 import { Input } from './input';
 import { Button } from './button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { Search, X, Download, Plus, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, X, Download, Plus, Filter, SlidersHorizontal, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,6 +21,7 @@ interface DataTableToolbarProps {
     onChange: (value: string) => void;
   }>;
   onClearFilters?: () => void;
+  onRefresh?: () => void;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ export function DataTableToolbar({
   onExport,
   filters,
   onClearFilters,
+  onRefresh,
   className
 }: DataTableToolbarProps) {
   const hasActiveFilters = filters?.some(f => f.value && f.value !== '' && f.value !== 'all');
@@ -102,6 +104,18 @@ export function DataTableToolbar({
             <Button variant="outline" className="h-11 w-11 p-0 rounded-xl md:hidden">
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
+
+            {onRefresh && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onRefresh}
+                className="h-11 w-11 p-0 rounded-xl bg-card/50 shadow-sm"
+                title="Atualizar dados"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            )}
 
             {onExport && (
               <Button 
