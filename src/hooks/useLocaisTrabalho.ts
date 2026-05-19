@@ -1,66 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useGenericCrud } from './useGenericCrud';
 import { localTrabalhoService } from '@/services/localTrabalhoService';
 import { useEmpresas } from './useEmpresas';
-import { toast } from 'sonner';
-import { useState } from 'react';
 
 export function useLocaisTrabalho() {
   const { empresaAtual } = useEmpresas();
-  const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
 
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState('');
-
-  const query = useQuery({
-    queryKey: ['locais_trabalho', { empresaId, search, page, pageSize }],
-    queryFn: () => localTrabalhoService.listar({ empresaId, search, page, pageSize }),
-    enabled: true,
-  });
-
-  const criarMutation = useMutation({
-    mutationFn: (data: any) => localTrabalhoService.criar({ ...data, empresa_id: empresaId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locais_trabalho'] });
-      toast.success('Local de trabalho criado');
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => localTrabalhoService.atualizar(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locais_trabalho'] });
-      toast.success('Local de trabalho atualizado');
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const excluirMutation = useMutation({
-    mutationFn: (id: string) => localTrabalhoService.excluir(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locais_trabalho'] });
-      toast.success('Local de trabalho excluído');
-    },
-    onError: (err: Error) => toast.error(err.message),
+  const crud = useGenericCrud<any>({
+    queryKey: 'locais_trabalho',
+    service: localTrabalhoService,
+    initialPageSize: 10,
+    filters: empresaId ? { empresa_id: empresaId } : {},
+    successMessages: {
+      create: 'Local de trabalho criado',
+      update: 'Local de trabalho atualizado',
+      delete: 'Local de trabalho excluído'
+    }
   });
 
   return {
-    locais: query.data?.data || [],
-    total: query.data?.total || 0,
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    error: query.error,
-    page,
-    setPage,
-    pageSize,
-    setPageSize,
-    search,
-    setSearch,
-    criar: criarMutation.mutateAsync,
-    atualizar: atualizarMutation.mutateAsync,
-    excluir: excluirMutation.mutateAsync,
-    refetch: query.refetch,
+    ...crud,
+    locais: crud.items,
+    criar: (data: any) => crud.criar({ ...data, empresa_id: empresaId }),
   };
 }
