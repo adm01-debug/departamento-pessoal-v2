@@ -155,6 +155,8 @@ export default function ColaboradoresPage() {
           {statusOptions.map((opt, i) => {
             const statusKey = opt.value;
             const isActive = status === statusKey;
+            const count = summary ? (summary as any)[statusKey] || 0 : '-';
+            
             return (
               <motion.button
                 key={statusKey}
@@ -176,7 +178,7 @@ export default function ColaboradoresPage() {
                   "text-2xl font-display font-bold",
                   isActive ? "text-primary" : "text-foreground"
                 )}>
-                  {isActive ? total : '-'}
+                  {count}
                 </p>
               </motion.button>
             );
