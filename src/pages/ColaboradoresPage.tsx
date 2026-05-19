@@ -49,6 +49,10 @@ export default function ColaboradoresPage() {
     refetch
   } = useColaboradores();
 
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+  }, [setPage]);
+
   // Reset page when search or filters change
   const handleSearchChange = useCallback((val: string) => {
     setSearch(val);
@@ -112,7 +116,7 @@ export default function ColaboradoresPage() {
       page={page}
       pageSize={pageSize}
       search={search}
-      onPageChange={setPage}
+      onPageChange={handlePageChange}
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
       actions={
