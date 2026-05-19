@@ -33,9 +33,10 @@ export function useAfastamentos() {
     configs: configsQuery.data || [],
     isLoading: crud.isLoading || configsQuery.isLoading,
     filtros,
-    setFeltros: setFiltros,
+    setFiltros,
   };
 }
+
 
 export function useProrrogacoesAfastamento(afastamentoId?: string) {
   const queryClient = useQueryClient();
