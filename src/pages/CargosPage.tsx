@@ -43,12 +43,6 @@ export default function CargosPage() {
             <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Total Cargos</p>
             <h3 className="text-2xl font-display font-bold">{cargos?.length || 0}</h3>
           </CardContent></Card>
-          <Card className="border-border/30 rounded-2xl"><CardContent className="p-4">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Média Salarial</p>
-            <h3 className="text-2xl font-display font-bold">
-              {formatCurrency((Array.isArray(cargos) ? cargos.reduce((acc: number, c: any) => acc + (Number(c.salario_base) || 0), 0) : 0) / (cargos?.length || 1))}
-            </h3>
-          </CardContent></Card>
         </div>
 
         <DataTableToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por nome ou CBO..." />
