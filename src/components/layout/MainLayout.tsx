@@ -48,13 +48,16 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex h-screen bg-background">
       {/* Command Palette (global) */}
-      <CommandPalette />
+      <CommandPalette 
+        open={commandPaletteOpen} 
+        onOpenChange={setCommandPaletteOpen} 
+      />
 
       {/* Guided Tour (first visit) */}
       <GuidedTour />
 
       <div className={cn('hidden md:block transition-all duration-500 ease-in-out', sidebarOpen ? 'w-64' : 'w-16')}>
-        <MemoizedSidebar onSearchOpen={() => {}} />
+        <MemoizedSidebar onSearchOpen={() => setCommandPaletteOpen(true)} />
       </div>
 
       {mobileSidebarOpen && (
