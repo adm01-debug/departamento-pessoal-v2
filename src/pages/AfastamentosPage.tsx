@@ -42,7 +42,7 @@ const tipoLabels: Record<string, string> = {
 };
 
 export default function AfastamentosPage() {
-  const { afastamentos, isLoading, filtros, setFeltros } = useAfastamentos();
+  const { afastamentos, isLoading, filtros, setFiltros } = useAfastamentos();
   const { prorrogacoes, isLoading: loadProrr } = useProrrogacoesAfastamento(undefined);
   const { exportarPDF } = usePDFExport();
   
