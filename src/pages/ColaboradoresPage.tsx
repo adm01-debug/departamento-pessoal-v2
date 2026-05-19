@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { ColaboradorFilters } from '@/components/colaboradores/ColaboradorFilters';
 import { TableCell, TableRow } from '@/components/ui/table';
