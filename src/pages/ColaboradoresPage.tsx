@@ -46,7 +46,8 @@ export default function ColaboradoresPage() {
     setDepartamento,
     cargo,
     setCargo,
-    refetch
+    refetch,
+    summary
   } = useColaboradores();
 
   const handlePageChange = useCallback((p: number) => {
