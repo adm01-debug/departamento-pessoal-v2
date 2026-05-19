@@ -1,51 +1,35 @@
-import { supabase } from '@/integrations/supabase/client';
-export const webhookService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
-    let query = supabase.from('webhooks').select('*').order('nome');
+import { BaseService, ListOptions, ListResponse } from './baseService';
+
+class WebhookService extends BaseService<any> {
+  constructor() {
+    super('webhooks', { 
+      defaultOrderBy: 'nome' 
+    });
+  }
+
+  async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
+    const { filters, search } = options;
+    const empresaId = (filters as any)?.empresa_id;
+
+    let query = this.getQuery().select('*', { count: 'exact' });
     if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
+    if (search) query = query.ilike('nome', `%${search}%`);
+
+    const { data, count, error } = await query.order('nome');
     if (error) throw error;
-    return data || [];
-  
-  },
-  
-  async criar(d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('webhooks').insert(d).select().maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de webhook foi retornado.');
-    return data;
-  
-  },
-  
-  async atualizar(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('webhooks').update(d).eq('id', id).select().maybeSingle();
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de webhook foi retornado.');
-    return data;
-  
-  },
-  
-  async excluir(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('webhooks').delete().eq('id', id);
-    if (error) throw error;
-  
-  },
-  
+    return { data: data || [], total: count || 0 };
+  }
+
   async listarLogs(webhookId: string): Promise<any[]> {
-    
-    const { data, error } = await supabase
-      .from('webhook_logs')
+    const { data, error } = await (this.getQuery().from as any)('webhook_logs')
       .select('*')
       .eq('webhook_id', webhookId)
       .order('created_at', { ascending: false })
       .limit(50);
+    
     if (error) throw error;
     return data || [];
-  
-  },
-};
+  }
+}
 
+export const webhookService = new WebhookService();
