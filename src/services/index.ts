@@ -62,7 +62,7 @@ export const colaboradorService = {
     let query = supabase.from('colaboradores').select('*', { count: 'exact' });
     
     if (empresaId) query = query.eq('empresa_id', empresaId);
-    if (status && status !== 'all') query = query.eq('status', status);
+    if (status && status !== 'all') query = query.eq('status', status as any);
     if (departamento && departamento !== 'all') query = query.eq('departamento', departamento);
     if (cargo && cargo !== 'all') query = query.eq('cargo', cargo);
     
