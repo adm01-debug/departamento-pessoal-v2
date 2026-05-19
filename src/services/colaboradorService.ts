@@ -11,21 +11,15 @@ class ColaboradorService extends BaseService<Colaborador> {
     });
   }
 
-  async listar(options: ListOptions & { 
-    status?: string; 
-    departamento?: string; 
-    cargo?: string;
-    empresaId?: string;
-  } = {}): Promise<ListResponse<Colaborador>> {
+  async listar(options: ListOptions = {}): Promise<ListResponse<Colaborador>> {
     const { 
       search, 
       page = 1, 
       pageSize = 25, 
-      status, 
-      departamento, 
-      cargo, 
-      empresaId 
+      filters = {}
     } = options;
+    
+    const { status, departamento, cargo, empresaId } = filters;
 
     let query = this.getQuery().select('*', { count: 'exact' });
 

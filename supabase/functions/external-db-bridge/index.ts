@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
       }))
       .filter(
         (f: any) =>
-          f.value !== null && f.value !== undefined && f.value !== "" && f.value !== "null" && f.value !== "undefined",
+          f.value !== null && f.value !== undefined && f.value !== "" && f.value !== "null" && f.value !== "undefined" && f.value !== "all",
       );
 
     // Removed tolerant mode: errors will now be returned as 400 to the client
