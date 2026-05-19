@@ -70,7 +70,9 @@ export function EntityPageContainer<T extends { id: string | number }>({
   columns,
   renderRow,
   stats,
-  customFilters
+  customFilters,
+  onAdd,
+  addLabel
 }: EntityPageContainerProps<T>) {
 
   const totalPages = Math.ceil(total / pageSize);
