@@ -28,6 +28,7 @@ export function useBeneficios() {
     isLoading: crud.isLoading || resumoQuery.isLoading,
     criarBeneficio: { mutateAsync: crud.criar, mutate: crud.criar, isPending: crud.isCreating },
     atualizarBeneficio: { mutateAsync: (args: { id: string, dados: any }) => crud.atualizar(args.id, args.dados), isPending: crud.isUpdating },
+
     excluirBeneficio: { mutateAsync: crud.excluir, isPending: crud.isDeleting },
     tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
   };
