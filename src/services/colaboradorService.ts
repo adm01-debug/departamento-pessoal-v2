@@ -44,21 +44,33 @@ class ColaboradorService extends BaseService<Colaborador> {
   }
 
   async getSummary(empresaId?: string) {
-    let query = supabase.from('colaboradores').select('status', { count: 'exact' });
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    // Optimized: Run counts in parallel using Supabase count feature
+    const statuses = ['ativo', 'desligado', 'afastado', 'ferias'];
     
-    const { data, error } = await query;
-    if (error) throw error;
+    const countPromises = statuses.map(async (status) => {
+      let query = supabase
+        .from('colaboradores')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', status);
+      
+      if (empresaId) query = query.eq('empresa_id', empresaId);
+      
+      const { count, error } = await query;
+      if (error) return { status, count: 0 };
+      return { status, count: count || 0 };
+    });
 
-    const summary = {
-      total: data.length,
-      ativo: data.filter(c => (c.status as string) === 'ativo').length,
-      desligado: data.filter(c => (c.status as string) === 'desligado').length,
-      afastado: data.filter(c => (c.status as string) === 'afastado').length,
-      // Status inativo/ferias mapped for UI compatibility
-      inativo: data.filter(c => (c.status as string) === 'desligado').length, 
-      ferias: data.filter(c => (c.status as string) === 'ferias').length,
+    const results = await Promise.all(countPromises);
+    
+    const summary: Record<string, number> = {
+      total: results.reduce((acc, r) => acc + r.count, 0),
     };
+
+    results.forEach(r => {
+      summary[r.status] = r.count;
+      // UI compatibility mapping
+      if (r.status === 'desligado') summary.inativo = r.count;
+    });
     
     return summary;
   }
