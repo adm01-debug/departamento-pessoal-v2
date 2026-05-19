@@ -33,6 +33,8 @@ interface EntityPageContainerProps<T> {
   onPageChange: (page: number) => void;
   onSearchChange: (search: string) => void;
   onRefetch: () => void;
+  onAdd?: () => void;
+  addLabel?: string;
   
   // Customization
   searchPlaceholder?: string;
