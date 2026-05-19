@@ -30,11 +30,12 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
   const fileRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
-  const { data: documentos, isLoading } = useQuery({
+  const { data: documentos, isLoading } = useQuery<any[]>({
     queryKey: ['portal-documentos', colaboradorId],
     queryFn: () => documentoService.listarDocumentos(colaboradorId),
     enabled: !!colaboradorId
   });
+
 
 
   const handleUpload = async () => {
