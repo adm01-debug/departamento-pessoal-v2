@@ -91,6 +91,7 @@ export function EntityPageContainer<T extends { id: string | number }>({
             search={search} 
             onSearchChange={onSearchChange} 
             searchPlaceholder={searchPlaceholder || `Buscar por nome...`}
+            onRefresh={onRefetch}
           />
         )}
 
