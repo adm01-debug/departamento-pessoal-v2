@@ -8,10 +8,12 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Plus, Search, Info, FilterX } from 'lucide-react';
+import { Briefcase, Plus, Search, Info, FilterX, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
 
 export default function CargosPage() {
   const { 
