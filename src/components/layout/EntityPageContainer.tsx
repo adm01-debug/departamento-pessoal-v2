@@ -83,11 +83,14 @@ export function EntityPageContainer<T extends { id: string | number }>({
       >
         {stats}
 
-        <DataTableToolbar 
-          search={search} 
-          onSearchChange={onSearchChange} 
-          searchPlaceholder={searchPlaceholder || `Buscar por nome...`} 
-        />
+        {customFilters || (
+          <DataTableToolbar 
+            search={search} 
+            onSearchChange={onSearchChange} 
+            searchPlaceholder={searchPlaceholder || `Buscar por nome...`} 
+          />
+        )}
+
 
         {error ? (
           <SyncErrorState error={error} onRetry={onRefetch} entityName={entityName + 's'} />
