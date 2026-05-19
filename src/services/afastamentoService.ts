@@ -1,31 +1,37 @@
+import { BaseService, ListOptions, ListResponse } from './baseService';
 import { supabase } from '@/integrations/supabase/client';
-export const afastamentoService = {
-  // --- Afastamentos ---
-  async listar(empresaId?: string, filtros?: any): Promise<any[]> {
-    
+
+class AfastamentoService extends BaseService<any> {
+  constructor() {
+    super('afastamentos', { 
+      defaultOrderBy: 'data_inicio' 
+    });
+  }
+
+  async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
+    const { filters, empresaId } = options as any;
+    const empId = empresaId || (filters as any)?.empresa_id;
+
     const selectStr = `
       *,
       colaborador:colaboradores(nome_completo, departamento)
     `;
     
-    let query = (supabase.from('afastamentos') as any).select(selectStr);
+    let query = this.getQuery().select(selectStr, { count: 'exact' });
     
-    if (empresaId) query = query.eq('empresa_id', empresaId);
-    if (filtros?.status) query = query.eq('status', filtros.status);
+    if (empId) query = query.eq('empresa_id', empId);
+    if (filters?.status) query = query.eq('status', filters.status);
     
-    const { data, error } = await query.order('data_inicio', { ascending: false });
+    const { data, count, error } = await query.order('data_inicio', { ascending: false });
     if (error) throw error;
-    return data || [];
-  
-  },
-  
+    return { data: data || [], total: count || 0 };
+  }
+
   async listarHistoricoRecente(colaboradorId: string, dias: number = 60): Promise<any[]> {
-    
     const dataLimite = new Date();
     dataLimite.setDate(dataLimite.getDate() - dias);
     
-    const { data, error } = await supabase
-      .from('afastamentos')
+    const { data, error } = await this.getQuery()
       .select('*')
       .eq('colaborador_id', colaboradorId)
       .gte('data_inicio', dataLimite.toISOString().split('T')[0])
@@ -33,89 +39,31 @@ export const afastamentoService = {
       
     if (error) throw error;
     return data || [];
-  
-  },
+  }
 
-  async buscarPorId(id: string): Promise<any | null> {
-    
-    const { data, error } = await supabase
-      .from('afastamentos')
-      .select('*, colaborador:colaboradores(nome_completo)')
-      .eq('id', id)
-      .maybeSingle();
-    
-    if (error) throw error;
-    return data;
-  
-  },
-
-  async criar(d: any): Promise<any> {
-    
-    const { data, error } = await supabase
-      .from('afastamentos')
-      .insert(d)
-      .select()
-      .maybeSingle();
-    
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de afastamento foi retornado.');
-    return data;
-  
-  },
-
-  async atualizar(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase
-      .from('afastamentos')
-      .update({ ...d, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .maybeSingle();
-    
-    if (error) throw error;
-    if (!data) throw new Error('Nenhum registro de afastamento foi retornado.');
-    return data;
-  
-  },
-
-  async excluir(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('afastamentos').delete().eq('id', id);
-    if (error) throw error;
-  
-  },
-
-  // --- CID-10 ---
+  // CID-10 search
   async buscarCID(termo: string): Promise<any[]> {
-    
-    const { data, error } = await supabase
-      .from('afastamentos')
+    const { data, error } = await this.getQuery()
       .select('*')
       .or(`codigo.ilike.%${termo}%,descricao.ilike.%${termo}%`)
       .limit(10);
     
     if (error) throw error;
     return data || [];
-  
-  },
+  }
 
-  // --- Configurações ---
   async listarConfiguracoes(): Promise<any[]> {
-    
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('config_afastamentos')
       .select('*')
       .order('tipo');
     
     if (error) throw error;
     return data || [];
-  
-  },
+  }
 
-  // --- Documentos ---
   async listarDocumentos(afastamentoId: string): Promise<any[]> {
-    
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('documentos_afastamento')
       .select('*')
       .eq('afastamento_id', afastamentoId)
@@ -123,29 +71,21 @@ export const afastamentoService = {
     
     if (error) throw error;
     return data || [];
-  
-  },
+  }
 
   async uploadDocumento(afastamentoId: string, file: File, tipo: string): Promise<any> {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${afastamentoId}/${crypto.randomUUID()}.${fileExt}`;
       
-      if (file.size > 10 * 1024 * 1024) {
-        throw new Error('Arquivo excede o limite de 10MB');
-      }
+      if (file.size > 10 * 1024 * 1024) throw new Error('Arquivo excede o limite de 10MB');
 
-      const { error: uploadError } = await supabase.storage
-        .from('afastamentos')
-        .upload(fileName, file);
-
+      const { error: uploadError } = await supabase.storage.from('afastamentos').upload(fileName, file);
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('afastamentos')
-        .getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from('afastamentos').getPublicUrl(fileName);
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('documentos_afastamento')
         .insert({
           afastamento_id: afastamentoId,
@@ -163,15 +103,14 @@ export const afastamentoService = {
         .maybeSingle();
 
       if (error) throw error;
-      return (data);
+      return data;
     } catch (e: any) {
       throw new Error(e.message || 'Falha no upload do documento');
     }
-  },
+  }
 
   async validarDocumento(id: string, validado: boolean): Promise<any> {
-    
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('documentos_afastamento')
       .update({ validado } as any)
       .eq('id', id)
@@ -180,13 +119,10 @@ export const afastamentoService = {
     
     if (error) throw error;
     return data;
-  
-  },
+  }
 
-  // --- Prorrogações ---
   async listarProrrogacoes(afastamentoId?: string): Promise<any[]> {
-    
-    let query = supabase
+    let query = (supabase as any)
       .from('prorrogacoes_afastamento')
       .select('*, afastamento:afastamentos(*, colaborador:colaboradores(nome_completo))');
     
@@ -195,12 +131,11 @@ export const afastamentoService = {
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
-  
-  },
+  }
 
   async criarProrrogacao(d: any): Promise<any> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('prorrogacoes_afastamento')
         .insert(d)
         .select()
@@ -213,49 +148,36 @@ export const afastamentoService = {
         status: 'prorrogado'
       });
 
-      return (data);
+      return data;
     } catch (e: any) {
       throw new Error('Falha ao criar prorrogação');
     }
-  },
+  }
 
-  // --- Cálculos ---
   calcularDias(inicio: string, fim: string): number {
     if (!inicio || !fim) return 0;
     const start = new Date(inicio);
     const end = new Date(fim);
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
-    
     start.setHours(0, 0, 0, 0);
     end.setHours(0, 0, 0, 0);
-    
     const diffMs = end.getTime() - start.getTime();
     const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
     return days > 0 ? days : 0;
-  },
+  }
 
   calcularDistribuicaoDias(diasTotais: number, tipo: string, configs: any[]) {
     const config = configs.find(c => c.tipo === tipo);
     const tiposComLimite = ['doenca', 'acidente_trabalho', 'acidente_trajeto'];
     const maxEmpresa = config?.dias_empresa_maximo ?? (tiposComLimite.includes(tipo) ? 15 : 0);
-    
-    if (maxEmpresa === 0) {
-      return { empresa: diasTotais, inss: 0 };
-    }
+    if (maxEmpresa === 0) return { empresa: diasTotais, inss: 0 };
+    if (diasTotais <= maxEmpresa) return { empresa: diasTotais, inss: 0 };
+    return { empresa: maxEmpresa, inss: diasTotais - maxEmpresa };
+  }
 
-    if (diasTotais <= maxEmpresa) {
-      return { empresa: diasTotais, inss: 0 };
-    } else {
-      return { empresa: maxEmpresa, inss: diasTotais - maxEmpresa };
-    }
-  },
-
-  // --- Exportação ---
   async exportarRelatorio(empresaId: string, filtros?: any): Promise<any[]> {
     try {
-      const result = await this.listar(empresaId, filtros);
-      const data = result;
-      
+      const { data } = await this.listar({ filters: { ...filtros, empresa_id: empresaId } });
       const headers = ["ID", "Colaborador", "Tipo", "CID", "Início", "Fim Previsto", "Dias Totais", "Empresa", "INSS", "Status"];
       const rows = data.map((af: any) => [
         af.id.split('-')[0],
@@ -270,11 +192,7 @@ export const afastamentoService = {
         af.status
       ]);
 
-      const csvContent = [
-        headers.join(","),
-        ...rows.map((e: any) => e.join(","))
-      ].join("\n");
-
+      const csvContent = [headers.join(","), ...rows.map((e: any) => e.join(","))].join("\n");
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -283,10 +201,11 @@ export const afastamentoService = {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      return (data);
+      return data;
     } catch (e: any) {
       throw new Error('Falha ao exportar relatório');
     }
   }
-};
+}
+
+export const afastamentoService = new AfastamentoService();

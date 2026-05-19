@@ -1,30 +1,29 @@
-import { supabase } from '@/integrations/supabase/client';
+import { BaseService, ListOptions, ListResponse } from './baseService';
 import { auditLogger } from '@/utils/auditLogger';
-export const desligamentoService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
-    let query = supabase
-      .from('desligamentos')
-      .select('*, colaborador:colaboradores(nome_completo)')
+
+class DesligamentoService extends BaseService<any> {
+  constructor() {
+    super('desligamentos', { 
+      defaultOrderBy: 'data_desligamento' 
+    });
+  }
+
+  async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
+    const { filters } = options;
+    const empresaId = (filters as any)?.empresa_id;
+
+    let query = this.getQuery()
+      .select('*, colaborador:colaboradores(nome_completo)', { count: 'exact' })
       .order('data_desligamento', { ascending: false })
       .limit(500);
+
     if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  
-  },
-  
-  async buscarPorId(id: string): Promise<any | null> {
-    if (!id) throw new Error('ID é obrigatório');
     
-    
-    const { data, error } = await supabase.from('desligamentos').select('*').eq('id', id).maybeSingle();
+    const { data, count, error } = await query;
     if (error) throw error;
-    return data;
-  
-  },
-  
+    return { data: data || [], total: count || 0 };
+  }
+
   async criar(d: any): Promise<any> {
     try {
       if (!d.colaborador_id) throw new Error('Colaborador é obrigatório');
@@ -39,8 +38,7 @@ export const desligamentoService = {
         etapa: d.etapa || 'comunicacao'
       };
 
-      const { data, error } = await supabase.from('desligamentos').insert(sanitized).select().maybeSingle();
-      if (error) throw error;
+      const data = await super.criar(sanitized);
 
       if (data) {
         await auditLogger.log({
@@ -51,20 +49,18 @@ export const desligamentoService = {
         });
       }
 
-      return (data);
+      return data;
     } catch (e: any) {
       throw new Error(e.message || 'Erro ao criar desligamento');
     }
-  },
-  
+  }
+
   async atualizar(id: string, d: any): Promise<any> {
     if (!id) throw new Error('ID é obrigatório');
 
     try {
-      const { data: anterior } = await supabase.from('desligamentos').select('*').eq('id', id).single();
-
-      const { data, error } = await supabase.from('desligamentos').update(d).eq('id', id).select().maybeSingle();
-      if (error) throw error;
+      const anterior = await this.buscarPorId(id);
+      const data = await super.atualizar(id, d);
 
       if (data) {
         await auditLogger.log({
@@ -76,20 +72,18 @@ export const desligamentoService = {
         });
       }
 
-      return (data);
+      return data;
     } catch (e: any) {
       throw new Error('Falha ao atualizar desligamento');
     }
-  },
-  
+  }
+
   async excluir(id: string): Promise<void> {
     if (!id) throw new Error('ID é obrigatório');
     
     try {
-      const { data: anterior } = await supabase.from('desligamentos').select('*').eq('id', id).single();
-
-      const { error } = await supabase.from('desligamentos').delete().eq('id', id);
-      if (error) throw error;
+      const anterior = await this.buscarPorId(id);
+      await super.excluir(id);
 
       await auditLogger.log({
         tabela: 'desligamentos',
@@ -97,11 +91,10 @@ export const desligamentoService = {
         acao: 'DELETE',
         dados_anteriores: anterior,
       });
-      return (undefined);
     } catch (e: any) {
       throw new Error('Falha ao excluir desligamento');
     }
-  },
-};
+  }
+}
 
-
+export const desligamentoService = new DesligamentoService();

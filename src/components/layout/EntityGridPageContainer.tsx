@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
-import { Table, TableBody, TableHeader, TableRow, TableHead } from '@/components/ui/table';
 import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { FilterX } from 'lucide-react';
@@ -10,8 +9,9 @@ import { motion } from 'framer-motion';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { SyncErrorState } from '@/components/ui/sync-error-state';
 import { Button } from '@/components/ui/button';
+import { GridCardSkeleton } from '@/components/ui/module-skeleton';
 
-interface EntityPageContainerProps<T> {
+interface EntityGridPageContainerProps<T> {
   title: string;
   description: string;
   pageTitle: string;
@@ -35,15 +35,15 @@ interface EntityPageContainerProps<T> {
   
   // Customization
   searchPlaceholder?: string;
-  entityName: string; // e.g., "cargo", "departamento"
-  columns: { header: string; className?: string; width?: string; hidden?: 'sm' | 'md' | 'lg' | boolean }[];
-  renderRow: (item: T) => ReactNode;
+  entityName: string;
+  renderItem: (item: T, index: number) => ReactNode;
   stats?: ReactNode;
+  gridClassName?: string;
+  skeletonCount?: number;
   customFilters?: ReactNode;
 }
 
-
-export function EntityPageContainer<T extends { id: string | number }>({
+export function EntityGridPageContainer<T extends { id: string | number }>({
   title,
   description,
   pageTitle,
@@ -64,12 +64,12 @@ export function EntityPageContainer<T extends { id: string | number }>({
   onRefetch,
   searchPlaceholder,
   entityName,
-  columns,
-  renderRow,
+  renderItem,
   stats,
+  gridClassName = "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+  skeletonCount = 6,
   customFilters
-}: EntityPageContainerProps<T>) {
-
+}: EntityGridPageContainerProps<T>) {
   const totalPages = Math.ceil(total / pageSize);
   const hasFilters = search !== '';
 
@@ -93,13 +93,11 @@ export function EntityPageContainer<T extends { id: string | number }>({
           />
         )}
 
-
         {error ? (
           <SyncErrorState error={error} onRetry={onRefetch} entityName={entityName + 's'} />
         ) : isLoading ? (
-          <div className="flex flex-col items-center justify-center p-12 gap-4">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground animate-pulse">Carregando {entityName}s...</p>
+          <div className={gridClassName}>
+            {Array.from({ length: skeletonCount }).map((_, i) => <GridCardSkeleton key={i} />)}
           </div>
         ) : total === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/10">
@@ -115,32 +113,16 @@ export function EntityPageContainer<T extends { id: string | number }>({
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card relative"
-            >
+          <div className="space-y-8">
+            <div className={`${gridClassName} relative`}>
               {isFetching && !isLoading && (
-                <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center z-10">
-                  <Spinner size="md" />
+                <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-2xl">
+                  <Spinner size="lg" />
                 </div>
               )}
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/20">
-                    {columns.map((col, idx) => (
-                      <TableHead key={idx} className={`font-display font-semibold py-4 ${col.className || ''}`} style={{ width: col.width }}>
-                        {col.header}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map(renderRow)}
-                </TableBody>
-              </Table>
-            </motion.div>
+              
+              {items.map((item, i) => renderItem(item, i))}
+            </div>
 
             <DataTablePagination 
               currentPage={page}
