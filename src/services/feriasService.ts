@@ -10,7 +10,16 @@ class FeriasService extends BaseService<Ferias> {
     });
   }
 
+  async listar(options: ListOptions = {}): Promise<ListResponse<Ferias>> {
+    const { filters, search, page, pageSize } = options;
+    const empId = (filters as any)?.empresa_id;
+    const status = (filters as any)?.status;
+    const res = await this.listSolicitacoes(empId, { page, limit: pageSize, search, status });
+    return { data: res.data, total: res.count };
+  }
+
   async listSolicitacoes(empresaId?: string, params?: { page?: number; limit?: number; search?: string; status?: string }): Promise<{ data: Ferias[]; count: number }> {
+
     const { page = 1, limit = 10, search, status } = params || {};
     const from = (page - 1) * limit;
     const to = from + limit - 1;
