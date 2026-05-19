@@ -64,8 +64,16 @@ export const loggerService = {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
+
+      // Skip DB persistence when unauthenticated (RLS blocks anon inserts on external DB)
+      if (!userId) {
+        if (import.meta.env.DEV) {
+          console.debug('[logger] Skipping flush — no authenticated session');
+        }
+        return;
+      }
+
       const logsWithUser = logsToSend.map(l => ({ ...l, user_id: userId }));
-      
       const { error } = await supabase.from('logs_sistema').insert(logsWithUser as any);
       if (error) throw error;
     } catch (e) {
