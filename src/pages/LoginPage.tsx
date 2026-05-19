@@ -32,9 +32,10 @@ export default function LoginPage() {
   const [forgotSent, setForgotSent] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [govBrLoading, setGovBrLoading] = useState(false);
-  const { signIn, resetPassword } = useAuth();
+  const { signIn, resetPassword, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { lockState, checkLock, recordFailedAttempt, resetAttempts } = useBruteForceProtection();
+
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -341,11 +342,12 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     className="w-full h-11 rounded-lg font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-glow"
-                    disabled={loading || lockState.isLocked}
+                    disabled={loading || authLoading || lockState.isLocked}
                   >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {(loading || authLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Entrar
                   </Button>
+
 
                   <div className="relative my-2">
                     <div className="absolute inset-0 flex items-center">

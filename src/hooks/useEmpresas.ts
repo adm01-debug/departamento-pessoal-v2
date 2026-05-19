@@ -124,7 +124,8 @@ export function useEmpresas(): UseEmpresasReturn {
   // Empresa atual - buscamos os dados da empresa separadamente se necessário
   const empresaVinculo = userEmpresas?.find((ue) => ue.empresa_id === empresaAtualId);
   // Se não encontrar vínculo, mas houver ID selecionado, buscamos em todas as empresas
-  const empresaAtual = todasEmpresas?.find(e => e.id === (empresaVinculo?.empresa_id || empresaAtualId));
+  const empresaAtualData = todasEmpresas?.find(e => e.id === (empresaVinculo?.empresa_id || empresaAtualId));
+
 
   // Se não há empresa selecionada, usar a padrão
   const empresaDefaultVinculo = userEmpresas?.find((ue) => ue.is_default);
@@ -133,7 +134,7 @@ export function useEmpresas(): UseEmpresasReturn {
   // Determinamos a empresa "efetiva" (prioridade: Seleção atual > Padrão > Primeira da lista vinculada > Primeira da lista global)
   const empresaPrimeiraVinculada = todasEmpresas?.find(e => userEmpresas && userEmpresas[0] && e.id === userEmpresas[0].empresa_id);
   const empresaPrimeiraGlobal = todasEmpresas?.[0];
-  const empresaEfetiva = empresaAtual || empresaDefault || empresaPrimeiraVinculada || empresaPrimeiraGlobal;
+  const empresaEfetiva = empresaAtualData || empresaDefault || empresaPrimeiraVinculada || empresaPrimeiraGlobal;
 
 
   useEffect(() => {

@@ -205,7 +205,16 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
-  const handleLogout = async () => { await signOut(); toast.success('Logout realizado com sucesso'); navigate('/login'); };
+  const handleLogout = async () => { 
+    try {
+      await signOut(); 
+      toast.success('Logout realizado com sucesso'); 
+      navigate('/login'); 
+    } catch (e: any) {
+      toast.error('Erro ao sair: ' + (e.message || 'Erro desconhecido'));
+    }
+  };
+
   const toggleGroup = useCallback((groupId: string) => { setOpenGroups(prev => ({ ...prev, [groupId]: !prev[groupId] })); }, []);
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   const currentPath = location.pathname;

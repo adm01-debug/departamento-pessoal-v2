@@ -5,9 +5,10 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Settings, LogOut, Shield, HelpCircle } from 'lucide-react';
+import { User, Settings, LogOut, Shield, HelpCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface UserProfileMenuProps {
   user?: { name: string; email: string; avatar?: string };
@@ -16,7 +17,21 @@ interface UserProfileMenuProps {
 export function UserProfileMenu({ user }: UserProfileMenuProps) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const initials = user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'US';
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      toast.success('Sessão encerrada com sucesso');
+      navigate('/login');
+    } catch (error: any) {
+      toast.error('Erro ao sair: ' + (error.message || 'Erro desconhecido'));
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -38,7 +53,6 @@ export function UserProfileMenu({ user }: UserProfileMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 glass border-border/50 rounded-xl p-1.5">
-        {/* User info header */}
         <div className="px-3 py-3 mb-1">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 ring-2 ring-border/30">
@@ -59,7 +73,7 @@ export function UserProfileMenu({ user }: UserProfileMenuProps) {
 
         <DropdownMenuSeparator className="bg-border/30" />
 
-        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="gap-3 py-2.5 rounded-lg cursor-pointer">
+        <DropdownMenuItem onClick={() => navigate('/perfil')} className="gap-3 py-2.5 rounded-lg cursor-pointer">
           <div className="p-1.5 rounded-lg bg-accent/80"><User className="h-3.5 w-3.5" /></div>
           <div>
             <p className="text-sm font-body font-medium">Meu Perfil</p>
@@ -75,7 +89,7 @@ export function UserProfileMenu({ user }: UserProfileMenuProps) {
           </div>
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="gap-3 py-2.5 rounded-lg cursor-pointer">
+        <DropdownMenuItem onClick={() => navigate('/seguranca')} className="gap-3 py-2.5 rounded-lg cursor-pointer">
           <div className="p-1.5 rounded-lg bg-accent/80"><Shield className="h-3.5 w-3.5" /></div>
           <div>
             <p className="text-sm font-body font-medium">Segurança</p>
@@ -94,10 +108,13 @@ export function UserProfileMenu({ user }: UserProfileMenuProps) {
         <DropdownMenuSeparator className="bg-border/30" />
 
         <DropdownMenuItem
-          onClick={() => signOut()}
+          onClick={handleSignOut}
+          disabled={isLoggingOut}
           className="gap-3 py-2.5 rounded-lg cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
         >
-          <div className="p-1.5 rounded-lg bg-destructive/10"><LogOut className="h-3.5 w-3.5" /></div>
+          <div className="p-1.5 rounded-lg bg-destructive/10">
+            {isLoggingOut ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
+          </div>
           <div>
             <p className="text-sm font-body font-medium">Sair</p>
             <p className="text-[11px] text-muted-foreground">Encerrar sessão</p>

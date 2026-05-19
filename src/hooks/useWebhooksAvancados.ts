@@ -1,53 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { webhookService } from '@/services/webhookService';
 import { useEmpresas } from './useEmpresas';
-import { toast } from 'sonner';
+import { useGenericCrud } from './useGenericCrud';
 
 export function useWebhooksAvancados() {
   const { empresaAtual } = useEmpresas();
-  const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
 
-  const query = useQuery({
-    queryKey: ['webhooks', empresaId],
-    queryFn: () => webhookService.listar(empresaId),
-    enabled: !!empresaId,
-  });
-
-  const criarMutation = useMutation({
-    mutationFn: (data: any) => webhookService.criar({ ...data, empresa_id: empresaId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
-      toast.success('Webhook criado');
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => webhookService.atualizar(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
-      toast.success('Webhook atualizado');
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const excluirMutation = useMutation({
-    mutationFn: (id: string) => webhookService.excluir(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
-      toast.success('Webhook excluído');
-    },
-    onError: (err: Error) => toast.error(err.message),
+  const crud = useGenericCrud<any>({
+    queryKey: 'webhooks',
+    service: webhookService,
+    filters: { empresa_id: empresaId },
   });
 
   return {
-    webhooks: query.data || [],
-    isLoading: query.isLoading,
-    criar: criarMutation.mutateAsync,
-    atualizar: atualizarMutation.mutateAsync,
-    excluir: excluirMutation.mutateAsync,
-    refetch: query.refetch,
+    ...crud,
+    webhooks: crud.items,
   };
 }
 
