@@ -1,5 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 
 export interface ListOptions {
   search?: string;
@@ -26,18 +25,22 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
     } = {}
   ) {}
 
+  protected getQuery() {
+    return (supabase as any).from(this.table);
+  }
+
   async listar(options: ListOptions = {}): Promise<ListResponse<T>> {
     const { 
       search, 
       page = 1, 
       pageSize = 10, 
-      orderBy = this.options.defaultOrderBy || 'created_at', 
+      orderBy = this.options.defaultOrderBy || 'nome', 
       orderAscending = true,
       filters = {},
       searchColumn = this.options.searchColumn || 'nome'
     } = options;
 
-    let query = supabase.from(this.table).select('*', { count: 'exact' });
+    let query = this.getQuery().select('*', { count: 'exact' });
 
     // Aplicar filtros dinâmicos
     Object.entries(filters).forEach(([key, value]) => {
@@ -62,8 +65,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async buscarPorId(id: string): Promise<T | null> {
-    const { data, error } = await supabase
-      .from(this.table)
+    const { data, error } = await this.getQuery()
       .select('*')
       .eq('id', id)
       .maybeSingle();
@@ -73,8 +75,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async criar(payload: CreateDTO): Promise<T> {
-    const { data, error } = await supabase
-      .from(this.table)
+    const { data, error } = await this.getQuery()
       .insert(payload as any)
       .select()
       .maybeSingle();
@@ -85,11 +86,10 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async atualizar(id: string, payload: UpdateDTO): Promise<T> {
-    let query = supabase.from(this.table).update(payload as any).eq('id', id);
+    let query = this.getQuery().update(payload as any).eq('id', id);
 
     if (this.options.useVersioning) {
-      const { data: current, error: currentError } = await supabase
-        .from(this.table)
+      const { data: current, error: currentError } = await this.getQuery()
         .select('version')
         .eq('id', id)
         .single();
@@ -106,7 +106,8 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async excluir(id: string): Promise<void> {
-    const { error } = await supabase.from(this.table).delete().eq('id', id);
+    const { error } = await this.getQuery().delete().eq('id', id);
     if (error) throw error;
   }
 }
+
