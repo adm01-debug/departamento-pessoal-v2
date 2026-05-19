@@ -20,7 +20,8 @@ export default function CargosPage() {
     pageSize,
     search,
     setSearch,
-    refetch
+    refetch,
+    isRefreshing
   } = useCargos();
 
   const handleSearchChange = useCallback((val: string) => {
@@ -55,6 +56,7 @@ export default function CargosPage() {
       onPageChange={handlePageChange}
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
+      isRefreshing={isRefreshing}
       onAdd={() => console.log('Novo cargo')}
       addLabel="Novo Cargo"
       actions={

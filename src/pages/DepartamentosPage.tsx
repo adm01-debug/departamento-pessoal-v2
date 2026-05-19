@@ -23,7 +23,8 @@ export default function DepartamentosPage() {
     pageSize, 
     search, 
     setSearch,
-    refetch
+    refetch,
+    isRefreshing
   } = useDepartamentos();
 
   const handleSearchChange = useCallback((val: string) => {
@@ -61,6 +62,7 @@ export default function DepartamentosPage() {
         onPageChange={handlePageChange}
         onSearchChange={handleSearchChange}
         onRefetch={refetch}
+        isRefreshing={isRefreshing}
         onAdd={abrirNovo}
         addLabel="Novo Departamento"
         actions={

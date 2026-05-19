@@ -36,6 +36,7 @@ export function useGenericCrud<T>({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [search, setSearch] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Reset page on search or filter change
   useEffect(() => {
@@ -94,8 +95,13 @@ export function useGenericCrud<T>({
     },
   });
 
-  const refetch = useCallback(() => {
-    void query.refetch();
+  const refetch = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await query.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [query]);
 
   return {
@@ -114,6 +120,7 @@ export function useGenericCrud<T>({
     atualizar: atualizarMutation.mutateAsync,
     excluir: excluirMutation.mutateAsync,
     refetch,
+    isRefreshing,
     isCreating: criarMutation.isPending,
     isUpdating: atualizarMutation.isPending,
     isDeleting: excluirMutation.isPending,
