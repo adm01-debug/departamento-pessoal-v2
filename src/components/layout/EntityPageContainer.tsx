@@ -90,7 +90,7 @@ export function EntityPageContainer<T extends { id: string | number }>({
           <DataTableToolbar 
             search={search} 
             onSearchChange={onSearchChange} 
-            searchPlaceholder={searchPlaceholder || `Buscar por nome...`} 
+            searchPlaceholder={searchPlaceholder || `Buscar por nome...`}
           />
         )}
 
