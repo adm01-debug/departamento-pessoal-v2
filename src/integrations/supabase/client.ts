@@ -44,7 +44,9 @@ interface BridgePayload {
   filters?: Filter[];
   order?: { column: string; ascending?: boolean };
   limit?: number;
+  offset?: number;
   single?: boolean;
+  countMode?: string;
   params?: any;
 }
 
@@ -77,7 +79,7 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
-    return { data, error: null };
+    return { data, count: json.count, error: null };
   } catch (err: any) {
     return { data: null, error: { message: err?.message || 'Network error' } };
   }
@@ -100,8 +102,11 @@ const createQueryBuilder = (table: string) => {
   };
 
   const builder: any = {
-    select: (columns = '*') => {
+    select: (columns = '*', options: any = {}) => {
       state.payload.columns = columns;
+      if (options.count) {
+        state.payload.countMode = options.count;
+      }
       return builder;
     },
     insert: (data: any) => {
@@ -145,6 +150,7 @@ const createQueryBuilder = (table: string) => {
       return builder;
     },
     range: (from: number, to: number) => {
+      state.payload.offset = from;
       state.payload.limit = to - from + 1;
       return builder;
     },

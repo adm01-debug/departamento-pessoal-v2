@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, Cloud } from 'lucide-react';
 import { NotificationCenter } from '@/components/ui/notification-center';
 import { UserProfileMenu } from '@/components/ui/user-profile-menu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -55,20 +55,28 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         </button>
       </div>
 
-      <div className="flex items-center gap-1.5">
-        {/* Company badge in header (mobile-visible) */}
-        <div className="lg:hidden">
-          <EmpresaSelector 
-            collapsed={false}
-            empresaAtual={empresaAtual}
-            userEmpresas={userEmpresas}
-            temMultiplasEmpresas={temMultiplasEmpresas}
-            trocarEmpresa={trocarEmpresa}
-          />
+      <div className="flex items-center gap-3">
+        {/* Sync Status Badge */}
+        <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/5 border border-success/20 text-[10px] font-bold text-success uppercase tracking-wider animate-pulse-subtle">
+          <Cloud className="h-3 w-3" />
+          External DB Connected
         </div>
-        <ThemeToggle />
-        <NotificationCenter />
-        <UserProfileMenu user={user} />
+
+        <div className="flex items-center gap-1.5">
+          {/* Company badge in header (mobile-visible) */}
+          <div className="lg:hidden">
+            <EmpresaSelector 
+              collapsed={false}
+              empresaAtual={empresaAtual}
+              userEmpresas={userEmpresas}
+              temMultiplasEmpresas={temMultiplasEmpresas}
+              trocarEmpresa={trocarEmpresa}
+            />
+          </div>
+          <ThemeToggle />
+          <NotificationCenter />
+          <UserProfileMenu user={user} />
+        </div>
       </div>
     </header>
   );

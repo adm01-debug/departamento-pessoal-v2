@@ -1,53 +1,48 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cargoService } from '@/services/cargoService';
-import { useEmpresas } from './useEmpresas';
+import { empresaService } from '@/services';
 import { toast } from 'sonner';
 import { useState } from 'react';
 
-export function useCargos() {
-  const { empresaAtual } = useEmpresas();
+export function useTodasEmpresas() {
   const queryClient = useQueryClient();
-  const empresaId = empresaAtual?.id;
-
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = useState(12);
   const [search, setSearch] = useState('');
 
   const query = useQuery({
-    queryKey: ['cargos', { empresaId, search, page, pageSize }],
-    queryFn: () => cargoService.listar({ empresaId, search, page, pageSize }),
-    enabled: true,
+    queryKey: ['todas-empresas-list', { search, page, pageSize }],
+    queryFn: () => empresaService.list({ search, page, pageSize }),
   });
 
   const criarMutation = useMutation({
-    mutationFn: (data: any) => cargoService.criar({ ...data, empresa_id: empresaId }),
+    mutationFn: (data: any) => empresaService.criar(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cargos'] });
-      toast.success('Cargo criado');
+      queryClient.invalidateQueries({ queryKey: ['todas-empresas-list'] });
+      toast.success('Empresa criada');
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => cargoService.atualizar(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => empresaService.atualizar(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cargos'] });
-      toast.success('Cargo atualizado');
+      queryClient.invalidateQueries({ queryKey: ['todas-empresas-list'] });
+      toast.success('Empresa atualizada');
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => cargoService.excluir(id),
+    mutationFn: (id: string) => empresaService.excluir(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cargos'] });
-      toast.success('Cargo excluído');
+      queryClient.invalidateQueries({ queryKey: ['todas-empresas-list'] });
+      toast.success('Empresa excluída');
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   return {
-    cargos: query.data?.data || [],
+    empresas: query.data?.data || [],
     total: query.data?.total || 0,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
