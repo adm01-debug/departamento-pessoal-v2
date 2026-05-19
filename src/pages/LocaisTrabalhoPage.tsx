@@ -21,13 +21,15 @@ export default function LocaisTrabalhoPage() {
     total,
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
     search,
     setSearch,
     criar, 
-    excluir 
+    excluir,
+    refetch
   } = useLocaisTrabalho();
   
   const [showForm, setShowForm] = useState(false);
@@ -36,6 +38,12 @@ export default function LocaisTrabalhoPage() {
   useEffect(() => {
     setPage(1);
   }, [search, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de locais");
+    }
+  }, [error]);
 
   const handleSubmit = async () => {
     if (!form.nome) return;
