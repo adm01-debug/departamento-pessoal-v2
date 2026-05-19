@@ -156,7 +156,10 @@ export default function ColaboradoresPage() {
           {statusOptions.map((opt, i) => {
             const statusKey = opt.value;
             const isActive = status === statusKey;
-            const count = summary ? (summary as any)[statusKey] || 0 : '-';
+            
+            if (!summary && isLoading) return <StatCardSkeleton key={i} />;
+            
+            const count = summary ? (summary as any)[statusKey] || 0 : 0;
             
             return (
               <motion.button
@@ -166,21 +169,33 @@ export default function ColaboradoresPage() {
                 transition={{ delay: i * 0.1 }}
                 onClick={() => setStatus(isActive ? 'all' : statusKey)}
                 className={cn(
-                  "p-4 rounded-2xl border transition-all text-left group",
+                  "p-4 rounded-2xl border transition-all text-left group relative overflow-hidden",
                   isActive 
                     ? "bg-primary/5 border-primary shadow-sm" 
                     : "bg-card/50 border-border/40 hover:border-primary/20 hover:bg-card"
                 )}
               >
+                {isActive && (
+                  <motion.div 
+                    layoutId="active-indicator"
+                    className="absolute top-0 left-0 w-[2px] h-full bg-primary"
+                  />
+                )}
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
                   {opt.label}
                 </p>
-                <p className={cn(
-                  "text-2xl font-display font-bold",
-                  isActive ? "text-primary" : "text-foreground"
-                )}>
-                  {count}
-                </p>
+                <div className="flex items-end justify-between">
+                  <p className={cn(
+                    "text-2xl font-display font-bold",
+                    isActive ? "text-primary" : "text-foreground"
+                  )}>
+                    {count}
+                  </p>
+                  <Users className={cn(
+                    "h-4 w-4 transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground/30"
+                  )} />
+                </div>
               </motion.button>
             );
           })}
