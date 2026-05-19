@@ -6,6 +6,7 @@ import {
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
