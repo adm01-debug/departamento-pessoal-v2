@@ -21,6 +21,7 @@ interface DataTableToolbarProps {
     onChange: (value: string) => void;
   }>;
   onClearFilters?: () => void;
+  onRefresh?: () => void;
   className?: string;
 }
 
