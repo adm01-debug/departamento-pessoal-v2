@@ -196,6 +196,28 @@ const SidebarMenuGroup = memo(function SidebarMenuGroup({ group, collapsed, curr
   );
 });
 
+const ColaboradoresCount = memo(function ColaboradoresCount() {
+  const { data: count, isLoading } = useQuery({
+    queryKey: ['sidebar-colaboradores-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('colaboradores')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'ativo');
+      return count || 0;
+    },
+    staleTime: 60000,
+  });
+
+  if (isLoading || !count) return null;
+
+  return (
+    <span className="ml-auto bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-1 ring-primary/20">
+      {count}
+    </span>
+  );
+});
+
 const SystemStatus = memo(function SystemStatus({ collapsed }: { collapsed: boolean }) {
   const { data: isHealthy, isLoading } = useQuery({
     queryKey: ['system-health'],
