@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Building2, Edit, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -23,6 +24,15 @@ export default function EmpresasPage() {
     refetch
   } = useTodasEmpresas();
 
+  const handleSearchChange = useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, [setSearch, setPage]);
+
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+  }, [setPage]);
+
   return (
     <EntityGridPageContainer<Empresa>
       pageTitle="Empresas"
@@ -41,8 +51,8 @@ export default function EmpresasPage() {
       page={page}
       pageSize={pageSize}
       search={search}
-      onPageChange={setPage}
-      onSearchChange={setSearch}
+      onPageChange={handlePageChange}
+      onSearchChange={handleSearchChange}
       onRefetch={refetch}
       actions={
         <Button

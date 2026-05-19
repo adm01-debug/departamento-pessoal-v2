@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useCargos } from '@/hooks/useCargos';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,15 @@ export default function CargosPage() {
     refetch
   } = useCargos();
 
+  const handleSearchChange = useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, [setSearch, setPage]);
+
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+  }, [setPage]);
+
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
@@ -42,8 +52,8 @@ export default function CargosPage() {
       page={page}
       pageSize={pageSize}
       search={search}
-      onPageChange={setPage}
-      onSearchChange={setSearch}
+      onPageChange={handlePageChange}
+      onSearchChange={handleSearchChange}
       onRefetch={refetch}
       actions={
         <Button className="rounded-xl bg-gradient-to-r from-warning to-info hover:opacity-90 shadow-lg font-bold">

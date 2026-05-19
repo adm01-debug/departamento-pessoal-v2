@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,15 @@ export default function DepartamentosPage() {
     setSearch,
     refetch
   } = useDepartamentos();
+
+  const handleSearchChange = useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, [setSearch, setPage]);
+
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+  }, [setPage]);
   const navigate = useNavigate();
 
   const abrirNovo = () => { setEditando(null); setDialogOpen(true); };
@@ -49,8 +58,8 @@ export default function DepartamentosPage() {
         page={page}
         pageSize={pageSize}
         search={search}
-        onPageChange={setPage}
-        onSearchChange={setSearch}
+        onPageChange={handlePageChange}
+        onSearchChange={handleSearchChange}
         onRefetch={refetch}
         actions={
           <div className="flex gap-2">

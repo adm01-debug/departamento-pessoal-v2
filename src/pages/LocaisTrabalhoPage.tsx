@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useLocaisTrabalho } from '@/hooks/useLocaisTrabalho';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,12 +27,14 @@ export default function LocaisTrabalhoPage() {
     refetch
   } = useLocaisTrabalho();
   
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ nome: '', endereco: '', cidade: '', uf: '', cep: '', telefone: '' });
-
-  useEffect(() => {
+  const handleSearchChange = useCallback((val: string) => {
+    setSearch(val);
     setPage(1);
-  }, [search, setPage]);
+  }, [setSearch, setPage]);
+
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+  }, [setPage]);
 
   const handleSubmit = async () => {
     if (!form.nome) return;
@@ -59,8 +61,8 @@ export default function LocaisTrabalhoPage() {
       page={page}
       pageSize={pageSize}
       search={search}
-      onPageChange={setPage}
-      onSearchChange={setSearch}
+      onPageChange={handlePageChange}
+      onSearchChange={handleSearchChange}
       onRefetch={refetch}
       actions={
         <Button onClick={() => setShowForm(!showForm)} className="rounded-xl shadow-glow">
