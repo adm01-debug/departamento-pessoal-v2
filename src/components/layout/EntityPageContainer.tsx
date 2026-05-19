@@ -66,8 +66,10 @@ export function EntityPageContainer<T extends { id: string | number }>({
   entityName,
   columns,
   renderRow,
-  stats
+  stats,
+  customFilters
 }: EntityPageContainerProps<T>) {
+
   const totalPages = Math.ceil(total / pageSize);
   const hasFilters = search !== '';
 
