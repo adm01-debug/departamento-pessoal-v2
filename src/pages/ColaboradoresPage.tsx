@@ -13,6 +13,9 @@ import { usePDFExport } from '@/hooks/usePDFExport';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
 import { useColaboradores } from '@/hooks/useColaboradores';
+import { useEmpresas } from '@/hooks/useEmpresas';
+import { colaboradorService } from '@/services/colaboradorService';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +32,7 @@ export default function ColaboradoresPage() {
   const { cargos } = useCargos();
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
+  const { empresaAtual } = useEmpresas();
 
   const { 
     colaboradores, 
@@ -83,22 +87,67 @@ export default function ColaboradoresPage() {
     { value: 'afastado', label: `Afastados` },
   ];
 
-  const handleExportExcel = () => {
-    if (!colaboradores.length) return;
-    exportarExcel(
-      'Relatório de Colaboradores',
-      colaboradores,
-      ['nome_completo', 'cpf', 'cargo', 'departamento', 'status', 'data_admissao', 'email']
-    );
+  const handleExportExcel = async () => {
+    if (!empresaAtual?.id) return;
+    try {
+      toast.info('Preparando exportação completa...');
+      // Fetch all data for the current filter (ignoring pagination)
+      const { data } = await colaboradorService.listar({
+        pageSize: 5000,
+        filters: {
+          empresaId: empresaAtual.id,
+          status,
+          departamento,
+          cargo
+        },
+        search
+      });
+
+      if (!data.length) {
+        toast.error('Nenhum dado encontrado para exportar');
+        return;
+      }
+
+      exportarExcel(
+        'Relatório de Colaboradores',
+        data,
+        ['nome_completo', 'cpf', 'cargo', 'departamento', 'status', 'data_admissao', 'email']
+      );
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('Falha ao exportar dados');
+    }
   };
 
-  const handleExportPDF = () => {
-    if (!colaboradores.length) return;
-    exportarPDF(
-      'Relatório de Colaboradores',
-      colaboradores,
-      ['nome_completo', 'cpf', 'cargo', 'departamento', 'status']
-    );
+  const handleExportPDF = async () => {
+    if (!empresaAtual?.id) return;
+    try {
+      toast.info('Preparando PDF...');
+      const { data } = await colaboradorService.listar({
+        pageSize: 1000,
+        filters: {
+          empresaId: empresaAtual.id,
+          status,
+          departamento,
+          cargo
+        },
+        search
+      });
+
+      if (!data.length) {
+        toast.error('Nenhum dado encontrado para exportar');
+        return;
+      }
+
+      exportarPDF(
+        'Relatório de Colaboradores',
+        data,
+        ['nome_completo', 'cpf', 'cargo', 'departamento', 'status']
+      );
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('Falha ao exportar PDF');
+    }
   };
 
   return (
