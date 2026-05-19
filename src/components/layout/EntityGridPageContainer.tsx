@@ -70,7 +70,9 @@ export function EntityGridPageContainer<T extends { id: string | number }>({
   stats,
   gridClassName = "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
   skeletonCount = 6,
-  customFilters
+  customFilters,
+  onAdd,
+  addLabel
 }: EntityGridPageContainerProps<T>) {
   const totalPages = Math.ceil(total / pageSize);
   const hasFilters = search !== '';
