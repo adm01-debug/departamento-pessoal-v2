@@ -57,7 +57,15 @@ export interface Colaborador {
   version?: number;
   created_at?: string;
   avatar_url?: string;
+  foto_url?: string;
+  data_admissao?: string;
+  salario_base?: number;
+  cidade?: string;
+  uf?: string;
+  observacoes?: string;
+  matricula?: string;
 }
+
 
 export interface Ferias {
   id: string;
