@@ -23,12 +23,27 @@ export interface Departamento {
 
 export interface Empresa {
   id: string;
-  nome_fantasia: string;
+  nome_fantasia: string | null;
   razao_social: string;
-  cnpj: string;
-  ativo?: boolean;
+  cnpj: string | null;
+  inscricao_estadual?: string | null;
+  inscricao_municipal?: string | null;
+  cep?: string | null;
+  logradouro?: string | null;
+  numero?: string | null;
+  complemento?: string | null;
+  bairro?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+  telefone?: string | null;
+  email?: string | null;
+  logo_url?: string | null;
+  ativa?: boolean;
+  ativo?: boolean; // added both for compatibility
   created_at?: string;
+  updated_at?: string;
 }
+
 
 export interface Colaborador {
   id: string;
