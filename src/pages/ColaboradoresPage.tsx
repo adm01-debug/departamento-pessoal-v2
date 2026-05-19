@@ -10,7 +10,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
-import { Eye, Edit, Users, Download, FileSpreadsheet, FileText, FilterX } from 'lucide-react';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
+import { Eye, Edit, Users, Download, FileSpreadsheet, FileText, FilterX, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,6 +40,7 @@ export default function ColaboradoresPage() {
     total,
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
@@ -48,13 +51,20 @@ export default function ColaboradoresPage() {
     departamento,
     setDepartamento,
     cargo,
-    setCargo
+    setCargo,
+    refetch
   } = useColaboradores();
 
   // Resetar página ao mudar filtros
   useEffect(() => {
     setPage(1);
   }, [search, status, departamento, cargo, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de colaboradores");
+    }
+  }, [error]);
 
   // Para o resumo superior, ainda podemos precisar de contagens reais. 
   // Mas como agora é paginado no servidor, as contagens seriam apenas da página atual se usarmos useMemo.
@@ -174,7 +184,9 @@ export default function ColaboradoresPage() {
             }}
           />
 
-          {isLoading ? (
+          {error ? (
+            <SyncErrorState error={error} onRetry={refetch} entityName="colaboradores" />
+          ) : isLoading ? (
             <div className="rounded-2xl border border-border/30 overflow-hidden bg-card/30">
               <div className="p-1">
                 {Array.from({ length: 8 }).map((_, i) => (

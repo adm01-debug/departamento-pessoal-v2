@@ -8,10 +8,12 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Plus, Search, Info, FilterX } from 'lucide-react';
+import { Briefcase, Plus, Search, Info, FilterX, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
 
 export default function CargosPage() {
   const { 
@@ -19,11 +21,13 @@ export default function CargosPage() {
     total, 
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
     search,
-    setSearch
+    setSearch,
+    refetch
   } = useCargos();
 
   // Actually, looking at my previous hook update for useCargos, it doesn't take params yet for page/pageSize in the returned object if I didn't change the state.
@@ -33,6 +37,13 @@ export default function CargosPage() {
   useEffect(() => {
     setPage(1);
   }, [search, setPage]);
+
+  // Toast de erro se a query falhar
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização com banco externo");
+    }
+  }, [error]);
 
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const totalPages = Math.ceil(total / pageSize);
@@ -64,7 +75,9 @@ export default function CargosPage() {
           searchPlaceholder="Buscar por nome ou CBO..." 
         />
 
-        {isLoading ? (
+        {error ? (
+          <SyncErrorState error={error} onRetry={refetch} entityName="cargos" />
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center p-12 gap-4">
             <Spinner size="lg" />
             <p className="text-sm text-muted-foreground animate-pulse">Carregando cargos...</p>

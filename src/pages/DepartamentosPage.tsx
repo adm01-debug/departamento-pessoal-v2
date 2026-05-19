@@ -8,11 +8,13 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Building2, Plus, GitBranch, ArrowRight, Wallet, FilterX } from 'lucide-react';
+import { Building2, Plus, GitBranch, ArrowRight, Wallet, FilterX, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { NovoDepartamentoDialog } from '@/components/departamentos/NovoDepartamentoDialog';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
 
 export default function DepartamentosPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -22,11 +24,13 @@ export default function DepartamentosPage() {
     total, 
     isLoading, 
     isFetching,
+    error,
     page, 
     setPage, 
     pageSize, 
     search, 
-    setSearch 
+    setSearch,
+    refetch
   } = useDepartamentos();
   const navigate = useNavigate();
 
@@ -39,6 +43,12 @@ export default function DepartamentosPage() {
   useEffect(() => {
     setPage(1);
   }, [search, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de departamentos");
+    }
+  }, [error]);
 
   const hasFilters = search !== '';
 
@@ -67,7 +77,9 @@ export default function DepartamentosPage() {
           searchPlaceholder="Buscar departamento por nome..." 
         />
 
-        {isLoading ? (
+        {error ? (
+          <SyncErrorState error={error} onRetry={refetch} entityName="departamentos" />
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center p-12 gap-4">
             <Spinner size="lg" />
             <p className="text-sm text-muted-foreground animate-pulse">Carregando departamentos...</p>

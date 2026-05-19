@@ -6,10 +6,11 @@ import { useOrganograma } from '@/hooks/useOrganograma';
 import { OrganogramaNode } from '@/components/organograma/OrganogramaNode';
 import { Network, Users, Building2, TrendingUp, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
 import { useState, useMemo } from 'react';
 
 export default function OrganogramaPage() {
-  const { dados, isLoading } = useOrganograma();
+  const { dados, isLoading, error, refetch } = useOrganograma();
   const [search, setSearch] = useState('');
 
   const stats = useMemo(() => {
@@ -77,7 +78,9 @@ export default function OrganogramaPage() {
         </div>
 
         {/* Visualização da Árvore */}
-        {isLoading ? (
+        {error ? (
+          <SyncErrorState error={error} onRetry={refetch} entityName="organograma" />
+        ) : isLoading ? (
           <div className="flex justify-center py-20"><Spinner size="lg" /></div>
         ) : dados.length > 0 ? (
           <div className="space-y-4 max-w-4xl mx-auto">

@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, MapPin, Search, FilterX } from 'lucide-react';
+import { Plus, Trash2, MapPin, Search, FilterX, RefreshCw } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LocaisTrabalhoPage() {
@@ -19,13 +21,15 @@ export default function LocaisTrabalhoPage() {
     total,
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
     search,
     setSearch,
     criar, 
-    excluir 
+    excluir,
+    refetch
   } = useLocaisTrabalho();
   
   const [showForm, setShowForm] = useState(false);
@@ -34,6 +38,12 @@ export default function LocaisTrabalhoPage() {
   useEffect(() => {
     setPage(1);
   }, [search, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de locais");
+    }
+  }, [error]);
 
   const handleSubmit = async () => {
     if (!form.nome) return;
@@ -142,7 +152,9 @@ export default function LocaisTrabalhoPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoading ? (
+                    {error ? (
+                      <TableRow><TableCell colSpan={6}><SyncErrorState error={error} onRetry={refetch} entityName="locais de trabalho" /></TableCell></TableRow>
+                    ) : isLoading ? (
                       <TableRow><TableCell colSpan={6} className="py-20 text-center"><Spinner size="lg" className="mx-auto" /></TableCell></TableRow>
                     ) : total === 0 ? (
                       <TableRow>
