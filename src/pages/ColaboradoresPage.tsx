@@ -184,7 +184,9 @@ export default function ColaboradoresPage() {
             }}
           />
 
-          {isLoading ? (
+          {error ? (
+            <SyncErrorState error={error} onRetry={refetch} entityName="colaboradores" />
+          ) : isLoading ? (
             <div className="rounded-2xl border border-border/30 overflow-hidden bg-card/30">
               <div className="p-1">
                 {Array.from({ length: 8 }).map((_, i) => (
