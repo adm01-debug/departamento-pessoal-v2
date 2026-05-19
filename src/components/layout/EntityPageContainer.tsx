@@ -109,16 +109,11 @@ export function EntityPageContainer<T extends { id: string | number }>({
             <TableSkeleton columns={columns.filter(c => !c.hidden).length} rows={pageSize} />
           </div>
         ) : total === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/10">
+          <div className="flex flex-col items-center justify-center border border-dashed rounded-2xl bg-muted/10 p-4">
             {hasFilters ? (
-              <>
-                <FilterX className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
-                <h3 className="text-lg font-display font-bold">Nenhum {entityName} encontrado</h3>
-                <p className="text-muted-foreground mb-6">Tente ajustar seus termos de busca.</p>
-                <Button variant="outline" onClick={() => onSearchChange('')} className="rounded-xl">Limpar Busca</Button>
-              </>
+              <EmptySearch search={search} onClear={() => onSearchChange('')} />
             ) : (
-              <EmptyList entityName={entityName} />
+              <EmptyList entityName={entityName} onCreate={onAdd} />
             )}
           </div>
         ) : (
