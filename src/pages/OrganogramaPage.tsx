@@ -78,7 +78,9 @@ export default function OrganogramaPage() {
         </div>
 
         {/* Visualização da Árvore */}
-        {isLoading ? (
+        {error ? (
+          <SyncErrorState error={error} onRetry={refetch} entityName="organograma" />
+        ) : isLoading ? (
           <div className="flex justify-center py-20"><Spinner size="lg" /></div>
         ) : dados.length > 0 ? (
           <div className="space-y-4 max-w-4xl mx-auto">
