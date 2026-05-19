@@ -6,7 +6,6 @@ interface LogEntry {
   nivel: LogLevel;
   mensagem: string;
   contexto: Record<string, unknown>;
-  stack_trace?: string;
   url: string;
   user_agent: string;
   created_at: string;
