@@ -75,7 +75,9 @@ export default function CargosPage() {
           searchPlaceholder="Buscar por nome ou CBO..." 
         />
 
-        {isLoading ? (
+        {error ? (
+          <SyncErrorState error={error} onRetry={refetch} entityName="cargos" />
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center p-12 gap-4">
             <Spinner size="lg" />
             <p className="text-sm text-muted-foreground animate-pulse">Carregando cargos...</p>
