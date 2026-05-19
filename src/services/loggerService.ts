@@ -18,11 +18,11 @@ let flushTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const loggerService = {
   async log(nivel: LogLevel, mensagem: string, contexto: Record<string, unknown> = {}, stackTrace?: string) {
+    const trace = stackTrace || (nivel === 'error' || nivel === 'fatal' ? new Error().stack : undefined);
     const logEntry: LogEntry = {
       nivel,
       mensagem,
-      contexto,
-      stack_trace: stackTrace || (nivel === 'error' || nivel === 'fatal' ? new Error().stack : undefined),
+      contexto: trace ? { ...contexto, stack_trace: trace } : contexto,
       url: window.location.href,
       user_agent: navigator.userAgent,
       created_at: new Date().toISOString()
