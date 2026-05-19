@@ -21,6 +21,7 @@ const MemoizedHeader = memo(Header);
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const { user, isReady, signOut } = useAuth();
 
   // Ativa o gesto de swipe para voltar em mobile
