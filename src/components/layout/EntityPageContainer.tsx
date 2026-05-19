@@ -98,9 +98,8 @@ export function EntityPageContainer<T extends { id: string | number }>({
         {error ? (
           <SyncErrorState error={error} onRetry={onRefetch} entityName={entityName + 's'} />
         ) : isLoading ? (
-          <div className="flex flex-col items-center justify-center p-12 gap-4">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground animate-pulse">Carregando {entityName}s...</p>
+          <div className="space-y-4">
+            <TableSkeleton columns={columns.filter(c => !c.hidden).length} rows={pageSize} />
           </div>
         ) : total === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/10">
