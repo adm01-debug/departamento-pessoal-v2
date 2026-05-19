@@ -159,6 +159,7 @@ const SidebarMenuItem = memo(function SidebarMenuItem({ item, isActive, collapse
       {!collapsed && (
         <>
           <span className="text-sm font-medium truncate flex-1">{item.label}</span>
+          {item.path === '/colaboradores' && <ColaboradoresCount />}
           {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
         </>
       )}
