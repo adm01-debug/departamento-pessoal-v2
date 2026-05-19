@@ -1,13 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { beneficioService } from '@/services/beneficioService';
 import { useEmpresas } from './useEmpresas';
-import { toast } from 'sonner';
 import { useGenericCrud } from './useGenericCrud';
 
 export function useBeneficios() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
-  const qc = useQueryClient();
 
   const crud = useGenericCrud<any>({
     queryKey: 'beneficios',
@@ -26,12 +24,19 @@ export function useBeneficios() {
     beneficios: crud.items,
     resumo: resumoQuery.data || {},
     isLoading: crud.isLoading || resumoQuery.isLoading,
-    criarBeneficio: { mutateAsync: crud.criar, mutate: crud.criar, isPending: crud.isCreating },
-    atualizarBeneficio: { mutateAsync: (args: { id: string, dados: any }) => crud.atualizar(args.id, args.dados), isPending: crud.isUpdating } as any,
-
-    excluirBeneficio: { mutateAsync: crud.excluir, isPending: crud.isDeleting },
+    criarBeneficio: { 
+      mutateAsync: crud.criar, 
+      mutate: crud.criar, 
+      isPending: crud.isCreating 
+    } as any,
+    atualizarBeneficio: { 
+      mutateAsync: (args: { id: string, dados: any }) => crud.atualizar(args.id, args.dados),
+      isPending: crud.isUpdating 
+    } as any,
+    excluirBeneficio: { 
+      mutateAsync: crud.excluir, 
+      isPending: crud.isDeleting 
+    } as any,
     tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
   };
 }
-
-
