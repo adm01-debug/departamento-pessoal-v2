@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { beneficioService } from '@/services/beneficioService';
 import { useEmpresas } from './useEmpresas';
 import { useGenericCrud } from './useGenericCrud';
@@ -25,16 +25,16 @@ export function useBeneficios() {
     resumo: resumoQuery.data || {},
     isLoading: crud.isLoading || resumoQuery.isLoading,
     criarBeneficio: { 
-      mutateAsync: crud.criar, 
-      mutate: crud.criar, 
+      mutateAsync: (data: any) => crud.criar(data), 
+      mutate: (data: any) => crud.criar(data), 
       isPending: crud.isCreating 
     } as any,
     atualizarBeneficio: { 
-      mutateAsync: (args: { id: string, dados: any }) => crud.atualizar(args.id, args.dados),
+      mutateAsync: (args: any) => crud.atualizar(args.id, args.dados),
       isPending: crud.isUpdating 
     } as any,
     excluirBeneficio: { 
-      mutateAsync: crud.excluir, 
+      mutateAsync: (id: string) => crud.excluir(id), 
       isPending: crud.isDeleting 
     } as any,
     tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
