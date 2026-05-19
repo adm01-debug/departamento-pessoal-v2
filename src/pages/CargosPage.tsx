@@ -5,7 +5,7 @@ import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { EmptyList } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/spinner';
+import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Briefcase, Plus, Search, Info, FilterX } from 'lucide-react';
@@ -14,10 +14,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 
 export default function CargosPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const pageSize = 15;
-  const { cargos, total, isLoading, isFetching } = useCargos(); // useCargos is already updated to handle pagination internally or we need to pass params
+  const { 
+    cargos, 
+    total, 
+    isLoading, 
+    isFetching,
+    page,
+    setPage,
+    pageSize,
+    search,
+    setSearch
+  } = useCargos();
 
   // Actually, looking at my previous hook update for useCargos, it doesn't take params yet for page/pageSize in the returned object if I didn't change the state.
   // Let me re-verify useCargos.ts
