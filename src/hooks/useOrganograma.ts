@@ -11,13 +11,10 @@ export function useOrganograma() {
     enabled: true,
     queryFn: async () => {
       // Buscar departamentos com informações de parentesco
+      // Removido filtro de empresa_id para departamentos pois não existe no schema externo
       const { data: deps, error: depsError } = await supabase
         .from('departamentos')
-        .select(`
-          *,
-          departamento_pai:departamentos!departamentos_departamento_pai_id_fkey(id, nome)
-        `)
-        .eq('empresa_id', empresaId || '')
+        .select('*')
         .order('nome');
 
       if (depsError) throw depsError;
@@ -26,8 +23,7 @@ export function useOrganograma() {
       const { data: cols, error: colsError } = await supabase
         .from('colaboradores')
         .select('id, nome_completo, cargo, departamento, email, foto_url')
-        .eq('empresa_id', empresaId || '')
-        .eq('status', 'ativo');
+        .eq('status', 'ativo' as any); // Type cast for status
 
       if (colsError) throw colsError;
 
