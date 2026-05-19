@@ -150,6 +150,7 @@ const createQueryBuilder = (table: string) => {
       return builder;
     },
     range: (from: number, to: number) => {
+      state.payload.offset = from;
       state.payload.limit = to - from + 1;
       return builder;
     },
