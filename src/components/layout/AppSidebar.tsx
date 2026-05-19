@@ -195,6 +195,43 @@ const SidebarMenuGroup = memo(function SidebarMenuGroup({ group, collapsed, curr
   );
 });
 
+const SystemStatus = memo(function SystemStatus({ collapsed }: { collapsed: boolean }) {
+  const { data: isHealthy, isLoading } = useQuery({
+    queryKey: ['system-health'],
+    queryFn: async () => {
+      try {
+        await edgeFunctionsService.checkExternalDb();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    refetchInterval: 60000, // Cada 1 minuto
+  });
+
+  if (collapsed) {
+    return (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <div className={cn("w-2 h-2 rounded-full", isLoading ? "bg-muted animate-pulse" : isHealthy ? "bg-success" : "bg-destructive")} />
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          {isLoading ? "Verificando..." : isHealthy ? "Sistema Online" : "Problemas na Conexão"}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-sidebar-accent/10 border border-sidebar-border/30">
+      <div className={cn("w-1.5 h-1.5 rounded-full", isLoading ? "bg-muted animate-pulse" : isHealthy ? "bg-success" : "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]")} />
+      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+        {isLoading ? "Verificando..." : isHealthy ? "Sistemas Online" : "Erro de Conexão"}
+      </span>
+    </div>
+  );
+});
+
 export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
