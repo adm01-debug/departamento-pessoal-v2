@@ -1,13 +1,10 @@
 // Centralized Services Export
 export { authService } from './authService';
 export { afastamentoService } from './afastamentoService';
-export { cargoService } from './cargoService';
-export { departamentoService } from './departamentoService';
 export { contratoService } from './contratoService';
 export { bancoHorasService } from './bancoHorasService';
 export { desligamentoService } from './desligamentoService';
 export { auditoriaService, notificacaoService } from './auditoriaService';
-export { localTrabalhoService } from './localTrabalhoService';
 export { historicoContratoService } from './historicoContratoService';
 export { horaExtraService } from './horaExtraService';
 export { intervaloService } from './intervaloService';
@@ -36,7 +33,10 @@ export { beneficioService } from './beneficioService';
 export * from './calculoBeneficiosService';
 export { catalogoCursoService } from './catalogoCursoService';
 
-// New Refactored Services
+// Refactored Services
+export { cargoService } from './cargoService';
+export { departamentoService } from './departamentoService';
+export { localTrabalhoService } from './localTrabalhoService';
 export { colaboradorService } from './colaboradorService';
 export { empresaService } from './empresaService';
 export { feriasService } from './feriasService';
@@ -46,3 +46,4 @@ export { admissaoService } from './admissaoService';
 
 // Utilities
 export const fgtsService = { calcular: (salario: number) => salario * 0.08 };
+
