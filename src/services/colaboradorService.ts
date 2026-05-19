@@ -51,8 +51,13 @@ class ColaboradorService extends BaseService<Colaborador> {
 
   // Alias for backward compatibility
   async list(empresaId?: string) {
-    return (await this.listar({ empresaId, pageSize: 1000 })).data;
+    return (await this.listar({ filters: { empresa_id: empresaId }, pageSize: 1000 })).data;
   }
+
+  async getById(id: string) { return this.buscarPorId(id); }
+  async create(d: any) { return this.criar(d); }
+  async update(id: string, d: any) { return this.atualizar(id, d); }
+
 }
 
 export const colaboradorService = new ColaboradorService();
