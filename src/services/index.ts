@@ -48,39 +48,58 @@ export * from './calculoBeneficiosService';
 
 
 export const colaboradorService = {
-  async list(empresaId?: string): Promise<any[]> {
-    let query = supabase.from('colaboradores').select('*').order('nome_completo');
+  async listar(options: { 
+    empresaId?: string; 
+    search?: string; 
+    page?: number; 
+    pageSize?: number;
+    status?: string;
+    departamento?: string;
+    cargo?: string;
+  } = {}): Promise<{ data: any[], total: number }> {
+    const { empresaId, search, page = 1, pageSize = 25, status, departamento, cargo } = options;
     
-    // Se empresaId for fornecido, filtra. Se não, traz tudo (útil para admins ou dados sem vínculo).
-    if (empresaId) {
-      query = query.eq('empresa_id', empresaId);
+    let query = supabase.from('colaboradores').select('*', { count: 'exact' });
+    
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    if (status && status !== 'all') query = query.eq('status', status as any);
+    if (departamento && departamento !== 'all') query = query.eq('departamento', departamento);
+    if (cargo && cargo !== 'all') query = query.eq('cargo', cargo);
+    
+    if (search) {
+      query = query.or(`nome_completo.ilike.%${search}%,cpf.ilike.%${search}%,email.ilike.%${search}%`);
     }
     
-    const { data, error } = await query;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    
+    const { data, count, error } = await query
+      .order('nome_completo', { ascending: true })
+      .range(from, to);
+      
     if (error) throw error;
-    return data || [];
+    return { data: (data as any[]) || [], total: count || 0 };
   },
 
-  listar: async (empresaId?: string) => colaboradorService.list(empresaId),
+  async list(empresaId?: string): Promise<any[]> {
+    const res = await colaboradorService.listar({ empresaId, pageSize: 1000 });
+    return res.data;
+  },
+
   async buscarPorId(id: string): Promise<any | null> {
-    
     const { data, error } = await supabase.from('colaboradores').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
-  
   },
   async getById(id: string) { return colaboradorService.buscarPorId(id); },
   async criar(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>): Promise<any> {
-    
     const { data, error } = await supabase.from('colaboradores').insert(d as any).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de colaborador foi retornado.');
     return data;
-  
   },
   async create(d: Partial<Database['public']['Tables']['colaboradores']['Insert']>) { return colaboradorService.criar(d); },
   async atualizar(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>): Promise<any> {
-    
     const { data: current } = await supabase.from('colaboradores').select('version').eq('id', id).single();
     const { data, error } = await supabase
       .from('colaboradores')
@@ -92,14 +111,11 @@ export const colaboradorService = {
     if (error) throw error;
     if (!data) throw new Error('Falha ao atualizar colaborador.');
     return data;
-  
   },
   async update(id: string, d: Partial<Database['public']['Tables']['colaboradores']['Update']>) { return colaboradorService.atualizar(id, d); },
   async excluir(id: string): Promise<void> {
-    
     const { error } = await supabase.from('colaboradores').delete().eq('id', id);
     if (error) throw error;
-  
   },
 };
 

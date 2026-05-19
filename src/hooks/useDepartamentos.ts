@@ -1,16 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { departamentoService } from '@/services/departamentoService';
-import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export function useDepartamentos() {
-  const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
-  const empresaId = empresaAtual?.id;
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState('');
 
   const query = useQuery({
-    queryKey: ['departamentos'],
-    queryFn: () => departamentoService.listar(),
+    queryKey: ['departamentos', { search, page, pageSize }],
+    queryFn: () => departamentoService.listar({ search, page, pageSize }),
   });
 
   const criarMutation = useMutation({
@@ -41,9 +42,17 @@ export function useDepartamentos() {
   });
 
   return {
-    departamentos: query.data || [],
+    departamentos: query.data?.data || [],
+    total: query.data?.total || 0,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     error: query.error,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    search,
+    setSearch,
     criar: criarMutation.mutateAsync,
     atualizar: atualizarMutation.mutateAsync,
     excluir: excluirMutation.mutateAsync,

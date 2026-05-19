@@ -1,7 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { PageTitle } from '@/components/PageTitle';
-import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { ColaboradorFilters } from '@/components/colaboradores/ColaboradorFilters';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,10 +10,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
-import { colaboradorService } from '@/services';
-import { Eye, Edit, Users, Download, FileSpreadsheet, FileText, Search, Filter } from 'lucide-react';
+import { Eye, Edit, Users, Download, FileSpreadsheet, FileText, FilterX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useEmpresa } from '@/contexts';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExcelExport } from '@/hooks/useExcelExport';
@@ -29,83 +26,74 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const PAGE_SIZE = 25;
-
 export default function ColaboradoresPage() {
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [deptoFilter, setDeptoFilter] = useState('');
-  const [cargoFilter, setCargoFilter] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
-  const { empresaAtual } = useEmpresa();
   const { departamentos } = useDepartamentos();
   const { cargos } = useCargos();
   const { exportarExcel } = useExcelExport();
   const { exportarPDF } = usePDFExport();
 
-  const { colaboradores, isLoading } = useColaboradores();
+  const { 
+    colaboradores, 
+    total,
+    isLoading, 
+    isFetching,
+    page,
+    setPage,
+    pageSize,
+    search,
+    setSearch,
+    status,
+    setStatus,
+    departamento,
+    setDepartamento,
+    cargo,
+    setCargo
+  } = useColaboradores();
 
-  const statusCounts = useMemo(() => {
-    if (!colaboradores) return {};
-    return colaboradores.reduce((acc: Record<string, number>, c) => {
-      acc[c.status] = (acc[c.status] || 0) + 1;
-      return acc;
-    }, {});
-  }, [colaboradores]);
+  // Resetar página ao mudar filtros
+  useEffect(() => {
+    setPage(1);
+  }, [search, status, departamento, cargo, setPage]);
 
+  // Para o resumo superior, ainda podemos precisar de contagens reais. 
+  // Mas como agora é paginado no servidor, as contagens seriam apenas da página atual se usarmos useMemo.
+  // O ideal seria uma query de agregação, mas por enquanto vamos manter estático ou simplificar.
   const statusOptions = [
-    { value: 'ativo', label: `Ativo (${statusCounts['ativo'] || 0})` },
-    { value: 'inativo', label: `Inativo (${statusCounts['inativo'] || 0})` },
-    { value: 'ferias', label: `Férias (${statusCounts['ferias'] || 0})` },
-    { value: 'afastado', label: `Afastado (${statusCounts['afastado'] || 0})` },
+    { value: 'ativo', label: `Ativos` },
+    { value: 'inativo', label: `Inativos` },
+    { value: 'ferias', label: `Em Férias` },
+    { value: 'afastado', label: `Afastados` },
   ];
 
-  const filtered = useMemo(() => {
-    return (colaboradores as any[])?.filter((c: any) => {
-      const matchSearch = !search || 
-        c.nome_completo.toLowerCase().includes(search.toLowerCase()) || 
-        c.cpf?.includes(search) ||
-        c.email?.toLowerCase().includes(search.toLowerCase());
-      
-      const matchStatus = !statusFilter || statusFilter === 'all' || c.status === statusFilter;
-      const matchDepto = !deptoFilter || deptoFilter === 'all' || c.departamento === deptoFilter;
-      const matchCargo = !cargoFilter || cargoFilter === 'all' || c.cargo === cargoFilter;
-      
-      return matchSearch && matchStatus && matchDepto && matchCargo;
-    }) || [];
-  }, [colaboradores, search, statusFilter, deptoFilter, cargoFilter]);
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-
-  const handleSearchChange = (v: string) => { setSearch(v); setCurrentPage(1); };
-  const handleStatusChange = (v: string) => { setStatusFilter(v); setCurrentPage(1); };
+  const totalPages = Math.ceil(total / pageSize);
 
   const handleExportExcel = () => {
-    if (!filtered.length) return;
+    if (!colaboradores.length) return;
     exportarExcel(
       'Relatório de Colaboradores',
-      filtered,
+      colaboradores,
       ['nome_completo', 'cpf', 'cargo', 'departamento', 'status', 'data_admissao', 'email']
     );
   };
 
   const handleExportPDF = () => {
-    if (!filtered.length) return;
+    if (!colaboradores.length) return;
     exportarPDF(
       'Relatório de Colaboradores',
-      filtered,
+      colaboradores,
       ['nome_completo', 'cpf', 'cargo', 'departamento', 'status']
     );
   };
+
+  const hasActiveFilters = search !== '' || status !== 'all' || departamento !== 'all' || cargo !== 'all';
 
   return (
     <>
       <PageTitle title="Colaboradores" />
       <PageLayout
         title="Colaboradores"
-        description={`Gestão analítica de ${filtered.length} talentos da organização`}
+        description={`Gestão analítica de ${total} talentos da organização`}
         icon={<Users className="h-5 w-5 text-primary-foreground" />}
         actions={
           <div className="flex items-center gap-2">
@@ -142,14 +130,14 @@ export default function ColaboradoresPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {statusOptions.map((opt, i) => {
               const statusKey = opt.value;
-              const isActive = statusFilter === statusKey;
+              const isActive = status === statusKey;
               return (
                 <motion.button
                   key={statusKey}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  onClick={() => handleStatusChange(isActive ? '' : statusKey)}
+                  onClick={() => setStatus(isActive ? 'all' : statusKey)}
                   className={cn(
                     "p-4 rounded-2xl border transition-all text-left group",
                     isActive 
@@ -158,13 +146,13 @@ export default function ColaboradoresPage() {
                   )}
                 >
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
-                    {opt.label.split(' (')[0]}
+                    {opt.label}
                   </p>
                   <p className={cn(
                     "text-2xl font-display font-bold",
                     isActive ? "text-primary" : "text-foreground"
                   )}>
-                    {statusCounts[statusKey] || 0}
+                    {isActive ? total : '-'}
                   </p>
                 </motion.button>
               );
@@ -172,12 +160,18 @@ export default function ColaboradoresPage() {
           </div>
 
           <ColaboradorFilters
-            onSearchChange={handleSearchChange}
-            onStatusChange={handleStatusChange}
-            onDeptoChange={(v) => { setDeptoFilter(v); setCurrentPage(1); }}
-            onCargoChange={(v) => { setCargoFilter(v); setCurrentPage(1); }}
+            onSearchChange={setSearch}
+            onStatusChange={setStatus}
+            onDeptoChange={setDepartamento}
+            onCargoChange={setCargo}
             departamentos={departamentos}
             cargos={cargos}
+            currentFilters={{
+              search,
+              status,
+              departamento,
+              cargo
+            }}
           />
 
           {isLoading ? (
@@ -197,14 +191,43 @@ export default function ColaboradoresPage() {
                 ))}
               </div>
             </div>
-          ) : !filtered?.length ? (
-            <EmptyList entityName="colaborador" onCreate={() => navigate('/colaboradores/novo')} />
+          ) : total === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/10">
+              {hasActiveFilters ? (
+                <>
+                  <FilterX className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
+                  <h3 className="text-lg font-display font-bold">Nenhum colaborador encontrado</h3>
+                  <p className="text-muted-foreground mb-6 text-center max-w-sm">
+                    Não encontramos colaboradores com os filtros aplicados.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setSearch('');
+                      setStatus('all');
+                      setDepartamento('all');
+                      setCargo('all');
+                    }} 
+                    className="rounded-xl"
+                  >
+                    Limpar Todos os Filtros
+                  </Button>
+                </>
+              ) : (
+                <EmptyList entityName="colaborador" onCreate={() => navigate('/colaboradores/novo')} />
+              )}
+            </div>
           ) : (
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
-              className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card/30 backdrop-blur-sm"
+              className="rounded-2xl border border-border/30 overflow-hidden shadow-elevated bg-card/30 backdrop-blur-sm relative"
             >
+              {isFetching && !isLoading && (
+                <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center z-10">
+                  <Spinner size="md" />
+                </div>
+              )}
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 border-b border-border/20">
@@ -216,7 +239,7 @@ export default function ColaboradoresPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(paginated as any[]).map((c: any, idx: number) => (
+                  {colaboradores.map((c: any) => (
                     <TableRow
                       key={c.id}
                       className="hover:bg-primary/5 border-b border-border/10 last:border-0 transition-colors cursor-pointer group"
@@ -273,11 +296,11 @@ export default function ColaboradoresPage() {
 
               <div className="p-4 border-t border-border/10 bg-muted/10">
                 <DataTablePagination
-                  currentPage={currentPage}
+                  currentPage={page}
                   totalPages={totalPages}
-                  totalItems={filtered.length}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setCurrentPage}
+                  totalItems={total}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
                 />
               </div>
             </motion.div>

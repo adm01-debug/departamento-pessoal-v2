@@ -56,10 +56,11 @@ export default function DocumentosPage() {
     queryFn: () => documentoService.listar(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
   });
 
-  const { data: colaboradores } = useQuery({
+  const { data: colaboradoresRes } = useQuery({
     queryKey: ['colaboradores-simples'],
-    queryFn: () => colaboradorService.listar(),
+    queryFn: () => colaboradorService.listar({ pageSize: 1000 }),
   });
+  const colaboradores = colaboradoresRes?.data || [];
 
   const deleteMutation = useMutation({
     mutationFn: async (doc: any) => {

@@ -1,13 +1,27 @@
 import { supabase } from '@/integrations/supabase/client';
 export const localTrabalhoService = {
-  async listar(empresaId?: string): Promise<any[]> {
+  async listar(options: { 
+    empresaId?: string; 
+    search?: string; 
+    page?: number; 
+    pageSize?: number;
+  } = {}): Promise<{ data: any[], total: number }> {
+    const { empresaId, search, page = 1, pageSize = 100 } = options;
     
-    let query = supabase.from('locais_trabalho').select('*').order('nome');
+    let query = supabase.from('locais_trabalho').select('*', { count: 'exact' });
+    
     if (empresaId) query = query.eq('empresa_id', empresaId);
-    const { data, error } = await query;
+    if (search) query = query.ilike('nome', `%${search}%`);
+    
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    
+    const { data, count, error } = await query
+      .order('nome', { ascending: true })
+      .range(from, to);
+      
     if (error) throw error;
-    return data || [];
-  
+    return { data: (data as any[]) || [], total: count || 0 };
   },
   
   async criar(d: any): Promise<any> {
