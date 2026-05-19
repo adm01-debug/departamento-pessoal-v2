@@ -120,14 +120,30 @@ export const colaboradorService = {
 };
 
 export const empresaService = {
-  async list(): Promise<any[]> {
+  async list(options: { 
+    search?: string; 
+    page?: number; 
+    pageSize?: number;
+  } = {}): Promise<{ data: any[], total: number }> {
+    const { search, page = 1, pageSize = 12 } = options;
     
-    const { data, error } = await supabase.from('empresas').select('*').order('razao_social');
+    let query = supabase.from('empresas').select('*', { count: 'exact' });
+    
+    if (search) {
+      query = query.or(`razao_social.ilike.%${search}%,nome_fantasia.ilike.%${search}%,cnpj.ilike.%${search}%`);
+    }
+    
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    
+    const { data, count, error } = await query
+      .order('razao_social', { ascending: true })
+      .range(from, to);
+      
     if (error) throw error;
-    return data || [];
-  
+    return { data: (data as any[]) || [], total: count || 0 };
   },
-  listar: async () => empresaService.list(),
+  listar: async (options?: any) => empresaService.list(options),
   async buscarPorId(id: string): Promise<any | null> {
     
     const { data, error } = await supabase.from('empresas').select('*').eq('id', id).maybeSingle();
