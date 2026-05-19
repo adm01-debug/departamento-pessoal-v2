@@ -27,6 +27,7 @@ interface EntityPageContainerProps<T> {
   isLoading: boolean;
   isFetching: boolean;
   error: any;
+  isRefreshing?: boolean;
   page: number;
   pageSize: number;
   search: string;
@@ -59,6 +60,7 @@ export function EntityPageContainer<T extends { id: string | number }>({
   isLoading,
   isFetching,
   error,
+  isRefreshing,
   page,
   pageSize,
   search,
@@ -96,6 +98,7 @@ export function EntityPageContainer<T extends { id: string | number }>({
             onSearchChange={onSearchChange} 
             searchPlaceholder={searchPlaceholder || `Buscar por nome...`}
             onRefresh={onRefetch}
+            isRefreshing={isRefreshing}
             onAdd={onAdd}
             addLabel={addLabel}
           />

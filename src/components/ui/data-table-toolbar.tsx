@@ -22,6 +22,7 @@ interface DataTableToolbarProps {
   }>;
   onClearFilters?: () => void;
   onRefresh?: () => void;
+  isRefreshing?: boolean;
   className?: string;
 }
 
@@ -35,6 +36,7 @@ export function DataTableToolbar({
   filters,
   onClearFilters,
   onRefresh,
+  isRefreshing,
   className
 }: DataTableToolbarProps) {
   const hasActiveFilters = filters?.some(f => f.value && f.value !== '' && f.value !== 'all');
@@ -110,10 +112,11 @@ export function DataTableToolbar({
                 variant="outline" 
                 size="sm" 
                 onClick={onRefresh}
-                className="h-11 w-11 p-0 rounded-xl bg-card/50 shadow-sm"
+                disabled={isRefreshing}
+                className="h-11 w-11 p-0 rounded-xl bg-card/50 shadow-sm transition-all active:scale-95"
                 title="Atualizar dados"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
               </Button>
             )}
 
