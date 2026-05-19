@@ -63,19 +63,20 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-1.5">
-        {/* Company badge in header (mobile-visible) */}
-        <div className="lg:hidden">
-          <EmpresaSelector 
-            collapsed={false}
-            empresaAtual={empresaAtual}
-            userEmpresas={userEmpresas}
-            temMultiplasEmpresas={temMultiplasEmpresas}
-            trocarEmpresa={trocarEmpresa}
-          />
+          {/* Company badge in header (mobile-visible) */}
+          <div className="lg:hidden">
+            <EmpresaSelector 
+              collapsed={false}
+              empresaAtual={empresaAtual}
+              userEmpresas={userEmpresas}
+              temMultiplasEmpresas={temMultiplasEmpresas}
+              trocarEmpresa={trocarEmpresa}
+            />
+          </div>
+          <ThemeToggle />
+          <NotificationCenter />
+          <UserProfileMenu user={user} />
         </div>
-        <ThemeToggle />
-        <NotificationCenter />
-        <UserProfileMenu user={user} />
       </div>
     </header>
   );
