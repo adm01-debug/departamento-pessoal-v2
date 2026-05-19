@@ -10,9 +10,10 @@ export function useAdmissoes() {
 
   const query = useQuery({
     queryKey: ['admissoes', empresaId],
-    queryFn: () => admissaoService.listar(empresaId),
+    queryFn: () => admissaoService.listarAdmissoes(empresaId),
     enabled: true,
   });
+
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => admissaoService.criar({ ...data, empresa_id: empresaId }),
