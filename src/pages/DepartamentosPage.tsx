@@ -77,7 +77,9 @@ export default function DepartamentosPage() {
           searchPlaceholder="Buscar departamento por nome..." 
         />
 
-        {isLoading ? (
+        {error ? (
+          <SyncErrorState error={error} onRetry={refetch} entityName="departamentos" />
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center p-12 gap-4">
             <Spinner size="lg" />
             <p className="text-sm text-muted-foreground animate-pulse">Carregando departamentos...</p>
