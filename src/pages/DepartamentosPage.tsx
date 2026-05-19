@@ -61,13 +61,12 @@ export default function DepartamentosPage() {
         onPageChange={handlePageChange}
         onSearchChange={handleSearchChange}
         onRefetch={refetch}
+        onAdd={abrirNovo}
+        addLabel="Novo Departamento"
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" className="rounded-xl font-bold" onClick={() => navigate('/organograma')}>
+            <Button variant="outline" className="h-11 rounded-xl font-bold bg-card/50 shadow-sm" onClick={() => navigate('/organograma')}>
               <GitBranch className="h-4 w-4 mr-2" />Ver Organograma
-            </Button>
-            <Button onClick={abrirNovo} className="rounded-xl bg-gradient-to-r from-info to-primary hover:opacity-90 shadow-lg font-bold">
-              <Plus className="h-4 w-4 mr-2" />Novo Departamento
             </Button>
           </div>
         }
