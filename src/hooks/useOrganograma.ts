@@ -54,6 +54,7 @@ export function useOrganograma() {
   return {
     dados: query.data || [],
     isLoading: query.isLoading,
+    error: query.error,
     refetch: query.refetch
   };
 }
