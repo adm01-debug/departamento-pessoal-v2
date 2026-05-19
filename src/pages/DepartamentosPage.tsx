@@ -24,11 +24,13 @@ export default function DepartamentosPage() {
     total, 
     isLoading, 
     isFetching,
+    error,
     page, 
     setPage, 
     pageSize, 
     search, 
-    setSearch 
+    setSearch,
+    refetch
   } = useDepartamentos();
   const navigate = useNavigate();
 
@@ -41,6 +43,12 @@ export default function DepartamentosPage() {
   useEffect(() => {
     setPage(1);
   }, [search, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de departamentos");
+    }
+  }, [error]);
 
   const hasFilters = search !== '';
 
