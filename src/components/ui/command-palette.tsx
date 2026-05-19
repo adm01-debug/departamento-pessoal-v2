@@ -93,8 +93,17 @@ function addRecentSearch(term: string) {
 }
 
 /* ─── Component ─── */
-export function CommandPalette() {
-  const [open, setOpen] = useState(false);
+export function CommandPalette({ 
+  open: externalOpen, 
+  onOpenChange: setExternalOpen 
+}: { 
+  open?: boolean; 
+  onOpenChange?: (open: boolean) => void 
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
+  
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
