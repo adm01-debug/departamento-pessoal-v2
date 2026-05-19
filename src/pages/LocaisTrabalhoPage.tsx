@@ -27,6 +27,9 @@ export default function LocaisTrabalhoPage() {
     refetch
   } = useLocaisTrabalho();
   
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ nome: '', endereco: '', cidade: '', uf: '', cep: '', telefone: '' });
+
   const handleSearchChange = useCallback((val: string) => {
     setSearch(val);
     setPage(1);
