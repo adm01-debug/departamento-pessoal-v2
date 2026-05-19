@@ -6,6 +6,7 @@ import {
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -159,6 +160,7 @@ const SidebarMenuItem = memo(function SidebarMenuItem({ item, isActive, collapse
       {!collapsed && (
         <>
           <span className="text-sm font-medium truncate flex-1">{item.label}</span>
+          {item.path === '/colaboradores' && <ColaboradoresCount />}
           {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
         </>
       )}
@@ -192,6 +194,28 @@ const SidebarMenuGroup = memo(function SidebarMenuGroup({ group, collapsed, curr
         {group.items.map((item) => (<SidebarMenuItem key={item.path} item={item} isActive={currentPath.startsWith(item.path)} collapsed={false} />))}
       </CollapsibleContent>
     </Collapsible>
+  );
+});
+
+const ColaboradoresCount = memo(function ColaboradoresCount() {
+  const { data: count, isLoading } = useQuery({
+    queryKey: ['sidebar-colaboradores-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('colaboradores')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'ativo');
+      return count || 0;
+    },
+    staleTime: 60000,
+  });
+
+  if (isLoading || !count) return null;
+
+  return (
+    <span className="ml-auto bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-1 ring-primary/20">
+      {count}
+    </span>
   );
 });
 

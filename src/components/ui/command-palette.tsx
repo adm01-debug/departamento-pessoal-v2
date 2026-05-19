@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
 import { UserAvatar } from '@/components/ui/user-avatar';
+import { ColaboradorStatus } from '@/components/ui/status-badge';
 import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
@@ -28,6 +29,7 @@ interface CommandItem {
   gradient: string;
   shortcut?: string;
   avatar?: { name: string };
+  status?: string;
 }
 
 /* ─── Static commands ─── */
@@ -181,7 +183,8 @@ export function CommandPalette({
       items.push({
         id: `colab-${c.id}`,
         label: c.nome_completo,
-        description: `${c.cpf || ''} · ${c.cargo || ''} · ${c.status}`,
+        description: `${c.cpf || ''} · ${c.cargo || ''}`,
+        status: c.status,
         icon: User,
         category: 'pessoa',
         path: `/colaboradores/${c.id}/detalhes`,
@@ -296,7 +299,12 @@ export function CommandPalette({
                   <p className="text-xs text-muted-foreground font-body truncate">{item.description}</p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                {item.status && (
+                  <div className="hidden sm:block scale-75 origin-right">
+                    <ColaboradorStatus status={item.status} />
+                  </div>
+                )}
                 {item.shortcut && (
                   <kbd className="h-5 min-w-[20px] inline-flex items-center justify-center rounded border border-border/50 bg-muted px-1.5 text-[10px] font-mono text-muted-foreground">
                     {item.shortcut}
