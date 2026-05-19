@@ -19,9 +19,10 @@ class FolhaService extends BaseService<any> {
   }
 
   // Alias
-  async listar(competencia?: string, empresaId?: string) {
+  async listarFolhas(competencia?: string, empresaId?: string) {
     return this.list(competencia, empresaId);
   }
+
 }
 
 export const folhaService = new FolhaService();

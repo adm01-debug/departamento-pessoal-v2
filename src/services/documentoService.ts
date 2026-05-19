@@ -9,7 +9,7 @@ class DocumentoService extends BaseService<Documento> {
     });
   }
 
-  async listar(colaboradorId?: string, empresaId?: string): Promise<Documento[]> {
+  async listarDocumentos(colaboradorId?: string, empresaId?: string): Promise<Documento[]> {
     let query = this.getQuery()
       .select('*, colaborador:colaboradores(id, nome_completo, cpf)')
       .order('created_at', { ascending: false })
@@ -22,6 +22,7 @@ class DocumentoService extends BaseService<Documento> {
     if (error) throw error;
     return (data as Documento[]) || [];
   }
+
 }
 
 export const documentoService = new DocumentoService();
