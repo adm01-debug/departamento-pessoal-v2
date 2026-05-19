@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { ColaboradorFilters } from '@/components/colaboradores/ColaboradorFilters';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -48,6 +48,10 @@ export default function ColaboradoresPage() {
     setCargo,
     refetch
   } = useColaboradores();
+
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+  }, [setPage]);
 
   // Reset page when search or filters change
   const handleSearchChange = useCallback((val: string) => {
@@ -112,7 +116,7 @@ export default function ColaboradoresPage() {
       page={page}
       pageSize={pageSize}
       search={search}
-      onPageChange={setPage}
+      onPageChange={handlePageChange}
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
       actions={
