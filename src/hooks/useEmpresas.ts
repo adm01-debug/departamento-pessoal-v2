@@ -279,7 +279,7 @@ export function useEmpresas(): UseEmpresasReturn {
         const tenantKeys = [
           'colaboradores', 'colaborador', 'folhas', 'folha', 
           'registros-ponto', 'batidas-ponto', 'ferias', 
-          'afastamentos', 'beneficios', 'admissoes',
+          'afastamentos', 'beneficios', 'admissoes', 'departamentos', 'cargos', 'locais_trabalho',
           'notificacoes', 'relatorios_analytics'
         ];
         return tenantKeys.includes(key as string);
