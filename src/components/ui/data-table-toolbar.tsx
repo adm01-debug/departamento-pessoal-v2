@@ -105,6 +105,18 @@ export function DataTableToolbar({
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
 
+            {onRefresh && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onRefresh}
+                className="h-11 w-11 p-0 rounded-xl bg-card/50 shadow-sm"
+                title="Atualizar dados"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            )}
+
             {onExport && (
               <Button 
                 variant="outline" 
