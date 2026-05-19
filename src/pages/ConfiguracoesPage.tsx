@@ -133,51 +133,81 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="geral">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-card">
               <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
               <CardHeader>
-                <CardTitle className="font-display">Configurações Gerais</CardTitle>
-                <CardDescription className="font-body">Ajustes gerais do sistema</CardDescription>
+                <CardTitle className="font-display">Preferências de Interface</CardTitle>
+                <CardDescription className="font-body">Personalize sua experiência no sistema</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField label="Nome da Empresa" defaultValue="Minha Empresa" />
-                <FormSelect label="Fuso Horário" options={[{value:'america-sp',label:'América/São Paulo'}]} />
-                <FormSwitch label="Modo Escuro" description="Ativar tema escuro" />
-                <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body">Salvar</Button>
+              <CardContent className="space-y-6 pt-2">
+                <div className="space-y-4">
+                  <FormField label="Nome de Exibição" defaultValue={user?.name || "Usuário"} className="max-w-md" />
+                  <FormSelect 
+                    label="Idioma do Sistema" 
+                    options={[{value:'pt-BR',label:'Português (Brasil)'}, {value:'en-US',label:'English (US)'}]} 
+                    className="max-w-md"
+                  />
+                  <div className="flex flex-col gap-4 p-4 rounded-2xl bg-muted/30 border border-border/20">
+                    <FormSwitch label="Modo Escuro" description="Alternar entre tema claro e escuro automaticamente" />
+                    <FormSwitch label="Animações Reduzidas" description="Desativar efeitos visuais para melhor performance" />
+                  </div>
+                </div>
+                <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-lg font-body px-8 h-11">
+                  Salvar Alterações
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
         </TabsContent>
+
         <TabsContent value="notificacoes">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+             <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-card">
                 <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
                 <CardHeader>
                    <CardTitle className="font-display">Central de Notificações</CardTitle>
-                   <CardDescription>Configure como e quando o sistema deve alertar os usuários</CardDescription>
+                   <CardDescription>Configure alertas via E-mail, WhatsApp e Push</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 font-body">
-                   <FormSwitch label="Novas Admissões" description="Notificar gestores sobre novos processos" />
-                   <FormSwitch label="Férias Pendentes" description="Alertar sobre solicitações aguardando aprovação" />
-                   <FormSwitch label="Vencimento de Exames" description="Avisar 15 dias antes do vencimento de ASOs" />
-                   <FormSwitch label="Logs de Erro" description="Notificar administradores sobre falhas em integrações" />
+                <CardContent className="space-y-6 pt-2 font-body">
+                   <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-4 p-5 rounded-2xl bg-muted/20 border border-border/30">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-primary">Operacional</h4>
+                        <FormSwitch label="Novas Admissões" description="Notificar sobre novos processos iniciados" />
+                        <FormSwitch label="Férias Pendentes" description="Alertar sobre solicitações aguardando aprovação" />
+                        <FormSwitch label="Afastamentos" description="Informar quando um colaborador se afastar" />
+                      </div>
+                      <div className="space-y-4 p-5 rounded-2xl bg-muted/20 border border-border/30">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-warning">Compliance</h4>
+                        <FormSwitch label="Vencimento de ASO" description="Avisar 15 dias antes do vencimento" />
+                        <FormSwitch label="Treinamentos" description="Alertar sobre convocações de cursos" />
+                        <FormSwitch label="Logs de Erro" description="Notificar falhas críticas em integrações" />
+                      </div>
+                   </div>
                    <div className="pt-2">
-                      <Button className="rounded-xl shadow-glow">Salvar Preferências</Button>
+                      <Button className="rounded-xl shadow-glow px-8 h-11">Salvar Preferências</Button>
                    </div>
                 </CardContent>
              </Card>
           </motion.div>
         </TabsContent>
+
         <TabsContent value="folha">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-card">
               <div className="h-[2px] bg-gradient-to-r from-primary-glow to-primary" />
-              <CardHeader><CardTitle className="font-display">Configurações de Folha</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <FormField label="Dia de Fechamento" type="number" defaultValue="25" />
-                <FormField label="Dia de Pagamento" type="number" defaultValue="5" />
-                <FormSwitch label="Calcular Automaticamente" description="Calcular folha no fechamento" />
-                <Button className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body">Salvar</Button>
+              <CardHeader>
+                <CardTitle className="font-display">Parâmetros de Folha</CardTitle>
+                <CardDescription>Defina os gatilhos para o processamento mensal</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-2">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField label="Dia de Fechamento" type="number" defaultValue="25" helperText="Dia em que as variáveis de ponto são cortadas" />
+                  <FormField label="Dia de Pagamento" type="number" defaultValue="5" helperText="Data limite para envio bancário" />
+                </div>
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/20">
+                  <FormSwitch label="Cálculo Automático" description="Processar rubricas básicas no dia do fechamento" />
+                </div>
+                <Button className="rounded-xl bg-gradient-to-r from-primary-glow to-primary hover:opacity-90 shadow-lg font-body px-8 h-11">Salvar Configurações</Button>
               </CardContent>
             </Card>
           </motion.div>
@@ -185,18 +215,27 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="ponto">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-card">
               <div className="h-[2px] bg-gradient-to-r from-primary/60 to-primary/90" />
-              <CardHeader><CardTitle className="font-display">Configurações de Ponto</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <FormField label="Tolerância (minutos)" type="number" defaultValue="10" />
-                <FormSwitch label="Exigir Geolocalização" />
-                <FormSwitch label="Exigir Foto" />
-                <Button className="rounded-xl bg-gradient-to-r from-primary/60 to-primary/90 hover:opacity-90 shadow-lg font-body">Salvar</Button>
+              <CardHeader>
+                <CardTitle className="font-display">Compliance de Jornada</CardTitle>
+                <CardDescription>Configurações de REP-P e segurança de registros</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-2">
+                <div className="max-w-md space-y-4">
+                  <FormField label="Tolerância de Atraso (min)" type="number" defaultValue="10" />
+                  <div className="space-y-4 p-4 rounded-2xl bg-muted/30 border border-border/20">
+                    <FormSwitch label="Exigir Geolocalização" description="Obriga o uso de GPS para bater ponto" />
+                    <FormSwitch label="Reconhecimento Facial" description="Capturar foto em cada registro de jornada" />
+                    <FormSwitch label="Ponto Offline" description="Permitir batidas sem conexão com internet" />
+                  </div>
+                </div>
+                <Button className="rounded-xl bg-gradient-to-r from-primary/60 to-primary/90 hover:opacity-90 shadow-lg font-body px-8 h-11">Atualizar Regras</Button>
               </CardContent>
             </Card>
           </motion.div>
         </TabsContent>
+
 
 
         <TabsContent value="alertas">
