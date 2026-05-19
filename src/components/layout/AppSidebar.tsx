@@ -9,8 +9,8 @@ import {
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useState, memo, useCallback, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, memo, useCallback, useMemo, useEffect } from 'react';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 interface MenuItem { icon: LucideIcon; label: string; path: string; color: string; }
 interface MenuGroup { id: string; label: string; icon: LucideIcon; color: string; items: MenuItem[]; }
