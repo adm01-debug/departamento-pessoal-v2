@@ -29,3 +29,39 @@ export interface Empresa {
   ativo?: boolean;
   created_at?: string;
 }
+
+export interface Colaborador {
+  id: string;
+  nome_completo: string;
+  cpf: string;
+  email: string;
+  status: 'ativo' | 'afastado' | 'desligado';
+  departamento?: string;
+  cargo?: string;
+  empresa_id: string;
+  version?: number;
+  created_at?: string;
+  avatar_url?: string;
+}
+
+export interface Ferias {
+  id: string;
+  colaborador_id: string;
+  data_inicio: string;
+  data_fim: string;
+  status: 'pendente' | 'aprovada' | 'rejeitada' | 'cancelada';
+  empresa_id: string;
+  created_at?: string;
+  colaborador_nome?: string;
+}
+
+export interface Documento {
+  id: string;
+  nome: string;
+  url: string;
+  tipo: string;
+  colaborador_id?: string;
+  empresa_id?: string;
+  created_at?: string;
+}
+
