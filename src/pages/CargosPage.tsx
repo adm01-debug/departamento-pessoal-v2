@@ -137,8 +137,13 @@ export default function CargosPage() {
               </Table>
             </motion.div>
 
-            {/* Pagination is tricky if useCargos doesn't export setPage. 
-                I'll need to update useCargos.ts to be like useDepartamentos.ts */}
+            <DataTablePagination 
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              pageSize={pageSize}
+              onPageChange={setPage}
+            />
           </div>
         )}
       </PageLayout>
