@@ -6,12 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EmptyList } from '@/components/ui/empty-state';
 import { GridCardSkeleton } from '@/components/ui/module-skeleton';
-import { Building2, Edit, Users, FilterX } from 'lucide-react';
+import { Building2, Edit, Users, FilterX, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTodasEmpresas } from '@/hooks/useTodasEmpresas';
 import { Spinner } from '@/components/ui/spinner';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
 
 export default function EmpresasPage() {
   const navigate = useNavigate();
