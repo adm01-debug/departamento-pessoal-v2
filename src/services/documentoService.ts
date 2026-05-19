@@ -1,4 +1,4 @@
-import { BaseService } from './baseService';
+import { BaseService, ListOptions, ListResponse } from './baseService';
 import { Documento } from '@/types/entities';
 
 class DocumentoService extends BaseService<Documento> {

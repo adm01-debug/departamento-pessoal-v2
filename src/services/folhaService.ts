@@ -1,4 +1,4 @@
-import { BaseService } from './baseService';
+import { BaseService, ListOptions, ListResponse } from './baseService';
 
 class FolhaService extends BaseService<any> {
   constructor() {

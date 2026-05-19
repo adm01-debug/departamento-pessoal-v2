@@ -1,4 +1,4 @@
-import { BaseService } from './baseService';
+import { BaseService, ListOptions, ListResponse } from './baseService';
 import { Ferias } from '@/types/entities';
 import { supabase } from '@/integrations/supabase/client';
 

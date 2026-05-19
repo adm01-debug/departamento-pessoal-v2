@@ -1,4 +1,4 @@
-import { BaseService } from './baseService';
+import { BaseService, ListOptions, ListResponse } from './baseService';
 
 class AdmissaoService extends BaseService<any> {
   constructor() {
