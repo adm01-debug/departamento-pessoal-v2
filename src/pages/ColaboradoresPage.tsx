@@ -90,17 +90,19 @@ export default function ColaboradoresPage() {
   const handleExportExcel = async () => {
     if (!empresaAtual?.id) return;
     try {
-      toast.info('Preparando exportação completa...');
-      // Fetch all data for the current filter (ignoring pagination)
+      toast.info('Preparando exportação completa...', {
+        description: 'Isso pode levar alguns segundos dependendo do tamanho da base.'
+      });
+      
       const { data } = await colaboradorService.listar({
         pageSize: 5000,
         filters: {
           empresaId: empresaAtual.id,
-          status,
-          departamento,
-          cargo
+          status: status === 'all' ? undefined : status,
+          departamento: departamento === 'all' ? undefined : departamento,
+          cargo: cargo === 'all' ? undefined : cargo
         },
-        search
+        search: search || undefined
       });
 
       if (!data.length) {
@@ -122,16 +124,19 @@ export default function ColaboradoresPage() {
   const handleExportPDF = async () => {
     if (!empresaAtual?.id) return;
     try {
-      toast.info('Preparando PDF...');
+      toast.info('Preparando PDF...', {
+        description: 'Gerando documento com os filtros atuais.'
+      });
+      
       const { data } = await colaboradorService.listar({
         pageSize: 1000,
         filters: {
           empresaId: empresaAtual.id,
-          status,
-          departamento,
-          cargo
+          status: status === 'all' ? undefined : status,
+          departamento: departamento === 'all' ? undefined : departamento,
+          cargo: cargo === 'all' ? undefined : cargo
         },
-        search
+        search: search || undefined
       });
 
       if (!data.length) {
