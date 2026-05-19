@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Session } from '@supabase/supabase-js';
+import type { Session, AuthError } from '@supabase/supabase-js';
 import DOMPurify from 'dompurify';
+import { loggerService } from '@/services/loggerService';
 
-type AppRole = 'admin' | 'moderator' | 'user';
+export type AppRole = 'admin' | 'moderator' | 'user';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name?: string;
@@ -27,19 +28,27 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AUTH_INIT_TIMEOUT_MS = 4000;
-const USER_ROLES_TIMEOUT_MS = 2500;
+const AUTH_INIT_TIMEOUT_MS = 5000;
+const USER_ROLES_TIMEOUT_MS = 3000;
 
 async function fetchUserRoles(userId: string): Promise<AppRole[]> {
-  const { data, error } = await supabase.rpc('get_user_roles', { _user_id: userId });
-  if (error || !data) return ['user'];
-  return data as AppRole[];
+  try {
+    const { data, error } = await supabase.rpc('get_user_roles', { _user_id: userId });
+    if (error) {
+      loggerService.error('Error fetching user roles', { userId, error });
+      return ['user'];
+    }
+    return (data as AppRole[]) || ['user'];
+  } catch (e) {
+    loggerService.error('Exception fetching user roles', { userId }, e as Error);
+    return ['user'];
+  }
 }
 
 function fetchUserRolesWithTimeout(userId: string): Promise<AppRole[]> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const timeoutId = window.setTimeout(() => {
-      console.warn('User roles fetch timed out, using default role.');
+      loggerService.warn('User roles fetch timed out', { userId });
       resolve(['user']);
     }, USER_ROLES_TIMEOUT_MS);
 
@@ -50,7 +59,8 @@ function fetchUserRolesWithTimeout(userId: string): Promise<AppRole[]> {
       })
       .catch((error) => {
         window.clearTimeout(timeoutId);
-        reject(error);
+        loggerService.error('Failed to fetch user roles', { userId }, error);
+        resolve(['user']);
       });
   });
 }
@@ -70,66 +80,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
+  const markReady = useCallback(() => {
+    setLoading(false);
+    setIsReady(true);
+  }, []);
+
+  const enrichUserWithRoles = useCallback(async (supabaseUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
+    const roles = await fetchUserRolesWithTimeout(supabaseUser.id);
+    setUser(prevUser => prevUser && prevUser.id === supabaseUser.id ? buildUser(supabaseUser, roles) : prevUser);
+  }, []);
+
+  const applySession = useCallback((nextSession: Session | null) => {
+    if (nextSession?.user) {
+      setSession(nextSession);
+      setUser(buildUser(nextSession.user, ['user']));
+      void enrichUserWithRoles(nextSession.user);
+    } else {
+      setSession(null);
+      setUser(null);
+    }
+    markReady();
+  }, [enrichUserWithRoles, markReady]);
+
   useEffect(() => {
     let isMounted = true;
 
-    const markReady = () => {
-      if (!isMounted) return;
-      setLoading(false);
-      setIsReady(true);
-    };
-
-    const applySession = (nextSession: Session | null) => {
-      if (!isMounted) return;
-
-      if (nextSession?.user) {
-        setUser(buildUser(nextSession.user, ['user']));
-        setSession(nextSession);
-      } else {
-        setUser(null);
-        setSession(null);
-      }
-
-      markReady();
-    };
-
-    const enrichUserWithRoles = async (supabaseUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
-      try {
-        const roles = await fetchUserRolesWithTimeout(supabaseUser.id);
-        if (!isMounted) return;
-        setUser(buildUser(supabaseUser, roles));
-      } catch (e) {
-        console.warn('Failed to fetch user roles, using default:', e);
-      }
-    };
-
     const authInitTimeout = window.setTimeout(() => {
-      console.warn('Auth initialization timed out, continuing without blocking the UI.');
-      markReady();
+      if (isMounted && !isReady) {
+        loggerService.warn('Auth initialization timed out');
+        markReady();
+      }
     }, AUTH_INIT_TIMEOUT_MS);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!isMounted) return;
+      loggerService.info('Auth state changed', { event, userId: newSession?.user?.id });
       applySession(newSession);
-
-      if (newSession?.user) {
-        void enrichUserWithRoles(newSession.user);
-      }
     });
 
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
-        applySession(initialSession);
-
-        if (initialSession?.user) {
-          await enrichUserWithRoles(initialSession.user);
-        }
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (isMounted) applySession(initialSession);
       } catch (e) {
-        console.error('Auth initialization error:', e);
-        if (!isMounted) return;
-        setUser(null);
-        setSession(null);
-        markReady();
+        loggerService.error('Auth initialization error', {}, e as Error);
+        if (isMounted) {
+          applySession(null);
+        }
       } finally {
         window.clearTimeout(authInitTimeout);
       }
@@ -142,29 +140,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(authInitTimeout);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [applySession, isReady, markReady]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      loggerService.info('User signed in', { email });
+    } catch (e) {
+      const err = e as AuthError;
+      loggerService.warn('Sign in failed', { email, message: err.message });
+      throw err;
+    }
   }, []);
 
   const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      loggerService.info('User signed out');
+    } catch (e) {
+      loggerService.error('Sign out error', {}, e as Error);
+      throw e;
+    }
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
-    const sanitizedName = DOMPurify.sanitize(name.trim());
-    const { error } = await supabase.auth.signUp({ email, password, options: { data: { name: sanitizedName } } });
-    if (error) throw error;
+    try {
+      const sanitizedName = DOMPurify.sanitize(name.trim());
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password, 
+        options: { data: { name: sanitizedName } } 
+      });
+      if (error) throw error;
+      loggerService.info('User signed up', { email });
+    } catch (e) {
+      loggerService.error('Sign up error', { email }, e as Error);
+      throw e;
+    }
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) throw error;
+      loggerService.info('Password reset email sent', { email });
+    } catch (e) {
+      loggerService.error('Password reset request error', { email }, e as Error);
+      throw e;
+    }
   }, []);
 
   const isAdmin = useMemo(() => user?.roles?.includes('admin') ?? false, [user]);
@@ -187,3 +214,4 @@ export function useAuth() {
   if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 }
+
