@@ -93,7 +93,10 @@ export function EntityGridPageContainer<T extends { id: string | number }>({
           <DataTableToolbar 
             search={search} 
             onSearchChange={onSearchChange} 
-            searchPlaceholder={searchPlaceholder || `Buscar por nome...`} 
+            searchPlaceholder={searchPlaceholder || `Buscar por nome...`}
+            onRefresh={onRefetch}
+            onAdd={onAdd}
+            addLabel={addLabel}
           />
         )}
 
