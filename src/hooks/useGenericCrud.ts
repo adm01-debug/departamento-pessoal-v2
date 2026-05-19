@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ListOptions, ListResponse } from '@/services/baseService';
+import { loggerService } from '@/services/loggerService';
 
 interface ServiceInterface<T> {
   listar(options: ListOptions): Promise<ListResponse<T>>;
@@ -43,35 +44,59 @@ export function useGenericCrud<T>({
 
   const query = useQuery({
     queryKey: [queryKey, { search, page, pageSize, filters }],
-    queryFn: () => service.listar({ search, page, pageSize, filters, searchColumn }),
+    queryFn: async () => {
+      try {
+        const result = await service.listar({ search, page, pageSize, filters, searchColumn });
+        return result;
+      } catch (e) {
+        loggerService.error(`Error fetching ${queryKey}`, { filters, search, page }, e as Error);
+        throw e;
+      }
+    },
   });
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => service.criar(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success(successMessages.create || 'Registro criado com sucesso');
+      loggerService.info(`${queryKey} created`, { id: (data as any)?.id });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => {
+      loggerService.error(`Failed to create ${queryKey}`, {}, err);
+      toast.error(err.message);
+    },
   });
 
   const atualizarMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => service.atualizar(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success(successMessages.update || 'Registro atualizado com sucesso');
+      loggerService.info(`${queryKey} updated`, { id: variables.id });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => {
+      loggerService.error(`Failed to update ${queryKey}`, {}, err);
+      toast.error(err.message);
+    },
   });
 
   const excluirMutation = useMutation({
     mutationFn: (id: string) => service.excluir(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+    onSuccess: (_, id) => {
+      void queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success(successMessages.delete || 'Registro excluído com sucesso');
+      loggerService.info(`${queryKey} deleted`, { id });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => {
+      loggerService.error(`Failed to delete ${queryKey}`, {}, err);
+      toast.error(err.message);
+    },
   });
+
+  const refetch = useCallback(() => {
+    void query.refetch();
+  }, [query]);
 
   return {
     items: query.data?.data || [],
@@ -88,11 +113,12 @@ export function useGenericCrud<T>({
     criar: criarMutation.mutateAsync,
     atualizar: atualizarMutation.mutateAsync,
     excluir: excluirMutation.mutateAsync,
-    refetch: query.refetch,
+    refetch,
     isCreating: criarMutation.isPending,
     isUpdating: atualizarMutation.isPending,
     isDeleting: excluirMutation.isPending,
     query
   };
 }
+
 
