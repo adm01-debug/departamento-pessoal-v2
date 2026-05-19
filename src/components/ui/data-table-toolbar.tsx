@@ -34,6 +34,7 @@ export function DataTableToolbar({
   onExport,
   filters,
   onClearFilters,
+  onRefresh,
   className
 }: DataTableToolbarProps) {
   const hasActiveFilters = filters?.some(f => f.value && f.value !== '' && f.value !== 'all');
