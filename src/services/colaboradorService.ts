@@ -43,8 +43,9 @@ class ColaboradorService extends BaseService<Colaborador> {
     return { data: (data as Colaborador[]) || [], total: count || 0 };
   }
 
-  async getSummary(empresaId?: string) {
+  async getSummary(empresaId?: string, filters: any = {}) {
     // Optimized: Run counts in parallel using Supabase count feature
+    const { departamento, cargo } = filters;
     const statuses = ['ativo', 'desligado', 'afastado', 'ferias'];
     
     const countPromises = statuses.map(async (status) => {
@@ -54,6 +55,8 @@ class ColaboradorService extends BaseService<Colaborador> {
         .eq('status', status);
       
       if (empresaId) query = query.eq('empresa_id', empresaId);
+      if (departamento && departamento !== 'all') query = query.eq('departamento', departamento);
+      if (cargo && cargo !== 'all') query = query.eq('cargo', cargo);
       
       const { count, error } = await query;
       if (error) return { status, count: 0 };
