@@ -1,8 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 
-type LogLevel = 'info' | 'warn' | 'error' | 'fatal';
+export type LogLevel = 'info' | 'warn' | 'error' | 'fatal';
 
-interface LogEntry {
+export interface LogEntry {
   nivel: LogLevel;
   mensagem: string;
   contexto: Record<string, unknown>;
@@ -34,15 +34,17 @@ export const loggerService = {
       if (import.meta.env.DEV) {
         console.error(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
       }
-      this.flush(); // Errors are sent immediately
+      void this.flush(); // Errors are sent immediately
     } else {
       if (import.meta.env.DEV) {
         console.debug(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
       }
       if (logBuffer.length >= MAX_LOGS_BUFFER) {
-        this.flush();
+        void this.flush();
       } else if (!flushTimeout) {
-        flushTimeout = setTimeout(() => this.flush(), 10000); // Flush every 10s if limit not reached
+        flushTimeout = setTimeout(() => {
+          void this.flush();
+        }, 10000); // Flush every 10s if limit not reached
       }
     }
   },
@@ -72,18 +74,18 @@ export const loggerService = {
   },
 
   info(mensagem: string, contexto?: Record<string, unknown>) {
-    return this.log('info', mensagem, contexto);
+    void this.log('info', mensagem, contexto);
   },
 
   warn(mensagem: string, contexto?: Record<string, unknown>) {
-    return this.log('warn', mensagem, contexto);
+    void this.log('warn', mensagem, contexto);
   },
 
   error(mensagem: string, contexto?: Record<string, unknown>, error?: Error) {
-    return this.log('error', mensagem, contexto, error?.stack);
+    void this.log('error', mensagem, contexto, error?.stack);
   },
 
   fatal(mensagem: string, contexto?: Record<string, unknown>, error?: Error) {
-    return this.log('fatal', mensagem, contexto, error?.stack);
+    void this.log('fatal', mensagem, contexto, error?.stack);
   }
 };
