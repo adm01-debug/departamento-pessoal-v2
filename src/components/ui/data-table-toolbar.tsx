@@ -2,7 +2,7 @@
 import { Input } from './input';
 import { Button } from './button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { Search, X, Download, Plus, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, X, Download, Plus, Filter, SlidersHorizontal, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
