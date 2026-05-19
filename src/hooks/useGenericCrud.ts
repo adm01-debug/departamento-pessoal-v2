@@ -89,6 +89,10 @@ export function useGenericCrud<T>({
     atualizar: atualizarMutation.mutateAsync,
     excluir: excluirMutation.mutateAsync,
     refetch: query.refetch,
+    isCreating: criarMutation.isPending,
+    isUpdating: atualizarMutation.isPending,
+    isDeleting: excluirMutation.isPending,
     query
   };
 }
+
