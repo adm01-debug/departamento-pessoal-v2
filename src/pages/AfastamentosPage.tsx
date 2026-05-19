@@ -154,7 +154,7 @@ export default function AfastamentosPage() {
                 placeholder="Filtrar por CID-10..." 
                 className="pl-9 bg-card shadow-sm border-orange-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
                 value={filtros.cid || ''}
-                onChange={(e) => setFeltros({ ...filtros, cid: e.target.value })}
+                onChange={(e) => setFiltros({ ...filtros, cid: e.target.value })}
               />
             </div>
 
@@ -168,11 +168,11 @@ export default function AfastamentosPage() {
               <DropdownMenuContent align="end" className="w-56 p-2">
                 <DropdownMenuLabel className="text-xs uppercase text-muted-foreground font-bold">Status do Afastamento</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: null })}>Todos Status</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'ativo' })} className="text-green-600 font-medium">Ativos</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'pendente' })} className="text-orange-600 font-medium">Pendentes (INSS)</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'finalizado' })} className="text-gray-600 font-medium">Finalizados</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFeltros({ ...filtros, status: 'prorrogado' })} className="text-blue-600 font-medium">Prorrogados</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFiltros({ ...filtros, status: null })}>Todos Status</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFiltros({ ...filtros, status: 'ativo' })} className="text-green-600 font-medium">Ativos</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFiltros({ ...filtros, status: 'pendente' })} className="text-orange-600 font-medium">Pendentes (INSS)</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFiltros({ ...filtros, status: 'finalizado' })} className="text-gray-600 font-medium">Finalizados</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFiltros({ ...filtros, status: 'prorrogado' })} className="text-blue-600 font-medium">Prorrogados</DropdownMenuItem>
                 
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="text-xs uppercase text-muted-foreground font-bold">Tipo de Licença</DropdownMenuLabel>
