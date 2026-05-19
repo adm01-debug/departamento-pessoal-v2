@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { loggerService } from './loggerService';
+
 
 export interface SecurityAlert {
   id: string;
@@ -51,8 +53,12 @@ export const securityService = {
       .from('blocked_ips' as any)
       .select('*')
       .order('created_at', { ascending: false });
-    if (error) throw error;
+    if (error) {
+      loggerService.error('Error fetching blocked IPs', {}, error);
+      throw error;
+    }
     return (data || []) as unknown as BlockedIp[];
+
   },
 
   async unblockIp(id: string) {
@@ -60,7 +66,12 @@ export const securityService = {
       .from('blocked_ips' as any)
       .delete()
       .eq('id', id);
-    if (error) throw error;
+    if (error) {
+      loggerService.error('Error unblocking IP', { id }, error);
+      throw error;
+    }
+    loggerService.info('IP unblocked', { id });
+
   },
 
   async getLoginAttempts(): Promise<LoginAttempt[]> {
@@ -69,8 +80,12 @@ export const securityService = {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
-    if (error) throw error;
+    if (error) {
+      loggerService.error('Error fetching login attempts', {}, error);
+      throw error;
+    }
     return (data || []) as unknown as LoginAttempt[];
+
   },
 
   async getSecurityAlerts(): Promise<SecurityAlert[]> {
