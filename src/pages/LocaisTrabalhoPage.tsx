@@ -152,7 +152,9 @@ export default function LocaisTrabalhoPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoading ? (
+                    {error ? (
+                      <TableRow><TableCell colSpan={6}><SyncErrorState error={error} onRetry={refetch} entityName="locais de trabalho" /></TableCell></TableRow>
+                    ) : isLoading ? (
                       <TableRow><TableCell colSpan={6} className="py-20 text-center"><Spinner size="lg" className="mx-auto" /></TableCell></TableRow>
                     ) : total === 0 ? (
                       <TableRow>
