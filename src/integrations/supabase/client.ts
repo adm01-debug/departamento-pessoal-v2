@@ -79,7 +79,7 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
-    return { data, error: null };
+    return { data, count: json.count, error: null };
   } catch (err: any) {
     return { data: null, error: { message: err?.message || 'Network error' } };
   }
