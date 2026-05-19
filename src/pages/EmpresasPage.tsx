@@ -54,13 +54,12 @@ export default function EmpresasPage() {
       onPageChange={handlePageChange}
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
+      onAdd={() => navigate('/empresas/novo')}
+      addLabel="Nova Empresa"
       actions={
-        <Button
-          onClick={() => navigate('/empresas/novo')}
-          className="rounded-xl bg-gradient-to-r from-primary/80 to-primary hover:opacity-90 shadow-lg font-body"
-        >
-          Nova Empresa
-        </Button>
+        <div className="flex gap-2">
+          {/* Outras ações se necessário */}
+        </div>
       }
       renderItem={(empresa, i) => (
         <motion.div
