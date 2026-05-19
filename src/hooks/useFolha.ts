@@ -1,52 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useEmpresas } from '@/hooks/useEmpresas';
-import { toast } from 'sonner';
+import { useEmpresas } from './useEmpresas';
+import { useGenericCrud } from './useGenericCrud';
+import { folhaService } from '@/services/folhaService';
 
 export function useFolha(competencia?: string) {
-  const { empresaAtualId } = useEmpresas();
-  const queryClient = useQueryClient();
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id;
 
-  const query = useQuery({
-    queryKey: ['folhas', empresaAtualId, competencia],
-    enabled: true,
-    queryFn: async () => {
-      let q = supabase
-        .from('folhas_pagamento')
-        .select('*')
-        .order('competencia', { ascending: false });
-      
-      if (empresaAtualId) q = q.eq('empresa_id', empresaAtualId);
-
-      
-      if (competencia) q = q.eq('competencia', competencia);
-      
-      const { data, error } = await q;
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const fecharFolha = useMutation({
-    mutationFn: async (id: string) => {
-      const { folhaPagamentoService } = await import('@/services/folhaPagamentoService');
-      return await folhaPagamentoService.fecharFolha(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['folhas'] });
-      toast.success('Folha encerrada com sucesso!');
-    },
-    onError: (err: Error) => {
-      toast.error(`Erro ao fechar folha: ${err.message}`);
-    }
+  const crud = useGenericCrud<any>({
+    queryKey: 'folhas',
+    service: folhaService,
+    filters: { empresa_id: empresaId, competencia },
   });
 
   return {
-    folhas: query.data || [],
-    isLoading: query.isLoading,
-    error: query.error,
-    refetch: query.refetch,
-    fecharFolha: fecharFolha.mutate,
-    isClosing: fecharFolha.isPending,
+    ...crud,
+    folhas: crud.items,
   };
 }
