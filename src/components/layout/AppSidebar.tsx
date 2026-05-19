@@ -306,6 +306,10 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
           ))}
         </nav>
 
+        <div className="px-3 py-2">
+          <SystemStatus collapsed={collapsed} />
+        </div>
+
         {/* Footer */}
         <div className={cn("border-t border-sidebar-border transition-all duration-200", collapsed ? "p-2" : "p-3")}>
           {collapsed ? (
