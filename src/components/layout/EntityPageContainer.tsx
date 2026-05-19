@@ -3,7 +3,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableHeader, TableRow, TableHead } from '@/components/ui/table';
-import { EmptyList } from '@/components/ui/empty-state';
+import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { FilterX, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
