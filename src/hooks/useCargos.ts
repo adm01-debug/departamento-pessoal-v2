@@ -10,7 +10,7 @@ export function useCargos() {
 
   const query = useQuery({
     queryKey: ['cargos', empresaId],
-    queryFn: () => cargoService.listar(empresaId),
+    queryFn: () => cargoService.listar({ empresaId, pageSize: 1000 }),
     enabled: true,
   });
 
@@ -42,7 +42,8 @@ export function useCargos() {
   });
 
   return {
-    cargos: query.data || [],
+    cargos: query.data?.data || [],
+    total: query.data?.total || 0,
     isLoading: query.isLoading,
     error: query.error,
     criar: criarMutation.mutateAsync,
