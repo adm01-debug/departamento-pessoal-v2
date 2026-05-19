@@ -496,29 +496,58 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="webhooks">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-card">
               <div className="h-[2px] bg-gradient-to-r from-primary-glow to-primary" />
-              <CardHeader>
-                <CardTitle className="font-display flex items-center gap-2"><Webhook className="h-5 w-5" /> Logs de Webhooks</CardTitle>
-                <CardDescription className="font-body">Últimos 50 registros de webhooks</CardDescription>
+              <CardHeader className="pb-4 px-6 pt-6">
+                <CardTitle className="font-display text-xl flex items-center gap-2">
+                  <Webhook className="h-5 w-5 text-primary" /> Atividade de Webhooks
+                </CardTitle>
+                <CardDescription className="font-body text-sm mt-1">Últimos 50 eventos recebidos ou disparados via bridge</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                {loadWebhooks ? <div className="p-8 flex justify-center"><Spinner /></div> : (
-                  <Table>
-                    <TableHeader><TableRow><TableHead>URL</TableHead><TableHead>Evento</TableHead><TableHead>Status</TableHead><TableHead>Data</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      {webhooksLogs.map((w: any) => (
-                        <TableRow key={w.id}>
-                          <TableCell className="font-mono text-xs max-w-[200px] truncate">{w.url || w.webhook_url || '-'}</TableCell>
-                          <TableCell className="text-sm">{w.evento || w.event || '-'}</TableCell>
-                          <TableCell><Badge variant={w.status_code === 200 ? 'outline' : 'destructive'} className={w.status_code === 200 ? 'bg-success/10 text-success border-success/30 rounded-full' : 'rounded-full'}>{w.status_code || w.status || '-'}</Badge></TableCell>
-                          <TableCell className="text-sm text-muted-foreground">{w.created_at ? new Date(w.created_at).toLocaleString('pt-BR') : '-'}</TableCell>
+                <div className="overflow-x-auto">
+                  {loadWebhooks ? <div className="p-12 flex justify-center"><Spinner size="lg" /></div> : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/30 border-b border-border/20">
+                          <TableHead className="font-display font-semibold py-4 pl-6">Endpoint/URL</TableHead>
+                          <TableHead className="font-display font-semibold">Evento</TableHead>
+                          <TableHead className="font-display font-semibold text-center">Status</TableHead>
+                          <TableHead className="font-display font-semibold hidden sm:table-cell pr-6 text-right">Data/Hora</TableHead>
                         </TableRow>
-                      ))}
-                      {webhooksLogs.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum log de webhook encontrado</TableCell></TableRow>}
-                    </TableBody>
-                  </Table>
-                )}
+                      </TableHeader>
+                      <TableBody>
+                        {webhooksLogs.map((w: any) => (
+                          <TableRow key={w.id} className="hover:bg-accent/10 transition-colors">
+                            <TableCell className="font-mono text-[10px] max-w-[200px] truncate pl-6 py-4 text-muted-foreground">{w.url || w.webhook_url || '-'}</TableCell>
+                            <TableCell className="text-xs font-bold text-foreground">{w.evento || w.event || '-'}</TableCell>
+                            <TableCell className="text-center">
+                              <Badge 
+                                variant={w.status_code === 200 ? 'outline' : 'destructive'} 
+                                className={`rounded-lg text-[10px] font-bold px-2 py-0.5 ${w.status_code === 200 ? 'bg-success/10 text-success border-success/30' : ''}`}
+                              >
+                                {w.status_code || w.status || '-'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-[11px] text-muted-foreground font-body hidden sm:table-cell pr-6 text-right">
+                              {w.created_at ? new Date(w.created_at).toLocaleString('pt-BR') : '-'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {webhooksLogs.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center text-muted-foreground py-16 font-body opacity-40">
+                              <div className="flex flex-col items-center gap-3">
+                                <Webhook className="h-10 w-10" />
+                                <p>Nenhum log de webhook registrado.</p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -535,7 +564,6 @@ export default function ConfiguracoesPage() {
         <TabsContent value="sistema">
           <SystemHealthTab />
         </TabsContent>
-
 
         <TabsContent value="logs-integ">
           <LogsIntegracoesTab />
