@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, Cloud } from 'lucide-react';
 import { NotificationCenter } from '@/components/ui/notification-center';
 import { UserProfileMenu } from '@/components/ui/user-profile-menu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
