@@ -6,8 +6,6 @@ export interface LogEntry {
   nivel: LogLevel;
   mensagem: string;
   contexto: Record<string, unknown>;
-  url: string;
-  user_agent: string;
   created_at: string;
   user_id?: string;
 }
@@ -19,12 +17,16 @@ let flushTimeout: ReturnType<typeof setTimeout> | null = null;
 export const loggerService = {
   async log(nivel: LogLevel, mensagem: string, contexto: Record<string, unknown> = {}, stackTrace?: string) {
     const trace = stackTrace || (nivel === 'error' || nivel === 'fatal' ? new Error().stack : undefined);
+    const enrichedContexto: Record<string, unknown> = {
+      ...contexto,
+      url: window.location.href,
+      user_agent: navigator.userAgent,
+      ...(trace ? { stack_trace: trace } : {}),
+    };
     const logEntry: LogEntry = {
       nivel,
       mensagem,
-      contexto: trace ? { ...contexto, stack_trace: trace } : contexto,
-      url: window.location.href,
-      user_agent: navigator.userAgent,
+      contexto: enrichedContexto,
       created_at: new Date().toISOString()
     };
 
