@@ -18,10 +18,19 @@ class FolhaService extends BaseService<any> {
     return data || [];
   }
 
+  async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
+    const { filters, search } = options;
+    const competencia = search || (filters as any)?.competencia;
+    const empresaId = (filters as any)?.empresa_id;
+    const data = await this.list(competencia, empresaId);
+    return { data, total: data.length };
+  }
+
   // Alias
   async listarFolhas(competencia?: string, empresaId?: string) {
     return this.list(competencia, empresaId);
   }
+
 
 }
 

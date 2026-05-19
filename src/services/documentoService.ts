@@ -9,6 +9,14 @@ class DocumentoService extends BaseService<Documento> {
     });
   }
 
+  async listar(options: ListOptions = {}): Promise<ListResponse<Documento>> {
+    const { filters } = options;
+    const colabId = (filters as any)?.colaborador_id;
+    const empId = (filters as any)?.empresa_id;
+    const data = await this.listarDocumentos(colabId, empId);
+    return { data, total: data.length };
+  }
+
   async listarDocumentos(colaboradorId?: string, empresaId?: string): Promise<Documento[]> {
     let query = this.getQuery()
       .select('*, colaborador:colaboradores(id, nome_completo, cpf)')
@@ -22,6 +30,7 @@ class DocumentoService extends BaseService<Documento> {
     if (error) throw error;
     return (data as Documento[]) || [];
   }
+
 
 }
 

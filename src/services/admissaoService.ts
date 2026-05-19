@@ -7,6 +7,13 @@ class AdmissaoService extends BaseService<any> {
     });
   }
 
+  async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
+    const { filters } = options;
+    const empresaId = (filters as any)?.empresa_id;
+    const data = await this.listarAdmissoes(empresaId);
+    return { data, total: data.length };
+  }
+
   async listarAdmissoes(empresaId?: string): Promise<any[]> {
     let query = this.getQuery().select('*').order('data_prevista', { ascending: false });
     if (empresaId) query = query.eq('empresa_id', empresaId);
@@ -17,6 +24,7 @@ class AdmissaoService extends BaseService<any> {
 
   // Aliases
   async getAll(empresaId?: string) { return this.listarAdmissoes(empresaId); }
+
 
   async getById(id: string) { return this.buscarPorId(id); }
   async create(d: any) { return this.criar(d); }
