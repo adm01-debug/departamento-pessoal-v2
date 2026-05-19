@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
 import { UserAvatar } from '@/components/ui/user-avatar';
+import { ColaboradorStatus } from '@/components/ui/status-badge';
 import {
   Home, Users, Building2, FileText, Calendar,
   Clock, Gift, BarChart3, Settings, FileCheck,
