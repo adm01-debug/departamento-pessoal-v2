@@ -26,6 +26,10 @@ export function useBeneficios() {
     beneficios: crud.items,
     resumo: resumoQuery.data || {},
     isLoading: crud.isLoading || resumoQuery.isLoading,
+    criarBeneficio: { mutateAsync: crud.criar },
+    atualizarBeneficio: { mutateAsync: (args: { id: string, dados: any }) => crud.atualizar(args.id, args.dados) },
+    excluirBeneficio: { mutateAsync: crud.excluir },
     tiposBeneficio: ['transporte', 'alimentacao', 'saude', 'vida', 'outros']
   };
 }
+
