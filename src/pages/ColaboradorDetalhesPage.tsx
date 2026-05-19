@@ -40,9 +40,10 @@ export default function ColaboradorDetalhesPage() {
 
   const { data: colaborador, isLoading } = useQuery({
     queryKey: ['colaborador', id],
-    queryFn: () => colaboradorService.getById(id!),
+    queryFn: () => (colaboradorService as any).buscarPorId(id!),
     enabled: !!id,
   });
+
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><Spinner /></div>;
   if (!colaborador) return <div className="p-6">Colaborador não encontrado</div>;

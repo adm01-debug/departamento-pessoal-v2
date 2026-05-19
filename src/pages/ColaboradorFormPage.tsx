@@ -90,9 +90,10 @@ export default function ColaboradorFormPage() {
 
   const { data: colaborador, isLoading } = useQuery({
     queryKey: ['colaborador', id],
-    queryFn: () => colaboradorService.getById(id!),
+    queryFn: () => (colaboradorService as any).buscarPorId(id!),
     enabled: isEditing,
   });
+
 
   const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -114,7 +115,8 @@ export default function ColaboradorFormPage() {
   }, [colaborador, reset]);
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => isEditing ? colaboradorService.update(id!, data as any) : colaboradorService.create(data as any),
+    mutationFn: (data: FormData) => isEditing ? (colaboradorService as any).atualizar(id!, data as any) : (colaboradorService as any).criar(data as any),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
       success(isEditing ? 'Colaborador atualizado!' : 'Colaborador criado!');
