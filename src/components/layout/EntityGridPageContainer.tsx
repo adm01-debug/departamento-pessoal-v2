@@ -2,10 +2,10 @@ import React, { ReactNode } from 'react';
 import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
-import { EmptyList } from '@/components/ui/empty-state';
+import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
-import { FilterX } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { FilterX, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { SyncErrorState } from '@/components/ui/sync-error-state';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,8 @@ interface EntityGridPageContainerProps<T> {
   onPageChange: (page: number) => void;
   onSearchChange: (search: string) => void;
   onRefetch: () => void;
+  onAdd?: () => void;
+  addLabel?: string;
   
   // Customization
   searchPlaceholder?: string;
@@ -68,7 +70,9 @@ export function EntityGridPageContainer<T extends { id: string | number }>({
   stats,
   gridClassName = "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
   skeletonCount = 6,
-  customFilters
+  customFilters,
+  onAdd,
+  addLabel
 }: EntityGridPageContainerProps<T>) {
   const totalPages = Math.ceil(total / pageSize);
   const hasFilters = search !== '';
@@ -89,7 +93,10 @@ export function EntityGridPageContainer<T extends { id: string | number }>({
           <DataTableToolbar 
             search={search} 
             onSearchChange={onSearchChange} 
-            searchPlaceholder={searchPlaceholder || `Buscar por nome...`} 
+            searchPlaceholder={searchPlaceholder || `Buscar por nome...`}
+            onRefresh={onRefetch}
+            onAdd={onAdd}
+            addLabel={addLabel}
           />
         )}
 
@@ -100,16 +107,11 @@ export function EntityGridPageContainer<T extends { id: string | number }>({
             {Array.from({ length: skeletonCount }).map((_, i) => <GridCardSkeleton key={i} />)}
           </div>
         ) : total === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-2xl bg-muted/10">
+          <div className="flex flex-col items-center justify-center border border-dashed rounded-2xl bg-muted/10 p-4">
             {hasFilters ? (
-              <>
-                <FilterX className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
-                <h3 className="text-lg font-display font-bold">Nenhum {entityName} encontrado</h3>
-                <p className="text-muted-foreground mb-6">Tente ajustar seus termos de busca.</p>
-                <Button variant="outline" onClick={() => onSearchChange('')} className="rounded-xl">Limpar Busca</Button>
-              </>
+              <EmptySearch search={search} onClear={() => onSearchChange('')} />
             ) : (
-              <EmptyList entityName={entityName} />
+              <EmptyList entityName={entityName} onCreate={onAdd} />
             )}
           </div>
         ) : (

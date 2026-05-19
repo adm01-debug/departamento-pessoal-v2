@@ -55,10 +55,12 @@ export default function CargosPage() {
       onPageChange={handlePageChange}
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
+      onAdd={() => console.log('Novo cargo')}
+      addLabel="Novo Cargo"
       actions={
-        <Button className="rounded-xl bg-gradient-to-r from-warning to-info hover:opacity-90 shadow-lg font-bold">
-          <Plus className="h-4 w-4 mr-2" />Novo Cargo
-        </Button>
+        <div className="flex gap-2">
+          {/* Outras ações específicas se necessário */}
+        </div>
       }
       stats={
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
