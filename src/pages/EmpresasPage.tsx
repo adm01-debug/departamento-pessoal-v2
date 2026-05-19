@@ -22,16 +22,24 @@ export default function EmpresasPage() {
     total, 
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
     search,
-    setSearch
+    setSearch,
+    refetch
   } = useTodasEmpresas();
 
   useEffect(() => {
     setPage(1);
   }, [search, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de empresas");
+    }
+  }, [error]);
 
   const totalPages = Math.ceil(total / pageSize);
 
