@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { loggerService } from './loggerService';
 
 export interface ListOptions {
   search?: string;
@@ -40,74 +41,99 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
       searchColumn = this.options.searchColumn || 'nome'
     } = options;
 
-    let query = this.getQuery().select('*', { count: 'exact' });
+    try {
+      let query = this.getQuery().select('*', { count: 'exact' });
 
-    // Aplicar filtros dinâmicos
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        query = query.eq(key, value);
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          query = query.eq(key, value);
+        }
+      });
+
+      if (search && searchColumn) {
+        query = query.ilike(searchColumn, `%${search}%`);
       }
-    });
 
-    if (search && searchColumn) {
-      query = query.ilike(searchColumn, `%${search}%`);
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      const { data, count, error } = await query
+        .order(orderBy, { ascending: orderAscending })
+        .range(from, to);
+
+      if (error) throw error;
+      return { data: (data as T[]) || [], total: count || 0 };
+    } catch (e) {
+      loggerService.error(`Error in listar for ${this.table}`, { options }, e as Error);
+      throw e;
     }
-
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-
-    const { data, count, error } = await query
-      .order(orderBy, { ascending: orderAscending })
-      .range(from, to);
-
-    if (error) throw error;
-    return { data: (data as T[]) || [], total: count || 0 };
   }
 
   async buscarPorId(id: string): Promise<T | null> {
-    const { data, error } = await this.getQuery()
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-    
-    if (error) throw error;
-    return data as T;
+    try {
+      const { data, error } = await this.getQuery()
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data as T;
+    } catch (e) {
+      loggerService.error(`Error in buscarPorId for ${this.table}`, { id }, e as Error);
+      throw e;
+    }
   }
 
   async criar(payload: CreateDTO): Promise<T> {
-    const { data, error } = await this.getQuery()
-      .insert(payload as any)
-      .select()
-      .maybeSingle();
-    
-    if (error) throw error;
-    if (!data) throw new Error(`Nenhum registro de ${this.table} foi retornado após criação.`);
-    return data as T;
+    try {
+      const { data, error } = await this.getQuery()
+        .insert(payload as any)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error(`Nenhum registro de ${this.table} foi retornado após criação.`);
+      return data as T;
+    } catch (e) {
+      loggerService.error(`Error in criar for ${this.table}`, { payload }, e as Error);
+      throw e;
+    }
   }
 
   async atualizar(id: string, payload: UpdateDTO): Promise<T> {
-    let query = this.getQuery().update(payload as any).eq('id', id);
+    try {
+      let query = this.getQuery().update(payload as any).eq('id', id);
 
-    if (this.options.useVersioning) {
-      const { data: current, error: currentError } = await this.getQuery()
-        .select('version')
-        .eq('id', id)
-        .single();
+      if (this.options.useVersioning) {
+        const { data: current, error: currentError } = await this.getQuery()
+          .select('version')
+          .eq('id', id)
+          .single();
+        
+        if (currentError) throw currentError;
+        query = query.eq('version', (current as any)?.version || 1);
+      }
+
+      const { data, error } = await query.select().maybeSingle();
       
-      if (currentError) throw currentError;
-      query = query.eq('version', (current as any)?.version || 1);
+      if (error) throw error;
+      if (!data) throw new Error(`Falha ao atualizar ${this.table} ou conflito de versão.`);
+      return data as T;
+    } catch (e) {
+      loggerService.error(`Error in atualizar for ${this.table}`, { id, payload }, e as Error);
+      throw e;
     }
-
-    const { data, error } = await query.select().maybeSingle();
-    
-    if (error) throw error;
-    if (!data) throw new Error(`Falha ao atualizar ${this.table} ou conflito de versão.`);
-    return data as T;
   }
 
   async excluir(id: string): Promise<void> {
-    const { error } = await this.getQuery().delete().eq('id', id);
-    if (error) throw error;
+    try {
+      const { error } = await this.getQuery().delete().eq('id', id);
+      if (error) throw error;
+    } catch (e) {
+      loggerService.error(`Error in excluir for ${this.table}`, { id }, e as Error);
+      throw e;
+    }
   }
 }
+
 
