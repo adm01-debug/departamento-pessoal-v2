@@ -202,9 +202,10 @@ export default function ConfiguracoesPage() {
               </CardHeader>
               <CardContent className="space-y-6 pt-2">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <FormField label="Dia de Fechamento" type="number" defaultValue="25" helperText="Dia em que as variáveis de ponto são cortadas" />
-                  <FormField label="Dia de Pagamento" type="number" defaultValue="5" helperText="Data limite para envio bancário" />
+                  <FormField label="Dia de Fechamento" type="number" defaultValue="25" />
+                  <FormField label="Dia de Pagamento" type="number" defaultValue="5" />
                 </div>
+
                 <div className="p-4 rounded-2xl bg-muted/30 border border-border/20">
                   <FormSwitch label="Cálculo Automático" description="Processar rubricas básicas no dia do fechamento" />
                 </div>
