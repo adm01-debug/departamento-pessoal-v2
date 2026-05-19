@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { ColaboradorFilters } from '@/components/colaboradores/ColaboradorFilters';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -49,10 +49,26 @@ export default function ColaboradoresPage() {
     refetch
   } = useColaboradores();
 
-  // Reset page when filters change
-  useEffect(() => {
+  // Reset page when search or filters change
+  const handleSearchChange = useCallback((val: string) => {
+    setSearch(val);
     setPage(1);
-  }, [search, status, departamento, cargo, setPage]);
+  }, [setSearch, setPage]);
+
+  const handleStatusChange = useCallback((val: string) => {
+    setStatus(val);
+    setPage(1);
+  }, [setStatus, setPage]);
+
+  const handleDeptoChange = useCallback((val: string) => {
+    setDepartamento(val);
+    setPage(1);
+  }, [setDepartamento, setPage]);
+
+  const handleCargoChange = useCallback((val: string) => {
+    setCargo(val);
+    setPage(1);
+  }, [setCargo, setPage]);
 
   const statusOptions = [
     { value: 'ativo', label: `Ativos` },
@@ -97,7 +113,7 @@ export default function ColaboradoresPage() {
       pageSize={pageSize}
       search={search}
       onPageChange={setPage}
-      onSearchChange={setSearch}
+      onSearchChange={handleSearchChange}
       onRefetch={refetch}
       actions={
         <div className="flex items-center gap-2">
@@ -164,10 +180,10 @@ export default function ColaboradoresPage() {
       }
       customFilters={
         <ColaboradorFilters
-          onSearchChange={setSearch}
-          onStatusChange={setStatus}
-          onDeptoChange={setDepartamento}
-          onCargoChange={setCargo}
+          onSearchChange={handleSearchChange}
+          onStatusChange={handleStatusChange}
+          onDeptoChange={handleDeptoChange}
+          onCargoChange={handleCargoChange}
           departamentos={departamentos}
           cargos={cargos}
           currentFilters={{

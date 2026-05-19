@@ -37,10 +37,10 @@ export function useGenericCrud<T>({
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [search, setSearch] = useState('');
 
-  // Reset page on search change
+  // Reset page on search or filter change
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [search, JSON.stringify(filters)]);
 
   const query = useQuery({
     queryKey: [queryKey, { search, page, pageSize, filters }],

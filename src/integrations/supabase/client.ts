@@ -79,9 +79,25 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
+    
+    // Log do tempo de resposta se for lento
+    if (json.duration_ms > 1000) {
+      console.warn(`🕒 [BRIDGE_SLOW_QUERY] ${action} em ${target} demorou ${json.duration_ms}ms`);
+    }
+
     return { data, count: json.count, error: null };
   } catch (err: any) {
-    return { data: null, error: { message: err?.message || 'Network error' } };
+    const isNetworkError = err.message === 'Failed to fetch' || err.name === 'TypeError';
+    const errorMsg = isNetworkError ? 'Erro de conexão com o banco externo. Verifique sua internet.' : (err?.message || 'Erro desconhecido');
+    
+    console.error('🔴 [BRIDGE_FATAL_ERROR]', err);
+
+    toast.error(`ERRO CRÍTICO: ${errorMsg}`, {
+      duration: 5000,
+      description: 'Tente recarregar a página se o problema persistir.',
+    });
+
+    return { data: null, error: { message: errorMsg } };
   }
 };
 
@@ -94,8 +110,9 @@ const createQueryBuilder = (table: string) => {
   const exec = () => callBridge(state.action, table, state.payload);
 
   const addFilter = (column: string, op: string, value: any) => {
-    // Se o valor for "undefined" ou "null" como string (comum em erros de template string), 
-    // converte para null real. Se for undefined real, JSON.stringify o removerá.
+    // Se o valor for "undefined" ou "null" como string, converte para null real.
+    // Se for "all", ignoramos o filtro para permitir listagem completa.
+    if (value === "all") return builder;
     const cleanValue = (value === "undefined" || value === "null") ? null : value;
     state.payload.filters = [...(state.payload.filters || []), { column, op, value: cleanValue }];
     return builder;
