@@ -29,6 +29,11 @@ export default function CargosPage() {
   // Actually, looking at my previous hook update for useCargos, it doesn't take params yet for page/pageSize in the returned object if I didn't change the state.
   // Let me re-verify useCargos.ts
   
+  // Resetar página ao buscar
+  useEffect(() => {
+    setPage(1);
+  }, [search, setPage]);
+
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const totalPages = Math.ceil(total / pageSize);
 
