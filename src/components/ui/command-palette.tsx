@@ -181,7 +181,8 @@ export function CommandPalette({
       items.push({
         id: `colab-${c.id}`,
         label: c.nome_completo,
-        description: `${c.cpf || ''} · ${c.cargo || ''} · ${c.status}`,
+        description: `${c.cpf || ''} · ${c.cargo || ''}`,
+        status: c.status,
         icon: User,
         category: 'pessoa',
         path: `/colaboradores/${c.id}/detalhes`,
