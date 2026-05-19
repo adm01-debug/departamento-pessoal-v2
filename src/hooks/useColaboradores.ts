@@ -45,6 +45,8 @@ export function useColaboradores() {
     setDepartamento,
     cargo,
     setCargo,
+    summary,
+    isLoadingSummary,
     criar: (data: any) => crud.criar({ ...data, empresa_id: empresaId }),
   };
 }
