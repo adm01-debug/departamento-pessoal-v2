@@ -8,11 +8,13 @@ import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Building2, Plus, GitBranch, ArrowRight, Wallet, FilterX } from 'lucide-react';
+import { Building2, Plus, GitBranch, ArrowRight, Wallet, FilterX, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { NovoDepartamentoDialog } from '@/components/departamentos/NovoDepartamentoDialog';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { toast } from 'sonner';
 
 export default function DepartamentosPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
