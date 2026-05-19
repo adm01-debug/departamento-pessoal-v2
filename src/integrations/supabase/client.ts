@@ -100,8 +100,11 @@ const createQueryBuilder = (table: string) => {
   };
 
   const builder: any = {
-    select: (columns = '*') => {
+    select: (columns = '*', options: any = {}) => {
       state.payload.columns = columns;
+      if (options.count) {
+        state.payload.countMode = options.count;
+      }
       return builder;
     },
     insert: (data: any) => {
