@@ -240,52 +240,106 @@ export default function ConfiguracoesPage() {
 
         <TabsContent value="alertas">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden">
+            <Card className="border border-border/30 shadow-elevated rounded-2xl overflow-hidden bg-card">
               <div className="h-[2px] bg-gradient-to-r from-warning to-destructive" />
-              <CardHeader>
-                <div className="flex justify-between items-center">
+              <CardHeader className="pb-4 px-6 pt-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="font-display">Configuração de Alertas de Indicadores</CardTitle>
-                    <CardDescription className="font-body">Defina limites para alertas automáticos de indicadores de RH</CardDescription>
+                    <CardTitle className="font-display text-xl flex items-center gap-2">
+                      <Bell className="h-5 w-5 text-warning" /> Monitoramento de Indicadores
+                    </CardTitle>
+                    <CardDescription className="font-body text-sm mt-1">Alertas automáticos baseados em limites de tolerância</CardDescription>
                   </div>
                   <Dialog open={openAlerta} onOpenChange={setOpenAlerta}>
-                    <DialogTrigger asChild><Button size="sm"><Plus className="mr-1 h-4 w-4" />Novo Alerta</Button></DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader><DialogTitle>Nova Configuração de Alerta</DialogTitle></DialogHeader>
-                      <div className="space-y-4">
-                        <div><Label>Tipo de Indicador</Label><Input value={alertaForm.tipo} onChange={e => setAlertaForm(p => ({ ...p, tipo: e.target.value }))} placeholder="Ex: turnover, absenteismo, horas_extras" /></div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div><Label>Limite Atenção</Label><Input type="number" value={alertaForm.limite_atencao} onChange={e => setAlertaForm(p => ({ ...p, limite_atencao: e.target.value }))} placeholder="Ex: 10" /></div>
-                          <div><Label>Limite Crítico</Label><Input type="number" value={alertaForm.limite_critico} onChange={e => setAlertaForm(p => ({ ...p, limite_critico: e.target.value }))} placeholder="Ex: 20" /></div>
+                    <DialogTrigger asChild>
+                      <Button className="rounded-xl shadow-glow gap-2">
+                        <Plus className="h-4 w-4" /> Novo Alerta
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="rounded-2xl max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="font-display">Configurar Limite de Indicador</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Tipo de Indicador</Label>
+                          <Input value={alertaForm.tipo} onChange={e => setAlertaForm(p => ({ ...p, tipo: e.target.value }))} placeholder="Ex: turnover, absenteismo, horas_extras" className="rounded-xl border-border/40" />
                         </div>
-                        <Button onClick={() => criarAlerta.mutate(alertaForm)} disabled={!alertaForm.tipo || !alertaForm.limite_atencao || !alertaForm.limite_critico || criarAlerta.isPending} className="w-full">{criarAlerta.isPending ? 'Salvando...' : 'Salvar'}</Button>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Limite Atenção (%)</Label>
+                            <Input type="number" value={alertaForm.limite_atencao} onChange={e => setAlertaForm(p => ({ ...p, limite_atencao: e.target.value }))} placeholder="Ex: 10" className="rounded-xl border-border/40" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Limite Crítico (%)</Label>
+                            <Input type="number" value={alertaForm.limite_critico} onChange={e => setAlertaForm(p => ({ ...p, limite_critico: e.target.value }))} placeholder="Ex: 20" className="rounded-xl border-border/40" />
+                          </div>
+                        </div>
+                        <Button onClick={() => criarAlerta.mutate(alertaForm)} disabled={!alertaForm.tipo || !alertaForm.limite_atencao || !alertaForm.limite_critico || criarAlerta.isPending} className="w-full rounded-xl shadow-glow h-11 mt-2">
+                          {criarAlerta.isPending ? <Spinner size="sm" className="mr-2" /> : <Save className="mr-2 h-4 w-4" />}
+                          Salvar Configuração
+                        </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                {loadAlertas ? <div className="p-8 flex justify-center"><Spinner /></div> : (
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Tipo Indicador</TableHead><TableHead>Limite Atenção</TableHead><TableHead>Limite Crítico</TableHead><TableHead>Atualizado</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      {alertasConfig.map((a: any) => (
-                        <TableRow key={a.id}>
-                          <TableCell className="font-medium capitalize">{a.tipo?.replace(/_/g, ' ')}</TableCell>
-                          <TableCell className="text-warning font-medium">{a.limite_atencao}</TableCell>
-                          <TableCell className="text-destructive font-medium">{a.limite_critico}</TableCell>
-                          <TableCell className="text-sm text-muted-foreground">{new Date(a.updated_at).toLocaleDateString('pt-BR')}</TableCell>
-                          <TableCell><Button variant="ghost" size="icon" onClick={() => excluirAlerta.mutate(a.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                <div className="overflow-x-auto">
+                  {loadAlertas ? <div className="p-12 flex justify-center"><Spinner size="lg" /></div> : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/30 border-b border-border/20">
+                          <TableHead className="font-display font-semibold py-4 pl-6">Tipo de Indicador</TableHead>
+                          <TableHead className="font-display font-semibold">Limite Atenção</TableHead>
+                          <TableHead className="font-display font-semibold">Limite Crítico</TableHead>
+                          <TableHead className="font-display font-semibold hidden sm:table-cell">Última Alteração</TableHead>
+                          <TableHead className="w-[80px] text-right pr-6"></TableHead>
                         </TableRow>
-                      ))}
-                      {alertasConfig.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma configuração de alerta</TableCell></TableRow>}
-                    </TableBody>
-                  </Table>
-                )}
+                      </TableHeader>
+                      <TableBody>
+                        {alertasConfig.map((a: any) => (
+                          <TableRow key={a.id} className="hover:bg-accent/10 transition-colors group">
+                            <TableCell className="font-body font-bold capitalize pl-6 py-4">{a.tipo?.replace(/_/g, ' ')}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 font-bold px-2 py-0.5 rounded-lg">
+                                {a.limite_atencao}%
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 font-bold px-2 py-0.5 rounded-lg">
+                                {a.limite_critico}%
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground hidden sm:table-cell font-body">
+                              {new Date(a.updated_at).toLocaleDateString('pt-BR')}
+                            </TableCell>
+                            <TableCell className="text-right pr-6">
+                              <Button variant="ghost" size="icon" onClick={() => excluirAlerta.mutate(a.id)} className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {alertasConfig.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground py-16 font-body opacity-40">
+                              <div className="flex flex-col items-center gap-3">
+                                <Bell className="h-10 w-10" />
+                                <p>Nenhum alerta de KPI configurado.</p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
         </TabsContent>
+
 
         <TabsContent value="seguranca">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
