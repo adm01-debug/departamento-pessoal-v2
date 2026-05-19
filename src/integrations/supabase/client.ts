@@ -44,7 +44,9 @@ interface BridgePayload {
   filters?: Filter[];
   order?: { column: string; ascending?: boolean };
   limit?: number;
+  offset?: number;
   single?: boolean;
+  countMode?: string;
   params?: any;
 }
 
