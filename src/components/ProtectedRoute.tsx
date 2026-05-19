@@ -12,6 +12,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Espera a inicialização completa (RESTORE SESSION) antes de decidir
   if (!isReady || (loading && !user)) {
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
         {/* Animated background elements */}
