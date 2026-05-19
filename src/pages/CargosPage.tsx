@@ -38,6 +38,13 @@ export default function CargosPage() {
     setPage(1);
   }, [search, setPage]);
 
+  // Toast de erro se a query falhar
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização com banco externo");
+    }
+  }, [error]);
+
   const formatCurrency = (v: number | null) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const totalPages = Math.ceil(total / pageSize);
 
