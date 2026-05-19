@@ -53,9 +53,11 @@ class ColaboradorService extends BaseService<Colaborador> {
     const summary = {
       total: data.length,
       ativo: data.filter(c => c.status === 'ativo').length,
-      inativo: data.filter(c => c.status === 'inativo').length,
-      ferias: data.filter(c => c.status === 'ferias').length,
+      desligado: data.filter(c => c.status === 'desligado').length,
       afastado: data.filter(c => c.status === 'afastado').length,
+      // Status inativo/ferias mapped for UI compatibility
+      inativo: data.filter(c => c.status === 'desligado').length, 
+      ferias: 0, // Placeholder: ferias usually comes from a separate table or a specific status
     };
     
     return summary;
