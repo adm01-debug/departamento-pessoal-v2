@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 
 export default function OrganogramaPage() {
-  const { dados, isLoading } = useOrganograma();
+  const { dados, isLoading, error, refetch } = useOrganograma();
   const [search, setSearch] = useState('');
 
   const stats = useMemo(() => {
