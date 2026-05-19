@@ -21,7 +21,8 @@ export default function EmpresasPage() {
     pageSize,
     search,
     setSearch,
-    refetch
+    refetch,
+    isRefreshing
   } = useTodasEmpresas();
 
   const handleSearchChange = useCallback((val: string) => {
@@ -54,6 +55,7 @@ export default function EmpresasPage() {
       onPageChange={handlePageChange}
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
+      isRefreshing={isRefreshing}
       onAdd={() => navigate('/empresas/novo')}
       addLabel="Nova Empresa"
       actions={
