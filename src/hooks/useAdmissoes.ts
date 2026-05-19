@@ -8,11 +8,13 @@ export function useAdmissoes() {
   const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
 
-  const query = useQuery({
+  const query = useQuery<any[]>({
     queryKey: ['admissoes', empresaId],
-    queryFn: () => admissaoService.listar(empresaId),
+    queryFn: () => admissaoService.listarAdmissoes(empresaId),
     enabled: true,
   });
+
+
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => admissaoService.criar({ ...data, empresa_id: empresaId }),

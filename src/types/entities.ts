@@ -1,0 +1,90 @@
+export interface Cargo {
+  id: string;
+  nome: string;
+  descricao?: string;
+  cbo?: string;
+  nivel_hierarquico?: number;
+  salario_base?: number;
+  ativo?: boolean;
+  empresa_id?: string;
+  version?: number;
+  created_at?: string;
+}
+
+export interface Departamento {
+  id: string;
+  nome: string;
+  codigo_centro_custo?: string;
+  departamento_pai_id?: string;
+  ativo?: boolean;
+  empresa_id?: string;
+  created_at?: string;
+}
+
+export interface Empresa {
+  id: string;
+  nome_fantasia: string | null;
+  razao_social: string;
+  cnpj: string | null;
+  inscricao_estadual?: string | null;
+  inscricao_municipal?: string | null;
+  cep?: string | null;
+  logradouro?: string | null;
+  numero?: string | null;
+  complemento?: string | null;
+  bairro?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+  telefone?: string | null;
+  email?: string | null;
+  logo_url?: string | null;
+  ativa?: boolean;
+  ativo?: boolean; // added both for compatibility
+  created_at?: string;
+  updated_at?: string;
+}
+
+
+export interface Colaborador {
+  id: string;
+  nome_completo: string;
+  cpf: string;
+  email: string;
+  status: 'ativo' | 'afastado' | 'desligado';
+  departamento?: string;
+  cargo?: string;
+  empresa_id: string;
+  version?: number;
+  created_at?: string;
+  avatar_url?: string;
+  foto_url?: string;
+  data_admissao?: string;
+  salario_base?: number;
+  cidade?: string;
+  uf?: string;
+  observacoes?: string;
+  matricula?: string;
+}
+
+
+export interface Ferias {
+  id: string;
+  colaborador_id: string;
+  data_inicio: string;
+  data_fim: string;
+  status: 'pendente' | 'aprovada' | 'rejeitada' | 'cancelada';
+  empresa_id: string;
+  created_at?: string;
+  colaborador_nome?: string;
+}
+
+export interface Documento {
+  id: string;
+  nome: string;
+  url: string;
+  tipo: string;
+  colaborador_id?: string;
+  empresa_id?: string;
+  created_at?: string;
+}
+
