@@ -6,10 +6,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import {
   Activity, Database, HardDrive, CheckCircle, XCircle, Trash2, Download,
   RefreshCw, Loader2, Bell, Zap, Clock
 } from 'lucide-react';
+
 
 export function SystemHealthTab() {
   const [healthData, setHealthData] = useState<any>(null);
