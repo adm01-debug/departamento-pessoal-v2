@@ -2,15 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cargoService } from '@/services/cargoService';
 import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export function useCargos() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [search, setSearch] = useState('');
+
   const query = useQuery({
-    queryKey: ['cargos', empresaId],
-    queryFn: () => cargoService.listar({ empresaId, pageSize: 1000 }),
+    queryKey: ['cargos', { empresaId, search, page, pageSize }],
+    queryFn: () => cargoService.listar({ empresaId, search, page, pageSize }),
     enabled: true,
   });
 
@@ -45,7 +50,14 @@ export function useCargos() {
     cargos: query.data?.data || [],
     total: query.data?.total || 0,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     error: query.error,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    search,
+    setSearch,
     criar: criarMutation.mutateAsync,
     atualizar: atualizarMutation.mutateAsync,
     excluir: excluirMutation.mutateAsync,
