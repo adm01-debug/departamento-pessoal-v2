@@ -6,6 +6,7 @@ import { useOrganograma } from '@/hooks/useOrganograma';
 import { OrganogramaNode } from '@/components/organograma/OrganogramaNode';
 import { Network, Users, Building2, TrendingUp, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { SyncErrorState } from '@/components/ui/sync-error-state';
 import { useState, useMemo } from 'react';
 
 export default function OrganogramaPage() {
