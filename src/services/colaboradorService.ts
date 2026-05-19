@@ -46,7 +46,7 @@ class ColaboradorService extends BaseService<Colaborador> {
   async getSummary(empresaId?: string, filters: any = {}) {
     // Optimized: Run counts in parallel using Supabase count feature
     const { departamento, cargo } = filters;
-    const statuses = ['ativo', 'desligado', 'afastado', 'ferias'];
+    const statuses = ['ativo', 'desligado', 'afastado', 'ferias'] as const;
     
     const countPromises = statuses.map(async (status) => {
       let query = supabase
