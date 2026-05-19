@@ -36,10 +36,12 @@ interface EntityPageContainerProps<T> {
   // Customization
   searchPlaceholder?: string;
   entityName: string; // e.g., "cargo", "departamento"
-  columns: { header: string; className?: string; width?: string }[];
+  columns: { header: string; className?: string; width?: string; hidden?: 'sm' | 'md' | 'lg' | boolean }[];
   renderRow: (item: T) => ReactNode;
   stats?: ReactNode;
+  customFilters?: ReactNode;
 }
+
 
 export function EntityPageContainer<T extends { id: string | number }>({
   title,
