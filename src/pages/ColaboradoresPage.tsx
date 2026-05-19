@@ -40,6 +40,7 @@ export default function ColaboradoresPage() {
     total,
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
@@ -50,13 +51,20 @@ export default function ColaboradoresPage() {
     departamento,
     setDepartamento,
     cargo,
-    setCargo
+    setCargo,
+    refetch
   } = useColaboradores();
 
   // Resetar página ao mudar filtros
   useEffect(() => {
     setPage(1);
   }, [search, status, departamento, cargo, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Falha na sincronização de colaboradores");
+    }
+  }, [error]);
 
   // Para o resumo superior, ainda podemos precisar de contagens reais. 
   // Mas como agora é paginado no servidor, as contagens seriam apenas da página atual se usarmos useMemo.
