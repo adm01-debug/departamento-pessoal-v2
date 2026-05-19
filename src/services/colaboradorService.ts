@@ -43,9 +43,27 @@ class ColaboradorService extends BaseService<Colaborador> {
     return { data: (data as Colaborador[]) || [], total: count || 0 };
   }
 
+  async getSummary(empresaId?: string) {
+    let query = supabase.from('colaboradores').select('status', { count: 'exact' });
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const summary = {
+      total: data.length,
+      ativo: data.filter(c => c.status === 'ativo').length,
+      inativo: data.filter(c => c.status === 'inativo').length,
+      ferias: data.filter(c => c.status === 'ferias').length,
+      afastado: data.filter(c => c.status === 'afastado').length,
+    };
+    
+    return summary;
+  }
+
   // Alias for backward compatibility
   async list(empresaId?: string) {
-    return (await this.listar({ filters: { empresa_id: empresaId }, pageSize: 1000 })).data;
+    return (await this.listar({ filters: { empresaId }, pageSize: 1000 })).data;
   }
 
   async getById(id: string) { return this.buscarPorId(id); }
