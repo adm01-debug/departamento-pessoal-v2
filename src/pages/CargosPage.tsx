@@ -19,11 +19,13 @@ export default function CargosPage() {
     total, 
     isLoading, 
     isFetching,
+    error,
     page,
     setPage,
     pageSize,
     search,
-    setSearch
+    setSearch,
+    refetch
   } = useCargos();
 
   // Actually, looking at my previous hook update for useCargos, it doesn't take params yet for page/pageSize in the returned object if I didn't change the state.
