@@ -18,7 +18,8 @@ export function SyncErrorState({ error, onRetry, entityName = "dados" }: SyncErr
                  (error?.error || "Erro de conexão com o banco externo");
 
   const isUuidError = errorMessage.includes('invalid input syntax for type uuid');
-  const isSchemaError = errorMessage.includes('schema cache');
+  const isSchemaError = errorMessage.includes('schema cache') || errorMessage.includes('column') || errorMessage.includes('does not exist');
+  const isNetworkError = errorMessage.includes('failed to fetch') || errorMessage.includes('network error') || errorMessage.includes('timeout');
 
   return (
     <div className="flex flex-col items-center justify-center p-8 w-full max-w-2xl mx-auto space-y-4">
@@ -36,7 +37,13 @@ export function SyncErrorState({ error, onRetry, entityName = "dados" }: SyncErr
           
           {isSchemaError && (
             <p className="mt-2 text-destructive font-medium">
-              O banco de dados externo parece ter mudado sua estrutura recentemente.
+              O banco de dados externo parece ter uma estrutura diferente da esperada (coluna ou tabela ausente).
+            </p>
+          )}
+
+          {isNetworkError && (
+            <p className="mt-2 text-destructive font-medium">
+              Falha na conexão de rede com o servidor externo.
             </p>
           )}
 
