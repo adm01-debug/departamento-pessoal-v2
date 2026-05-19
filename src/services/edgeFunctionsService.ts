@@ -167,4 +167,8 @@ export const edgeFunctionsService = {
   /** Verifica rate limit */
   checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) => 
     handleInvoke('rateLimit', { body: { key, limit, window_seconds: windowSeconds } }),
+
+  /** Verifica conexão com banco externo */
+  checkExternalDb: async () => 
+    handleInvoke('external-db-bridge', { body: { action: 'select', table: 'empresas', limit: 1 } }),
 };
