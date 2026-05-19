@@ -5,10 +5,11 @@ import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { Table, TableBody, TableHeader, TableRow, TableHead } from '@/components/ui/table';
 import { EmptyList } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
-import { FilterX } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { FilterX, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { SyncErrorState } from '@/components/ui/sync-error-state';
+import { TableSkeleton } from '@/components/ui/module-skeleton';
 import { Button } from '@/components/ui/button';
 
 interface EntityPageContainerProps<T> {
