@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { EntityPageContainer } from '@/components/layout/EntityPageContainer';
 import { Colaborador } from '@/types/entities';
+import { StatCardSkeleton } from '@/components/ui/module-skeleton';
 
 export default function ColaboradoresPage() {
   const navigate = useNavigate();
