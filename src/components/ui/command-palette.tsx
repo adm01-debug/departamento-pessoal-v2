@@ -28,6 +28,7 @@ interface CommandItem {
   gradient: string;
   shortcut?: string;
   avatar?: { name: string };
+  status?: string;
 }
 
 /* ─── Static commands ─── */
