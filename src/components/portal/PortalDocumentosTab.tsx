@@ -32,9 +32,10 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
 
   const { data: documentos, isLoading } = useQuery({
     queryKey: ['portal-documentos', colaboradorId],
-    queryFn: () => documentoService.listar(colaboradorId),
+    queryFn: () => documentoService.listarDocumentos(colaboradorId),
     enabled: !!colaboradorId
   });
+
 
   const handleUpload = async () => {
     if (!file || !tipo || !colaboradorId) {

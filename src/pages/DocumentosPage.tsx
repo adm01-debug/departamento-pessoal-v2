@@ -53,8 +53,9 @@ export default function DocumentosPage() {
 
   const { data: documentos, isLoading } = useQuery({
     queryKey: ['documentos', colaboradorFilter],
-    queryFn: () => documentoService.listar(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
+    queryFn: () => documentoService.listarDocumentos(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
   });
+
 
   const { data: colaboradoresRes } = useQuery({
     queryKey: ['colaboradores-simples'],
