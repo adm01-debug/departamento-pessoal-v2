@@ -86,40 +86,50 @@ export default function ConfiguracoesPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['config-alertas-indicadores'] }); toast.success('Configuração removida'); },
   });
 
+  const tabs = [
+    { value: 'empresa', label: 'Empresa', adminOnly: true },
+    { value: 'perfis', label: 'Perfis', adminOnly: true },
+    { value: 'beneficios', label: 'Benefícios', adminOnly: false },
+    { value: 'folha', label: 'Folha', adminOnly: false },
+    { value: 'ponto', label: 'Ponto', adminOnly: false },
+    { value: 'notificacoes', label: 'Notificações', adminOnly: false },
+    { value: 'seguranca', label: 'Segurança', adminOnly: false },
+    { value: 'geral', label: 'Preferências', adminOnly: false },
+    { value: 'alertas', label: 'Alertas RH', adminOnly: true },
+    { value: 'campos', label: 'Campos Custom', adminOnly: true },
+    { value: 'ips', label: 'Filtro IP', adminOnly: true },
+    { value: 'integracoes', label: 'Integ.', adminOnly: true },
+    { value: 'webhooks', label: 'Webhooks', adminOnly: true },
+    { value: 'logs-integ', label: 'Integ. Logs', adminOnly: true },
+    { value: 'auditoria-global', label: 'Auditoria', adminOnly: true },
+    { value: 'config-bd', label: 'BD', adminOnly: true },
+    { value: 'sistema', label: 'Saúde/Sync', adminOnly: true },
+  ];
+
   return (
     <>
     <PageTitle title="Configurações" description="Configurações do sistema" />
     <PageLayout
       title="Configurações"
-      description="Configurações do sistema"
+      description="Gerenciamento centralizado de parâmetros e segurança"
       icon={<Settings className="h-5 w-5 text-primary-foreground" />}
       gradient="from-muted-foreground to-foreground"
     >
-      <Tabs defaultValue={isAdmin ? "empresa" : "seguranca"} className="space-y-4">
-        <TabsList className="bg-muted/50 rounded-xl p-1 border border-border/30 overflow-x-auto no-scrollbar flex-nowrap w-full h-auto">
-          <TabsTrigger value="empresa" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Empresa</TabsTrigger>
-          <TabsTrigger value="perfis" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Perfis</TabsTrigger>
-          <TabsTrigger value="beneficios" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Benefícios</TabsTrigger>
-          <TabsTrigger value="folha" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Folha</TabsTrigger>
-          <TabsTrigger value="ponto" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Ponto</TabsTrigger>
-          <TabsTrigger value="notificacoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Notificações</TabsTrigger>
-          <TabsTrigger value="seguranca" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Segurança</TabsTrigger>
-          <TabsTrigger value="geral" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Preferências</TabsTrigger>
-          {isAdmin && (
-            <>
-              <TabsTrigger value="alertas" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Alertas RH</TabsTrigger>
-              <TabsTrigger value="campos" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Campos Custom</TabsTrigger>
-              <TabsTrigger value="ips" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Filtro IP</TabsTrigger>
-              <TabsTrigger value="integracoes" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Integ.</TabsTrigger>
-              <TabsTrigger value="webhooks" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Webhooks</TabsTrigger>
-              <TabsTrigger value="logs-integ" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Integ. Logs</TabsTrigger>
-              <TabsTrigger value="auditoria-global" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Auditoria</TabsTrigger>
+      <Tabs defaultValue={isAdmin ? "empresa" : "seguranca"} className="space-y-6">
+        <div className="bg-muted/50 rounded-2xl p-1.5 border border-border/30 overflow-x-auto no-scrollbar scroll-smooth">
+          <TabsList className="bg-transparent h-auto flex flex-nowrap gap-1 w-max min-w-full">
+            {tabs.filter(t => !t.adminOnly || isAdmin).map(tab => (
+              <TabsTrigger 
+                key={tab.value} 
+                value={tab.value} 
+                className="rounded-xl px-4 py-2 text-xs font-body font-medium transition-all data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm min-w-fit"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
-              <TabsTrigger value="config-bd" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">BD</TabsTrigger>
-              <TabsTrigger value="sistema" className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm min-w-fit">Saúde/Sync</TabsTrigger>
-            </>
-          )}
-        </TabsList>
 
         <TabsContent value="geral">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
