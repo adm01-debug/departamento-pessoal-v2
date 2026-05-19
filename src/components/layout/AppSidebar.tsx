@@ -9,8 +9,8 @@ import {
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useState, memo, useCallback, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, memo, useCallback, useMemo, useEffect } from 'react';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 
 interface MenuItem { icon: LucideIcon; label: string; path: string; color: string; }
 interface MenuGroup { id: string; label: string; icon: LucideIcon; color: string; items: MenuItem[]; }
@@ -194,6 +195,43 @@ const SidebarMenuGroup = memo(function SidebarMenuGroup({ group, collapsed, curr
   );
 });
 
+const SystemStatus = memo(function SystemStatus({ collapsed }: { collapsed: boolean }) {
+  const { data: isHealthy, isLoading } = useQuery({
+    queryKey: ['system-health'],
+    queryFn: async () => {
+      try {
+        await edgeFunctionsService.checkExternalDb();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    refetchInterval: 60000, // Cada 1 minuto
+  });
+
+  if (collapsed) {
+    return (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <div className={cn("w-2 h-2 rounded-full", isLoading ? "bg-muted animate-pulse" : isHealthy ? "bg-success" : "bg-destructive")} />
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          {isLoading ? "Verificando..." : isHealthy ? "Sistema Online" : "Problemas na Conexão"}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-sidebar-accent/10 border border-sidebar-border/30">
+      <div className={cn("w-1.5 h-1.5 rounded-full", isLoading ? "bg-muted animate-pulse" : isHealthy ? "bg-success" : "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]")} />
+      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+        {isLoading ? "Verificando..." : isHealthy ? "Sistemas Online" : "Erro de Conexão"}
+      </span>
+    </div>
+  );
+});
+
 export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
@@ -267,6 +305,10 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
             <SidebarMenuGroup key={group.id} group={group} collapsed={collapsed} currentPath={currentPath} isOpen={openGroups[group.id] ?? true} onToggle={() => toggleGroup(group.id)} />
           ))}
         </nav>
+
+        <div className="px-3 py-2">
+          <SystemStatus collapsed={collapsed} />
+        </div>
 
         {/* Footer */}
         <div className={cn("border-t border-sidebar-border transition-all duration-200", collapsed ? "p-2" : "p-3")}>

@@ -3,6 +3,7 @@ import { useGenericCrud } from './useGenericCrud';
 import { colaboradorService } from '@/services/colaboradorService';
 import { useEmpresas } from './useEmpresas';
 import { Colaborador } from '@/types/entities';
+import { useQuery } from '@tanstack/react-query';
 
 export function useColaboradores() {
   const { empresaAtual } = useEmpresas();
@@ -11,6 +12,12 @@ export function useColaboradores() {
   const [status, setStatus] = useState('all');
   const [departamento, setDepartamento] = useState('all');
   const [cargo, setCargo] = useState('all');
+
+  const { data: summary, isLoading: isLoadingSummary } = useQuery({
+    queryKey: ['colaboradores-summary', empresaId],
+    queryFn: () => colaboradorService.getSummary(empresaId),
+    enabled: !!empresaId,
+  });
 
   const crud = useGenericCrud<Colaborador>({
     queryKey: 'colaboradores',
@@ -38,6 +45,8 @@ export function useColaboradores() {
     setDepartamento,
     cargo,
     setCargo,
+    summary,
+    isLoadingSummary,
     criar: (data: any) => crud.criar({ ...data, empresa_id: empresaId }),
   };
 }

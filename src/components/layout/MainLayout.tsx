@@ -21,6 +21,7 @@ const MemoizedHeader = memo(Header);
 export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const { user, isReady, signOut } = useAuth();
 
   // Ativa o gesto de swipe para voltar em mobile
@@ -47,20 +48,26 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex h-screen bg-background">
       {/* Command Palette (global) */}
-      <CommandPalette />
+      <CommandPalette 
+        open={commandPaletteOpen} 
+        onOpenChange={setCommandPaletteOpen} 
+      />
 
       {/* Guided Tour (first visit) */}
       <GuidedTour />
 
       <div className={cn('hidden md:block transition-all duration-500 ease-in-out', sidebarOpen ? 'w-64' : 'w-16')}>
-        <MemoizedSidebar onSearchOpen={() => {}} />
+        <MemoizedSidebar onSearchOpen={() => setCommandPaletteOpen(true)} />
       </div>
 
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileSidebarOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="absolute left-0 top-0 h-full w-64" onClick={(e) => e.stopPropagation()}>
-            <MemoizedSidebar onSearchOpen={() => {}} />
+            <MemoizedSidebar onSearchOpen={() => {
+              setMobileSidebarOpen(false);
+              setCommandPaletteOpen(true);
+            }} />
           </div>
         </div>
       )}
