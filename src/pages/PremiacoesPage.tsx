@@ -16,6 +16,8 @@ import { premiacoesService } from '@/services/premiacoesService';
 import { useEmpresas } from '@/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RewardsSimulator } from '@/components/premiacoes/RewardsSimulator';
+import { RewardsApprovalHub } from '@/components/premiacoes/RewardsApprovalHub';
+import { CampaignWizard } from '@/components/premiacoes/CampaignWizard';
 import { toast } from 'sonner';
 
 const formatCurrency = (val: number) => 
@@ -25,6 +27,7 @@ export default function PremiacoesPage() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = React.useState('campanhas');
+  const [isWizardOpen, setIsWizardOpen] = React.useState(false);
   
   const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
     queryKey: ['premiacoes_campanhas', empresaAtual?.id],
@@ -154,7 +157,7 @@ export default function PremiacoesPage() {
               <Button variant="outline" className="gap-2 rounded-xl" onClick={() => handleExport('pdf')}>
                 <Download className="h-4 w-4" /> Exportar
               </Button>
-              <Button className="gap-2 rounded-xl shadow-lg shadow-primary/20">
+              <Button className="gap-2 rounded-xl shadow-lg shadow-primary/20" onClick={() => setIsWizardOpen(true)}>
                 <Plus className="h-4 w-4" /> Nova Campanha
               </Button>
             </div>
@@ -238,7 +241,8 @@ export default function PremiacoesPage() {
           </TabsContent>
 
           <TabsContent value="pagamentos" className="space-y-6">
-            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm">
+            <RewardsApprovalHub pagamentos={pagamentos} />
+            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm mt-8">
               <CardHeader className="bg-muted/30 border-b border-border/30 flex-row justify-between items-center space-y-0 py-4">
                 <div>
                   <CardTitle className="text-base">Fila de Aprovação Financeira</CardTitle>
@@ -317,6 +321,8 @@ export default function PremiacoesPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
           <TabsContent value="auditoria" className="space-y-6">
             <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm">
               <CardHeader className="bg-muted/30 border-b border-border/30 py-4">
@@ -374,6 +380,12 @@ export default function PremiacoesPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <CampaignWizard 
+          isOpen={isWizardOpen} 
+          onClose={() => setIsWizardOpen(false)} 
+          empresaId={empresaAtual?.id} 
+        />
       </PageLayout>
     </>
   );
