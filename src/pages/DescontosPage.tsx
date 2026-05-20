@@ -31,7 +31,7 @@ export default function DescontosPage() {
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores-descontos', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('colaboradores').select('id, nome_completo').eq('empresa_id', empresaAtual?.id).eq('status', 'ativo');
+      const { data, error } = await supabase.from('colaboradores').select('id, nome_completo').eq('empresa_id', empresaAtual?.id as string).eq('status', 'ativo');
       if (error) throw error;
       return data || [];
     },
