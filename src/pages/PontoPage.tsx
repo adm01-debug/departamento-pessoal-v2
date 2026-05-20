@@ -25,6 +25,7 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
+import { PontoLeaderboard } from '@/components/ponto/PontoLeaderboard';
 
 interface BancoHorasResumo {
   saldo: string;
