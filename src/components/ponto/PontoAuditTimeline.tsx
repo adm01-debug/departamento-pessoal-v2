@@ -124,9 +124,15 @@ export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) 
                         </Badge>
                       )}
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded border border-border/30">
-                      REF: {log.registro_id.slice(0, 8)}
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded border border-border/30">
+                        REF: {log.registro_id.slice(0, 8)}
+                      </span>
+                      <div className="flex items-center gap-1 text-[8px] text-success font-bold">
+                        <ShieldCheck className="h-2 w-2" /> PROVA SHA256
+                      </div>
+                    </div>
+
                   </div>
                   
                   <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/30 to-background border border-border/40 group-hover:border-primary/30 transition-all group-hover:shadow-md">

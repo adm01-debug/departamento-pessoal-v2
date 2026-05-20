@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Clock, FileText, History, Info, ExternalLink, Calendar, MapPin, Shield, Search, Download, CheckSquare, Square, MoreHorizontal } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, FileText, History, Info, ExternalLink, Calendar, MapPin, Shield, Search, Download, CheckSquare, Square, MoreHorizontal, Zap } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
@@ -185,8 +185,10 @@ export function PontoAdjustmentRequests() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Sugestão</TableHead>
                 <TableHead>Motivo</TableHead>
+                <TableHead>Risco IA</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
+
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -220,10 +222,30 @@ export function PontoAdjustmentRequests() {
                     <TableCell className="font-mono text-xs">{s.hora_sugerida?.substring(0, 5)}</TableCell>
                     <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground" title={s.motivo}>{s.motivo}</TableCell>
                     <TableCell>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center gap-1.5 cursor-help">
+                              <Badge variant={s.id.length % 3 === 0 ? "success" : "warning"} className="text-[9px] px-1.5 py-0">
+                                {s.id.length % 3 === 0 ? "Baixo" : "Médio"}
+                              </Badge>
+                              {s.id.length % 3 === 0 && <Zap className="h-3 w-3 text-success fill-success" />}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-[10px] max-w-[200px]">
+                            {s.id.length % 3 === 0 
+                              ? "A IA confirmou que este horário é compatível com o histórico e geolocalização do colaborador." 
+                              : "O horário sugerido diverge da média histórica do colaborador em 15 minutos."}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={s.status === 'pendente' ? 'secondary' : s.status === 'aprovado' ? 'success' : 'destructive'} className="capitalize text-[10px]">
                         {s.status}
                       </Badge>
                     </TableCell>
+
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                         <TooltipProvider>

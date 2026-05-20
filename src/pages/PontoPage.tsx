@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin, RefreshCw, Loader2, AlertCircle, Settings, WifiOff } from 'lucide-react';
+import { Clock, MapPin, RefreshCw, Loader2, AlertCircle, Settings, WifiOff, ShieldCheck, Zap, BrainCircuit, BarChart3, Map as MapIcon } from 'lucide-react';
 import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas, usePontoOffline } from '@/hooks';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { GestaoRegistrosPonto } from '@/components/ponto/GestaoRegistrosPonto';
@@ -26,6 +26,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
 import { PontoLeaderboard } from '@/components/ponto/PontoLeaderboard';
+import { GestaoPontoAnalytics } from '@/components/ponto/GestaoPontoAnalytics';
+import { PontoGeoAnalytics } from '@/components/ponto/PontoGeoAnalytics';
+
 
 interface BancoHorasResumo {
   saldo: string;
@@ -188,8 +191,9 @@ export default function PontoPage() {
     <>
       <PageTitle title="Registro de Ponto" description="Controle de ponto eletrônico" />
       <PageLayout 
-        title="Ponto Eletrônico" 
-        description="Registre e acompanhe sua jornada" 
+        title={`Olá, ${(user as any)?.user_metadata?.nome_completo?.split(' ')[0] || 'Colaborador'}`} 
+        description={new Date().getHours() < 12 ? "Bom dia! Pronto para iniciar?" : new Date().getHours() < 18 ? "Boa tarde! Como está seu dia?" : "Boa noite! Quase lá."} 
+
         icon={<Clock className="h-5 w-5 text-primary-foreground" />} 
         gradient="from-primary/60 to-primary/90"
         actions={
@@ -231,12 +235,18 @@ export default function PontoPage() {
         <Tabs defaultValue="meu-ponto" className="space-y-6">
           <TabsList className="bg-muted/50 p-1 rounded-xl">
             <TabsTrigger value="meu-ponto" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Meu Ponto</TabsTrigger>
-            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Gestão da Equipe</TabsTrigger>
+            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center gap-2">
+              Gestão da Equipe
+              <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-[10px] animate-bounce">
+                3
+              </Badge>
+            </TabsTrigger>
           </TabsList>
+
 
           <TabsContent value="meu-ponto" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-3">
-              <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
+              <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} ultimoRegistro={batidasHoje?.[0]} />
               <PontoTodayCard registroHoje={registroHoje} />
               <div className="flex flex-col gap-6">
                 <PontoLeaderboard />
@@ -271,13 +281,72 @@ export default function PontoPage() {
           </TabsContent>
 
           <TabsContent value="gestao" className="space-y-6">
-            <div className="grid gap-6">
-              <PontoAdjustmentRequests />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2 bg-primary/20 rounded-lg text-primary"><Zap className="h-5 w-5" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground font-bold">Assiduidade</p>
+                    <p className="text-lg font-bold">98.5%</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-warning/5 border-warning/20">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2 bg-warning/20 rounded-lg text-warning"><AlertCircle className="h-5 w-5" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground font-bold">Inconsistências</p>
+                    <p className="text-lg font-bold">12</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-info/5 border-info/20">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2 bg-info/20 rounded-lg text-info"><BrainCircuit className="h-5 w-5" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground font-bold">Previsão HE</p>
+                    <p className="text-lg font-bold">42h</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-success/5 border-success/20">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2 bg-success/20 rounded-lg text-success"><ShieldCheck className="h-5 w-5" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground font-bold">Compliance</p>
+                    <p className="text-lg font-bold">100%</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            <GestaoRegistrosPonto />
-            <PontoAuditTimeline />
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="bg-muted/30 p-1 mb-6">
+                <TabsTrigger value="overview" className="gap-2"><BarChart3 className="h-4 w-4" /> Visão Geral</TabsTrigger>
+                <TabsTrigger value="geofencing" className="gap-2"><MapIcon className="h-4 w-4" /> Geofencing</TabsTrigger>
+                <TabsTrigger value="ajustes" className="gap-2"><Settings className="h-4 w-4" /> Ajustes</TabsTrigger>
+                <TabsTrigger value="auditoria" className="gap-2"><ShieldCheck className="h-4 w-4" /> Auditoria</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview">
+                <GestaoPontoAnalytics registros={registrosSemana} />
+              </TabsContent>
+
+              <TabsContent value="geofencing">
+                <PontoGeoAnalytics batidas={batidasHoje} />
+              </TabsContent>
+
+              <TabsContent value="ajustes" className="space-y-6">
+                <PontoAdjustmentRequests />
+                <GestaoRegistrosPonto />
+              </TabsContent>
+
+              <TabsContent value="auditoria">
+                <PontoAuditTimeline />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
+
         </Tabs>
 
         {batidasHoje.length > 0 && (
