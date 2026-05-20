@@ -2,10 +2,30 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, CheckCircle2, XCircle, Clock, User, AlertCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  ShieldCheck, 
+  CheckCircle2, 
+  XCircle, 
+  Clock, 
+  User, 
+  AlertCircle, 
+  MessageSquare, 
+  Search,
+  Check,
+  AlertTriangle
+} from 'lucide-react';
 import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface ApprovalHubProps {
   pagamentos: any[];
@@ -13,56 +33,165 @@ interface ApprovalHubProps {
 
 export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
   const queryClient = useQueryClient();
+  const [selectedPagamento, setSelectedPagamento] = React.useState<any>(null);
+  const [comentario, setComentario] = React.useState('');
+  const [isReconcileOpen, setIsReconcileOpen] = React.useState(false);
+  const [valorFolha, setValorFolha] = React.useState('');
 
   const handleApprove = async (id: string, nextStatus: string, valor: number) => {
     try {
-      await premiacoesService.atualizarStatusPagamento(id, nextStatus, valor);
+      await premiacoesService.atualizarStatusPagamento(id, nextStatus, valor, comentario || 'Aprovado via Hub');
       queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
       toast.success("Aprovação registrada com sucesso.");
+      setSelectedPagamento(null);
+      setComentario('');
     } catch (e) {
       toast.error("Erro ao aprovar pagamento.");
     }
   };
 
+  const handleReconcile = async () => {
+    if (!selectedPagamento) return;
+    try {
+      await premiacoesService.reconciliarFolha(selectedPagamento.id, Number(valorFolha), comentario);
+      queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
+      toast.success("Conciliação registrada.");
+      setIsReconcileOpen(false);
+      setValorFolha('');
+      setComentario('');
+    } catch (e) {
+      toast.error("Erro na conciliação.");
+    }
+  };
+
+  const stages = [
+    { id: 'calculado', label: 'Aguardando Gestor', icon: User },
+    { id: 'aprovado_gestor', label: 'Aguardando RH', icon: ShieldCheck },
+    { id: 'aprovado_rh', label: 'Aguardando Financeiro', icon: Clock },
+    { id: 'aprovado_financeiro', label: 'Conciliação (Folha)', icon: Search }
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {['calculado', 'aprovado_gestor', 'aprovado_rh'].map((stage) => (
-        <Card key={stage} className="border-border/30 rounded-2xl shadow-sm">
-          <CardHeader className="bg-muted/30 py-4 border-b border-border/10">
-            <CardTitle className="text-sm font-bold flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-primary" />
-              {stage === 'calculado' ? 'Aguardando Gestor' : stage === 'aprovado_gestor' ? 'Aguardando RH' : 'Aguardando Financeiro'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 space-y-4">
-            {pagamentos
-              .filter(p => p.status === stage)
-              .map(p => (
-                <div key={p.id} className="p-3 border border-border/20 rounded-xl hover:bg-muted/5">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-bold">{p.colaborador?.nome_completo}</span>
-                    <Badge variant="outline" className="text-[10px] font-bold">R$ {p.valor_calculado}</Badge>
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <Button 
-                      size="sm" 
-                      className="flex-1 h-7 text-[10px] bg-success hover:bg-success/90"
-                      onClick={() => handleApprove(p.id, stage === 'calculado' ? 'aprovado_gestor' : stage === 'aprovado_gestor' ? 'aprovado_rh' : 'aprovado_financeiro', p.valor_calculado)}
-                    >
-                      <CheckCircle2 className="h-3 w-3 mr-1" /> Aprovar
-                    </Button>
-                    <Button size="sm" variant="outline" className="h-7 text-[10px]">
-                      <XCircle className="h-3 w-3 text-destructive" />
-                    </Button>
-                  </div>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {stages.map((stage) => (
+          <Card key={stage.id} className="border-border/30 rounded-2xl shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardHeader className="py-4 border-b border-border/10">
+              <CardTitle className="text-xs font-bold flex items-center gap-2 uppercase tracking-tighter text-muted-foreground">
+                <stage.icon className="h-4 w-4 text-primary" />
+                {stage.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 space-y-3">
+              {pagamentos
+                .filter(p => stage.id === 'aprovado_financeiro' ? (p.status === stage.id || p.status === 'pago') : p.status === stage.id)
+                .map(p => {
+                  const hasDivergence = p.valor_folha_real && p.valor_folha_real !== p.valor_aprovado;
+                  return (
+                    <div key={p.id} className={`p-3 border rounded-xl transition-all ${hasDivergence ? 'border-amber-500/30 bg-amber-500/5' : 'border-border/20 hover:bg-muted/5'}`}>
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-[11px] font-bold truncate max-w-[120px]">{p.colaborador?.nome_completo}</span>
+                        <Badge variant="secondary" className="text-[9px] font-mono">R$ {p.valor_aprovado || p.valor_calculado}</Badge>
+                      </div>
+                      
+                      {stage.id === 'aprovado_financeiro' && p.status_conciliacao === 'divergente' && (
+                        <div className="flex items-center gap-1 mt-1 text-[9px] text-amber-600 font-bold">
+                          <AlertTriangle className="h-3 w-3" /> Divergência Detectada
+                        </div>
+                      )}
+
+                      <div className="flex gap-2 mt-3">
+                        {stage.id === 'aprovado_financeiro' ? (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="w-full h-7 text-[10px] rounded-lg"
+                            onClick={() => {
+                              setSelectedPagamento(p);
+                              setValorFolha(p.valor_folha_real?.toString() || '');
+                              setIsReconcileOpen(true);
+                            }}
+                          >
+                            <Search className="h-3 w-3 mr-1" /> Conciliar
+                          </Button>
+                        ) : (
+                          <>
+                            <Button 
+                              size="sm" 
+                              className="flex-1 h-7 text-[10px] bg-success hover:bg-success/90 rounded-lg"
+                              onClick={() => {
+                                setSelectedPagamento(p);
+                                handleApprove(p.id, stage.id === 'calculado' ? 'aprovado_gestor' : stage.id === 'aprovado_gestor' ? 'aprovado_rh' : 'aprovado_financeiro', p.valor_aprovado || p.valor_calculado);
+                              }}
+                            >
+                              <CheckCircle2 className="h-3 w-3 mr-1" /> Aprovar
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7 w-7 p-0 rounded-lg text-destructive">
+                              <XCircle className="h-3 w-3" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              {pagamentos.filter(p => stage.id === 'aprovado_financeiro' ? (p.status === stage.id || p.status === 'pago') : p.status === stage.id).length === 0 && (
+                <div className="text-center py-8 text-[10px] text-muted-foreground italic bg-muted/20 rounded-xl border border-dashed border-border/50">
+                  Fila vazia
                 </div>
-            ))}
-            {pagamentos.filter(p => p.status === stage).length === 0 && (
-              <div className="text-center py-6 text-[10px] text-muted-foreground italic">Nenhum pagamento nesta etapa.</div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Dialog open={isReconcileOpen} onOpenChange={setIsReconcileOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5 text-primary" />
+              Conciliação Bancária / Folha
+            </DialogTitle>
+            <DialogDescription>
+              Compare o valor aprovado com o lançamento real na folha de pagamento.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="p-4 bg-muted/30 rounded-2xl border border-border/10 space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Valor Aprovado:</span>
+                <span className="font-bold font-mono">R$ {selectedPagamento?.valor_aprovado}</span>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">Valor Real na Folha</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
+                <input 
+                  type="number"
+                  className="w-full pl-8 pr-4 py-2 bg-background border border-border/50 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                  placeholder="0,00"
+                  value={valorFolha}
+                  onChange={(e) => setValorFolha(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">Justificativa (Obrigatório se houver divergência)</label>
+              <Textarea 
+                placeholder="Ex: Diferença de impostos retidos..."
+                className="rounded-xl resize-none text-xs"
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsReconcileOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button onClick={handleReconcile} className="rounded-xl px-8">Salvar Conciliação</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

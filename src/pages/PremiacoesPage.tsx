@@ -81,9 +81,10 @@ export default function PremiacoesPage() {
 
   const stats = {
     totalAprovado: pagamentos.reduce((acc, p) => acc + (Number(p.valor_aprovado) || 0), 0),
+    totalRealFolha: pagamentos.reduce((acc, p) => acc + (Number(p.valor_folha_real) || 0), 0),
     totalPendente: pagamentos.filter(p => p.status === 'calculado').reduce((acc, p) => acc + Number(p.valor_calculado), 0),
     campanhasAtivas: campanhas.filter(c => c.status === 'ativo').length,
-    roiEstimado: 24.5 // Mock ROI for visual excellence
+    divergenciaCount: pagamentos.filter(p => p.status_conciliacao === 'divergente').length
   };
 
   if (loadCampanhas) return <div className="p-8"><Skeleton className="h-[400px] w-full" /></div>;
@@ -133,14 +134,18 @@ export default function PremiacoesPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/40 shadow-sm bg-primary/5">
+          <Card className={`border-border/40 shadow-sm ${stats.divergenciaCount > 0 ? 'bg-amber-500/5' : 'bg-primary/5'}`}>
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
-                <p className="text-xs font-bold text-primary uppercase tracking-wider">ROI de Incentivo</p>
-                <div className="p-2 bg-primary/10 rounded-lg text-primary"><TrendingUp className="h-4 w-4" /></div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Conciliação (Divergências)</p>
+                <div className={`p-2 rounded-lg ${stats.divergenciaCount > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-primary/10 text-primary'}`}>
+                  {stats.divergenciaCount > 0 ? <AlertCircle className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+                </div>
               </div>
-              <h3 className="text-2xl font-bold mt-2 text-primary">{stats.roiEstimado}%</h3>
-              <p className="text-[10px] text-primary/70 mt-1">Crescimento de produtividade</p>
+              <h3 className="text-2xl font-bold mt-2">{stats.divergenciaCount}</h3>
+              <p className={`text-[10px] mt-1 ${stats.divergenciaCount > 0 ? 'text-amber-600 font-bold' : 'text-muted-foreground'}`}>
+                {stats.divergenciaCount > 0 ? 'Atenção necessária na auditoria' : 'Todos os valores conciliados'}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -242,21 +247,22 @@ export default function PremiacoesPage() {
 
           <TabsContent value="pagamentos" className="space-y-6">
             <RewardsApprovalHub pagamentos={pagamentos} />
-            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm mt-8">
-              <CardHeader className="bg-muted/30 border-b border-border/30 flex-row justify-between items-center space-y-0 py-4">
+            
+            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm mt-8 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-muted/30 border-b border-border/10 flex-row justify-between items-center space-y-0 py-4">
                 <div>
-                  <CardTitle className="text-base">Fila de Aprovação Financeira</CardTitle>
-                  <CardDescription className="text-xs">Cálculos automáticos baseados em metas e regras</CardDescription>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    Relatório Gerencial de Alta Fidelidade 10/10
+                  </CardTitle>
+                  <CardDescription className="text-[10px] uppercase tracking-widest">Extração de dados com filtros por empresa e unidade</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg" onClick={handleSyncFolha}>
-                    <RefreshCw className="mr-1 h-3 w-3" /> Sincronizar Folha
+                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
+                    <Download className="mr-1 h-3 w-3" /> Exportar CSV
                   </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg">
-                    <Filter className="mr-1 h-3 w-3" /> Filtros
-                  </Button>
-                  <Button size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg bg-success hover:bg-success/90">
-                    Aprovar Lote
+                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('pdf')}>
+                    <FileText className="mr-1 h-3 w-3" /> Gerar PDF
                   </Button>
                 </div>
               </CardHeader>
@@ -264,55 +270,45 @@ export default function PremiacoesPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-muted/20 border-b border-border/10">
-                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Colaborador</th>
-                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Campanha</th>
-                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Valor Calculado</th>
-                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Status</th>
-                        <th className="text-right p-4 font-bold text-[10px] uppercase text-muted-foreground">Ações</th>
+                      <tr className="bg-muted/10 border-b border-border/5">
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Colaborador</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Campanha</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Valor Aprovado</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Folha Real</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Status Conciliação</th>
+                        <th className="text-right p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Auditoria</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/10">
+                    <tbody className="divide-y divide-border/5">
                       {pagamentos.map(p => (
                         <tr key={p.id} className="hover:bg-accent/5 transition-colors group">
                           <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                                {p.colaborador?.nome_completo?.charAt(0)}
-                              </div>
-                              <span className="font-semibold text-xs">{p.colaborador?.nome_completo}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-xs">{p.colaborador?.nome_completo}</span>
                             </div>
                           </td>
                           <td className="p-4">
-                            <Badge variant="outline" className="text-[10px] font-medium">{p.campanha?.nome}</Badge>
+                            <Badge variant="outline" className="text-[9px] font-medium border-border/50">{p.campanha?.nome}</Badge>
                           </td>
                           <td className="p-4 font-mono font-bold text-xs">
-                            {formatCurrency(p.valor_calculado)}
+                            {formatCurrency(p.valor_aprovado || p.valor_calculado)}
+                          </td>
+                          <td className="p-4 font-mono font-bold text-xs text-muted-foreground">
+                            {p.valor_folha_real ? formatCurrency(p.valor_folha_real) : '—'}
                           </td>
                           <td className="p-4">
                             <Badge className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                              p.status === 'aprovado' ? 'bg-success/10 text-success border-success/20' : 
-                              p.status === 'calculado' ? 'bg-warning/10 text-warning border-warning/20' : 
+                              p.status_conciliacao === 'conciliado' ? 'bg-success/10 text-success' : 
+                              p.status_conciliacao === 'divergente' ? 'bg-amber-500/10 text-amber-500' : 
                               'bg-muted text-muted-foreground'
                             }`}>
-                              {p.status}
+                              {p.status_conciliacao || 'pendente'}
                             </Badge>
                           </td>
                           <td className="p-4 text-right">
-                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-7 w-7 text-success hover:bg-success/10"
-                                onClick={() => updateStatusMutation.mutate({ id: p.id, status: 'aprovado', valor: p.valor_calculado })}
-                                disabled={p.status === 'aprovado'}
-                              >
-                                <CheckCircle2 className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:bg-muted/10">
-                                <ExternalLink className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <History className="h-3 w-3" />
+                            </Button>
                           </td>
                         </tr>
                       ))}

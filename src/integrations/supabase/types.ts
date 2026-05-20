@@ -14048,6 +14048,36 @@ export type Database = {
         }
         Relationships: []
       }
+      premiacoes_alertas: {
+        Row: {
+          created_at: string | null
+          id: string
+          lido: boolean | null
+          mensagem: string
+          metadata: Json | null
+          tipo: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          lido?: boolean | null
+          mensagem: string
+          metadata?: Json | null
+          tipo: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          lido?: boolean | null
+          mensagem?: string
+          metadata?: Json | null
+          tipo?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       premiacoes_auditoria: {
         Row: {
           acao: string
@@ -14086,39 +14116,48 @@ export type Database = {
       }
       premiacoes_campanhas: {
         Row: {
+          comentarios_aprovacao: Json | null
           created_at: string
           data_fim: string
           data_inicio: string
           descricao: string | null
           empresa_id: string
           id: string
+          meta_dados: Json | null
           nome: string
           orcamento_estimado: number | null
           status: string
+          status_aprovacao: string | null
           updated_at: string
         }
         Insert: {
+          comentarios_aprovacao?: Json | null
           created_at?: string
           data_fim: string
           data_inicio: string
           descricao?: string | null
           empresa_id: string
           id?: string
+          meta_dados?: Json | null
           nome: string
           orcamento_estimado?: number | null
           status?: string
+          status_aprovacao?: string | null
           updated_at?: string
         }
         Update: {
+          comentarios_aprovacao?: Json | null
           created_at?: string
           data_fim?: string
           data_inicio?: string
           descricao?: string | null
           empresa_id?: string
           id?: string
+          meta_dados?: Json | null
           nome?: string
           orcamento_estimado?: number | null
           status?: string
+          status_aprovacao?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -14173,15 +14212,20 @@ export type Database = {
           created_at: string
           data_integracao: string | null
           data_pagamento: string | null
+          historico_mudancas: Json | null
           id: string
           integrado_folha: boolean | null
+          justificativa_divergencia: string | null
+          logs_calculo: Json | null
           observacoes: string | null
           referencia_folha: string | null
           regra_id: string
           status: string
+          status_conciliacao: string | null
           updated_at: string
           valor_aprovado: number | null
           valor_calculado: number
+          valor_folha_real: number | null
         }
         Insert: {
           campanha_id: string
@@ -14189,15 +14233,20 @@ export type Database = {
           created_at?: string
           data_integracao?: string | null
           data_pagamento?: string | null
+          historico_mudancas?: Json | null
           id?: string
           integrado_folha?: boolean | null
+          justificativa_divergencia?: string | null
+          logs_calculo?: Json | null
           observacoes?: string | null
           referencia_folha?: string | null
           regra_id: string
           status?: string
+          status_conciliacao?: string | null
           updated_at?: string
           valor_aprovado?: number | null
           valor_calculado: number
+          valor_folha_real?: number | null
         }
         Update: {
           campanha_id?: string
@@ -14205,15 +14254,20 @@ export type Database = {
           created_at?: string
           data_integracao?: string | null
           data_pagamento?: string | null
+          historico_mudancas?: Json | null
           id?: string
           integrado_folha?: boolean | null
+          justificativa_divergencia?: string | null
+          logs_calculo?: Json | null
           observacoes?: string | null
           referencia_folha?: string | null
           regra_id?: string
           status?: string
+          status_conciliacao?: string | null
           updated_at?: string
           valor_aprovado?: number | null
           valor_calculado?: number
+          valor_folha_real?: number | null
         }
         Relationships: [
           {
@@ -14307,6 +14361,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      premiacoes_roi_cenarios: {
+        Row: {
+          configuracoes: Json
+          created_at: string | null
+          id: string
+          nome: string
+          resultados: Json
+          snapshot_logs: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          configuracoes: Json
+          created_at?: string | null
+          id?: string
+          nome: string
+          resultados: Json
+          snapshot_logs?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          configuracoes?: Json
+          created_at?: string | null
+          id?: string
+          nome?: string
+          resultados?: Json
+          snapshot_logs?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
