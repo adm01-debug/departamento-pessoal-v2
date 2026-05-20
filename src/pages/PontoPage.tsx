@@ -234,8 +234,14 @@ export default function PontoPage() {
         <Tabs defaultValue="meu-ponto" className="space-y-6">
           <TabsList className="bg-muted/50 p-1 rounded-xl">
             <TabsTrigger value="meu-ponto" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Meu Ponto</TabsTrigger>
-            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Gestão da Equipe</TabsTrigger>
+            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center gap-2">
+              Gestão da Equipe
+              <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-[10px] animate-bounce">
+                3
+              </Badge>
+            </TabsTrigger>
           </TabsList>
+
 
           <TabsContent value="meu-ponto" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-3">
