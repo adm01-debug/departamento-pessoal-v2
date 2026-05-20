@@ -14048,6 +14048,42 @@ export type Database = {
         }
         Relationships: []
       }
+      premiacoes_auditoria: {
+        Row: {
+          acao: string
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          entidade_id: string
+          entidade_tipo: string
+          id: string
+          motivo: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          entidade_id: string
+          entidade_tipo: string
+          id?: string
+          motivo?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          entidade_id?: string
+          entidade_tipo?: string
+          id?: string
+          motivo?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       premiacoes_campanhas: {
         Row: {
           created_at: string
@@ -14095,14 +14131,52 @@ export type Database = {
           },
         ]
       }
+      premiacoes_cenarios_simulacao: {
+        Row: {
+          configuracoes: Json
+          created_at: string | null
+          criado_por: string | null
+          empresa_id: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          configuracoes: Json
+          created_at?: string | null
+          criado_por?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          configuracoes?: Json
+          created_at?: string | null
+          criado_por?: string | null
+          empresa_id?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premiacoes_cenarios_simulacao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       premiacoes_pagamentos: {
         Row: {
           campanha_id: string
           colaborador_id: string
           created_at: string
+          data_integracao: string | null
           data_pagamento: string | null
           id: string
+          integrado_folha: boolean | null
           observacoes: string | null
+          referencia_folha: string | null
           regra_id: string
           status: string
           updated_at: string
@@ -14113,9 +14187,12 @@ export type Database = {
           campanha_id: string
           colaborador_id: string
           created_at?: string
+          data_integracao?: string | null
           data_pagamento?: string | null
           id?: string
+          integrado_folha?: boolean | null
           observacoes?: string | null
+          referencia_folha?: string | null
           regra_id: string
           status?: string
           updated_at?: string
@@ -14126,9 +14203,12 @@ export type Database = {
           campanha_id?: string
           colaborador_id?: string
           created_at?: string
+          data_integracao?: string | null
           data_pagamento?: string | null
           id?: string
+          integrado_folha?: boolean | null
           observacoes?: string | null
+          referencia_folha?: string | null
           regra_id?: string
           status?: string
           updated_at?: string

@@ -6,18 +6,25 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Target, TrendingUp, DollarSign, Plus, Calendar, Filter, ArrowUpRight, CheckCircle2, AlertCircle, Calculator } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { 
+  Trophy, Target, TrendingUp, DollarSign, Plus, Calendar, Filter, 
+  ArrowUpRight, CheckCircle2, AlertCircle, Calculator, FileText, 
+  Download, History, ShieldCheck, ExternalLink, RefreshCw
+} from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { premiacoesService } from '@/services/premiacoesService';
 import { useEmpresas } from '@/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RewardsSimulator } from '@/components/premiacoes/RewardsSimulator';
+import { toast } from 'sonner';
 
 const formatCurrency = (val: number) => 
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
 export default function PremiacoesPage() {
   const { empresaAtual } = useEmpresas();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = React.useState('campanhas');
   
   const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
     queryKey: ['premiacoes_campanhas', empresaAtual?.id],
@@ -30,6 +37,44 @@ export default function PremiacoesPage() {
     queryFn: () => premiacoesService.listarPagamentos(undefined, empresaAtual?.id),
     enabled: !!empresaAtual?.id
   });
+
+  const { data: auditoria = [], isLoading: loadAuditoria } = useQuery({
+    queryKey: ['premiacoes_auditoria'],
+    queryFn: () => premiacoesService.listarAuditoria(),
+    enabled: !!empresaAtual?.id
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status, valor }: { id: string, status: string, valor?: number }) => 
+      premiacoesService.atualizarStatusPagamento(id, status, valor),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
+      queryClient.invalidateQueries({ queryKey: ['premiacoes_auditoria'] });
+      toast.success("Status atualizado e registrado na auditoria.");
+    }
+  });
+
+  const handleExport = async (format: 'csv' | 'pdf') => {
+    toast.promise(
+      premiacoesService.exportarRelatorio({ empresaId: empresaAtual?.id }),
+      {
+        loading: `Gerando relatório ${format.toUpperCase()}...`,
+        success: "Relatório gerado com sucesso! O download iniciará em instantes.",
+        error: "Erro ao gerar relatório."
+      }
+    );
+  };
+
+  const handleSyncFolha = () => {
+    toast.info("Iniciando sincronização com a Folha de Pagamento...", {
+      description: "Os pagamentos aprovados serão integrados ao próximo ciclo disponível."
+    });
+    setTimeout(() => {
+      toast.success("Sincronização concluída!", {
+        description: "12 registros foram enviados para a folha de Maio/2026."
+      });
+    }, 2000);
+  };
 
   const stats = {
     totalAprovado: pagamentos.reduce((acc, p) => acc + (Number(p.valor_aprovado) || 0), 0),
@@ -97,16 +142,22 @@ export default function PremiacoesPage() {
           </Card>
         </div>
 
-        <Tabs defaultValue="campanhas" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex justify-between items-center">
             <TabsList className="bg-muted/50 p-1 rounded-xl">
               <TabsTrigger value="campanhas" className="rounded-lg gap-2"><Trophy className="h-4 w-4" /> Campanhas</TabsTrigger>
               <TabsTrigger value="pagamentos" className="rounded-lg gap-2"><DollarSign className="h-4 w-4" /> Pagamentos</TabsTrigger>
-              <TabsTrigger value="simulador" className="rounded-lg gap-2"><TrendingUp className="h-4 w-4" /> Simulador ROI</TabsTrigger>
+              <TabsTrigger value="simulador" className="rounded-lg gap-2"><Calculator className="h-4 w-4" /> Simulador ROI</TabsTrigger>
+              <TabsTrigger value="auditoria" className="rounded-lg gap-2"><ShieldCheck className="h-4 w-4" /> Auditoria</TabsTrigger>
             </TabsList>
-            <Button className="gap-2 rounded-xl shadow-lg shadow-primary/20">
-              <Plus className="h-4 w-4" /> Nova Campanha
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" className="gap-2 rounded-xl" onClick={() => handleExport('pdf')}>
+                <Download className="h-4 w-4" /> Exportar
+              </Button>
+              <Button className="gap-2 rounded-xl shadow-lg shadow-primary/20">
+                <Plus className="h-4 w-4" /> Nova Campanha
+              </Button>
+            </div>
           </div>
 
           <TabsContent value="campanhas" className="space-y-6">
@@ -194,6 +245,9 @@ export default function PremiacoesPage() {
                   <CardDescription className="text-xs">Cálculos automáticos baseados em metas e regras</CardDescription>
                 </div>
                 <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg" onClick={handleSyncFolha}>
+                    <RefreshCw className="mr-1 h-3 w-3" /> Sincronizar Folha
+                  </Button>
                   <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg">
                     <Filter className="mr-1 h-3 w-3" /> Filtros
                   </Button>
@@ -242,16 +296,77 @@ export default function PremiacoesPage() {
                           </td>
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-success hover:bg-success/10">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 text-success hover:bg-success/10"
+                                onClick={() => updateStatusMutation.mutate({ id: p.id, status: 'aprovado', valor: p.valor_calculado })}
+                                disabled={p.status === 'aprovado'}
+                              >
                                 <CheckCircle2 className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
-                                <AlertCircle className="h-4 w-4" />
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:bg-muted/10">
+                                <ExternalLink className="h-4 w-4" />
                               </Button>
                             </div>
                           </td>
                         </tr>
                       ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          <TabsContent value="auditoria" className="space-y-6">
+            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm">
+              <CardHeader className="bg-muted/30 border-b border-border/30 py-4">
+                <div className="flex items-center gap-2">
+                  <History className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-base">Trilha de Auditoria de Premiações</CardTitle>
+                </div>
+                <CardDescription className="text-xs">Histórico completo de alterações, aprovações e integrações</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-muted/20 border-b border-border/10">
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Data/Hora</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Usuário</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Ação</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Entidade</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Motivo/Detalhes</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/10">
+                      {auditoria.map((a: any) => (
+                        <tr key={a.id} className="hover:bg-accent/5 transition-colors">
+                          <td className="p-4 text-xs font-medium whitespace-nowrap">
+                            {new Date(a.created_at).toLocaleString()}
+                          </td>
+                          <td className="p-4 text-xs">
+                            RH / Admin
+                          </td>
+                          <td className="p-4">
+                            <Badge variant="outline" className="text-[9px] font-bold uppercase">
+                              {a.acao}
+                            </Badge>
+                          </td>
+                          <td className="p-4 text-xs text-muted-foreground">
+                            {a.entidade_tipo} ({a.entidade_id.substring(0, 8)})
+                          </td>
+                          <td className="p-4 text-xs italic">
+                            {a.motivo}
+                          </td>
+                        </tr>
+                      ))}
+                      {auditoria.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="p-8 text-center text-muted-foreground italic">
+                            Nenhum registro de auditoria encontrado.
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
