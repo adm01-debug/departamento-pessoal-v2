@@ -28,6 +28,7 @@ export default function PremiacoesPage() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = React.useState('campanhas');
   const [isWizardOpen, setIsWizardOpen] = React.useState(false);
+  const [periodoFiltro, setPeriodoFiltro] = React.useState('Todos os Períodos');
   
   const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
     queryKey: ['premiacoes_campanhas', empresaAtual?.id],
@@ -261,7 +262,11 @@ export default function PremiacoesPage() {
                   <div className="flex gap-2 w-full md:w-auto">
                     <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
                       <Filter className="h-3 w-3 text-muted-foreground" />
-                      <select className="bg-transparent text-[10px] font-bold outline-none border-none">
+                      <select 
+                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        value={periodoFiltro}
+                        onChange={(e) => setPeriodoFiltro(e.target.value)}
+                      >
                         <option>Todos os Períodos</option>
                         <option>Maio 2026</option>
                         <option>Abril 2026</option>
