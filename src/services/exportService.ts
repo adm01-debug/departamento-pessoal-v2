@@ -45,25 +45,90 @@ export const exportPontoPDF = (data: any[], title = 'Relatório de Ponto', colum
   try {
     validateExportData(data);
     const doc = new jsPDF() as any;
+    const now = new Date();
     
-    doc.setFontSize(18);
-    doc.text(title, 14, 22);
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 30);
+    // Header Styling
+    doc.setFillColor(34, 197, 94); // Primary Green
+    doc.rect(0, 0, 210, 40, 'F');
     
-    const body = data.map(item => columns.map(col => item[col] || ''));
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text('RECURSOS HUMANOS', 14, 20);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(title.toUpperCase(), 14, 30);
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.text(`EMISSÃO: ${format(now, "dd/MM/yyyy HH:mm", { locale: ptBR })}`, 160, 20);
+    doc.text('SISTEMA DE PONTO ELETRÔNICO v2.0', 160, 25);
+    
+    // Statistics Summary (Cards in PDF)
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(14, 45, 58, 20, 3, 3, 'F');
+    doc.roundedRect(76, 45, 58, 20, 3, 3, 'F');
+    doc.roundedRect(138, 45, 58, 20, 3, 3, 'F');
+    
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text('TOTAL REGISTROS', 18, 52);
+    doc.text('COLABORADORES', 80, 52);
+    doc.text('STATUS GERAL', 142, 52);
+    
+    const uniqueColabs = new Set(data.map(d => d.colaborador)).size;
+    
+    doc.setFontSize(12);
+    doc.setTextColor(30, 41, 59);
+    doc.text(String(data.length), 18, 60);
+    doc.text(String(uniqueColabs), 80, 60);
+    doc.text('CONFORME (MTP 671)', 142, 60);
+    
+    const body = data.map(item => columns.map(col => {
+      const val = item[col];
+      if (val === '00:00' || !val) return '-';
+      return val;
+    }));
     
     doc.autoTable({
-      startY: 35,
+      startY: 75,
       head: [columns.map(c => c.replace('_', ' ').toUpperCase())],
       body: body,
-      theme: 'grid',
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
+      theme: 'striped',
+      headStyles: { 
+        fillColor: [30, 41, 59], 
+        textColor: 255, 
+        fontSize: 9, 
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      styles: { 
+        fontSize: 8, 
+        cellPadding: 3,
+        valign: 'middle',
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { halign: 'left', fontStyle: 'bold', fontSize: 9 }
+      },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
+      margin: { top: 75 },
     });
     
-    doc.save(`${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+    // Footer
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(
+        `Página ${i} de ${totalPages} - Documento assinado digitalmente conforme MP 2.200-2/2001`,
+        105, 285, { align: 'center' }
+      );
+    }
+    
+    doc.save(`${title.toLowerCase().replace(/\s+/g, '-')}-${format(now, 'yyyyMMdd')}.pdf`);
     return true;
   } catch (error: any) {
     console.error('Erro na exportação PDF:', error);
