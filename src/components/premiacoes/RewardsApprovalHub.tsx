@@ -36,17 +36,32 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
   const [selectedPagamento, setSelectedPagamento] = React.useState<any>(null);
   const [comentario, setComentario] = React.useState('');
   const [isReconcileOpen, setIsReconcileOpen] = React.useState(false);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = React.useState(false);
+  const [pendingAction, setPendingAction] = React.useState<{id: string, nextStatus: string, valor: number} | null>(null);
   const [valorFolha, setValorFolha] = React.useState('');
 
   const handleApprove = async (id: string, nextStatus: string, valor: number) => {
+    setSelectedPagamento(pagamentos.find(p => p.id === id));
+    setPendingAction({ id, nextStatus, valor });
+    setIsApprovalDialogOpen(true);
+  };
+
+  const confirmApproval = async () => {
+    if (!pendingAction) return;
     try {
-      await premiacoesService.atualizarStatusPagamento(id, nextStatus, valor, comentario || 'Aprovado via Hub');
+      await premiacoesService.atualizarStatusPagamento(
+        pendingAction.id, 
+        pendingAction.nextStatus, 
+        pendingAction.valor, 
+        comentario || (pendingAction.nextStatus === 'rejeitado' ? 'Rejeitado via Hub' : 'Aprovado via Hub')
+      );
       queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
-      toast.success("Aprovação registrada com sucesso.");
-      setSelectedPagamento(null);
+      toast.success(pendingAction.nextStatus === 'rejeitado' ? "Rejeição registrada." : "Aprovação registrada.");
+      setIsApprovalDialogOpen(false);
+      setPendingAction(null);
       setComentario('');
     } catch (e) {
-      toast.error("Erro ao aprovar pagamento.");
+      toast.error("Erro ao processar ação.");
     }
   };
 
@@ -197,6 +212,50 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsReconcileOpen(false)} className="rounded-xl">Cancelar</Button>
             <Button onClick={handleReconcile} className="rounded-xl px-8">Salvar Conciliação</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {pendingAction?.nextStatus === 'rejeitado' ? (
+                <XCircle className="h-5 w-5 text-destructive" />
+              ) : (
+                <CheckCircle2 className="h-5 w-5 text-success" />
+              )}
+              {pendingAction?.nextStatus === 'rejeitado' ? 'Confirmar Rejeição' : 'Confirmar Aprovação'}
+            </DialogTitle>
+            <DialogDescription>
+              {pendingAction?.nextStatus === 'rejeitado' 
+                ? 'Justifique o motivo da rejeição deste pagamento.' 
+                : 'Adicione um comentário opcional para este estágio da aprovação.'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="p-4 bg-muted/30 rounded-2xl mb-4">
+              <p className="text-xs font-bold">{selectedPagamento?.colaborador?.nome_completo}</p>
+              <p className="text-[10px] text-muted-foreground">{selectedPagamento?.campanha?.nome}</p>
+              <p className="text-sm font-bold mt-2 text-primary">R$ {selectedPagamento?.valor_aprovado || selectedPagamento?.valor_calculado}</p>
+            </div>
+            <div className="grid gap-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">Comentário / Justificativa</label>
+              <Textarea 
+                placeholder="Escreva aqui..."
+                className="rounded-xl resize-none text-xs h-24"
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsApprovalDialogOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button 
+              onClick={confirmApproval} 
+              className={`rounded-xl px-8 ${pendingAction?.nextStatus === 'rejeitado' ? 'bg-destructive hover:bg-destructive/90' : 'bg-success hover:bg-success/90'}`}
+            >
+              {pendingAction?.nextStatus === 'rejeitado' ? 'Rejeitar Pagamento' : 'Aprovar e Avançar'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
