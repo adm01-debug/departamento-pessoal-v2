@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { batidasPontoService } from '@/services/batidasPontoService';
 import { GestaoPontoAnalytics } from './GestaoPontoAnalytics';
+import { PontoGeoAnalytics } from './PontoGeoAnalytics';
 import { toast } from 'sonner';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -39,6 +40,22 @@ export function GestaoRegistrosPonto() {
         .gte('data', filtroData)
         .lte('data', filtroFim)
         .order('data', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id,
+  });
+
+  const { data: batidas = [] } = useQuery({
+    queryKey: ['gestao-batidas-ponto-geo', empresaAtual?.id, filtroData, filtroFim],
+    queryFn: async () => {
+      if (!empresaAtual?.id) return [];
+      const { data, error } = await supabase
+        .from('batidas_ponto')
+        .select('*, colaborador:colaboradores(nome_completo)')
+        .eq('empresa_id', empresaAtual.id)
+        .gte('data', filtroData)
+        .lte('data', filtroFim);
       if (error) throw error;
       return data || [];
     },
@@ -400,8 +417,9 @@ export function GestaoRegistrosPonto() {
         )}
             </TabsContent>
             
-            <TabsContent value="analytics">
+            <TabsContent value="analytics" className="space-y-6">
               <GestaoPontoAnalytics registros={registros} />
+              <PontoGeoAnalytics batidas={batidas} />
             </TabsContent>
           </Tabs>
         </CardContent>

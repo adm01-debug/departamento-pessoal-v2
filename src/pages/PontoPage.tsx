@@ -25,6 +25,7 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
+import { PontoLeaderboard } from '@/components/ponto/PontoLeaderboard';
 
 interface BancoHorasResumo {
   saldo: string;
@@ -209,6 +210,24 @@ export default function PontoPage() {
           </div>
         }
       >
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 bg-primary/5 border border-primary/20 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/20 rounded-xl text-primary"><ShieldCheck className="h-5 w-5" /></div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-primary">Ambiente Certificado MTP 671/21</p>
+              <p className="text-[10px] text-muted-foreground">Integridade de dados garantida por criptografia de ponta a ponta e auditoria em tempo real.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[9px] font-bold bg-success/10 text-success border-success/30 px-2 py-1">
+              REP-P HOMOLOGADO
+            </Badge>
+            <Badge variant="outline" className="text-[9px] font-bold bg-info/10 text-info border-info/30 px-2 py-1">
+              BIOMETRIA ATIVA
+            </Badge>
+          </div>
+        </motion.div>
+
         <Tabs defaultValue="meu-ponto" className="space-y-6">
           <TabsList className="bg-muted/50 p-1 rounded-xl">
             <TabsTrigger value="meu-ponto" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Meu Ponto</TabsTrigger>
@@ -219,7 +238,8 @@ export default function PontoPage() {
             <div className="grid gap-6 lg:grid-cols-3">
               <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
               <PontoTodayCard registroHoje={registroHoje} />
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
+                <PontoLeaderboard />
                 <PontoWeekSummary registrosSemana={registrosSemana} />
                 {bancoResumo && (
                   <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}>
