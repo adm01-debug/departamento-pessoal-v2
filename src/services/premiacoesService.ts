@@ -45,14 +45,48 @@ export const premiacoesService = {
     return data;
   },
 
-  async atualizarStatusPagamento(id: string, status: string, valorAprovado?: number) {
+  async atualizarStatusPagamento(id: string, status: string, valorAprovado?: number, motivo?: string) {
+    const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*').eq('id', id).single();
+    if (fetchErr) throw fetchErr;
+
     const { data, error } = await supabase
       .from('premiacoes_pagamentos')
-      .update({ status, valor_aprovado: valorAprovado })
+      .update({ 
+        status, 
+        valor_aprovado: valorAprovado,
+        integrado_folha: status === 'pago' ? true : false,
+        data_integracao: status === 'pago' ? new Date().toISOString() : null
+      })
       .eq('id', id)
       .select()
       .single();
+    
     if (error) throw error;
+
+    // Auditoria
+    await supabase.from('premiacoes_auditoria').insert({
+      entidade_tipo: 'pagamento',
+      entidade_id: id,
+      acao: status === 'aprovado' ? 'aprovacao' : 'alteracao',
+      dados_anteriores: original,
+      dados_novos: data,
+      motivo: motivo || `Status alterado para ${status}`
+    });
+
     return data;
+  },
+
+  async listarAuditoria(entidadeId?: string) {
+    let q = supabase.from('premiacoes_auditoria').select('*').order('created_at', { ascending: false });
+    if (entidadeId) q = q.eq('entidade_id', entidadeId);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  },
+
+  async exportarRelatorio(filtros: any) {
+    // Simulação de exportação - na prática buscaria dados e formataria
+    const pagamentos = await this.listarPagamentos(undefined, filtros.empresaId);
+    return pagamentos;
   }
 };
