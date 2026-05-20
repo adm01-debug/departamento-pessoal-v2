@@ -46,6 +46,22 @@ export function GestaoRegistrosPonto() {
     enabled: !!empresaAtual?.id,
   });
 
+  const { data: batidas = [] } = useQuery({
+    queryKey: ['gestao-batidas-ponto-geo', empresaAtual?.id, filtroData, filtroFim],
+    queryFn: async () => {
+      if (!empresaAtual?.id) return [];
+      const { data, error } = await supabase
+        .from('batidas_ponto')
+        .select('*, colaborador:colaboradores(nome_completo)')
+        .eq('empresa_id', empresaAtual.id)
+        .gte('data', filtroData)
+        .lte('data', filtroFim);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!empresaAtual?.id,
+  });
+
   const formatTime = (val: any) => {
     if (!val) return '--:--';
     const m = String(val).match(/(\d+):(\d+)/);
