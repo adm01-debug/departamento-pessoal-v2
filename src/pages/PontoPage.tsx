@@ -220,7 +220,8 @@ export default function PontoPage() {
             <div className="grid gap-6 lg:grid-cols-3">
               <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
               <PontoTodayCard registroHoje={registroHoje} />
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
+                <PontoLeaderboard />
                 <PontoWeekSummary registrosSemana={registrosSemana} />
                 {bancoResumo && (
                   <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}>
