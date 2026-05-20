@@ -285,7 +285,7 @@ export default function PremiacoesPage() {
                         <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Campanha</th>
                         <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Valor Aprovado</th>
                         <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Folha Real</th>
-                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Status Conciliação</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Status / Justificativa</th>
                         <th className="text-right p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Auditoria</th>
                       </tr>
                     </thead>
@@ -307,13 +307,20 @@ export default function PremiacoesPage() {
                             {p.valor_folha_real ? formatCurrency(p.valor_folha_real) : '—'}
                           </td>
                           <td className="p-4">
-                            <Badge className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                              p.status_conciliacao === 'conciliado' ? 'bg-success/10 text-success' : 
-                              p.status_conciliacao === 'divergente' ? 'bg-amber-500/10 text-amber-500' : 
-                              'bg-muted text-muted-foreground'
-                            }`}>
-                              {p.status_conciliacao || 'pendente'}
-                            </Badge>
+                            <div className="flex flex-col gap-1">
+                              <Badge className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full w-fit ${
+                                p.status_conciliacao === 'conciliado' ? 'bg-success/10 text-success' : 
+                                p.status_conciliacao === 'divergente' ? 'bg-amber-500/10 text-amber-500' : 
+                                'bg-muted text-muted-foreground'
+                              }`}>
+                                {p.status_conciliacao || 'pendente'}
+                              </Badge>
+                              {p.justificativa_divergencia && (
+                                <span className="text-[9px] text-muted-foreground italic truncate max-w-[150px]" title={p.justificativa_divergencia}>
+                                  "{p.justificativa_divergencia}"
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="p-4 text-right">
                             <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
