@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { toast } from 'sonner';
