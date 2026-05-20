@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface Inconsistency {
   id: string;
