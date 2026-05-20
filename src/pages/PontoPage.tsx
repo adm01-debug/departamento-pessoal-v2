@@ -191,7 +191,7 @@ export default function PontoPage() {
     <>
       <PageTitle title="Registro de Ponto" description="Controle de ponto eletrônico" />
       <PageLayout 
-        title={`Olá, ${user?.user_metadata?.nome_completo?.split(' ')[0] || 'Colaborador'}`} 
+        title={`Olá, ${(user as any)?.user_metadata?.nome_completo?.split(' ')[0] || 'Colaborador'}`} 
         description={new Date().getHours() < 12 ? "Bom dia! Pronto para iniciar?" : new Date().getHours() < 18 ? "Boa tarde! Como está seu dia?" : "Boa noite! Quase lá."} 
 
         icon={<Clock className="h-5 w-5 text-primary-foreground" />} 
