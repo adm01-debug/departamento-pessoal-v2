@@ -25,7 +25,7 @@ export function NewLoanDialog({ colaboradores, onSave }: any) {
       if (!form.colaborador_id) return null;
       const { data, error } = await supabase
         .from('colaboradores')
-        .select('salario_nominal')
+        .select('salario_base')
         .eq('id', form.colaborador_id)
         .single();
       if (error) throw error;
@@ -35,10 +35,11 @@ export function NewLoanDialog({ colaboradores, onSave }: any) {
   });
 
   const marginData = useMemo(() => {
-    if (!colaboradorData?.salario_nominal) return { margin: 0, percent: 0, isValid: true };
+    if (!colaboradorData?.salario_base) return { margin: 0, percent: 0, isValid: true };
     const valor_parcela = Number(form.valor_total) / (Number(form.numero_parcelas) || 1);
-    const margin = colaboradorData.salario_nominal * 0.3; // 30% Law
-    const currentPercent = (valor_parcela / colaboradorData.salario_nominal) * 100;
+    const margin = colaboradorData.salario_base * 0.3; // 30% Law
+    const currentPercent = (valor_parcela / colaboradorData.salario_base) * 100;
+
     return {
       margin,
       percent: currentPercent,
