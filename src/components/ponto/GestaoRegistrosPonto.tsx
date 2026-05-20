@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { batidasPontoService } from '@/services/batidasPontoService';
 import { GestaoPontoAnalytics } from './GestaoPontoAnalytics';
+import { PontoGeoAnalytics } from './PontoGeoAnalytics';
 import { toast } from 'sonner';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
