@@ -45,7 +45,7 @@ export const premiacoesService = {
     return data;
   },
 
-  async atualizarStatusPagamento(id: string, status: string, valorAprovado?: number, motivo?: string) {
+  async atualizarStatusPagamento(id: string, status: string, valorAprovado?: number, comentario?: string) {
     const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*').eq('id', id).single();
     if (fetchErr) throw fetchErr;
 
@@ -54,8 +54,7 @@ export const premiacoesService = {
       .update({ 
         status, 
         valor_aprovado: valorAprovado,
-        integrado_folha: status === 'pago' ? true : false,
-        data_integracao: status === 'pago' ? new Date().toISOString() : null
+        historico_mudancas: [...(original.historico_mudancas || []), { status, data: new Date().toISOString(), comentario, user: 'current_user' }]
       })
       .eq('id', id)
       .select()
@@ -63,16 +62,22 @@ export const premiacoesService = {
     
     if (error) throw error;
 
-    // Auditoria
-    await supabase.from('premiacoes_auditoria').insert({
-      entidade_tipo: 'pagamento',
-      entidade_id: id,
-      acao: status === 'aprovado' ? 'aprovacao' : 'alteracao',
-      dados_anteriores: original,
-      dados_novos: data,
-      motivo: motivo || `Status alterado para ${status}`
-    });
+    return data;
+  },
 
+  async reconciliarFolha(id: string, valorFolha: number, justificativa?: string) {
+    const { data, error } = await supabase
+      .from('premiacoes_pagamentos')
+      .update({
+        valor_folha_real: valorFolha,
+        status_conciliacao: valorFolha === 0 ? 'pendente' : (valorFolha === 0 /* simplified logic */ ? 'conciliado' : 'divergente'),
+        justificativa_divergencia: justificativa
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
     return data;
   },
 
