@@ -14048,6 +14048,186 @@ export type Database = {
         }
         Relationships: []
       }
+      premiacoes_campanhas: {
+        Row: {
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          descricao: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          orcamento_estimado: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          orcamento_estimado?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          orcamento_estimado?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premiacoes_campanhas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premiacoes_pagamentos: {
+        Row: {
+          campanha_id: string
+          colaborador_id: string
+          created_at: string
+          data_pagamento: string | null
+          id: string
+          observacoes: string | null
+          regra_id: string
+          status: string
+          updated_at: string
+          valor_aprovado: number | null
+          valor_calculado: number
+        }
+        Insert: {
+          campanha_id: string
+          colaborador_id: string
+          created_at?: string
+          data_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          regra_id: string
+          status?: string
+          updated_at?: string
+          valor_aprovado?: number | null
+          valor_calculado: number
+        }
+        Update: {
+          campanha_id?: string
+          colaborador_id?: string
+          created_at?: string
+          data_pagamento?: string | null
+          id?: string
+          observacoes?: string | null
+          regra_id?: string
+          status?: string
+          updated_at?: string
+          valor_aprovado?: number | null
+          valor_calculado?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premiacoes_pagamentos_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "premiacoes_campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premiacoes_pagamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premiacoes_pagamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premiacoes_pagamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premiacoes_pagamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "premiacoes_pagamentos_regra_id_fkey"
+            columns: ["regra_id"]
+            isOneToOne: false
+            referencedRelation: "premiacoes_regras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premiacoes_regras: {
+        Row: {
+          campanha_id: string
+          configuracao: Json | null
+          created_at: string
+          id: string
+          meta_id: string | null
+          tipo_calculo: string
+          titulo: string
+          valor_base: number | null
+        }
+        Insert: {
+          campanha_id: string
+          configuracao?: Json | null
+          created_at?: string
+          id?: string
+          meta_id?: string | null
+          tipo_calculo: string
+          titulo: string
+          valor_base?: number | null
+        }
+        Update: {
+          campanha_id?: string
+          configuracao?: Json | null
+          created_at?: string
+          id?: string
+          meta_id?: string | null
+          tipo_calculo?: string
+          titulo?: string
+          valor_base?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premiacoes_regras_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "premiacoes_campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "premiacoes_regras_meta_id_fkey"
+            columns: ["meta_id"]
+            isOneToOne: false
+            referencedRelation: "metas_okrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
