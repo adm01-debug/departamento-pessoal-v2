@@ -1,0 +1,258 @@
+import React from 'react';
+import { PageLayout } from '@/components/layout';
+import { PageTitle } from '@/components/PageTitle';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Trophy, Target, TrendingUp, DollarSign, Plus, Calendar, Filter, ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { premiacoesService } from '@/services/premiacoesService';
+import { useEmpresas } from '@/hooks';
+import { formatCurrency } from '@/utils/formatters';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export default function PremiacoesPage() {
+  const { empresaAtual } = useEmpresas();
+  
+  const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
+    queryKey: ['premiacoes_campanhas', empresaAtual?.id],
+    queryFn: () => premiacoesService.listarCampanhas(empresaAtual?.id),
+    enabled: !!empresaAtual?.id
+  });
+
+  const { data: pagamentos = [], isLoading: loadPagamentos } = useQuery({
+    queryKey: ['premiacoes_pagamentos', empresaAtual?.id],
+    queryFn: () => premiacoesService.listarPagamentos(undefined, empresaAtual?.id),
+    enabled: !!empresaAtual?.id
+  });
+
+  const stats = {
+    totalAprovado: pagamentos.reduce((acc, p) => acc + (Number(p.valor_aprovado) || 0), 0),
+    totalPendente: pagamentos.filter(p => p.status === 'calculado').reduce((acc, p) => acc + Number(p.valor_calculado), 0),
+    campanhasAtivas: campanhas.filter(c => c.status === 'ativo').length,
+    roiEstimado: 24.5 // Mock ROI for visual excellence
+  };
+
+  if (loadCampanhas) return <div className="p-8"><Skeleton className="h-[400px] w-full" /></div>;
+
+  return (
+    <>
+      <PageTitle title="Premiações & Renda Variável 10/10" description="Gestão estratégica de incentivos e alta performance" />
+      <PageLayout 
+        title="Hub de Premiações" 
+        description="Campanhas, Metas e ROI de Capital Humano" 
+        icon={<Trophy className="h-5 w-5 text-primary-foreground" />}
+        gradient="from-amber-500 to-orange-600"
+      >
+        <div className="grid gap-4 md:grid-cols-4 mb-8">
+          <Card className="border-border/40 shadow-sm bg-gradient-to-br from-card to-muted/20">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Aprovado</p>
+                <div className="p-2 bg-success/10 rounded-lg text-success"><DollarSign className="h-4 w-4" /></div>
+              </div>
+              <h3 className="text-2xl font-bold mt-2">{formatCurrency(stats.totalAprovado)}</h3>
+              <p className="text-[10px] text-success flex items-center gap-1 mt-1 font-medium">
+                <ArrowUpRight className="h-3 w-3" /> +12% vs mês anterior
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/40 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Pendente (Calculado)</p>
+                <div className="p-2 bg-warning/10 rounded-lg text-warning"><AlertCircle className="h-4 w-4" /></div>
+              </div>
+              <h3 className="text-2xl font-bold mt-2">{formatCurrency(stats.totalPendente)}</h3>
+              <p className="text-[10px] text-muted-foreground mt-1">Aguardando revisão manual</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/40 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Campanhas Ativas</p>
+                <div className="p-2 bg-primary/10 rounded-lg text-primary"><Target className="h-4 w-4" /></div>
+              </div>
+              <h3 className="text-2xl font-bold mt-2">{stats.campanhasAtivas}</h3>
+              <p className="text-[10px] text-muted-foreground mt-1">Impactando 85% do time</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/40 shadow-sm bg-primary/5">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <p className="text-xs font-bold text-primary uppercase tracking-wider">ROI de Incentivo</p>
+                <div className="p-2 bg-primary/10 rounded-lg text-primary"><TrendingUp className="h-4 w-4" /></div>
+              </div>
+              <h3 className="text-2xl font-bold mt-2 text-primary">{stats.roiEstimado}%</h3>
+              <p className="text-[10px] text-primary/70 mt-1">Crescimento de produtividade</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="campanhas" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <TabsList className="bg-muted/50 p-1 rounded-xl">
+              <TabsTrigger value="campanhas" className="rounded-lg gap-2"><Trophy className="h-4 w-4" /> Campanhas</TabsTrigger>
+              <TabsTrigger value="pagamentos" className="rounded-lg gap-2"><DollarSign className="h-4 w-4" /> Pagamentos</TabsTrigger>
+              <TabsTrigger value="simulador" className="rounded-lg gap-2"><TrendingUp className="h-4 w-4" /> Simulador ROI</TabsTrigger>
+            </TabsList>
+            <Button className="gap-2 rounded-xl shadow-lg shadow-primary/20">
+              <Plus className="h-4 w-4" /> Nova Campanha
+            </Button>
+          </div>
+
+          <TabsContent value="campanhas" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {campanhas.map(c => (
+                <Card key={c.id} className="border-border/30 hover:border-primary/20 transition-all group overflow-hidden rounded-2xl">
+                  <div className={`h-1.5 w-full bg-gradient-to-r ${c.status === 'ativo' ? 'from-success to-emerald-400' : 'from-muted to-muted-foreground/30'}`} />
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{c.nome}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">{c.descricao}</p>
+                      </div>
+                      <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'} className="rounded-full px-3">
+                        {c.status.toUpperCase()}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 my-6">
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter flex items-center gap-1">
+                          <Calendar className="h-3 w-3" /> Período
+                        </p>
+                        <p className="text-xs font-semibold">
+                          {new Date(c.data_inicio).toLocaleDateString()} - {new Date(c.data_fim).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter flex items-center gap-1">
+                          <DollarSign className="h-3 w-3" /> Orçamento
+                        </p>
+                        <p className="text-xs font-semibold">{formatCurrency(c.orcamento_estimado)}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-[10px] font-bold">
+                        <span className="text-muted-foreground">Progresso do Orçamento</span>
+                        <span>45%</span>
+                      </div>
+                      <Progress value={45} className="h-1.5" />
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-border/10 flex justify-between items-center">
+                      <div className="flex -space-x-2">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-7 w-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold">
+                            U{i}
+                          </div>
+                        ))}
+                        <div className="h-7 w-7 rounded-full border-2 border-background bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                          +12
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-xs font-bold text-primary hover:bg-primary/5">
+                        Gerenciar Regras <ArrowUpRight className="ml-1 h-3 w-3" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {campanhas.length === 0 && (
+                <Card className="col-span-full border-dashed border-2 py-12 flex flex-col items-center justify-center text-center">
+                  <div className="p-4 bg-muted/50 rounded-full mb-4">
+                    <Trophy className="h-8 w-8 text-muted-foreground/50" />
+                  </div>
+                  <h3 className="font-bold text-lg">Nenhuma campanha estratégica</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs mx-auto">Comece criando sua primeira campanha de incentivo para impulsionar a performance do time.</p>
+                  <Button variant="outline" className="mt-6 rounded-xl">Criar Campanha agora</Button>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pagamentos" className="space-y-6">
+            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm">
+              <CardHeader className="bg-muted/30 border-b border-border/30 flex-row justify-between items-center space-y-0 py-4">
+                <div>
+                  <CardTitle className="text-base">Fila de Aprovação Financeira</CardTitle>
+                  <CardDescription className="text-xs">Cálculos automáticos baseados em metas e regras</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg">
+                    <Filter className="mr-1 h-3 w-3" /> Filtros
+                  </Button>
+                  <Button size="sm" className="h-8 text-[10px] font-bold uppercase rounded-lg bg-success hover:bg-success/90">
+                    Aprovar Lote
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-muted/20 border-b border-border/10">
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Colaborador</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Campanha</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Valor Calculado</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground">Status</th>
+                        <th className="text-right p-4 font-bold text-[10px] uppercase text-muted-foreground">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/10">
+                      {pagamentos.map(p => (
+                        <tr key={p.id} className="hover:bg-accent/5 transition-colors group">
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                                {p.colaborador?.nome_completo?.charAt(0)}
+                              </div>
+                              <span className="font-semibold text-xs">{p.colaborador?.nome_completo}</span>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <Badge variant="outline" className="text-[10px] font-medium">{p.campanha?.nome}</Badge>
+                          </td>
+                          <td className="p-4 font-mono font-bold text-xs">
+                            {formatCurrency(p.valor_calculado)}
+                          </td>
+                          <td className="p-4">
+                            <Badge className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                              p.status === 'aprovado' ? 'bg-success/10 text-success border-success/20' : 
+                              p.status === 'calculado' ? 'bg-warning/10 text-warning border-warning/20' : 
+                              'bg-muted text-muted-foreground'
+                            }`}>
+                              {p.status}
+                            </Badge>
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-success hover:bg-success/10">
+                                <CheckCircle2 className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
+                                <AlertCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </PageLayout>
+    </>
+  );
+}
