@@ -246,7 +246,7 @@ export default function PontoPage() {
 
           <TabsContent value="meu-ponto" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-3">
-              <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} />
+              <PontoClockRegister time={time} loading={loading} geoStatus={geoStatus} onRegistrar={registrar} ultimoRegistro={batidasHoje?.[0]} />
               <PontoTodayCard registroHoje={registroHoje} />
               <div className="flex flex-col gap-6">
                 <PontoLeaderboard />

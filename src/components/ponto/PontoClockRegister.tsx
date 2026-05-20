@@ -15,6 +15,8 @@ interface PontoClockRegisterProps {
   loading: string | null;
   geoStatus: 'idle' | 'capturing' | 'success' | 'error' | 'out_of_range';
   onRegistrar: (tipo: 'entrada' | 'saida_almoco' | 'retorno_almoco' | 'saida', options?: any) => void;
+  ultimoRegistro?: any;
+
 }
 
 const buttons = [
@@ -24,7 +26,7 @@ const buttons = [
   { tipo: 'saida' as const, label: 'Saída', icon: LogOut, gradient: 'from-destructive to-destructive/70/70' },
 ];
 
-export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: PontoClockRegisterProps) {
+export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ultimoRegistro }: PontoClockRegisterProps) {
   const { user } = useAuth();
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -216,14 +218,31 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar }: Po
               </Button>
             ))}
           </div>
+          
+          {ultimoRegistro && (
+            <div className="mt-4 p-3 rounded-xl bg-muted/30 border border-border/20 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-full bg-success/20 text-success">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                </div>
+                <div>
+                  <p className="text-[9px] uppercase font-bold text-muted-foreground">Último Registro</p>
+                  <p className="text-xs font-bold capitalize">{ultimoRegistro.tipo.replace(/_/g, ' ')} às {ultimoRegistro.hora}</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-[8px] bg-background">HOJE</Badge>
+            </div>
+          )}
+
           <p className="text-xs text-muted-foreground font-body text-center mt-3 flex items-center justify-center gap-1">
             <MapPin className="h-3 w-3" />
             {geoStatus === 'capturing' ? 'Capturando localização...' :
              geoStatus === 'success' ? '✅ Localização capturada' :
              geoStatus === 'error' ? '⚠️ GPS indisponível' :
              geoStatus === 'out_of_range' ? '📍 Fora do raio permitido' :
-             'Localização será registrada automaticamente'}
+             'Geolocalização Ativa (671/21)'}
           </p>
+
         </CardContent>
       </Card>
 
