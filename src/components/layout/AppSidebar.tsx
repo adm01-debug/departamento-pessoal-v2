@@ -77,6 +77,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: Wallet, label: 'Folha de Pagamento', path: '/folha', color: 'text-success' },
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
+      { icon: TrendingDown, label: 'Descontos & Consignados', path: '/descontos', color: 'text-destructive' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
       { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },

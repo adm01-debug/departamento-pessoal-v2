@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -44,7 +44,7 @@ export default function DescontosPage() {
       const { data, error } = await supabase
         .from('emprestimos_consignados' as any)
         .select('*, colaborador:colaboradores(nome_completo)')
-        .eq('empresa_id', empresaAtual?.id);
+        .eq('empresa_id', empresaAtual?.id as string);
       if (error) throw error;
       return data || [];
     },
@@ -57,7 +57,7 @@ export default function DescontosPage() {
       const { data, error } = await supabase
         .from('adiantamentos_salariais' as any)
         .select('*, colaborador:colaboradores(nome_completo)')
-        .eq('empresa_id', empresaAtual?.id);
+        .eq('empresa_id', empresaAtual?.id as string);
       if (error) throw error;
       return data || [];
     },
@@ -166,16 +166,16 @@ export default function DescontosPage() {
           <div className="flex items-center justify-between">
             <TabsList className="bg-muted/50 p-1 rounded-xl">
               <TabsTrigger value="emprestimos" className="rounded-lg gap-2"><Landmark className="h-4 w-4" /> Empréstimos</TabsTrigger>
-              <TabsTrigger value="adiantamentos" className="rounded-lg gap-2"><Wallet className="h-4 w-4" /> Adiantamentos</TabsTrigger>
-            </TabsList>
+            <TabsTrigger value="adiantamentos" className="rounded-lg gap-2"><Wallet className="h-4 w-4" /> Adiantamentos</TabsTrigger>
+          </TabsList>
 
-            <div className="flex gap-2">
-              {activeTab === 'emprestimos' ? (
-                <NewLoanDialog colaboradores={colaboradores} onSave={(v) => criarEmprestimo.mutate(v)} />
-              ) : (
-                <NewAdvanceDialog colaboradores={colaboradores} onSave={(v) => criarAdiantamento.mutate(v)} />
-              )}
-            </div>
+          <div className="flex gap-2">
+            {activeTab === 'emprestimos' ? (
+              <NewLoanDialog colaboradores={colaboradores} onSave={(v: any) => criarEmprestimo.mutate(v)} />
+            ) : (
+              <NewAdvanceDialog colaboradores={colaboradores} onSave={(v: any) => criarAdiantamento.mutate(v)} />
+            )}
+          </div>
           </div>
 
           <TabsContent value="emprestimos" className="space-y-4">
