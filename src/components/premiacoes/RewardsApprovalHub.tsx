@@ -99,7 +99,7 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
             </CardHeader>
             <CardContent className="p-3 space-y-3">
               {pagamentos
-                .filter(p => stage.id === 'aprovado_financeiro' ? (p.status === stage.id || p.status === 'pago') : p.status === stage.id)
+                .filter(p => p.status !== 'rejeitado' && (stage.id === 'aprovado_financeiro' ? (p.status === stage.id || p.status === 'pago') : p.status === stage.id))
                 .map(p => {
                   const hasDivergence = p.valor_folha_real && p.valor_folha_real !== p.valor_aprovado;
                   return (
