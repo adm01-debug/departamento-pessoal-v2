@@ -116,5 +116,20 @@ export const premiacoesService = {
     // Simulação de exportação - na prática buscaria dados e formataria
     const pagamentos = await this.listarPagamentos(undefined, filtros.empresaId);
     return pagamentos;
+  },
+
+  async enviarNotificacaoCritica(tipo: string, payload: any) {
+    console.log(`[Notification] ${tipo}:`, payload);
+    // Em um cenário real, chamaria uma Edge Function para enviar e-mail/WhatsApp
+    const { error } = await supabase.from('notificacoes').insert({
+      tipo: 'premiacao_critica',
+      titulo: `Evento Crítico: ${tipo.replace('_', ' ').toUpperCase()}`,
+      mensagem: `Ação detectada no módulo de premiações: ${JSON.stringify(payload)}`,
+      user_id: payload.user_id,
+      metadata: { ...payload, modulo: 'premiacoes' }
+    });
+    
+    if (error) console.error("Erro ao registrar notificação:", error);
+    return true;
   }
 };
