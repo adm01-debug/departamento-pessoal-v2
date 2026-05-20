@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Calculator, TrendingUp, DollarSign, Users } from 'lucide-react';
-import { formatCurrency } from '@/utils/formatters';
+import { Calculator, TrendingUp } from 'lucide-react';
+
+const formatCurrency = (val: number) => 
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
 export function RewardsSimulator() {
   const [employees, setEmployees] = React.useState(50);
@@ -14,7 +15,7 @@ export function RewardsSimulator() {
   const [performanceLevel, setPerformanceLevel] = React.useState(85);
 
   const totalBudget = employees * avgSalary * (bonusPercent / 100) * (performanceLevel / 100);
-  const roi = (performanceLevel / 100) * 2.5; // Arbitrary multiplier for ROI simulation
+  const roi = (performanceLevel / 100) * 2.5;
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
@@ -25,7 +26,7 @@ export function RewardsSimulator() {
               <Label className="text-sm font-bold uppercase tracking-tighter">Número de Colaboradores Elegíveis</Label>
               <Badge variant="outline" className="font-mono">{employees}</Badge>
             </div>
-            <Slider value={[employees]} onValueChange={([v]) => setEmployees(v)} max={500} step={5} />
+            <Slider value={[employees]} onValueChange={([v]: number[]) => setEmployees(v)} max={500} step={5} />
           </div>
 
           <div className="space-y-4">
@@ -33,7 +34,7 @@ export function RewardsSimulator() {
               <Label className="text-sm font-bold uppercase tracking-tighter">Salário Base Médio</Label>
               <Badge variant="outline" className="font-mono">{formatCurrency(avgSalary)}</Badge>
             </div>
-            <Slider value={[avgSalary]} onValueChange={([v]) => setAvgSalary(v)} min={1500} max={25000} step={100} />
+            <Slider value={[avgSalary]} onValueChange={([v]: number[]) => setAvgSalary(v)} min={1500} max={25000} step={100} />
           </div>
 
           <div className="space-y-4">
@@ -41,7 +42,7 @@ export function RewardsSimulator() {
               <Label className="text-sm font-bold uppercase tracking-tighter">% de Bônus Alvo (100% da Meta)</Label>
               <Badge variant="outline" className="font-mono">{bonusPercent}%</Badge>
             </div>
-            <Slider value={[bonusPercent]} onValueChange={([v]) => setBonusPercent(v)} max={100} step={1} />
+            <Slider value={[bonusPercent]} onValueChange={([v]: number[]) => setBonusPercent(v)} max={100} step={1} />
           </div>
 
           <div className="space-y-4">
@@ -49,7 +50,7 @@ export function RewardsSimulator() {
               <Label className="text-sm font-bold uppercase tracking-tighter">Previsão de Atingimento Global</Label>
               <Badge variant="outline" className="font-mono">{performanceLevel}%</Badge>
             </div>
-            <Slider value={[performanceLevel]} onValueChange={([v]) => setPerformanceLevel(v)} max={120} step={5} />
+            <Slider value={[performanceLevel]} onValueChange={([v]: number[]) => setPerformanceLevel(v)} max={120} step={5} />
           </div>
         </CardContent>
       </Card>
