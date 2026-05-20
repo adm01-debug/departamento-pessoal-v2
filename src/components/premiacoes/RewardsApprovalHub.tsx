@@ -126,7 +126,15 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                             >
                               <CheckCircle2 className="h-3 w-3 mr-1" /> Aprovar
                             </Button>
-                            <Button size="sm" variant="outline" className="h-7 w-7 p-0 rounded-lg text-destructive">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-7 w-7 p-0 rounded-lg text-destructive hover:bg-destructive/10"
+                              onClick={() => {
+                                setSelectedPagamento(p);
+                                handleApprove(p.id, 'rejeitado', 0);
+                              }}
+                            >
                               <XCircle className="h-3 w-3" />
                             </Button>
                           </>
