@@ -249,21 +249,31 @@ export default function PremiacoesPage() {
             <RewardsApprovalHub pagamentos={pagamentos} />
             
             <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm mt-8 bg-card/50 backdrop-blur-sm">
-              <CardHeader className="bg-muted/30 border-b border-border/10 flex-row justify-between items-center space-y-0 py-4">
-                <div>
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    Relatório Gerencial de Alta Fidelidade 10/10
-                  </CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Extração de dados com filtros por empresa e unidade</CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
-                    <Download className="mr-1 h-3 w-3" /> Exportar CSV
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('pdf')}>
-                    <FileText className="mr-1 h-3 w-3" /> Gerar PDF
-                  </Button>
+              <CardHeader className="bg-muted/30 border-b border-border/10 p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      Painel Gerencial de Auditoria & ROI v1.2
+                    </CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest mt-1">Dados consolidados com snapshot de metas e conciliação</CardDescription>
+                  </div>
+                  <div className="flex gap-2 w-full md:w-auto">
+                    <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
+                      <Filter className="h-3 w-3 text-muted-foreground" />
+                      <select className="bg-transparent text-[10px] font-bold outline-none border-none">
+                        <option>Todos os Períodos</option>
+                        <option>Maio 2026</option>
+                        <option>Abril 2026</option>
+                      </select>
+                    </div>
+                    <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
+                      <Download className="mr-1 h-3 w-3" /> CSV
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('pdf')}>
+                      <FileText className="mr-1 h-3 w-3" /> PDF
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
