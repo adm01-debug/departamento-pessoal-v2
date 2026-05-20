@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   Activity, Users, Clock, Calendar, ShieldAlert, Gavel, 
-  TrendingUp, AlertTriangle, CheckCircle2, Zap, BrainCircuit
+  TrendingUp, AlertTriangle, CheckCircle2, Zap, BrainCircuit, ShieldCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
@@ -120,6 +120,18 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
 
   return (
     <div className="space-y-6 mt-6">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <h2 className="text-xl font-display font-bold">Painel de Gestão Estratégica</h2>
+          <p className="text-sm text-muted-foreground">Monitoramento preditivo e conformidade MTP 671</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-success/20 text-success border-success/30 gap-1.5 px-3 py-1.5">
+            <ShieldCheck className="h-3.5 w-3.5" /> IA Monitorando
+          </Badge>
+        </div>
+      </div>
+
       {/* Predictive Top Banner */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
