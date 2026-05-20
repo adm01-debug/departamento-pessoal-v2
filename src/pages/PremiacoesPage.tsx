@@ -90,7 +90,7 @@ export default function PremiacoesPage() {
 
   return (
     <>
-      <PageTitle title="Premiações & Renda Variável 10/10" description="Gestão estratégica de incentivos e alta performance" />
+      <PageTitle title="Premiações & Renda Variável 10/10" description="Gestão estratégica de incentivos e alta performance organizacional" />
       <PageLayout 
         title="Hub de Premiações" 
         description="Campanhas, Metas e ROI de Capital Humano" 

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trophy, Target, TargetIcon, Calculator, Plus, Trash2 } from 'lucide-react';
+import { Trophy, Target, TargetIcon, Calculator, Plus, Trash2, Sparkles, Info } from 'lucide-react';
 import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -92,7 +92,24 @@ export function CampaignWizard({ isOpen, onClose, empresaId }: CampaignWizardPro
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 flex items-start gap-3">
+                <Sparkles className="h-5 w-5 text-primary mt-1" />
+                <div>
+                  <h4 className="text-sm font-bold text-primary">Inteligência de Incentivos</h4>
+                  <p className="text-[10px] text-muted-foreground">Analise as metas atuais para sugerir as melhores regras de premiação.</p>
+                  <Button variant="link" className="p-0 h-auto text-[10px] font-bold text-primary" onClick={() => {
+                    setRules([
+                      ...rules,
+                      { nome: 'Atingimento Meta Vendas', tipo_calculo: 'percentual_comissao', valor_base: 5, condicao_metrica: 'meta_vendas > 100%' },
+                      { nome: 'Superação de Meta (Kicker)', tipo_calculo: 'valor_fixo', valor_base: 1000, condicao_metrica: 'meta_vendas > 120%' }
+                    ]);
+                    toast.success("Regras sugeridas aplicadas!");
+                  }}>
+                    Aplicar sugestões baseadas em OKRs
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-2">
                 <Label className="text-sm font-bold">Regras de Premiação</Label>
                 <Button size="sm" variant="outline" className="h-8 text-[10px]" onClick={() => setRules([...rules, { nome: '', tipo_calculo: 'valor_fixo', valor_base: 0, condicao_metrica: '' }])}>
                   <Plus className="h-3 w-3 mr-1" /> Adicionar Regra
