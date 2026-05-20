@@ -28,6 +28,7 @@ export default function PremiacoesPage() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = React.useState('campanhas');
   const [isWizardOpen, setIsWizardOpen] = React.useState(false);
+  const [periodoFiltro, setPeriodoFiltro] = React.useState('Todos os Períodos');
   
   const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
     queryKey: ['premiacoes_campanhas', empresaAtual?.id],
@@ -249,21 +250,35 @@ export default function PremiacoesPage() {
             <RewardsApprovalHub pagamentos={pagamentos} />
             
             <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm mt-8 bg-card/50 backdrop-blur-sm">
-              <CardHeader className="bg-muted/30 border-b border-border/10 flex-row justify-between items-center space-y-0 py-4">
-                <div>
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    Relatório Gerencial de Alta Fidelidade 10/10
-                  </CardTitle>
-                  <CardDescription className="text-[10px] uppercase tracking-widest">Extração de dados com filtros por empresa e unidade</CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
-                    <Download className="mr-1 h-3 w-3" /> Exportar CSV
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('pdf')}>
-                    <FileText className="mr-1 h-3 w-3" /> Gerar PDF
-                  </Button>
+              <CardHeader className="bg-muted/30 border-b border-border/10 p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      Painel Gerencial de Auditoria & ROI v1.2
+                    </CardTitle>
+                    <CardDescription className="text-[10px] uppercase tracking-widest mt-1">Dados consolidados com snapshot de metas e conciliação</CardDescription>
+                  </div>
+                  <div className="flex gap-2 w-full md:w-auto">
+                    <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
+                      <Filter className="h-3 w-3 text-muted-foreground" />
+                      <select 
+                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        value={periodoFiltro}
+                        onChange={(e) => setPeriodoFiltro(e.target.value)}
+                      >
+                        <option>Todos os Períodos</option>
+                        <option>Maio 2026</option>
+                        <option>Abril 2026</option>
+                      </select>
+                    </div>
+                    <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
+                      <Download className="mr-1 h-3 w-3" /> CSV
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('pdf')}>
+                      <FileText className="mr-1 h-3 w-3" /> PDF
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
@@ -275,7 +290,7 @@ export default function PremiacoesPage() {
                         <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Campanha</th>
                         <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Valor Aprovado</th>
                         <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Folha Real</th>
-                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Status Conciliação</th>
+                        <th className="text-left p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Status / Justificativa</th>
                         <th className="text-right p-4 font-bold text-[10px] uppercase text-muted-foreground tracking-widest">Auditoria</th>
                       </tr>
                     </thead>
@@ -297,13 +312,20 @@ export default function PremiacoesPage() {
                             {p.valor_folha_real ? formatCurrency(p.valor_folha_real) : '—'}
                           </td>
                           <td className="p-4">
-                            <Badge className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                              p.status_conciliacao === 'conciliado' ? 'bg-success/10 text-success' : 
-                              p.status_conciliacao === 'divergente' ? 'bg-amber-500/10 text-amber-500' : 
-                              'bg-muted text-muted-foreground'
-                            }`}>
-                              {p.status_conciliacao || 'pendente'}
-                            </Badge>
+                            <div className="flex flex-col gap-1">
+                              <Badge className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full w-fit ${
+                                p.status_conciliacao === 'conciliado' ? 'bg-success/10 text-success' : 
+                                p.status_conciliacao === 'divergente' ? 'bg-amber-500/10 text-amber-500' : 
+                                'bg-muted text-muted-foreground'
+                              }`}>
+                                {p.status_conciliacao || 'pendente'}
+                              </Badge>
+                              {p.justificativa_divergencia && (
+                                <span className="text-[9px] text-muted-foreground italic truncate max-w-[150px]" title={p.justificativa_divergencia}>
+                                  "{p.justificativa_divergencia}"
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="p-4 text-right">
                             <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">

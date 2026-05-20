@@ -214,6 +214,14 @@ export function RewardsSimulator() {
                       <span className="text-[10px] font-mono font-bold text-primary">{formatCurrency(s.totalBudget)}</span>
                       <Badge variant="outline" className="text-[8px] h-4 bg-success/5 text-success border-success/20">{s.roi.toFixed(1)}x ROI</Badge>
                     </div>
+                    <div className="hidden group-hover:block mt-2 pt-2 border-t border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest">Logs de Cálculo (Snapshot)</p>
+                      <ul className="text-[8px] text-muted-foreground list-disc pl-3 mt-1">
+                        <li>Metas: {s.performanceLevel}%</li>
+                        <li>Retenção: {s.retentionImpact}%</li>
+                        <li>Salário Médio: {formatCurrency(s.avgSalary)}</li>
+                      </ul>
+                    </div>
                     <Button variant="ghost" size="icon" className="absolute -right-2 -top-2 h-5 w-5 bg-background border border-border rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                       <Copy className="h-2 w-2" />
                     </Button>

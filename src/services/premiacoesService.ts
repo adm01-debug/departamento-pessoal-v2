@@ -61,23 +61,54 @@ export const premiacoesService = {
       .single();
     
     if (error) throw error;
+    
+    if (status === 'rejeitado' || status === 'aprovado_financeiro') {
+      await this.enviarNotificacaoCritica(`pagamento_${status}`, { id, status, valorAprovado });
+    }
 
     return data;
   },
 
   async reconciliarFolha(id: string, valorFolha: number, justificativa?: string) {
+    const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*').eq('id', id).single();
+    if (fetchErr) throw fetchErr;
+
+    const valorAprovado = Number(original.valor_aprovado || original.valor_calculado);
+    const status_conciliacao = valorFolha === valorAprovado ? 'conciliado' : 'divergente';
+
     const { data, error } = await supabase
       .from('premiacoes_pagamentos')
       .update({
         valor_folha_real: valorFolha,
-        status_conciliacao: valorFolha === 0 ? 'pendente' : (valorFolha === 0 /* simplified logic */ ? 'conciliado' : 'divergente'),
-        justificativa_divergencia: justificativa
+        status_conciliacao,
+        justificativa_divergencia: justificativa,
+        status: status_conciliacao === 'conciliado' ? 'pago' : 'divergente_em_revisao',
+        historico_mudancas: [...(original.historico_mudancas || []), { 
+          status: status_conciliacao === 'conciliado' ? 'pago' : 'divergente_em_revisao', 
+          data: new Date().toISOString(), 
+          comentario: `Conciliação: ${status_conciliacao}. ${justificativa || ''}`,
+          valor_folha: valorFolha,
+          user: 'current_user' 
+        }]
       })
       .eq('id', id)
       .select()
       .single();
     
     if (error) throw error;
+
+    // Log to audit table
+    await supabase.from('premiacoes_auditoria').insert({
+      entidade_tipo: 'pagamento',
+      entidade_id: id,
+      acao: 'conciliacao_folha',
+      detalhes: { valor_aprovado: valorAprovado, valor_folha: valorFolha, status_conciliacao, justificativa }
+    });
+
+    if (status_conciliacao === 'divergente') {
+      await this.enviarNotificacaoCritica('conciliacao_divergente', { id, valorAprovado, valorFolha, justificativa });
+    }
+
     return data;
   },
 
@@ -93,5 +124,20 @@ export const premiacoesService = {
     // Simulação de exportação - na prática buscaria dados e formataria
     const pagamentos = await this.listarPagamentos(undefined, filtros.empresaId);
     return pagamentos;
+  },
+
+  async enviarNotificacaoCritica(tipo: string, payload: any) {
+    console.log(`[Notification] ${tipo}:`, payload);
+    // Em um cenário real, chamaria uma Edge Function para enviar e-mail/WhatsApp
+    const { error } = await supabase.from('notificacoes').insert({
+      tipo: 'premiacao_critica',
+      titulo: `Evento Crítico: ${tipo.replace('_', ' ').toUpperCase()}`,
+      mensagem: `Ação detectada no módulo de premiações: ${JSON.stringify(payload)}`,
+      user_id: payload.user_id,
+      metadata: { ...payload, modulo: 'premiacoes' }
+    });
+    
+    if (error) console.error("Erro ao registrar notificação:", error);
+    return true;
   }
 };

@@ -36,17 +36,32 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
   const [selectedPagamento, setSelectedPagamento] = React.useState<any>(null);
   const [comentario, setComentario] = React.useState('');
   const [isReconcileOpen, setIsReconcileOpen] = React.useState(false);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = React.useState(false);
+  const [pendingAction, setPendingAction] = React.useState<{id: string, nextStatus: string, valor: number} | null>(null);
   const [valorFolha, setValorFolha] = React.useState('');
 
   const handleApprove = async (id: string, nextStatus: string, valor: number) => {
+    setSelectedPagamento(pagamentos.find(p => p.id === id));
+    setPendingAction({ id, nextStatus, valor });
+    setIsApprovalDialogOpen(true);
+  };
+
+  const confirmApproval = async () => {
+    if (!pendingAction) return;
     try {
-      await premiacoesService.atualizarStatusPagamento(id, nextStatus, valor, comentario || 'Aprovado via Hub');
+      await premiacoesService.atualizarStatusPagamento(
+        pendingAction.id, 
+        pendingAction.nextStatus, 
+        pendingAction.valor, 
+        comentario || (pendingAction.nextStatus === 'rejeitado' ? 'Rejeitado via Hub' : 'Aprovado via Hub')
+      );
       queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
-      toast.success("Aprovação registrada com sucesso.");
-      setSelectedPagamento(null);
+      toast.success(pendingAction.nextStatus === 'rejeitado' ? "Rejeição registrada." : "Aprovação registrada.");
+      setIsApprovalDialogOpen(false);
+      setPendingAction(null);
       setComentario('');
     } catch (e) {
-      toast.error("Erro ao aprovar pagamento.");
+      toast.error("Erro ao processar ação.");
     }
   };
 
@@ -84,7 +99,7 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
             </CardHeader>
             <CardContent className="p-3 space-y-3">
               {pagamentos
-                .filter(p => stage.id === 'aprovado_financeiro' ? (p.status === stage.id || p.status === 'pago') : p.status === stage.id)
+                .filter(p => p.status !== 'rejeitado' && (stage.id === 'aprovado_financeiro' ? (p.status === stage.id || p.status === 'pago') : p.status === stage.id))
                 .map(p => {
                   const hasDivergence = p.valor_folha_real && p.valor_folha_real !== p.valor_aprovado;
                   return (
@@ -126,7 +141,15 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                             >
                               <CheckCircle2 className="h-3 w-3 mr-1" /> Aprovar
                             </Button>
-                            <Button size="sm" variant="outline" className="h-7 w-7 p-0 rounded-lg text-destructive">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-7 w-7 p-0 rounded-lg text-destructive hover:bg-destructive/10"
+                              onClick={() => {
+                                setSelectedPagamento(p);
+                                handleApprove(p.id, 'rejeitado', 0);
+                              }}
+                            >
                               <XCircle className="h-3 w-3" />
                             </Button>
                           </>
@@ -144,6 +167,31 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
           </Card>
         ))}
       </div>
+
+      {pagamentos.some(p => p.status === 'rejeitado') && (
+        <Card className="border-destructive/20 bg-destructive/5 rounded-2xl">
+          <CardHeader className="py-3 px-4 border-b border-destructive/10">
+            <CardTitle className="text-[10px] font-bold uppercase text-destructive flex items-center gap-2">
+              <XCircle className="h-3 w-3" /> Pagamentos Rejeitados (Auditoria Necessária)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 flex flex-wrap gap-3">
+            {pagamentos.filter(p => p.status === 'rejeitado').map(p => (
+              <div key={p.id} className="p-2 bg-background border border-destructive/20 rounded-xl text-[10px] flex items-center gap-3">
+                <span className="font-bold">{p.colaborador?.nome_completo}</span>
+                <span className="text-muted-foreground">R$ {p.valor_calculado}</span>
+                <Button variant="ghost" size="sm" className="h-6 text-[8px] text-primary" onClick={() => {
+                  setSelectedPagamento(p);
+                  setPendingAction({ id: p.id, nextStatus: 'calculado', valor: p.valor_calculado });
+                  setIsApprovalDialogOpen(true);
+                }}>
+                  Reiniciar Fluxo
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Dialog open={isReconcileOpen} onOpenChange={setIsReconcileOpen}>
         <DialogContent className="sm:max-w-[425px] rounded-3xl">
@@ -189,6 +237,50 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsReconcileOpen(false)} className="rounded-xl">Cancelar</Button>
             <Button onClick={handleReconcile} className="rounded-xl px-8">Salvar Conciliação</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {pendingAction?.nextStatus === 'rejeitado' ? (
+                <XCircle className="h-5 w-5 text-destructive" />
+              ) : (
+                <CheckCircle2 className="h-5 w-5 text-success" />
+              )}
+              {pendingAction?.nextStatus === 'rejeitado' ? 'Confirmar Rejeição' : 'Confirmar Aprovação'}
+            </DialogTitle>
+            <DialogDescription>
+              {pendingAction?.nextStatus === 'rejeitado' 
+                ? 'Justifique o motivo da rejeição deste pagamento.' 
+                : 'Adicione um comentário opcional para este estágio da aprovação.'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="p-4 bg-muted/30 rounded-2xl mb-4">
+              <p className="text-xs font-bold">{selectedPagamento?.colaborador?.nome_completo}</p>
+              <p className="text-[10px] text-muted-foreground">{selectedPagamento?.campanha?.nome}</p>
+              <p className="text-sm font-bold mt-2 text-primary">R$ {selectedPagamento?.valor_aprovado || selectedPagamento?.valor_calculado}</p>
+            </div>
+            <div className="grid gap-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">Comentário / Justificativa</label>
+              <Textarea 
+                placeholder="Escreva aqui..."
+                className="rounded-xl resize-none text-xs h-24"
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsApprovalDialogOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button 
+              onClick={confirmApproval} 
+              className={`rounded-xl px-8 ${pendingAction?.nextStatus === 'rejeitado' ? 'bg-destructive hover:bg-destructive/90' : 'bg-success hover:bg-success/90'}`}
+            >
+              {pendingAction?.nextStatus === 'rejeitado' ? 'Rejeitar Pagamento' : 'Aprovar e Avançar'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
