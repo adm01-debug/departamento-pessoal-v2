@@ -168,6 +168,31 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
         ))}
       </div>
 
+      {pagamentos.some(p => p.status === 'rejeitado') && (
+        <Card className="border-destructive/20 bg-destructive/5 rounded-2xl">
+          <CardHeader className="py-3 px-4 border-b border-destructive/10">
+            <CardTitle className="text-[10px] font-bold uppercase text-destructive flex items-center gap-2">
+              <XCircle className="h-3 w-3" /> Pagamentos Rejeitados (Auditoria Necessária)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 flex flex-wrap gap-3">
+            {pagamentos.filter(p => p.status === 'rejeitado').map(p => (
+              <div key={p.id} className="p-2 bg-background border border-destructive/20 rounded-xl text-[10px] flex items-center gap-3">
+                <span className="font-bold">{p.colaborador?.nome_completo}</span>
+                <span className="text-muted-foreground">R$ {p.valor_calculado}</span>
+                <Button variant="ghost" size="sm" className="h-6 text-[8px] text-primary" onClick={() => {
+                  setSelectedPagamento(p);
+                  setPendingAction({ id: p.id, nextStatus: 'calculado', valor: p.valor_calculado });
+                  setIsApprovalDialogOpen(true);
+                }}>
+                  Reiniciar Fluxo
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
       <Dialog open={isReconcileOpen} onOpenChange={setIsReconcileOpen}>
         <DialogContent className="sm:max-w-[425px] rounded-3xl">
           <DialogHeader>
