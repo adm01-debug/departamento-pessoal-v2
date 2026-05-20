@@ -81,9 +81,10 @@ export default function PremiacoesPage() {
 
   const stats = {
     totalAprovado: pagamentos.reduce((acc, p) => acc + (Number(p.valor_aprovado) || 0), 0),
+    totalRealFolha: pagamentos.reduce((acc, p) => acc + (Number(p.valor_folha_real) || 0), 0),
     totalPendente: pagamentos.filter(p => p.status === 'calculado').reduce((acc, p) => acc + Number(p.valor_calculado), 0),
     campanhasAtivas: campanhas.filter(c => c.status === 'ativo').length,
-    roiEstimado: 24.5 // Mock ROI for visual excellence
+    divergenciaCount: pagamentos.filter(p => p.status_conciliacao === 'divergente').length
   };
 
   if (loadCampanhas) return <div className="p-8"><Skeleton className="h-[400px] w-full" /></div>;
@@ -133,14 +134,18 @@ export default function PremiacoesPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/40 shadow-sm bg-primary/5">
+          <Card className={`border-border/40 shadow-sm ${stats.divergenciaCount > 0 ? 'bg-amber-500/5' : 'bg-primary/5'}`}>
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
-                <p className="text-xs font-bold text-primary uppercase tracking-wider">ROI de Incentivo</p>
-                <div className="p-2 bg-primary/10 rounded-lg text-primary"><TrendingUp className="h-4 w-4" /></div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Conciliação (Divergências)</p>
+                <div className={`p-2 rounded-lg ${stats.divergenciaCount > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-primary/10 text-primary'}`}>
+                  {stats.divergenciaCount > 0 ? <AlertCircle className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+                </div>
               </div>
-              <h3 className="text-2xl font-bold mt-2 text-primary">{stats.roiEstimado}%</h3>
-              <p className="text-[10px] text-primary/70 mt-1">Crescimento de produtividade</p>
+              <h3 className="text-2xl font-bold mt-2">{stats.divergenciaCount}</h3>
+              <p className={`text-[10px] mt-1 ${stats.divergenciaCount > 0 ? 'text-amber-600 font-bold' : 'text-muted-foreground'}`}>
+                {stats.divergenciaCount > 0 ? 'Atenção necessária na auditoria' : 'Todos os valores conciliados'}
+              </p>
             </CardContent>
           </Card>
         </div>
