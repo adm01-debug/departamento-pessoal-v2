@@ -120,13 +120,18 @@ export default function PontoKioskPage() {
     }
   };
 
+  const [speaking, setSpeaking] = useState(false);
   const speak = (text: string) => {
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'pt-BR';
+      utterance.onstart = () => setSpeaking(true);
+      utterance.onend = () => setSpeaking(false);
       window.speechSynthesis.speak(utterance);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 font-body">
@@ -158,7 +163,31 @@ export default function PontoKioskPage() {
             <RefreshCw className="h-5 w-5 text-primary animate-spin" />
           )}
         </div>
-      </div>
+        </div>
+        
+        <AnimatePresence>
+          {speaking && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: 10 }}
+              className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20"
+            >
+              <div className="flex gap-1">
+                {[1,2,3,4].map(i => (
+                  <motion.div 
+                    key={i}
+                    animate={{ height: [4, 12, 4] }}
+                    transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                    className="w-1 bg-primary rounded-full"
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Assistente de Voz Ativo</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       <div className="max-w-md mx-auto mt-12">
         <div className="text-center mb-12">
           <div className="text-7xl font-display font-bold tabular-nums mb-2">
