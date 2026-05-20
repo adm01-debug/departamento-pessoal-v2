@@ -417,8 +417,9 @@ export function GestaoRegistrosPonto() {
         )}
             </TabsContent>
             
-            <TabsContent value="analytics">
+            <TabsContent value="analytics" className="space-y-6">
               <GestaoPontoAnalytics registros={registros} />
+              <PontoGeoAnalytics batidas={batidas} />
             </TabsContent>
           </Tabs>
         </CardContent>
