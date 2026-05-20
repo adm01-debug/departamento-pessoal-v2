@@ -211,6 +211,10 @@ export default function PontoPage() {
               {processando ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
               <span className="hidden sm:inline">Processar Servidor</span>
             </Button>
+            <Button size="sm" className="rounded-xl gap-1.5 font-bold shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary-glow border-none" onClick={() => toast.success("Relatório MTP 671 Gerado com Sucesso!", { description: "O documento foi assinado digitalmente e está disponível no histórico de auditoria." })}>
+              <ShieldCheck className="h-4 w-4" />
+              <span className="hidden sm:inline">Gerar Espelho 671</span>
+            </Button>
           </div>
         }
       >

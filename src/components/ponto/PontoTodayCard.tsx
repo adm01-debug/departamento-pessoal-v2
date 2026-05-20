@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Timer, Clock, AlertTriangle, ArrowUpRight, ArrowDownRight, Coffee } from 'lucide-react';
+import { Timer, Clock, AlertTriangle, ArrowUpRight, ArrowDownRight, Coffee, Sparkles, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,31 @@ export function PontoTodayCard({ registroHoje }: PontoTodayCardProps) {
     const workedMins = timeToMinutes(formatInterval(registroHoje.horas_trabalhadas));
     const p = (workedMins / totalMins) * 100;
     return Math.min(100, Math.max(0, p));
+  }, [registroHoje]);
+  
+  const estimatedEndTime = useMemo(() => {
+    if (!registroHoje || !registroHoje.entrada_1 || !registroHoje.entrada_esperada || !registroHoje.saida_esperada) return null;
+    
+    const [eh, em] = registroHoje.entrada_esperada.split(':').map(Number);
+    const [sh, sm] = registroHoje.saida_esperada.split(':').map(Number);
+    const expectedDurationMins = (sh * 60 + sm) - (eh * 60 + em);
+    
+    const [h1, m1] = registroHoje.entrada_1.split(':').map(Number);
+    const startMins = h1 * 60 + m1;
+    
+    // Add lunch time if already taken or expected
+    let lunchMins = 60; // default 1h
+    if (registroHoje.saida_intervalo && registroHoje.retorno_intervalo) {
+      const [sh_int, sm_int] = registroHoje.saida_intervalo.split(':').map(Number);
+      const [rh_int, rm_int] = registroHoje.retorno_intervalo.split(':').map(Number);
+      lunchMins = (rh_int * 60 + rm_int) - (sh_int * 60 + sm_int);
+    }
+    
+    const totalDurationMins = startMins + expectedDurationMins + lunchMins;
+    const endH = Math.floor(totalDurationMins / 60) % 24;
+    const endM = totalDurationMins % 60;
+    
+    return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
   }, [registroHoje]);
 
   const pares = registroHoje ? [
@@ -110,6 +135,18 @@ export function PontoTodayCard({ registroHoje }: PontoTodayCardProps) {
                       <ArrowUpRight className="h-3 w-3" /> Saída antecipada
                     </Badge>
                   )}
+                </div>
+              )}
+
+              {estimatedEndTime && !registroHoje.saida_1 && (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BrainCircuit className="h-4 w-4 text-primary animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase text-primary">Previsão de Saída IA</span>
+                  </div>
+                  <Badge variant="secondary" className="font-display font-bold text-sm bg-background/50">
+                    {estimatedEndTime}
+                  </Badge>
                 </div>
               )}
 
