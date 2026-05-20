@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -33,6 +33,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
   const [showFaceScan, setShowFaceScan] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [selectedTipo, setSelectedTipo] = useState<any>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -140,6 +141,8 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
     
     if (navigator.onLine) {
       onRegistrar(tipo, { foto_biometria_url: fotoUrl });
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
       return;
     }
 
@@ -218,6 +221,44 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
               </Button>
             ))}
           </div>
+          
+          <AnimatePresence>
+            {showConfetti && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center"
+              >
+                <div className="relative">
+                  <motion.div 
+                    animate={{ rotate: 360 }} 
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="absolute -inset-10"
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-2 h-2 rounded-full bg-primary-glow"
+                        style={{
+                          left: '50%',
+                          top: '50%',
+                          transform: `rotate(${i * 30}deg) translateY(-40px)`
+                        }}
+                        animate={{ y: [-40, -100], opacity: [1, 0] }}
+                        transition={{ duration: 1, delay: i * 0.05 }}
+                      />
+                    ))}
+                  </motion.div>
+                  <Card className="bg-background/90 backdrop-blur-md border-primary/30 p-4 shadow-2xl flex flex-col items-center gap-2">
+                    <Sparkles className="h-8 w-8 text-primary animate-bounce" />
+                    <p className="font-display font-bold text-primary">Ponto Confirmado!</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">+50 XP • Assiduidade</p>
+                  </Card>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {ultimoRegistro && (
             <div className="mt-4 p-3 rounded-xl bg-muted/30 border border-border/20 flex items-center justify-between">
