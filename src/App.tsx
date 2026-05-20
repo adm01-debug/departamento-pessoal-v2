@@ -76,6 +76,7 @@ const EscalasPage = lazy(() => import('@/pages/EscalasPage'));
 const SegurosVidaPage = lazy(() => import('@/pages/SegurosVidaPage'));
 const PensoesPage = lazy(() => import('@/pages/PensoesPage'));
 const ValesPage = lazy(() => import('@/pages/ValesPage'));
+const DescontosPage = lazy(() => import('@/pages/DescontosPage'));
 const ExamesPage = lazy(() => import('@/pages/ExamesPage'));
 const HoleritesPage = lazy(() => import('@/pages/HoleritesPage'));
 const LotacoesPage = lazy(() => import('@/pages/LotacoesPage'));
@@ -234,6 +235,7 @@ export default function App() {
         <Route path="seguros-vida" element={<LazyPage Component={SegurosVidaPage} />} />
         <Route path="pensoes" element={<LazyPage Component={PensoesPage} />} />
         <Route path="vales" element={<LazyPage Component={ValesPage} />} />
+        <Route path="descontos" element={<LazyPage Component={DescontosPage} />} />
         <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
         <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
         <Route path="portal" element={<LazyPage Component={PortalPage} />} />

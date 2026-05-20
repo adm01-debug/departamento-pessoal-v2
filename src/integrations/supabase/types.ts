@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      adiantamentos_salariais: {
+        Row: {
+          aprovado_por: string | null
+          colaborador_id: string
+          competencia_desconto: string
+          created_at: string
+          data_pagamento: string | null
+          data_solicitacao: string
+          empresa_id: string
+          id: string
+          motivo: string | null
+          status: string | null
+          updated_at: string
+          valor_solicitado: number
+        }
+        Insert: {
+          aprovado_por?: string | null
+          colaborador_id: string
+          competencia_desconto: string
+          created_at?: string
+          data_pagamento?: string | null
+          data_solicitacao?: string
+          empresa_id: string
+          id?: string
+          motivo?: string | null
+          status?: string | null
+          updated_at?: string
+          valor_solicitado: number
+        }
+        Update: {
+          aprovado_por?: string | null
+          colaborador_id?: string
+          competencia_desconto?: string
+          created_at?: string
+          data_pagamento?: string | null
+          data_solicitacao?: string
+          empresa_id?: string
+          id?: string
+          motivo?: string | null
+          status?: string | null
+          updated_at?: string
+          valor_solicitado?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adiantamentos_salariais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "adiantamentos_salariais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "adiantamentos_salariais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "adiantamentos_salariais_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "adiantamentos_salariais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admissao_tokens: {
         Row: {
           admissao_id: string
@@ -6721,6 +6802,93 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      emprestimos_consignados: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          data_inicio: string
+          empresa_id: string
+          id: string
+          instituicao_financeira: string | null
+          numero_parcelas: number
+          observacoes: string | null
+          parcelas_pagas: number | null
+          status: string | null
+          taxa_juros: number | null
+          updated_at: string
+          valor_parcela: number
+          valor_total: number
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          data_inicio: string
+          empresa_id: string
+          id?: string
+          instituicao_financeira?: string | null
+          numero_parcelas: number
+          observacoes?: string | null
+          parcelas_pagas?: number | null
+          status?: string | null
+          taxa_juros?: number | null
+          updated_at?: string
+          valor_parcela: number
+          valor_total: number
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          data_inicio?: string
+          empresa_id?: string
+          id?: string
+          instituicao_financeira?: string | null
+          numero_parcelas?: number
+          observacoes?: string | null
+          parcelas_pagas?: number | null
+          status?: string | null
+          taxa_juros?: number | null
+          updated_at?: string
+          valor_parcela?: number
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emprestimos_consignados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emprestimos_consignados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emprestimos_consignados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emprestimos_consignados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "emprestimos_consignados_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       epis: {
         Row: {

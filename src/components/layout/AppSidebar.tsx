@@ -4,7 +4,7 @@ import {
   LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
-  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen
+  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -77,6 +77,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: Wallet, label: 'Folha de Pagamento', path: '/folha', color: 'text-success' },
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
+      { icon: TrendingDown, label: 'Descontos & Consignados', path: '/descontos', color: 'text-destructive' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
       { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },
