@@ -10,9 +10,11 @@ import { Trophy, Target, TrendingUp, DollarSign, Plus, Calendar, Filter, ArrowUp
 import { useQuery } from '@tanstack/react-query';
 import { premiacoesService } from '@/services/premiacoesService';
 import { useEmpresas } from '@/hooks';
-import { formatCurrency } from '@/utils/formatters';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RewardsSimulator } from '@/components/premiacoes/RewardsSimulator';
+
+const formatCurrency = (val: number) => 
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
 export default function PremiacoesPage() {
   const { empresaAtual } = useEmpresas();
