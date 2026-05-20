@@ -4,8 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calculator, TrendingUp, Save, History, RefreshCw, Zap } from 'lucide-react';
+import { Calculator, TrendingUp, Save, History, RefreshCw, Zap, PieChart as PieChartIcon, BarChart as BarChartIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 
 const formatCurrency = (val: number) => 
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
@@ -37,6 +38,11 @@ export function RewardsSimulator() {
     setScenarios([newScenario, ...scenarios.slice(0, 2)]);
     toast.success("Cenário salvo para comparação!");
   };
+
+  const chartData = [
+    { name: 'Custo do Bônus', valor: totalBudget, color: '#f59e0b' },
+    { name: 'Economia (ROI)', valor: savings, color: '#10b981' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -110,6 +116,38 @@ export function RewardsSimulator() {
                 <Slider value={[retentionImpact]} onValueChange={([v]: number[]) => setRetentionImpact(v)} max={20} step={0.5} />
                 <p className="text-[10px] text-muted-foreground italic">Impacto baseado em benchmark do setor para programas de premiação estruturados.</p>
               </div>
+            </div>
+
+            <div className="h-[200px] w-full mt-8 p-4 bg-muted/20 rounded-2xl border border-border/5">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
+                <BarChartIcon className="h-3 w-3" /> Comparativo Financeiro: Custo vs. Economia
+              </h4>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(0,0,0,0.05)" />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" width={80} style={{ fontSize: '10px', fontWeight: 'bold' }} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background border border-border p-2 rounded-lg shadow-xl text-[10px]">
+                            <p className="font-bold">{payload[0].name}</p>
+                            <p className="text-primary">{formatCurrency(Number(payload[0].value))}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar dataKey="valor" radius={[0, 4, 4, 0]} barSize={24}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
