@@ -49,7 +49,7 @@ const menuGroups: MenuGroup[] = [
       { icon: UserPlus, label: 'Onboarding', path: '/onboarding', color: 'text-info' },
       { icon: UserMinus, label: 'Desligamentos', path: '/desligamentos', color: 'text-destructive' },
       { icon: Target, label: 'Avaliação & Performance', path: '/avaliacao', color: 'text-warning' },
-      { icon: Trophy, label: 'Premiações', path: '/premiacoes', color: 'text-primary' },
+      { icon: Trophy, label: 'Premiações 10/10', path: '/premiacoes', color: 'text-primary' },
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
       { icon: UserSearch, label: 'Recrutamento', path: '/recrutamento', color: 'text-success' },
       { icon: ClipboardList, label: 'Pesquisas Clima', path: '/pesquisas-clima', color: 'text-info' },
