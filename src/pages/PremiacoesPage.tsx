@@ -180,6 +180,10 @@ export default function PremiacoesPage() {
             </div>
           </TabsContent>
 
+          <TabsContent value="simulador" className="space-y-6">
+            <RewardsSimulator />
+          </TabsContent>
+
           <TabsContent value="pagamentos" className="space-y-6">
             <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm">
               <CardHeader className="bg-muted/30 border-b border-border/30 flex-row justify-between items-center space-y-0 py-4">
