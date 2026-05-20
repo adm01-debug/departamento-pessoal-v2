@@ -7,6 +7,7 @@ import {
 import { MapPin, ShieldCheck, ShieldAlert, Navigation, Compass } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export function PontoGeoAnalytics({ batidas }: { batidas: any[] }) {
   const geoStats = useMemo(() => {
