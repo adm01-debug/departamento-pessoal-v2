@@ -6,12 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Target, TrendingUp, DollarSign, Plus, Calendar, Filter, ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Trophy, Target, TrendingUp, DollarSign, Plus, Calendar, Filter, ArrowUpRight, CheckCircle2, AlertCircle, Calculator } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { premiacoesService } from '@/services/premiacoesService';
 import { useEmpresas } from '@/hooks';
 import { formatCurrency } from '@/utils/formatters';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RewardsSimulator } from '@/components/premiacoes/RewardsSimulator';
 
 export default function PremiacoesPage() {
   const { empresaAtual } = useEmpresas();

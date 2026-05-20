@@ -4,7 +4,8 @@ import {
   LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
-  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown
+  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
+  Trophy
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -47,7 +48,8 @@ const menuGroups: MenuGroup[] = [
       { icon: UserPlus, label: 'Admissões', path: '/admissoes', color: 'text-success' },
       { icon: UserPlus, label: 'Onboarding', path: '/onboarding', color: 'text-info' },
       { icon: UserMinus, label: 'Desligamentos', path: '/desligamentos', color: 'text-destructive' },
-      { icon: Target, label: 'Avaliação', path: '/avaliacao', color: 'text-warning' },
+      { icon: Target, label: 'Avaliação & Performance', path: '/avaliacao', color: 'text-warning' },
+      { icon: Trophy, label: 'Premiações', path: '/premiacoes', color: 'text-primary' },
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
       { icon: UserSearch, label: 'Recrutamento', path: '/recrutamento', color: 'text-success' },
       { icon: ClipboardList, label: 'Pesquisas Clima', path: '/pesquisas-clima', color: 'text-info' },
