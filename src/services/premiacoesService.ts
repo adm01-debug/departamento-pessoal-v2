@@ -61,6 +61,10 @@ export const premiacoesService = {
       .single();
     
     if (error) throw error;
+    
+    if (status === 'rejeitado' || status === 'aprovado_financeiro') {
+      await this.enviarNotificacaoCritica(`pagamento_${status}`, { id, status, valorAprovado });
+    }
 
     return data;
   },
@@ -100,6 +104,10 @@ export const premiacoesService = {
       acao: 'conciliacao_folha',
       detalhes: { valor_aprovado: valorAprovado, valor_folha: valorFolha, status_conciliacao, justificativa }
     });
+
+    if (status_conciliacao === 'divergente') {
+      await this.enviarNotificacaoCritica('conciliacao_divergente', { id, valorAprovado, valorFolha, justificativa });
+    }
 
     return data;
   },
