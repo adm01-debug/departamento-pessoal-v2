@@ -11,9 +11,9 @@ const calcularINSS = (base: number): number => {
   let inss = 0;
   if (base <= 1518) inss = base * 0.075;
   else if (base <= 2793.88) inss = 113.85 + (base - 1518) * 0.09;
-  else if (base <= 5563.80) inss = 228.64 + (base - 2793.88) * 0.12;
-  else inss = 560.83 + (Math.min(base, 7786.93) - 5563.80) * 0.14;
-  return Number(Math.min(inss, 872.15).toFixed(2));
+  else if (base <= 4190.83) inss = 228.68 + (base - 2793.88) * 0.12;
+  else inss = 396.31 + (Math.min(base, 8157.41) - 4190.83) * 0.14;
+  return Number(Math.min(inss, 951.63).toFixed(2));
 };
 
 const calcularIRRF = (base: number, dependentes: number = 0): number => {

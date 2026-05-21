@@ -4,7 +4,7 @@ const corsHeaders = {
 };
 
 function calcINSS(s: number): number {
-  const fx = [{ l: 1518, a: 0.075 }, { l: 2793.88, a: 0.09 }, { l: 5563.80, a: 0.12 }, { l: 7786.93, a: 0.14 }];
+  const fx = [{ l: 1518, a: 0.075 }, { l: 2793.88, a: 0.09 }, { l: 4190.83, a: 0.12 }, { l: 8157.41, a: 0.14 }];
   let d = 0, r = s;
   for (let i = 0; i < fx.length; i++) { const la = i === 0 ? 0 : fx[i-1].l; const f = Math.min(r, fx[i].l - la); if (f <= 0) break; d += f * fx[i].a; r -= f; }
   return Math.round(d * 100) / 100;
