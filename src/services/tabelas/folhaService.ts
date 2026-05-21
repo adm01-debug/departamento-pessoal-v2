@@ -16,7 +16,7 @@ export const esocialLotesService = {
 
 export const eventosVariaveisService = {
   listar: async (empresaId?: string, competencia?: string) => {
-    let q = supabase.from('eventos_variaveis').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
+    let q: any = supabase.from('eventos_variaveis').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
     if (empresaId) q = q.eq('empresa_id', empresaId);
     if (competencia) q = q.eq('competencia', competencia);
     const { data, error } = await q;
@@ -35,7 +35,7 @@ export const eventosVariaveisService = {
 
 export const lancamentosFolhaService = {
   listar: async (folhaId: string) => {
-    const { data, error } = await supabase.from('lancamentos_folha').select('*').eq('folha_id', folhaId).order('created_at', { ascending: false });
+    const { data, error } = await (supabase.from('lancamentos_folha') as any).select('*').eq('folha_id', folhaId).order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },

@@ -4,6 +4,15 @@ import { calcularINSS, calcularIRRF, calcularFGTS } from './impostos';
 
 export type TipoRescisao = 'sem_justa_causa' | 'com_justa_causa' | 'pedido_demissao' | 'acordo_mutuo';
 
+// Avos proporcionais (CLT): fração >= 15 dias conta como mês integral.
+function calcularAvos(inicio: Date, fim: Date): number {
+  if (fim < inicio) return 0;
+  const meses = (fim.getFullYear() - inicio.getFullYear()) * 12 + (fim.getMonth() - inicio.getMonth());
+  const dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
+  const diasRestantes = Math.floor((fim.getTime() - dataReferencia.getTime()) / (1000 * 60 * 60 * 24));
+  return diasRestantes >= 15 ? meses + 1 : meses;
+}
+
 export function calcularRescisao(params: {
   salarioBase: number;
   dataAdmissao: string;
@@ -15,21 +24,27 @@ export function calcularRescisao(params: {
   const { salarioBase, dataAdmissao, dataDesligamento, tipoRescisao, saldoFGTS = 0, feriasVencidas = false } = params;
   const admissao = new Date(dataAdmissao);
   const desligamento = new Date(dataDesligamento);
-  const diffMs = desligamento.getTime() - admissao.getTime();
-  const totalDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const totalMeses = Math.floor(totalDias / 30);
-  const diasNoMes = desligamento.getDate();
+  const avosTotal = calcularAvos(admissao, desligamento);
 
-  const saldoSalario = Math.round((salarioBase / 30) * diasNoMes * 100) / 100;
-  const mesAtual = desligamento.getMonth() + 1;
-  const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * mesAtual * 100) / 100 : 0;
-  const mesesFeriasProp = totalMeses % 12;
+  // Saldo de salário: dias trabalhados no mês sobre os dias reais do mês.
+  const diasNoMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate();
+  const diasTrabalhados = desligamento.getDate();
+  const saldoSalario = Math.round((salarioBase / diasNoMes) * diasTrabalhados * 100) / 100;
+
+  // 13º proporcional: meses trabalhados no ano-calendário (a partir da admissão, se admitido no ano).
+  const inicioAno = new Date(desligamento.getFullYear(), 0, 1);
+  const baseInicio13 = admissao > inicioAno ? admissao : inicioAno;
+  const meses13 = calcularAvos(baseInicio13, desligamento);
+  const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * meses13 * 100) / 100 : 0;
+
+  // Férias proporcionais: avos do período aquisitivo corrente (com regra dos 15 dias).
+  const mesesFeriasProp = avosTotal % 12 || (avosTotal > 0 ? 12 : 0);
   const feriasProp = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * mesesFeriasProp * 100) / 100 : 0;
   const tercoFeriasProp = Math.round(feriasProp / 3 * 100) / 100;
   const feriasVencidasValor = feriasVencidas ? salarioBase : 0;
   const tercoFeriasVencidas = Math.round(feriasVencidasValor / 3 * 100) / 100;
 
-  const anosServico = Math.floor(totalMeses / 12);
+  const anosServico = Math.floor(avosTotal / 12);
   const diasAvisoPrevio = tipoRescisao === 'sem_justa_causa' ? Math.min(90, 30 + anosServico * 3) : 0;
   const avisoPrevio = tipoRescisao === 'sem_justa_causa'
     ? Math.round((salarioBase / 30) * diasAvisoPrevio * 100) / 100
@@ -44,8 +59,9 @@ export function calcularRescisao(params: {
       : 0;
 
   const totalBruto = saldoSalario + decimo13Prop + feriasProp + tercoFeriasProp + feriasVencidasValor + tercoFeriasVencidas + avisoPrevio;
-  const inss = calcularINSS(saldoSalario);
-  const irrf = calcularIRRF(saldoSalario);
+  // INSS/IRRF incidem sobre saldo de salário e 13º (em bases separadas); férias indenizadas são isentas.
+  const inss = Math.round((calcularINSS(saldoSalario) + calcularINSS(decimo13Prop)) * 100) / 100;
+  const irrf = Math.round((calcularIRRF(saldoSalario) + calcularIRRF(decimo13Prop)) * 100) / 100;
   const totalLiquido = Math.round((totalBruto - inss - irrf) * 100) / 100;
 
   return {
