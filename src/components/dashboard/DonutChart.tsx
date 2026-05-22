@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 
 interface Segment {
   label: string;
@@ -48,7 +48,7 @@ export function DonutChart({ segments, size = 140, strokeWidth = 16, className }
           strokeWidth={strokeWidth}
           opacity={0.3}
         />
-        {segmentsWithOffsets.map((seg, i) => {
+        {segmentsWithOffsets.map((seg: any, i: number) => {
           const gap = segments.length > 1 ? 3 : 0;
           const dashArray = `${Math.max(seg.segLength - gap, 0)} ${circumference - seg.segLength + gap}`;
           const strokeOffset = -seg.offset + circumference * 0.25; // start from top
