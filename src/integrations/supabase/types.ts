@@ -20711,6 +20711,15 @@ export type Database = {
           },
         ]
       }
+      vw_metricas_fila: {
+        Row: {
+          falhas: number | null
+          sucessos: number | null
+          tempo_medio_segundos: number | null
+          tipo_tarefa: string | null
+        }
+        Relationships: []
+      }
       vw_passivo_trabalhista_consolidado: {
         Row: {
           colaborador_id: string | null
