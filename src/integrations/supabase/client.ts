@@ -155,9 +155,16 @@ const createQueryBuilder = (table: string) => {
     ilike: (c: string, v: any) => addFilter(c, 'ilike', v),
     in: (c: string, v: any[]) => addFilter(c, 'in', v),
     is: (c: string, v: any) => addFilter(c, 'is', v),
-    not: (c: string, _op: string, v: any) => addFilter(c, 'not', v),
+    not: (c: string, op: string, v: any) => {
+      const cleanValue = (v === "undefined" || v === "null") ? null : v;
+      state.payload.filters = [...(state.payload.filters || []), { column: c, op: 'not', value: cleanValue, extraOp: op }];
+      return builder;
+    },
     contains: (c: string, v: any) => addFilter(c, 'contains', v),
-    or: (_expr: string) => builder,
+    or: (expr: string) => {
+      state.payload.filters = [...(state.payload.filters || []), { column: '', op: 'or', value: expr }];
+      return builder;
+    },
     match: (obj: Record<string, any>) => {
       Object.entries(obj).forEach(([k, v]) => addFilter(k, 'eq', v));
       return builder;

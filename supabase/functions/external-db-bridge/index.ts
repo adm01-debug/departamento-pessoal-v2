@@ -102,6 +102,15 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Security Check: Verify Authorization Header
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await req.json();
     console.log("[external-db-bridge] Request body:", JSON.stringify(body));
@@ -162,6 +171,8 @@ Deno.serve(async (req) => {
           else if (f.op === "ilike") query = query.ilike(f.column, f.value);
           else if (f.op === "in") query = query.in(f.column, f.value);
           else if (f.op === "is") query = query.is(f.column, f.value);
+          else if (f.op === "or") query = query.or(f.value);
+          else if (f.op === "not") query = query.not(f.column, f.extraOp || 'eq', f.value);
         }
       }
 
