@@ -30,14 +30,31 @@ export function useRealtimeDashboard() {
       clearTimeout(timeouts.current[keyString]);
     }
     timeouts.current[keyString] = setTimeout(() => {
-      keys.forEach(key => queryClient.invalidateQueries({ queryKey: key }));
+      keys.forEach(key => void queryClient.invalidateQueries({ queryKey: key }));
       delete timeouts.current[keyString];
     }, delay);
   };
 
   useEffect(() => {
-    // Realtime desativado temporariamente para compatibilidade com banco externo via bridge
+    // Escuta mudanças em tabelas críticas para o Dashboard
+    const tables = ['admissoes', 'desligamentos', 'ferias', 'folhas_pagamento', 'registros_ponto'];
+    
+    const channel = supabase.channel('dashboard-updates')
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+        if (payload.table && tables.includes(payload.table)) {
+          debounceInvalidate([['dashboard-stats'], ['dashboard-pendencias']]);
+          
+          const label = TABLE_LABELS[payload.table] || 'Dados atualizados';
+          toast.info(label, {
+            description: 'O painel será atualizado em instantes.',
+            duration: 3000
+          });
+        }
+      })
+      .subscribe();
+
     return () => {
+      void supabase.removeChannel(channel);
       Object.values(timeouts.current).forEach(clearTimeout);
     };
   }, [queryClient]);
