@@ -163,7 +163,14 @@ export function CampaignWizard({ isOpen, onClose, empresaId }: CampaignWizardPro
           ) : (
             <div className="flex gap-2 w-full">
               <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
-              <Button className="flex-1" onClick={handleSave}>Finalizar e Lançar Campanha</Button>
+              <Button variant="secondary" className="flex-1" onClick={() => {
+                setFormData({...formData, status: 'rascunho'});
+                handleSave();
+              }}>Salvar Rascunho</Button>
+              <Button className="flex-2" onClick={() => {
+                setFormData({...formData, status: 'ativo'});
+                handleSave();
+              }}>Lançar Campanha</Button>
             </div>
           )}
         </DialogFooter>

@@ -13,7 +13,8 @@ import {
   MessageSquare, 
   Search,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
@@ -81,6 +82,7 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
 
   const stages = [
     { id: 'calculado', label: 'Aguardando Gestor', icon: User },
+    { id: 'revisando', label: 'Em Revisão', icon: MessageSquare },
     { id: 'aprovado_gestor', label: 'Aguardando RH', icon: ShieldCheck },
     { id: 'aprovado_rh', label: 'Aguardando Financeiro', icon: Clock },
     { id: 'aprovado_financeiro', label: 'Conciliação (Folha)', icon: Search }
@@ -115,20 +117,37 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                         </div>
                       )}
 
-                      <div className="flex gap-2 mt-3">
+                      <div className="flex flex-col gap-2 mt-3">
                         {stage.id === 'aprovado_financeiro' ? (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="w-full h-7 text-[10px] rounded-lg"
-                            onClick={() => {
-                              setSelectedPagamento(p);
-                              setValorFolha(p.valor_folha_real?.toString() || '');
-                              setIsReconcileOpen(true);
-                            }}
-                          >
-                            <Search className="h-3 w-3 mr-1" /> Conciliar
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="flex-1 h-7 text-[10px] rounded-lg"
+                              onClick={() => {
+                                setSelectedPagamento(p);
+                                setValorFolha(p.valor_folha_real?.toString() || '');
+                                setIsReconcileOpen(true);
+                              }}
+                            >
+                              <Search className="h-3 w-3 mr-1" /> Manual
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              className="flex-1 h-7 text-[10px] bg-primary/10 text-primary hover:bg-primary/20 rounded-lg border border-primary/20"
+                              onClick={async () => {
+                                try {
+                                  await premiacoesService.autoConciliarComFolha(p.id);
+                                  queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
+                                  toast.success("Auto-conciliação concluída com sucesso!");
+                                } catch (e: any) {
+                                  toast.error(e.message || "Falha na conciliação automática.");
+                                }
+                              }}
+                            >
+                              <RefreshCw className="h-3 w-3 mr-1" /> Auto
+                            </Button>
+                          </div>
                         ) : (
                           <>
                             <Button 
@@ -136,7 +155,13 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                               className="flex-1 h-7 text-[10px] bg-success hover:bg-success/90 rounded-lg"
                               onClick={() => {
                                 setSelectedPagamento(p);
-                                handleApprove(p.id, stage.id === 'calculado' ? 'aprovado_gestor' : stage.id === 'aprovado_gestor' ? 'aprovado_rh' : 'aprovado_financeiro', p.valor_aprovado || p.valor_calculado);
+                                const nextStageMap: Record<string, string> = {
+                                  'calculado': 'revisando',
+                                  'revisando': 'aprovado_gestor',
+                                  'aprovado_gestor': 'aprovado_rh',
+                                  'aprovado_rh': 'aprovado_financeiro'
+                                };
+                                handleApprove(p.id, nextStageMap[stage.id], p.valor_aprovado || p.valor_calculado);
                               }}
                             >
                               <CheckCircle2 className="h-3 w-3 mr-1" /> Aprovar
@@ -155,6 +180,15 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                           </>
                         )}
                       </div>
+                      
+                      {p.historico_mudancas && p.historico_mudancas.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-border/10">
+                          <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest">Último Comentário</p>
+                          <p className="text-[9px] text-muted-foreground italic truncate">
+                            {p.historico_mudancas[p.historico_mudancas.length - 1].comentario}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
