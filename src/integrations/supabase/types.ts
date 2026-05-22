@@ -4163,6 +4163,30 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracoes_alertas: {
+        Row: {
+          ativa: boolean | null
+          email_notificacao: string | null
+          id: string
+          metrica: string
+          threshold: number
+        }
+        Insert: {
+          ativa?: boolean | null
+          email_notificacao?: string | null
+          id?: string
+          metrica: string
+          threshold: number
+        }
+        Update: {
+          ativa?: boolean | null
+          email_notificacao?: string | null
+          id?: string
+          metrica?: string
+          threshold?: number
+        }
+        Relationships: []
+      }
       configuracoes_esocial: {
         Row: {
           ambiente: string | null
@@ -11805,6 +11829,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      metricas_processamento: {
+        Row: {
+          funcao_nome: string
+          id: string
+          status: string
+          tempo_execucao_ms: number | null
+          timestamp: string | null
+        }
+        Insert: {
+          funcao_nome: string
+          id?: string
+          status: string
+          tempo_execucao_ms?: number | null
+          timestamp?: string | null
+        }
+        Update: {
+          funcao_nome?: string
+          id?: string
+          status?: string
+          tempo_execucao_ms?: number | null
+          timestamp?: string | null
+        }
+        Relationships: []
       }
       motivos_afastamento: {
         Row: {
@@ -19684,6 +19732,15 @@ export type Database = {
           returns_set: boolean | null
           schema: unknown
           volatility: string | null
+        }
+        Relationships: []
+      }
+      v_alertas_timeout: {
+        Row: {
+          funcao_nome: string | null
+          media_ms: number | null
+          ocorrencias: number | null
+          ultima_ocorrencia: string | null
         }
         Relationships: []
       }
