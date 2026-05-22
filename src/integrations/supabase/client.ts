@@ -113,6 +113,10 @@ const createQueryBuilder = (table: string) => {
     // Se o valor for "undefined" ou "null" como string, converte para null real.
     // Se for "all", ignoramos o filtro para permitir listagem completa.
     if (value === "all") return builder;
+    
+    // Filtros de busca vazios não devem ser aplicados
+    if (value === "" && (op === 'ilike' || op === 'like')) return builder;
+
     const cleanValue = (value === "undefined" || value === "null") ? null : value;
     state.payload.filters = [...(state.payload.filters || []), { column, op, value: cleanValue }];
     return builder;

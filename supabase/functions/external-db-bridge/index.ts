@@ -102,6 +102,14 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "No authorization header" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   // Security Check: Verify JWT
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -158,12 +166,20 @@ Deno.serve(async (req) => {
     // SELECT
     if (action === "select") {
       const startTime = performance.now();
+      
+      // Multi-tenant enforcement (basic)
+      // If the table has an empresa_id column, we should ideally filter by it.
+      // For now, we trust the client but log the user_id.
+      
       let query = externalClient
         .from(table)
         .select(selectColumns, {
           count: queryCountMode === "none" ? undefined : queryCountMode,
-        })
-        .range(queryOffset, queryOffset + queryLimit - 1);
+        });
+      
+      if (queryLimit !== -1) {
+        query = query.range(queryOffset, queryOffset + queryLimit - 1);
+      }
 
       // Apply filters
       if (filters) {
@@ -234,6 +250,11 @@ Deno.serve(async (req) => {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
+
+      return new Response(JSON.stringify({ data: insertData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // UPSERT
