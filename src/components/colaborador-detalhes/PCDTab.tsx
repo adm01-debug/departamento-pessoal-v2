@@ -19,11 +19,11 @@ export function PCDTab({ colaboradorId }: { colaboradorId: string }) {
   const [form, setForm] = useState({ tipo: '', cid: '', descricao: '', observacoes: '' });
 
   useEffect(() => {
-    if (data) {
+    if (data && !editing) {
       const d = data as any;
       setForm({ tipo: d.tipo || '', cid: d.cid || '', descricao: d.descricao || '', observacoes: d.observacoes || '' });
     }
-  }, [data]);
+  }, [data, editing]);
 
   const handleSave = async () => {
     if (!form.tipo) { toast.error('Tipo de deficiência é obrigatório'); return; }
