@@ -13,7 +13,8 @@ import {
   MessageSquare, 
   Search,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
