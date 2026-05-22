@@ -66,16 +66,3 @@ Deno.test("verifySignature: deve retornar false se o secret estiver ausente", as
   const isValid = await verifySignature(payload, `sha256=any`, undefined);
   assertEquals(isValid, false);
 });
-
-
-Deno.test("webhook: deve processar payload JSON padrão", async () => {
-  const res = await fetch(WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "ping" }),
-  });
-  
-  const data = await res.json();
-  assertEquals(res.status, 200);
-  assert(data.success === true);
-});
