@@ -29,6 +29,8 @@ export default function PremiacoesPage() {
   const [activeTab, setActiveTab] = React.useState('campanhas');
   const [isWizardOpen, setIsWizardOpen] = React.useState(false);
   const [periodoFiltro, setPeriodoFiltro] = React.useState('Todos os Períodos');
+  const [unidadeFiltro, setUnidadeFiltro] = React.useState('Todas as Unidades');
+  const [faixaMetaFiltro, setFaixaMetaFiltro] = React.useState('Todas');
   
   const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
     queryKey: ['premiacoes_campanhas', empresaAtual?.id],
@@ -259,7 +261,7 @@ export default function PremiacoesPage() {
                     </CardTitle>
                     <CardDescription className="text-[10px] uppercase tracking-widest mt-1">Dados consolidados com snapshot de metas e conciliação</CardDescription>
                   </div>
-                  <div className="flex gap-2 w-full md:w-auto">
+                  <div className="flex flex-wrap gap-2 w-full md:w-auto">
                     <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
                       <Filter className="h-3 w-3 text-muted-foreground" />
                       <select 
@@ -270,6 +272,28 @@ export default function PremiacoesPage() {
                         <option>Todos os Períodos</option>
                         <option>Maio 2026</option>
                         <option>Abril 2026</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
+                      <select 
+                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        value={unidadeFiltro}
+                        onChange={(e) => setUnidadeFiltro(e.target.value)}
+                      >
+                        <option>Todas as Unidades</option>
+                        <option>Matriz</option>
+                        <option>Filial Sul</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
+                      <select 
+                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        value={faixaMetaFiltro}
+                        onChange={(e) => setFaixaMetaFiltro(e.target.value)}
+                      >
+                        <option>Todas as Metas</option>
+                        <option>Meta > 100%</option>
+                        <option>Meta > 120%</option>
                       </select>
                     </div>
                     <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
