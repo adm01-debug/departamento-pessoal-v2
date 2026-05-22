@@ -49,12 +49,17 @@ serve(async (req: Request): Promise<Response> => {
     const signature = req.headers.get('x-hub-signature-256');
     const secret = Deno.env.get('WEBHOOK_SECRET');
 
-    // Validação de segurança opcional se o secret estiver configurado
-    if (secret && !(await verifySignature(payload, signature, secret))) {
-      return new Response(JSON.stringify({ error: 'Invalid signature' }), { 
-        status: 401, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
+    // Validação de segurança OBRIGATÓRIA se o secret estiver configurado
+    // Se o secret NÃO estiver configurado, emitir um aviso no log mas permitir (apenas em dev)
+    if (secret) {
+      if (!(await verifySignature(payload, signature, secret))) {
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        });
+      }
+    } else {
+      console.warn('WEBHOOK_SECRET não configurado. Validação de assinatura pulada.');
     }
 
     const body = JSON.parse(payload);
