@@ -57,7 +57,7 @@ export default function CargosPage() {
       onSearchChange={handleSearchChange}
       onRefetch={refetch}
       isRefreshing={isRefreshing}
-      onAdd={() => console.log('Novo cargo')}
+      onAdd={() => {}}
       addLabel="Novo Cargo"
       actions={
         <div className="flex gap-2">

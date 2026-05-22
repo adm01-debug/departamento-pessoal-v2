@@ -195,7 +195,10 @@ export const premiacoesService = {
   },
 
   async enviarNotificacaoCritica(tipo: string, payload: any) {
-    console.log(`[Notification] ${tipo}:`, payload);
+    // Notification logged to audit trail in production
+    if (import.meta.env.DEV) {
+      console.log(`[Notification] ${tipo}:`, payload);
+    }
     // Em um cenário real, chamaria uma Edge Function para enviar e-mail/WhatsApp
     const { error } = await supabase.from('notificacoes').insert({
       tipo: 'premiacao_critica',
