@@ -1,6 +1,7 @@
 import React, { Component, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { loggerService } from '@/services/loggerService';
 
 interface Props {
   children: ReactNode;
@@ -20,6 +21,10 @@ export class RouteErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('[RouteErrorBoundary]', error, info.componentStack);
+    loggerService.fatal('Route rendering error', { 
+      componentStack: info.componentStack,
+      location: window.location.pathname 
+    }, error);
   }
 
   handleRetry = () => {

@@ -10,6 +10,7 @@ import { CommandPalette } from '@/components/ui/command-palette';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBackGesture } from '@/hooks/useBackGesture';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -32,7 +33,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       // Opcional: Implementar logout automático por inatividade se necessário para compliance
     };
     
-    const channel = (window as any).supabase?.channel('system-health')
+    const channel = supabase.channel('system-health')
       .on('presence', { event: 'sync' }, () => {
         // Telemetria silenciosa de sessão ativa
       })
