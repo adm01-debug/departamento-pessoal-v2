@@ -15,7 +15,7 @@ serve(async (req) => {
 
     const [colabs, folha, ferias, afast, esocial] = await Promise.all([
       supabase.from('colaboradores').select('status, departamento', { count: 'exact' }).eq('empresa_id', empresaId || ''),
-      supabase.from('folha_pagamento').select('competencia, salario_bruto, salario_liquido').eq('empresa_id', empresaId || '').order('competencia', { ascending: false }).limit(500),
+      supabase.from('folhas_pagamento').select('competencia, salario_bruto, salario_liquido').eq('empresa_id', empresaId || '').order('competencia', { ascending: false }).limit(500),
       supabase.from('ferias').select('status').eq('empresa_id', empresaId || ''),
       supabase.from('afastamentos').select('tipo, status').eq('empresa_id', empresaId || ''),
       supabase.from('esocial_eventos').select('status').eq('empresa_id', empresaId || ''),
