@@ -141,7 +141,7 @@ const createQueryBuilder = (table: string) => {
       return builder;
     },
     upsert: (data: any) => {
-      state.action = 'insert';
+      state.action = 'upsert';
       state.payload.data = data;
       return builder;
     },

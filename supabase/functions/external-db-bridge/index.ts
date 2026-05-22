@@ -227,7 +227,36 @@ Deno.serve(async (req) => {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+    }
+
+    // UPSERT
+    if (action === "upsert") {
+      const startTime = performance.now();
+      const { data: upsertData, error: upsertError } = await externalClient.from(table).upsert(data).select();
+      const durationMs = Math.round(performance.now() - startTime);
+
+      const status = classifySeverity(durationMs, !!upsertError);
+      emitTelemetry({
+        operation: "upsert",
+        table,
+        durationMs,
+        status,
+        recordCount: upsertData?.length ?? 0,
+        error: upsertError?.message,
+        userId,
+      });
+
+      if (upsertError) {
+        return new Response(JSON.stringify({ error: upsertError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+
+      return new Response(JSON.stringify({ data: upsertData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
       return new Response(JSON.stringify({ data: insertData, duration_ms: durationMs }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
