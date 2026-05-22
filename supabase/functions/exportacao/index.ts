@@ -35,7 +35,7 @@ serve(async (req) => {
         });
       }
       case 'folha': {
-        let q = supabase.from('folha_pagamento').select('*, colaborador:colaboradores(nome_completo, cpf)');
+        let q = supabase.from('folhas_pagamento').select('*, colaborador:colaboradores(nome_completo, cpf)');
         if (empresaId) q = q.eq('empresa_id', empresaId);
         if (filters?.competencia) q = q.eq('competencia', filters.competencia);
         const { data, error } = await q;
