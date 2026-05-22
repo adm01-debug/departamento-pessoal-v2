@@ -8693,6 +8693,48 @@ export type Database = {
         }
         Relationships: []
       }
+      fila_processamento: {
+        Row: {
+          created_at: string | null
+          empresa_id: string | null
+          erro_log: string | null
+          id: string
+          payload: Json | null
+          progresso: number | null
+          resultado: Json | null
+          status: string
+          tipo_tarefa: string
+          updated_at: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id?: string | null
+          erro_log?: string | null
+          id?: string
+          payload?: Json | null
+          progresso?: number | null
+          resultado?: Json | null
+          status?: string
+          tipo_tarefa: string
+          updated_at?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string | null
+          erro_log?: string | null
+          id?: string
+          payload?: Json | null
+          progresso?: number | null
+          resultado?: Json | null
+          status?: string
+          tipo_tarefa?: string
+          updated_at?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       folha_assinaturas: {
         Row: {
           assinante_id: string | null
