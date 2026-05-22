@@ -39,7 +39,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
   const handleChecklistToggle = async (key: string, value: boolean) => {
     try {
       // Regras de transição de etapa baseadas no checklist
-      let updates: any = { [key]: value };
+      const updates: any = { [key]: value };
       
       if (key === 'checklist_comunicacao' && value) {
         updates.etapa = 'documentacao';

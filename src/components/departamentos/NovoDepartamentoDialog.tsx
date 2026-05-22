@@ -26,14 +26,16 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
   });
 
   useEffect(() => {
-    if (departamento) {
-      setForm({
-        nome: departamento.nome || '',
-        descricao: departamento.descricao || '',
-        ativo: departamento.ativo !== false,
-      });
-    } else {
-      setForm({ nome: '', descricao: '', ativo: true });
+    if (open) {
+      if (departamento) {
+        setForm({
+          nome: departamento.nome || '',
+          descricao: departamento.descricao || '',
+          ativo: departamento.ativo !== false,
+        });
+      } else {
+        setForm({ nome: '', descricao: '', ativo: true });
+      }
     }
   }, [departamento, open]);
 

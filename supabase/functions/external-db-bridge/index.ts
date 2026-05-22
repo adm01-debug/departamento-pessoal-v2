@@ -102,6 +102,22 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Security Check: Verify JWT
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: authHeader } },
+  });
+
+  const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await req.json();
     console.log("[external-db-bridge] Request body:", JSON.stringify(body));
@@ -162,6 +178,8 @@ Deno.serve(async (req) => {
           else if (f.op === "ilike") query = query.ilike(f.column, f.value);
           else if (f.op === "in") query = query.in(f.column, f.value);
           else if (f.op === "is") query = query.is(f.column, f.value);
+          else if (f.op === "or") query = query.or(f.value);
+          else if (f.op === "not") query = query.not(f.column, f.extraOp || 'eq', f.value);
         }
       }
 
@@ -216,7 +234,36 @@ Deno.serve(async (req) => {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+    }
+
+    // UPSERT
+    if (action === "upsert") {
+      const startTime = performance.now();
+      const { data: upsertData, error: upsertError } = await externalClient.from(table).upsert(data).select();
+      const durationMs = Math.round(performance.now() - startTime);
+
+      const status = classifySeverity(durationMs, !!upsertError);
+      emitTelemetry({
+        operation: "upsert",
+        table,
+        durationMs,
+        status,
+        recordCount: upsertData?.length ?? 0,
+        error: upsertError?.message,
+        userId,
+      });
+
+      if (upsertError) {
+        return new Response(JSON.stringify({ error: upsertError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+
+      return new Response(JSON.stringify({ data: upsertData, duration_ms: durationMs }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
       return new Response(JSON.stringify({ data: insertData, duration_ms: durationMs }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

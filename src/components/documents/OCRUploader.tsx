@@ -42,18 +42,14 @@ export function OCRUploader({ onTextExtracted }: OCRUploaderProps) {
         documentType: docType as any,
       });
 
-      if (true) {
-        const data = result as any;
-        if (data.success && data.extractedText) {
-          setExtractedText(data.extractedText);
-          setFields(data.mappedFields || {});
-          onTextExtracted?.(data.extractedText, docType);
-          toast.success('Texto extraído e mapeado com sucesso!');
-        } else {
-          throw new Error(data.error || 'Nenhum texto extraído');
-        }
+      const data = result as any;
+      if (data.success && data.extractedText) {
+        setExtractedText(data.extractedText);
+        setFields(data.mappedFields || {});
+        onTextExtracted?.(data.extractedText, docType);
+        toast.success('Texto extraído e mapeado com sucesso!');
       } else {
-        throw new Error('Nenhum texto extraído');
+        throw new Error(data.error || 'Nenhum texto extraído');
       }
     } catch (err: any) {
       toast.error(`Erro no OCR: ${err.message}`);

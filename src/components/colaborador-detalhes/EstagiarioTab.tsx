@@ -20,7 +20,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
   });
 
   useEffect(() => {
-    if (data) {
+    if (data && !editing) {
       const d = data as any;
       setForm({
         instituicao_nome: d.instituicao_nome || '', instituicao_cnpj: d.instituicao_cnpj || '',
@@ -31,7 +31,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
         valor_bolsa: d.valor_bolsa?.toString() || '', numero_apolice: d.numero_apolice || ''
       });
     }
-  }, [data]);
+  }, [data, editing]);
 
   const handleSave = async () => {
     if (!form.instituicao_nome.trim()) { toast.error('Instituição de ensino é obrigatória'); return; }

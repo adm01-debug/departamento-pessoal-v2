@@ -96,7 +96,7 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
 
   const displayEvents = useMemo(() => {
     const list = dbEvents || initialEvents || [];
-    let filtered = filterType === 'all' ? list : list.filter(e => e.type === filterType);
+    const filtered = filterType === 'all' ? list : list.filter(e => e.type === filterType);
     
     return filtered.sort((a, b) => {
       const timeA = a.raw_time ? new Date(a.raw_time).getTime() : 0;
