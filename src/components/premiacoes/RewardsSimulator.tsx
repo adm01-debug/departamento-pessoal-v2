@@ -7,18 +7,33 @@ import { Button } from '@/components/ui/button';
 import { Calculator, TrendingUp, Save, History, RefreshCw, Zap, PieChart as PieChartIcon, BarChart as BarChartIcon, Copy, Trash2, ArrowRightLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
+import { premiacoesService } from '@/services/premiacoesService';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const formatCurrency = (val: number) => 
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
 export function RewardsSimulator() {
+  const queryClient = useQueryClient();
   const [employees, setEmployees] = React.useState(50);
   const [avgSalary, setAvgSalary] = React.useState(4500);
   const [bonusPercent, setBonusPercent] = React.useState(10);
   const [performanceLevel, setPerformanceLevel] = React.useState(85);
   const [retentionImpact, setRetentionImpact] = React.useState(5);
-  const [scenarios, setScenarios] = React.useState<any[]>([]);
   const [compareMode, setCompareMode] = React.useState(false);
+
+  const { data: scenarios = [] } = useQuery({
+    queryKey: ['premiacoes_cenarios_roi'],
+    queryFn: () => premiacoesService.listarCenariosROI()
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: (cenario: any) => premiacoesService.salvarCenarioROI(cenario),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['premiacoes_cenarios_roi'] });
+      toast.success("Cenário salvo no banco de dados estrategicamente!");
+    }
+  });
 
   const calculateMetrics = (emp: number, sal: number, bonus: number, perf: number, ret: number) => {
     const totalBudget = emp * sal * (bonus / 100) * (perf / 100);
@@ -31,8 +46,7 @@ export function RewardsSimulator() {
   const { totalBudget, savings, roi } = calculateMetrics(employees, avgSalary, bonusPercent, performanceLevel, retentionImpact);
 
   const saveScenario = () => {
-    const newScenario = {
-      id: Date.now(),
+    saveMutation.mutate({
       name: `Cenário ${scenarios.length + 1}`,
       employees,
       avgSalary,
@@ -41,27 +55,24 @@ export function RewardsSimulator() {
       retentionImpact,
       totalBudget,
       savings,
-      roi,
-      timestamp: new Date().toLocaleTimeString()
-    };
-    setScenarios([newScenario, ...scenarios.slice(0, 4)]);
-    toast.success("Cenário salvo para comparação estratégica!");
+      roi
+    });
   };
 
   const loadScenario = (s: any) => {
-    setEmployees(s.employees);
-    setAvgSalary(s.avgSalary);
-    setBonusPercent(s.bonusPercent);
-    setPerformanceLevel(s.performanceLevel);
-    setRetentionImpact(s.retentionImpact);
+    setEmployees(s.configuracoes.employees);
+    setAvgSalary(s.configuracoes.avgSalary);
+    setBonusPercent(s.configuracoes.bonusPercent);
+    setPerformanceLevel(s.configuracoes.performanceLevel);
+    setRetentionImpact(s.configuracoes.retentionImpact);
     toast.info(`Cenário "${s.name}" carregado.`);
   };
 
   const chartData = compareMode && scenarios.length > 0 
-    ? scenarios.slice(0, 3).map(s => ({
+    ? scenarios.slice(0, 3).map((s: any) => ({
         name: s.name,
-        'Custo Bônus': s.totalBudget,
-        'Economia ROI': s.savings
+        'Custo Bônus': s.resultados.totalBudget,
+        'Economia ROI': s.resultados.savings
       }))
     : [
         { name: 'Atual', 'Custo Bônus': totalBudget, 'Economia ROI': savings }
@@ -199,27 +210,27 @@ export function RewardsSimulator() {
                   <History className="h-3 w-3 text-muted-foreground" />
                   <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Snapshots (Auditoria)</CardTitle>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setScenarios([])}>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {}}>
                   <Trash2 className="h-3 w-3 text-muted-foreground" />
                 </Button>
               </CardHeader>
               <CardContent className="p-4 pt-4 space-y-3">
-                {scenarios.map(s => (
+                {scenarios.map((s: any) => (
                   <div key={s.id} className="group relative flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/10 hover:border-primary/30 transition-all cursor-pointer" onClick={() => loadScenario(s)}>
                     <div className="flex justify-between items-center">
                       <span className="text-[11px] font-bold">{s.name}</span>
-                      <span className="text-[9px] text-muted-foreground">{s.timestamp}</span>
+                      <span className="text-[9px] text-muted-foreground">{new Date(s.created_at).toLocaleTimeString()}</span>
                     </div>
                     <div className="flex justify-between items-end mt-1">
-                      <span className="text-[10px] font-mono font-bold text-primary">{formatCurrency(s.totalBudget)}</span>
-                      <Badge variant="outline" className="text-[8px] h-4 bg-success/5 text-success border-success/20">{s.roi.toFixed(1)}x ROI</Badge>
+                      <span className="text-[10px] font-mono font-bold text-primary">{formatCurrency(s.resultados.totalBudget)}</span>
+                      <Badge variant="outline" className="text-[8px] h-4 bg-success/5 text-success border-success/20">{s.resultados.roi.toFixed(1)}x ROI</Badge>
                     </div>
                     <div className="hidden group-hover:block mt-2 pt-2 border-t border-border/10">
                       <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest">Logs de Cálculo (Snapshot)</p>
                       <ul className="text-[8px] text-muted-foreground list-disc pl-3 mt-1">
-                        <li>Metas: {s.performanceLevel}%</li>
-                        <li>Retenção: {s.retentionImpact}%</li>
-                        <li>Salário Médio: {formatCurrency(s.avgSalary)}</li>
+                        <li>Metas: {s.configuracoes.performanceLevel}%</li>
+                        <li>Retenção: {s.configuracoes.retentionImpact}%</li>
+                        <li>Salário Médio: {formatCurrency(s.configuracoes.avgSalary)}</li>
                       </ul>
                     </div>
                     <Button variant="ghost" size="icon" className="absolute -right-2 -top-2 h-5 w-5 bg-background border border-border rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
