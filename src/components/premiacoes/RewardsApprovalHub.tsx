@@ -116,20 +116,37 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                         </div>
                       )}
 
-                      <div className="flex gap-2 mt-3">
+                      <div className="flex flex-col gap-2 mt-3">
                         {stage.id === 'aprovado_financeiro' ? (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="w-full h-7 text-[10px] rounded-lg"
-                            onClick={() => {
-                              setSelectedPagamento(p);
-                              setValorFolha(p.valor_folha_real?.toString() || '');
-                              setIsReconcileOpen(true);
-                            }}
-                          >
-                            <Search className="h-3 w-3 mr-1" /> Conciliar
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="flex-1 h-7 text-[10px] rounded-lg"
+                              onClick={() => {
+                                setSelectedPagamento(p);
+                                setValorFolha(p.valor_folha_real?.toString() || '');
+                                setIsReconcileOpen(true);
+                              }}
+                            >
+                              <Search className="h-3 w-3 mr-1" /> Manual
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              className="flex-1 h-7 text-[10px] bg-primary/10 text-primary hover:bg-primary/20 rounded-lg border border-primary/20"
+                              onClick={async () => {
+                                try {
+                                  await premiacoesService.autoConciliarComFolha(p.id);
+                                  queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
+                                  toast.success("Auto-conciliação concluída com sucesso!");
+                                } catch (e: any) {
+                                  toast.error(e.message || "Falha na conciliação automática.");
+                                }
+                              }}
+                            >
+                              <RefreshCw className="h-3 w-3 mr-1" /> Auto
+                            </Button>
+                          </div>
                         ) : (
                           <>
                             <Button 
