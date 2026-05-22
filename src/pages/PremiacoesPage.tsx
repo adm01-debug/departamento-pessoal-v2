@@ -62,10 +62,16 @@ export default function PremiacoesPage() {
 
   const handleExport = async (format: 'csv' | 'pdf') => {
     toast.promise(
-      premiacoesService.exportarRelatorio({ empresaId: empresaAtual?.id }),
+      premiacoesService.exportarRelatorio({ 
+        empresaId: empresaAtual?.id,
+        periodo: periodoFiltro,
+        unidade: unidadeFiltro,
+        faixaMeta: faixaMetaFiltro,
+        versao: '1.2.5-stable'
+      }),
       {
-        loading: `Gerando relatório ${format.toUpperCase()}...`,
-        success: "Relatório gerado com sucesso! O download iniciará em instantes.",
+        loading: `Gerando relatório ${format.toUpperCase()} com filtros aplicados...`,
+        success: "Relatório gerado com sucesso! Trilha de auditoria incluída.",
         error: "Erro ao gerar relatório."
       }
     );
