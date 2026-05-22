@@ -36,7 +36,7 @@ const supabaseBase = createClient<Database>(
 //     limit?: number,
 //     single?: boolean }
 
-type Action = 'select' | 'insert' | 'update' | 'delete' | 'rpc';
+type Action = 'select' | 'insert' | 'update' | 'delete' | 'rpc' | 'upsert';
 interface Filter { column: string; op: string; value: any; extraOp?: string }
 interface BridgePayload {
   columns?: string;
