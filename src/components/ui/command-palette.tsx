@@ -118,10 +118,10 @@ export function CommandPalette({
 
   // Search colaboradores from DB
   const { data: dbColaboradores } = useQuery({
-    queryKey: ['cmd-colaboradores', empresaAtual?.id, query],
-    enabled: open && query.length >= 2 && !!empresaAtual?.id,
+    queryKey: ['cmd-colaboradores', empresaAtual?.id, debouncedQuery],
+    enabled: open && debouncedQuery.length >= 2 && !!empresaAtual?.id,
     queryFn: async () => {
-      const q = query.trim();
+      const q = debouncedQuery.trim();
       let queryBuilder = supabase
         .from('colaboradores')
         .select('id, nome_completo, cpf, cargo, status')
