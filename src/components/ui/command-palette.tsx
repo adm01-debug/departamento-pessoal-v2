@@ -189,7 +189,7 @@ export function CommandPalette({
         status: c.status,
         icon: User,
         category: 'pessoa',
-        path: `/colaboradores/${c.id}/detalhes`,
+        path: `/colaboradores/${c.id}`,
         gradient: 'from-primary to-primary-glow',
         avatar: { name: c.nome_completo },
       });
