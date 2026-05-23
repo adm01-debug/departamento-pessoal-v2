@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as esocialService from '@/services/esocialService';
 import { toast } from 'sonner';
+import { useServerValidation } from './useServerValidation';
 
 export function useESocial() {
   const queryClient = useQueryClient();
+  const { handleServerError } = useServerValidation();
 
   const eventosQuery = useQuery({
     queryKey: ['esocial-eventos'],
@@ -36,7 +38,7 @@ export function useESocial() {
       }
       invalidate();
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: any) => handleServerError(err),
   });
 
   const reenviarMutation = useMutation({
@@ -48,7 +50,7 @@ export function useESocial() {
       else toast.error(`Falha ao reenviar: ${data?.error}`);
       invalidate();
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: any) => handleServerError(err),
   });
 
   const gerarEventosMutation = useMutation({
@@ -59,17 +61,19 @@ export function useESocial() {
       toast.success(`Geração concluída: ${data.criados} criados, ${data.pulados} já existentes.`);
       invalidate();
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: any) => handleServerError(err),
   });
 
   const configQuery = useQuery({
     queryKey: ['esocial-config'],
     queryFn: async () => esocialService.getConfig(''),
   });
+  
   const certificadosQuery = useQuery({
     queryKey: ['esocial-certificados'],
     queryFn: async () => esocialService.listarCertificados(''),
   });
+  
   const logsQuery = useQuery({
     queryKey: ['esocial-logs'],
     queryFn: async () => esocialService.listarTransmissaoLogs(''),
@@ -83,8 +87,11 @@ export function useESocial() {
       }
       return results;
     },
-    onSuccess: () => { toast.success('Lote enviado'); invalidate(); },
-    onError: (err: Error) => toast.error(err.message),
+    onSuccess: () => { 
+      toast.success('Lote enviado com sucesso'); 
+      invalidate(); 
+    },
+    onError: (err: any) => handleServerError(err),
   });
 
   return {
@@ -105,3 +112,4 @@ export function useESocial() {
     isSending: enviarMutation.isPending || reenviarMutation.isPending || gerarEventosMutation.isPending,
   };
 }
+
