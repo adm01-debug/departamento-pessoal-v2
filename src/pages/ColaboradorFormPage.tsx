@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
 import { useFormGuard } from '@/hooks/useFormGuard';
+import { useServerValidation } from '@/hooks/useServerValidation';
 
 const schema = z.object({
   // Geral
