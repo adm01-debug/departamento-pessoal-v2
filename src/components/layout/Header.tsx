@@ -21,6 +21,7 @@ interface HeaderProps {
 export function Header({ onMenuClick, user, className }: HeaderProps) {
   const { isAdmin } = useAuth();
   const { empresaAtual, userEmpresas, temMultiplasEmpresas, trocarEmpresa } = useEmpresas();
+  const { latency, status } = useSystemHealth();
   const handleSearchClick = () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
   };
