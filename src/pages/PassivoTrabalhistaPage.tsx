@@ -21,6 +21,7 @@ import {
 import { format, addMonths, differenceInDays, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { ChartSkeleton, KPICardSkeleton } from '@/components/ui/module-skeleton';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F'];
 
@@ -141,7 +142,7 @@ export default function PassivoTrabalhistaPage() {
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[
+        {isLoading ? Array.from({ length: 4 }).map((_, i) => <KPICardSkeleton key={i} index={i} />) : [
           { label: 'Passivo Total Estimado', value: data?.totalLiability || 0, icon: DollarSign, gradient: 'from-destructive to-destructive/70', desc: 'Soma de Férias, 13º e Encargos' },
           { label: 'Risco de Multa (Férias)', value: data?.riskEmployees.length || 0, icon: ShieldAlert, gradient: 'from-warning to-warning/70', desc: 'Colaboradores com férias vencendo' },
           { label: 'Provisão 13º Acumulada', value: data?.thirteenthLiability || 0, icon: Clock, gradient: 'from-primary to-primary/70', desc: 'Valor pro-rata até hoje' },
@@ -160,7 +161,7 @@ export default function PassivoTrabalhistaPage() {
                   )}
                 </div>
                 <h3 className="text-2xl font-display font-bold truncate">
-                  {typeof kpi.value === 'number' && kpi.label.includes('Total') || kpi.label.includes('Provisão') || kpi.label.includes('Encargos') 
+                  {typeof kpi.value === 'number' && (kpi.label.includes('Total') || kpi.label.includes('Provisão') || kpi.label.includes('Encargos')) 
                     ? formatCurrency(kpi.value) 
                     : kpi.value}
                 </h3>
@@ -183,26 +184,28 @@ export default function PassivoTrabalhistaPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data?.projection || []}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="mes" fontSize={12} axisLine={false} tickLine={false} />
-                  <YAxis fontSize={12} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`} />
-                  <RechartsTooltip 
-                    formatter={(v: any) => formatCurrency(v)}
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
-                  />
-                  <Area type="monotone" dataKey="valor" stroke="hsl(var(--destructive))" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            {isLoading ? <ChartSkeleton /> : (
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data?.projection || []}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis dataKey="mes" fontSize={12} axisLine={false} tickLine={false} />
+                    <YAxis fontSize={12} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`} />
+                    <RechartsTooltip 
+                      formatter={(v: any) => formatCurrency(v)}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
+                    />
+                    <Area type="monotone" dataKey="valor" stroke="hsl(var(--destructive))" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
             <div className="mt-4 p-3 bg-muted/30 rounded-xl border border-border/20">
               <p className="text-xs text-muted-foreground flex items-center gap-2">
                 <Info className="h-4 w-4 text-info" />

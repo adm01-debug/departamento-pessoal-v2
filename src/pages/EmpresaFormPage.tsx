@@ -27,12 +27,14 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { useFormGuard } from '@/hooks/useFormGuard';
+import { useServerValidation } from '@/hooks/useServerValidation';
 
 export default function EmpresaFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { success, error: notifyError } = useNotification();
+  const { handleServerError } = useServerValidation<EmpresaSchema>();
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
@@ -43,7 +45,7 @@ export default function EmpresaFormPage() {
   });
 
 
-  const { register, handleSubmit, setValue, reset, watch, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
+  const { register, handleSubmit, setValue, reset, watch, setError, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
     resolver: zodResolver(empresaSchema),
     defaultValues: { ativa: true },
   });
@@ -78,7 +80,7 @@ export default function EmpresaFormPage() {
       success(isEditing ? 'Empresa atualizada!' : 'Empresa criada!');
       navigate('/empresas');
     },
-    onError: (err: any) => notifyError('Erro', err.message),
+    onError: (err: any) => handleServerError(err, setError),
   });
 
   const handleAddressFound = (addr: Address) => {

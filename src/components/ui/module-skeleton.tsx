@@ -2,12 +2,15 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 /* ─── Shimmer Skeleton ─── */
-function ShimmerBar({ className }: { className?: string }) {
+function ShimmerBar({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <div className={cn(
-      'relative overflow-hidden rounded-xl bg-muted/60',
-      className
-    )}>
+    <div 
+      className={cn(
+        'relative overflow-hidden rounded-xl bg-muted/60',
+        className
+      )}
+      style={style}
+    >
       <motion.div
         animate={{ 
           x: ['-100%', '100%'],
@@ -180,6 +183,26 @@ export function GridCardSkeleton() {
       <div className="flex items-center justify-between">
         <ShimmerBar className="h-3 w-24" />
         <ShimmerBar className="h-8 w-16 rounded-xl" />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Chart Skeleton ─── */
+export function ChartSkeleton({ height = 300 }: { height?: number }) {
+  return (
+    <div className="space-y-4 w-full">
+      <div className="flex items-end justify-between gap-2" style={{ height: `${height}px` }}>
+        {[40, 70, 45, 90, 65, 30, 80, 55, 95, 40, 60, 75].map((h, i) => (
+          <div key={i} className="flex-1">
+            <ShimmerBar className={cn("w-full rounded-t-md")} style={{ height: `${h}%` }} />
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between">
+        {Array(6).fill(0).map((_, i) => (
+          <ShimmerBar key={i} className="h-3 w-10" />
+        ))}
       </div>
     </div>
   );

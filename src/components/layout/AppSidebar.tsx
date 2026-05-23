@@ -5,7 +5,7 @@ import {
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
-  Trophy
+  Trophy, MessageSquareText
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -337,7 +337,19 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
           ))}
         </nav>
 
-        <div className="px-3 py-2">
+        <div className="px-3 py-2 space-y-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toast.info('Abertura de ticket de suporte...')}
+            className={cn(
+              "w-full gap-2 text-muted-foreground hover:text-primary rounded-xl",
+              collapsed && "px-0 justify-center"
+            )}
+          >
+            <MessageSquareText className="h-4 w-4" />
+            {!collapsed && "Dar Feedback"}
+          </Button>
           {isInstallable && (
             <Button 
               variant="outline" 
