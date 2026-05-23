@@ -248,18 +248,20 @@ export default function DashboardExecutivoPage() {
             <Card className="border border-border/30 rounded-2xl">
               <CardHeader><CardTitle className="text-sm font-display">Admissões vs Desligamentos</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <ComposedChart data={data?.evolucao || []}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }} />
-                    <Legend />
-                    <Bar dataKey="admissoes" name="Admissões" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="demissoes" name="Demissões" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
-                    <Line dataKey="saldo" name="Saldo" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
-                  </ComposedChart>
-                </ResponsiveContainer>
+                {isLoading ? <ChartSkeleton /> : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={data?.evolucao || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} />
+                      <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }} />
+                      <Legend />
+                      <Bar dataKey="admissoes" name="Admissões" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="demissoes" name="Demissões" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                      <Line dataKey="saldo" name="Saldo" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
 
