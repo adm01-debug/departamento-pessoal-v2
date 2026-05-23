@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import {
   Zap, UserPlus, DollarSign, Clock, Bot, ArrowRight,
-  Calendar, FileText, Building2, BarChart3
+  Calendar, FileText, Building2, BarChart3, Scale
 } from 'lucide-react';
 
 const MotionCard = motion.create(Card);
