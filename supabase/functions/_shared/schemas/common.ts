@@ -12,3 +12,17 @@ export const webhookSchema = z.object({
 });
 
 export const healthcheckSchema = z.object({}).strict();
+
+export const cepSchema = z.object({
+  cep: z.string().regex(/^\d{5}-?\d{3}$/, 'CEP deve ter 8 dígitos (pode conter hífen)'),
+});
+
+export const cnpjSchema = z.object({
+  cnpj: z.string().regex(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/, 'CNPJ inválido'),
+});
+
+export const holeriteSchema = z.object({
+  colaboradorId: z.string().uuid('ID do colaborador deve ser um UUID válido'),
+  competencia: z.string().regex(/^\d{4}-\d{2}$/, 'Competência deve estar no formato AAAA-MM'),
+});
+
