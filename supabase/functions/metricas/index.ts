@@ -1,17 +1,21 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { metricasSchema } from '../_shared/schemas/common.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const { data, errorResponse } = await validateRequest(req, metricasSchema);
+  if (errorResponse) return errorResponse;
+
+  const { empresaId } = data!;
+
   try {
-    const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
-    const { empresaId } = await req.json();
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     const [colabs, folha, ferias, afast, esocial] = await Promise.all([
       supabase.from('colaboradores').select('status, departamento', { count: 'exact' }).eq('empresa_id', empresaId || ''),
@@ -28,6 +32,7 @@ serve(async (req) => {
     const totalBruto = folhaData.filter((f: any) => f.competencia === ultimaComp).reduce((s: number, f: any) => s + (f.salario_bruto || 0), 0);
 
     const esocialData = esocial.data || [];
+    
     return new Response(JSON.stringify({
       timestamp: new Date().toISOString(),
       colaboradores: { total: colabs.count || 0, ativos, departamentos: deptos.length },
@@ -43,8 +48,6 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
+    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });
