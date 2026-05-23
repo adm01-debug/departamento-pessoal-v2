@@ -97,7 +97,7 @@ export default function ColaboradorFormPage() {
   });
 
 
-  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch, setError } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { 
       status: 'ativo', 
@@ -124,7 +124,7 @@ export default function ColaboradorFormPage() {
       success(isEditing ? 'Colaborador atualizado!' : 'Colaborador criado!');
       navigate('/colaboradores');
     },
-    onError: (err: any) => notifyError('Erro', err.message),
+    onError: (err: any) => handleServerError(err, setError),
   });
 
   const handleAddressFound = (addr: Address) => {
