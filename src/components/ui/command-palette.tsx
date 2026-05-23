@@ -110,6 +110,7 @@ export function CommandPalette({
   const setOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
   
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
