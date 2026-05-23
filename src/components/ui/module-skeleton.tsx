@@ -2,12 +2,15 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 /* ─── Shimmer Skeleton ─── */
-function ShimmerBar({ className }: { className?: string }) {
+function ShimmerBar({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <div className={cn(
-      'relative overflow-hidden rounded-xl bg-muted/60',
-      className
-    )}>
+    <div 
+      className={cn(
+        'relative overflow-hidden rounded-xl bg-muted/60',
+        className
+      )}
+      style={style}
+    >
       <motion.div
         animate={{ 
           x: ['-100%', '100%'],
