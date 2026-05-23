@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { useFormGuard } from '@/hooks/useFormGuard';
+import { useServerValidation } from '@/hooks/useServerValidation';
 
 export default function EmpresaFormPage() {
   const { id } = useParams();
