@@ -207,7 +207,7 @@ export default function ColaboradoresPage() {
         </div>
       }
       stats={
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           {statusOptions.map((opt, i) => {
             const statusKey = opt.value;
             const isActive = status === statusKey;
