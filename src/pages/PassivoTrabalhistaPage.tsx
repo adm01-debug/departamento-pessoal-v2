@@ -184,26 +184,28 @@ export default function PassivoTrabalhistaPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data?.projection || []}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="mes" fontSize={12} axisLine={false} tickLine={false} />
-                  <YAxis fontSize={12} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`} />
-                  <RechartsTooltip 
-                    formatter={(v: any) => formatCurrency(v)}
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
-                  />
-                  <Area type="monotone" dataKey="valor" stroke="hsl(var(--destructive))" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            {isLoading ? <ChartSkeleton /> : (
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data?.projection || []}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis dataKey="mes" fontSize={12} axisLine={false} tickLine={false} />
+                    <YAxis fontSize={12} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`} />
+                    <RechartsTooltip 
+                      formatter={(v: any) => formatCurrency(v)}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
+                    />
+                    <Area type="monotone" dataKey="valor" stroke="hsl(var(--destructive))" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
             <div className="mt-4 p-3 bg-muted/30 rounded-xl border border-border/20">
               <p className="text-xs text-muted-foreground flex items-center gap-2">
                 <Info className="h-4 w-4 text-info" />
