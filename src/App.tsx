@@ -171,6 +171,7 @@ export default function App() {
         <Route path="folha/calcular" element={<LazyPage Component={FolhaPagamentoPage} />} />
         <Route path="rubricas" element={<LazyPage Component={RubricasPage} />} />
         <Route path="provisoes" element={<LazyPage Component={ProvisoesPage} />} />
+        <Route path="passivo-trabalhista" element={<LazyPage Component={PassivoTrabalhistaPage} />} />
         <Route path="financeiro-bancario" element={<LazyPage Component={FinanceiroBancarioPage} />} />
         <Route path="contabilidade" element={<LazyPage Component={ContabilidadePage} />} />
         
