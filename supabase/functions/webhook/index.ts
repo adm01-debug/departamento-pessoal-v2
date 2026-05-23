@@ -1,8 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { crypto } from 'https://deno.land/std@0.177.0/crypto/mod.ts';
 import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { webhookSchema } from '../_shared/schemas/common.ts';
+import { withMonitoring } from '../_shared/monitor.ts';
 
 async function verifySignature(payload: string, signature: string | null, secret: string | undefined): Promise<boolean> {
   if (!signature || !secret) return false;
@@ -37,7 +37,7 @@ serve(async (req: Request): Promise<Response> => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  try {
+  return withMonitoring(req, 'webhook', async (supabase) => {
     const secret = Deno.env.get('WEBHOOK_SECRET');
     const signature = req.headers.get('x-hub-signature-256');
     const payloadText = await req.clone().text();
@@ -50,10 +50,6 @@ serve(async (req: Request): Promise<Response> => {
     if (errorResponse) return errorResponse;
 
     const webhookData = data!;
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     // Auditoria do recebimento
     await supabase.from('webhook_logs').insert({
@@ -75,11 +71,9 @@ serve(async (req: Request): Promise<Response> => {
       JSON.stringify({ success: true, data: result, version: webhookData.version }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
-  }
+  });
 });
+
 
 async function processWebhookV1(body: any, supabase: any) {
   console.log('Processando Webhook V1:', body.event);
