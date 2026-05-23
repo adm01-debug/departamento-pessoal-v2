@@ -81,11 +81,11 @@ export default function ColaboradoresPage() {
   }, [setCargo, setPage]);
 
   const statusOptions = [
-    { value: 'ativo', label: `Ativos` },
-    { value: 'inativo', label: `Inativos` },
-    { value: 'desligado', label: `Desligados` },
-    { value: 'ferias', label: `Em Férias` },
-    { value: 'afastado', label: `Afastados` },
+    { value: 'ativo', label: 'Ativos' },
+    { value: 'inativo', label: 'Inativos' },
+    { value: 'desligado', label: 'Desligados' },
+    { value: 'ferias', label: 'Em Férias' },
+    { value: 'afastado', label: 'Afastados' },
   ];
 
   const handleExportExcel = async () => {
