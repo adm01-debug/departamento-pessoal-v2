@@ -117,11 +117,12 @@ function useDashboardStats(enabled: boolean) {
           const lastFeriasEnd = employeeFerias.length > 0 
             ? new Date(Math.max(...employeeFerias.map(f => new Date(f.data_fim).getTime())))
             : admissionDate;
-          const diffDays = Math.floor((now.getTime() - lastFeriasEnd.getTime()) / (1000 * 60 * 60 * 24));
+          const diffMs = now.getTime() - lastFeriasEnd.getTime();
+          const diffDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
           const accruedDays = Math.floor(diffDays / 30) * 2.5;
-          passivoTotal += ((salario / 30) * accruedDays) * 1.33; // vacations + 1/3
+          passivoTotal += ((salario / 30) * accruedDays) * 1.3333; // vacations + 1/3
         });
-        passivoTotal *= 1.35; // + charges (35%)
+        passivoTotal *= 1.358; // + average charges (INSS Patronal + FGTS + RAT + S)
       }
 
       return {
