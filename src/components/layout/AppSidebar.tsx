@@ -272,6 +272,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isInstallable, installApp } = usePWA();
 
   const handleLogout = async () => { 
     try {
@@ -337,6 +338,20 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
         </nav>
 
         <div className="px-3 py-2">
+          {isInstallable && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={installApp} 
+              className={cn(
+                "w-full mb-2 gap-2 border-primary/30 text-primary hover:bg-primary/10 rounded-xl",
+                collapsed && "px-0 justify-center"
+              )}
+            >
+              <DownloadCloud className="h-4 w-4" />
+              {!collapsed && "Instalar App"}
+            </Button>
+          )}
           <SystemStatus collapsed={collapsed} />
         </div>
 
