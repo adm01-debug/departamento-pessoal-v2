@@ -1,9 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
 
 const FAIXAS_INSS = [
   { limite: 1518.00, aliquota: 0.075 },
@@ -49,12 +46,12 @@ function calcIRRF(base: number): number {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-  try {
-    const { empresa_id, competencia } = await req.json();
-    if (!empresa_id || !competencia) {
-      return new Response(JSON.stringify({ error: 'empresa_id e competencia obrigatórios' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+  const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
+  if (errorResponse) return errorResponse;
 
+  const { empresa_id, competencia } = data!;
+
+  try {
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
     const { data: colaboradores, error: colabErr } = await supabase
@@ -63,7 +60,7 @@ Deno.serve(async (req) => {
 
     if (colabErr) throw colabErr;
     if (!colaboradores?.length) {
-      return new Response(JSON.stringify({ error: 'Nenhum colaborador ativo' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return createErrorResponse('Nenhum colaborador ativo encontrado para esta empresa', 404, 'NOT_FOUND');
     }
 
     const itens = colaboradores.map(c => {
@@ -92,7 +89,7 @@ Deno.serve(async (req) => {
     }, { onConflict: 'empresa_id,competencia' });
 
     return new Response(JSON.stringify({ success: true, competencia, total_colaboradores: colaboradores.length, ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, Math.round(v * 100) / 100])), itens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (error: any) {
+    return createErrorResponse(error.message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });
