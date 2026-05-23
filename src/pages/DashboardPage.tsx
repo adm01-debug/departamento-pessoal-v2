@@ -31,6 +31,7 @@ interface DashboardStats {
   admissoesMes: number;
   demissoesMes: number;
   departamentos: { nome: string; count: number }[];
+  passivoTotal: number;
 }
 
 interface Pendencia {
@@ -61,6 +62,8 @@ function useDashboardStats(enabled: boolean) {
         { data: deptData },
         { data: turnoverData },
         { data: absenteismoData },
+        { data: colabsAll },
+        { data: feriasAll },
       ] = await Promise.all([
         supabase.from("colaboradores").select("id", { count: "exact", head: true }).eq("status", "ativo"),
         supabase.from("folhas_pagamento").select("total_liquido").eq("competencia", mesAtual),
@@ -71,6 +74,8 @@ function useDashboardStats(enabled: boolean) {
         supabase.from("colaboradores").select("departamento").eq("status", "ativo"),
         supabase.from("vw_kpi_turnover" as any).select("taxa_turnover").limit(1),
         supabase.from("vw_kpi_absenteismo" as any).select("taxa_absenteismo").limit(1),
+        supabase.from("colaboradores").select("id, salario_base, data_admissao").eq("status", "ativo"),
+        supabase.from("ferias").select("colaborador_id, data_fim").neq("status", "cancelado"),
       ]);
 
       const folhaMensal = folhaData?.reduce((acc, f) => acc + (f.total_liquido || 0), 0) || 0;
@@ -93,6 +98,32 @@ function useDashboardStats(enabled: boolean) {
       const turnoverVal = (turnoverData as any)?.[0]?.taxa_turnover ?? ((demissoesMes || 0) / (colaboradoresAtivos || 1)) * 100;
       const absenteismoVal = (absenteismoData as any)?.[0]?.taxa_absenteismo ?? 0;
 
+      // Passivo Total Estimation (Simplified from PassivoTrabalhistaPage)
+      let passivoTotal = 0;
+      if (colabsAll) {
+        colabsAll.forEach(c => {
+          const salario = Number(c.salario_base || 0);
+          if (salario === 0) return;
+          
+          // 13th pro-rata
+          const startOfYear = new Date(now.getFullYear(), 0, 1);
+          const admissionDate = new Date(c.data_admissao);
+          const calcStart = admissionDate > startOfYear ? admissionDate : startOfYear;
+          const months = now.getMonth() - calcStart.getMonth() + (12 * (now.getFullYear() - calcStart.getFullYear())) + 1;
+          passivoTotal += (salario / 12) * Math.min(months, 12);
+
+          // Vacation pro-rata estimation
+          const employeeFerias = feriasAll?.filter(f => f.colaborador_id === c.id) || [];
+          const lastFeriasEnd = employeeFerias.length > 0 
+            ? new Date(Math.max(...employeeFerias.map(f => new Date(f.data_fim).getTime())))
+            : admissionDate;
+          const diffDays = Math.floor((now.getTime() - lastFeriasEnd.getTime()) / (1000 * 60 * 60 * 24));
+          const accruedDays = Math.floor(diffDays / 30) * 2.5;
+          passivoTotal += ((salario / 30) * accruedDays) * 1.33; // vacations + 1/3
+        });
+        passivoTotal *= 1.35; // + charges (35%)
+      }
+
       return {
         colaboradoresAtivos: colaboradoresAtivos || 0,
         folhaMensal,
@@ -104,6 +135,7 @@ function useDashboardStats(enabled: boolean) {
         admissoesMes: admissoesMes || 0,
         demissoesMes: demissoesMes || 0,
         departamentos,
+        passivoTotal,
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -253,6 +285,7 @@ export default function DashboardPage() {
               cadastrosCompletos={stats?.colaboradoresAtivos || 0}
               totalColaboradores={stats?.colaboradoresAtivos || 0}
               feriasPendentes={stats?.feriasPendentes || 0}
+              passivoTotal={stats?.passivoTotal || 0}
             />
           </div>
         </div>
