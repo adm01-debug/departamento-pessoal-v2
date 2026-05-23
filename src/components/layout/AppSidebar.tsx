@@ -337,7 +337,19 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
           ))}
         </nav>
 
-        <div className="px-3 py-2">
+        <div className="px-3 py-2 space-y-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toast.info('Abertura de ticket de suporte...')}
+            className={cn(
+              "w-full gap-2 text-muted-foreground hover:text-primary rounded-xl",
+              collapsed && "px-0 justify-center"
+            )}
+          >
+            <MessageSquareText className="h-4 w-4" />
+            {!collapsed && "Dar Feedback"}
+          </Button>
           {isInstallable && (
             <Button 
               variant="outline" 
