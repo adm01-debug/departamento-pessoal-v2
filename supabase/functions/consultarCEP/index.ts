@@ -1,38 +1,26 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { cepSchema } from '../_shared/schemas/common.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const { data, errorResponse } = await validateRequest(req, cepSchema);
+  if (errorResponse) return errorResponse;
+
+  const { cep } = data!;
+  const clean = cep.replace(/\D/g, '');
+
   try {
-    const { cep } = await req.json();
-    if (!cep) {
-      return new Response(JSON.stringify({ error: 'CEP obrigatório' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-      });
-    }
-
-    const clean = cep.replace(/\D/g, '');
-    if (clean.length !== 8) {
-      return new Response(JSON.stringify({ error: 'CEP deve ter 8 dígitos' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-      });
-    }
-
     // ViaCEP
     const res = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
     if (res.ok) {
-      const data = await res.json();
-      if (!data.erro) {
+      const viacep = await res.json();
+      if (!viacep.erro) {
         return new Response(JSON.stringify({
-          cep: data.cep, logradouro: data.logradouro || '', complemento: data.complemento || '',
-          bairro: data.bairro || '', localidade: data.localidade || '', uf: data.uf || '',
-          ibge: data.ibge || '', ddd: data.ddd || '',
+          cep: viacep.cep, logradouro: viacep.logradouro || '', complemento: viacep.complemento || '',
+          bairro: viacep.bairro || '', localidade: viacep.localidade || '', uf: viacep.uf || '',
+          ibge: viacep.ibge || '', ddd: viacep.ddd || '',
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
@@ -47,13 +35,9 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    return new Response(JSON.stringify({ error: 'CEP não encontrado' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404,
-    });
+    return createErrorResponse('CEP não encontrado', 404, 'NOT_FOUND');
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
+    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });

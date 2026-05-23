@@ -1,10 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { holeriteSchema } from '../_shared/schemas/common.ts';
 
 // Tabelas INSS 2026
 const calcularINSS = (base: number): number => {
@@ -25,26 +22,20 @@ const calcularIRRF = (base: number, dependentes: number = 0): number => {
   return Number(Math.max(0, baseCalculo * 0.275 - 896.00).toFixed(2));
 };
 
-interface HoleriteRequest {
-  colaboradorId: string;
-  competencia: string; // "2026-03"
-}
-
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  const { data, errorResponse } = await validateRequest(req, holeriteSchema);
+  if (errorResponse) return errorResponse;
+
+  const { colaboradorId, competencia } = data!;
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const { colaboradorId, competencia }: HoleriteRequest = await req.json();
-
-    if (!colaboradorId || !competencia) {
-      throw new Error('Campos obrigatórios: colaboradorId, competencia');
-    }
 
     // Buscar dados do colaborador
     const { data: colaborador, error: colError } = await supabase
@@ -54,7 +45,7 @@ serve(async (req: Request): Promise<Response> => {
       .maybeSingle();
 
     if (colError || !colaborador) {
-      throw new Error('Colaborador não encontrado');
+      return createErrorResponse('Colaborador não encontrado', 404, 'NOT_FOUND');
     }
 
     // Buscar registros de ponto do mês
@@ -132,10 +123,7 @@ serve(async (req: Request): Promise<Response> => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Erro desconhecido';
-    return new Response(
-      JSON.stringify({ success: false, error: message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-    );
+    const message = error instanceof Error ? error.message : 'Erro interno no servidor';
+    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });
