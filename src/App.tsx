@@ -89,6 +89,7 @@ const DashboardExecutivoPage = lazy(() => import('@/pages/DashboardExecutivoPage
 const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
+const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
 const FinanceiroBancarioPage = lazy(() => import('@/pages/FinanceiroBancarioPage'));
 const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
@@ -170,6 +171,7 @@ export default function App() {
         <Route path="folha/calcular" element={<LazyPage Component={FolhaPagamentoPage} />} />
         <Route path="rubricas" element={<LazyPage Component={RubricasPage} />} />
         <Route path="provisoes" element={<LazyPage Component={ProvisoesPage} />} />
+        <Route path="passivo-trabalhista" element={<LazyPage Component={PassivoTrabalhistaPage} />} />
         <Route path="financeiro-bancario" element={<LazyPage Component={FinanceiroBancarioPage} />} />
         <Route path="contabilidade" element={<LazyPage Component={ContabilidadePage} />} />
         

@@ -16,11 +16,13 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
+import { usePWA } from '@/hooks/usePWA';
 import { toast } from 'sonner';
 import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { DownloadCloud } from 'lucide-react';
 
 interface MenuItem { icon: LucideIcon; label: string; path: string; color: string; }
 interface MenuGroup { id: string; label: string; icon: LucideIcon; color: string; items: MenuItem[]; }
@@ -80,6 +82,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Wallet, label: 'Folha de Pagamento', path: '/folha', color: 'text-success' },
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
       { icon: TrendingDown, label: 'Descontos & Consignados', path: '/descontos', color: 'text-destructive' },
+      { icon: Scale, label: 'Passivo Trabalhista', path: '/passivo-trabalhista', color: 'text-destructive' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
       { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },
@@ -269,6 +272,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isInstallable, installApp } = usePWA();
 
   const handleLogout = async () => { 
     try {
@@ -334,6 +338,20 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
         </nav>
 
         <div className="px-3 py-2">
+          {isInstallable && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={installApp} 
+              className={cn(
+                "w-full mb-2 gap-2 border-primary/30 text-primary hover:bg-primary/10 rounded-xl",
+                collapsed && "px-0 justify-center"
+              )}
+            >
+              <DownloadCloud className="h-4 w-4" />
+              {!collapsed && "Instalar App"}
+            </Button>
+          )}
           <SystemStatus collapsed={collapsed} />
         </div>
 

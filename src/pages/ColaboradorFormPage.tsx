@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
 import { useFormGuard } from '@/hooks/useFormGuard';
+import { useServerValidation } from '@/hooks/useServerValidation';
 
 const schema = z.object({
   // Geral
@@ -82,6 +83,7 @@ export default function ColaboradorFormPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { success, error: notifyError } = useNotification();
+  const { handleServerError } = useServerValidation<FormData>();
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
@@ -95,7 +97,7 @@ export default function ColaboradorFormPage() {
   });
 
 
-  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch, setError } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { 
       status: 'ativo', 
@@ -122,7 +124,7 @@ export default function ColaboradorFormPage() {
       success(isEditing ? 'Colaborador atualizado!' : 'Colaborador criado!');
       navigate('/colaboradores');
     },
-    onError: (err: any) => notifyError('Erro', err.message),
+    onError: (err: any) => handleServerError(err, setError),
   });
 
   const handleAddressFound = (addr: Address) => {
