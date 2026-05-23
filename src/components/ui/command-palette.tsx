@@ -51,6 +51,8 @@ const staticCommands: CommandItem[] = [
   { id: 'feriados', label: 'Feriados', description: 'Calendário de feriados', icon: CalendarDays, category: 'navigation', path: '/feriados', gradient: 'from-primary to-primary-glow' },
   { id: 'organograma', label: 'Organograma', description: 'Hierarquia organizacional', icon: Network, category: 'navigation', path: '/organograma', gradient: 'from-primary/80 to-primary' },
   { id: 'relatorios', label: 'Relatórios', description: 'Relatórios e exportações', icon: BarChart3, category: 'navigation', path: '/relatorios', gradient: 'from-primary to-primary-glow' },
+  { id: 'passivo-trabalhista', label: 'Passivo Trabalhista', description: 'Análise de riscos e provisões', icon: Scale, category: 'navigation', path: '/passivo-trabalhista', gradient: 'from-destructive to-destructive/80' },
+  { id: 'dashboard-executivo', label: 'Dashboard Executivo', description: 'KPIs estratégicos para gestão', icon: TrendingUp, category: 'navigation', path: '/dashboard-executivo', gradient: 'from-success to-success/80' },
   { id: 'esocial', label: 'eSocial', description: 'Eventos e transmissão', icon: FileCheck, category: 'navigation', path: '/esocial', gradient: 'from-primary to-primary-glow' },
   { id: 'auditoria', label: 'Auditoria', description: 'Logs e rastreamento', icon: Shield, category: 'navigation', path: '/auditoria', gradient: 'from-primary/60 to-primary/90' },
   { id: 'usuarios', label: 'Usuários', description: 'Gerenciar usuários', icon: UserCog, category: 'navigation', path: '/usuarios', gradient: 'from-primary/80 to-primary' },
