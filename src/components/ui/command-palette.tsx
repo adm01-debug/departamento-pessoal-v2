@@ -14,7 +14,7 @@ import {
   Search, UserPlus, DollarSign, ArrowRight,
   Zap, Calculator, Plus, User, Briefcase,
   FolderOpen, Network, Shield, UserCog, Plug, Database,
-  CalendarDays, UserMinus,
+  CalendarDays, UserMinus, Scale, TrendingUp
 } from 'lucide-react';
 
 /* ─── Types ─── */
