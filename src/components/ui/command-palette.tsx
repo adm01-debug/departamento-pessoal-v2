@@ -143,10 +143,10 @@ export function CommandPalette({
 
   // Search empresas from DB (filtered by user's empresas via RLS)
   const { data: dbEmpresas } = useQuery({
-    queryKey: ['cmd-empresas', query],
-    enabled: open && query.length >= 2,
+    queryKey: ['cmd-empresas', debouncedQuery],
+    enabled: open && debouncedQuery.length >= 2,
     queryFn: async () => {
-      const q = query.trim();
+      const q = debouncedQuery.trim();
       let queryBuilder = supabase
         .from('empresas')
         .select('id, razao_social, nome_fantasia, cnpj')
