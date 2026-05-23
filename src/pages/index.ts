@@ -41,3 +41,4 @@ export { default as ProvisoesPage } from './ProvisoesPage';
 export { default as ContabilidadePage } from './ContabilidadePage';
 export { default as SegurancaPage } from './SegurancaPage';
 export { default as AdminTelemetriaPage } from './AdminTelemetriaPage';
+export { default as PassivoTrabalhistaPage } from './PassivoTrabalhistaPage';
