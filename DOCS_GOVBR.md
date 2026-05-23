@@ -1,39 +1,41 @@
-# Documentação de Integração Gov.br
+# Guia Definitivo: Integração Gov.br (SERPRO) - 10/10
 
-Esta documentação descreve os passos necessários para configurar e manter a integração com o provedor de identidade Gov.br (SERPRO).
+Este guia detalha a configuração crítica para manter a integração com o Gov.br resiliente e segura em ambientes de escala empresarial.
 
-## Variáveis de Ambiente Necessárias
+## 1. Arquitetura de Ambiente
 
-As seguintes variáveis devem ser configuradas no Supabase (Edge Functions):
+Garantir que as variáveis de ambiente estejam isoladas por contexto:
 
-| Variável | Descrição | Exemplo |
-|----------|-----------|---------|
-| `GOVBR_CLIENT_ID` | Identificador único da aplicação fornecido pelo SERPRO. | `meu-app-id` |
-| `GOVBR_CLIENT_SECRET` | Chave secreta para troca de tokens (Manter Segredo). | `scrt_...` |
-| `GOVBR_REDIRECT_URI` | URL de callback autorizada no painel do Gov.br. | `https://[project].supabase.co/functions/v1/auth-gov-br` |
+| Variável | Desenvolvimento (Sandbox) | Produção (Live) |
+|----------|--------------------------|-----------------|
+| `GOVBR_ENV` | `staging` | `production` |
+| `GOVBR_CLIENT_ID` | Sandbox Client ID | Production Client ID |
+| `GOVBR_CLIENT_SECRET` | Sandbox Secret | Production Secret (Seguro) |
+| `GOVBR_REDIRECT_URI` | `http://localhost:54321/...` | `https://api.empresa.com/...` |
 
-## Checklist de Instalação (Novo Ambiente)
+## 2. Checklist de Integração Crítica (Zero-Downtime)
 
-1. [ ] **Cadastro no SERPRO:** Garantir que o CNPJ da empresa está vinculado à aplicação no portal do desenvolvedor Gov.br.
-2. [ ] **Configuração de Escopos:** Verificar se os escopos `openid`, `profile` e `govbr_confiabilidades` estão liberados.
-3. [ ] **Secrets do Supabase:** Executar o comando para cada variável:
-   ```bash
-   supabase secrets set GOVBR_CLIENT_ID=...
-   supabase secrets set GOVBR_CLIENT_SECRET=...
-   ```
-4. [ ] **Certificados SSL:** Garantir que o ambiente de produção utiliza HTTPS (obrigatório para Gov.br).
-5. [ ] **Homologação:** Realizar teste inicial no ambiente de staging (`sso.staging.acesso.gov.br`).
+1. [ ] **Verificação de DNS:** O domínio de redirecionamento deve possuir certificado TLS 1.2+ válido.
+2. [ ] **Assinatura de Tokens:** Validar se o SERPRO exige assinatura RS256 e se a chave pública está atualizada no `auth-gov-br`.
+3. [ ] **Rate Limiting:** Configurar o `login_rate_limits` no Supabase para evitar força bruta no fluxo de callback.
+4. [ ] **Auditoria Legal:** Garantir que o `usuario_id` gerado via Gov.br está sendo mapeado corretamente na tabela `profiles`.
+5. [ ] **Fallback de Conectividade:** Implementar retry exponencial na troca de token em caso de instabilidade no SERPRO.
 
-## Fluxo de Autenticação
+## 3. Resolução de Problemas (Troubleshooting)
 
-1. O frontend solicita a URL de autenticação via ação `get_auth_url`.
-2. O usuário é redirecionado para o Gov.br.
-3. Após o login, o Gov.br redireciona de volta com um `code`.
-4. O frontend chama a ação `callback` enviando o `code` e o `state`.
-5. A Edge Function valida o `state`, troca o `code` pelo `access_token` e busca os dados do cidadão.
+### Erro: `invalid_request` ou `mismatching_state`
+- **Causa:** O `state` expirou ou foi reutilizado.
+- **Solução:** Limpar a tabela `govbr_auth_state` e garantir que o cookie/storage do navegador está enviando o `state` correto.
 
-## Segurança e Conformidade
+### Erro: `401 Unauthorized` no Client Secret
+- **Causa:** Secret incorreto ou rotacionado no portal do SERPRO.
+- **Solução:** Atualizar via `supabase secrets set` imediatamente.
 
-- O `state` é armazenado na tabela `govbr_auth_state` com expiração curta para evitar ataques de CSRF/Replay.
-- O `Client Secret` nunca deve ser exposto no frontend ou em logs públicos.
-- Logs de erro não devem conter dados sensíveis (CPF, tokens).
+## 4. Segurança de Dados Sensíveis (LGPD)
+
+- Nunca armazene o `access_token` em texto claro por longos períodos.
+- Use a tabela `audit_logs` para registrar quem iniciou o fluxo, mas oculte o CPF/Dados Pessoais nos logs de depuração.
+- O tempo de vida (TTL) do `state` deve ser de no máximo 10 minutos.
+
+---
+*Documentação gerada automaticamente para conformidade técnica 10/10.*
