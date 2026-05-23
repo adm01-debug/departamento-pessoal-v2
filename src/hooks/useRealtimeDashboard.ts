@@ -63,5 +63,7 @@ export function useRealtimeDashboard() {
       void supabase.removeChannel(channel);
       Object.values(timeouts.current).forEach(clearTimeout);
     };
-  }, [queryClient]);
+  }, [queryClient, empresaAtualId]);
+
+  return { empresaAtualId };
 }
