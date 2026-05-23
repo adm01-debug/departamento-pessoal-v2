@@ -45,7 +45,7 @@ export default function EmpresaFormPage() {
   });
 
 
-  const { register, handleSubmit, setValue, reset, watch, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
+  const { register, handleSubmit, setValue, reset, watch, setError, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
     resolver: zodResolver(empresaSchema),
     defaultValues: { ativa: true },
   });
