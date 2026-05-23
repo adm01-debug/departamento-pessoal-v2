@@ -9,6 +9,8 @@ import { BackButton } from './BackButton';
 import { EmpresaSelector } from './EmpresaSelector';
 import { useAuth } from '@/hooks/useAuth';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { useSystemHealth } from '@/hooks/useSystemHealth';
+import { Activity } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick?: () => void;
