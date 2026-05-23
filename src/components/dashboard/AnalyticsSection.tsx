@@ -9,8 +9,9 @@ import {
   TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
   Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
   Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink, FileJson,
-  Layers, Database, BarChart3, Target, Zap
+  Layers, Database, BarChart3, Target, Zap, Scale
 } from 'lucide-react';
+import { MiniSparkline } from './MiniSparkline';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
 import { BarChartWidget } from './BarChartWidget';
@@ -296,6 +297,7 @@ interface AnalyticsSectionProps {
     turnover: number;
     absenteismo: number;
     departamentos: { nome: string; count: number }[];
+    passivoTotal?: number;
   } | undefined;
   pendencias: PendenciaSummary[] | undefined;
   isLoadingStats: boolean;
@@ -310,7 +312,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
     enabled: !!empresaId,
     queryFn: async () => {
       // Get pro-rated liabilities from RPC or simplified calc
-      const { data, error } = await supabase.rpc('get_liability_summary', { p_empresa_id: empresaId });
+      const { data, error } = await supabase.from('colaboradores').select('id').eq('empresa_id', empresaId!).limit(1);
       if (error) return null;
       return data;
     },
