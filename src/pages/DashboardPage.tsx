@@ -204,11 +204,10 @@ function OnboardingWizard() {
 /* ─── Main Dashboard ─── */
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { empresaAtualId } = useRealtimeDashboard();
   const isAuthenticated = !!user;
   const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useDashboardStats(isAuthenticated);
   const { data: pendencias, isLoading: loadingPendencias } = usePendencias(isAuthenticated);
-
-  useRealtimeDashboard();
 
   const hoje = new Date();
   const greeting = hoje.getHours() < 12 ? "Bom dia" : hoje.getHours() < 18 ? "Boa tarde" : "Boa noite";
@@ -272,6 +271,7 @@ export default function DashboardPage() {
         isLoadingStats={loadingStats}
         isLoadingPendencias={loadingPendencias}
         isEmptySystem={isEmptySystem}
+        empresaId={empresaAtualId || undefined}
       />
     </div>
   );
