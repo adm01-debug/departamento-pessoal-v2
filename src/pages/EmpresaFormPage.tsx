@@ -80,7 +80,7 @@ export default function EmpresaFormPage() {
       success(isEditing ? 'Empresa atualizada!' : 'Empresa criada!');
       navigate('/empresas');
     },
-    onError: (err: any) => notifyError('Erro', err.message),
+    onError: (err: any) => handleServerError(err, setError),
   });
 
   const handleAddressFound = (addr: Address) => {
