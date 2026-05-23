@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useEmpresas } from './useEmpresas';
 
 const TABLE_LABELS: Record<string, string> = {
   admissoes: '📋 Nova admissão registrada',
@@ -21,6 +22,7 @@ const TABLE_LABELS: Record<string, string> = {
 };
 
 export function useRealtimeDashboard() {
+  const { empresaAtualId } = useEmpresas();
   const queryClient = useQueryClient();
   const timeouts = useRef<Record<string, NodeJS.Timeout>>({});
 
@@ -40,7 +42,11 @@ export function useRealtimeDashboard() {
     const tables = ['admissoes', 'desligamentos', 'ferias', 'folhas_pagamento', 'registros_ponto'];
     
     const channel = supabase.channel('dashboard-updates')
-      .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public',
+        filter: empresaAtualId ? `empresa_id=eq.${empresaAtualId}` : undefined
+      }, (payload) => {
         if (payload.table && tables.includes(payload.table)) {
           debounceInvalidate([['dashboard-stats'], ['dashboard-pendencias']]);
           
@@ -57,5 +63,7 @@ export function useRealtimeDashboard() {
       void supabase.removeChannel(channel);
       Object.values(timeouts.current).forEach(clearTimeout);
     };
-  }, [queryClient]);
+  }, [queryClient, empresaAtualId]);
+
+  return { empresaAtualId };
 }

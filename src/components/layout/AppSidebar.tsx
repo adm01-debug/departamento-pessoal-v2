@@ -36,6 +36,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', color: 'text-primary' },
       { icon: BarChart3, label: 'Dashboard Executivo', path: '/dashboard-executivo', color: 'text-success' },
+      { icon: Scale, label: 'Passivo Trabalhista', path: '/passivo-trabalhista', color: 'text-destructive' },
       { icon: Users, label: 'Colaboradores', path: '/colaboradores', color: 'text-info' },
       { icon: Network, label: 'Organograma', path: '/organograma', color: 'text-info' },
       { icon: Bot, label: 'Assistente IA', path: '/assistente-ia', color: 'text-primary' },
@@ -82,7 +83,6 @@ const menuGroups: MenuGroup[] = [
       { icon: Wallet, label: 'Folha de Pagamento', path: '/folha', color: 'text-success' },
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
       { icon: TrendingDown, label: 'Descontos & Consignados', path: '/descontos', color: 'text-destructive' },
-      { icon: Scale, label: 'Passivo Trabalhista', path: '/passivo-trabalhista', color: 'text-destructive' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
       { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },

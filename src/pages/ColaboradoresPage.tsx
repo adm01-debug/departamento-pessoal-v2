@@ -81,10 +81,11 @@ export default function ColaboradoresPage() {
   }, [setCargo, setPage]);
 
   const statusOptions = [
-    { value: 'ativo', label: `Ativos` },
-    { value: 'inativo', label: `Inativos` },
-    { value: 'ferias', label: `Em Férias` },
-    { value: 'afastado', label: `Afastados` },
+    { value: 'ativo', label: 'Ativos' },
+    { value: 'inativo', label: 'Inativos' },
+    { value: 'desligado', label: 'Desligados' },
+    { value: 'ferias', label: 'Em Férias' },
+    { value: 'afastado', label: 'Afastados' },
   ];
 
   const handleExportExcel = async () => {
@@ -206,7 +207,7 @@ export default function ColaboradoresPage() {
         </div>
       }
       stats={
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           {statusOptions.map((opt, i) => {
             const statusKey = opt.value;
             const isActive = status === statusKey;
