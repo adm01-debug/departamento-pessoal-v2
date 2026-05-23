@@ -83,6 +83,7 @@ export default function ColaboradorFormPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { success, error: notifyError } = useNotification();
+  const { handleServerError } = useServerValidation<FormData>();
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
