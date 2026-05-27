@@ -206,7 +206,7 @@ export default function PremiacoesPage() {
                         <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter flex items-center gap-1">
                           <DollarSign className="h-3 w-3" /> Orçamento
                         </p>
-                        <p className="text-xs font-semibold">{formatCurrency(c.orcamento_estimado)}</p>
+                        <p className="text-xs font-semibold">{formatCurrency(c.orcamento_estimado || 0)}</p>
                       </div>
                     </div>
 
@@ -298,8 +298,8 @@ export default function PremiacoesPage() {
                         onChange={(e) => setFaixaMetaFiltro(e.target.value)}
                       >
                         <option>Todas as Metas</option>
-                        <option>Meta > 100%</option>
-                        <option>Meta > 120%</option>
+                          <option>Meta {'>'} 100%</option>
+                          <option>Meta {'>'} 120%</option>
                       </select>
                     </div>
                     <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>

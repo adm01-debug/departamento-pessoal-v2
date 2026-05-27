@@ -286,10 +286,6 @@ Deno.serve(async (req) => {
       });
     }
 
-      return new Response(JSON.stringify({ data: insertData, duration_ms: durationMs }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     // UPDATE
     if (action === "update") {

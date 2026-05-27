@@ -42,10 +42,13 @@ interface Pendencia {
 }
 
 function useDashboardStats(enabled: boolean) {
+  const { empresaAtualId } = useRealtimeDashboard();
   return useQuery<DashboardStats>({
-    queryKey: ["dashboard-stats"],
-    enabled,
+    queryKey: ["dashboard-stats", empresaAtualId],
+    enabled: enabled && !!empresaAtualId,
     queryFn: async () => {
+      if (!empresaAtualId) throw new Error("Empresa não selecionada");
+
       const now = new Date();
       const mesAtual = now.toISOString().slice(0, 7);
       const em30Dias = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();

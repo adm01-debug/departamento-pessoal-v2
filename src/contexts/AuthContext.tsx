@@ -140,7 +140,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(authInitTimeout);
       subscription.unsubscribe();
     };
-  }, [applySession, isReady, markReady]);
+  }, [applySession, markReady]);
+
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {

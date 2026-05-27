@@ -52,5 +52,5 @@ export function useRealTimeSubscription(
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [table, queryKey, empresaId, options.event, options.schema, handleChange]);
+  }, [table, JSON.stringify(queryKey), empresaId, options.event, options.schema, handleChange]);
 }
