@@ -102,28 +102,28 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Auth opcional: requisições anônimas são permitidas (RLS no banco externo
+  // continua sendo a fonte de verdade). Se um JWT de usuário válido for
+  // enviado, capturamos o user para telemetria; tokens inválidos ou o próprio
+  // anon key simplesmente seguem como anônimos em vez de bloquear a chamada.
   const authHeader = req.headers.get("Authorization");
-  if (!authHeader) {
-    return new Response(JSON.stringify({ error: "No authorization header" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
-  // Security Check: Verify JWT
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-  const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: authHeader } },
-  });
+  let user: { id: string } | null = null;
 
-  const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-
-  if (authError || !user) {
-    return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+  if (authHeader) {
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (token && token !== supabaseAnonKey) {
+      try {
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+          global: { headers: { Authorization: authHeader } },
+        });
+        const { data } = await supabaseClient.auth.getUser();
+        if (data?.user) user = { id: data.user.id };
+      } catch (_e) {
+        // ignore — segue como anônimo
+      }
+    }
   }
 
   try {
