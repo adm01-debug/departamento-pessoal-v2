@@ -53,6 +53,7 @@ const menuGroups: MenuGroup[] = [
       { icon: UserMinus, label: 'Desligamentos', path: '/desligamentos', color: 'text-destructive' },
       { icon: Target, label: 'Avaliação & Performance', path: '/avaliacao', color: 'text-warning' },
       { icon: Trophy, label: 'Premiações 10/10', path: '/premiacoes', color: 'text-primary' },
+
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
       { icon: UserSearch, label: 'Recrutamento', path: '/recrutamento', color: 'text-success' },
       { icon: ClipboardList, label: 'Pesquisas Clima', path: '/pesquisas-clima', color: 'text-info' },
@@ -84,7 +85,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
       { icon: TrendingDown, label: 'Descontos & Consignados', path: '/descontos', color: 'text-destructive' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
-      { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
+      { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/financeiro-bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },
     ]
   },
@@ -125,7 +126,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Shield, label: 'SST', path: '/sst', color: 'text-success' },
       { icon: Calculator, label: 'Rescisão', path: '/calculadora-rescisao', color: 'text-warning' },
       { icon: Users, label: 'Importação', path: '/importacao', color: 'text-info' },
-      { icon: Megaphone, label: 'Comunicação', path: '/comunicacao', color: 'text-warning' },
+      { icon: Megaphone, label: 'Comunicação', path: '/comunicacao-interna', color: 'text-warning' },
       { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
       { icon: Settings, label: 'Configurações', path: '/configuracoes', color: 'text-muted-foreground' },
       { icon: Gift, label: 'Promo Brindes', path: '/promo-brindes', color: 'text-warning' },

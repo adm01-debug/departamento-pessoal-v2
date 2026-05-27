@@ -95,6 +95,8 @@ const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
 const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const PremiacoesPage = lazy(() => import('@/pages/PremiacoesPage'));
+
 
 
 function PageLoader() {
@@ -246,7 +248,9 @@ export default function App() {
         <Route path="integracoes" element={<LazyPage Component={IntegracoesPage} />} />
         <Route path="banco-horas" element={<LazyPage Component={BancoHorasPage} />} />
         
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="premiacoes" element={<LazyPage Component={PremiacoesPage} />} />
+        <Route path="*" element={<LazyPage Component={NotFoundPage} />} />
+
       </Route>
       
       {/* Public route */}
