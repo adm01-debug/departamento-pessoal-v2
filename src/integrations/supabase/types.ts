@@ -20947,6 +20947,7 @@ export type Database = {
       }
       format_type_string: { Args: { "": string }; Returns: string }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
+      get_auth_empresa_id: { Args: never; Returns: string }
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
         Returns: number
