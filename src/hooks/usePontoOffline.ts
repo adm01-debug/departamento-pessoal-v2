@@ -62,13 +62,14 @@ export function usePontoOffline() {
   };
 
   useEffect(() => {
-    window.addEventListener('online', sync);
+    const handleOnline = () => sync();
+    window.addEventListener('online', handleOnline);
     // Tenta sincronizar se já estiver online ao montar
     if (navigator.onLine) {
       sync();
     }
-    return () => window.removeEventListener('online', sync);
-  }, []);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [sync]);
 
   return { 
     offlineBatidasCount: queueSize, 
