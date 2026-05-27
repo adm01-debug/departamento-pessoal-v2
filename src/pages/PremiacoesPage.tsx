@@ -206,7 +206,7 @@ export default function PremiacoesPage() {
                         <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter flex items-center gap-1">
                           <DollarSign className="h-3 w-3" /> Orçamento
                         </p>
-                        <p className="text-xs font-semibold">{formatCurrency(c.orcamento_estimado)}</p>
+                        <p className="text-xs font-semibold">{formatCurrency(c.orcamento_estimado || 0)}</p>
                       </div>
                     </div>
 
