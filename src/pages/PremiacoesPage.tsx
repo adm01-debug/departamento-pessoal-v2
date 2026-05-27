@@ -298,8 +298,8 @@ export default function PremiacoesPage() {
                         onChange={(e) => setFaixaMetaFiltro(e.target.value)}
                       >
                         <option>Todas as Metas</option>
-                        <option>Meta > 100%</option>
-                        <option>Meta > 120%</option>
+                          <option>Meta {'>'} 100%</option>
+                          <option>Meta {'>'} 120%</option>
                       </select>
                     </div>
                     <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase rounded-xl" onClick={() => handleExport('csv')}>
