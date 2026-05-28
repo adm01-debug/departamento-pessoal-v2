@@ -65,7 +65,7 @@ export const automacaoService = {
     if (!asos) return;
 
     for (const aso of asos) {
-      const colab = (aso as any).colaborador;
+      const colab = (aso as Record<string, unknown>).colaborador;
       const mensagem = `Olá ${colab.nome_completo}, seu exame médico (ASO) vence em 30 dias (${dataAlerta.toLocaleDateString('pt-BR')}). Favor agendar com o RH.`;
       
       await criarNotificacao({
@@ -97,7 +97,7 @@ export const automacaoService = {
     if (!periodos) return;
 
     for (const periodo of periodos) {
-      const colab = (periodo as any).colaborador;
+      const colab = (periodo as Record<string, unknown>).colaborador;
       
       await criarNotificacao({
         titulo: 'Término de Experiência Próximo',

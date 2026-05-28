@@ -75,8 +75,8 @@ function useDashboardStats(enabled: boolean) {
         supabase.from("admissoes").select("id", { count: "exact", head: true }).gte("data_prevista", inicioMes),
         supabase.from("desligamentos").select("id", { count: "exact", head: true }).gte("data_desligamento", inicioMes),
         supabase.from("colaboradores").select("departamento").eq("status", "ativo"),
-        supabase.from("vw_kpi_turnover" as any).select("taxa_turnover").limit(1),
-        supabase.from("vw_kpi_absenteismo" as any).select("taxa_absenteismo").limit(1),
+        supabase.from("vw_kpi_turnover" as Record<string, unknown>).select("taxa_turnover").limit(1),
+        supabase.from("vw_kpi_absenteismo" as Record<string, unknown>).select("taxa_absenteismo").limit(1),
         supabase.from("colaboradores").select("id, salario_base, data_admissao").eq("status", "ativo"),
         supabase.from("ferias").select("colaborador_id, data_fim").neq("status", "cancelado"),
       ]);
@@ -163,8 +163,8 @@ function usePendencias(enabled: boolean) {
         supabase.from("ferias").select("*", { count: "exact", head: true }).eq("status", "pendente"),
         supabase.from("afastamentos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
         supabase.from("admissoes").select("*", { count: "exact", head: true }).filter('etapa', 'not.in', '("concluida","cancelada")'),
-        supabase.from("assinaturas_digitais" as any).select("*", { count: "exact", head: true }).eq("status", "pendente"),
-        supabase.from("solicitacoes_ajuste_ponto" as any).select("*", { count: "exact", head: true }).eq("status", "pendente"),
+        supabase.from("assinaturas_digitais" as Record<string, unknown>).select("*", { count: "exact", head: true }).eq("status", "pendente"),
+        supabase.from("solicitacoes_ajuste_ponto" as Record<string, unknown>).select("*", { count: "exact", head: true }).eq("status", "pendente"),
       ]);
       const pendencias: Pendencia[] = [];
       if (feriasPendentes && feriasPendentes > 0) pendencias.push({ tipo: "ferias", descricao: `${feriasPendentes} férias pendentes`, quantidade: feriasPendentes, icone: 'ferias' });

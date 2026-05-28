@@ -50,13 +50,13 @@ export const rescisaoService = {
 
       // 2. Realizar o cálculo
       const result = await calcularRescisao({
-        salario: params.salario_base || (anterior as any).salario_base,
+        salario: params.salario_base || (anterior as Record<string, unknown>).salario_base,
         dataAdmissao: (anterior.colaborador as any)?.data_admissao || params.data_admissao,
-        dataDesligamento: params.data_desligamento || (anterior as any).data_desligamento,
-        tipo: params.tipo || (anterior as any).tipo,
-        avisoTrabalhado: params.aviso_trabalhado !== undefined ? params.aviso_trabalhado : (anterior as any).aviso_trabalhado,
-        feriasVencidas: params.ferias_vencidas !== undefined ? params.ferias_vencidas : (anterior as any).ferias_vencidas_check,
-        saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as any).saldo_fgts || 0),
+        dataDesligamento: params.data_desligamento || (anterior as Record<string, unknown>).data_desligamento,
+        tipo: params.tipo || (anterior as Record<string, unknown>).tipo,
+        avisoTrabalhado: params.aviso_trabalhado !== undefined ? params.aviso_trabalhado : (anterior as Record<string, unknown>).aviso_trabalhado,
+        feriasVencidas: params.ferias_vencidas !== undefined ? params.ferias_vencidas : (anterior as Record<string, unknown>).ferias_vencidas_check,
+        saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as Record<string, unknown>).saldo_fgts || 0),
         dependentes: (anterior.colaborador as any)?.dependentes_irrf || 0,
       });
       const resultado = result;

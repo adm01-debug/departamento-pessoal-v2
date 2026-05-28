@@ -149,7 +149,7 @@ export function MorningBriefing() {
             Erro de Esquema (Banco Externo)
           </CardTitle>
           <CardDescription className="text-destructive/80 font-mono text-xs">
-            {(error as any).message}
+            {(error as Record<string, unknown>).message}
           </CardDescription>
         </CardHeader>
         <CardContent>

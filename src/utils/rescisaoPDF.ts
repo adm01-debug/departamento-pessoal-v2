@@ -43,7 +43,7 @@ export async function gerarPDFRescisao(form: any, result: RescisaoResult, audito
   doc.text(`Desligamento: ${form.dataDesligamento ? new Date(form.dataDesligamento).toLocaleDateString('pt-BR') : '—'}`, 110, y); y += 6;
   doc.text(`Tipo: ${form.tipo === 'sem_justa_causa' ? 'Sem Justa Causa' : form.tipo === 'justa_causa' ? 'Justa Causa' : 'Pedido de Demissão'}`, 14, y); y += 10;
 
-  (doc as any).autoTable({
+  (doc as Record<string, unknown>).autoTable({
     startY: y,
     head: [['Verba', 'Referência', 'Valor (R$)']],
     body: [
@@ -66,7 +66,7 @@ export async function gerarPDFRescisao(form: any, result: RescisaoResult, audito
     styles: { fontSize: 9 },
   });
 
-  y = (doc as any).lastAutoTable.finalY + 15;
+  y = (doc as Record<string, unknown>).lastAutoTable.finalY + 15;
   
   // Checklist de Homologação se disponível no form (desligamento object)
   if (form.checklist_homologacao !== undefined) {

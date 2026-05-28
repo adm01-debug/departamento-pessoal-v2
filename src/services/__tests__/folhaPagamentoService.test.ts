@@ -30,7 +30,7 @@ describe('folhaPagamentoService', () => {
       });
       const mockUpsert = vi.fn().mockResolvedValue({ error: null });
 
-      (supabase.from as any).mockImplementation((table: string) => {
+      (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
         if (table === 'colaboradores') {
           return { select: mockSelect, eq: mockEq, single: mockSingle };
         }
@@ -57,7 +57,7 @@ describe('folhaPagamentoService', () => {
   describe('fecharFolha', () => {
     it('should throw error if there are critical alerts', async () => {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
-      (validadorFolha.validarFolha as any).mockResolvedValueOnce([
+      (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([
         { gravidade: 'alta', mensagem: 'Erro crítico' }
       ]);
 
@@ -70,7 +70,7 @@ describe('folhaPagamentoService', () => {
 
     it('should update folha status to fechada if no critical alerts', async () => {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
-      (validadorFolha.validarFolha as any).mockResolvedValueOnce([]);
+      (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([]);
 
       const mockUpdate = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
@@ -78,7 +78,7 @@ describe('folhaPagamentoService', () => {
       const mockSingle = vi.fn().mockResolvedValue({ data: null, error: null }); // For the competency fetch
       const mockInsert = vi.fn().mockResolvedValue({ error: null });
 
-      (supabase.from as any).mockImplementation((table: string) => {
+      (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
         if (table === 'folhas_pagamento') {
           return {
             update: mockUpdate,

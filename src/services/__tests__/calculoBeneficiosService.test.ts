@@ -32,7 +32,7 @@ describe('calculoBeneficiosService', () => {
         error: null 
       });
 
-      (supabase.from as any).mockImplementation((table: string) => {
+      (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
         if (table === 'colaboradores') {
           return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: mockSingle };
         }
@@ -48,7 +48,7 @@ describe('calculoBeneficiosService', () => {
       });
       
       // Override for specific chain
-      (supabase.from as any).mockReturnValue({
+      (supabase.from as Record<string, unknown>).mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: mockSingle,
@@ -57,7 +57,7 @@ describe('calculoBeneficiosService', () => {
       });
 
       // Simpler way for this specific test case
-      (supabase.from as any).mockImplementation((table: string) => {
+      (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
           const chain = {
               select: vi.fn().mockReturnThis(),
               eq: vi.fn().mockReturnThis(),
@@ -69,7 +69,7 @@ describe('calculoBeneficiosService', () => {
           } else if (table === 'beneficios_colaborador') {
               chain.eq.mockReturnThis();
               chain.single = undefined as any; // No single for this one
-              (chain as any).then = (resolve: any) => resolve({ 
+              (chain as Record<string, unknown>).then = (resolve: any) => resolve({ 
                   data: [{ beneficio: { tipo: 'transporte', valor: 5.0 }, quantidade_diaria: 2 }], 
                   error: null 
               });
@@ -91,7 +91,7 @@ describe('calculoBeneficiosService', () => {
 
   describe('valeAlimentacaoService.calcularCredito', () => {
     it('should calculate daily proportional value if benefit is daily (value < 100)', async () => {
-      (supabase.from as any).mockReturnValue({
+      (supabase.from as Record<string, unknown>).mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: { valor: 25, tipo: 'refeicao' }, error: null })
@@ -102,7 +102,7 @@ describe('calculoBeneficiosService', () => {
     });
 
     it('should return full value if benefit is monthly (value >= 100)', async () => {
-      (supabase.from as any).mockReturnValue({
+      (supabase.from as Record<string, unknown>).mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: { valor: 800, tipo: 'alimentacao' }, error: null })

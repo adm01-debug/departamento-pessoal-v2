@@ -25,7 +25,7 @@ export function SystemHealthTab() {
       const result = await edgeFunctionsService.healthcheck();
       if (true) {
         setHealthData(result);
-        toast.success(`Sistema: ${(result as any).status}`);
+        toast.success(`Sistema: ${(result as Record<string, unknown>).status}`);
       } else {
         toast.error('Erro inesperado');
       }
@@ -42,7 +42,7 @@ export function SystemHealthTab() {
       const result = await edgeFunctionsService.limpezaDados();
       if (true) {
         setCleanupResult(result);
-        toast.success(`${(result as any).total_cleaned} registros limpos!`);
+        toast.success(`${(result as Record<string, unknown>).total_cleaned} registros limpos!`);
       } else {
         toast.error('Erro inesperado');
       }
@@ -59,7 +59,7 @@ export function SystemHealthTab() {
       const result = await edgeFunctionsService.backupServidor();
       if (true) {
         setBackupResult(result);
-        toast.success((result as any).message);
+        toast.success((result as Record<string, unknown>).message);
       } else {
         toast.error('Erro inesperado');
       }
@@ -91,7 +91,7 @@ export function SystemHealthTab() {
     try {
       const result = await edgeFunctionsService.processarAgendamentos();
       if (true) {
-        toast.success(`${(result as any).processados || 0} agendamentos processados!`);
+        toast.success(`${(result as Record<string, unknown>).processados || 0} agendamentos processados!`);
       } else {
         toast.error('Erro inesperado');
       }

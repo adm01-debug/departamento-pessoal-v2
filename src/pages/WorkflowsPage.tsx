@@ -261,7 +261,7 @@ export default function WorkflowsPage() {
 
                     return (
                       <TableRow key={e.id} className="hover:bg-accent/30 transition-colors cursor-pointer" onClick={() => { setSelectedExec(e); setShowLog(true); }}>
-                        <TableCell className="font-body font-medium">{(e as any).workflow?.nome || '—'}</TableCell>
+                        <TableCell className="font-body font-medium">{(e as Record<string, unknown>).workflow?.nome || '—'}</TableCell>
                         <TableCell><Badge variant="outline" className="font-body text-xs">{tipoIcons[e.entidade_tipo] || '📋'} {e.entidade_tipo}</Badge></TableCell>
                         <TableCell>
                           <Badge className={cn("font-body", config.color)}>
@@ -327,7 +327,7 @@ export default function WorkflowsPage() {
                       <motion.div key={e.id} layout>
                         <Card className="border-border/30 rounded-xl hover:shadow-elevated transition-all">
                           <CardContent className="p-3">
-                            <p className="text-xs font-body font-medium">{(e as any).workflow?.nome || 'Workflow'}</p>
+                            <p className="text-xs font-body font-medium">{(e as Record<string, unknown>).workflow?.nome || 'Workflow'}</p>
                             <div className="flex items-center justify-between mt-1">
                               <Badge variant="outline" className="text-[10px] font-body">{e.entidade_tipo}</Badge>
                               <span className="text-[10px] text-muted-foreground font-body">{new Date(e.created_at).toLocaleDateString('pt-BR')}</span>

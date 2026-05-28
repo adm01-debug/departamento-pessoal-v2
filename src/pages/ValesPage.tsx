@@ -169,7 +169,7 @@ export default function ValesPage() {
                 <TableBody>
                   {recargas.map((r: any) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-medium">{(r as any).colaborador?.nome_completo || '-'}</TableCell>
+                      <TableCell className="font-medium">{(r as Record<string, unknown>).colaborador?.nome_completo || '-'}</TableCell>
                       <TableCell>{fmt(r.valor)}</TableCell>
                       <TableCell>{r.mes_referencia || '-'}</TableCell>
                       <TableCell>{r.data_recarga ? new Date(r.data_recarga).toLocaleDateString('pt-BR') : '-'}</TableCell>

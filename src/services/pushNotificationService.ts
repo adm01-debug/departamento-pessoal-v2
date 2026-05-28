@@ -40,13 +40,13 @@ export const pushNotificationService = {
       const { error } = await supabase.from('').upsert({
         user_id: userId,
         endpoint,
-        p256dh: (keys as any).p256dh,
-        auth_key: (keys as any).auth,
+        p256dh: (keys as Record<string, unknown>).p256dh,
+        auth_key: (keys as Record<string, unknown>).auth,
         ativo: true,
         device_info: {
           userAgent: navigator.userAgent,
           language: navigator.language,
-          platform: (navigator as any).platform
+          platform: (navigator as Record<string, unknown>).platform
         }
       }, { onConflict: 'endpoint' });
 

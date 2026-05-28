@@ -20,7 +20,7 @@ export function GlobalAuditLogTab() {
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ['global-audit-logs', tabelaFilter],
     queryFn: async () => {
-      let query = (supabase as any).from('audit_log').select('*').order('created_at', { ascending: false }).limit(200);
+      let query = (supabase as Record<string, unknown>).from('audit_log').select('*').order('created_at', { ascending: false }).limit(200);
       if (tabelaFilter !== 'todas') {
         query = query.eq('tabela', tabelaFilter);
       }

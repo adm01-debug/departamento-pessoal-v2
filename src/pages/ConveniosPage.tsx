@@ -184,8 +184,8 @@ export default function ConveniosPage() {
                 <TableBody>
                   {vinculos.map((v: any) => (
                     <TableRow key={v.id}>
-                      <TableCell>{(v as any).convenio?.nome || '-'}</TableCell>
-                      <TableCell className="font-medium">{(v as any).colaborador?.nome_completo || '-'}</TableCell>
+                      <TableCell>{(v as Record<string, unknown>).convenio?.nome || '-'}</TableCell>
+                      <TableCell className="font-medium">{(v as Record<string, unknown>).colaborador?.nome_completo || '-'}</TableCell>
                       <TableCell>{v.limite_individual ? fmt(v.limite_individual) : '-'}</TableCell>
                       <TableCell>{v.saldo_utilizado ? fmt(v.saldo_utilizado) : 'R$ 0,00'}</TableCell>
                       <TableCell><Badge variant={v.ativo ? 'default' : 'secondary'}>{v.ativo ? 'Ativo' : 'Inativo'}</Badge></TableCell>

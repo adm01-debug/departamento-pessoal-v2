@@ -40,7 +40,7 @@ export default function ColaboradorDetalhesPage() {
 
   const { data: colaborador, isLoading } = useQuery({
     queryKey: ['colaborador', id],
-    queryFn: () => (colaboradorService as any).buscarPorId(id!),
+    queryFn: () => (colaboradorService as Record<string, unknown>).buscarPorId(id!),
     enabled: !!id,
   });
 

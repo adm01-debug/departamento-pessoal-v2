@@ -112,7 +112,7 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: Record
     if (existing) {
       const { data, error } = await (supabase.from('') as any)
         .update(dados)
-        .eq('id', (existing as any).id)
+        .eq('id', (existing as Record<string, unknown>).id)
         .select()
         .maybeSingle();
       if (error) throw error;

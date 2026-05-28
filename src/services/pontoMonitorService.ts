@@ -5,7 +5,7 @@ export const pontoMonitorService = {
   logEvent: async (eventName: string, details: any) => {
     try {
       // Usando a tabela de auditoria para monitoramento técnico também
-      const { error } = await (supabase as any).from('ponto_auditoria').insert({
+      const { error } = await (supabase as Record<string, unknown>).from('ponto_auditoria').insert({
         tabela_nome: 'SYSTEM_EVENT',
         registro_id: '00000000-0000-0000-0000-000000000000',
         acao: eventName,

@@ -503,7 +503,7 @@ export default function ESocialPage() {
                                 <TooltipContent className="bg-destructive text-destructive-foreground border-none max-w-[300px] p-3 rounded-xl shadow-glow">
                                   <p className="font-bold mb-1">Erro de Transmissão:</p>
                                   <p className="max-w-xs text-xs">{(e.erros as any)?.mensagem || (e.erros as any)?.validacao?.[0]?.mensagem || (e.erros as any)?.detalhes || 'Falha na recepção pelo Governo'}</p>
-                                  {(e.erros as any)?.codigo && <p className="text-[10px] mt-2 opacity-80">Código: {(e.erros as any).codigo}</p>}
+                                  {(e.erros as any)?.codigo && <p className="text-[10px] mt-2 opacity-80">Código: {(e.erros as Record<string, unknown>).codigo}</p>}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>

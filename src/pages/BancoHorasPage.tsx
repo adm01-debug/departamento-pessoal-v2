@@ -49,7 +49,7 @@ export default function BancoHorasPage() {
               {registros.length === 0 ? <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum registro no banco de horas</TableCell></TableRow> :
                 registros.map((r: any) => (
                   <TableRow key={r.id}>
-                    <TableCell className="font-medium">{(r as any).colaborador?.nome_completo || '—'}</TableCell>
+                    <TableCell className="font-medium">{(r as Record<string, unknown>).colaborador?.nome_completo || '—'}</TableCell>
                     <TableCell>{r.data}</TableCell>
                     <TableCell>{r.tipo === 'credito' ? <Badge className="bg-success/20 text-success"><TrendingUp className="h-3 w-3 mr-1" />Crédito</Badge> : <Badge variant="destructive"><TrendingDown className="h-3 w-3 mr-1" />Débito</Badge>}</TableCell>
                     <TableCell className="font-mono">{r.horas}</TableCell>

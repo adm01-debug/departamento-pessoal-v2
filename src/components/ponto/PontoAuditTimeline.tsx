@@ -49,7 +49,7 @@ export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) 
         }
       )
       .subscribe();
-    return () => { (supabase as any).removeChannel(channel); };
+    return () => { (supabase as Record<string, unknown>).removeChannel(channel); };
   }, [queryClient]);
 
 
