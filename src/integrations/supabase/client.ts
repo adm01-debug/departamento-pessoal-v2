@@ -3,19 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import type { Database } from './types';
 
-// Configurações do Supabase EXTERNO (hncgwjbzdajfdztqgefe) via .env
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.warn("Supabase env variables are missing. Using defaults for hncgwjbzdajfdztqgefe.");
-}
+// Configurações do Supabase EXTERNO (corporativo - hncgwjbzdajfdztqgefe).
+// Usamos valores fixos do projeto corporativo, ignorando o .env do Lovable Cloud,
+// pois os usuários reais (ex.: adm01@promobrindes.com.br) existem APENAS no
+// banco corporativo. Quando o .env apontava para o projeto do Lovable Cloud,
+// o Auth retornava "Invalid API key" / "Invalid credentials".
+const SUPABASE_URL = 'https://hncgwjbzdajfdztqgefe.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
-  SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co',
-  SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE',
-
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
   {
     auth: {
       storage: localStorage,
@@ -67,20 +66,22 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.error) {
       const errorMsg = json.error || `Erro HTTP ${res.status}`;
-      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', errorMsg);
-      
-      // Grita no UI para o desenvolvedor ver exatamente o que falta
-      toast.error(`ERRO DE BANCO: ${errorMsg}`, {
-        duration: 10000, // 10 segundos para dar tempo de ler
-        style: { background: '#fee2e2', color: '#991b1b', border: '1px solid #f87171' },
-      });
+      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', action, target, errorMsg);
 
-      throw new Error(errorMsg);
+      // Erros de função/tabela ausente NÃO devem poluir a UI com toast.
+      // Apenas propagamos o erro para quem chamou tratar (ou ignorar).
+      const isMissingObject = /Could not find the (function|table)|schema cache|does not exist/i.test(errorMsg);
+      if (!isMissingObject) {
+        toast.error(`Erro de banco: ${errorMsg}`, {
+          duration: 6000,
+        });
+      }
+
+      return { data: null, count: 0, error: { message: errorMsg } };
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
-    
-    // Log do tempo de resposta se for lento
+
     if (json.duration_ms > 1000) {
       console.warn(`🕒 [BRIDGE_SLOW_QUERY] ${action} em ${target} demorou ${json.duration_ms}ms`);
     }
@@ -88,14 +89,13 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     return { data, count: json.count, error: null };
   } catch (err: any) {
     const isNetworkError = err.message === 'Failed to fetch' || err.name === 'TypeError';
-    const errorMsg = isNetworkError ? 'Erro de conexão com o banco externo. Verifique sua internet.' : (err?.message || 'Erro desconhecido');
-    
+    const errorMsg = isNetworkError ? 'Erro de conexão com o banco. Verifique sua internet.' : (err?.message || 'Erro desconhecido');
+
     console.error('🔴 [BRIDGE_FATAL_ERROR]', err);
 
-    toast.error(`ERRO CRÍTICO: ${errorMsg}`, {
-      duration: 5000,
-      description: 'Tente recarregar a página se o problema persistir.',
-    });
+    if (isNetworkError) {
+      toast.error(errorMsg, { duration: 5000 });
+    }
 
     return { data: null, error: { message: errorMsg } };
   }
