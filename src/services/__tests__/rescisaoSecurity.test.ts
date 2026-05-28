@@ -62,7 +62,7 @@ describe('Rescisão Module — Security and RLS Scenarios', () => {
         limit: vi.fn()
       }))
     }));
-    (supabase.from as any).mockReturnValue({ select: selectSpy });
+    (supabase.from as Record<string, unknown>).mockReturnValue({ select: selectSpy });
 
     // Listing should not necessarily include detailed breakdown unless requested
     await supabase.from('desligamentos').select('id, colaborador_id, data_desligamento');

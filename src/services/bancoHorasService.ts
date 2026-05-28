@@ -11,8 +11,8 @@ export const bancoHorasService = {
     if (error) throw error;
     if (!data) return 0;
     return data.reduce((saldo, item) => {
-      const horas = parseFloat((item as any).quantidade_horas) || 0;
-      return (item as any).tipo === 'credito' ? saldo + horas : saldo - horas;
+      const horas = parseFloat((item as Record<string, unknown>).quantidade_horas) || 0;
+      return (item as Record<string, unknown>).tipo === 'credito' ? saldo + horas : saldo - horas;
     }, 0);
   },
   async registrar(d: any) {

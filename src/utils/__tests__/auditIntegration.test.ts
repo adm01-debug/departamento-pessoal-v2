@@ -24,14 +24,14 @@ vi.mock('@/integrations/supabase/client', () => ({
 describe('Audit Log & RLS Integration Logic', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (supabase.auth.getUser as any).mockResolvedValue({
+    (supabase.auth.getUser as Record<string, unknown>).mockResolvedValue({
       data: { user: { id: 'user-123', email: 'test@example.com' } },
     });
   });
 
   it('should include tenant isolation fields when logging', async () => {
     const insertSpy = vi.fn().mockResolvedValue({ error: null });
-    (supabase.from as any).mockReturnValue({ insert: insertSpy });
+    (supabase.from as Record<string, unknown>).mockReturnValue({ insert: insertSpy });
 
     await auditLogger.log({
       tabela: 'desligamentos',
@@ -50,9 +50,9 @@ describe('Audit Log & RLS Integration Logic', () => {
   });
 
   it('should ensure that only authenticated users can trigger audit inserts', async () => {
-     (supabase.auth.getUser as any).mockResolvedValue({ data: { user: null } });
+     (supabase.auth.getUser as Record<string, unknown>).mockResolvedValue({ data: { user: null } });
      const insertSpy = vi.fn();
-     (supabase.from as any).mockReturnValue({ insert: insertSpy });
+     (supabase.from as Record<string, unknown>).mockReturnValue({ insert: insertSpy });
 
      await auditLogger.log({
        tabela: 'desligamentos',

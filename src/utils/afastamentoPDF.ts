@@ -105,7 +105,7 @@ export async function gerarAfastamentosPDF(
     });
 
     // Rodapé
-    const pageCount = (doc as any).internal.getNumberOfPages();
+    const pageCount = (doc as Record<string, unknown>).internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);

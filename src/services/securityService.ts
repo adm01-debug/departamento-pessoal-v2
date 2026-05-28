@@ -50,7 +50,7 @@ export interface GeoBlockedAttempt {
 export const securityService = {
   async getBlockedIps(): Promise<BlockedIp[]> {
     const { data, error } = await supabase
-      .from('blocked_ips' as any)
+      .from('')
       .select('*')
       .order('created_at', { ascending: false });
     if (error) {
@@ -63,7 +63,7 @@ export const securityService = {
 
   async unblockIp(id: string) {
     const { error } = await supabase
-      .from('blocked_ips' as any)
+      .from('')
       .delete()
       .eq('id', id);
     if (error) {
@@ -76,7 +76,7 @@ export const securityService = {
 
   async getLoginAttempts(): Promise<LoginAttempt[]> {
     const { data, error } = await supabase
-      .from('login_attempts' as any)
+      .from('')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
@@ -90,7 +90,7 @@ export const securityService = {
 
   async getSecurityAlerts(): Promise<SecurityAlert[]> {
     const { data, error } = await supabase
-      .from('security_alerts' as any)
+      .from('')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
@@ -100,7 +100,7 @@ export const securityService = {
 
   async getGeoBlockedAttempts(): Promise<GeoBlockedAttempt[]> {
     const { data, error } = await supabase
-      .from('geo_blocked_attempts' as any)
+      .from('')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
@@ -110,7 +110,7 @@ export const securityService = {
 
   async getRateLimitLogs() {
     const { data, error } = await supabase
-      .from('rate_limit_logs' as any)
+      .from('')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
@@ -120,7 +120,7 @@ export const securityService = {
 
   async resolveAlert(id: string, userId: string) {
     const { error } = await supabase
-      .from('security_alerts' as any)
+      .from('')
       .update({ 
         resolved: true, 
         resolved_by: userId, 

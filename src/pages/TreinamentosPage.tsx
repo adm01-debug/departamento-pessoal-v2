@@ -137,8 +137,8 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
                   {i + 1}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold truncate max-w-[150px]">{(v as any).curso?.nome || 'Curso'}</p>
-                  <p className="text-[10px] text-muted-foreground">{(v as any).curso?.carga_horaria || 0} horas de conteúdo</p>
+                  <p className="text-sm font-semibold truncate max-w-[150px]">{(v as Record<string, unknown>).curso?.nome || 'Curso'}</p>
+                  <p className="text-[10px] text-muted-foreground">{(v as Record<string, unknown>).curso?.carga_horaria || 0} horas de conteúdo</p>
                 </div>
               </div>
               <Button 
@@ -168,7 +168,7 @@ export default function TreinamentosPage() {
   const { data: trilhas = [], isLoading: loadTrilhas } = useQuery({ queryKey: ['trilhas', empresaAtual?.id], queryFn: () => catalogoCursoService.listarTrilhas(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: instancias = [], isLoading: loadInst } = useQuery({ queryKey: ['treinamento_instancias', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInstancias(), enabled: !!empresaAtual?.id });
-  const { data: certificados = [], isLoading: loadCert } = useQuery({ queryKey: ['treinamento_certificados', empresaAtual?.id], queryFn: () => (catalogoCursoService as any).listarCertificados(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: certificados = [], isLoading: loadCert } = useQuery({ queryKey: ['treinamento_certificados', empresaAtual?.id], queryFn: () => (catalogoCursoService as Record<string, unknown>).listarCertificados(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   // === Treinamentos ===

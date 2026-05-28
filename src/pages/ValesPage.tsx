@@ -59,7 +59,7 @@ export default function ValesPage() {
   const { data: recargas = [], isLoading: loadRec } = useQuery({
     queryKey: ['recargas-vale', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('recargas_vale' as any).select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false }).limit(100);
+      const { data, error } = await supabase.from('').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false }).limit(100);
       if (error) throw error;
       return data || [];
     },
@@ -68,7 +68,7 @@ export default function ValesPage() {
 
   const criarRecarga = useMutation({
     mutationFn: async (d: typeof recForm) => {
-      const { error } = await supabase.from('recargas_vale' as any).insert({
+      const { error } = await supabase.from('').insert({
         colaborador_id: d.colaborador_id || null,
         vale_id: d.vale_id || null,
         valor: Number(d.valor),
@@ -169,7 +169,7 @@ export default function ValesPage() {
                 <TableBody>
                   {recargas.map((r: any) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-medium">{(r as any).colaborador?.nome_completo || '-'}</TableCell>
+                      <TableCell className="font-medium">{(r as Record<string, unknown>).colaborador?.nome_completo || '-'}</TableCell>
                       <TableCell>{fmt(r.valor)}</TableCell>
                       <TableCell>{r.mes_referencia || '-'}</TableCell>
                       <TableCell>{r.data_recarga ? new Date(r.data_recarga).toLocaleDateString('pt-BR') : '-'}</TableCell>

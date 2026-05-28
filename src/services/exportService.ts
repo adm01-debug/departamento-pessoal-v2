@@ -173,7 +173,7 @@ export const exportPortaria671PDF = (solicitacao: any) => {
     });
     
     // Compliance Info
-    const nextY = (doc as any).lastAutoTable.finalY + 15;
+    const nextY = (doc as Record<string, unknown>).lastAutoTable.finalY + 15;
     doc.text('Validações de Conformidade', 14, nextY);
     
     const complianceData = [

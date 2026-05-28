@@ -27,7 +27,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   ) {}
 
   protected getQuery() {
-    return (supabase as any).from(this.table);
+    return (supabase as Record<string, unknown>).from(this.table);
   }
 
   async listar(options: ListOptions = {}): Promise<ListResponse<T>> {
@@ -102,7 +102,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
 
   async atualizar(id: string, payload: UpdateDTO): Promise<T> {
     try {
-      let query = this.getQuery().update(payload as any).eq('id', id);
+      let query = this.getQuery().update(payload as Record<string, unknown>).eq('id', id);
 
       if (this.options.useVersioning) {
         const { data: current, error: currentError } = await this.getQuery()

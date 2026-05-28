@@ -101,7 +101,7 @@ async function fetchReportData(id: string, empresaId?: string) {
       }; 
     }
     case 'turnover': {
-      const { data, error } = await supabase.from('vw_kpi_turnover' as any).select('*');
+      const { data, error } = await supabase.from('').select('*');
       if (error) throw error;
       return {
         title: 'Análise de Turnover',

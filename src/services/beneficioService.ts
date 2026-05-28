@@ -81,7 +81,7 @@ class BeneficioService extends BaseService<any> {
   }
 
   async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any): Promise<any> {
-    const { data, error } = await (supabase as any).from('beneficios_colaborador').insert({
+    const { data, error } = await (supabase as Record<string, unknown>).from('beneficios_colaborador').insert({
       beneficio_id: beneficioId,
       colaborador_id: colaboradorId,
       ...dados

@@ -58,7 +58,7 @@ export async function notificarAjustePonto(
       let targetUserId = null;
       if (colab.email) {
         const { data: profile } = await supabase
-          .from('profiles' as any)
+          .from('')
           .select('user_id')
           .eq('email', colab.email)
           .maybeSingle();

@@ -90,7 +90,7 @@ export default function ControleAcessoPage() {
               {registros.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum registro de acesso</TableCell></TableRow> :
                 registros.map((r: any) => (
                   <TableRow key={r.id}>
-                    <TableCell className="font-medium">{(r as any).colaborador?.nome_completo || '—'}</TableCell>
+                    <TableCell className="font-medium">{(r as Record<string, unknown>).colaborador?.nome_completo || '—'}</TableCell>
                     <TableCell>{r.tipo === 'entrada' ? <Badge className="bg-success/20 text-success"><LogIn className="h-3 w-3 mr-1" />Entrada</Badge> : <Badge variant="secondary"><LogOut className="h-3 w-3 mr-1" />Saída</Badge>}</TableCell>
                     <TableCell><Badge variant="outline">{r.metodo}</Badge></TableCell>
                     <TableCell>{r.local || '—'}</TableCell>

@@ -12,7 +12,7 @@ export function LogsIntegracoesTab() {
     queryKey: ['logs-integracoes'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('logs_integracoes' as any)
+        .from('')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(100);

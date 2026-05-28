@@ -64,7 +64,7 @@ class FeriasService extends BaseService<Ferias> {
 
   async getAprovacoesLog(feriasId: string): Promise<any[]> {
     const { data, error } = await (supabase as any)
-      .from('ferias_aprovacoes_log' as any)
+      .from('')
       .select('*')
       .eq('ferias_id', feriasId)
       .order('created_at', { ascending: true });
@@ -74,19 +74,19 @@ class FeriasService extends BaseService<Ferias> {
   }
 
   async criarPeriodoAquisitivo(d: any): Promise<any> {
-    const { data, error } = await (supabase as any).from('periodos_aquisitivos').insert(d).select().maybeSingle();
+    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').insert(d).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
   async atualizarPeriodoAquisitivo(id: string, d: any): Promise<any> {
-    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
+    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
   async excluirPeriodoAquisitivo(id: string): Promise<void> {
-    const { error } = await (supabase as any).from('periodos_aquisitivos').delete().eq('id', id);
+    const { error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').delete().eq('id', id);
     if (error) throw error;
   }
 
@@ -101,7 +101,7 @@ class FeriasService extends BaseService<Ferias> {
 
 
   async aprovar(id: string): Promise<void> {
-    const { error } = await this.getQuery().update({ status: 'aprovada' } as any).eq('id', id);
+    const { error } = await this.getQuery().update({ status: 'aprovada' } as Record<string, unknown>).eq('id', id);
     if (error) throw error;
   }
 
@@ -137,7 +137,7 @@ class FeriasService extends BaseService<Ferias> {
   }
 
   async rejeitar(id: string): Promise<void> {
-    const { error } = await this.getQuery().update({ status: 'rejeitada' } as any).eq('id', id);
+    const { error } = await this.getQuery().update({ status: 'rejeitada' } as Record<string, unknown>).eq('id', id);
     if (error) throw error;
   }
 
