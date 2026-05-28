@@ -16,7 +16,9 @@ const defaultConfig: PWAConfig = {
 };
 
 export const initialize = async (config: PWAConfig = defaultConfig): Promise<void> => {
-  console.log('Initializing PWA feature: ServiceWorkerAdvanced');
+  if (typeof location !== 'undefined' && location.hostname === 'localhost') {
+    console.log('Initializing PWA feature: ServiceWorkerAdvanced');
+  }
 };
 
 export const isSupported = (): boolean => {
