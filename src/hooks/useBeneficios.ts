@@ -7,7 +7,7 @@ export function useBeneficios() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
 
-  const crud = useGenericCrud<any>({
+  const crud = useGenericCrud<unknown>({
     queryKey: 'beneficios',
     service: beneficioService,
     filters: { empresa_id: empresaId },

@@ -8,6 +8,8 @@ import { jornadaHorariosService } from '@/services/jornadaHorariosService';
 import { bancoHorasConfigService } from '@/services/bancoHorasConfigService';
 import { toast } from 'sonner';
 
+type DataRecord = Record<string, unknown>;
+
 // === BATIDAS DE PONTO ===
 export function useBatidasPonto(colaboradorId: string, dataInicio?: string, dataFim?: string) {
   return useQuery({
@@ -29,9 +31,9 @@ export function useBatidasPontoDia(data: string) {
 export function useRegistrarBatida() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (d: any) => batidasPontoService.registrar(d),
+    mutationFn: (d: DataRecord) => batidasPontoService.registrar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['batidas-ponto'] }); toast.success('Batida registrada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -56,18 +58,18 @@ export function useFaltasColaborador(colaboradorId: string) {
 export function useCriarFalta() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (d: any) => faltasService.criar(d),
+    mutationFn: (d: DataRecord) => faltasService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['faltas'] }); toast.success('Falta registrada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
 export function useAtualizarFalta() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...d }: any) => faltasService.atualizar(id, d),
+    mutationFn: ({ id, ...d }: { id: string } & DataRecord) => faltasService.atualizar(id, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['faltas'] }); toast.success('Falta atualizada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -76,7 +78,7 @@ export function useExcluirFalta() {
   return useMutation({
     mutationFn: (id: string) => faltasService.excluir(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['faltas'] }); toast.success('Falta excluída'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -101,18 +103,18 @@ export function useMedidasDisciplinaresColaborador(colaboradorId: string) {
 export function useCriarMedidaDisciplinar() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (d: any) => medidasDisciplinaresService.criar(d),
+    mutationFn: (d: DataRecord) => medidasDisciplinaresService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] }); toast.success('Medida disciplinar registrada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
 export function useAtualizarMedidaDisciplinar() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...d }: any) => medidasDisciplinaresService.atualizar(id, d),
+    mutationFn: ({ id, ...d }: { id: string } & DataRecord) => medidasDisciplinaresService.atualizar(id, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] }); toast.success('Medida atualizada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -129,18 +131,18 @@ export function useEpis() {
 export function useCriarEpi() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (d: any) => episService.criar(d),
+    mutationFn: (d: DataRecord) => episService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI cadastrado'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
 export function useAtualizarEpi() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...d }: any) => episService.atualizar(id, d),
+    mutationFn: ({ id, ...d }: { id: string } & DataRecord) => episService.atualizar(id, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI atualizado'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -149,7 +151,7 @@ export function useExcluirEpi() {
   return useMutation({
     mutationFn: (id: string) => episService.excluir(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI excluído'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -174,9 +176,9 @@ export function useEpisEntregasColaborador(colaboradorId: string) {
 export function useCriarEpiEntrega() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (d: any) => episEntregasService.criar(d),
+    mutationFn: (d: DataRecord) => episEntregasService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Entrega de EPI registrada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -185,7 +187,7 @@ export function useDevolverEpi() {
   return useMutation({
     mutationFn: ({ id, dataDevolucao }: { id: string; dataDevolucao: string }) => episEntregasService.registrarDevolucao(id, dataDevolucao),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Devolução registrada'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -201,9 +203,9 @@ export function useJornadaHorarios(jornadaId: string) {
 export function useSalvarGradeHorarios() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ jornadaId, horarios }: { jornadaId: string; horarios: any[] }) => jornadaHorariosService.salvarGrade(jornadaId, horarios),
+    mutationFn: ({ jornadaId, horarios }: { jornadaId: string; horarios: unknown[] }) => jornadaHorariosService.salvarGrade(jornadaId, horarios),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['jornada-horarios'] }); toast.success('Grade horária salva'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -220,8 +222,8 @@ export function useBancoHorasConfig() {
 export function useSalvarBancoHorasConfig() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (d: any) => bancoHorasConfigService.salvar(d),
+    mutationFn: (d: DataRecord) => bancoHorasConfigService.salvar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['banco-horas-config'] }); toast.success('Configuração salva'); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 }

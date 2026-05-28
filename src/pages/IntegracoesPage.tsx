@@ -47,7 +47,7 @@ function Bitrix24ConfigPanel() {
   const qc = useQueryClient();
   const [tab, setTab] = useState('config');
 
-  const { data: config, isLoading: loadConfig } = useQuery<any>({
+  const { data: config, isLoading: loadConfig } = useQuery<unknown>({
     queryKey: ['bitrix24_config'],
     queryFn: () => bitrix24Service.getConfig(),
   });

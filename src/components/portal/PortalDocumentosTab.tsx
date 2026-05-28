@@ -26,7 +26,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [docToSign, setDocToSign] = useState<any>(null);
+  const [docToSign, setDocToSign] = useState<unknown>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 

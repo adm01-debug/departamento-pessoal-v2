@@ -9,9 +9,9 @@ import { useGenericCrud } from './useGenericCrud';
 export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
-  const [filtros, setFiltros] = useState<any>({});
+  const [filtros, setFiltros] = useState<unknown>({});
 
-  const crud = useGenericCrud<any>({
+  const crud = useGenericCrud<unknown>({
     queryKey: 'afastamentos',
     service: afastamentoService,
     filters: { ...filtros, empresaId },

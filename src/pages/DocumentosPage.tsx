@@ -37,11 +37,11 @@ export default function DocumentosPage() {
   const [colaboradorId, setColaboradorId] = useState(urlColaboradorId || '');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
-  const [ocrResult, setOcrResult] = useState<any>(null);
+  const [selectedDocForOcr, setSelectedDocForOcr] = useState<unknown>(null);
+  const [ocrResult, setOcrResult] = useState<unknown>(null);
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
-  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<any>(null);
-  const [selectedDocForPreview, setSelectedDocForPreview] = useState<any>(null);
+  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<unknown>(null);
+  const [selectedDocForPreview, setSelectedDocForPreview] = useState<unknown>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {

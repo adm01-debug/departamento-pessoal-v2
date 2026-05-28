@@ -13,7 +13,7 @@ export const horaExtraService = {
   
   },
   
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('solicitacoes_hora_extra').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -22,7 +22,7 @@ export const horaExtraService = {
   
   },
   
-  async aprovar(id: string, aprovadoPor: string, obs?: string): Promise<any> {
+  async aprovar(id: string, aprovadoPor: string, obs?: string): Promise<unknown> {
     
     const { data, error } = await supabase
       .from('solicitacoes_hora_extra')
@@ -34,7 +34,7 @@ export const horaExtraService = {
   
   },
   
-  async rejeitar(id: string, aprovadoPor: string, obs?: string): Promise<any> {
+  async rejeitar(id: string, aprovadoPor: string, obs?: string): Promise<unknown> {
     
     const { data, error } = await supabase
       .from('solicitacoes_hora_extra')

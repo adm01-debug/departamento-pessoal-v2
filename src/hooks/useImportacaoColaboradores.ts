@@ -78,7 +78,7 @@ export function useImportacaoColaboradores() {
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rawData = XLSX.utils.sheet_to_json<any>(sheet, { header: 1 });
+      const rawData = XLSX.utils.sheet_to_json<unknown>(sheet, { header: 1 });
 
       if (rawData.length < 2) throw new Error('Planilha vazia');
 

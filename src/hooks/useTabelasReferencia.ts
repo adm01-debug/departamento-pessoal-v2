@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as service from '@/services/tabelasReferenciaService';
 
+type DataRecord = Record<string, unknown>;
+
 // =============================================
 // Helper for Result Pattern hooks
 // =============================================
-const useResultQuery = (key: any[], fn: () => Promise<any>, enabled: boolean = true) => 
+const useResultQuery = (key: unknown[], fn: () => Promise<unknown>, enabled: boolean = true) => 
   useQuery({
     queryKey: key,
     queryFn: async () => {
@@ -43,7 +45,7 @@ export function useCentrosCusto(empresaId?: string) {
 export function useCriarCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: DataRecord) => {
       return await service.criarCentroCusto(data);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
@@ -53,7 +55,7 @@ export function useCriarCentroCusto() {
 export function useAtualizarCentroCusto() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
+    mutationFn: async ({ id, dados }: { id: string; dados: DataRecord }) => {
       return await service.atualizarCentroCusto(id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
@@ -80,17 +82,17 @@ export function useContasBancarias(colaboradorId: string) {
 export function useCriarContaBancaria() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: DataRecord) => {
       return await service.criarContaBancaria(data);
     },
-    onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['contas-bancarias', vars.colaborador_id] }),
+    onSuccess: (_data: unknown, vars: DataRecord) => qc.invalidateQueries({ queryKey: ['contas-bancarias', vars.colaborador_id] }),
   });
 }
 
 export function useAtualizarContaBancaria() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
+    mutationFn: async ({ id, dados }: { id: string; dados: DataRecord }) => {
       return await service.atualizarContaBancaria(id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias'] }),
@@ -117,10 +119,10 @@ export function useDadosEstagiario(colaboradorId: string) {
 export function useSalvarDadosEstagiario() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ colaboradorId, dados }: { colaboradorId: string; dados: Record<string, unknown> }) => {
+    mutationFn: async ({ colaboradorId, dados }: { colaboradorId: string; dados: DataRecord }) => {
       return await service.salvarDadosEstagiario(colaboradorId, dados);
     },
-    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['dados-estagiario', vars.colaboradorId] }),
+    onSuccess: (_data: unknown, vars: { colaboradorId: string; dados: DataRecord }) => qc.invalidateQueries({ queryKey: ['dados-estagiario', vars.colaboradorId] }),
   });
 }
 
@@ -134,10 +136,10 @@ export function useDocumentosPessoais(colaboradorId: string) {
 export function useCriarDocumentoPessoal() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: DataRecord) => {
       return await service.criarDocumentoPessoal(data);
     },
-    onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['documentos-pessoais', vars.colaborador_id] }),
+    onSuccess: (_data: unknown, vars: DataRecord) => qc.invalidateQueries({ queryKey: ['documentos-pessoais', vars.colaborador_id] }),
   });
 }
 
@@ -161,17 +163,17 @@ export function useFeriasAprovacoes(feriasId: string) {
 export function useCriarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: DataRecord) => {
       return await service.criarFeriasAprovacao(data);
     },
-    onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes', vars.ferias_id] }),
+    onSuccess: (_data: unknown, vars: DataRecord) => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes', vars.ferias_id] }),
   });
 }
 
 export function useAtualizarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, dados }: { id: string; dados: Record<string, unknown> }) => {
+    mutationFn: async ({ id, dados }: { id: string; dados: DataRecord }) => {
       return await service.atualizarFeriasAprovacao(id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes'] }),
@@ -188,10 +190,10 @@ export function useFeriasArquivos(feriasId: string) {
 export function useCriarFeriasArquivo() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: DataRecord) => {
       return await service.criarFeriasArquivo(data);
     },
-    onSuccess: (_, vars: any) => qc.invalidateQueries({ queryKey: ['ferias-arquivos', vars.ferias_id] }),
+    onSuccess: (_data: unknown, vars: DataRecord) => qc.invalidateQueries({ queryKey: ['ferias-arquivos', vars.ferias_id] }),
   });
 }
 
@@ -205,7 +207,7 @@ export function useDependentesBeneficios(dependenteId: string) {
 export function useVincularDependenteBeneficio() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: DataRecord) => {
       return await service.vincularDependenteBeneficio(data);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes-beneficios'] }),
@@ -221,4 +223,3 @@ export function useDesvincularDependenteBeneficio() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes-beneficios'] }),
   });
 }
-

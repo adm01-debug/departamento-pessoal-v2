@@ -18,7 +18,7 @@ export const medidasDisciplinaresService = {
   
   },
   
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('medidas_disciplinares').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -27,7 +27,7 @@ export const medidasDisciplinaresService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<any> {
+  async atualizar(id: string, d: any): Promise<unknown> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('medidas_disciplinares').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;

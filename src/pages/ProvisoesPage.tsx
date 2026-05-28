@@ -39,7 +39,7 @@ function formatCurrency(value: number): string {
 
 export default function ProvisoesPage() {
   const [competencia, setCompetencia] = useState(new Date().toISOString().substring(0, 7));
-  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [selectedLog, setSelectedLog] = useState<unknown>(null);
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
 
