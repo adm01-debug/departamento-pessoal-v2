@@ -72,7 +72,7 @@ export default function ComunicacaoInternaPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from('').select('comunicado_id').eq('usuario_id', user!.id);
       if (error) return [];
-      return data?.map((l: any) => l.comunicado_id) || [];
+      return data?.map((l: Record<string, unknown>) => l.comunicado_id) || [];
     },
   });
 
@@ -82,14 +82,14 @@ export default function ComunicacaoInternaPage() {
     enabled: !!empresaAtual?.id,
   });
 
-  const comunicadosFiltrados = comunicados.filter((c: any) => {
+  const comunicadosFiltrados = comunicados.filter((c: Record<string, unknown>) => {
     if (filtroTipo !== 'todos' && c.tipo !== filtroTipo) return false;
     if (busca && !c.titulo?.toLowerCase().includes(busca.toLowerCase()) && !c.conteudo?.toLowerCase().includes(busca.toLowerCase())) return false;
     return true;
   });
 
-  const fixados = comunicadosFiltrados.filter((c: any) => c.fixado);
-  const normais = comunicadosFiltrados.filter((c: any) => !c.fixado);
+  const fixados = comunicadosFiltrados.filter((c: Record<string, unknown>) => c.fixado);
+  const normais = comunicadosFiltrados.filter((c: Record<string, unknown>) => !c.fixado);
 
   const criarCom = useMutation({
     mutationFn: () => comunicacaoService.criarComunicado({ ...formCom, empresa_id: empresaAtual?.id, ativo: true }),
@@ -116,7 +116,7 @@ export default function ComunicacaoInternaPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['comunicados'] }); toast.success('Comunicado excluído'); },
   });
 
-  const naoLidos = comunicados.filter((c: any) => !leituras.includes(c.id)).length;
+  const naoLidos = comunicados.filter((c: Record<string, unknown>) => !leituras.includes(c.id)).length;
 
   const renderComunicado = (c: any, i: number) => {
     const isLido = leituras.includes(c.id);
@@ -177,7 +177,7 @@ export default function ComunicacaoInternaPage() {
           { label: 'Comunicados', value: comunicados.length, icon: Megaphone, gradient: 'from-primary to-primary-glow' },
           { label: 'Não Lidos', value: naoLidos, icon: EyeOff, gradient: 'from-warning to-warning/70' },
           { label: 'Relatos Éticos', value: denuncias.length, icon: Shield, gradient: 'from-info to-info/70' },
-          { label: 'Abertos', value: denuncias.filter((d: any) => d.status === 'aberto').length, icon: AlertTriangle, gradient: 'from-destructive to-destructive/70' },
+          { label: 'Abertos', value: denuncias.filter((d: Record<string, unknown>) => d.status === 'aberto').length, icon: AlertTriangle, gradient: 'from-destructive to-destructive/70' },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
             <Card className="border border-border/30 rounded-2xl overflow-hidden">
@@ -286,7 +286,7 @@ export default function ComunicacaoInternaPage() {
                 <TableHeader><TableRow><TableHead>Protocolo</TableHead><TableHead>Categoria</TableHead><TableHead>Status</TableHead><TableHead>Prioridade</TableHead><TableHead>Data</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {denuncias.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum relato registrado</TableCell></TableRow> :
-                    denuncias.map((d: any) => (
+                    denuncias.map((d: Record<string, unknown>) => (
                       <TableRow key={d.id}>
                         <TableCell className="font-mono text-xs">{d.protocolo?.slice(0, 8)}</TableCell>
                         <TableCell><Badge variant="outline" className="text-[10px]">{d.categoria}</Badge></TableCell>
