@@ -71,8 +71,13 @@ export const loggerService = {
         return;
       }
 
-      const logsWithUser = logsToSend.map(l => ({ ...l, user_id: userId }));
-      const { error } = await supabase.from('logs_sistema').insert(logsWithUser as any);
+      // External corporate `logs_sistema` does not have a `user_id` column;
+      // embed it into `contexto` instead.
+      const logsToInsert = logsToSend.map(({ user_id: _omit, ...l }) => ({
+        ...l,
+        contexto: { ...l.contexto, user_id: userId },
+      }));
+      const { error } = await supabase.from('logs_sistema').insert(logsToInsert as any);
       if (error) throw error;
       
       // Clear buffer only after successful insert
