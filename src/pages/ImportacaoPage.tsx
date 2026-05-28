@@ -84,7 +84,10 @@ export default function ImportacaoPage() {
     try {
       await processarArquivo(file);
       setStep('preview');
-    } catch (err) {}
+    } catch (err) {
+      console.error('Erro ao processar arquivo:', err);
+      toast.error('Falha ao processar o arquivo. Verifique o formato e tente novamente.');
+    }
   };
 
   const handleImport = async () => {
