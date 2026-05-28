@@ -4,12 +4,11 @@ import { toast } from 'sonner';
 import type { Database } from './types';
 
 // Configurações do Supabase EXTERNO (corporativo - hncgwjbzdajfdztqgefe).
-// Usamos valores fixos do projeto corporativo, ignorando o .env do Lovable Cloud,
-// pois os usuários reais (ex.: adm01@promobrindes.com.br) existem APENAS no
-// banco corporativo. Quando o .env apontava para o projeto do Lovable Cloud,
-// o Auth retornava "Invalid API key" / "Invalid credentials".
-const SUPABASE_URL = 'https://hncgwjbzdajfdztqgefe.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
+// Os valores abaixo são fallbacks para desenvolvimento local; em produção,
+// configure as variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.
+// Usuários reais (ex.: adm01@promobrindes.com.br) existem APENAS no banco corporativo.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
