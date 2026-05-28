@@ -8,6 +8,11 @@ const corsHeaders = {
 
 const SLOW_QUERY_THRESHOLD_MS = 3000;
 const VERY_SLOW_QUERY_THRESHOLD_MS = 8000;
+const LOGIN_PROTECTION_RPC_FALLBACKS: Record<string, unknown> = {
+  check_login_lock: false,
+  record_failed_login: null,
+  reset_login_attempts: null,
+};
 
 interface TelemetryMeta {
   operation: string;
@@ -366,6 +371,15 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      if (rpcName in LOGIN_PROTECTION_RPC_FALLBACKS) {
+        const durationMs = Math.round(performance.now() - startTime);
+        console.info(`[external-db-bridge] RPC ${rpcName} ignorada: função não existe no banco externo corporativo.`);
+        return new Response(JSON.stringify({ data: LOGIN_PROTECTION_RPC_FALLBACKS[rpcName], duration_ms: durationMs }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       const { data: rpcData, error: rpcError } = await externalClient.rpc(rpcName, rpcArgs || {});
       const durationMs = Math.round(performance.now() - startTime);
 
