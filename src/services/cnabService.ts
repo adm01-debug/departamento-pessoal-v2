@@ -11,34 +11,97 @@ export interface CNABConfig {
   nome_empresa?: string;
 }
 
+interface CnabConfigRecord {
+  id: string;
+  empresa_id: string;
+  banco_codigo: string;
+  agencia: string;
+  agencia_digito?: string;
+  conta: string;
+  conta_digito: string;
+  convenio: string;
+  codigo_empresa?: string;
+  nome_empresa?: string;
+}
+
+interface CnabRemessaRecord {
+  id: string;
+  empresa_id: string;
+  banco_codigo: string;
+  status: string;
+  valor_total: number;
+  total_pagamentos: number;
+  arquivo_remessa?: string;
+  created_at?: string;
+}
+
+interface ContaBancariaRecord {
+  id: string;
+  colaborador_id: string;
+  banco_codigo: string;
+  agencia: string;
+  agencia_digito?: string;
+  conta: string;
+  digito?: string;
+  tipo_conta?: string;
+  pix_chave?: string;
+  pix_tipo?: string;
+  principal?: boolean;
+}
+
+interface CnabItemRecord {
+  id: string;
+  remessa_id: string;
+  colaborador_id: string;
+  folha_item_id?: string;
+  nome_favorecido: string;
+  cpf_cnpj_favorecido: string;
+  valor_pagamento: number;
+  seu_numero: string;
+  status: string;
+  codigo_ocorrencia?: string;
+  mensagem_ocorrencia?: string;
+}
+
+interface FolhaItemRecord {
+  id: string;
+  colaborador_id: string;
+  folha_id: string;
+  total_liquido: number;
+  colaborador?: { id: string; nome_completo: string; cpf: string };
+}
+
+type DataRecord = Record<string, unknown>;
+
 export const cnabService = {
   async getConfig(empresaId: string): Promise<CNABConfig | null> {
     const { data, error } = await supabase
-      .from('cnab_configuracoes' as any)
+      .from('cnab_configuracoes')
       .select('*')
       .eq('empresa_id', empresaId)
       .maybeSingle();
     
     if (error) throw error;
-    return data as any as CNABConfig | null;
+    return (data as CnabConfigRecord | null) as CNABConfig | null;
   },
 
   async saveConfig(empresaId: string, config: CNABConfig) {
     const { data: existing } = await supabase
-      .from('cnab_configuracoes' as any)
+      .from('cnab_configuracoes')
       .select('id')
       .eq('empresa_id', empresaId)
       .maybeSingle();
 
     if (existing) {
+      const existingRecord = existing as DataRecord;
       const { error } = await supabase
-        .from('cnab_configuracoes' as any)
-        .update(config)
-        .eq('id', (existing as any).id);
+        .from('cnab_configuracoes')
+        .update(config as DataRecord)
+        .eq('id', String(existingRecord.id));
       if (error) throw error;
     } else {
       const { error } = await supabase
-        .from('cnab_configuracoes' as any)
+        .from('cnab_configuracoes')
         .insert([{ empresa_id: empresaId, ...config }]);
       if (error) throw error;
     }
@@ -46,7 +109,7 @@ export const cnabService = {
 
   async listRemessas(empresaId: string) {
     const { data, error } = await supabase
-      .from('cnab_remessas' as any)
+      .from('cnab_remessas')
       .select('*')
       .eq('empresa_id', empresaId)
       .order('created_at', { ascending: false });
@@ -57,7 +120,7 @@ export const cnabService = {
 
   async listPixLotes(empresaId: string) {
     const { data, error } = await supabase
-      .from('pix_lotes' as any)
+      .from('pix_lotes')
       .select('*')
       .eq('empresa_id', empresaId)
       .order('created_at', { ascending: false });
@@ -81,9 +144,10 @@ export const cnabService = {
     if (hError) throw hError;
     if (!itens?.length) throw new Error('Nenhum pagamento encontrado para gerar CNAB.');
 
-    const colaboradorIds = itens.map(i => i.colaborador_id);
+    const typedItens = itens as unknown as FolhaItemRecord[];
+    const colaboradorIds = typedItens.map(i => i.colaborador_id);
     const { data: contas, error: cError } = await supabase
-      .from('contas_bancarias' as any)
+      .from('contas_bancarias')
       .select('*')
       .in('colaborador_id', colaboradorIds)
       .eq('principal', true);
@@ -91,23 +155,24 @@ export const cnabService = {
     if (cError) throw cError;
 
     const { data: remessa, error: rError } = await supabase
-      .from('cnab_remessas' as any)
+      .from('cnab_remessas')
       .insert([{
         empresa_id: empresaId,
         banco_codigo: config.banco_codigo,
         status: 'pendente',
-        valor_total: itens.reduce((acc, i) => acc + Number(i.total_liquido), 0),
-        total_pagamentos: itens.length
+        valor_total: typedItens.reduce((acc, i) => acc + Number(i.total_liquido), 0),
+        total_pagamentos: typedItens.length
       }])
       .select()
       .single();
 
     if (rError || !remessa) throw rError || new Error('Falha ao criar remessa');
+    const remessaRecord = remessa as unknown as CnabRemessaRecord;
 
     const lines: string[] = [];
     let sequence = 1;
 
-    const pad = (val: any, len: number, char = ' ', side: 'left' | 'right' = 'right') => {
+    const pad = (val: unknown, len: number, char = ' ', side: 'left' | 'right' = 'right') => {
       const s = String(val || '').substring(0, len);
       return side === 'right' ? s.padEnd(len, char) : s.padStart(len, char);
     };
@@ -122,46 +187,48 @@ export const cnabService = {
     lines.push(header.padEnd(240, ' '));
 
     // Registrar o arquivo de remessa no banco para auditoria real
-    await supabase.from('cnab_remessas' as any).update({ 
+    await supabase.from('cnab_remessas').update({ 
       arquivo_remessa: lines[0],
       status: 'enviado' 
-    } as any).eq('id', (remessa as any).id);
+    }).eq('id', remessaRecord.id);
 
     let detailSequence = 1;
     let totalValue = 0;
-    const cnabItensToInsert = [];
+    const cnabItensToInsert: DataRecord[] = [];
 
     // Header de Lote (Tipo 1)
     let lotHeader = pad(config.banco_codigo, 3, '0', 'left') + '00011' + 'C' + '30' + '01' + ' ' + '040' + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('', 40) + pad('', 30) + pad('', 10) + dateStr + pad('', 8, '0') + pad('', 33);
     lines.push(lotHeader.padEnd(240, ' '));
 
-    for (const item of itens) {
-      const colab = item.colaborador as any;
-      const conta = (contas as any[])?.find(c => c.colaborador_id === item.colaborador_id);
+    const typedContas = (contas as unknown as ContaBancariaRecord[]) || [];
+
+    for (const item of typedItens) {
+      const colab = item.colaborador;
+      const conta = typedContas.find(c => c.colaborador_id === item.colaborador_id);
       if (!conta) continue;
 
       const valor = Number(item.total_liquido);
       totalValue += valor;
-      const seuNumero = `${(remessa as any).id.substring(0, 8)}-${detailSequence}`;
+      const seuNumero = `${remessaRecord.id.substring(0, 8)}-${detailSequence}`;
 
       cnabItensToInsert.push({
-        remessa_id: (remessa as any).id,
+        remessa_id: remessaRecord.id,
         colaborador_id: item.colaborador_id,
         folha_item_id: item.id,
-        nome_favorecido: colab.nome_completo,
-        cpf_cnpj_favorecido: colab.cpf,
+        nome_favorecido: colab?.nome_completo ?? '',
+        cpf_cnpj_favorecido: colab?.cpf ?? '',
         valor_pagamento: valor,
         seu_numero: seuNumero,
         status: 'processando'
       });
 
       // Segmento A (Crédito em Conta)
-      let segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A' + '000' + '000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
+      let segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A' + '000' + '000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab?.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
       lines.push(segA.padEnd(240, ' '));
 
       // Se tiver chave PIX, adiciona Segmento B (PIX)
       if (conta.pix_chave) {
-        let segB = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'B' + pad('', 3) + '2' + pad(colab.cpf || '', 14, '0', 'left') + pad('', 30) + pad('', 30) + pad('', 30) + pad('', 30) + pad(conta.pix_chave, 60) + pad('', 25);
+        let segB = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'B' + pad('', 3) + '2' + pad(colab?.cpf || '', 14, '0', 'left') + pad('', 30) + pad('', 30) + pad('', 30) + pad('', 30) + pad(conta.pix_chave, 60) + pad('', 25);
         lines.push(segB.padEnd(240, ' '));
       }
     }
@@ -170,7 +237,7 @@ export const cnabService = {
     let lotTrailer = pad(config.banco_codigo, 3, '0', 'left') + '00015' + pad('', 9) + pad(detailSequence + 1, 6, '0', 'left') + formatAmount(totalValue) + pad('', 18, '0') + pad('', 183);
     lines.push(lotTrailer.padEnd(240, ' '));
 
-    await supabase.from('cnab_itens' as any).insert(cnabItensToInsert);
+    await supabase.from('cnab_itens').insert(cnabItensToInsert);
 
     // Trailer de Arquivo (Tipo 9)
     let trailer = pad(config.banco_codigo, 3, '0', 'left') + '99999' + pad('', 9) + '000001' + pad(lines.length + 1, 6, '0', 'left') + pad('', 6, '0') + pad('', 205);
@@ -179,9 +246,9 @@ export const cnabService = {
     const fullFile = lines.join('\r\n');
     
     // Atualiza com o arquivo completo
-    await supabase.from('cnab_remessas' as any).update({ 
+    await supabase.from('cnab_remessas').update({ 
       arquivo_remessa: fullFile 
-    } as any).eq('id', (remessa as any).id);
+    }).eq('id', remessaRecord.id);
 
     return fullFile;
   },
@@ -191,7 +258,7 @@ export const cnabService = {
     const results = {
       sucesso: 0,
       erro: 0,
-      detalhes: [] as any[]
+      detalhes: [] as Array<{ nome: string; status: string; ocorrencia: string }>
     };
 
     for (const line of lines) {
@@ -205,36 +272,37 @@ export const cnabService = {
         const codigoOcorrencia = line.substring(230, 232);
         
         const { data: item } = await supabase
-          .from('cnab_itens' as any)
+          .from('cnab_itens')
           .select('id, folha_item_id, nome_favorecido')
           .eq('seu_numero', seuNumero)
           .maybeSingle();
 
         if (item) {
+          const itemRecord = item as unknown as CnabItemRecord;
           const isSuccess = ['00', '02'].includes(codigoOcorrencia);
           const status = isSuccess ? 'pago' : 'erro';
           
           await supabase
-            .from('cnab_itens' as any)
+            .from('cnab_itens')
             .update({ 
               status, 
               codigo_ocorrencia: codigoOcorrencia,
               mensagem_ocorrencia: isSuccess ? 'Confirmado' : 'Rejeitado pelo banco'
             })
-            .eq('id', (item as any).id);
+            .eq('id', itemRecord.id);
 
-          if (isSuccess && (item as any).folha_item_id) {
+          if (isSuccess && itemRecord.folha_item_id) {
             await supabase
               .from('folha_itens')
-              .update({ status_pagamento: 'pago' } as any)
-              .eq('id', (item as any).folha_item_id);
+              .update({ status_pagamento: 'pago' })
+              .eq('id', itemRecord.folha_item_id);
             results.sucesso++;
           } else {
             results.erro++;
           }
 
           results.detalhes.push({
-            nome: (item as any).nome_favorecido,
+            nome: itemRecord.nome_favorecido,
             status,
             ocorrencia: codigoOcorrencia
           });
@@ -256,22 +324,25 @@ export const cnabService = {
     if (hError) throw hError;
     if (!itens?.length) throw new Error('Nenhum pagamento encontrado para gerar lote PIX.');
 
-    const colaboradorIds = itens.map(i => i.colaborador_id);
+    const typedItens = itens as unknown as FolhaItemRecord[];
+    const colaboradorIds = typedItens.map(i => i.colaborador_id);
     const { data: contas, error: cError } = await supabase
-      .from('contas_bancarias' as any)
+      .from('contas_bancarias')
       .select('*')
       .in('colaborador_id', colaboradorIds)
       .eq('principal', true);
 
     if (cError) throw cError;
 
+    const typedContas = (contas as unknown as ContaBancariaRecord[]) || [];
+
     const csvLines = ['Nome;CPF/CNPJ;Chave Pix;Tipo Chave;Valor;Descricao;ID_Folha_Item'];
-    for (const item of itens) {
-      const colab = item.colaborador as any;
-      const conta = (contas as any[])?.find(c => c.colaborador_id === item.colaborador_id);
+    for (const item of typedItens) {
+      const colab = item.colaborador;
+      const conta = typedContas.find(c => c.colaborador_id === item.colaborador_id);
       if (!conta || !conta.pix_chave) continue;
       const valor = Number(item.total_liquido);
-      csvLines.push(`${colab.nome_completo};${colab.cpf || ''};${conta.pix_chave};${conta.pix_tipo || 'CPF'};${valor.toFixed(2).replace('.', ',')};Pagamento Salarial;${item.id}`);
+      csvLines.push(`${colab?.nome_completo ?? ''};${colab?.cpf || ''};${conta.pix_chave};${conta.pix_tipo || 'CPF'};${valor.toFixed(2).replace('.', ',')};Pagamento Salarial;${item.id}`);
     }
 
     if (csvLines.length === 1) throw new Error('Nenhum colaborador com chave PIX cadastrada nesta folha.');
