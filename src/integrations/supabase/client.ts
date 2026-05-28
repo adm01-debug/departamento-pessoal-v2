@@ -66,20 +66,22 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.error) {
       const errorMsg = json.error || `Erro HTTP ${res.status}`;
-      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', errorMsg);
-      
-      // Grita no UI para o desenvolvedor ver exatamente o que falta
-      toast.error(`ERRO DE BANCO: ${errorMsg}`, {
-        duration: 10000, // 10 segundos para dar tempo de ler
-        style: { background: '#fee2e2', color: '#991b1b', border: '1px solid #f87171' },
-      });
+      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', action, target, errorMsg);
 
-      throw new Error(errorMsg);
+      // Erros de função/tabela ausente NÃO devem poluir a UI com toast.
+      // Apenas propagamos o erro para quem chamou tratar (ou ignorar).
+      const isMissingObject = /Could not find the (function|table)|schema cache|does not exist/i.test(errorMsg);
+      if (!isMissingObject) {
+        toast.error(`Erro de banco: ${errorMsg}`, {
+          duration: 6000,
+        });
+      }
+
+      return { data: null, count: 0, error: { message: errorMsg } };
     }
     let data = json.data;
     if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
-    
-    // Log do tempo de resposta se for lento
+
     if (json.duration_ms > 1000) {
       console.warn(`🕒 [BRIDGE_SLOW_QUERY] ${action} em ${target} demorou ${json.duration_ms}ms`);
     }
@@ -87,14 +89,13 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
     return { data, count: json.count, error: null };
   } catch (err: any) {
     const isNetworkError = err.message === 'Failed to fetch' || err.name === 'TypeError';
-    const errorMsg = isNetworkError ? 'Erro de conexão com o banco externo. Verifique sua internet.' : (err?.message || 'Erro desconhecido');
-    
+    const errorMsg = isNetworkError ? 'Erro de conexão com o banco. Verifique sua internet.' : (err?.message || 'Erro desconhecido');
+
     console.error('🔴 [BRIDGE_FATAL_ERROR]', err);
 
-    toast.error(`ERRO CRÍTICO: ${errorMsg}`, {
-      duration: 5000,
-      description: 'Tente recarregar a página se o problema persistir.',
-    });
+    if (isNetworkError) {
+      toast.error(errorMsg, { duration: 5000 });
+    }
 
     return { data: null, error: { message: errorMsg } };
   }
