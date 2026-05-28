@@ -88,3 +88,40 @@ export interface Documento {
   created_at?: string;
 }
 
+/** Funcionario — alias semântico para Colaborador (compatibilidade) */
+export interface Funcionario extends Colaborador {
+  matricula: string;
+}
+
+export interface Dependente {
+  id: string;
+  colaborador_id: string;
+  nome_completo: string;
+  cpf?: string;
+  data_nascimento?: string;
+  grau_parentesco?: string;
+  irrf_dependente?: boolean;
+  salario_familia?: boolean;
+  created_at?: string;
+}
+
+export interface Endereco {
+  id: string;
+  colaborador_id?: string;
+  empresa_id?: string;
+  cep: string;
+  logradouro: string;
+  numero?: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  tipo?: string;
+  created_at?: string;
+}
+
+export interface Periodo {
+  dataInicio: string;
+  dataFim: string;
+}
+
