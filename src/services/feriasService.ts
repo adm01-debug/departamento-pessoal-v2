@@ -64,7 +64,7 @@ class FeriasService extends BaseService<Ferias> {
 
   async getAprovacoesLog(feriasId: string): Promise<any[]> {
     const { data, error } = await (supabase as any)
-      .from('ferias_aprovacoes_log' as any)
+      .from('')
       .select('*')
       .eq('ferias_id', feriasId)
       .order('created_at', { ascending: true });

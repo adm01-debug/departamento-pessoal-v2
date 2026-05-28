@@ -19,7 +19,7 @@ export function SSTIncidentesTab() {
     enabled: !!empresaAtual?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('sst_incidentes' as any)
+        .from('')
         .select('*')
         .eq('empresa_id', empresaAtual!.id)
         .order('data_hora', { ascending: false });

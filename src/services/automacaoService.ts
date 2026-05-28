@@ -57,7 +57,7 @@ export const automacaoService = {
     const dataFormatada = dataAlerta.toISOString().split('T')[0];
 
     const { data: asos } = await supabase
-      .from('asos' as any)
+      .from('')
       .select('*, colaborador:colaboradores(nome_completo, telefone_celular)')
       .eq('empresa_id', empresaId)
       .eq('data_vencimento', dataFormatada);
@@ -89,7 +89,7 @@ export const automacaoService = {
     const dataFormatada = dataAlerta.toISOString().split('T')[0];
 
     const { data: periodos } = await supabase
-      .from('periodos_experiencia' as any)
+      .from('')
       .select('*, colaborador:colaboradores(id, nome_completo, empresa_id)')
       .eq('empresa_id', empresaId)
       .or(`data_fim_primeiro_periodo.eq.${dataFormatada},data_fim_segundo_periodo.eq.${dataFormatada}`);

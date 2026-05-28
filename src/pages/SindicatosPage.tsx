@@ -23,7 +23,7 @@ export default function SindicatosPage() {
   const { data: sindicatos = [], isLoading } = useQuery({
     queryKey: ['sindicatos', empresaAtual?.id],
     queryFn: async () => {
-      let q = supabase.from('sindicatos' as any).select('*').order('nome');
+      let q = supabase.from('').select('*').order('nome');
       if (empresaAtual?.id) q = q.eq('empresa_id', empresaAtual.id);
       const { data, error } = await q;
       if (error) throw error;

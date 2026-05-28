@@ -104,7 +104,7 @@ export default function NotificacoesPage() {
   const { data: historicoAlertas = [], isLoading: loadAlertas } = useQuery({
     queryKey: ['historico-alertas'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('historico_alertas' as any).select('*').order('created_at', { ascending: false }).limit(100);
+      const { data, error } = await supabase.from('').select('*').order('created_at', { ascending: false }).limit(100);
       if (error) throw error;
       return data || [];
     },

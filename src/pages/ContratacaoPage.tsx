@@ -266,7 +266,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
 
         // 2. Registrar na tabela documentos_admissao
         const { error: dbErr } = await supabase
-          .from('documentos_admissao' as any)
+          .from('')
           .insert({
             admissao_id: tokenData?.admissao_id,
             tipo_documento: docType,
