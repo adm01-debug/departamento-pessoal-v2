@@ -37,7 +37,7 @@ export const pushNotificationService = {
       const { endpoint, keys } = subscription.toJSON();
       if (!endpoint) throw new Error('Endpoint de push inválido');
 
-      const { error } = await supabase.from('').upsert({
+      const { error } = await supabase.from('push_subscriptions').upsert({
         user_id: userId,
         endpoint,
         p256dh: (keys as Record<string, unknown>).p256dh,
@@ -65,7 +65,7 @@ export const pushNotificationService = {
         await subscription.unsubscribe();
         const { endpoint } = subscription.toJSON();
         
-        await supabase.from('')
+        await supabase.from('push_subscriptions')
           .update({ ativo: false })
           .eq('endpoint', endpoint)
           .eq('user_id', userId);

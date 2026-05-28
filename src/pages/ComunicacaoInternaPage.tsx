@@ -70,7 +70,7 @@ export default function ComunicacaoInternaPage() {
     queryKey: ['comunicados-leituras', empresaAtual?.id, user?.id],
     enabled: !!empresaAtual?.id && !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase.from('').select('comunicado_id').eq('usuario_id', user!.id);
+      const { data, error } = await supabase.from('comunicados_leituras').select('comunicado_id').eq('usuario_id', user!.id);
       if (error) return [];
       return data?.map((l: Record<string, unknown>) => l.comunicado_id) || [];
     },

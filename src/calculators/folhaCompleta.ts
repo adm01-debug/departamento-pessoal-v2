@@ -30,7 +30,7 @@ export function calcularFolhaCompleta(params: ParamsFolhaCompleta) {
     diasUteis = 26, domingosEFeriados = 4,
   } = params;
 
-  const he = calcularHorasExtras(salarioBase, horasExtras50, horasExtras100, diasUteis, domingosEFeriados);
+  const he = calcularHorasExtras(salarioBase, horasExtras50, horasExtras100, 220, diasUteis, domingosEFeriados);
   const adNoturno = horasNoturnas > 0 ? calcularAdicionalNoturno(salarioBase, horasNoturnas, 220, adicionalNoturnoPerc) : 0;
   
   // Cálculo de DSR sobre Adicional Noturno (o DSR das HE já vem no objeto he)

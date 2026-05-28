@@ -36,7 +36,7 @@ export default function DescontosPage() {
     queryKey: ['emprestimos-consignados', empresaAtual?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('')
+        .from('emprestimos_consignados')
         .select('*, colaborador:colaboradores(nome_completo)')
         .eq('empresa_id', empresaAtual?.id as string);
       if (error) throw error;
@@ -49,7 +49,7 @@ export default function DescontosPage() {
     queryKey: ['adiantamentos-salariais', empresaAtual?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('')
+        .from('adiantamentos_salariais')
         .select('*, colaborador:colaboradores(nome_completo)')
         .eq('empresa_id', empresaAtual?.id as string);
       if (error) throw error;
@@ -60,7 +60,7 @@ export default function DescontosPage() {
 
   const criarEmprestimo = useMutation({
     mutationFn: async (values: any) => {
-      const { error } = await supabase.from('').insert({
+      const { error } = await supabase.from('emprestimos_consignados').insert({
         ...values,
         empresa_id: empresaAtual?.id,
         status: 'ativo'
@@ -76,7 +76,7 @@ export default function DescontosPage() {
 
   const criarAdiantamento = useMutation({
     mutationFn: async (values: any) => {
-      const { error } = await supabase.from('').insert({
+      const { error } = await supabase.from('adiantamentos_salariais').insert({
         ...values,
         empresa_id: empresaAtual?.id,
         status: 'pendente'
@@ -93,7 +93,7 @@ export default function DescontosPage() {
   const atualizarStatusAdiantamento = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: string }) => {
       const { error } = await supabase
-        .from('')
+        .from('adiantamentos_salariais')
         .update({ status })
         .eq('id', id);
       if (error) throw error;

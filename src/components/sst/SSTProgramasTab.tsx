@@ -16,7 +16,7 @@ export function SSTProgramasTab() {
     enabled: !!empresaAtual?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('')
+        .from('sst_programas')
         .select('*')
         .eq('empresa_id', empresaAtual!.id)
         .order('data_validade', { ascending: true });

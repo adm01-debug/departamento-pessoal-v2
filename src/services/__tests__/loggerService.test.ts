@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Criar mocks globais
 const mockInsert = vi.fn(() => Promise.resolve({ error: null }));
-const mockFrom = vi.fn(() => ({
+const mockFrom = vi.fn((_table: string) => ({
   insert: mockInsert,
 }));
 

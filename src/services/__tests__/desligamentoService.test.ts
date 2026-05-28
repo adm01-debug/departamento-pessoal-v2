@@ -40,7 +40,7 @@ describe('desligamentoService', () => {
     it('should call select with colaborador join', () => {
       mockLimit.mockResolvedValue({ data: [], error: null });
       desligamentoService.listar();
-      expect(mockSelect).toHaveBeenCalledWith('*, colaborador:colaboradores(nome_completo)');
+      expect(mockSelect).toHaveBeenCalledWith('*, colaborador:colaboradores(nome_completo)', { count: 'exact' });
     });
 
     it('should apply limit of 500', () => {
@@ -51,16 +51,16 @@ describe('desligamentoService', () => {
     });
 
     it('should filter by empresaId when provided', async () => {
-      mockEq.mockResolvedValue({ data: [{ id: '1' }], error: null });
-      const result = await desligamentoService.listar('empresa-123');
+      mockEq.mockResolvedValue({ data: [{ id: '1' }], count: 1, error: null });
+      const result = await desligamentoService.listar({ filters: { empresa_id: 'empresa-123' } });
       expect(mockEq).toHaveBeenCalledWith('empresa_id', 'empresa-123');
-      expect(result).toEqual([{ id: '1' }]);
+      expect(result.data).toEqual([{ id: '1' }]);
     });
 
     it('should return empty array when data is null', async () => {
       mockLimit.mockResolvedValue({ data: null, error: null });
       const result = await desligamentoService.listar();
-      expect(result).toEqual([]);
+      expect(result.data).toEqual([]);
     });
 
     it('should throw on error', async () => {

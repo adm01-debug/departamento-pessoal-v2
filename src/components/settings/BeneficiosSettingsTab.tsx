@@ -22,7 +22,7 @@ export function BeneficiosSettingsTab() {
     queryKey: ['configuracoes-beneficios'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('')
+        .from('beneficios')
         .select('*')
         .order('nome');
       if (error) {
@@ -35,7 +35,7 @@ export function BeneficiosSettingsTab() {
 
   const criar = useMutation({
     mutationFn: async (d: typeof form) => {
-      const { error } = await supabase.from('').insert({
+      const { error } = await supabase.from('beneficios').insert({
         nome: d.nome,
         tipo: d.tipo,
         valor: Number(d.valor),
@@ -54,7 +54,7 @@ export function BeneficiosSettingsTab() {
 
   const alternarStatus = useMutation({
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
-      const { error } = await supabase.from('').update({ ativo }).eq('id', id);
+      const { error } = await supabase.from('beneficios').update({ ativo }).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

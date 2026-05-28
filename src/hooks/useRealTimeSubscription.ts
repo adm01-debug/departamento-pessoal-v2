@@ -11,18 +11,22 @@ export function useRealTimeSubscription(
   options: { event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*'; schema?: string } = { event: '*', schema: 'public' }
 ) {
   const queryClient = useQueryClient();
+  // queryKey costuma ser um array literal recriado a cada render; estabilizamos por valor
+  // para evitar recriar handleChange/efeito (e re-subscrever o canal) em todo render.
+  const queryKeyString = JSON.stringify(queryKey);
 
   const handleChange = useCallback((payload: RealtimePostgresChangesPayload<any>) => {
     if (import.meta.env.DEV) {
       console.debug(`[RealTime] Change detected in ${table}:`, payload.eventType);
     }
-    loggerService.info(`Realtime change detected in ${table}`, { 
-      table, 
+    loggerService.info(`Realtime change detected in ${table}`, {
+      table,
       eventType: payload.eventType,
-      schema: payload.schema 
+      schema: payload.schema
     });
     void queryClient.invalidateQueries({ queryKey });
-  }, [table, queryClient, queryKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, queryClient, queryKeyString]);
 
   useEffect(() => {
     if (!empresaId) return;
@@ -52,5 +56,6 @@ export function useRealTimeSubscription(
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [table, JSON.stringify(queryKey), empresaId, options.event, options.schema, handleChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, queryKeyString, empresaId, options.event, options.schema, handleChange]);
 }

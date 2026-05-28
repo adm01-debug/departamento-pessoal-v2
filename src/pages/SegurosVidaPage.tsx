@@ -138,7 +138,7 @@ export default function SegurosVidaPage() {
   const { data: sinistros = [], isLoading: loadSin } = useQuery({
     queryKey: ['sinistros-seguro', empresaAtual?.id],
     queryFn: async () => {
-      const { data: d, error } = await supabase.from('').select('*, colaborador:colaboradores(nome_completo), seguro:seguros_vida(seguradora)').order('created_at', { ascending: false });
+      const { data: d, error } = await supabase.from('sinistros_seguro').select('*, colaborador:colaboradores(nome_completo), seguro:seguros_vida(seguradora)').order('created_at', { ascending: false });
       if (error) throw error;
       return d || [];
     },
@@ -147,7 +147,7 @@ export default function SegurosVidaPage() {
 
   const criarSinistro = useMutation({
     mutationFn: async (d: typeof sinForm) => {
-      const { error } = await supabase.from('').insert({ seguro_vida_id: d.seguro_vida_id || null, colaborador_id: d.colaborador_id || null, tipo: d.tipo || null, data_sinistro: d.data_sinistro || null, descricao: d.descricao || null, status: 'aberto' });
+      const { error } = await supabase.from('sinistros_seguro').insert({ seguro_vida_id: d.seguro_vida_id || null, colaborador_id: d.colaborador_id || null, tipo: d.tipo || null, data_sinistro: d.data_sinistro || null, descricao: d.descricao || null, status: 'aberto' });
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['sinistros-seguro'] }); setOpenSin(false); setSinForm({ seguro_vida_id: '', colaborador_id: '', tipo: '', data_sinistro: '', descricao: '' }); toast.success('Sinistro registrado'); },

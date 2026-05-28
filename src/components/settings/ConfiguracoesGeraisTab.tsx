@@ -22,7 +22,7 @@ export function ConfiguracoesGeraisTab() {
     queryKey: ['configuracoes'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('')
+        .from('configuracoes')
         .select('*')
         .order('chave');
       if (error) {
@@ -35,7 +35,7 @@ export function ConfiguracoesGeraisTab() {
 
   const criar = useMutation({
     mutationFn: async (d: typeof form) => {
-      const { error } = await supabase.from('').insert({
+      const { error } = await supabase.from('configuracoes').insert({
         chave: d.chave,
         valor: d.valor,
         descricao: d.descricao || null,
@@ -53,7 +53,7 @@ export function ConfiguracoesGeraisTab() {
 
   const excluir = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('').delete().eq('id', id);
+      const { error } = await supabase.from('configuracoes').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

@@ -68,7 +68,7 @@ export default function ConveniosPage() {
   const { data: vinculos = [], isLoading: loadVinc } = useQuery({
     queryKey: ['convenios-colaboradores', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('').select('*, colaborador:colaboradores(nome_completo), convenio:convenios(nome)').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('convenios_colaboradores').select('*, colaborador:colaboradores(nome_completo), convenio:convenios(nome)').order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
@@ -77,7 +77,7 @@ export default function ConveniosPage() {
 
   const criarVinculo = useMutation({
     mutationFn: async (d: typeof vincForm) => {
-      const { error } = await supabase.from('').insert({
+      const { error } = await supabase.from('convenios_colaboradores').insert({
         convenio_id: d.convenio_id, colaborador_id: d.colaborador_id,
         limite_individual: d.limite_individual ? Number(d.limite_individual) : null,
         ativo: true,
@@ -89,7 +89,7 @@ export default function ConveniosPage() {
   });
 
   const excluirVinculo = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('').delete().eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await supabase.from('convenios_colaboradores').delete().eq('id', id); if (error) throw error; },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['convenios-colaboradores'] }); toast.success('Vínculo removido'); },
   });
 

@@ -29,7 +29,7 @@ export function RelatoriosAgendadosTab({ empresaId }: { empresaId: string }) {
     queryKey: ['relatorios_agendados', empresaId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('')
+        .from('relatorios_agendados')
         .select('*')
         .eq('empresa_id', empresaId)
         .order('created_at', { ascending: false });
@@ -42,7 +42,7 @@ export function RelatoriosAgendadosTab({ empresaId }: { empresaId: string }) {
   const criar = useMutation({
     mutationFn: async (d: any) => {
       const { data, error } = await supabase
-        .from('')
+        .from('relatorios_agendados')
         .insert([{ ...d, empresa_id: empresaId, ativo: true }])
         .select()
         .single();
@@ -59,7 +59,7 @@ export function RelatoriosAgendadosTab({ empresaId }: { empresaId: string }) {
 
   const excluir = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('').delete().eq('id', id);
+      const { error } = await supabase.from('relatorios_agendados').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

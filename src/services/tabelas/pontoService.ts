@@ -20,18 +20,18 @@ export const ajustesPontoService = {
 
 export const periodosPontoService = {
   listar: async (empresaId?: string) => {
-    let q = supabase.from('').select('*').order('data_inicio', { ascending: false });
+    let q = supabase.from('periodos_ponto').select('*').order('data_inicio', { ascending: false });
     if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
   },
   criar: async (d: any) => {
-    const { error } = await supabase.from('').insert(d);
+    const { error } = await supabase.from('periodos_ponto').insert(d);
     if (error) throw error;
   },
   fechar: async (id: string) => {
-    const { error } = await supabase.from('').update({ status: 'fechado', fechado_em: new Date().toISOString() }).eq('id', id);
+    const { error } = await supabase.from('periodos_ponto').update({ status: 'fechado', fechado_em: new Date().toISOString() }).eq('id', id);
     if (error) throw error;
   },
 };

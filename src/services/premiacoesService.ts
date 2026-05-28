@@ -87,12 +87,12 @@ export const premiacoesService = {
         status_conciliacao,
         justificativa_divergencia: justificativa,
         status: status_conciliacao === 'conciliado' ? 'pago' : 'divergente_em_revisao',
-        historico_mudancas: [...currentHistory, { 
-          status: status_conciliacao === 'conciliado' ? 'pago' : 'divergente_em_revisao', 
-          data: new Date().toISOString(), 
+        historico_mudancas: [...currentHistory, {
+          status: status_conciliacao === 'conciliado' ? 'pago' : 'divergente_em_revisao',
+          data: new Date().toISOString(),
           comentario: `Conciliação: ${status_conciliacao}. ${justificativa || ''}`,
           valor_folha: valorFolha,
-          user: 'current_user' 
+          user: 'current_user'
         }]
       })
       .eq('id', id)

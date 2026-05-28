@@ -61,17 +61,17 @@ export const catalogoCursoService = {
 
   // === Trilhas ↔ Cursos ===
   async listarTrilhasCursos(trilhaId: string) {
-    const { data, error } = await supabase.from('').select('*, curso:catalogo_cursos(id, nome, carga_horaria)').eq('trilha_id', trilhaId).order('ordem');
+    const { data, error } = await supabase.from('trilhas_cursos').select('*, curso:catalogo_cursos(id, nome, carga_horaria)').eq('trilha_id', trilhaId).order('ordem');
     if (error) throw error;
     return data || [];
   },
   async vincularCursoTrilha(d: { trilha_id: string; curso_id: string; ordem?: number; obrigatorio?: boolean }) {
-    const { data, error } = await supabase.from('').insert(d).select().maybeSingle();
+    const { data, error } = await supabase.from('trilhas_cursos').insert(d).select().maybeSingle();
     if (error) throw error;
     return data;
   },
   async desvincularCursoTrilha(id: string) {
-    const { error } = await supabase.from('').delete().eq('id', id);
+    const { error } = await supabase.from('trilhas_cursos').delete().eq('id', id);
     if (error) throw error;
   },
 
@@ -103,7 +103,7 @@ export const catalogoCursoService = {
 
   // === Certificados ===
   async listarCertificados(colaboradorId?: string, empresaId?: string) {
-    let q = supabase.from('').select('*, curso:catalogo_cursos(nome, carga_horaria), colaborador:colaboradores(nome_completo)');
+    let q = supabase.from('treinamento_certificados').select('*, curso:catalogo_cursos(nome, carga_horaria), colaborador:colaboradores(nome_completo)');
     if (colaboradorId) q = q.eq('colaborador_id', colaboradorId);
     if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data, error } = await q.order('data_emissao', { ascending: false });
@@ -112,7 +112,7 @@ export const catalogoCursoService = {
   },
   
   async getCertificado(id: string) {
-    const { data, error } = await supabase.from('').select('*, curso:catalogo_cursos(*), colaborador:colaboradores(*)').eq('id', id).single();
+    const { data, error } = await supabase.from('treinamento_certificados').select('*, curso:catalogo_cursos(*), colaborador:colaboradores(*)').eq('id', id).single();
     if (error) throw error;
     return data;
   }

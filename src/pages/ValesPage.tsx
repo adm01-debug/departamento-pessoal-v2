@@ -59,7 +59,7 @@ export default function ValesPage() {
   const { data: recargas = [], isLoading: loadRec } = useQuery({
     queryKey: ['recargas-vale', empresaAtual?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false }).limit(100);
+      const { data, error } = await supabase.from('recargas_vale').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false }).limit(100);
       if (error) throw error;
       return data || [];
     },
@@ -68,7 +68,7 @@ export default function ValesPage() {
 
   const criarRecarga = useMutation({
     mutationFn: async (d: typeof recForm) => {
-      const { error } = await supabase.from('').insert({
+      const { error } = await supabase.from('recargas_vale').insert({
         colaborador_id: d.colaborador_id || null,
         vale_id: d.vale_id || null,
         valor: Number(d.valor),

@@ -24,7 +24,7 @@ export const automacaoService = {
     
     const { data: aniversariantes } = await supabase
       .from('colaboradores')
-      .select('id, nome_completo, telefone_celular, empresa_id')
+      .select('id, nome_completo, telefone, empresa_id')
       .eq('empresa_id', empresaId)
       .eq('status', 'ativo')
       .filter('data_nascimento', 'ilike', `%-${diaMes}`);
@@ -45,8 +45,8 @@ export const automacaoService = {
       });
 
       // WhatsApp (se configurado)
-      if (colab.telefone_celular) {
-        await whatsappService.sendMessage(empresaId, colab.telefone_celular, mensagem);
+      if (colab.telefone) {
+        await whatsappService.sendMessage({ empresaId, colaboradorId: colab.id, phone: colab.telefone, message: mensagem });
       }
     }
   },
@@ -57,8 +57,8 @@ export const automacaoService = {
     const dataFormatada = dataAlerta.toISOString().split('T')[0];
 
     const { data: asos } = await supabase
-      .from('')
-      .select('*, colaborador:colaboradores(nome_completo, telefone_celular)')
+      .from('asos')
+      .select('*, colaborador:colaboradores(id, nome_completo, telefone)')
       .eq('empresa_id', empresaId)
       .eq('data_vencimento', dataFormatada);
 
@@ -77,8 +77,8 @@ export const automacaoService = {
         entidade_id: colab.id
       });
 
-      if (colab.telefone_celular) {
-        await whatsappService.sendMessage(empresaId, colab.telefone_celular, mensagem);
+      if (colab.telefone) {
+        await whatsappService.sendMessage({ empresaId, colaboradorId: colab.id, phone: colab.telefone, message: mensagem });
       }
     }
   },
@@ -89,7 +89,7 @@ export const automacaoService = {
     const dataFormatada = dataAlerta.toISOString().split('T')[0];
 
     const { data: periodos } = await supabase
-      .from('')
+      .from('periodos_experiencia')
       .select('*, colaborador:colaboradores(id, nome_completo, empresa_id)')
       .eq('empresa_id', empresaId)
       .or(`data_fim_primeiro_periodo.eq.${dataFormatada},data_fim_segundo_periodo.eq.${dataFormatada}`);

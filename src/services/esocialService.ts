@@ -326,7 +326,7 @@ export async function adicionarCertificado(cert: {
 export async function listarTransmissaoLogs(empresaId: string, eventoId?: string): Promise<any[]> {
   
   let query = supabase
-    .from('')
+    .from('esocial_transmissao_logs')
     .select('*')
     .eq('empresa_id', empresaId)
     .order('created_at', { ascending: false })
