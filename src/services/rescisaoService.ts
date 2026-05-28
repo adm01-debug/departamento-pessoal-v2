@@ -81,7 +81,7 @@ export const rescisaoService = {
 
       const { data: novo, error: updateError } = await supabase
         .from('desligamentos')
-        .update(dadosAtualizados)
+        .update(dadosAtualizados as any)
         .eq('id', id)
         .select()
         .single();
@@ -223,7 +223,7 @@ export const rescisaoService = {
           etapa: 'finalizado',
           checklist_pagamento: true,
           data_pagamento: new Date().toISOString()
-        })
+        } as any)
         .eq('id', id)
         .select()
         .single();

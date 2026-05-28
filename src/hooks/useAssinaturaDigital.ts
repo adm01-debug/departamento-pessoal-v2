@@ -19,7 +19,7 @@ export function useAssinaturaDigital() {
               timestamp: new Date().toISOString()
             }
           }
-        })
+        } as any)
         .eq('id', tokenId)
         .select()
         .single();

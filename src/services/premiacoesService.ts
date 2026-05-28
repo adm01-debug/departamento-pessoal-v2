@@ -107,7 +107,7 @@ export const premiacoesService = {
       entidade_id: id,
       acao: 'conciliacao_folha',
       detalhes: { valor_aprovado: valorAprovado, valor_folha: valorFolha, status_conciliacao, justificativa }
-    });
+    } as any);
 
     if (status_conciliacao === 'divergente') {
       await this.enviarNotificacaoCritica('conciliacao_divergente', { id, valorAprovado, valorFolha, justificativa });
@@ -206,7 +206,7 @@ export const premiacoesService = {
       mensagem: `Ação detectada no módulo de premiações: ${JSON.stringify(payload)}`,
       user_id: payload.user_id,
       metadata: { ...payload, modulo: 'premiacoes' }
-    });
+    } as any);
     
     if (error) console.error("Erro ao registrar notificação:", error);
     return true;
