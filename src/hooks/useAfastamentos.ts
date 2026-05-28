@@ -9,9 +9,9 @@ import { useGenericCrud } from './useGenericCrud';
 export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
-  const [filtros, setFiltros] = useState<any>({});
+  const [filtros, setFiltros] = useState<unknown>({});
 
-  const crud = useGenericCrud<any>({
+  const crud = useGenericCrud<unknown>({
     queryKey: 'afastamentos',
     service: afastamentoService,
     filters: { ...filtros, empresaId },
@@ -58,7 +58,7 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
       auditLogger.log({
         tabela: 'prorrogacoes_afastamento',
-        registro_id: (data as any).id,
+        registro_id: (data as Record<string, unknown>).id,
         acao: 'INSERT',
         dados_novos: data
       });
@@ -96,7 +96,7 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => (afastamentoService as any).excluir(id),
+    mutationFn: (id: string) => (afastamentoService as Record<string, unknown>).excluir(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });
       toast.success('Documento excluído com sucesso');

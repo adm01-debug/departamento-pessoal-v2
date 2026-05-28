@@ -39,7 +39,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
   const handleChecklistToggle = async (key: string, value: boolean) => {
     try {
       // Regras de transição de etapa baseadas no checklist
-      let updates: any = { [key]: value };
+      const updates: any = { [key]: value };
       
       if (key === 'checklist_comunicacao' && value) {
         updates.etapa = 'documentacao';
@@ -71,9 +71,9 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
         data_admissao: d.colaborador?.data_admissao || d.data_admissao, // Fallback
         data_desligamento: d.data_desligamento,
         tipo: d.tipo || 'sem_justa_causa',
-        aviso_trabalhado: (d as any).aviso_trabalhado ?? false,
-        ferias_vencidas: (d as any).ferias_vencidas_check ?? false,
-        saldo_fgts: (d as any).saldo_fgts ?? 0,
+        aviso_trabalhado: (d as Record<string, unknown>).aviso_trabalhado ?? false,
+        ferias_vencidas: (d as Record<string, unknown>).ferias_vencidas_check ?? false,
+        saldo_fgts: (d as Record<string, unknown>).saldo_fgts ?? 0,
       });
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Rescisão calculada com sucesso');
@@ -157,7 +157,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
                 <RescisaoRow label="Total Proventos" value={d.total_proventos} bold className="text-success" />
                 <RescisaoRow label="Total Descontos" value={d.total_descontos} bold className="text-destructive" />
                 <div className="flex justify-between text-[10px] font-body text-muted-foreground px-1">
-                  <span>(INSS: {fmt((d as any).inss)} / IRRF: {fmt((d as any).irrf)})</span>
+                  <span>(INSS: {fmt((d as Record<string, unknown>).inss)} / IRRF: {fmt((d as Record<string, unknown>).irrf)})</span>
                 </div>
                 <RescisaoRow label="Multa FGTS" value={d.multa_fgts} />
                 <Separator className="my-2" />

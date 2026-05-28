@@ -3,13 +3,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { MobileQuickActions } from './MobileQuickActions';
-import { Home, Users, FileText, Calendar, MoreHorizontal, LayoutGrid } from 'lucide-react';
+import { Home, Users, FileText, Calendar, MoreHorizontal, LayoutGrid, Scale } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const mobileItems = [
   { path: '/dashboard', label: 'Home', icon: Home, color: 'from-primary to-primary-glow' },
   { path: '/colaboradores', label: 'Equipe', icon: Users, color: 'from-primary to-primary-glow' },
   { path: '/quick-actions', label: 'Ações', icon: LayoutGrid, color: 'from-primary to-primary-glow', isSpecial: true },
+  { path: '/passivo-trabalhista', label: 'Riscos', icon: Scale, color: 'from-destructive to-destructive-glow' },
   { path: '/folha', label: 'Folha', icon: FileText, color: 'from-primary-glow to-primary' },
   { path: '/configuracoes', label: 'Mais', icon: MoreHorizontal, color: 'from-muted-foreground to-foreground' },
 ];

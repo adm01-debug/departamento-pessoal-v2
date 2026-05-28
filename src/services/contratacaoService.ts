@@ -95,7 +95,7 @@ export const contratacaoService = {
     }
   },
 
-  async enviarLinkCandidato(admissaoId: string, email: string): Promise<any> {
+  async enviarLinkCandidato(admissaoId: string, email: string): Promise<unknown> {
     
     const token = Math.random().toString(36).substring(2, 10).toUpperCase();
     const expiracao = new Date();

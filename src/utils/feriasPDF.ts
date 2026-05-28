@@ -36,7 +36,7 @@ export const feriasPDF = {
     });
 
     // Texto Legal
-    const finalY = (doc as any).lastAutoTable.finalY + 20;
+    const finalY = (doc as Record<string, unknown>).lastAutoTable.finalY + 20;
     doc.setFontSize(11);
     doc.setTextColor(0);
     const texto = `Comunico-lhe que, de acordo com as disposições legais vigentes, lhe serão concedidas férias relativas ao período aquisitivo correspondente, a serem gozadas no período acima mencionado.`;
@@ -146,7 +146,7 @@ export const feriasPDF = {
     });
 
     // Detalhamento
-    const nextY = (doc as any).lastAutoTable.finalY + 15;
+    const nextY = (doc as Record<string, unknown>).lastAutoTable.finalY + 15;
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
@@ -168,7 +168,7 @@ export const feriasPDF = {
       alternateRowStyles: { fillColor: [245, 245, 245] },
       margin: { top: 40, bottom: 20 },
       didDrawPage: (dataArg) => {
-        const totalPages = (doc as any).internal.getNumberOfPages();
+        const totalPages = (doc as Record<string, unknown>).internal.getNumberOfPages();
         drawFooter(doc, dataArg.pageNumber, totalPages);
         if (dataArg.pageNumber > 1) {
           drawHeader(doc);

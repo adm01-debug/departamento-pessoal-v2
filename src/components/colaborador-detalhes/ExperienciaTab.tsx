@@ -47,11 +47,11 @@ export function ExperienciaTab({ colaboradorId }: { colaboradorId: string }) {
       <CardContent>
         {!showForm && data ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div><Label className="text-muted-foreground text-xs">Início</Label><p className="font-medium">{(data as any).data_inicio}</p></div>
-            <div><Label className="text-muted-foreground text-xs">1ª Etapa (fim)</Label><p className="font-medium">{(data as any).primeira_etapa_fim || '-'}</p></div>
-            <div><Label className="text-muted-foreground text-xs">2ª Etapa (fim)</Label><p className="font-medium">{(data as any).segunda_etapa_fim || '-'}</p></div>
-            <div><Label className="text-muted-foreground text-xs">Tipo</Label><p className="font-medium">{(data as any).tipo}</p></div>
-            <div><Label className="text-muted-foreground text-xs">Status</Label><Badge>{(data as any).status}</Badge></div>
+            <div><Label className="text-muted-foreground text-xs">Início</Label><p className="font-medium">{(data as Record<string, unknown>).data_inicio}</p></div>
+            <div><Label className="text-muted-foreground text-xs">1ª Etapa (fim)</Label><p className="font-medium">{(data as Record<string, unknown>).primeira_etapa_fim || '-'}</p></div>
+            <div><Label className="text-muted-foreground text-xs">2ª Etapa (fim)</Label><p className="font-medium">{(data as Record<string, unknown>).segunda_etapa_fim || '-'}</p></div>
+            <div><Label className="text-muted-foreground text-xs">Tipo</Label><p className="font-medium">{(data as Record<string, unknown>).tipo}</p></div>
+            <div><Label className="text-muted-foreground text-xs">Status</Label><Badge>{(data as Record<string, unknown>).status}</Badge></div>
           </div>
         ) : (
           <div className="grid gap-3 max-w-md">

@@ -9,6 +9,8 @@ import { BackButton } from './BackButton';
 import { EmpresaSelector } from './EmpresaSelector';
 import { useAuth } from '@/hooks/useAuth';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { useSystemHealth } from '@/hooks/useSystemHealth';
+import { Activity } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -19,6 +21,7 @@ interface HeaderProps {
 export function Header({ onMenuClick, user, className }: HeaderProps) {
   const { isAdmin } = useAuth();
   const { empresaAtual, userEmpresas, temMultiplasEmpresas, trocarEmpresa } = useEmpresas();
+  const { latency, status } = useSystemHealth();
   const handleSearchClick = () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
   };
@@ -57,9 +60,20 @@ export function Header({ onMenuClick, user, className }: HeaderProps) {
 
       <div className="flex items-center gap-3">
         {/* Sync Status Badge */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/5 border border-success/20 text-[10px] font-bold text-success uppercase tracking-wider animate-pulse-subtle">
+        <div className={cn(
+          "hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider",
+          status === 'online' ? "bg-success/5 border-success/20 text-success" :
+          status === 'slow' ? "bg-warning/5 border-warning/20 text-warning" :
+          "bg-destructive/5 border-destructive/20 text-destructive"
+        )}>
           <Cloud className="h-3 w-3" />
-          External DB Connected
+          {status === 'online' ? 'DB Conectado' : status === 'slow' ? 'Latência Alta' : 'DB Offline'}
+          {latency !== null && (
+            <span className="flex items-center gap-1 ml-1 pl-1 border-l border-current/20">
+              <Activity className="h-2.5 w-2.5" />
+              {latency}ms
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-1.5">

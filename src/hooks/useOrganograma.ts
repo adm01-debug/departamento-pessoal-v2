@@ -22,7 +22,7 @@ export function useOrganograma() {
       // Buscar todos os colaboradores ativos para distribuir nos departamentos
       const { data: cols, error: colsError } = await supabase
         .from('colaboradores')
-        .select('id, nome_completo, cargo, departamento, email, foto_url')
+        .select('id, nome_completo, departamento, email, foto_url')
         .eq('status', 'ativo' as any); // Type cast for status
 
       if (colsError) throw colsError;

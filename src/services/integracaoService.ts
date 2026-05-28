@@ -23,7 +23,7 @@ export interface WebhookConfig {
 export const cnabService = {
   async getConfig(): Promise<CnabConfig | null> {
     
-    const { data, error } = await supabase.from('cnab_configuracoes' as any).select('*').limit(1).maybeSingle();
+    const { data, error } = await supabase.from('cnab_configuracoes').select('*').limit(1).maybeSingle();
     if (error) throw error;
     return data as unknown as CnabConfig;
   
@@ -31,14 +31,14 @@ export const cnabService = {
   
   async saveConfig(d: any): Promise<void> {
     
-    const { error } = await supabase.from('cnab_configuracoes' as any).upsert(d);
+    const { error } = await supabase.from('cnab_configuracoes').upsert(d);
     if (error) throw error;
   
   },
   
   async getRemessas(): Promise<any[]> {
     
-    const { data, error } = await supabase.from('cnab_remessas' as any).select('*').order('created_at', { ascending: false }).limit(50);
+    const { data, error } = await supabase.from('cnab_remessas').select('*').order('created_at', { ascending: false }).limit(50);
     if (error) throw error;
     return data || [];
   
@@ -48,7 +48,7 @@ export const cnabService = {
 export const webhookService = {
   async listar(): Promise<WebhookConfig[]> {
     
-    const { data, error } = await supabase.from('webhooks_config' as any).select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('webhooks_config').select('*').order('created_at', { ascending: false });
     if (error) throw error;
     return (data || []) as unknown as WebhookConfig[];
   
@@ -56,21 +56,21 @@ export const webhookService = {
   
   async criar(d: any): Promise<void> {
     
-    const { error } = await supabase.from('webhooks_config' as any).insert(d);
+    const { error } = await supabase.from('webhooks_config').insert(d);
     if (error) throw error;
   
   },
   
   async excluir(id: string): Promise<void> {
     
-    const { error } = await supabase.from('webhooks_config' as any).delete().eq('id', id);
+    const { error } = await supabase.from('webhooks_config').delete().eq('id', id);
     if (error) throw error;
   
   },
   
   async getLogs(): Promise<any[]> {
     
-    const { data, error } = await supabase.from('webhook_logs' as any).select('*').order('created_at', { ascending: false }).limit(50);
+    const { data, error } = await supabase.from('webhook_logs').select('*').order('created_at', { ascending: false }).limit(50);
     if (error) throw error;
     return data || [];
   

@@ -1,13 +1,21 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  // Healthcheck geralmente é GET, mas se for POST validamos que o corpo está vazio
+  if (req.method === 'POST') {
+    try {
+      const body = await req.json();
+      if (Object.keys(body).length > 0) {
+        return createErrorResponse('Corpo da requisição não permitido para healthcheck', 422, 'VALIDATION_ERROR');
+      }
+    } catch (e) {
+      // Ignora erro se não houver JSON
+    }
+  }
 
   try {
     const supabase = createClient(
@@ -46,8 +54,6 @@ serve(async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ status: 'error', error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
+    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });

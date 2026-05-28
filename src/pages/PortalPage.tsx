@@ -25,10 +25,10 @@ function usePortalCompleto(userId: string | undefined) {
         supabase.from('notificacoes').select('id, titulo, mensagem, lida, created_at, tipo').eq('user_id', userId!).eq('lida', false).order('created_at', { ascending: false }).limit(8),
         supabase.from('registros_ponto').select('entrada_1, saida_1, entrada_2, saida_2, horas_trabalhadas, horas_extras, atraso_minutos').eq('data', hoje).limit(1).maybeSingle(),
         supabase.from('ferias').select('data_inicio, data_fim, status, dias_total').in('status', ['pendente', 'aprovada']).order('data_inicio', { ascending: true }).limit(5),
-        supabase.from('folhas_pagamento' as any).select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3),
+        supabase.from('folhas_pagamento').select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3),
         supabase.from('beneficios').select('nome, tipo, valor, status').eq('status', 'ativo').limit(6),
-        supabase.from('comunicados' as any).select('id, titulo, tipo, created_at').eq('ativo', true).order('created_at', { ascending: false }).limit(5),
-        supabase.from('treinamentos' as any).select('id, nome, status, data_inicio').in('status', ['pendente', 'em_andamento']).limit(3),
+        supabase.from('comunicados').select('id, titulo, tipo, created_at').eq('ativo', true).order('created_at', { ascending: false }).limit(5),
+        supabase.from('treinamentos').select('id, nome, status, data_inicio').in('status', ['pendente', 'em_andamento']).limit(3),
       ]);
       return { profile, notificacoes: notificacoes || [], pontoHoje, feriasPendentes: feriasPendentes || [], holerites: holerites || [], beneficios: beneficios || [], comunicados: comunicados || [], treinamentos: treinamentos || [] };
     },

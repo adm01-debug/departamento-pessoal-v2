@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import {
   Zap, UserPlus, DollarSign, Clock, Bot, ArrowRight,
-  Calendar, FileText, Building2, BarChart3
+  Calendar, FileText, Building2, BarChart3, Scale
 } from 'lucide-react';
 
 const MotionCard = motion.create(Card);
@@ -14,7 +14,7 @@ const actions = [
   { label: 'Lançar Ponto', icon: Clock, gradient: 'from-primary/80 to-primary', path: '/ponto', desc: 'Batida manual' },
   { label: 'Calcular Folha', icon: DollarSign, gradient: 'from-primary/60 to-primary/90', path: '/folha/calcular', desc: 'Processamento mensal' },
   { label: 'Férias / Ausências', icon: Calendar, gradient: 'from-primary-glow to-primary', path: '/ferias', desc: 'Gestão de tempo' },
-  { label: 'Obrigações Fiscais', icon: FileText, gradient: 'from-info to-info/70', path: '/obrigacoes-fiscais', desc: 'Compliance eSocial' },
+  { label: 'Passivo Trabalhista', icon: Scale, gradient: 'from-destructive to-destructive/80', path: '/passivo-trabalhista', desc: 'Análise de risco' },
   { label: 'Relatórios DP', icon: BarChart3, gradient: 'from-primary to-primary-glow', path: '/relatorios', desc: 'Extração de BI' },
 ];
 

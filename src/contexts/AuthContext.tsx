@@ -28,8 +28,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AUTH_INIT_TIMEOUT_MS = 5000;
-const USER_ROLES_TIMEOUT_MS = 3000;
+const AUTH_INIT_TIMEOUT_MS = 10000;
+const USER_ROLES_TIMEOUT_MS = 5000;
 
 async function fetchUserRoles(userId: string): Promise<AppRole[]> {
   try {
@@ -140,7 +140,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(authInitTimeout);
       subscription.unsubscribe();
     };
-  }, [applySession, isReady, markReady]);
+  }, [applySession, markReady]);
+
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {

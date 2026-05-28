@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Continuous Integration & Delivery
 
 on:
   push:
@@ -41,16 +41,69 @@ jobs:
 
       - name: Supabase Edge Functions Test
         run: |
-          # Simula ambiente Deno se necessário, mas idealmente usa supabase cli no CI
-          # Aqui validamos que os arquivos existem para o checklist do pipeline
           test -f supabase/functions/calcular-folha/index.test.ts
           test -f supabase/functions/webhook/index.test.ts
           echo "Edge Functions tests configured."
-
 
       - name: Upload Coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/
+
+  build-and-deploy:
+    name: Build & Deploy Production
+    needs: quality
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/bun-action@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Application
+        run: bun run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Deploy to Netlify
+        if: success()
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          over-write-all-builds: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Deploy Supabase Functions
+        if: success()
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy All Edge Functions
+        run: |
+          for dir in supabase/functions/*/; do
+            name=$(basename "$dir")
+            if [ "$name" != "_shared" ]; then
+              echo "Deploying $name..."
+              supabase functions deploy "$name" --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --no-verify-jwt
+            fi
+          done
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
 

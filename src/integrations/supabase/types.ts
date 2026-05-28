@@ -4163,6 +4163,30 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracoes_alertas: {
+        Row: {
+          ativa: boolean | null
+          email_notificacao: string | null
+          id: string
+          metrica: string
+          threshold: number
+        }
+        Insert: {
+          ativa?: boolean | null
+          email_notificacao?: string | null
+          id?: string
+          metrica: string
+          threshold: number
+        }
+        Update: {
+          ativa?: boolean | null
+          email_notificacao?: string | null
+          id?: string
+          metrica?: string
+          threshold?: number
+        }
+        Relationships: []
+      }
       configuracoes_esocial: {
         Row: {
           ambiente: string | null
@@ -8693,6 +8717,48 @@ export type Database = {
         }
         Relationships: []
       }
+      fila_processamento: {
+        Row: {
+          created_at: string | null
+          empresa_id: string | null
+          erro_log: string | null
+          id: string
+          payload: Json | null
+          progresso: number | null
+          resultado: Json | null
+          status: string
+          tipo_tarefa: string
+          updated_at: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          empresa_id?: string | null
+          erro_log?: string | null
+          id?: string
+          payload?: Json | null
+          progresso?: number | null
+          resultado?: Json | null
+          status?: string
+          tipo_tarefa: string
+          updated_at?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          empresa_id?: string | null
+          erro_log?: string | null
+          id?: string
+          payload?: Json | null
+          progresso?: number | null
+          resultado?: Json | null
+          status?: string
+          tipo_tarefa?: string
+          updated_at?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
       folha_assinaturas: {
         Row: {
           assinante_id: string | null
@@ -11763,6 +11829,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      metricas_processamento: {
+        Row: {
+          funcao_nome: string
+          id: string
+          status: string
+          tempo_execucao_ms: number | null
+          timestamp: string | null
+        }
+        Insert: {
+          funcao_nome: string
+          id?: string
+          status: string
+          tempo_execucao_ms?: number | null
+          timestamp?: string | null
+        }
+        Update: {
+          funcao_nome?: string
+          id?: string
+          status?: string
+          tempo_execucao_ms?: number | null
+          timestamp?: string | null
+        }
+        Relationships: []
       }
       motivos_afastamento: {
         Row: {
@@ -19645,6 +19735,15 @@ export type Database = {
         }
         Relationships: []
       }
+      v_alertas_timeout: {
+        Row: {
+          funcao_nome: string | null
+          media_ms: number | null
+          ocorrencias: number | null
+          ultima_ocorrencia: string | null
+        }
+        Relationships: []
+      }
       vw_alertas_compensacao: {
         Row: {
           colaborador_id: string | null
@@ -20612,6 +20711,15 @@ export type Database = {
           },
         ]
       }
+      vw_metricas_fila: {
+        Row: {
+          falhas: number | null
+          sucessos: number | null
+          tempo_medio_segundos: number | null
+          tipo_tarefa: string | null
+        }
+        Relationships: []
+      }
       vw_passivo_trabalhista_consolidado: {
         Row: {
           colaborador_id: string | null
@@ -20839,6 +20947,7 @@ export type Database = {
       }
       format_type_string: { Args: { "": string }; Returns: string }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
+      get_auth_empresa_id: { Args: never; Returns: string }
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
         Returns: number

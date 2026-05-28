@@ -55,7 +55,10 @@ export function usePonto(colaboradorId?: string) {
               toast.error('Atenção: Falha na validação biométrica!');
             }
           })
-          .catch(err => console.error('Erro na validação biométrica:', err));
+          .catch(err => {
+            console.error('Erro na validação biométrica:', err);
+            toast.error('Falha na validação biométrica. O registro de ponto não será validado.');
+          });
       }
 
       return batida;

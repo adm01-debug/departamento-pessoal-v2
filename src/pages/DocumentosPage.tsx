@@ -37,11 +37,11 @@ export default function DocumentosPage() {
   const [colaboradorId, setColaboradorId] = useState(urlColaboradorId || '');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
-  const [ocrResult, setOcrResult] = useState<any>(null);
+  const [selectedDocForOcr, setSelectedDocForOcr] = useState<unknown>(null);
+  const [ocrResult, setOcrResult] = useState<unknown>(null);
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
-  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<any>(null);
-  const [selectedDocForPreview, setSelectedDocForPreview] = useState<any>(null);
+  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<unknown>(null);
+  const [selectedDocForPreview, setSelectedDocForPreview] = useState<unknown>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function DocumentosPage() {
   const colaboradores = colaboradoresRes?.data || [];
 
   const deleteMutation = useMutation({
-    mutationFn: async (doc: any) => {
+    mutationFn: async (doc: Record<string, unknown>) => {
       if (doc.url) {
         const path = doc.url.split(`${BUCKET}/`).pop();
         if (path) await supabase.storage.from(BUCKET).remove([path]);
@@ -122,7 +122,7 @@ export default function DocumentosPage() {
     }
   };
 
-  const handleOCR = async (doc: any) => {
+  const handleOCR = async (doc: Record<string, unknown>) => {
     setSelectedDocForOcr(doc);
     setOcrResult(null);
     setIsProcessingOcr(true);
@@ -142,7 +142,7 @@ export default function DocumentosPage() {
     }
   };
 
-  const handleDownload = async (doc: any) => {
+  const handleDownload = async (doc: Record<string, unknown>) => {
     try {
       const path = doc.storage_path || doc.url?.split(`${BUCKET}/`).pop();
       if (!path) { toast.error('Arquivo não encontrado'); return; }
@@ -161,7 +161,7 @@ export default function DocumentosPage() {
     }
   };
 
-  const handleView = async (doc: any) => {
+  const handleView = async (doc: Record<string, unknown>) => {
     setSelectedDocForPreview(doc);
   };
 
@@ -172,7 +172,7 @@ export default function DocumentosPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const filtered = documentos?.filter((d: any) => {
+  const filtered = documentos?.filter((d: Record<string, unknown>) => {
     const searchMatch = !search || 
       (d.nome || d.nome_arquivo || '').toLowerCase().includes(search.toLowerCase()) ||
       (d.colaborador?.nome_completo || '').toLowerCase().includes(search.toLowerCase());
@@ -222,7 +222,7 @@ export default function DocumentosPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos Colaboradores</SelectItem>
-              {colaboradores?.map((c: any) => (
+              {colaboradores?.map((c: Record<string, unknown>) => (
                 <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
               ))}
             </SelectContent>
@@ -252,7 +252,7 @@ export default function DocumentosPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((doc: any) => (
+              {filtered.map((doc: Record<string, unknown>) => (
                 <TableRow key={doc.id} className="hover:bg-accent/30 transition-colors">
                   <TableCell className="font-body font-medium flex items-center gap-2">
                     <File className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -394,7 +394,7 @@ export default function DocumentosPage() {
                   <SelectTrigger className="rounded-xl"><SelectValue placeholder="Geral" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="geral">Geral / Empresa</SelectItem>
-                    {colaboradores?.map((c: any) => (
+                    {colaboradores?.map((c: Record<string, unknown>) => (
                       <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
                     ))}
                   </SelectContent>

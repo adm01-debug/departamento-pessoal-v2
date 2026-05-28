@@ -32,7 +32,7 @@ export const rescisaoService = {
     }
   },
 
-  async calcularESalvar(id: string, params: any): Promise<any> {
+  async calcularESalvar(id: string, params: any): Promise<unknown> {
     if (!id) throw new Error('ID do desligamento é obrigatório');
 
     try {
@@ -50,13 +50,13 @@ export const rescisaoService = {
 
       // 2. Realizar o cálculo
       const result = await calcularRescisao({
-        salario: params.salario_base || (anterior as any).salario_base,
+        salario: params.salario_base || (anterior as Record<string, unknown>).salario_base,
         dataAdmissao: (anterior.colaborador as any)?.data_admissao || params.data_admissao,
-        dataDesligamento: params.data_desligamento || (anterior as any).data_desligamento,
-        tipo: params.tipo || (anterior as any).tipo,
-        avisoTrabalhado: params.aviso_trabalhado !== undefined ? params.aviso_trabalhado : (anterior as any).aviso_trabalhado,
-        feriasVencidas: params.ferias_vencidas !== undefined ? params.ferias_vencidas : (anterior as any).ferias_vencidas_check,
-        saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as any).saldo_fgts || 0),
+        dataDesligamento: params.data_desligamento || (anterior as Record<string, unknown>).data_desligamento,
+        tipo: params.tipo || (anterior as Record<string, unknown>).tipo,
+        avisoTrabalhado: params.aviso_trabalhado !== undefined ? params.aviso_trabalhado : (anterior as Record<string, unknown>).aviso_trabalhado,
+        feriasVencidas: params.ferias_vencidas !== undefined ? params.ferias_vencidas : (anterior as Record<string, unknown>).ferias_vencidas_check,
+        saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as Record<string, unknown>).saldo_fgts || 0),
         dependentes: (anterior.colaborador as any)?.dependentes_irrf || 0,
       });
       const resultado = result;
@@ -81,7 +81,7 @@ export const rescisaoService = {
 
       const { data: novo, error: updateError } = await supabase
         .from('desligamentos')
-        .update(dadosAtualizados)
+        .update(dadosAtualizados as any)
         .eq('id', id)
         .select()
         .single();
@@ -108,7 +108,7 @@ export const rescisaoService = {
     }
   },
 
-  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<any> {
+  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<unknown> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -169,7 +169,7 @@ export const rescisaoService = {
     }
   },
 
-  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<any> {
+  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<unknown> {
     try {
       const hash = btoa(`rescisao-${id}-${tipo}-${new Date().getTime()}`).slice(0, 32);
       const updateData: any = {};
@@ -206,7 +206,7 @@ export const rescisaoService = {
     }
   },
 
-  async processarPagamento(id: string, comprovanteUrl?: string): Promise<any> {
+  async processarPagamento(id: string, comprovanteUrl?: string): Promise<unknown> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -223,7 +223,7 @@ export const rescisaoService = {
           etapa: 'finalizado',
           checklist_pagamento: true,
           data_pagamento: new Date().toISOString()
-        })
+        } as any)
         .eq('id', id)
         .select()
         .single();

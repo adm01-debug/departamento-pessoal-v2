@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { useDepartamentos } from '@/hooks/useDepartamentos';
 import { useCargos } from '@/hooks/useCargos';
 import { useFormGuard } from '@/hooks/useFormGuard';
+import { useServerValidation } from '@/hooks/useServerValidation';
 
 const schema = z.object({
   // Geral
@@ -82,6 +83,7 @@ export default function ColaboradorFormPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { success, error: notifyError } = useNotification();
+  const { handleServerError } = useServerValidation<FormData>();
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
@@ -90,12 +92,12 @@ export default function ColaboradorFormPage() {
 
   const { data: colaborador, isLoading } = useQuery({
     queryKey: ['colaborador', id],
-    queryFn: () => (colaboradorService as any).buscarPorId(id!),
+    queryFn: () => (colaboradorService as Record<string, unknown>).buscarPorId(id!),
     enabled: isEditing,
   });
 
 
-  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch, setError } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { 
       status: 'ativo', 
@@ -115,14 +117,14 @@ export default function ColaboradorFormPage() {
   }, [colaborador, reset]);
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => isEditing ? (colaboradorService as any).atualizar(id!, data as any) : (colaboradorService as any).criar(data as any),
+    mutationFn: (data: FormData) => isEditing ? (colaboradorService as Record<string, unknown>).atualizar(id!, data as any) : (colaboradorService as Record<string, unknown>).criar(data as any),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
       success(isEditing ? 'Colaborador atualizado!' : 'Colaborador criado!');
       navigate('/colaboradores');
     },
-    onError: (err: any) => notifyError('Erro', err.message),
+    onError: (err: any) => handleServerError(err, setError),
   });
 
   const handleAddressFound = (addr: Address) => {

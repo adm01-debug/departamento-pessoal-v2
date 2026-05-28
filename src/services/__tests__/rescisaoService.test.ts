@@ -22,7 +22,7 @@ describe('rescisaoService', () => {
 
   describe('validarTransicao', () => {
     it('should block jumping more than one stage', async () => {
-      (supabase.from as any).mockReturnValue({
+      (supabase.from as Record<string, unknown>).mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: { etapa: 'comunicacao', status: 'pendente' }, error: null }),
@@ -36,7 +36,7 @@ describe('rescisaoService', () => {
     });
 
     it('should block homologation if status is not calculado', async () => {
-       (supabase.from as any).mockReturnValue({
+       (supabase.from as Record<string, unknown>).mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: { etapa: 'calculo', status: 'pendente' }, error: null }),
@@ -54,7 +54,7 @@ describe('rescisaoService', () => {
       const mockSelect = vi.fn().mockReturnThis();
       const mockSingle = vi.fn().mockResolvedValue({ data: { id: '1' }, error: null });
 
-      (supabase.from as any).mockReturnValue({
+      (supabase.from as Record<string, unknown>).mockReturnValue({
         update: mockUpdate,
         eq: mockEq,
         select: mockSelect,

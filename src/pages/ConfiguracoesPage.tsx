@@ -43,7 +43,7 @@ export default function ConfiguracoesPage() {
   const { data: alertasConfig = [], isLoading: loadAlertas } = useQuery({
     queryKey: ['config-alertas-indicadores'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('config_alertas_indicadores' as any).select('*').order('tipo');
+      const { data, error } = await supabase.from('config_alertas_indicadores').select('*').order('tipo');
       if (error) throw error;
       return data || [];
     },
@@ -53,7 +53,7 @@ export default function ConfiguracoesPage() {
   const { data: integracoes = [], isLoading: loadInteg } = useQuery({
     queryKey: ['integracoes'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('integracoes' as any).select('*').order('nome');
+      const { data, error } = await supabase.from('integracoes').select('*').order('nome');
       if (error) { if (error.code === '42P01') return []; throw error; }
       return data || [];
     },
@@ -63,7 +63,7 @@ export default function ConfiguracoesPage() {
   const { data: webhooksLogs = [], isLoading: loadWebhooks } = useQuery({
     queryKey: ['webhooks-logs'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('webhooks_logs' as any).select('*').order('created_at', { ascending: false }).limit(50);
+      const { data, error } = await supabase.from('webhooks_logs').select('*').order('created_at', { ascending: false }).limit(50);
       if (error) { if (error.code === '42P01') return []; throw error; }
       return data || [];
     },
@@ -71,7 +71,7 @@ export default function ConfiguracoesPage() {
 
   const criarAlerta = useMutation({
     mutationFn: async (d: typeof alertaForm) => {
-      const { error } = await supabase.from('config_alertas_indicadores' as any).insert({
+      const { error } = await supabase.from('config_alertas_indicadores').insert({
         tipo: d.tipo,
         limite_atencao: Number(d.limite_atencao),
         limite_critico: Number(d.limite_critico),
@@ -83,7 +83,7 @@ export default function ConfiguracoesPage() {
   });
 
   const excluirAlerta = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('config_alertas_indicadores' as any).delete().eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await supabase.from('config_alertas_indicadores').delete().eq('id', id); if (error) throw error; },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['config-alertas-indicadores'] }); toast.success('Configuração removida'); },
   });
 

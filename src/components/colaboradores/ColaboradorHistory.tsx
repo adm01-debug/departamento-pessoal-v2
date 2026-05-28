@@ -18,7 +18,7 @@ export function ColaboradorHistory({ colaboradorId }: ColaboradorHistoryProps) {
     queryKey: ['colaborador-history', colaboradorId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('audit_log' as any)
+        .from('audit_log')
         .select('*')
         .eq('registro_id', colaboradorId)
         .eq('tabela', 'colaboradores')

@@ -1,24 +1,24 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { metricasSchema } from '../_shared/schemas/common.ts';
+import { withMonitoring } from '../_shared/monitor.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  try {
-    const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
-    const { empresaId } = await req.json();
+  return withMonitoring(req, 'metricas', async (supabase) => {
+    const { data, errorResponse } = await validateRequest(req, metricasSchema);
+    if (errorResponse) return errorResponse;
 
-    const [colabs, folha, ferias, afast, esocial] = await Promise.all([
+    const { empresaId } = data!;
+
+    const [colabs, folha, ferias, afast, esocial, processing] = await Promise.all([
       supabase.from('colaboradores').select('status, departamento', { count: 'exact' }).eq('empresa_id', empresaId || ''),
-      supabase.from('folha_pagamento').select('competencia, salario_bruto, salario_liquido').eq('empresa_id', empresaId || '').order('competencia', { ascending: false }).limit(500),
+      supabase.from('folhas_pagamento').select('competencia, salario_bruto, salario_liquido').eq('empresa_id', empresaId || '').order('competencia', { ascending: false }).limit(500),
       supabase.from('ferias').select('status').eq('empresa_id', empresaId || ''),
       supabase.from('afastamentos').select('tipo, status').eq('empresa_id', empresaId || ''),
       supabase.from('esocial_eventos').select('status').eq('empresa_id', empresaId || ''),
+      supabase.from('metricas_processamento').select('*').order('timestamp', { ascending: false }).limit(100)
     ]);
 
     const ativos = (colabs.data || []).filter((c: any) => c.status === 'ativo').length;
@@ -28,6 +28,8 @@ serve(async (req) => {
     const totalBruto = folhaData.filter((f: any) => f.competencia === ultimaComp).reduce((s: number, f: any) => s + (f.salario_bruto || 0), 0);
 
     const esocialData = esocial.data || [];
+    const processingData = processing.data || [];
+    
     return new Response(JSON.stringify({
       timestamp: new Date().toISOString(),
       colaboradores: { total: colabs.count || 0, ativos, departamentos: deptos.length },
@@ -39,12 +41,12 @@ serve(async (req) => {
         pendentes: esocialData.filter((e: any) => e.status === 'pendente').length,
         erros: esocialData.filter((e: any) => e.status === 'erro').length,
       },
+      monitoring: {
+        avg_latency: processingData.reduce((acc: number, curr: any) => acc + curr.tempo_execucao_ms, 0) / (processingData.length || 1),
+        success_rate: (processingData.filter((p: any) => p.status === 'success').length / (processingData.length || 1)) * 100,
+        recent_failures: processingData.filter((p: any) => p.status !== 'success').length
+      }
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
-  }
+  });
 });
+

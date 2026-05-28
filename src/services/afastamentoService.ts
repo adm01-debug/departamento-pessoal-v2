@@ -73,7 +73,7 @@ class AfastamentoService extends BaseService<any> {
     return data || [];
   }
 
-  async uploadDocumento(afastamentoId: string, file: File, tipo: string): Promise<any> {
+  async uploadDocumento(afastamentoId: string, file: File, tipo: string): Promise<unknown> {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${afastamentoId}/${crypto.randomUUID()}.${fileExt}`;
@@ -109,7 +109,7 @@ class AfastamentoService extends BaseService<any> {
     }
   }
 
-  async validarDocumento(id: string, validado: boolean): Promise<any> {
+  async validarDocumento(id: string, validado: boolean): Promise<unknown> {
     const { data, error } = await (supabase as any)
       .from('documentos_afastamento')
       .update({ validado } as any)
@@ -133,7 +133,7 @@ class AfastamentoService extends BaseService<any> {
     return data || [];
   }
 
-  async criarProrrogacao(d: any): Promise<any> {
+  async criarProrrogacao(d: any): Promise<unknown> {
     try {
       const { data, error } = await (supabase as any)
         .from('prorrogacoes_afastamento')

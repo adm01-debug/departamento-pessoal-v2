@@ -77,7 +77,7 @@ export async function listarEventosPorCompetencia(empresaId: string | null, comp
   
 }
 
-export async function obterEstatisticas(empresaId: string | null): Promise<any> {
+export async function obterEstatisticas(empresaId: string | null): Promise<unknown> {
   try {
     const res = await listarEventos(empresaId);
     const eventos = res;
@@ -143,7 +143,7 @@ export function listarEventosValidaveis(): string[] {
   return getValidadoresDisponiveis();
 }
 
-export async function enviarEvento(eventoId: string, empresaId: string): Promise<any> {
+export async function enviarEvento(eventoId: string, empresaId: string): Promise<unknown> {
   try {
     await supabase.from('esocial_eventos').update({ status: 'processando' }).eq('id', eventoId);
 
@@ -178,11 +178,11 @@ export async function enviarEvento(eventoId: string, empresaId: string): Promise
   }
 }
 
-export async function reenviarEvento(eventoId: string, empresaId: string): Promise<any> {
+export async function reenviarEvento(eventoId: string, empresaId: string): Promise<unknown> {
   return enviarEvento(eventoId, empresaId);
 }
 
-export async function gerarEventosPeriodo(empresaId: string, competencia: string): Promise<any> {
+export async function gerarEventosPeriodo(empresaId: string, competencia: string): Promise<unknown> {
   try {
     const { data: itens, error: iError } = await supabase
       .from('folha_itens')
@@ -270,7 +270,7 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
   }
 }
 
-export async function getConfig(empresaId: string): Promise<any> {
+export async function getConfig(empresaId: string): Promise<unknown> {
   
   const { data, error } = await supabase
     .from('configuracoes_esocial')
@@ -311,7 +311,7 @@ export async function adicionarCertificado(cert: {
   arquivo_base64: string;
   senha_encriptada: string;
   cnpj_cpf: string;
-}): Promise<any> {
+}): Promise<unknown> {
   
   const { data, error } = await supabase
     .from('certificados_digitais')
@@ -326,7 +326,7 @@ export async function adicionarCertificado(cert: {
 export async function listarTransmissaoLogs(empresaId: string, eventoId?: string): Promise<any[]> {
   
   let query = supabase
-    .from('esocial_transmissao_logs' as any)
+    .from('esocial_transmissao_logs')
     .select('*')
     .eq('empresa_id', empresaId)
     .order('created_at', { ascending: false })

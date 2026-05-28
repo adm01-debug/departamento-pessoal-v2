@@ -5,7 +5,7 @@ import {
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
-  Trophy
+  Trophy, MessageSquareText
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -16,11 +16,13 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
+import { usePWA } from '@/hooks/usePWA';
 import { toast } from 'sonner';
 import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
+import { DownloadCloud } from 'lucide-react';
 
 interface MenuItem { icon: LucideIcon; label: string; path: string; color: string; }
 interface MenuGroup { id: string; label: string; icon: LucideIcon; color: string; items: MenuItem[]; }
@@ -34,6 +36,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', color: 'text-primary' },
       { icon: BarChart3, label: 'Dashboard Executivo', path: '/dashboard-executivo', color: 'text-success' },
+      { icon: Scale, label: 'Passivo Trabalhista', path: '/passivo-trabalhista', color: 'text-destructive' },
       { icon: Users, label: 'Colaboradores', path: '/colaboradores', color: 'text-info' },
       { icon: Network, label: 'Organograma', path: '/organograma', color: 'text-info' },
       { icon: Bot, label: 'Assistente IA', path: '/assistente-ia', color: 'text-primary' },
@@ -50,6 +53,7 @@ const menuGroups: MenuGroup[] = [
       { icon: UserMinus, label: 'Desligamentos', path: '/desligamentos', color: 'text-destructive' },
       { icon: Target, label: 'Avaliação & Performance', path: '/avaliacao', color: 'text-warning' },
       { icon: Trophy, label: 'Premiações 10/10', path: '/premiacoes', color: 'text-primary' },
+
       { icon: GraduationCap, label: 'Treinamentos', path: '/treinamentos', color: 'text-info' },
       { icon: UserSearch, label: 'Recrutamento', path: '/recrutamento', color: 'text-success' },
       { icon: ClipboardList, label: 'Pesquisas Clima', path: '/pesquisas-clima', color: 'text-info' },
@@ -81,7 +85,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Gift, label: 'Benefícios', path: '/beneficios', color: 'text-warning' },
       { icon: TrendingDown, label: 'Descontos & Consignados', path: '/descontos', color: 'text-destructive' },
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
-      { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/bancario', color: 'text-info' },
+      { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/financeiro-bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },
     ]
   },
@@ -122,7 +126,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Shield, label: 'SST', path: '/sst', color: 'text-success' },
       { icon: Calculator, label: 'Rescisão', path: '/calculadora-rescisao', color: 'text-warning' },
       { icon: Users, label: 'Importação', path: '/importacao', color: 'text-info' },
-      { icon: Megaphone, label: 'Comunicação', path: '/comunicacao', color: 'text-warning' },
+      { icon: Megaphone, label: 'Comunicação', path: '/comunicacao-interna', color: 'text-warning' },
       { icon: Shield, label: 'Usuários', path: '/usuarios', color: 'text-warning' },
       { icon: Settings, label: 'Configurações', path: '/configuracoes', color: 'text-muted-foreground' },
       { icon: Gift, label: 'Promo Brindes', path: '/promo-brindes', color: 'text-warning' },
@@ -269,6 +273,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isInstallable, installApp } = usePWA();
 
   const handleLogout = async () => { 
     try {
@@ -333,7 +338,33 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
           ))}
         </nav>
 
-        <div className="px-3 py-2">
+        <div className="px-3 py-2 space-y-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toast.info('Abertura de ticket de suporte...')}
+            className={cn(
+              "w-full gap-2 text-muted-foreground hover:text-primary rounded-xl",
+              collapsed && "px-0 justify-center"
+            )}
+          >
+            <MessageSquareText className="h-4 w-4" />
+            {!collapsed && "Dar Feedback"}
+          </Button>
+          {isInstallable && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={installApp} 
+              className={cn(
+                "w-full mb-2 gap-2 border-primary/30 text-primary hover:bg-primary/10 rounded-xl",
+                collapsed && "px-0 justify-center"
+              )}
+            >
+              <DownloadCloud className="h-4 w-4" />
+              {!collapsed && "Instalar App"}
+            </Button>
+          )}
           <SystemStatus collapsed={collapsed} />
         </div>
 

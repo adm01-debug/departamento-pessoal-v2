@@ -16,7 +16,7 @@ export function SSTRiscosTab() {
     enabled: !!empresaAtual?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('sst_riscos_ambientais' as any)
+        .from('sst_riscos_ambientais')
         .select('*, local:locais_trabalho(nome)')
         .eq('empresa_id', empresaAtual!.id);
       if (error) throw error;

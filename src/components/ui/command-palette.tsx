@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
+import { useDebounce } from '@/hooks/useDebounce';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { ColaboradorStatus } from '@/components/ui/status-badge';
 import {
@@ -14,7 +15,7 @@ import {
   Search, UserPlus, DollarSign, ArrowRight,
   Zap, Calculator, Plus, User, Briefcase,
   FolderOpen, Network, Shield, UserCog, Plug, Database,
-  CalendarDays, UserMinus,
+  CalendarDays, UserMinus, Scale, TrendingUp
 } from 'lucide-react';
 
 /* ─── Types ─── */
@@ -51,6 +52,8 @@ const staticCommands: CommandItem[] = [
   { id: 'feriados', label: 'Feriados', description: 'Calendário de feriados', icon: CalendarDays, category: 'navigation', path: '/feriados', gradient: 'from-primary to-primary-glow' },
   { id: 'organograma', label: 'Organograma', description: 'Hierarquia organizacional', icon: Network, category: 'navigation', path: '/organograma', gradient: 'from-primary/80 to-primary' },
   { id: 'relatorios', label: 'Relatórios', description: 'Relatórios e exportações', icon: BarChart3, category: 'navigation', path: '/relatorios', gradient: 'from-primary to-primary-glow' },
+  { id: 'passivo-trabalhista', label: 'Passivo Trabalhista', description: 'Análise de riscos e provisões', icon: Scale, category: 'navigation', path: '/passivo-trabalhista', gradient: 'from-destructive to-destructive/80' },
+  { id: 'dashboard-executivo', label: 'Dashboard Executivo', description: 'KPIs estratégicos para gestão', icon: TrendingUp, category: 'navigation', path: '/dashboard-executivo', gradient: 'from-success to-success/80' },
   { id: 'esocial', label: 'eSocial', description: 'Eventos e transmissão', icon: FileCheck, category: 'navigation', path: '/esocial', gradient: 'from-primary to-primary-glow' },
   { id: 'auditoria', label: 'Auditoria', description: 'Logs e rastreamento', icon: Shield, category: 'navigation', path: '/auditoria', gradient: 'from-primary/60 to-primary/90' },
   { id: 'usuarios', label: 'Usuários', description: 'Gerenciar usuários', icon: UserCog, category: 'navigation', path: '/usuarios', gradient: 'from-primary/80 to-primary' },
@@ -107,6 +110,7 @@ export function CommandPalette({
   const setOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
   
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,10 +118,10 @@ export function CommandPalette({
 
   // Search colaboradores from DB
   const { data: dbColaboradores } = useQuery({
-    queryKey: ['cmd-colaboradores', empresaAtual?.id, query],
-    enabled: open && query.length >= 2 && !!empresaAtual?.id,
+    queryKey: ['cmd-colaboradores', empresaAtual?.id, debouncedQuery],
+    enabled: open && debouncedQuery.length >= 2 && !!empresaAtual?.id,
     queryFn: async () => {
-      const q = query.trim();
+      const q = debouncedQuery.trim();
       let queryBuilder = supabase
         .from('colaboradores')
         .select('id, nome_completo, cpf, cargo, status')
@@ -139,10 +143,10 @@ export function CommandPalette({
 
   // Search empresas from DB (filtered by user's empresas via RLS)
   const { data: dbEmpresas } = useQuery({
-    queryKey: ['cmd-empresas', query],
-    enabled: open && query.length >= 2,
+    queryKey: ['cmd-empresas', debouncedQuery],
+    enabled: open && debouncedQuery.length >= 2,
     queryFn: async () => {
-      const q = query.trim();
+      const q = debouncedQuery.trim();
       let queryBuilder = supabase
         .from('empresas')
         .select('id, razao_social, nome_fantasia, cnpj')
@@ -187,7 +191,7 @@ export function CommandPalette({
         status: c.status,
         icon: User,
         category: 'pessoa',
-        path: `/colaboradores/${c.id}/detalhes`,
+        path: `/colaboradores/${c.id}`,
         gradient: 'from-primary to-primary-glow',
         avatar: { name: c.nome_completo },
       });

@@ -84,9 +84,9 @@ export function DashboardHeader({ greeting, isLoading, onRefresh }: DashboardHea
         </div>
         
         <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
-          <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 whitespace-nowrap bg-card/50 shadow-sm">
-            <Calendar className="h-4 w-4 text-primary" />
-            Competência: 05/2026
+          <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 whitespace-nowrap bg-card/50 shadow-sm border-primary/20 text-primary font-bold">
+            <Calendar className="h-4 w-4" />
+            05/2026
           </Button>
           
           <DropdownMenu>

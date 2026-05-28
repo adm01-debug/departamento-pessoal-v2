@@ -21,6 +21,7 @@ interface WorkforceHealthScoreProps {
   cadastrosCompletos: number;
   totalColaboradores: number;
   feriasPendentes: number;
+  passivoTotal?: number;
 }
 
 function getScoreColor(score: number) {
@@ -44,7 +45,7 @@ const statusColors = {
   critical: 'bg-destructive/15 text-destructive',
 };
 
-export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos, totalColaboradores, feriasPendentes }: WorkforceHealthScoreProps) {
+export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos, totalColaboradores, feriasPendentes, passivoTotal = 0 }: WorkforceHealthScoreProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
   const navigate = useNavigate();
@@ -54,9 +55,12 @@ export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos
   const absenteismoScore = Math.max(0, 100 - (absenteismo * 10)); // 0% = 100, 10% = 0
   const cadastroScore = totalColaboradores > 0 ? (cadastrosCompletos / totalColaboradores) * 100 : 100;
   const feriasScore = Math.max(0, 100 - (feriasPendentes * 5)); // each pending = -5
+  
+  // Passivo score: penalty if passivo > 1.5x monthly payroll (estimativa simplificada)
+  const passivoPenalty = passivoTotal > 100000 ? 5 : 0; 
 
   const compositeScore = Math.round(
-    (turnoverScore * 0.35) + (absenteismoScore * 0.30) + (cadastroScore * 0.20) + (feriasScore * 0.15)
+    (turnoverScore * 0.30) + (absenteismoScore * 0.25) + (cadastroScore * 0.20) + (feriasScore * 0.15) - passivoPenalty
   );
 
   const scoreInfo = getScoreColor(compositeScore);
@@ -64,8 +68,8 @@ export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos
   const metrics: HealthMetric[] = [
     { label: 'Turnover', value: turnover, maxValue: 20, weight: 35, status: getMetricStatus(turnover, [3, 8, 15]), route: '/desligamentos' },
     { label: 'Absenteísmo', value: absenteismo, maxValue: 10, weight: 30, status: getMetricStatus(absenteismo, [2, 4, 7]), route: '/faltas' },
-    { label: 'Cadastros', value: cadastroScore, maxValue: 100, weight: 20, status: getMetricStatus(100 - cadastroScore, [5, 15, 30]), route: '/colaboradores' },
-    { label: 'Férias Pendentes', value: feriasPendentes, maxValue: 20, weight: 15, status: getMetricStatus(feriasPendentes, [3, 8, 15]), route: '/ferias' },
+    { label: 'Passivo', value: passivoTotal, maxValue: 1, weight: 1, status: passivoTotal > 50000 ? 'warning' : 'good', route: '/passivo-trabalhista' },
+    { label: 'Férias', value: feriasPendentes, maxValue: 20, weight: 15, status: getMetricStatus(feriasPendentes, [3, 8, 15]), route: '/ferias' },
   ];
 
   // Arc drawing
@@ -140,7 +144,7 @@ export function WorkforceHealthScore({ turnover, absenteismo, cadastrosCompletos
                   className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 transition-colors text-left group"
                 >
                   <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded", statusColors[m.status])}>
-                    {m.label === 'Cadastros' ? `${m.value.toFixed(0)}%` : m.label === 'Férias Pendentes' ? m.value : `${m.value.toFixed(1)}%`}
+                    {m.label === 'Cadastros' ? `${m.value.toFixed(0)}%` : m.label === 'Férias' ? m.value : m.label === 'Passivo' ? (m.value > 1000 ? `${(m.value/1000).toFixed(0)}k` : m.value) : `${m.value.toFixed(1)}%`}
                   </span>
                   <span className="text-caption text-muted-foreground font-body flex-1 truncate">{m.label}</span>
                   <ChevronRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -58,8 +58,8 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
 
       // Fetch audit logs and compliance alerts
       const [auditResponse, complianceResponse] = await Promise.all([
-        (supabase as any).from('audit_log').select('*').eq('empresa_id', empresaId!).order('timestamp', { ascending: false }).limit(10),
-        (supabase as any).from('conformidade_ponto_logs').select('*').eq('empresa_id', empresaId!).order('timestamp', { ascending: false }).limit(10)
+        (supabase as Record<string, unknown>).from('audit_log').select('*').eq('empresa_id', empresaId!).order('timestamp', { ascending: false }).limit(10),
+        (supabase as Record<string, unknown>).from('conformidade_ponto_logs').select('*').eq('empresa_id', empresaId!).order('timestamp', { ascending: false }).limit(10)
       ]);
 
       if (auditResponse.error) throw auditResponse.error;
@@ -96,7 +96,7 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
 
   const displayEvents = useMemo(() => {
     const list = dbEvents || initialEvents || [];
-    let filtered = filterType === 'all' ? list : list.filter(e => e.type === filterType);
+    const filtered = filterType === 'all' ? list : list.filter(e => e.type === filterType);
     
     return filtered.sort((a, b) => {
       const timeA = a.raw_time ? new Date(a.raw_time).getTime() : 0;

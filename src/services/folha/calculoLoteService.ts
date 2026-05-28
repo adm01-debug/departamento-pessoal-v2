@@ -215,7 +215,7 @@ export const calculoLoteService = {
             .upsert(itemData, { onConflict: 'folha_id,colaborador_id' });
 
           // Auditoria analítica
-          await (supabase as any).from('folha_auditoria').insert({
+          await (supabase as Record<string, unknown>).from('folha_auditoria').insert({
             folha_id: folhaId,
             colaborador_id: colab.id,
             tipo_evento: 'CALCULO',

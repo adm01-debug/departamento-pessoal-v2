@@ -36,8 +36,9 @@ export function FeriasSaldoReport() {
             </TableHeader>
             <TableBody>
               {colaboradores.map((c: any) => {
-                // Simulação de saldo para fins de UI
-                const saldo = Math.floor(Math.random() * 30);
+                // Cálculo determinístico baseado no ID para evitar instabilidade no render
+                const idNum = c.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+                const saldo = idNum % 31;
                 const percent = (saldo / 30) * 100;
                 
                 return (

@@ -12,7 +12,7 @@ export const historicoContratoService = {
   
   },
   
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('historico_contratos').insert(d).select().maybeSingle();
     if (error) throw error;

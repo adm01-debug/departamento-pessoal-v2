@@ -90,7 +90,7 @@ export default function DespesasPage() {
               {despesas.length === 0 ? <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma despesa registrada</TableCell></TableRow> :
                 despesas.map((d: any) => (
                   <TableRow key={d.id}>
-                    <TableCell className="font-medium">{(d as any).colaborador?.nome_completo || '—'}</TableCell>
+                    <TableCell className="font-medium">{(d as Record<string, unknown>).colaborador?.nome_completo || '—'}</TableCell>
                     <TableCell><Badge variant="outline">{d.categoria}</Badge></TableCell>
                     <TableCell className="max-w-[200px] truncate">{d.descricao}</TableCell>
                     <TableCell className="font-medium">{Number(d.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>

@@ -42,9 +42,9 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const { colaboradores } = useColaboradores();
   const [diasInfo, setDiasInfo] = useState({ total: 0, empresa: 0, inss: 0 });
   const [cidSearch, setCidSearch] = useState('');
-  const [cidResults, setCidResults] = useState<any[]>([]);
-  const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
-  const [historicoRecente, setHistoricoRecente] = useState<any[]>([]);
+  const [cidResults, setCidResults] = useState<unknown[]>([]);
+  const [selectedCid, setSelectedCid] = useState<unknown>(initialData?.cid || null);
+  const [historicoRecente, setHistoricoRecente] = useState<unknown[]>([]);
 
   const [isVerificandoHistorico, setIsVerificandoHistorico] = useState(false);
 
@@ -131,9 +131,12 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
                 role="combobox"
                 className="w-full justify-between"
               >
-                {watch('colaborador_id') && Array.isArray(colaboradores)
-                  ? (colaboradores as any[]).find((c: any) => c.id === watch('colaborador_id'))?.nome_completo 
-                  : "Selecionar colaborador..."}
+                {(() => {
+                  const currentId = watch('colaborador_id');
+                  return currentId && Array.isArray(colaboradores)
+                    ? (colaboradores as any[]).find((c: any) => c.id === currentId)?.nome_completo 
+                    : "Selecionar colaborador...";
+                })()}
 
                 <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>

@@ -81,10 +81,11 @@ export default function ColaboradoresPage() {
   }, [setCargo, setPage]);
 
   const statusOptions = [
-    { value: 'ativo', label: `Ativos` },
-    { value: 'inativo', label: `Inativos` },
-    { value: 'ferias', label: `Em Férias` },
-    { value: 'afastado', label: `Afastados` },
+    { value: 'ativo', label: 'Ativos' },
+    { value: 'inativo', label: 'Inativos' },
+    { value: 'desligado', label: 'Desligados' },
+    { value: 'ferias', label: 'Em Férias' },
+    { value: 'afastado', label: 'Afastados' },
   ];
 
   const handleExportExcel = async () => {
@@ -206,7 +207,7 @@ export default function ColaboradoresPage() {
         </div>
       }
       stats={
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           {statusOptions.map((opt, i) => {
             const statusKey = opt.value;
             const isActive = status === statusKey;
@@ -282,7 +283,7 @@ export default function ColaboradoresPage() {
         <TableRow
           key={c.id}
           className="hover:bg-primary/5 border-b border-border/10 last:border-0 transition-colors cursor-pointer group"
-          onClick={() => navigate(`/colaboradores/${c.id}/editar`)}
+          onClick={() => navigate(`/colaboradores/${c.id}`)}
         >
           <TableCell className="py-4 pl-6">
             <div className="flex items-center gap-4">
@@ -312,7 +313,7 @@ export default function ColaboradoresPage() {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 rounded-xl hover:bg-info/10 text-info"
-                onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}/editar`); }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}`); }}
                 title="Ver Perfil"
               >
                 <Eye className="h-4.5 w-4.5" />
@@ -321,7 +322,7 @@ export default function ColaboradoresPage() {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 rounded-xl hover:bg-primary/10 text-primary"
-                onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/${c.id}/editar`); }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/colaboradores/editar/${c.id}`); }}
                 title="Editar"
               >
                 <Edit className="h-4.5 w-4.5" />

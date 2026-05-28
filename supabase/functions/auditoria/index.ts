@@ -1,20 +1,22 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { auditoriaSchema } from '../_shared/schemas/common.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const { data: reqData, errorResponse } = await validateRequest(req, auditoriaSchema);
+  if (errorResponse) return errorResponse;
+
+  const { action, empresaId, data } = reqData!;
+
   try {
     const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
-    const { action, empresaId, data } = await req.json();
 
     switch (action) {
       case 'registrar': {
+        if (!data) return createErrorResponse('Dados são obrigatórios para registrar auditoria', 422, 'VALIDATION_ERROR');
         const { error } = await supabase.from('auditoria').insert({
           acao: data.acao, entidade: data.entidade, entidade_id: data.entidade_id,
           usuario_id: data.usuario_id, usuario_nome: data.usuario_nome, empresa_id: empresaId,
@@ -40,23 +42,19 @@ serve(async (req) => {
         });
       }
       case 'resumo': {
-        const { data: logs, error } = await supabase.from('auditoria').select('acao, entidade').eq('empresa_id', empresaId || '');
+        const { data: resLogs, error } = await supabase.from('auditoria').select('acao, entidade').eq('empresa_id', empresaId || '');
         if (error) throw error;
         const acoes: Record<string, number> = {};
-        (logs || []).forEach((l: any) => { acoes[l.acao] = (acoes[l.acao] || 0) + 1; });
-        return new Response(JSON.stringify({ total: logs?.length || 0, acoes }), {
+        (resLogs || []).forEach((l: any) => { acoes[l.acao] = (acoes[l.acao] || 0) + 1; });
+        return new Response(JSON.stringify({ total: resLogs?.length || 0, acoes }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       default:
-        return new Response(JSON.stringify({ error: 'Ação inválida' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-        });
+        return createErrorResponse('Ação inválida', 400, 'INVALID_ACTION');
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
+    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });

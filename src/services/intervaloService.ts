@@ -10,7 +10,7 @@ export const intervaloService = {
   
   },
   
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('configuracoes_intervalo').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const intervaloService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<any> {
+  async atualizar(id: string, d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('configuracoes_intervalo').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;

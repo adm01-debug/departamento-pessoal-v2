@@ -64,6 +64,14 @@ serve(async (req: Request): Promise<Response> => {
 
     const totalCleaned = Object.values(results).reduce((a, b) => a + b, 0);
 
+    // Auditoria da execução
+    await supabase.from('auditoria').insert({
+      acao: 'EXECUCAO_LIMPEZA_SISTEMA',
+      entidade: 'sistema',
+      descricao: `Limpeza automática executada. Total de registros removidos: ${totalCleaned}`,
+      dados_novos: results,
+    });
+
     return new Response(JSON.stringify({
       success: true,
       timestamp: new Date().toISOString(),

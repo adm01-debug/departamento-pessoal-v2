@@ -46,7 +46,7 @@ export default function CalculadoraRescisaoPage() {
         cargo: data.cargo || '',
         salario: data.salario_base?.toString() || '',
         dataAdmissao: data.data_admissao || '',
-        saldoFGTS: (data as any).saldo_fgts_estimado?.toString() || '',
+        saldoFGTS: (data as Record<string, unknown>).saldo_fgts_estimado?.toString() || '',
       }));
       toast.success('Dados do colaborador importados!');
     } catch (err: any) {
@@ -130,7 +130,7 @@ export default function CalculadoraRescisaoPage() {
     setSaving(true);
     try {
       // 1. Save to History
-      const { data: historico, error: histError } = await supabase.from('historico_rescisoes' as any).insert({
+      const { data: historico, error: histError } = await supabase.from('historico_rescisoes').insert({
         empresa_id: empresaAtual.id,
         created_by: user.id,
         nome_colaborador: form.nomeColaborador || null,

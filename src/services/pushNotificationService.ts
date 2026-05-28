@@ -37,16 +37,16 @@ export const pushNotificationService = {
       const { endpoint, keys } = subscription.toJSON();
       if (!endpoint) throw new Error('Endpoint de push inválido');
 
-      const { error } = await supabase.from('push_subscriptions' as any).upsert({
+      const { error } = await supabase.from('push_subscriptions').upsert({
         user_id: userId,
         endpoint,
-        p256dh: (keys as any).p256dh,
-        auth_key: (keys as any).auth,
+        p256dh: (keys as Record<string, unknown>).p256dh,
+        auth_key: (keys as Record<string, unknown>).auth,
         ativo: true,
         device_info: {
           userAgent: navigator.userAgent,
           language: navigator.language,
-          platform: (navigator as any).platform
+          platform: (navigator as Record<string, unknown>).platform
         }
       }, { onConflict: 'endpoint' });
 
@@ -65,7 +65,7 @@ export const pushNotificationService = {
         await subscription.unsubscribe();
         const { endpoint } = subscription.toJSON();
         
-        await supabase.from('push_subscriptions' as any)
+        await supabase.from('push_subscriptions')
           .update({ ativo: false })
           .eq('endpoint', endpoint)
           .eq('user_id', userId);

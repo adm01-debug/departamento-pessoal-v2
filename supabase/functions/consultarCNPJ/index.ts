@@ -1,33 +1,20 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { cnpjSchema } from '../_shared/schemas/common.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const { data, errorResponse } = await validateRequest(req, cnpjSchema);
+  if (errorResponse) return errorResponse;
+
+  const { cnpj } = data!;
+  const clean = cnpj.replace(/\D/g, '');
+
   try {
-    const { cnpj } = await req.json();
-    if (!cnpj) {
-      return new Response(JSON.stringify({ error: 'CNPJ obrigatório' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-      });
-    }
-
-    const clean = cnpj.replace(/\D/g, '');
-    if (clean.length !== 14) {
-      return new Response(JSON.stringify({ error: 'CNPJ deve ter 14 dígitos' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-      });
-    }
-
     const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${clean}`);
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'CNPJ não encontrado' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404,
-      });
+      return createErrorResponse('CNPJ não encontrado', 404, 'NOT_FOUND');
     }
 
     const d = await res.json();
@@ -44,8 +31,6 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
+    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });

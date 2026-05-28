@@ -47,7 +47,7 @@ function Bitrix24ConfigPanel() {
   const qc = useQueryClient();
   const [tab, setTab] = useState('config');
 
-  const { data: config, isLoading: loadConfig } = useQuery<any>({
+  const { data: config, isLoading: loadConfig } = useQuery<unknown>({
     queryKey: ['bitrix24_config'],
     queryFn: () => bitrix24Service.getConfig(),
   });
@@ -87,7 +87,7 @@ function Bitrix24ConfigPanel() {
 
   const sincronizar = useMutation({
     mutationFn: async () => {
-      const { data, error } = await (window as any).supabase.functions.invoke('sincronizar-bitrix', {
+      const { data, error } = await (window as Record<string, unknown>).supabase.functions.invoke('sincronizar-bitrix', {
         body: { action: 'sync_all' }
       });
       if (error) throw error;
@@ -312,7 +312,7 @@ function WhatsAppConfigPanel() {
     if (!empresaAtual?.id) return;
     setLoading(true);
     try {
-      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id, status: (config as any).status || 'active' } as any);
+      await whatsappService.saveConfig({ ...config, empresa_id: empresaAtual.id, status: (config as Record<string, unknown>).status || 'active' } as any);
       toast.success('Configuração de WhatsApp salva!');
     } catch (e) {
       toast.error('Erro ao salvar configuração');

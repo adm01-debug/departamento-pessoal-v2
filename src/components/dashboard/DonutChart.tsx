@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 
 interface Segment {
   label: string;
@@ -25,7 +25,15 @@ export function DonutChart({ segments, size = 140, strokeWidth = 16, className }
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
-  let accumulatedOffset = 0;
+  const segmentsWithOffsets = useMemo(() => {
+    let offset = 0;
+    return segments.map(seg => {
+      const segLength = (seg.value / total) * circumference;
+      const currentOffset = offset;
+      offset += segLength;
+      return { ...seg, segLength, offset: currentOffset };
+    });
+  }, [segments, total, circumference]);
 
   return (
     <div className={className}>
@@ -40,12 +48,10 @@ export function DonutChart({ segments, size = 140, strokeWidth = 16, className }
           strokeWidth={strokeWidth}
           opacity={0.3}
         />
-        {segments.map((seg, i) => {
-          const segLength = (seg.value / total) * circumference;
+        {segmentsWithOffsets.map((seg: any, i: number) => {
           const gap = segments.length > 1 ? 3 : 0;
-          const dashArray = `${Math.max(segLength - gap, 0)} ${circumference - segLength + gap}`;
-          const offset = -accumulatedOffset + circumference * 0.25; // start from top
-          accumulatedOffset += segLength;
+          const dashArray = `${Math.max(seg.segLength - gap, 0)} ${circumference - seg.segLength + gap}`;
+          const strokeOffset = -seg.offset + circumference * 0.25; // start from top
 
           return (
             <motion.circle
@@ -57,7 +63,7 @@ export function DonutChart({ segments, size = 140, strokeWidth = 16, className }
               stroke={seg.color}
               strokeWidth={strokeWidth}
               strokeDasharray={dashArray}
-              strokeDashoffset={offset}
+              strokeDashoffset={strokeOffset}
               strokeLinecap="round"
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}

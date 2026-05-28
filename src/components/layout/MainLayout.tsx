@@ -10,6 +10,7 @@ import { CommandPalette } from '@/components/ui/command-palette';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBackGesture } from '@/hooks/useBackGesture';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -32,7 +33,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       // Opcional: Implementar logout automático por inatividade se necessário para compliance
     };
     
-    const channel = (window as any).supabase?.channel('system-health')
+    const channel = supabase.channel('system-health')
       .on('presence', { event: 'sync' }, () => {
         // Telemetria silenciosa de sessão ativa
       })
@@ -75,7 +76,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="flex-1 flex flex-col min-w-0">
         <MemoizedHeader
           onMenuClick={() => setMobileSidebarOpen(true)}
-          user={useMemo(() => ({ name: user?.name || user?.email || 'Usuário', email: user?.email || '' }), [user])}
+          user={useMemo(() => ({ name: user?.name || user?.email || 'Usuário', email: user?.email || '' }), [user?.name, user?.email])}
         />
         <main role="main" className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">Pular para conteúdo</a>

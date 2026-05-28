@@ -60,7 +60,7 @@ export default function PontoPage() {
 
   const { data: registroHoje, refetch: refetchRegistro } = useQuery({
     queryKey: ['registro-ponto-hoje', user?.id, today],
-    queryFn: async () => { if (!user?.id) return null; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return null; const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).eq('data', today).maybeSingle(); if (error) throw error; return data; },
+    queryFn: async () => { if (!user?.id) return null; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return null; const { data, error } = await (supabase as Record<string, unknown>).from('registros_ponto').select('*').eq('colaborador_id', colab.id).eq('data', today).maybeSingle(); if (error) throw error; return data; },
     enabled: !!user?.id, refetchInterval: 30000,
   });
 
@@ -68,7 +68,7 @@ export default function PontoPage() {
 
   const { data: registrosSemana = [] } = useQuery({
     queryKey: ['registros-semana', user?.id],
-    queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', w.toISOString().split('T')[0]).order('data', { ascending: false }); if (error) throw error; return data || []; },
+    queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as Record<string, unknown>).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', w.toISOString().split('T')[0]).order('data', { ascending: false }); if (error) throw error; return data || []; },
     enabled: !!user?.id,
   });
 
@@ -162,7 +162,7 @@ export default function PontoPage() {
           accuracy: geo?.accuracy 
         });
       } else {
-        await (pontoService as any).registrar(tipo, colab.id, {
+        await (pontoService as Record<string, unknown>).registrar(tipo, colab.id, {
           latitude: geo?.lat,
           longitude: geo?.lng,
           precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
@@ -364,7 +364,7 @@ export default function PontoPage() {
                   <TableBody>
                     {batidasHoje.slice(0, 5).map((b: any) => (
                       <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
-                        <TableCell className="font-body font-medium">{(b as any).colaborador?.nome_completo || b.colaborador_id?.slice(0, 8)}</TableCell>
+                        <TableCell className="font-body font-medium">{(b as Record<string, unknown>).colaborador?.nome_completo || b.colaborador_id?.slice(0, 8)}</TableCell>
                         <TableCell className="font-body font-mono">{b.hora}</TableCell>
                         <TableCell><Badge variant="outline" className="text-[10px]">{b.tipo}</Badge></TableCell>
                         <TableCell className="font-body">{b.ordem}ª</TableCell>

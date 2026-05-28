@@ -28,7 +28,7 @@ export function SSTKPIs({ validos, vencendo, vencidos, totalEpis, totalEntregas 
       startOfMonth.setHours(0,0,0,0);
       
       const { count, error } = await supabase
-        .from('sst_incidentes' as any)
+        .from('sst_incidentes')
         .select('*', { count: 'exact', head: true })
         .eq('empresa_id', empresaAtual!.id)
         .gte('data_hora', startOfMonth.toISOString());

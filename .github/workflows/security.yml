@@ -1,4 +1,4 @@
-name: Security Scan
+name: Security Scan & Code Quality
 
 on:
   push:
@@ -7,14 +7,23 @@ on:
     - cron: '0 0 * * 0' # Every Sunday at midnight
 
 jobs:
-  audit:
-    name: Dependency Audit
+  security:
+    name: Dependency & Code Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup Bun
-        run: |
-          curl -fsSL https://bun.sh/install | bash
-          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
+        uses: oven-sh/bun-action@v1
+        with:
+          bun-version: latest
+
       - name: Bun Audit
         run: bun pm audit
+
+      - name: Run SonarCloud Scan (Optional/Placeholder)
+        run: echo "SonarCloud scan would run here if configured"
+
+      - name: Snyk Security Scan (Optional/Placeholder)
+        run: echo "Snyk scan would run here if configured"
+

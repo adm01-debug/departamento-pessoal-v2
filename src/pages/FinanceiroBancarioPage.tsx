@@ -19,9 +19,9 @@ import { StatusBadge } from '@/components/ui/status-badge';
 export default function FinanceiroBancarioPage() {
   const { empresaAtual } = useEmpresas();
   const [config, setConfig] = useState<CNABConfig | null>(null);
-  const [remessas, setRemessas] = useState<any[]>([]);
-  const [pixLotes, setPixLotes] = useState<any[]>([]);
-  const [folhas, setFolhas] = useState<any[]>([]);
+  const [remessas, setRemessas] = useState<unknown[]>([]);
+  const [pixLotes, setPixLotes] = useState<unknown[]>([]);
+  const [folhas, setFolhas] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [processingRetorno, setProcessingRetorno] = useState(false);

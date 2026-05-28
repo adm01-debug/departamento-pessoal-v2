@@ -3,19 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import type { Database } from './types';
 
-// Configurações do Supabase EXTERNO (hncgwjbzdajfdztqgefe) via .env
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.warn("Supabase env variables are missing. Using defaults for hncgwjbzdajfdztqgefe.");
-}
+// Configurações do Supabase EXTERNO (corporativo - hncgwjbzdajfdztqgefe).
+// Os valores abaixo são fallbacks para desenvolvimento local; em produção,
+// configure as variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.
+// Usuários reais (ex.: adm01@promobrindes.com.br) existem APENAS no banco corporativo.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
-  SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co',
-  SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE',
-
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
   {
     auth: {
       storage: localStorage,
@@ -31,28 +29,64 @@ const supabaseBase = createClient<Database>(
 //     table: string,
 //     columns?: string,
 //     data?: object | object[],
-//     filters?: Array<{ column: string; op: string; value: any }>,
+//     filters?: Array<{ column: string; op: string; value: unknown }>,
 //     order?: { column: string; ascending?: boolean },
 //     limit?: number,
 //     single?: boolean }
 
-type Action = 'select' | 'insert' | 'update' | 'delete' | 'rpc';
-interface Filter { column: string; op: string; value: any }
+type Action = 'select' | 'insert' | 'update' | 'delete' | 'rpc' | 'upsert';
+
+interface Filter {
+  column: string;
+  op: string;
+  value: unknown;
+  extraOp?: string;
+}
+
 interface BridgePayload {
   columns?: string;
-  data?: any;
+  data?: Record<string, unknown> | Record<string, unknown>[];
   filters?: Filter[];
   order?: { column: string; ascending?: boolean };
   limit?: number;
   offset?: number;
   single?: boolean;
   countMode?: string;
-  params?: any;
+  params?: Record<string, unknown>;
 }
 
-const callBridge = async (action: Action, target: string, payload: BridgePayload = {}) => {
+interface BridgeResponse<T = unknown> {
+  data: T | null;
+  count?: number;
+  error: { message: string } | null;
+}
+
+interface RpcBody {
+  action: Action;
+  table?: string;
+  fn?: string;
+  columns?: string;
+  data?: Record<string, unknown> | Record<string, unknown>[];
+  filters?: Filter[];
+  order?: { column: string; ascending?: boolean };
+  limit?: number;
+  offset?: number;
+  single?: boolean;
+  countMode?: string;
+  params?: Record<string, unknown>;
+}
+
+const callBridge = async <T = unknown>(
+  action: Action,
+  target: string,
+  payload: BridgePayload = {}
+): Promise<BridgeResponse<T>> => {
   const { data: { session } } = await supabaseBase.auth.getSession();
-  const body: any = { action, ...(action === 'rpc' ? { fn: target } : { table: target }), ...payload };
+  const body: RpcBody = {
+    action,
+    ...(action === 'rpc' ? { fn: target } : { table: target }),
+    ...payload,
+  };
 
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/external-db-bridge`, {
@@ -64,74 +98,121 @@ const callBridge = async (action: Action, target: string, payload: BridgePayload
       },
       body: JSON.stringify(body),
     });
-    const json = await res.json().catch(() => ({}));
+    const json: {
+      data?: unknown;
+      count?: number;
+      error?: string;
+      duration_ms?: number;
+    } = await res.json().catch(() => ({}));
     if (!res.ok || json.error) {
       const errorMsg = json.error || `Erro HTTP ${res.status}`;
-      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', errorMsg);
-      
-      // Grita no UI para o desenvolvedor ver exatamente o que falta
-      toast.error(`ERRO DE BANCO: ${errorMsg}`, {
-        duration: 10000, // 10 segundos para dar tempo de ler
-        style: { background: '#fee2e2', color: '#991b1b', border: '1px solid #f87171' },
-      });
+      console.error('🔴 [BRIDGE_SCHEMA_ERROR]', action, target, errorMsg);
 
-      throw new Error(errorMsg);
+      // Erros de função/tabela ausente NÃO devem poluir a UI com toast.
+      // Apenas propagamos o erro para quem chamou tratar (ou ignorar).
+      const isMissingObject = /Could not find the (function|table)|schema cache|does not exist/i.test(errorMsg);
+      if (!isMissingObject) {
+        toast.error(`Erro de banco: ${errorMsg}`, {
+          duration: 6000,
+        });
+      }
+
+      return { data: null, count: 0, error: { message: errorMsg } };
     }
-    let data = json.data;
-    if (payload.single) data = Array.isArray(data) ? (data[0] ?? null) : data;
-    
-    // Log do tempo de resposta se for lento
-    if (json.duration_ms > 1000) {
+    let data: unknown = json.data;
+    if (payload.single) data = Array.isArray(data) ? ((data as unknown[])[0] ?? null) : data;
+
+    if (json.duration_ms && json.duration_ms > 1000) {
       console.warn(`🕒 [BRIDGE_SLOW_QUERY] ${action} em ${target} demorou ${json.duration_ms}ms`);
     }
 
-    return { data, count: json.count, error: null };
-  } catch (err: any) {
-    const isNetworkError = err.message === 'Failed to fetch' || err.name === 'TypeError';
-    const errorMsg = isNetworkError ? 'Erro de conexão com o banco externo. Verifique sua internet.' : (err?.message || 'Erro desconhecido');
-    
+    return { data: data as T | null, count: json.count, error: null };
+  } catch (err: unknown) {
+    const isNetworkError =
+      err instanceof Error &&
+      (err.message === 'Failed to fetch' || err.name === 'TypeError');
+    const errorMsg = isNetworkError
+      ? 'Erro de conexão com o banco. Verifique sua internet.'
+      : (err instanceof Error ? err.message : 'Erro desconhecido');
+
     console.error('🔴 [BRIDGE_FATAL_ERROR]', err);
 
-    toast.error(`ERRO CRÍTICO: ${errorMsg}`, {
-      duration: 5000,
-      description: 'Tente recarregar a página se o problema persistir.',
-    });
+    if (isNetworkError) {
+      toast.error(errorMsg, { duration: 5000 });
+    }
 
     return { data: null, error: { message: errorMsg } };
   }
 };
 
-const createQueryBuilder = (table: string) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFn = (...args: unknown[]) => unknown;
+
+interface QueryBuilder {
+  select: (columns?: string, options?: { count?: string }) => QueryBuilder;
+  insert: (data: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
+  update: (data: Record<string, unknown>) => QueryBuilder;
+  delete: () => QueryBuilder;
+  upsert: (data: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
+  eq: (column: string, value: unknown) => QueryBuilder;
+  neq: (column: string, value: unknown) => QueryBuilder;
+  gt: (column: string, value: unknown) => QueryBuilder;
+  gte: (column: string, value: unknown) => QueryBuilder;
+  lt: (column: string, value: unknown) => QueryBuilder;
+  lte: (column: string, value: unknown) => QueryBuilder;
+  like: (column: string, value: unknown) => QueryBuilder;
+  ilike: (column: string, value: unknown) => QueryBuilder;
+  in: (column: string, value: unknown[]) => QueryBuilder;
+  is: (column: string, value: unknown) => QueryBuilder;
+  not: (column: string, op: string, value: unknown) => QueryBuilder;
+  contains: (column: string, value: unknown) => QueryBuilder;
+  or: (expr: string) => QueryBuilder;
+  match: (obj: Record<string, unknown>) => QueryBuilder;
+  order: (column: string, options?: { ascending?: boolean }) => QueryBuilder;
+  range: (from: number, to: number) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  single: () => QueryBuilder;
+  maybeSingle: () => QueryBuilder;
+  then: (resolve: AnyFn, reject?: AnyFn) => Promise<unknown>;
+  catch: (reject: AnyFn) => Promise<unknown>;
+  finally: (cb: AnyFn) => Promise<unknown>;
+}
+
+const createQueryBuilder = (table: string): QueryBuilder => {
   const state: { action: Action; payload: BridgePayload } = {
     action: 'select',
     payload: { filters: [] },
   };
 
-  const exec = () => callBridge(state.action, table, state.payload);
+  const exec = <T = unknown>() => callBridge<T>(state.action, table, state.payload);
 
-  const addFilter = (column: string, op: string, value: any) => {
+  const addFilter = (column: string, op: string, value: unknown): QueryBuilder => {
     // Se o valor for "undefined" ou "null" como string, converte para null real.
     // Se for "all", ignoramos o filtro para permitir listagem completa.
     if (value === "all") return builder;
+    
+    // Filtros de busca vazios não devem ser aplicados
+    if (value === "" && (op === 'ilike' || op === 'like')) return builder;
+
     const cleanValue = (value === "undefined" || value === "null") ? null : value;
     state.payload.filters = [...(state.payload.filters || []), { column, op, value: cleanValue }];
     return builder;
   };
 
-  const builder: any = {
-    select: (columns = '*', options: any = {}) => {
+  const builder: QueryBuilder = {
+    select: (columns = '*', options: { count?: string } = {}) => {
       state.payload.columns = columns;
       if (options.count) {
         state.payload.countMode = options.count;
       }
       return builder;
     },
-    insert: (data: any) => {
+    insert: (data: Record<string, unknown> | Record<string, unknown>[]) => {
       state.action = 'insert';
       state.payload.data = data;
       return builder;
     },
-    update: (data: any) => {
+    update: (data: Record<string, unknown>) => {
       state.action = 'update';
       state.payload.data = data;
       return builder;
@@ -140,29 +221,36 @@ const createQueryBuilder = (table: string) => {
       state.action = 'delete';
       return builder;
     },
-    upsert: (data: any) => {
-      state.action = 'insert';
+    upsert: (data: Record<string, unknown> | Record<string, unknown>[]) => {
+      state.action = 'upsert';
       state.payload.data = data;
       return builder;
     },
-    eq: (c: string, v: any) => addFilter(c, 'eq', v),
-    neq: (c: string, v: any) => addFilter(c, 'neq', v),
-    gt: (c: string, v: any) => addFilter(c, 'gt', v),
-    gte: (c: string, v: any) => addFilter(c, 'gte', v),
-    lt: (c: string, v: any) => addFilter(c, 'lt', v),
-    lte: (c: string, v: any) => addFilter(c, 'lte', v),
-    like: (c: string, v: any) => addFilter(c, 'like', v),
-    ilike: (c: string, v: any) => addFilter(c, 'ilike', v),
-    in: (c: string, v: any[]) => addFilter(c, 'in', v),
-    is: (c: string, v: any) => addFilter(c, 'is', v),
-    not: (c: string, _op: string, v: any) => addFilter(c, 'not', v),
-    contains: (c: string, v: any) => addFilter(c, 'contains', v),
-    or: (_expr: string) => builder,
-    match: (obj: Record<string, any>) => {
+    eq: (c: string, v: unknown) => addFilter(c, 'eq', v),
+    neq: (c: string, v: unknown) => addFilter(c, 'neq', v),
+    gt: (c: string, v: unknown) => addFilter(c, 'gt', v),
+    gte: (c: string, v: unknown) => addFilter(c, 'gte', v),
+    lt: (c: string, v: unknown) => addFilter(c, 'lt', v),
+    lte: (c: string, v: unknown) => addFilter(c, 'lte', v),
+    like: (c: string, v: unknown) => addFilter(c, 'like', v),
+    ilike: (c: string, v: unknown) => addFilter(c, 'ilike', v),
+    in: (c: string, v: unknown[]) => addFilter(c, 'in', v),
+    is: (c: string, v: unknown) => addFilter(c, 'is', v),
+    not: (c: string, op: string, v: unknown) => {
+      const cleanValue = (v === "undefined" || v === "null") ? null : v;
+      state.payload.filters = [...(state.payload.filters || []), { column: c, op: 'not', value: cleanValue, extraOp: op }];
+      return builder;
+    },
+    contains: (c: string, v: unknown) => addFilter(c, 'contains', v),
+    or: (expr: string) => {
+      state.payload.filters = [...(state.payload.filters || []), { column: '', op: 'or', value: expr }];
+      return builder;
+    },
+    match: (obj: Record<string, unknown>) => {
       Object.entries(obj).forEach(([k, v]) => addFilter(k, 'eq', v));
       return builder;
     },
-    order: (column: string, options: any = {}) => {
+    order: (column: string, options: { ascending?: boolean } = {}) => {
       state.payload.order = { column, ascending: options.ascending !== false };
       return builder;
     },
@@ -177,20 +265,37 @@ const createQueryBuilder = (table: string) => {
     },
     single: () => { state.payload.single = true; return builder; },
     maybeSingle: () => { state.payload.single = true; return builder; },
-    then: (resolve: any, reject: any) => exec().then(resolve, reject),
-    catch: (reject: any) => exec().catch(reject),
-    finally: (cb: any) => exec().finally(cb),
+    then: (resolve: AnyFn, reject?: AnyFn) => exec().then(resolve, reject),
+    catch: (reject: AnyFn) => exec().catch(reject),
+    finally: (cb: AnyFn) => exec().finally(cb),
   };
 
   return builder;
 };
 
-const dbBridgeProxy: ProxyHandler<any> = {
-  get(target, prop) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface SupabaseProxyTarget {
+  from: (table: string) => QueryBuilder;
+  rpc: (fn: string, params: Record<string, unknown>) => Promise<BridgeResponse<unknown>>;
+  [key: string]: unknown;
+}
+
+const proxyTarget: SupabaseProxyTarget = {
+  from: (table: string) => createQueryBuilder(table),
+  rpc: (fn: string, params: Record<string, unknown>) =>
+    callBridge('rpc', fn, { params }),
+};
+
+const dbBridgeProxy: ProxyHandler<SupabaseProxyTarget> = {
+  get(target, prop, receiver) {
     if (prop === 'from') return (table: string) => createQueryBuilder(table);
-    if (prop === 'rpc') return (fn: string, params: any) => callBridge('rpc', fn, { params });
-    return (target as any)[prop];
+    if (prop === 'rpc') return (fn: string, params: Record<string, unknown>) =>
+      callBridge('rpc', fn, { params });
+    return Reflect.get(target, prop, receiver);
   }
 };
 
-export const supabase = new Proxy(supabaseBase, dbBridgeProxy) as unknown as typeof supabaseBase;
+export const supabase = new Proxy(
+  supabaseBase as unknown as SupabaseProxyTarget,
+  dbBridgeProxy
+) as unknown as typeof supabaseBase & SupabaseProxyTarget;

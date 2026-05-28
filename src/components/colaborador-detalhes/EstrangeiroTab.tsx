@@ -16,11 +16,11 @@ export function EstrangeiroTab({ colaboradorId }: { colaboradorId: string }) {
   const [form, setForm] = useState({ pais_origem: '', tipo_visto: '', data_chegada: '', reside_brasil: true });
 
   useEffect(() => {
-    if (data) {
+    if (data && !editing) {
       const d = data as any;
       setForm({ pais_origem: d.pais_origem || '', tipo_visto: d.tipo_visto || '', data_chegada: d.data_chegada || '', reside_brasil: d.reside_brasil ?? true });
     }
-  }, [data]);
+  }, [data, editing]);
 
   const handleSave = async () => {
     if (!form.pais_origem.trim()) { toast.error('País de origem é obrigatório'); return; }
@@ -48,10 +48,10 @@ export function EstrangeiroTab({ colaboradorId }: { colaboradorId: string }) {
       <CardContent>
         {!showForm && data ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div><Label className="text-xs text-muted-foreground">País de Origem</Label><p className="font-medium">{(data as any).pais_origem || '-'}</p></div>
-            <div><Label className="text-xs text-muted-foreground">Tipo de Visto</Label><p className="font-medium">{(data as any).tipo_visto || '-'}</p></div>
-            <div><Label className="text-xs text-muted-foreground">Data Chegada</Label><p className="font-medium">{(data as any).data_chegada || '-'}</p></div>
-            <div><Label className="text-xs text-muted-foreground">Reside no Brasil</Label><Badge>{(data as any).reside_brasil ? 'Sim' : 'Não'}</Badge></div>
+            <div><Label className="text-xs text-muted-foreground">País de Origem</Label><p className="font-medium">{(data as Record<string, unknown>).pais_origem || '-'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Tipo de Visto</Label><p className="font-medium">{(data as Record<string, unknown>).tipo_visto || '-'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Data Chegada</Label><p className="font-medium">{(data as Record<string, unknown>).data_chegada || '-'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Reside no Brasil</Label><Badge>{(data as Record<string, unknown>).reside_brasil ? 'Sim' : 'Não'}</Badge></div>
           </div>
         ) : (
           <div className="grid gap-3 max-w-md">

@@ -30,7 +30,7 @@ class BeneficioService extends BaseService<any> {
     return data || [];
   }
 
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     try {
       const data = await super.criar(d);
       await auditLogger.log({
@@ -45,7 +45,7 @@ class BeneficioService extends BaseService<any> {
     }
   }
 
-  async atualizar(id: string, d: any): Promise<any> {
+  async atualizar(id: string, d: any): Promise<unknown> {
     try {
       const anterior = await this.buscarPorId(id);
       const data = await super.atualizar(id, d);
@@ -80,8 +80,8 @@ class BeneficioService extends BaseService<any> {
     }
   }
 
-  async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any): Promise<any> {
-    const { data, error } = await (supabase as any).from('beneficios_colaborador').insert({
+  async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any): Promise<unknown> {
+    const { data, error } = await (supabase as Record<string, unknown>).from('beneficios_colaborador').insert({
       beneficio_id: beneficioId,
       colaborador_id: colaboradorId,
       ...dados
@@ -99,7 +99,7 @@ class BeneficioService extends BaseService<any> {
     return data || [];
   }
 
-  async obterResumoCustos(empresaId: string): Promise<any> {
+  async obterResumoCustos(empresaId: string): Promise<unknown> {
     const { data, error } = await (supabase as any)
       .from('beneficios_colaborador')
       .select(`

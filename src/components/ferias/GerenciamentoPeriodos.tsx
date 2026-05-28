@@ -26,7 +26,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   const qc = useQueryClient();
   const [selectedColabId, setSelectedColabId] = useState(initialColaboradorId || '');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingPeriodo, setEditingPeriodo] = useState<any>(null);
+  const [editingPeriodo, setEditingPeriodo] = useState<unknown>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [form, setForm] = useState({
     data_inicio: '',
@@ -162,7 +162,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
                         <SelectItem key={c.id} value={c.id}>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-5 w-5">
-                              <AvatarImage src={(c as any).avatar_url} />
+                              <AvatarImage src={(c as Record<string, unknown>).avatar_url} />
                               <AvatarFallback className="text-[8px]">{c.nome_completo[0]}</AvatarFallback>
                             </Avatar>
                             <span className="truncate">{c.nome_completo}</span>

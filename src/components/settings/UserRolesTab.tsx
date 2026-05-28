@@ -15,7 +15,7 @@ export function UserRolesTab() {
   const { data: roles = [], isLoading } = useQuery({
     queryKey: ['user-roles-list'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('user_roles' as any).select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('user_roles').select('*').order('created_at', { ascending: false });
       if (error) {
         if (error.code === '42P01') return [];
         throw error;
@@ -26,7 +26,7 @@ export function UserRolesTab() {
 
   const upgradeToAdmin = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase.from('user_roles' as any).upsert({ 
+      const { error } = await supabase.from('user_roles').upsert({ 
         user_id: userId, 
         role: 'admin' 
       }, { onConflict: 'user_id, role' });
