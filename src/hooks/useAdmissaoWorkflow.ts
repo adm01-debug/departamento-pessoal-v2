@@ -97,7 +97,7 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
         .update({ 
           etapa_atual: proximaEtapa,
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', execucaoId)
         .select()
         .single();
