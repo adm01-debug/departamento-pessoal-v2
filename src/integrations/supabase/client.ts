@@ -3,19 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import type { Database } from './types';
 
-// Configurações do Supabase EXTERNO (hncgwjbzdajfdztqgefe) via .env
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.warn("Supabase env variables are missing. Using defaults for hncgwjbzdajfdztqgefe.");
-}
+// Configurações do Supabase EXTERNO (corporativo - hncgwjbzdajfdztqgefe).
+// Usamos valores fixos do projeto corporativo, ignorando o .env do Lovable Cloud,
+// pois os usuários reais (ex.: adm01@promobrindes.com.br) existem APENAS no
+// banco corporativo. Quando o .env apontava para o projeto do Lovable Cloud,
+// o Auth retornava "Invalid API key" / "Invalid credentials".
+const SUPABASE_URL = 'https://hncgwjbzdajfdztqgefe.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
-  SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co',
-  SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE',
-
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
   {
     auth: {
       storage: localStorage,
