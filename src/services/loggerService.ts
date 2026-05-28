@@ -58,34 +58,12 @@ export const loggerService = {
       flushTimeout = null;
     }
 
-    const logsToSend = [...logBuffer];
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-
-      if (!userId) {
-        if (import.meta.env.DEV) {
-          console.debug('[logger] Skipping flush — no authenticated session');
-        }
-        return;
-      }
-
-      // External corporate `logs_sistema` does not have a `user_id` column;
-      // embed it into `contexto` instead.
-      const logsToInsert = logsToSend.map(({ user_id: _omit, ...l }) => ({
-        ...l,
-        contexto: { ...l.contexto, user_id: userId },
-      }));
-      const { error } = await supabase.from('logs_sistema').insert(logsToInsert as any);
-      if (error) throw error;
-      
-      // Clear buffer only after successful insert
-      logBuffer.splice(0, logsToSend.length);
-    } catch (e) {
-      if (import.meta.env.DEV) {
-        console.warn('Failed to send logs to DB:', e);
-      }
+    // O banco corporativo externo bloqueia inserts em `logs_sistema` via RLS
+    // para clientes autenticados. Como logs do front não devem quebrar a UI,
+    // descartamos o buffer silenciosamente. Mantemos console em DEV.
+    const logsToSend = logBuffer.splice(0, logBuffer.length);
+    if (import.meta.env.DEV) {
+      console.debug(`[logger] Descartando ${logsToSend.length} log(s) — persistência remota desabilitada.`);
     }
   },
 
