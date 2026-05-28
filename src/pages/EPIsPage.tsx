@@ -65,7 +65,7 @@ export default function EPIsPage() {
   });
 
   const criarEpi = useMutation({
-    mutationFn: (d: any) => episService.criar({ 
+    mutationFn: (d: Record<string, unknown>) => episService.criar({ 
       ...d, 
       empresa_id: empresaAtual?.id, 
       validade_meses: Number(d.validade_meses) || null,
@@ -92,7 +92,7 @@ export default function EPIsPage() {
   });
 
   const criarEntrega = useMutation({
-    mutationFn: (d: any) => episEntregasService.criar({ ...d, empresa_id: empresaAtual?.id, quantidade: Number(d.quantidade) }),
+    mutationFn: (d: Record<string, unknown>) => episEntregasService.criar({ ...d, empresa_id: empresaAtual?.id, quantidade: Number(d.quantidade) }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['epis-entregas'] });
       setOpenEntrega(false);
@@ -112,13 +112,13 @@ export default function EPIsPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Devolução registrada!'); },
   });
 
-  const filteredEpis = useMemo(() => epis.filter((e: any) => {
+  const filteredEpis = useMemo(() => epis.filter((e: Record<string, unknown>) => {
     if (catFilter && catFilter !== 'all' && e.categoria !== catFilter) return false;
     if (searchCatalogo && !e.nome.toLowerCase().includes(searchCatalogo.toLowerCase())) return false;
     return true;
   }), [epis, catFilter, searchCatalogo]);
 
-  const filteredEntregas = useMemo(() => entregas.filter((e: any) => {
+  const filteredEntregas = useMemo(() => entregas.filter((e: Record<string, unknown>) => {
     if (!searchEntregas) return true;
     const nome = (e.colaborador?.nome_completo || '').toLowerCase();
     const epiNome = (e.epi?.nome || '').toLowerCase();
@@ -126,9 +126,9 @@ export default function EPIsPage() {
   }), [entregas, searchEntregas]);
 
   const stats = useMemo(() => {
-    const uniqueCats = new Set(epis.map((e: any) => e.categoria).filter(Boolean));
+    const uniqueCats = new Set(epis.map((e: Record<string, unknown>) => e.categoria).filter(Boolean));
     const now = new Date();
-    const vencProximo = entregas.filter((e: any) => {
+    const vencProximo = entregas.filter((e: Record<string, unknown>) => {
       if (!e.data_entrega || !e.epi?.validade_meses || e.data_devolucao) return false;
       try {
         const venc = addMonths(parseISO(e.data_entrega), e.epi.validade_meses);
@@ -140,10 +140,10 @@ export default function EPIsPage() {
       totalEpis: epis.length,
       totalEntregas: entregas.length,
       categoriasCobertas: uniqueCats.size,
-      comCA: epis.filter((e: any) => e.ca).length,
-      semCA: epis.filter((e: any) => !e.ca).length,
+      comCA: epis.filter((e: Record<string, unknown>) => e.ca).length,
+      semCA: epis.filter((e: Record<string, unknown>) => !e.ca).length,
       vencimentoProximo: vencProximo,
-      estoqueBaixo: epis.filter((e: any) => e.estoque_atual <= e.estoque_minimo && e.estoque_minimo > 0).length,
+      estoqueBaixo: epis.filter((e: Record<string, unknown>) => e.estoque_atual <= e.estoque_minimo && e.estoque_minimo > 0).length,
       totalEstoque: epis.reduce((acc: number, e: any) => acc + (e.estoque_atual || 0), 0),
     };
   }, [epis, entregas]);
@@ -246,14 +246,14 @@ export default function EPIsPage() {
                     <Label>EPI *</Label>
                     <Select value={formEntrega.epi_id} onValueChange={v => setFormEntrega(p => ({ ...p, epi_id: v }))}>
                       <SelectTrigger><SelectValue placeholder="Selecione o EPI" /></SelectTrigger>
-                      <SelectContent>{epis.map((e: any) => <SelectItem key={e.id} value={e.id}>{e.nome}{e.ca ? ` (CA: ${e.ca})` : ''}</SelectItem>)}</SelectContent>
+                      <SelectContent>{epis.map((e: Record<string, unknown>) => <SelectItem key={e.id} value={e.id}>{e.nome}{e.ca ? ` (CA: ${e.ca})` : ''}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div>
                     <Label>Colaborador *</Label>
                     <Select value={formEntrega.colaborador_id} onValueChange={v => setFormEntrega(p => ({ ...p, colaborador_id: v }))}>
                       <SelectTrigger><SelectValue placeholder="Selecione o colaborador" /></SelectTrigger>
-                      <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
+                      <SelectContent>{colaboradores.map((c: Record<string, unknown>) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div><Label>Data Entrega *</Label><Input type="date" value={formEntrega.data_entrega} onChange={e => setFormEntrega(p => ({ ...p, data_entrega: e.target.value }))} /></div>
