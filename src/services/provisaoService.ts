@@ -16,7 +16,7 @@ export const provisaoService = {
   
   },
   
-  async calcular(empresaId: string, competencia: string): Promise<any> {
+  async calcular(empresaId: string, competencia: string): Promise<unknown> {
     
     const { data, error } = await supabase.functions.invoke('calcular-provisoes', {
       body: { empresa_id: empresaId, competencia }

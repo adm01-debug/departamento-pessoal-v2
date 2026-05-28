@@ -11,7 +11,7 @@ export const recrutamentoService = {
   
   },
 
-  async criarVaga(d: Record<string, unknown>): Promise<any> {
+  async criarVaga(d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('vagas').insert(d as Record<string, unknown>).select().maybeSingle();
     if (error) throw error;
@@ -20,7 +20,7 @@ export const recrutamentoService = {
   
   },
 
-  async atualizarVaga(id: string, d: Record<string, unknown>): Promise<any> {
+  async atualizarVaga(id: string, d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('vagas').update(d as Record<string, unknown>).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -47,7 +47,7 @@ export const recrutamentoService = {
   
   },
 
-  async criarCandidato(d: Record<string, unknown>): Promise<any> {
+  async criarCandidato(d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('candidatos').insert(d as Record<string, unknown>).select().maybeSingle();
     if (error) throw error;
@@ -56,7 +56,7 @@ export const recrutamentoService = {
   
   },
 
-  async atualizarCandidato(id: string, d: Record<string, unknown>): Promise<any> {
+  async atualizarCandidato(id: string, d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('candidatos').update(d as Record<string, unknown>).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -83,7 +83,7 @@ export const recrutamentoService = {
   
   },
 
-  async criarCandidatura(d: Record<string, unknown>): Promise<any> {
+  async criarCandidatura(d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('candidaturas').insert(d as Record<string, unknown>).select().maybeSingle();
     if (error) throw error;
@@ -92,7 +92,7 @@ export const recrutamentoService = {
   
   },
 
-  async atualizarCandidatura(id: string, d: Record<string, unknown>): Promise<any> {
+  async atualizarCandidatura(id: string, d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('candidaturas').update(d as Record<string, unknown>).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -109,7 +109,7 @@ export const recrutamentoService = {
   },
 
   // ===== TESTES E ENTREVISTAS =====
-  async agendarEntrevista(d: Record<string, unknown>): Promise<any> {
+  async agendarEntrevista(d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('recrutamento_entrevistas').insert(d as Record<string, unknown>).select().maybeSingle();
     if (error) throw error;
@@ -117,7 +117,7 @@ export const recrutamentoService = {
   
   },
 
-  async registrarTeste(d: Record<string, unknown>): Promise<any> {
+  async registrarTeste(d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('recrutamento_testes').insert(d as Record<string, unknown>).select().maybeSingle();
     if (error) throw error;
@@ -125,7 +125,7 @@ export const recrutamentoService = {
   
   },
 
-  async adicionarAnotacao(d: Record<string, unknown>): Promise<any> {
+  async adicionarAnotacao(d: Record<string, unknown>): Promise<unknown> {
     
     const { data, error } = await supabase.from('recrutamento_anotacoes').insert(d as Record<string, unknown>).select().maybeSingle();
     if (error) throw error;

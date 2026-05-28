@@ -10,7 +10,7 @@ export const despesaService = {
   
   },
   
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('despesas').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const despesaService = {
   
   },
   
-  async aprovar(id: string, aprovadoPor?: string | null, obs?: string): Promise<any> {
+  async aprovar(id: string, aprovadoPor?: string | null, obs?: string): Promise<unknown> {
     try {
       const { data: authData } = await supabase.auth.getUser();
       const aprovadorId = aprovadoPor || authData.user?.id || null;
@@ -37,7 +37,7 @@ export const despesaService = {
     }
   },
   
-  async rejeitar(id: string, aprovadoPor?: string | null, obs?: string): Promise<any> {
+  async rejeitar(id: string, aprovadoPor?: string | null, obs?: string): Promise<unknown> {
     try {
       const { data: authData } = await supabase.auth.getUser();
       const aprovadorId = aprovadoPor || authData.user?.id || null;
@@ -55,7 +55,7 @@ export const despesaService = {
     }
   },
   
-  async reembolsar(id: string): Promise<any> {
+  async reembolsar(id: string): Promise<unknown> {
     
     const { data, error } = await supabase.from('despesas').update({ status: 'reembolsada' }).eq('id', id).select().maybeSingle();
     if (error) throw error;

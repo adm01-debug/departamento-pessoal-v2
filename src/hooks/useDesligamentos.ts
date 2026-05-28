@@ -6,7 +6,7 @@ export function useDesligamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
 
-  const crud = useGenericCrud<any>({
+  const crud = useGenericCrud<unknown>({
     queryKey: 'desligamentos',
     service: desligamentoService,
     filters: { empresa_id: empresaId },

@@ -10,7 +10,7 @@ export const comunicacaoService = {
   
   },
   
-  async criarComunicado(d: any): Promise<any> {
+  async criarComunicado(d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('comunicados').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const comunicacaoService = {
   
   },
   
-  async atualizarComunicado(id: string, d: any): Promise<any> {
+  async atualizarComunicado(id: string, d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('comunicados').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -35,7 +35,7 @@ export const comunicacaoService = {
   
   },
   
-  async marcarLido(comunicadoId: string, usuarioId: string): Promise<any> {
+  async marcarLido(comunicadoId: string, usuarioId: string): Promise<unknown> {
     
     const { data, error } = await supabase.from('comunicados_leituras').insert({ comunicado_id: comunicadoId, usuario_id: usuarioId }).select().maybeSingle();
     if (error) throw error;
@@ -53,7 +53,7 @@ export const comunicacaoService = {
   
   },
   
-  async criarDenuncia(d: any): Promise<any> {
+  async criarDenuncia(d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('canal_etica').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -62,7 +62,7 @@ export const comunicacaoService = {
   
   },
   
-  async atualizarDenuncia(id: string, d: any): Promise<any> {
+  async atualizarDenuncia(id: string, d: any): Promise<unknown> {
     
     const { data, error } = await supabase.from('canal_etica').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;

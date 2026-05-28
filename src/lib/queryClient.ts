@@ -18,7 +18,7 @@ export function invalidateQueries(key: string | string[]) {
   queryClient.invalidateQueries({ queryKey: Array.isArray(key) ? key : [key] });
 }
 
-export function prefetchQuery(key: string | string[], queryFn: () => Promise<any>) {
+export function prefetchQuery(key: string | string[], queryFn: () => Promise<unknown>) {
   queryClient.prefetchQuery({ queryKey: Array.isArray(key) ? key : [key], queryFn });
 }
 

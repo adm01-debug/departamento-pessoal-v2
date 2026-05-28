@@ -8,7 +8,7 @@ export const jornadaHorariosService = {
   
   },
   
-  async criar(d: any): Promise<any> {
+  async criar(d: any): Promise<unknown> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('jornadas_horarios').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -17,7 +17,7 @@ export const jornadaHorariosService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<any> {
+  async atualizar(id: string, d: any): Promise<unknown> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('jornadas_horarios').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;

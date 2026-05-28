@@ -7,7 +7,7 @@ export function useWebhooksAvancados() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
 
-  const crud = useGenericCrud<any>({
+  const crud = useGenericCrud<unknown>({
     queryKey: 'webhooks',
     service: webhookService,
     filters: { empresa_id: empresaId },

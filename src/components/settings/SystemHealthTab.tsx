@@ -14,10 +14,10 @@ import {
 
 
 export function SystemHealthTab() {
-  const [healthData, setHealthData] = useState<any>(null);
+  const [healthData, setHealthData] = useState<unknown>(null);
   const [loading, setLoading] = useState<string | null>(null);
-  const [cleanupResult, setCleanupResult] = useState<any>(null);
-  const [backupResult, setBackupResult] = useState<any>(null);
+  const [cleanupResult, setCleanupResult] = useState<unknown>(null);
+  const [backupResult, setBackupResult] = useState<unknown>(null);
 
   const runHealthcheck = async () => {
     setLoading('health');
