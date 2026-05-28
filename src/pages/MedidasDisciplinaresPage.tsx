@@ -70,7 +70,7 @@ export default function MedidasDisciplinaresPage() {
   });
 
   const criar = useMutation({
-    mutationFn: (d: any) => medidasDisciplinaresService.criar({
+    mutationFn: (d: Record<string, unknown>) => medidasDisciplinaresService.criar({
       ...d,
       empresa_id: empresaAtual?.id,
       dias_suspensao: d.dias_suspensao ? Number(d.dias_suspensao) : null,
@@ -111,7 +111,7 @@ export default function MedidasDisciplinaresPage() {
     },
   });
 
-  const filtered = useMemo(() => medidas.filter((m: any) => {
+  const filtered = useMemo(() => medidas.filter((m: Record<string, unknown>) => {
     if (tipoFilter && tipoFilter !== 'all' && m.tipo !== tipoFilter) return false;
     if (search) {
       const nome = (m.colaborador?.nome_completo || '').toLowerCase();
@@ -122,13 +122,13 @@ export default function MedidasDisciplinaresPage() {
 
   const stats = useMemo(() => ({
     total: medidas.length,
-    advertenciasVerbais: medidas.filter((m: any) => m.tipo === 'advertencia_verbal').length,
-    advertenciasEscritas: medidas.filter((m: any) => m.tipo === 'advertencia_escrita').length,
-    suspensoes: medidas.filter((m: any) => m.tipo === 'suspensao').length,
-    justaCausa: medidas.filter((m: any) => m.tipo === 'justa_causa').length,
-    pendenteCiencia: medidas.filter((m: any) => !m.colaborador_ciente && !m.recusa_assinatura).length,
-    recusas: medidas.filter((m: any) => m.recusa_assinatura).length,
-    ultimosMeses: medidas.filter((m: any) => {
+    advertenciasVerbais: medidas.filter((m: Record<string, unknown>) => m.tipo === 'advertencia_verbal').length,
+    advertenciasEscritas: medidas.filter((m: Record<string, unknown>) => m.tipo === 'advertencia_escrita').length,
+    suspensoes: medidas.filter((m: Record<string, unknown>) => m.tipo === 'suspensao').length,
+    justaCausa: medidas.filter((m: Record<string, unknown>) => m.tipo === 'justa_causa').length,
+    pendenteCiencia: medidas.filter((m: Record<string, unknown>) => !m.colaborador_ciente && !m.recusa_assinatura).length,
+    recusas: medidas.filter((m: Record<string, unknown>) => m.recusa_assinatura).length,
+    ultimosMeses: medidas.filter((m: Record<string, unknown>) => {
       const d = new Date(m.data_ocorrencia);
       const now = new Date();
       return d >= new Date(now.getFullYear(), now.getMonth() - 3, 1);
@@ -179,7 +179,7 @@ export default function MedidasDisciplinaresPage() {
                 <Select value={form.colaborador_id} onValueChange={v => setForm(p => ({ ...p, colaborador_id: v }))}>
                   <SelectTrigger><SelectValue placeholder="Selecione o colaborador" /></SelectTrigger>
                   <SelectContent>
-                    {colaboradores.map((c: any) => (
+                    {colaboradores.map((c: Record<string, unknown>) => (
                       <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>
                     ))}
                   </SelectContent>
