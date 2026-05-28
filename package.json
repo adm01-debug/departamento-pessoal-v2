@@ -59,7 +59,7 @@
     "framer-motion": "12.36.0",
     "jsdom": "^20.0.3",
     "jspdf": "4.2.1",
-    "jspdf-autotable": "5.0.7",
+    "jspdf-autotable": "5.0.8",
     "lovable-tagger": "1.1.13",
     "lucide-react": "^0.562.0",
     "papaparse": "5.5.3",
