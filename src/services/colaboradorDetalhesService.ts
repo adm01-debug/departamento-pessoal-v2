@@ -1,5 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 
+// Tipos locais para este módulo
+type DadosInsert = Record<string, unknown>;
+type DadosUpdate = Record<string, unknown>;
+
 // =============================================
 // Dependentes
 // =============================================
@@ -13,18 +17,18 @@ export async function listarDependentes(colaboradorId: string) {
   return data || [];
 }
 
-export async function criarDependente(dependente: Record<string, unknown>) {
+export async function criarDependente(dependente: DadosInsert) {
   const { data, error } = await supabase
     .from('dependentes')
-    .insert([dependente as any])
+    .insert([dependente])
     .select()
     .maybeSingle();
   if (error) throw error;
   return data;
 }
 
-export async function atualizarDependente(id: string, dados: Record<string, unknown>) {
-  const { error } = await supabase.from('dependentes').update(dados as any).eq('id', id);
+export async function atualizarDependente(id: string, dados: DadosUpdate) {
+  const { error } = await supabase.from('dependentes').update(dados).eq('id', id);
   if (error) throw error;
 }
 
@@ -40,9 +44,9 @@ export async function listarContatosEmergencia(colaboradorId: string) {
   return []; // Tabela contatos_emergencia não encontrada no cache do banco externo
 }
 
-export async function criarContatoEmergencia(contato: Record<string, unknown>) {
+export async function criarContatoEmergencia(contato: DadosInsert) {
   const { data, error } = await supabase
-    .from('contatos_emergencia' as any)
+    .from('contatos_emergencia')
     .insert([contato])
     .select()
     .maybeSingle();
@@ -51,7 +55,7 @@ export async function criarContatoEmergencia(contato: Record<string, unknown>) {
 }
 
 export async function excluirContatoEmergencia(id: string) {
-  const { error } = await supabase.from('contatos_emergencia' as any).delete().eq('id', id);
+  const { error } = await supabase.from('contatos_emergencia').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -60,7 +64,7 @@ export async function excluirContatoEmergencia(id: string) {
 // =============================================
 export async function listarHistoricoSalarial(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('historico_salarial' as any)
+    .from('historico_salarial')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .order('data_vigencia', { ascending: false });
@@ -68,9 +72,9 @@ export async function listarHistoricoSalarial(colaboradorId: string) {
   return data || [];
 }
 
-export async function criarRegistroSalarial(registro: Record<string, unknown>) {
+export async function criarRegistroSalarial(registro: DadosInsert) {
   const { data, error } = await supabase
-    .from('historico_salarial' as any)
+    .from('historico_salarial')
     .insert([registro])
     .select()
     .maybeSingle();
@@ -83,7 +87,7 @@ export async function criarRegistroSalarial(registro: Record<string, unknown>) {
 // =============================================
 export async function listarASOs(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('asos' as any)
+    .from('asos')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .order('data_exame', { ascending: false });
@@ -91,9 +95,9 @@ export async function listarASOs(colaboradorId: string) {
   return data || [];
 }
 
-export async function criarASO(aso: Record<string, unknown>) {
+export async function criarASO(aso: DadosInsert) {
   const { data, error } = await supabase
-    .from('asos' as any)
+    .from('asos')
     .insert([aso])
     .select()
     .maybeSingle();
@@ -106,7 +110,7 @@ export async function criarASO(aso: Record<string, unknown>) {
 // =============================================
 export async function listarFormacoes(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('formacoes_academicas' as any)
+    .from('formacoes_academicas')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .order('ano_conclusao', { ascending: false });
@@ -114,9 +118,9 @@ export async function listarFormacoes(colaboradorId: string) {
   return data || [];
 }
 
-export async function criarFormacao(formacao: Record<string, unknown>) {
+export async function criarFormacao(formacao: DadosInsert) {
   const { data, error } = await supabase
-    .from('formacoes_academicas' as any)
+    .from('formacoes_academicas')
     .insert([formacao])
     .select()
     .maybeSingle();
@@ -125,7 +129,7 @@ export async function criarFormacao(formacao: Record<string, unknown>) {
 }
 
 export async function excluirFormacao(id: string) {
-  const { error } = await supabase.from('formacoes_academicas' as any).delete().eq('id', id);
+  const { error } = await supabase.from('formacoes_academicas').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -134,7 +138,7 @@ export async function excluirFormacao(id: string) {
 // =============================================
 export async function obterDadosEstrangeiro(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('dados_estrangeiro' as any)
+    .from('dados_estrangeiro')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .maybeSingle();
@@ -142,9 +146,9 @@ export async function obterDadosEstrangeiro(colaboradorId: string) {
   return data;
 }
 
-export async function salvarDadosEstrangeiro(colaboradorId: string, dados: Record<string, unknown>) {
+export async function salvarDadosEstrangeiro(colaboradorId: string, dados: DadosUpdate) {
   const { data, error } = await supabase
-    .from('dados_estrangeiro' as any)
+    .from('dados_estrangeiro')
     .upsert({ ...dados, colaborador_id: colaboradorId }, { onConflict: 'colaborador_id' })
     .select()
     .maybeSingle();
@@ -157,7 +161,7 @@ export async function salvarDadosEstrangeiro(colaboradorId: string, dados: Recor
 // =============================================
 export async function obterDeficiencia(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('deficiencias' as any)
+    .from('deficiencias')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .maybeSingle();
@@ -165,9 +169,9 @@ export async function obterDeficiencia(colaboradorId: string) {
   return data;
 }
 
-export async function salvarDeficiencia(colaboradorId: string, dados: Record<string, unknown>) {
+export async function salvarDeficiencia(colaboradorId: string, dados: DadosUpdate) {
   const { data, error } = await supabase
-    .from('deficiencias' as any)
+    .from('deficiencias')
     .upsert({ ...dados, colaborador_id: colaboradorId }, { onConflict: 'colaborador_id' })
     .select()
     .maybeSingle();
@@ -180,7 +184,7 @@ export async function salvarDeficiencia(colaboradorId: string, dados: Record<str
 // =============================================
 export async function obterPeriodoExperiencia(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('periodos_experiencia' as any)
+    .from('periodos_experiencia')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .maybeSingle();
@@ -188,20 +192,21 @@ export async function obterPeriodoExperiencia(colaboradorId: string) {
   return data;
 }
 
-export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Record<string, unknown>) {
+export async function salvarPeriodoExperiencia(colaboradorId: string, dados: DadosUpdate) {
   const existing = await obterPeriodoExperiencia(colaboradorId);
   if (existing) {
+    const existingRecord = existing as Record<string, unknown>;
     const { data, error } = await supabase
-      .from('periodos_experiencia' as any)
+      .from('periodos_experiencia')
       .update(dados)
-      .eq('id', (existing as any).id)
+      .eq('id', String(existingRecord.id))
       .select()
       .maybeSingle();
     if (error) throw error;
     return data;
   } else {
     const { data, error } = await supabase
-      .from('periodos_experiencia' as any)
+      .from('periodos_experiencia')
       .insert([{ ...dados, colaborador_id: colaboradorId }])
       .select()
       .maybeSingle();
@@ -215,7 +220,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Rec
 // =============================================
 export async function listarAnotacoes(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('anotacoes_colaborador' as any)
+    .from('anotacoes_colaborador')
     .select('*')
     .eq('colaborador_id', colaboradorId)
     .order('data', { ascending: false });
@@ -223,9 +228,9 @@ export async function listarAnotacoes(colaboradorId: string) {
   return data || [];
 }
 
-export async function criarAnotacao(anotacao: Record<string, unknown>) {
+export async function criarAnotacao(anotacao: DadosInsert) {
   const { data, error } = await supabase
-    .from('anotacoes_colaborador' as any)
+    .from('anotacoes_colaborador')
     .insert([anotacao])
     .select()
     .maybeSingle();
@@ -234,7 +239,7 @@ export async function criarAnotacao(anotacao: Record<string, unknown>) {
 }
 
 export async function excluirAnotacao(id: string) {
-  const { error } = await supabase.from('anotacoes_colaborador' as any).delete().eq('id', id);
+  const { error } = await supabase.from('anotacoes_colaborador').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -255,16 +260,16 @@ export async function listarPeriodosAquisitivos(colaboradorId: string) {
 // Times
 // =============================================
 export async function listarTimes(empresaId?: string) {
-  let query = supabase.from('times' as any).select('*').order('nome');
+  let query = supabase.from('times').select('*').order('nome');
   if (empresaId) query = query.eq('empresa_id', empresaId);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-export async function criarTime(time: Record<string, unknown>) {
+export async function criarTime(time: DadosInsert) {
   const { data, error } = await supabase
-    .from('times' as any)
+    .from('times')
     .insert([time])
     .select()
     .maybeSingle();
@@ -276,25 +281,25 @@ export async function criarTime(time: Record<string, unknown>) {
 // Tabelas de referência
 // =============================================
 export async function listarEtnias() {
-  const { data, error } = await supabase.from('etnias' as any).select('*').order('nome');
+  const { data, error } = await supabase.from('etnias').select('*').order('nome');
   if (error) throw error;
   return data || [];
 }
 
 export async function listarIdentidadesGenero() {
-  const { data, error } = await supabase.from('identidades_genero' as any).select('*').order('nome');
+  const { data, error } = await supabase.from('identidades_genero').select('*').order('nome');
   if (error) throw error;
   return data || [];
 }
 
 export async function listarTiposAdmissao() {
-  const { data, error } = await supabase.from('tipos_admissao' as any).select('*').order('nome');
+  const { data, error } = await supabase.from('tipos_admissao').select('*').order('nome');
   if (error) throw error;
   return data || [];
 }
 
 export async function listarTiposEstabilidade() {
-  const { data, error } = await supabase.from('tipos_estabilidade' as any).select('*').order('nome');
+  const { data, error } = await supabase.from('tipos_estabilidade').select('*').order('nome');
   if (error) throw error;
   return data || [];
 }
@@ -303,16 +308,16 @@ export async function listarTiposEstabilidade() {
 // Webhooks
 // =============================================
 export async function listarWebhooks(empresaId?: string) {
-  let query = supabase.from('webhooks_config' as any).select('*').order('created_at', { ascending: false });
+  let query = supabase.from('webhooks_config').select('*').order('created_at', { ascending: false });
   if (empresaId) query = query.eq('empresa_id', empresaId);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-export async function criarWebhook(webhook: Record<string, unknown>) {
+export async function criarWebhook(webhook: DadosInsert) {
   const { data, error } = await supabase
-    .from('webhooks_config' as any)
+    .from('webhooks_config')
     .insert([webhook])
     .select()
     .maybeSingle();
@@ -321,7 +326,7 @@ export async function criarWebhook(webhook: Record<string, unknown>) {
 }
 
 export async function excluirWebhook(id: string) {
-  const { error } = await supabase.from('webhooks_config' as any).delete().eq('id', id);
+  const { error } = await supabase.from('webhooks_config').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -330,7 +335,7 @@ export async function excluirWebhook(id: string) {
 // =============================================
 export async function listarFeriasColetivas(empresaId: string) {
   const { data, error } = await supabase
-    .from('ferias_coletivas' as any)
+    .from('ferias_coletivas')
     .select('*')
     .eq('empresa_id', empresaId)
     .order('created_at', { ascending: false });
@@ -338,9 +343,9 @@ export async function listarFeriasColetivas(empresaId: string) {
   return data || [];
 }
 
-export async function criarFeriasColetivas(ferias: Record<string, unknown>) {
+export async function criarFeriasColetivas(ferias: DadosInsert) {
   const { data, error } = await supabase
-    .from('ferias_coletivas' as any)
+    .from('ferias_coletivas')
     .insert([ferias])
     .select()
     .maybeSingle();
@@ -352,16 +357,16 @@ export async function criarFeriasColetivas(ferias: Record<string, unknown>) {
 // Campos Customizados
 // =============================================
 export async function listarCamposCustomizados(empresaId?: string) {
-  let query = supabase.from('campos_customizados' as any).select('*').eq('ativo', true).order('ordem');
+  let query = supabase.from('campos_customizados').select('*').eq('ativo', true).order('ordem');
   if (empresaId) query = query.eq('empresa_id', empresaId);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-export async function criarCampoCustomizado(campo: Record<string, unknown>) {
+export async function criarCampoCustomizado(campo: DadosInsert) {
   const { data, error } = await supabase
-    .from('campos_customizados' as any)
+    .from('campos_customizados')
     .insert([campo])
     .select()
     .maybeSingle();
@@ -371,16 +376,20 @@ export async function criarCampoCustomizado(campo: Record<string, unknown>) {
 
 export async function obterValoresCamposCustomizados(colaboradorId: string) {
   const { data, error } = await supabase
-    .from('valores_campos_customizados' as any)
+    .from('valores_campos_customizados')
     .select('*')
     .eq('colaborador_id', colaboradorId);
   if (error) throw error;
   return data || [];
 }
 
-export async function salvarValorCampoCustomizado(campoId: string, colaboradorId: string, valor: string) {
+export async function salvarValorCampoCustomizado(
+  campoId: string,
+  colaboradorId: string,
+  valor: string
+) {
   const { data, error } = await supabase
-    .from('valores_campos_customizados' as any)
+    .from('valores_campos_customizados')
     .upsert(
       { campo_customizado_id: campoId, colaborador_id: colaboradorId, valor },
       { onConflict: 'campo_customizado_id,colaborador_id' }
