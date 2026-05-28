@@ -72,7 +72,7 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
     },
   });
 
-  const cursosDisponiveis = cursos.filter(c => !vinculados.some((v: any) => v.curso_id === c.id));
+  const cursosDisponiveis = cursos.filter(c => !vinculados.some((v: Record<string, unknown>) => v.curso_id === c.id));
 
   return (
     <div className="mt-4 pt-4 border-t border-border/40">
@@ -100,7 +100,7 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
                     <SelectValue placeholder="Escolha um curso do catálogo" />
                   </SelectTrigger>
                   <SelectContent>
-                    {cursosDisponiveis.map((c: any) => (
+                    {cursosDisponiveis.map((c: Record<string, unknown>) => (
                       <SelectItem key={c.id} value={c.id}>{c.nome} ({c.carga_horaria}h)</SelectItem>
                     ))}
                     {cursosDisponiveis.length === 0 && <SelectItem value="none" disabled>Nenhum curso disponível</SelectItem>}
@@ -218,7 +218,7 @@ export default function TreinamentosPage() {
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
         <Card><CardContent className="pt-4 text-center"><Calendar className="h-6 w-6 mx-auto text-accent mb-1" /><p className="text-2xl font-bold">{treinamentos.length}</p><p className="text-xs text-muted-foreground">Treinamentos</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><BookOpen className="h-6 w-6 mx-auto text-primary mb-1" /><p className="text-2xl font-bold">{cursos.length}</p><p className="text-xs text-muted-foreground">Cursos</p></CardContent></Card>
-        <Card><CardContent className="pt-4 text-center"><Award className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{cursos.filter((c: any) => c.obrigatorio).length}</p><p className="text-xs text-muted-foreground">Obrigatórios</p></CardContent></Card>
+        <Card><CardContent className="pt-4 text-center"><Award className="h-6 w-6 mx-auto text-success mb-1" /><p className="text-2xl font-bold">{cursos.filter((c: Record<string, unknown>) => c.obrigatorio).length}</p><p className="text-xs text-muted-foreground">Obrigatórios</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><GraduationCap className="h-6 w-6 mx-auto text-warning mb-1" /><p className="text-2xl font-bold">{trilhas.length}</p><p className="text-xs text-muted-foreground">Trilhas</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><Users className="h-6 w-6 mx-auto text-info mb-1" /><p className="text-2xl font-bold">{inscricoes.length}</p><p className="text-xs text-muted-foreground">Inscrições</p></CardContent></Card>
         <Card><CardContent className="pt-4 text-center"><Video className="h-6 w-6 mx-auto text-purple-500 mb-1" /><p className="text-2xl font-bold">{instancias.length}</p><p className="text-xs text-muted-foreground">Turmas</p></CardContent></Card>
@@ -258,7 +258,7 @@ export default function TreinamentosPage() {
               <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Data</TableHead><TableHead>Carga Horária</TableHead><TableHead>Descrição</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {treinamentos.length === 0 ? <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum treinamento cadastrado</TableCell></TableRow> :
-                    treinamentos.map((t: any) => (
+                    treinamentos.map((t: Record<string, unknown>) => (
                       <TableRow key={t.id}>
                         <TableCell className="font-medium">{t.nome}</TableCell>
                         <TableCell>{t.data || '—'}</TableCell>
@@ -296,7 +296,7 @@ export default function TreinamentosPage() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      certificados.map((cert: any) => (
+                      certificados.map((cert: Record<string, unknown>) => (
                         <TableRow key={cert.id} className="hover:bg-muted/30">
                           <TableCell className="font-medium">{cert.colaborador?.nome_completo}</TableCell>
                           <TableCell>{cert.curso?.nome}</TableCell>
@@ -356,7 +356,7 @@ export default function TreinamentosPage() {
               <Table><TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Categoria</TableHead><TableHead>Modalidade</TableHead><TableHead>Carga Horária</TableHead><TableHead>Obrigatório</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {cursos.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum curso cadastrado</TableCell></TableRow> :
-                    cursos.map((c: any) => (
+                    cursos.map((c: Record<string, unknown>) => (
                       <TableRow key={c.id}>
                         <TableCell className="font-medium">{c.nome}</TableCell>
                         <TableCell>{c.categoria || '—'}</TableCell>
@@ -393,7 +393,7 @@ export default function TreinamentosPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            {trilhas.map((t: any) => (
+            {trilhas.map((t: Record<string, unknown>) => (
               <Card key={t.id} className="mb-4">
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between mb-3">
@@ -421,13 +421,13 @@ export default function TreinamentosPage() {
                     <div><Label>Colaborador *</Label>
                       <Select value={inscForm.colaborador_id} onValueChange={v => setInscForm(p => ({ ...p, colaborador_id: v }))}>
                         <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                        <SelectContent>{colaboradores.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
+                        <SelectContent>{colaboradores.map((c: Record<string, unknown>) => <SelectItem key={c.id} value={c.id}>{c.nome_completo}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div><Label>Curso *</Label>
                       <Select value={inscForm.curso_id} onValueChange={v => setInscForm(p => ({ ...p, curso_id: v }))}>
                         <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                        <SelectContent>{cursos.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+                        <SelectContent>{cursos.map((c: Record<string, unknown>) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div><Label>Data Início</Label><Input type="date" value={inscForm.data_inicio} onChange={e => setInscForm(p => ({ ...p, data_inicio: e.target.value }))} /></div>
@@ -440,7 +440,7 @@ export default function TreinamentosPage() {
               <Table><TableHeader><TableRow><TableHead>Colaborador</TableHead><TableHead>Curso</TableHead><TableHead>Status</TableHead><TableHead>Data Início</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {inscricoes.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma inscrição registrada</TableCell></TableRow> :
-                    inscricoes.map((i: any) => (
+                    inscricoes.map((i: Record<string, unknown>) => (
                       <TableRow key={i.id}>
                         <TableCell>{i.colaborador?.nome_completo || '—'}</TableCell>
                         <TableCell>{i.curso?.nome || '—'}</TableCell>
@@ -459,7 +459,7 @@ export default function TreinamentosPage() {
             <Card><CardContent className="p-0">
               <Table><TableHeader><TableRow><TableHead>Curso</TableHead><TableHead>Instrutor</TableHead><TableHead>Início</TableHead><TableHead>Status</TableHead><TableHead>Vagas</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {instancias.map((i: any) => (
+                  {instancias.map((i: Record<string, unknown>) => (
                     <TableRow key={i.id}>
                       <TableCell className="font-medium">{i.curso?.nome || '—'}</TableCell>
                       <TableCell>{i.instrutor?.nome_completo || '—'}</TableCell>
