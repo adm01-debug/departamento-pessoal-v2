@@ -298,4 +298,4 @@ const dbBridgeProxy: ProxyHandler<SupabaseProxyTarget> = {
 export const supabase = new Proxy(
   supabaseBase as unknown as SupabaseProxyTarget,
   dbBridgeProxy
-) as unknown as typeof supabaseBase & SupabaseProxyTarget;
+) as any;
