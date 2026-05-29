@@ -77,7 +77,7 @@ export async function notificarAjustePonto(
     }
     return (undefined);
   } catch (e: any) {
-    throw new Error('Falha ao notificar ajuste de ponto');
+    throw new Error('Falha ao notificar ajuste de ponto', { cause: e });
   }
 }
 

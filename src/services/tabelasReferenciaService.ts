@@ -129,7 +129,7 @@ export async function salvarDadosEstagiario(colaboradorId: string, dados: DataRe
     }
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Erro desconhecido';
-    throw new Error(`Falha ao salvar dados de estagiário: ${msg}`);
+    throw new Error(`Falha ao salvar dados de estagiário: ${msg}`, { cause: e });
   }
 }
 

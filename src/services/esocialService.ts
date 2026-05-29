@@ -90,7 +90,7 @@ export async function obterEstatisticas(empresaId: string | null): Promise<unkno
 
     return ({ enviados, pendentes, erros, conformidade });
   } catch (e: any) {
-    throw new Error('Falha ao processar estatísticas do eSocial');
+    throw new Error('Falha ao processar estatísticas do eSocial', { cause: e });
   }
 }
 
@@ -174,7 +174,7 @@ export async function enviarEvento(eventoId: string, empresaId: string): Promise
 
     return (data);
   } catch (e: any) {
-    throw new Error('Falha na transmissão do evento eSocial');
+    throw new Error('Falha na transmissão do evento eSocial', { cause: e });
   }
 }
 
@@ -266,7 +266,7 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
 
     return (resultados);
   } catch (e: any) {
-    throw new Error('Falha ao gerar eventos do período');
+    throw new Error('Falha ao gerar eventos do período', { cause: e });
   }
 }
 

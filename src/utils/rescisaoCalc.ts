@@ -24,7 +24,7 @@ function calcularAvos(inicio: Date, fim: Date): number {
     meses--;
   }
   
-  let dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
+  const dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
   const diffTime = fim.getTime() - dataReferencia.getTime();
   const diasRestantes = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
@@ -177,7 +177,7 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
 
     return (result);
   } catch (e: any) {
-    throw new Error(e.message || 'Erro inesperado no motor de cálculo de rescisão');
+    throw new Error(e.message || 'Erro inesperado no motor de cálculo de rescisão', { cause: e });
   }
 }
 

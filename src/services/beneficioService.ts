@@ -41,7 +41,7 @@ class BeneficioService extends BaseService<any> {
       });
       return data;
     } catch (e: any) {
-      throw new Error(e.message || 'Falha ao criar benefício');
+      throw new Error(e.message || 'Falha ao criar benefício', { cause: e });
     }
   }
 
@@ -60,7 +60,7 @@ class BeneficioService extends BaseService<any> {
       
       return data;
     } catch (e: any) {
-      throw new Error(e.message || 'Falha ao atualizar benefício');
+      throw new Error(e.message || 'Falha ao atualizar benefício', { cause: e });
     }
   }
 
@@ -76,7 +76,7 @@ class BeneficioService extends BaseService<any> {
         dados_anteriores: anterior
       });
     } catch (e: any) {
-      throw new Error(e.message || 'Falha ao excluir benefício');
+      throw new Error(e.message || 'Falha ao excluir benefício', { cause: e });
     }
   }
 

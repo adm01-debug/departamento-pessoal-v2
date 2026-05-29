@@ -41,7 +41,7 @@ export const jornadaHorariosService = {
       if (error) throw error;
       return (data || []);
     } catch (e: any) {
-      throw new Error('Falha ao salvar grade de horários');
+      throw new Error('Falha ao salvar grade de horários', { cause: e });
     }
   },
 };

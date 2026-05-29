@@ -114,7 +114,7 @@ export const whatsappService = {
         
       return ({ success: true, logId: (log as Record<string, unknown>).id });
     } catch (e: any) {
-      throw new Error('Falha ao enviar mensagem de template do WhatsApp');
+      throw new Error('Falha ao enviar mensagem de template do WhatsApp', { cause: e });
     }
   }
 };

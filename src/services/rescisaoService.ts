@@ -28,7 +28,7 @@ export const rescisaoService = {
 
       return (true);
     } catch (e: any) {
-      throw new Error(e.message || 'Erro inesperado na validação de transição');
+      throw new Error(e.message || 'Erro inesperado na validação de transição', { cause: e });
     }
   },
 
@@ -104,7 +104,7 @@ export const rescisaoService = {
 
       return (novo);
     } catch (e: any) {
-      throw new Error(e.message || 'Erro crítico ao processar cálculo de rescisão');
+      throw new Error(e.message || 'Erro crítico ao processar cálculo de rescisão', { cause: e });
     }
   },
 
@@ -165,7 +165,7 @@ export const rescisaoService = {
 
       return (data);
     } catch (e: any) {
-      throw new Error(e.message || 'Erro ao processar homologação');
+      throw new Error(e.message || 'Erro ao processar homologação', { cause: e });
     }
   },
 
@@ -202,7 +202,7 @@ export const rescisaoService = {
 
       return (data);
     } catch (e: any) {
-      throw new Error('Falha ao realizar assinatura digital');
+      throw new Error('Falha ao realizar assinatura digital', { cause: e });
     }
   },
 
@@ -249,7 +249,7 @@ export const rescisaoService = {
 
       return (data);
     } catch (e: any) {
-      throw new Error('Erro ao processar pagamento de rescisão');
+      throw new Error('Erro ao processar pagamento de rescisão', { cause: e });
     }
   }
 };

@@ -42,7 +42,7 @@ export const calculoLoteService = {
       }
 
       // 2. Garantir cabeçalho da folha
-      let { data: header, error: headerError } = await (supabase as any)
+      const { data: header, error: headerError } = await (supabase as any)
         .from('folhas_pagamento')
         .select('id, status')
         .eq('empresa_id', empresaId)

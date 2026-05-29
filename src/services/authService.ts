@@ -14,7 +14,7 @@ export const authService = {
       }
       return ({ success: true });
     } catch (e: any) {
-      throw new Error(e.message || 'Erro inesperado no servidor de autenticação');
+      throw new Error(e.message || 'Erro inesperado no servidor de autenticação', { cause: e });
     }
   },
 
@@ -29,7 +29,7 @@ export const authService = {
       }
       return ({ success: true });
     } catch (e: any) {
-      throw new Error(e.message || 'Erro inesperado ao redefinir senha');
+      throw new Error(e.message || 'Erro inesperado ao redefinir senha', { cause: e });
     }
   },
 
@@ -42,7 +42,7 @@ export const authService = {
       if (error) throw error;
       return (data.session);
     } catch (e: any) {
-      throw new Error('Sessão inválida ou expirada');
+      throw new Error('Sessão inválida ou expirada', { cause: e });
     }
   }
 };

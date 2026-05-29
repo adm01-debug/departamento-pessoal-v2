@@ -33,7 +33,7 @@ export const despesaService = {
       if (!data) throw new Error('Nenhum registro de despesa foi retornado.');
       return (data);
     } catch (e: any) {
-      throw new Error('Falha ao aprovar despesa');
+      throw new Error('Falha ao aprovar despesa', { cause: e });
     }
   },
   
@@ -51,7 +51,7 @@ export const despesaService = {
       if (!data) throw new Error('Nenhum registro de despesa foi retornado.');
       return (data);
     } catch (e: any) {
-      throw new Error('Falha ao rejeitar despesa');
+      throw new Error('Falha ao rejeitar despesa', { cause: e });
     }
   },
   

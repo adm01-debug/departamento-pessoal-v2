@@ -105,7 +105,7 @@ class AfastamentoService extends BaseService<any> {
       if (error) throw error;
       return data;
     } catch (e: any) {
-      throw new Error(e.message || 'Falha no upload do documento');
+      throw new Error(e.message || 'Falha no upload do documento', { cause: e });
     }
   }
 
@@ -150,7 +150,7 @@ class AfastamentoService extends BaseService<any> {
 
       return data;
     } catch (e: any) {
-      throw new Error('Falha ao criar prorrogação');
+      throw new Error('Falha ao criar prorrogação', { cause: e });
     }
   }
 
@@ -203,7 +203,7 @@ class AfastamentoService extends BaseService<any> {
       document.body.removeChild(link);
       return data;
     } catch (e: any) {
-      throw new Error('Falha ao exportar relatório');
+      throw new Error('Falha ao exportar relatório', { cause: e });
     }
   }
 }

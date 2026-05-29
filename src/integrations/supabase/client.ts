@@ -145,7 +145,7 @@ const callBridge = async <T = unknown>(
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type AnyFn = (...args: unknown[]) => unknown;
 
 interface QueryBuilder {
@@ -273,7 +273,7 @@ const createQueryBuilder = (table: string): QueryBuilder => {
   return builder;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 interface SupabaseProxyTarget {
   from: (table: string) => QueryBuilder;
   rpc: (fn: string, params: Record<string, unknown>) => Promise<BridgeResponse<unknown>>;
