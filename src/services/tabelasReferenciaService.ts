@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-type DataRecord = Record<string, unknown>;
+type DataRecord = any;
 
 // Helper genérico para listar tabelas de referência
 async function listarReferencia(tabela: string, orderBy = 'nome'): Promise<unknown[]> {

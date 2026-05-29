@@ -20,7 +20,7 @@ export const ajustesPontoService = {
 
 export const periodosPontoService = {
   listar: async (empresaId?: string) => {
-    let q = supabase.from('periodos_ponto').select('*').order('data_inicio', { ascending: false });
+    let q: any = supabase.from('periodos_ponto').select('*').order('data_inicio', { ascending: false });
     if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;

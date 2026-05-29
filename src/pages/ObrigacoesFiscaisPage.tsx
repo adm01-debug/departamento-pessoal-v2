@@ -65,7 +65,7 @@ export default function ObrigacoesFiscaisPage() {
 
   const marcarPaga = useMutation({
     mutationFn: async ({ id, tabela }: { id: string; tabela: string }) => {
-      const { error } = await supabase.from(tabela as Record<string, unknown>).update({ status: 'paga', data_pagamento: new Date().toISOString() } as any).eq('id', id);
+      const { error } = await supabase.from(tabela as any).update({ status: 'paga', data_pagamento: new Date().toISOString() } as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['guias-fgts'] }); qc.invalidateQueries({ queryKey: ['guias-inss'] }); toast.success('Guia marcada como paga!'); },

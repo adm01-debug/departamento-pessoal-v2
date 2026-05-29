@@ -116,12 +116,12 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
       
       if (blob && user?.id && navigator.onLine) {
         const fileName = `${user.id}/${Date.now()}.jpg`;
-        const { error } = await (window as Record<string, unknown>).supabase.storage
+        const { error } = await (window as any).supabase.storage
           .from('ponto-biometria')
           .upload(fileName, blob);
           
         if (!error) {
-          const { data: { publicUrl } } = (window as Record<string, unknown>).supabase.storage
+          const { data: { publicUrl } } = (window as any).supabase.storage
             .from('ponto-biometria')
             .getPublicUrl(fileName);
           fotoUrl = publicUrl;
@@ -148,7 +148,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
 
     // Modo Offline
     try {
-      const { data: colab } = await (window as Record<string, unknown>).supabase.from('colaboradores').select('id').eq('email', user.email).maybeSingle();
+      const { data: colab } = await (window as any).supabase.from('colaboradores').select('id').eq('email', user.email).maybeSingle();
       if (!colab) throw new Error('Colaborador não identificado localmente');
 
       const hashPayload = {

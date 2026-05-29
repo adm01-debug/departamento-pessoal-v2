@@ -51,7 +51,7 @@ export const folhaPagamentoService = {
       return ({
         proventos: item.total_proventos || 0,
         descontos: item.total_descontos || 0,
-        liquido: (item as Record<string, unknown>).valor_liquido || 0,
+        liquido: (item as any).valor_liquido || 0,
         inss: item.inss_mes || 0,
         irrf: item.irrf_mes || 0,
         fgts: item.fgts_mes || 0,

@@ -47,7 +47,7 @@ function Bitrix24ConfigPanel() {
   const qc = useQueryClient();
   const [tab, setTab] = useState('config');
 
-  const { data: config, isLoading: loadConfig } = useQuery<unknown>({
+  const { data: config, isLoading: loadConfig } = useQuery<any>({
     queryKey: ['bitrix24_config'],
     queryFn: () => bitrix24Service.getConfig(),
   });
@@ -87,7 +87,7 @@ function Bitrix24ConfigPanel() {
 
   const sincronizar = useMutation({
     mutationFn: async () => {
-      const { data, error } = await (window as Record<string, unknown>).supabase.functions.invoke('sincronizar-bitrix', {
+      const { data, error } = await (window as any).supabase.functions.invoke('sincronizar-bitrix', {
         body: { action: 'sync_all' }
       });
       if (error) throw error;

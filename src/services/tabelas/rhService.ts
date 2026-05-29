@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const configAfastamentosService = {
   obter: async (empresaId: string) => {
-    const { data, error } = await supabase.from('config_afastamentos').select('*').eq('empresa_id', empresaId).maybeSingle();
+    const { data, error } = await supabase.from('config_afastamentos' as any).select('*').eq('empresa_id', empresaId).maybeSingle();
     if (error) throw error;
     return data;
   },
@@ -40,7 +40,7 @@ export const historicoCargoService = {
 
 export const historicoFeriasService = {
   listar: async (colaboradorId: string) => {
-    const { data, error } = await supabase.from('historico_ferias').select('*').eq('colaborador_id', colaboradorId).order('data_inicio', { ascending: false });
+    const { data, error } = await supabase.from('historico_ferias' as any).select('*').eq('colaborador_id', colaboradorId).order('data_inicio', { ascending: false });
     if (error) throw error;
     return data || [];
   },
@@ -48,7 +48,7 @@ export const historicoFeriasService = {
 
 export const linhasTransporteService = {
   listar: async (empresaId?: string) => {
-    let q = supabase.from('linhas_transporte').select('*').order('nome');
+    let q = supabase.from('linhas_transporte' as any).select('*').order('nome');
     if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
@@ -108,14 +108,14 @@ export const onboardingService = {
     return data || [];
   },
   concluirTarefa: async (id: string) => {
-    const { error } = await supabase.from('onboarding_tarefas').update({ concluida: true, concluida_em: new Date().toISOString() }).eq('id', id);
+    const { error } = await supabase.from('onboarding_tarefas').update({ concluida: true, concluida_em: new Date().toISOString() } as any).eq('id', id);
     if (error) throw error;
   },
 };
 
 export const treinamentoParticipantesService = {
   listar: async (inscricaoId?: string) => {
-    let q = supabase.from('treinamento_participantes').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
+    let q = supabase.from('treinamento_participantes' as any).select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
     if (inscricaoId) q = q.eq('inscricao_id', inscricaoId);
     const { data, error } = await q;
     if (error) throw error;

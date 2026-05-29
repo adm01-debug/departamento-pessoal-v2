@@ -46,7 +46,7 @@ export const pontoOfflineService = {
         await db.put('photos', registro.foto_base64, id);
         // Não salvar o base64 no localStorage para economizar espaço
         entryWithId.foto_base64 = null;
-        (entryWithId as Record<string, unknown>).has_photo_in_idb = true;
+        (entryWithId as any).has_photo_in_idb = true;
       } catch (e) {
         console.error('Falha ao salvar foto no IndexedDB:', e);
       }
@@ -109,7 +109,7 @@ export const pontoOfflineService = {
     // Re-anexar fotos do IndexedDB antes do sync
     const db = await pontoOfflineService.openDB();
     const queueWithPhotos = await Promise.all(queue.map(async (item) => {
-      if ((item as Record<string, unknown>).has_photo_in_idb) {
+      if ((item as any).has_photo_in_idb) {
         const photo = await db.get('photos', item.id);
         return { ...item, foto_base64: photo };
       }
@@ -120,7 +120,7 @@ export const pontoOfflineService = {
     try {
       const { data, error } = await supabase.functions.invoke('processar-ponto-offline', {
         body: { registros: queueWithPhotos }
-      });
+      }) as { data: any; error: any };
 
       if (error) throw error;
       

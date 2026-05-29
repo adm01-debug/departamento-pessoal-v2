@@ -42,8 +42,8 @@ export default function FolhaPage() {
 
 
   // Summary KPIs from loaded data
-  const totais = (folhas || []).reduce(
-    (acc, f) => ({
+  const totais: any = (folhas || []).reduce(
+    (acc: any, f: any) => ({
       proventos: acc.proventos + (f.total_proventos || 0),
       descontos: acc.descontos + (f.total_descontos || 0),
       liquido: acc.liquido + (f.total_liquido || 0),
@@ -162,7 +162,7 @@ export default function FolhaPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {folhas.map((f) => (
+                {folhas.map((f: any) => (
                   <TableRow key={f.id} className="hover:bg-accent/30 transition-colors group">
                     <TableCell className="font-body font-semibold">{f.competencia}</TableCell>
                     <TableCell className="capitalize font-body text-muted-foreground">{(f.tipo || '').replace('_', ' ')}</TableCell>
@@ -205,7 +205,7 @@ export default function FolhaPage() {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
-            {folhas.map((f, i) => (
+            {folhas.map((f: any, i: number) => (
               <motion.div
                 key={f.id}
                 initial={{ opacity: 0, y: 10 }}

@@ -60,7 +60,7 @@ export async function notificarAjustePonto(
         const { data: profile } = await supabase
           .from('profiles')
           .select('user_id')
-          .eq('email', colab.email)
+          .eq('email' as any, colab.email)
           .maybeSingle();
         targetUserId = (profile as any)?.user_id;
       }

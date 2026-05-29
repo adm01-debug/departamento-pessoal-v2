@@ -71,7 +71,7 @@ interface FolhaItemRecord {
   colaborador?: { id: string; nome_completo: string; cpf: string };
 }
 
-type DataRecord = Record<string, unknown>;
+type DataRecord = any;
 
 export const cnabService = {
   async getConfig(empresaId: string): Promise<CNABConfig | null> {
@@ -162,7 +162,7 @@ export const cnabService = {
         status: 'pendente',
         valor_total: typedItens.reduce((acc, i) => acc + Number(i.total_liquido), 0),
         total_pagamentos: typedItens.length
-      }])
+      }] as any)
       .select()
       .single();
 
@@ -187,10 +187,10 @@ export const cnabService = {
     lines.push(header.padEnd(240, ' '));
 
     // Registrar o arquivo de remessa no banco para auditoria real
-    await supabase.from('cnab_remessas').update({ 
+    await supabase.from('cnab_remessas').update({
       arquivo_remessa: lines[0],
-      status: 'enviado' 
-    }).eq('id', remessaRecord.id);
+      status: 'enviado'
+    } as any).eq('id', remessaRecord.id);
 
     let detailSequence = 1;
     let totalValue = 0;
@@ -246,9 +246,9 @@ export const cnabService = {
     const fullFile = lines.join('\r\n');
     
     // Atualiza com o arquivo completo
-    await supabase.from('cnab_remessas').update({ 
-      arquivo_remessa: fullFile 
-    }).eq('id', remessaRecord.id);
+    await supabase.from('cnab_remessas').update({
+      arquivo_remessa: fullFile
+    } as any).eq('id', remessaRecord.id);
 
     return fullFile;
   },

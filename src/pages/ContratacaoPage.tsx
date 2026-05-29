@@ -272,7 +272,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
             tipo_documento: docType,
             storage_path: storagePath,
             status: 'pendente'
-          });
+          } as any);
 
         if (dbErr) throw dbErr;
 

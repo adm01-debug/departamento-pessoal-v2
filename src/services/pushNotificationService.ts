@@ -46,9 +46,9 @@ export const pushNotificationService = {
         device_info: {
           userAgent: navigator.userAgent,
           language: navigator.language,
-          platform: (navigator as Record<string, unknown>).platform
+          platform: (navigator as any).platform
         }
-      }, { onConflict: 'endpoint' });
+      } as any, { onConflict: 'endpoint' });
 
       if (error) throw error;
       return true;
@@ -65,7 +65,7 @@ export const pushNotificationService = {
         await subscription.unsubscribe();
         const { endpoint } = subscription.toJSON();
         
-        await supabase.from('push_subscriptions')
+        await (supabase.from('push_subscriptions') as any)
           .update({ ativo: false })
           .eq('endpoint', endpoint)
           .eq('user_id', userId);

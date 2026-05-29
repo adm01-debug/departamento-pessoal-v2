@@ -105,7 +105,7 @@ export const catalogoCursoService = {
   async listarCertificados(colaboradorId?: string, empresaId?: string) {
     let q = supabase.from('treinamento_certificados').select('*, curso:catalogo_cursos(nome, carga_horaria), colaborador:colaboradores(nome_completo)');
     if (colaboradorId) q = q.eq('colaborador_id', colaboradorId);
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    if (empresaId) q = (q as any).eq('empresa_id', empresaId);
     const { data, error } = await q.order('data_emissao', { ascending: false });
     if (error) throw error;
     return data || [];

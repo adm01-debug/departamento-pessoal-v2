@@ -162,7 +162,7 @@ export default function PontoPage() {
           accuracy: geo?.accuracy 
         });
       } else {
-        await (pontoService as Record<string, unknown>).registrar(tipo, colab.id, {
+        await (pontoService as any).registrar(tipo, colab.id, {
           latitude: geo?.lat,
           longitude: geo?.lng,
           precisao: geo?.accuracy ? Math.round(geo.accuracy) : undefined,
@@ -364,7 +364,7 @@ export default function PontoPage() {
                   <TableBody>
                     {batidasHoje.slice(0, 5).map((b: any) => (
                       <TableRow key={b.id} className="hover:bg-accent/30 transition-colors">
-                        <TableCell className="font-body font-medium">{(b as Record<string, unknown>).colaborador?.nome_completo || b.colaborador_id?.slice(0, 8)}</TableCell>
+                        <TableCell className="font-body font-medium">{(b as any).colaborador?.nome_completo || b.colaborador_id?.slice(0, 8)}</TableCell>
                         <TableCell className="font-body font-mono">{b.hora}</TableCell>
                         <TableCell><Badge variant="outline" className="text-[10px]">{b.tipo}</Badge></TableCell>
                         <TableCell className="font-body">{b.ordem}ª</TableCell>

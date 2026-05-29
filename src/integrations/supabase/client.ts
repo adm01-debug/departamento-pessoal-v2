@@ -271,7 +271,7 @@ const createQueryBuilder = (table: string): QueryBuilder => {
     },
     single: () => { state.payload.single = true; return builder; },
     maybeSingle: () => { state.payload.single = true; return builder; },
-    then: (resolve: AnyFn, reject?: AnyFn) => exec().then(resolve, reject),
+    then: (resolve: (value: BridgeResult) => unknown, reject?: AnyFn) => exec().then(resolve, reject),
     catch: (reject: AnyFn) => exec().catch(reject),
     finally: (cb: AnyFn) => exec().finally(cb),
   };

@@ -86,13 +86,13 @@ export default function WorkflowsPage() {
 
   const stats = {
     total: definicoes.length,
-    andamento: execucoes.filter((e: Record<string, unknown>) => e.status === 'em_andamento').length,
-    aprovados: execucoes.filter((e: Record<string, unknown>) => e.status === 'aprovado').length,
-    pendentes: execucoes.filter((e: Record<string, unknown>) => e.status === 'pendente').length,
-    rejeitados: execucoes.filter((e: Record<string, unknown>) => e.status === 'rejeitado').length,
+    andamento: execucoes.filter((e: any) => e.status === 'em_andamento').length,
+    aprovados: execucoes.filter((e: any) => e.status === 'aprovado').length,
+    pendentes: execucoes.filter((e: any) => e.status === 'pendente').length,
+    rejeitados: execucoes.filter((e: any) => e.status === 'rejeitado').length,
   };
 
-  const slaAtrasados = execucoes.filter((e: Record<string, unknown>) => {
+  const slaAtrasados = execucoes.filter((e: any) => {
     if (e.status !== 'pendente' && e.status !== 'em_andamento') return false;
     const created = new Date(e.created_at);
     const diffHours = (Date.now() - created.getTime()) / (1000 * 60 * 60);
@@ -252,7 +252,7 @@ export default function WorkflowsPage() {
                 <TableBody>
                   {execucoes.length === 0 ? (
                     <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 font-body">Nenhuma execução registrada</TableCell></TableRow>
-                  ) : execucoes.map((e: Record<string, unknown>) => {
+                  ) : execucoes.map((e: any) => {
                     const config = statusConfig[e.status] || statusConfig.pendente;
                     const StatusIcon = config.icon;
                     const horasDecorridas = Math.round((Date.now() - new Date(e.created_at).getTime()) / (1000 * 60 * 60));
@@ -261,7 +261,7 @@ export default function WorkflowsPage() {
 
                     return (
                       <TableRow key={e.id} className="hover:bg-accent/30 transition-colors cursor-pointer" onClick={() => { setSelectedExec(e); setShowLog(true); }}>
-                        <TableCell className="font-body font-medium">{(e as Record<string, unknown>).workflow?.nome || '—'}</TableCell>
+                        <TableCell className="font-body font-medium">{(e as any).workflow?.nome || '—'}</TableCell>
                         <TableCell><Badge variant="outline" className="font-body text-xs">{tipoIcons[e.entidade_tipo] || '📋'} {e.entidade_tipo}</Badge></TableCell>
                         <TableCell>
                           <Badge className={cn("font-body", config.color)}>
@@ -312,7 +312,7 @@ export default function WorkflowsPage() {
               { status: 'aprovado', title: 'Aprovados', color: 'from-success to-success/70' },
               { status: 'rejeitado', title: 'Rejeitados', color: 'from-destructive to-destructive/70' },
             ].map(({ status, title, color }) => {
-              const items = execucoes.filter((e: Record<string, unknown>) => e.status === status);
+              const items = execucoes.filter((e: any) => e.status === status);
               return (
                 <div key={status}>
                   <div className="flex items-center gap-2 mb-3">
@@ -323,11 +323,11 @@ export default function WorkflowsPage() {
                   <div className="space-y-2">
                     {items.length === 0 ? (
                       <Card className="border-dashed border-border/30 rounded-xl"><CardContent className="p-4 text-center text-xs text-muted-foreground font-body">Vazio</CardContent></Card>
-                    ) : items.map((e: Record<string, unknown>) => (
+                    ) : items.map((e: any) => (
                       <motion.div key={e.id} layout>
                         <Card className="border-border/30 rounded-xl hover:shadow-elevated transition-all">
                           <CardContent className="p-3">
-                            <p className="text-xs font-body font-medium">{(e as Record<string, unknown>).workflow?.nome || 'Workflow'}</p>
+                            <p className="text-xs font-body font-medium">{(e as any).workflow?.nome || 'Workflow'}</p>
                             <div className="flex items-center justify-between mt-1">
                               <Badge variant="outline" className="text-[10px] font-body">{e.entidade_tipo}</Badge>
                               <span className="text-[10px] text-muted-foreground font-body">{new Date(e.created_at).toLocaleDateString('pt-BR')}</span>
