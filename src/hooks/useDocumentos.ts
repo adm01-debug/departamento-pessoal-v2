@@ -11,7 +11,7 @@ export function useDocumentos(colaboradorId?: string) {
     queryKey: ['documentos', empresaAtualId, colaboradorId],
     enabled: !!empresaAtualId,
     queryFn: async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       let query: any = supabase
         .from('documentos')
         .select('*')

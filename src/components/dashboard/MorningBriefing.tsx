@@ -121,7 +121,7 @@ export function MorningBriefing() {
   const [runningAction, setRunningAction] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleAction = async (id: string, fn: () => Promise<unknown>, successMsg: string) => {
+  const handleAction = async (id: string, fn: () => Promise<any>, successMsg: string) => {
     setRunningAction(id);
     try {
       await fn();
@@ -149,7 +149,7 @@ export function MorningBriefing() {
             Erro de Esquema (Banco Externo)
           </CardTitle>
           <CardDescription className="text-destructive/80 font-mono text-xs">
-            {(error as Record<string, unknown>).message}
+            {(error as any).message}
           </CardDescription>
         </CardHeader>
         <CardContent>

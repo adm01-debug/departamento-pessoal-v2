@@ -30,7 +30,7 @@ export async function gerarPDIPDF(colaborador: string, pdi: any) {
   doc.setFont('helvetica', 'normal');
   doc.text(pdi.acao || '—', 14, y, { maxWidth: pw - 28 }); y += 20;
 
-  (doc as Record<string, unknown>).autoTable({
+  (doc as any).autoTable({
     startY: y,
     head: [['Ação', 'Prazo', 'Status']],
     body: [
@@ -40,7 +40,7 @@ export async function gerarPDIPDF(colaborador: string, pdi: any) {
     headStyles: { fillColor: [79, 70, 229] },
   });
 
-  y = (doc as Record<string, unknown>).lastAutoTable.finalY + 30;
+  y = (doc as any).lastAutoTable.finalY + 30;
   doc.line(14, y, 90, y); doc.line(pw - 90, y, pw - 14, y); y += 5;
   doc.setFontSize(9);
   doc.text('ASSINATURA GESTOR', 52, y, { align: 'center' });

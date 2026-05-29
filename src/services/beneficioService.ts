@@ -30,7 +30,7 @@ class BeneficioService extends BaseService<any> {
     return data || [];
   }
 
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     try {
       const data = await super.criar(d);
       await auditLogger.log({
@@ -41,11 +41,11 @@ class BeneficioService extends BaseService<any> {
       });
       return data;
     } catch (e: any) {
-      throw new Error(e.message || 'Falha ao criar benefício');
+      throw new Error(e.message || 'Falha ao criar benefício', { cause: e });
     }
   }
 
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     try {
       const anterior = await this.buscarPorId(id);
       const data = await super.atualizar(id, d);
@@ -60,7 +60,7 @@ class BeneficioService extends BaseService<any> {
       
       return data;
     } catch (e: any) {
-      throw new Error(e.message || 'Falha ao atualizar benefício');
+      throw new Error(e.message || 'Falha ao atualizar benefício', { cause: e });
     }
   }
 
@@ -76,12 +76,12 @@ class BeneficioService extends BaseService<any> {
         dados_anteriores: anterior
       });
     } catch (e: any) {
-      throw new Error(e.message || 'Falha ao excluir benefício');
+      throw new Error(e.message || 'Falha ao excluir benefício', { cause: e });
     }
   }
 
-  async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any): Promise<unknown> {
-    const { data, error } = await (supabase as Record<string, unknown>).from('beneficios_colaborador').insert({
+  async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any): Promise<any> {
+    const { data, error } = await (supabase as any).from('beneficios_colaborador').insert({
       beneficio_id: beneficioId,
       colaborador_id: colaboradorId,
       ...dados
@@ -99,7 +99,7 @@ class BeneficioService extends BaseService<any> {
     return data || [];
   }
 
-  async obterResumoCustos(empresaId: string): Promise<unknown> {
+  async obterResumoCustos(empresaId: string): Promise<any> {
     const { data, error } = await (supabase as any)
       .from('beneficios_colaborador')
       .select(`

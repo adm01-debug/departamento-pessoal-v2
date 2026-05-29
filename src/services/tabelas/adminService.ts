@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 export const logEnvioRelatoriosService = {
   listar: async (empresaId?: string) => {
     let q = supabase.from('log_envio_relatorios').select('*').order('created_at', { ascending: false }).limit(100);
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    if (empresaId) q = (q as any).eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];

@@ -24,7 +24,7 @@ class DesligamentoService extends BaseService<any> {
     return { data: data || [], total: count || 0 };
   }
 
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     try {
       if (!d.colaborador_id) throw new Error('Colaborador é obrigatório');
       if (!d.data_desligamento) throw new Error('Data de desligamento é obrigatória');
@@ -51,11 +51,11 @@ class DesligamentoService extends BaseService<any> {
 
       return data;
     } catch (e: any) {
-      throw new Error(e.message || 'Erro ao criar desligamento');
+      throw new Error(e.message || 'Erro ao criar desligamento', { cause: e });
     }
   }
 
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     if (!id) throw new Error('ID é obrigatório');
 
     try {
@@ -74,7 +74,7 @@ class DesligamentoService extends BaseService<any> {
 
       return data;
     } catch (e: any) {
-      throw new Error('Falha ao atualizar desligamento');
+      throw new Error('Falha ao atualizar desligamento', { cause: e });
     }
   }
 
@@ -92,7 +92,7 @@ class DesligamentoService extends BaseService<any> {
         dados_anteriores: anterior,
       });
     } catch (e: any) {
-      throw new Error('Falha ao excluir desligamento');
+      throw new Error('Falha ao excluir desligamento', { cause: e });
     }
   }
 }

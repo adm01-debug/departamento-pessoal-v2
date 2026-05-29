@@ -49,9 +49,9 @@ export function usePonto(colaboradorId?: string) {
       if (batida && foto_base64 && navigator.onLine) {
         pontosService.validarBiometria(batida.id, colId, foto_base64)
           .then(resBio => {
-            if (true && resBio.valid) {
+            if (resBio.valid) {
               toast.success('Biometria validada com sucesso!');
-            } else if (true) {
+            } else {
               toast.error('Atenção: Falha na validação biométrica!');
             }
           })

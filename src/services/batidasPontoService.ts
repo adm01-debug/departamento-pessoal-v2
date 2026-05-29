@@ -3,7 +3,7 @@ import { pontoAuditService } from './pontoAuditService';
 export const batidasPontoService = {
   async listar(colaboradorId: string, dataInicio?: string, dataFim?: string): Promise<any[]> {
     
-    let q = (supabase as Record<string, unknown>).from('batidas_ponto').select('*').eq('colaborador_id', colaboradorId).order('data').order('ordem');
+    let q = (supabase as any).from('batidas_ponto').select('*').eq('colaborador_id', colaboradorId).order('data').order('ordem');
     if (dataInicio) q = q.gte('data', dataInicio);
     if (dataFim) q = q.lte('data', dataFim);
     const { data, error } = await q;
@@ -13,26 +13,26 @@ export const batidasPontoService = {
   },
   async listarPorData(data: string, empresaId?: string): Promise<any[]> {
     
-    let q = (supabase as Record<string, unknown>).from('batidas_ponto').select('*, colaborador:colaboradores(nome_completo, foto_url)').eq('data', data).order('ordem');
+    let q = (supabase as any).from('batidas_ponto').select('*, colaborador:colaboradores(nome_completo, foto_url)').eq('data', data).order('ordem');
     if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data: result, error } = await q;
     if (error) throw error;
     return result || [];
   
   },
-  async registrar(d: any): Promise<unknown> {
+  async registrar(d: any): Promise<any> {
     
-    const { data, error } = await (supabase as Record<string, unknown>).from('batidas_ponto').insert(d).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('batidas_ponto').insert(d).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de batida de ponto foi retornado.');
     return data;
   
   },
-  async ajustar(id: string, d: any): Promise<unknown> {
+  async ajustar(id: string, d: any): Promise<any> {
     try {
-      const { data: anterior } = await (supabase as Record<string, unknown>).from('batidas_ponto').select('*').eq('id', id).single();
+      const { data: anterior } = await (supabase as any).from('batidas_ponto').select('*').eq('id', id).single();
       
-      const { data, error } = await (supabase as Record<string, unknown>).from('batidas_ponto').update({ ...d, ajustado: true }).eq('id', id).select().maybeSingle();
+      const { data, error } = await (supabase as any).from('batidas_ponto').update({ ...d, ajustado: true }).eq('id', id).select().maybeSingle();
       if (error) throw error;
       
       if (data) {
@@ -42,14 +42,14 @@ export const batidasPontoService = {
       if (!data) throw new Error('Nenhum registro de batida de ponto foi retornado.');
       return (data);
     } catch (e: any) {
-      throw new Error('Falha ao ajustar batida de ponto');
+      throw new Error('Falha ao ajustar batida de ponto', { cause: e });
     }
   },
   async excluir(id: string): Promise<void> {
     
-    const { data: anterior } = await (supabase as Record<string, unknown>).from('batidas_ponto').select('*').eq('id', id).single();
+    const { data: anterior } = await (supabase as any).from('batidas_ponto').select('*').eq('id', id).single();
     
-    const { error } = await (supabase as Record<string, unknown>).from('batidas_ponto').delete().eq('id', id);
+    const { error } = await (supabase as any).from('batidas_ponto').delete().eq('id', id);
     if (error) throw error;
     
     if (anterior) {
@@ -57,9 +57,9 @@ export const batidasPontoService = {
     }
   
   },
-  async fecharPeriodo(empresaId: string, dataInicio: string, dataFim: string): Promise<unknown> {
+  async fecharPeriodo(empresaId: string, dataInicio: string, dataFim: string): Promise<any> {
     
-    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_ponto').insert({
+    const { data, error } = await (supabase as any).from('periodos_ponto').insert({
       empresa_id: empresaId,
       data_inicio: dataInicio,
       data_fim: dataFim,

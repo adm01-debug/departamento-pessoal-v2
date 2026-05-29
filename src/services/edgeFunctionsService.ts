@@ -18,7 +18,7 @@ const handleInvoke = async <T>(name: string, options: any, breaker = genericBrea
       return (data as T);
     });
   } catch (e: any) {
-    throw new Error(e.message || `Falha crítica na comunicação com ${name}`);
+    throw new Error(e.message || `Falha crítica na comunicação com ${name}`, { cause: e });
   }
 };
 

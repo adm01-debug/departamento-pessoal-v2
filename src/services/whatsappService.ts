@@ -110,11 +110,11 @@ export const whatsappService = {
       
       await supabase.from('whatsapp_mensagens_logs')
         .update({ status: 'sent', mensagem_id_externo: `wa_${Date.now()}` } as any)
-        .eq('id', (log as Record<string, unknown>).id);
+        .eq('id', (log as any).id);
         
-      return ({ success: true, logId: (log as Record<string, unknown>).id });
+      return ({ success: true, logId: (log as any).id });
     } catch (e: any) {
-      throw new Error('Falha ao enviar mensagem de template do WhatsApp');
+      throw new Error('Falha ao enviar mensagem de template do WhatsApp', { cause: e });
     }
   }
 };

@@ -27,7 +27,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   ) {}
 
   protected getQuery() {
-    return (supabase as Record<string, unknown>).from(this.table);
+    return (supabase as any).from(this.table);
   }
 
   async listar(options: ListOptions = {}): Promise<ListResponse<T>> {
@@ -70,6 +70,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async buscarPorId(id: string): Promise<T | null> {
+    if (!id) throw new Error('ID é obrigatório');
     try {
       const { data, error } = await this.getQuery()
         .select('*')

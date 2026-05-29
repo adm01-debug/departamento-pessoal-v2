@@ -27,13 +27,14 @@ describe('calculoFerias', () => {
     // Total INSS: 113.85 + 114.83 + 144.73 = 373.41
     expect(result.inss).toBe(373.41);
     
-    // IRRF
-    // Base: 4000 - 373.41 = 3626.59
-    // Faixa 15%: (3626.59 * 0.15) - 381.44 = 543.99 - 381.44 = 162.55
-    expect(result.irrf).toBe(162.55);
-    
-    // Líquido: 4000 - 373.41 - 162.55 = 3464.04
-    expect(result.liquido).toBe(3464.04);
+    // IRRF — usa a base mais benéfica (desconto simplificado vs. deduções legais).
+    // Base legal:        4000 - 373.41 (INSS) = 3626.59 → imposto 162.55
+    // Base simplificada: 4000 - 564.80 (desconto) = 3435.20 → imposto 133.84
+    // A Receita aplica a MENOR (133.84), conforme regra 2026.
+    expect(result.irrf).toBe(133.84);
+
+    // Líquido: 4000 - 373.41 - 133.84 = 3492.75
+    expect(result.liquido).toBe(3492.75);
   });
 
   it('deve calcular férias com abono pecuniário (20 dias férias + 10 dias abono)', () => {

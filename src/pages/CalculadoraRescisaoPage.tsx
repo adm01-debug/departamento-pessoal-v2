@@ -85,14 +85,10 @@ export default function CalculadoraRescisaoPage() {
         dependentes_irrf: 0,
       });
 
-      if (true) {
-        const data = result as any;
-        if (data?.resultado) {
-          setResult(data.resultado);
-          toast.success('Rescisão calculada no servidor!');
-        }
-      } else {
-        toast.error(`Erro: ${'Erro inesperado'}`);
+      const data = result as any;
+      if (data?.resultado) {
+        setResult(data.resultado);
+        toast.success('Rescisão calculada no servidor!');
       }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
@@ -117,12 +113,8 @@ export default function CalculadoraRescisaoPage() {
       saldoFGTS: Number(form.saldoFGTS || 0),
     });
 
-    if (true) {
-      setResult(result);
-      toast.success('Rescisão calculada com sucesso!');
-    } else {
-      toast.error(`Erro no cálculo: ${'Erro inesperado'}`);
-    }
+    setResult(result);
+    toast.success('Rescisão calculada com sucesso!');
   }, [form]);
 
   const salvarHistorico = useCallback(async () => {

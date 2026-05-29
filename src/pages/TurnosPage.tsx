@@ -114,8 +114,8 @@ export default function TurnosPage() {
                 {escalas.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhuma escala agendada</TableCell></TableRow> :
                   escalas.map((e: any) => (
                     <TableRow key={e.id}>
-                      <TableCell className="font-medium">{(e as Record<string, unknown>).colaborador?.nome_completo || '—'}</TableCell>
-                      <TableCell><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: (e as Record<string, unknown>).turno?.cor || '#ccc' }} />{(e as Record<string, unknown>).turno?.nome || '—'}</div></TableCell>
+                      <TableCell className="font-medium">{(e as any).colaborador?.nome_completo || '—'}</TableCell>
+                      <TableCell><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: (e as any).turno?.cor || '#ccc' }} />{(e as any).turno?.nome || '—'}</div></TableCell>
                       <TableCell>{e.data}</TableCell>
                       <TableCell><Badge variant="outline">{e.status}</Badge></TableCell>
                     </TableRow>

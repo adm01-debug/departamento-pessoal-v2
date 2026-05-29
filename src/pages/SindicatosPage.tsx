@@ -24,7 +24,7 @@ export default function SindicatosPage() {
     queryKey: ['sindicatos', empresaAtual?.id],
     queryFn: async () => {
       let q = supabase.from('sindicatos').select('*').order('nome');
-      if (empresaAtual?.id) q = q.eq('empresa_id', empresaAtual.id);
+      if (empresaAtual?.id) q = (q as any).eq('empresa_id', empresaAtual.id);
       const { data, error } = await q;
       if (error) throw error;
       return data || [];

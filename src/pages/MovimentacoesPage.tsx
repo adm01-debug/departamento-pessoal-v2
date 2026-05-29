@@ -33,7 +33,7 @@ export default function MovimentacoesPage() {
     queryKey: ['transferencias', empresaAtual?.id],
     queryFn: async () => {
       let q = supabase.from('transferencias').select('*, colaborador:colaboradores(nome_completo)').order('data_efetivacao', { ascending: false });
-      if (empresaAtual?.id) q = q.eq('empresa_id', empresaAtual.id);
+      if (empresaAtual?.id) q = (q as any).eq('empresa_id', empresaAtual.id);
       const { data, error } = await q;
       if (error) throw error;
       return data || [];
@@ -45,7 +45,7 @@ export default function MovimentacoesPage() {
     queryKey: ['promocoes', empresaAtual?.id],
     queryFn: async () => {
       let q = supabase.from('promocoes').select('*, colaborador:colaboradores(nome_completo)').order('data_promocao', { ascending: false });
-      if (empresaAtual?.id) q = q.eq('empresa_id', empresaAtual.id);
+      if (empresaAtual?.id) q = (q as any).eq('empresa_id', empresaAtual.id);
       const { data, error } = await q;
       if (error) throw error;
       return data || [];

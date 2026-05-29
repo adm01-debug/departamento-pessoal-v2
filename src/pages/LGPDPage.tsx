@@ -158,7 +158,7 @@ export default function LGPDPage() {
                     {consentimentos.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 font-body">Nenhum consentimento registrado</TableCell></TableRow> :
                       consentimentos.map((c: any) => (
                         <TableRow key={c.id} className="hover:bg-accent/30 transition-colors">
-                          <TableCell className="font-body font-medium">{(c as Record<string, unknown>).colaborador?.nome_completo || '—'}</TableCell>
+                          <TableCell className="font-body font-medium">{(c as any).colaborador?.nome_completo || '—'}</TableCell>
                           <TableCell className="font-body text-sm">{tipoConsentimento[c.tipo] || c.tipo}</TableCell>
                           <TableCell>{c.aceito ? <Badge className="bg-success/15 text-success border-0 font-body"><CheckCircle className="h-3 w-3 mr-1" />Aceito</Badge> : <Badge className="bg-destructive/15 text-destructive border-0 font-body"><XCircle className="h-3 w-3 mr-1" />Revogado</Badge>}</TableCell>
                           <TableCell className="font-body text-sm">v{c.versao}</TableCell>
@@ -194,7 +194,7 @@ export default function LGPDPage() {
                         const prazoCritico = s.status === 'pendente' && s.prazo_legal && ((new Date(s.prazo_legal).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) <= 5;
                         return (
                           <TableRow key={s.id} className={cn("hover:bg-accent/30 transition-colors", prazoCritico && "bg-destructive/5")}>
-                            <TableCell className="font-body font-medium">{(s as Record<string, unknown>).colaborador?.nome_completo || '—'}</TableCell>
+                            <TableCell className="font-body font-medium">{(s as any).colaborador?.nome_completo || '—'}</TableCell>
                             <TableCell className="font-body text-sm">{tipoSolicitacao[s.tipo] || s.tipo}</TableCell>
                             <TableCell><Badge className={cn("font-body text-xs", statusColors[s.status] || statusColors.pendente)}>{s.status}</Badge></TableCell>
                             <TableCell className={cn("text-xs font-body", prazoCritico && "text-destructive font-semibold")}>{s.prazo_legal || '—'}{prazoCritico && ' ⚠️'}</TableCell>

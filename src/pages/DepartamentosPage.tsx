@@ -11,7 +11,7 @@ import { Departamento } from '@/types/entities';
 
 export default function DepartamentosPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editando, setEditando] = useState<unknown>(null);
+  const [editando, setEditando] = useState<any>(null);
   const { 
     departamentos, 
     total, 

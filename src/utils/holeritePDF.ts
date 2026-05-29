@@ -28,7 +28,7 @@ function fmt(v: number): string {
 export function gerarPDFHolerite(h: HoleriteData) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pw = doc.internal.pageSize.getWidth();
-  let y = 15;
+  let y: number;
 
   // Header
   doc.setFillColor(30, 58, 138);

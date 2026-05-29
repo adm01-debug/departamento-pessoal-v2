@@ -39,7 +39,7 @@ function formatCurrency(value: number): string {
 
 export default function ProvisoesPage() {
   const [competencia, setCompetencia] = useState(new Date().toISOString().substring(0, 7));
-  const [selectedLog, setSelectedLog] = useState<unknown>(null);
+  const [selectedLog, setSelectedLog] = useState<any>(null);
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
 
@@ -56,7 +56,7 @@ export default function ProvisoesPage() {
       const { data, error } = await supabase
         .from('colaboradores')
         .select('id, nome_completo')
-        .eq('empresa_id', empresaAtual?.id!)
+        .eq('empresa_id', empresaAtual?.id as string)
         .eq('status', 'ativo')
         .or('salario_base.is.null,salario_base.eq.0');
       if (error) throw error;
@@ -128,7 +128,7 @@ export default function ProvisoesPage() {
       const { data, error } = await supabase
         .from('provisao_logs')
         .select('*')
-        .eq('empresa_id', empresaAtual?.id!)
+        .eq('empresa_id', empresaAtual?.id as string)
         .order('created_at', { ascending: false })
         .limit(10);
       if (error) throw error;
@@ -144,7 +144,7 @@ export default function ProvisoesPage() {
       const { data, error } = await supabase
         .from('provisao_logs')
         .select('competencia, valor_total_provisionado')
-        .eq('empresa_id', empresaAtual?.id!)
+        .eq('empresa_id', empresaAtual?.id as string)
         .eq('status', 'CONCLUIDO')
         .order('competencia', { ascending: true })
         .limit(6);

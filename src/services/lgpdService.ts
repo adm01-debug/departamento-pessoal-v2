@@ -10,7 +10,7 @@ export const lgpdService = {
   
   },
   
-  async criarConsentimento(d: any): Promise<unknown> {
+  async criarConsentimento(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('lgpd_consentimentos').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const lgpdService = {
   
   },
   
-  async revogarConsentimento(id: string): Promise<unknown> {
+  async revogarConsentimento(id: string): Promise<any> {
     
     const { data, error } = await supabase.from('lgpd_consentimentos').update({ aceito: false, revogado_em: new Date().toISOString() }).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -38,7 +38,7 @@ export const lgpdService = {
   
   },
   
-  async criarSolicitacao(d: any): Promise<unknown> {
+  async criarSolicitacao(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('lgpd_solicitacoes').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -47,7 +47,7 @@ export const lgpdService = {
   
   },
   
-  async atualizarSolicitacao(id: string, d: any): Promise<unknown> {
+  async atualizarSolicitacao(id: string, d: any): Promise<any> {
     
     const { data, error } = await supabase.from('lgpd_solicitacoes').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;

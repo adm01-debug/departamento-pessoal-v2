@@ -17,7 +17,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
   const { prorrogacoes, isLoading } = useProrrogacoesAfastamento(afastamentoId);
   const { afastamentos } = useAfastamentos();
   
-  const afastamento = Array.isArray(afastamentos) ? afastamentos.find((a: any) => a.id === afastamentoId) : null;
+  const afastamento: any = Array.isArray(afastamentos) ? afastamentos.find((a: any) => a.id === afastamentoId) : null;
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center p-12 space-y-4">

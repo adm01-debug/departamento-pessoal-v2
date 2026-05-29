@@ -14,7 +14,7 @@ export const valeTransporteService = {
       .single();
     
     if (colabError) throw colabError;
-    const salario = (colab as Record<string, unknown>).salario_base || 0;
+    const salario = (colab as any).salario_base || 0;
     const descontoMaximo = salario * 0.06;
 
     const { data: rotas, error: rotasError } = await supabase
@@ -59,7 +59,7 @@ export const valeAlimentacaoService = {
       .single();
 
     if (error) throw error;
-    const valor = (beneficio as Record<string, unknown>).valor || 0;
+    const valor = (beneficio as any).valor || 0;
     
     // Se for mensal (valor alto), retorna o valor cheio, senão calcula proporcional
     if (valor < 100) {
@@ -80,7 +80,7 @@ export const valeAlimentacaoService = {
 
     await auditLogger.log({
       tabela: 'recargas_vale',
-      registro_id: (data as Record<string, unknown>).id,
+      registro_id: (data as any).id,
       acao: 'INSERT',
       dados_novos: data
     });
@@ -199,7 +199,7 @@ export const dependentesService = {
 
     await auditLogger.log({
       tabela: 'dependentes',
-      registro_id: (data as Record<string, unknown>).id,
+      registro_id: (data as any).id,
       acao: 'INSERT',
       dados_novos: data
     });

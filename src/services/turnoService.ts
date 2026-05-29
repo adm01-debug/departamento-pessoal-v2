@@ -10,7 +10,7 @@ export const turnoService = {
   
   },
   
-  async criarTurno(d: any): Promise<unknown> {
+  async criarTurno(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('turnos').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const turnoService = {
   
   },
   
-  async atualizarTurno(id: string, d: any): Promise<unknown> {
+  async atualizarTurno(id: string, d: any): Promise<any> {
     
     const { data, error } = await supabase.from('turnos').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -46,7 +46,7 @@ export const turnoService = {
   
   },
   
-  async criarEscala(d: any): Promise<unknown> {
+  async criarEscala(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('escalas_trabalho').insert(d).select().maybeSingle();
     if (error) throw error;

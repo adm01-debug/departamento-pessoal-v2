@@ -56,6 +56,6 @@ export function useRealTimeSubscription(
     return () => {
       void supabase.removeChannel(channel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [table, queryKeyString, empresaId, options.event, options.schema, handleChange]);
 }

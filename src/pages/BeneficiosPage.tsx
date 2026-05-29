@@ -97,7 +97,7 @@ export default function BeneficiosPage() {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((b) => {
-                    const adesoes = (b as Record<string, unknown>).beneficios_colaborador?.[0]?.count || 0;
+                    const adesoes = (b as any).beneficios_colaborador?.[0]?.count || 0;
                     return (
                       <TableRow key={b.id} className="hover:bg-accent/30 transition-colors group">
                         <TableCell className="font-body font-medium">{b.nome}</TableCell>

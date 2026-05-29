@@ -157,7 +157,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
                 <RescisaoRow label="Total Proventos" value={d.total_proventos} bold className="text-success" />
                 <RescisaoRow label="Total Descontos" value={d.total_descontos} bold className="text-destructive" />
                 <div className="flex justify-between text-[10px] font-body text-muted-foreground px-1">
-                  <span>(INSS: {fmt((d as Record<string, unknown>).inss)} / IRRF: {fmt((d as Record<string, unknown>).irrf)})</span>
+                  <span>(INSS: {fmt((d as any).inss)} / IRRF: {fmt((d as any).irrf)})</span>
                 </div>
                 <RescisaoRow label="Multa FGTS" value={d.multa_fgts} />
                 <Separator className="my-2" />

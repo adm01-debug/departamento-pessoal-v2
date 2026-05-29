@@ -55,7 +55,7 @@ interface BridgePayload {
   params?: Record<string, unknown>;
 }
 
-interface BridgeResponse<T = unknown> {
+interface BridgeResponse<T = any> {
   data: T | null;
   count?: number;
   error: { message: string } | null;
@@ -76,7 +76,7 @@ interface RpcBody {
   params?: Record<string, unknown>;
 }
 
-const callBridge = async <T = unknown>(
+const callBridge = async <T = any>(
   action: Action,
   target: string,
   payload: BridgePayload = {}
@@ -145,8 +145,14 @@ const callBridge = async <T = unknown>(
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type AnyFn = (...args: unknown[]) => unknown;
+
+// Resultado resolvido de qualquer cadeia da bridge. `data` é `any` de propósito:
+// a tipagem real das linhas vem do schema do banco em runtime, e os call sites
+// já assumem formatos concretos. Mantém o comportamento e evita o cascateamento
+// de `unknown` por centenas de chamadas.
+type BridgeResult = { data: any; error: { message: string } | null; count?: number };
 
 interface QueryBuilder {
   select: (columns?: string, options?: { count?: string }) => QueryBuilder;
@@ -173,7 +179,7 @@ interface QueryBuilder {
   limit: (n: number) => QueryBuilder;
   single: () => QueryBuilder;
   maybeSingle: () => QueryBuilder;
-  then: (resolve: AnyFn, reject?: AnyFn) => Promise<unknown>;
+  then: (resolve: (value: BridgeResult) => unknown, reject?: AnyFn) => Promise<unknown>;
   catch: (reject: AnyFn) => Promise<unknown>;
   finally: (cb: AnyFn) => Promise<unknown>;
 }
@@ -184,7 +190,7 @@ const createQueryBuilder = (table: string): QueryBuilder => {
     payload: { filters: [] },
   };
 
-  const exec = <T = unknown>() => callBridge<T>(state.action, table, state.payload);
+  const exec = <T = any>() => callBridge<T>(state.action, table, state.payload);
 
   const addFilter = (column: string, op: string, value: unknown): QueryBuilder => {
     // Se o valor for "undefined" ou "null" como string, converte para null real.
@@ -265,7 +271,7 @@ const createQueryBuilder = (table: string): QueryBuilder => {
     },
     single: () => { state.payload.single = true; return builder; },
     maybeSingle: () => { state.payload.single = true; return builder; },
-    then: (resolve: AnyFn, reject?: AnyFn) => exec().then(resolve, reject),
+    then: (resolve: (value: BridgeResult) => unknown, reject?: AnyFn) => exec().then(resolve, reject),
     catch: (reject: AnyFn) => exec().catch(reject),
     finally: (cb: AnyFn) => exec().finally(cb),
   };
@@ -273,10 +279,10 @@ const createQueryBuilder = (table: string): QueryBuilder => {
   return builder;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 interface SupabaseProxyTarget {
   from: (table: string) => QueryBuilder;
-  rpc: (fn: string, params: Record<string, unknown>) => Promise<BridgeResponse<unknown>>;
+  rpc: (fn: string, params: Record<string, unknown>) => Promise<BridgeResponse<any>>;
   [key: string]: unknown;
 }
 

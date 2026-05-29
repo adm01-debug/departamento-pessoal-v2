@@ -41,6 +41,22 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "react-hooks/exhaustive-deps": "warn",
+      // Regras do React Compiler (eslint-plugin-react-hooks v6+): sinalizam padrões
+      // que o compiler não consegue otimizar com segurança. Tratamos como aviso
+      // (adoção incremental) — visíveis como dívida técnica sem bloquear o CI,
+      // no mesmo espírito de exhaustive-deps/only-export-components acima.
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
+    },
+  },
+  {
+    // Componentes de UI "vendored" (shadcn/ui) usam @ts-nocheck e ficam fora do
+    // typecheck (excluídos no tsconfig). Permitimos diretivas ts-comment aqui.
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
     },
   },
 );

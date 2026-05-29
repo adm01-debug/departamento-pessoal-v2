@@ -91,11 +91,11 @@ export const contratacaoService = {
       });
       return (undefined);
     } catch (e: any) {
-      throw new Error('Falha ao validar documento de admissão');
+      throw new Error('Falha ao validar documento de admissão', { cause: e });
     }
   },
 
-  async enviarLinkCandidato(admissaoId: string, email: string): Promise<unknown> {
+  async enviarLinkCandidato(admissaoId: string, email: string): Promise<any> {
     
     const token = Math.random().toString(36).substring(2, 10).toUpperCase();
     const expiracao = new Date();
@@ -146,7 +146,7 @@ export const contratacaoService = {
       });
       return (undefined);
     } catch (e: any) {
-      throw new Error('Falha ao enviar notificação via WhatsApp');
+      throw new Error('Falha ao enviar notificação via WhatsApp', { cause: e });
     }
   },
 
@@ -175,7 +175,7 @@ export const contratacaoService = {
       
       return (true);
     } catch (e: any) {
-      throw new Error('Falha na transmissão para o eSocial');
+      throw new Error('Falha na transmissão para o eSocial', { cause: e });
     }
   }
 };

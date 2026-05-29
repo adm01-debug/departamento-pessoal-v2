@@ -350,7 +350,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   useRealTimeSubscription('pendencias', ['pendencias', empresaId], empresaId);
 
   // Notifications State & Logic
-  const [notifications, setNotifications] = useState<unknown[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   useEffect(() => {
@@ -417,7 +417,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
         }
       )
       .subscribe();
-    return () => { (supabase as Record<string, unknown>).removeChannel(channel); };
+    return () => { (supabase as any).removeChannel(channel); };
   }, [empresaId]);
 
   const filteredPendencias = useMemo(() => {

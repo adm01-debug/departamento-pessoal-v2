@@ -39,7 +39,7 @@ export function ConfiguracoesGeraisTab() {
         chave: d.chave,
         valor: d.valor,
         descricao: d.descricao || null,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {

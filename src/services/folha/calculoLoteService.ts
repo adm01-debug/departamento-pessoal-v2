@@ -42,7 +42,7 @@ export const calculoLoteService = {
       }
 
       // 2. Garantir cabeçalho da folha
-      let { data: header, error: headerError } = await (supabase as any)
+      const { data: header, error: headerError } = await (supabase as any)
         .from('folhas_pagamento')
         .select('id, status')
         .eq('empresa_id', empresaId)
@@ -215,7 +215,7 @@ export const calculoLoteService = {
             .upsert(itemData, { onConflict: 'folha_id,colaborador_id' });
 
           // Auditoria analítica
-          await (supabase as Record<string, unknown>).from('folha_auditoria').insert({
+          await (supabase as any).from('folha_auditoria').insert({
             folha_id: folhaId,
             colaborador_id: colab.id,
             tipo_evento: 'CALCULO',

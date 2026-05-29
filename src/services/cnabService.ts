@@ -71,7 +71,7 @@ interface FolhaItemRecord {
   colaborador?: { id: string; nome_completo: string; cpf: string };
 }
 
-type DataRecord = Record<string, unknown>;
+type DataRecord = any;
 
 export const cnabService = {
   async getConfig(empresaId: string): Promise<CNABConfig | null> {
@@ -162,7 +162,7 @@ export const cnabService = {
         status: 'pendente',
         valor_total: typedItens.reduce((acc, i) => acc + Number(i.total_liquido), 0),
         total_pagamentos: typedItens.length
-      }])
+      }] as any)
       .select()
       .single();
 
@@ -170,7 +170,7 @@ export const cnabService = {
     const remessaRecord = remessa as unknown as CnabRemessaRecord;
 
     const lines: string[] = [];
-    let sequence = 1;
+    const sequence = 1;
 
     const pad = (val: unknown, len: number, char = ' ', side: 'left' | 'right' = 'right') => {
       const s = String(val || '').substring(0, len);
@@ -183,21 +183,21 @@ export const cnabService = {
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
     const timeStr = today.toTimeString().slice(0, 8).replace(/:/g, '');
 
-    let header = pad(config.banco_codigo, 3, '0', 'left') + '00000' + pad('', 9) + '2' + pad('', 14, '0') + pad(config.convenio, 20) + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('BANCO', 30) + pad('', 10) + '1' + dateStr + timeStr + pad(sequence, 6, '0', 'left') + '081' + '00000' + pad('', 69);
+    const header = pad(config.banco_codigo, 3, '0', 'left') + '00000' + pad('', 9) + '2' + pad('', 14, '0') + pad(config.convenio, 20) + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('BANCO', 30) + pad('', 10) + '1' + dateStr + timeStr + pad(sequence, 6, '0', 'left') + '081' + '00000' + pad('', 69);
     lines.push(header.padEnd(240, ' '));
 
     // Registrar o arquivo de remessa no banco para auditoria real
-    await supabase.from('cnab_remessas').update({ 
+    await supabase.from('cnab_remessas').update({
       arquivo_remessa: lines[0],
-      status: 'enviado' 
-    }).eq('id', remessaRecord.id);
+      status: 'enviado'
+    } as any).eq('id', remessaRecord.id);
 
     let detailSequence = 1;
     let totalValue = 0;
     const cnabItensToInsert: DataRecord[] = [];
 
     // Header de Lote (Tipo 1)
-    let lotHeader = pad(config.banco_codigo, 3, '0', 'left') + '00011' + 'C' + '30' + '01' + ' ' + '040' + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('', 40) + pad('', 30) + pad('', 10) + dateStr + pad('', 8, '0') + pad('', 33);
+    const lotHeader = pad(config.banco_codigo, 3, '0', 'left') + '00011' + 'C' + '30' + '01' + ' ' + '040' + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('', 40) + pad('', 30) + pad('', 10) + dateStr + pad('', 8, '0') + pad('', 33);
     lines.push(lotHeader.padEnd(240, ' '));
 
     const typedContas = (contas as unknown as ContaBancariaRecord[]) || [];
@@ -223,32 +223,32 @@ export const cnabService = {
       });
 
       // Segmento A (Crédito em Conta)
-      let segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A' + '000' + '000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab?.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
+      const segA = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'A' + '000' + '000' + pad(conta.banco_codigo || '000', 3, '0', 'left') + pad(conta.agencia || '', 5, '0', 'left') + pad(conta.agencia_digito || '', 1) + pad(conta.conta || '', 12, '0', 'left') + pad(conta.digito || '', 1) + ' ' + pad(colab?.nome_completo || '', 30) + pad(seuNumero, 20) + dateStr + 'BRL' + pad('', 15, '0') + formatAmount(valor) + pad('', 20) + pad('', 8, '0') + pad('', 15, '0') + pad('', 40) + '00' + pad('', 10);
       lines.push(segA.padEnd(240, ' '));
 
       // Se tiver chave PIX, adiciona Segmento B (PIX)
       if (conta.pix_chave) {
-        let segB = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'B' + pad('', 3) + '2' + pad(colab?.cpf || '', 14, '0', 'left') + pad('', 30) + pad('', 30) + pad('', 30) + pad('', 30) + pad(conta.pix_chave, 60) + pad('', 25);
+        const segB = pad(config.banco_codigo, 3, '0', 'left') + '00013' + pad(detailSequence++, 5, '0', 'left') + 'B' + pad('', 3) + '2' + pad(colab?.cpf || '', 14, '0', 'left') + pad('', 30) + pad('', 30) + pad('', 30) + pad('', 30) + pad(conta.pix_chave, 60) + pad('', 25);
         lines.push(segB.padEnd(240, ' '));
       }
     }
 
     // Trailer de Lote (Tipo 5)
-    let lotTrailer = pad(config.banco_codigo, 3, '0', 'left') + '00015' + pad('', 9) + pad(detailSequence + 1, 6, '0', 'left') + formatAmount(totalValue) + pad('', 18, '0') + pad('', 183);
+    const lotTrailer = pad(config.banco_codigo, 3, '0', 'left') + '00015' + pad('', 9) + pad(detailSequence + 1, 6, '0', 'left') + formatAmount(totalValue) + pad('', 18, '0') + pad('', 183);
     lines.push(lotTrailer.padEnd(240, ' '));
 
     await supabase.from('cnab_itens').insert(cnabItensToInsert);
 
     // Trailer de Arquivo (Tipo 9)
-    let trailer = pad(config.banco_codigo, 3, '0', 'left') + '99999' + pad('', 9) + '000001' + pad(lines.length + 1, 6, '0', 'left') + pad('', 6, '0') + pad('', 205);
+    const trailer = pad(config.banco_codigo, 3, '0', 'left') + '99999' + pad('', 9) + '000001' + pad(lines.length + 1, 6, '0', 'left') + pad('', 6, '0') + pad('', 205);
     lines.push(trailer.padEnd(240, ' '));
 
     const fullFile = lines.join('\r\n');
     
     // Atualiza com o arquivo completo
-    await supabase.from('cnab_remessas').update({ 
-      arquivo_remessa: fullFile 
-    }).eq('id', remessaRecord.id);
+    await supabase.from('cnab_remessas').update({
+      arquivo_remessa: fullFile
+    } as any).eq('id', remessaRecord.id);
 
     return fullFile;
   },

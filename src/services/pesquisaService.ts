@@ -10,7 +10,7 @@ export const pesquisaService = {
   
   },
   
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('pesquisas').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const pesquisaService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     
     const { data, error } = await supabase.from('pesquisas').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -43,7 +43,7 @@ export const pesquisaService = {
   
   },
   
-  async criarPergunta(d: any): Promise<unknown> {
+  async criarPergunta(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('pesquisas_perguntas').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -59,7 +59,7 @@ export const pesquisaService = {
   
   },
   
-  async enviarResposta(d: any): Promise<unknown> {
+  async enviarResposta(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('pesquisas_respostas').insert(d).select().maybeSingle();
     if (error) throw error;

@@ -24,7 +24,7 @@ function calcularAvos(inicio: Date, fim: Date): number {
     meses--;
   }
   
-  let dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
+  const dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
   const diffTime = fim.getTime() - dataReferencia.getTime();
   const diasRestantes = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
@@ -117,7 +117,10 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
     const tercoFerias = Number(((feriasProporcionaisVal + feriasVencidasVal) / 3).toFixed(2));
 
     // 4. 13º Salário (Lei 4.090/62) - Com projeção do aviso
-    const inicioAno = new Date(dataFimProjetada.getFullYear(), 0, 1);
+    // O ano-base do 13º é o ano do DESLIGAMENTO. Usar o ano da data projetada
+    // zerava os avos quando a projeção do aviso cruzava para janeiro do ano
+    // seguinte (ex.: desligamento em 15/nov projetava p/ jan → meses13 = 0).
+    const inicioAno = new Date(desligamento.getFullYear(), 0, 1);
     const dataBase13 = admissao > inicioAno ? admissao : inicioAno;
     const meses13 = calcularAvos(dataBase13, dataFimProjetada);
     
@@ -177,7 +180,7 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
 
     return (result);
   } catch (e: any) {
-    throw new Error(e.message || 'Erro inesperado no motor de cálculo de rescisão');
+    throw new Error(e.message || 'Erro inesperado no motor de cálculo de rescisão', { cause: e });
   }
 }
 

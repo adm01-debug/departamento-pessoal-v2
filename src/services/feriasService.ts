@@ -42,7 +42,7 @@ class FeriasService extends BaseService<Ferias> {
     return { data: (data as any[]) || [], count: count || 0 };
   }
 
-  async syncWithHub(empresaId: string): Promise<unknown> {
+  async syncWithHub(empresaId: string): Promise<any> {
     const { data, error } = await (supabase as any)
       .from('ferias')
       .select('id, updated_at')
@@ -73,20 +73,20 @@ class FeriasService extends BaseService<Ferias> {
     return data || [];
   }
 
-  async criarPeriodoAquisitivo(d: any): Promise<unknown> {
-    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').insert(d).select().maybeSingle();
+  async criarPeriodoAquisitivo(d: any): Promise<any> {
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').insert(d).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
-  async atualizarPeriodoAquisitivo(id: string, d: any): Promise<unknown> {
-    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
+  async atualizarPeriodoAquisitivo(id: string, d: any): Promise<any> {
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
   async excluirPeriodoAquisitivo(id: string): Promise<void> {
-    const { error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').delete().eq('id', id);
+    const { error } = await (supabase as any).from('periodos_aquisitivos').delete().eq('id', id);
     if (error) throw error;
   }
 

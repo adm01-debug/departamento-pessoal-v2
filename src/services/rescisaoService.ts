@@ -28,11 +28,11 @@ export const rescisaoService = {
 
       return (true);
     } catch (e: any) {
-      throw new Error(e.message || 'Erro inesperado na validação de transição');
+      throw new Error(e.message || 'Erro inesperado na validação de transição', { cause: e });
     }
   },
 
-  async calcularESalvar(id: string, params: any): Promise<unknown> {
+  async calcularESalvar(id: string, params: any): Promise<any> {
     if (!id) throw new Error('ID do desligamento é obrigatório');
 
     try {
@@ -104,11 +104,11 @@ export const rescisaoService = {
 
       return (novo);
     } catch (e: any) {
-      throw new Error(e.message || 'Erro crítico ao processar cálculo de rescisão');
+      throw new Error(e.message || 'Erro crítico ao processar cálculo de rescisão', { cause: e });
     }
   },
 
-  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<unknown> {
+  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<any> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -165,11 +165,11 @@ export const rescisaoService = {
 
       return (data);
     } catch (e: any) {
-      throw new Error(e.message || 'Erro ao processar homologação');
+      throw new Error(e.message || 'Erro ao processar homologação', { cause: e });
     }
   },
 
-  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<unknown> {
+  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<any> {
     try {
       const hash = btoa(`rescisao-${id}-${tipo}-${new Date().getTime()}`).slice(0, 32);
       const updateData: any = {};
@@ -202,11 +202,11 @@ export const rescisaoService = {
 
       return (data);
     } catch (e: any) {
-      throw new Error('Falha ao realizar assinatura digital');
+      throw new Error('Falha ao realizar assinatura digital', { cause: e });
     }
   },
 
-  async processarPagamento(id: string, comprovanteUrl?: string): Promise<unknown> {
+  async processarPagamento(id: string, comprovanteUrl?: string): Promise<any> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -249,7 +249,7 @@ export const rescisaoService = {
 
       return (data);
     } catch (e: any) {
-      throw new Error('Erro ao processar pagamento de rescisão');
+      throw new Error('Erro ao processar pagamento de rescisão', { cause: e });
     }
   }
 };

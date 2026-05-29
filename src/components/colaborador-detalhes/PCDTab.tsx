@@ -51,10 +51,10 @@ export function PCDTab({ colaboradorId }: { colaboradorId: string }) {
       <CardContent>
         {!showForm && data ? (
           <div className="grid grid-cols-2 gap-4">
-            <div><Label className="text-xs text-muted-foreground">Tipo</Label><p className="font-medium">{(data as Record<string, unknown>).tipo}</p></div>
-            <div><Label className="text-xs text-muted-foreground">CID</Label><p className="font-medium">{(data as Record<string, unknown>).cid || '-'}</p></div>
-            <div className="col-span-2"><Label className="text-xs text-muted-foreground">Descrição</Label><p>{(data as Record<string, unknown>).descricao || '-'}</p></div>
-            <div className="col-span-2"><Label className="text-xs text-muted-foreground">Observações</Label><p>{(data as Record<string, unknown>).observacoes || '-'}</p></div>
+            <div><Label className="text-xs text-muted-foreground">Tipo</Label><p className="font-medium">{(data as any).tipo}</p></div>
+            <div><Label className="text-xs text-muted-foreground">CID</Label><p className="font-medium">{(data as any).cid || '-'}</p></div>
+            <div className="col-span-2"><Label className="text-xs text-muted-foreground">Descrição</Label><p>{(data as any).descricao || '-'}</p></div>
+            <div className="col-span-2"><Label className="text-xs text-muted-foreground">Observações</Label><p>{(data as any).observacoes || '-'}</p></div>
           </div>
         ) : (
           <div className="grid gap-3 max-w-md">

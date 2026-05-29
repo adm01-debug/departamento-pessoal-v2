@@ -60,7 +60,7 @@ export async function notificarAjustePonto(
         const { data: profile } = await supabase
           .from('profiles')
           .select('user_id')
-          .eq('email', colab.email)
+          .eq('email' as any, colab.email)
           .maybeSingle();
         targetUserId = (profile as any)?.user_id;
       }
@@ -77,7 +77,7 @@ export async function notificarAjustePonto(
     }
     return (undefined);
   } catch (e: any) {
-    throw new Error('Falha ao notificar ajuste de ponto');
+    throw new Error('Falha ao notificar ajuste de ponto', { cause: e });
   }
 }
 

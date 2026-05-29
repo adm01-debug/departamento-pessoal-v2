@@ -18,7 +18,7 @@ export default function PontoKioskPage() {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'pin' | 'facial_scan' | 'action' | 'success'>('pin');
-  const [selectedColab, setSelectedColab] = useState<unknown>(null);
+  const [selectedColab, setSelectedColab] = useState<any>(null);
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 

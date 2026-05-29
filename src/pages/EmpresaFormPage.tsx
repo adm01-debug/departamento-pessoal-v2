@@ -40,7 +40,7 @@ export default function EmpresaFormPage() {
 
   const { data: empresa, isLoading } = useQuery<Empresa>({
     queryKey: ['empresa', id],
-    queryFn: () => (empresaService as Record<string, unknown>).buscarPorId(id!),
+    queryFn: () => (empresaService as any).buscarPorId(id!),
     enabled: isEditing,
   });
 

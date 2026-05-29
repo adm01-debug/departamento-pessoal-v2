@@ -36,19 +36,23 @@ describe('loggerService', () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it('should flush info logs after 50 logs', async () => {
+  // A persistência remota em `logs_sistema` foi desabilitada de propósito: o banco
+  // corporativo externo bloqueia esses inserts via RLS, então o flush descarta o
+  // buffer silenciosamente para não quebrar a UI. Os testes abaixo garantem que o
+  // flush NÃO tenta inserir no Supabase (e não lança).
+  it('should flush info logs after 50 logs without hitting Supabase', async () => {
     for (let i = 0; i < 50; i++) {
       await loggerService.info(`Log ${i}`);
     }
-    
-    // Aguardar o flush async
-    await vi.waitFor(() => expect(mockFrom).toHaveBeenCalledWith('logs_sistema'));
+
+    await expect(loggerService.flush()).resolves.toBeUndefined();
+    expect(mockFrom).not.toHaveBeenCalledWith('logs_sistema');
   });
 
-  it('should flush error logs immediately', async () => {
+  it('should flush error logs immediately without hitting Supabase', async () => {
     await loggerService.error('Test error');
-    
-    // Aguardar o flush async
-    await vi.waitFor(() => expect(mockFrom).toHaveBeenCalledWith('logs_sistema'));
+
+    await expect(loggerService.flush()).resolves.toBeUndefined();
+    expect(mockFrom).not.toHaveBeenCalledWith('logs_sistema');
   });
 });
