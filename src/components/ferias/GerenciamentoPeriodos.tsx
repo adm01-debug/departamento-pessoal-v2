@@ -26,7 +26,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   const qc = useQueryClient();
   const [selectedColabId, setSelectedColabId] = useState(initialColaboradorId || '');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingPeriodo, setEditingPeriodo] = useState<unknown>(null);
+  const [editingPeriodo, setEditingPeriodo] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [form, setForm] = useState({
     data_inicio: '',

@@ -22,7 +22,7 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
-  const [colaboradores, setColaboradores] = useState<unknown[]>([]);
+  const [colaboradores, setColaboradores] = useState<any[]>([]);
   const [loadingColab, setLoadingColab] = useState(false);
   const [form, setForm] = useState({
     colaborador_id: '',

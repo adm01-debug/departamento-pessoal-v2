@@ -203,7 +203,7 @@ export function useJornadaHorarios(jornadaId: string) {
 export function useSalvarGradeHorarios() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ jornadaId, horarios }: { jornadaId: string; horarios: unknown[] }) => jornadaHorariosService.salvarGrade(jornadaId, horarios),
+    mutationFn: ({ jornadaId, horarios }: { jornadaId: string; horarios: any[] }) => jornadaHorariosService.salvarGrade(jornadaId, horarios),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['jornada-horarios'] }); toast.success('Grade horária salva'); },
     onError: (e: Error) => toast.error(e.message),
   });

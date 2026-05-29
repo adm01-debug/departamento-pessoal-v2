@@ -15,9 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export default function ContabilidadePage() {
   const { empresaAtual } = useEmpresas();
-  const [lancamentos, setLancamentos] = useState<unknown[]>([]);
-  const [planoContas, setPlanoContas] = useState<unknown[]>([]);
-  const [folhas, setFolhas] = useState<unknown[]>([]);
+  const [lancamentos, setLancamentos] = useState<any[]>([]);
+  const [planoContas, setPlanoContas] = useState<any[]>([]);
+  const [folhas, setFolhas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');

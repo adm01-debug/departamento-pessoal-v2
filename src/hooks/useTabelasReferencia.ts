@@ -6,7 +6,7 @@ type DataRecord = Record<string, unknown>;
 // =============================================
 // Helper for Result Pattern hooks
 // =============================================
-const useResultQuery = (key: unknown[], fn: () => Promise<unknown>, enabled: boolean = true) => 
+const useResultQuery = (key: any[], fn: () => Promise<unknown>, enabled: boolean = true) => 
   useQuery({
     queryKey: key,
     queryFn: async () => {

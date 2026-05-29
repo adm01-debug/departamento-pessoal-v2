@@ -9,7 +9,7 @@ import { useGenericCrud } from './useGenericCrud';
 export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
-  const [filtros, setFiltros] = useState<unknown>({});
+  const [filtros, setFiltros] = useState<any>({});
 
   const crud = useGenericCrud<unknown>({
     queryKey: 'afastamentos',

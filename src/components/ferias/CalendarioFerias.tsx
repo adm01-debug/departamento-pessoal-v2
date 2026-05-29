@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 export function CalendarioFerias() {
   const { ferias } = useFerias();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedEvent, setSelectedEvent] = useState<unknown>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);

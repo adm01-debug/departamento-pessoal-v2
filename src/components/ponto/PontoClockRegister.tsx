@@ -32,7 +32,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
   const [isSyncing, setIsSyncing] = useState(false);
   const [showFaceScan, setShowFaceScan] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
-  const [selectedTipo, setSelectedTipo] = useState<unknown>(null);
+  const [selectedTipo, setSelectedTipo] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);

@@ -20,7 +20,7 @@ export default function TimesPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<unknown>(null);
+  const [editingItem, setEditingItem] = useState<any>(null);
   const [form, setForm] = useState({ nome: '', descricao: '' });
 
   const { data: times = [], isLoading } = useQuery({
