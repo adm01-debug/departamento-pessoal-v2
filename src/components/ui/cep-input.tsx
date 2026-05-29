@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from './input';
 import { Button } from './button';
@@ -24,20 +24,23 @@ export interface Address {
   ibge?: string;
 }
 
+const formatCEP = (value: string): string => {
+  const cleaned = value.replace(/\D/g, '').slice(0, 8);
+  return cleaned.replace(/(\d{5})(\d)/, '$1-$2');
+};
+
 export function CEPInput({ value: controlledValue, onChange, onAddressFound, className, disabled }: CEPInputProps) {
-  const [displayValue, setDisplayValue] = useState('');
+  const [displayValue, setDisplayValue] = useState(controlledValue ? formatCEP(controlledValue) : '');
+  const [lastControlled, setLastControlled] = useState(controlledValue);
   const [loading, setLoading] = useState(false);
   const [found, setFound] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
+  // Sincroniza com a prop controlada durante o render (sem useEffect/setState-in-effect).
+  if (controlledValue !== lastControlled) {
+    setLastControlled(controlledValue);
     if (controlledValue) setDisplayValue(formatCEP(controlledValue));
-  }, [controlledValue]);
-
-  const formatCEP = (value: string): string => {
-    const cleaned = value.replace(/\D/g, '').slice(0, 8);
-    return cleaned.replace(/(\d{5})(\d)/, '$1-$2');
-  };
+  }
 
   const searchCEP = async () => {
     const cep = displayValue.replace(/\D/g, '');

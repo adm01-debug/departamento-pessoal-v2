@@ -19,21 +19,23 @@ export function DonutChart({ segments, size = 140, strokeWidth = 16, className }
   const isInView = useInView(ref, { once: true });
 
   const total = segments.reduce((sum, s) => sum + s.value, 0);
-  if (total === 0) return null;
 
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
+  // Hook sempre chamado (antes de qualquer early return) e sem mutação durante o render.
   const segmentsWithOffsets = useMemo(() => {
-    let offset = 0;
-    return segments.map(seg => {
-      const segLength = (seg.value / total) * circumference;
-      const currentOffset = offset;
-      offset += segLength;
-      return { ...seg, segLength, offset: currentOffset };
-    });
+    if (total <= 0) return [];
+    const lengths = segments.map((seg) => (seg.value / total) * circumference);
+    return segments.map((seg, i) => ({
+      ...seg,
+      segLength: lengths[i],
+      offset: lengths.slice(0, i).reduce((acc, len) => acc + len, 0),
+    }));
   }, [segments, total, circumference]);
+
+  if (total === 0) return null;
 
   return (
     <div className={className}>

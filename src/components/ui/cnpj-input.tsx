@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from './input';
 import { Button } from './button';
@@ -31,33 +31,36 @@ interface CNPJInputProps {
   disabled?: boolean;
 }
 
+const formatCNPJ = (value: string): string => {
+  const cleaned = value.replace(/\D/g, '').slice(0, 14);
+  return cleaned.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})/, '$1-$2');
+};
+
+const validateCNPJ = (cnpj: string): boolean => {
+  const cleaned = cnpj.replace(/\D/g, '');
+  if (cleaned.length !== 14 || /^(\d)\1+$/.test(cleaned)) return false;
+  const calc = (x: number) => {
+    const slice = cleaned.slice(0, x);
+    let factor = x - 7, sum = 0;
+    for (let i = x; i >= 1; i--) { sum += parseInt(slice[x - i]) * factor--; if (factor < 2) factor = 9; }
+    const result = 11 - (sum % 11);
+    return result > 9 ? 0 : result;
+  };
+  return calc(12) === parseInt(cleaned[12]) && calc(13) === parseInt(cleaned[13]);
+};
+
 export function CNPJInput({ value: controlledValue, onChange, onValidate, onCompanyFound, className, disabled }: CNPJInputProps) {
-  const [displayValue, setDisplayValue] = useState('');
+  const [displayValue, setDisplayValue] = useState(controlledValue ? formatCNPJ(controlledValue) : '');
+  const [lastControlled, setLastControlled] = useState(controlledValue);
   const [loading, setLoading] = useState(false);
   const [found, setFound] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
+  // Sincroniza com a prop controlada durante o render (sem useEffect/setState-in-effect).
+  if (controlledValue !== lastControlled) {
+    setLastControlled(controlledValue);
     if (controlledValue) setDisplayValue(formatCNPJ(controlledValue));
-  }, [controlledValue]);
-
-  const formatCNPJ = (value: string): string => {
-    const cleaned = value.replace(/\D/g, '').slice(0, 14);
-    return cleaned.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})/, '$1-$2');
-  };
-
-  const validateCNPJ = (cnpj: string): boolean => {
-    const cleaned = cnpj.replace(/\D/g, '');
-    if (cleaned.length !== 14 || /^(\d)\1+$/.test(cleaned)) return false;
-    const calc = (x: number) => {
-      const slice = cleaned.slice(0, x);
-      let factor = x - 7, sum = 0;
-      for (let i = x; i >= 1; i--) { sum += parseInt(slice[x - i]) * factor--; if (factor < 2) factor = 9; }
-      const result = 11 - (sum % 11);
-      return result > 9 ? 0 : result;
-    };
-    return calc(12) === parseInt(cleaned[12]) && calc(13) === parseInt(cleaned[13]);
-  };
+  }
 
   const searchCNPJ = async () => {
     const raw = displayValue.replace(/\D/g, '');

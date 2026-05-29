@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useState } from 'react';
 
 const variants = {
   enter: (direction: number) => ({
@@ -71,10 +71,15 @@ interface PageTransitionProps {
 
 export function PageTransition({ children }: PageTransitionProps) {
   const location = useLocation();
-  const prevIndex = useRef(getRouteIndex(location.pathname));
   const currentIndex = getRouteIndex(location.pathname);
-  const direction = currentIndex >= prevIndex.current ? 1 : -1;
-  prevIndex.current = currentIndex;
+  // Estado derivado de render anterior (padrão oficial do React, sem acessar refs no render):
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [prevIndex, setPrevIndex] = useState(currentIndex);
+  const [direction, setDirection] = useState(1);
+  if (prevIndex !== currentIndex) {
+    setDirection(currentIndex >= prevIndex ? 1 : -1);
+    setPrevIndex(currentIndex);
+  }
 
   return (
     <AnimatePresence mode="popLayout" initial={false} custom={direction}>
