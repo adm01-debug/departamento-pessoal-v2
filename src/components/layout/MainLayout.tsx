@@ -28,6 +28,12 @@ export function MainLayout({ children }: MainLayoutProps) {
   // Ativa o gesto de swipe para voltar em mobile
   useBackGesture();
 
+  // Hooks devem ser chamados no topo do componente (não dentro do JSX).
+  const headerUser = useMemo(
+    () => ({ name: user?.name || user?.email || 'Usuário', email: user?.email || '' }),
+    [user?.name, user?.email]
+  );
+
   useEffect(() => {
     const handleInactivity = () => {
       // Opcional: Implementar logout automático por inatividade se necessário para compliance
@@ -76,7 +82,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="flex-1 flex flex-col min-w-0">
         <MemoizedHeader
           onMenuClick={() => setMobileSidebarOpen(true)}
-          user={useMemo(() => ({ name: user?.name || user?.email || 'Usuário', email: user?.email || '' }), [user?.name, user?.email])}
+          user={headerUser}
         />
         <main role="main" className="flex-1 overflow-auto p-page pb-20 lg:pb-page">
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground">Pular para conteúdo</a>

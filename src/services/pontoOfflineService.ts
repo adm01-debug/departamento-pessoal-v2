@@ -84,7 +84,7 @@ export const pontoOfflineService = {
     const stored = localStorage.getItem(PONTO_OFFLINE_STORAGE_KEY);
     if (!stored) return { synced: 0, errors: 0 };
 
-    let queue: OfflineRegistro[] = [];
+    let queue: OfflineRegistro[];
     try {
       const bytes = CryptoJS.AES.decrypt(stored, CRYPTO_KEY);
       queue = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));

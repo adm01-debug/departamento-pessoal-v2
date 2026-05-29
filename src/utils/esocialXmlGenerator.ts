@@ -14,7 +14,7 @@ export function gerarXmlESocial({ tipo, dados, empresa, ambiente = '2' }: ESocia
   const now = new Date().toISOString();
   const id = `ID1${empresa.cnpj.replace(/\D/g, '').padStart(14, '0')}${now.replace(/[-T:.Z]/g, '').slice(0, 14)}`;
   
-  let content = '';
+  let content: string;
 
   switch (tipo) {
     case 'S-1000':

@@ -57,7 +57,7 @@ function gerarPDF(template: string, colaborador: any, empresa: any) {
   doc.setTextColor(0);
 
   switch (template) {
-    case 'contrato_trabalho':
+    case 'contrato_trabalho': {
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('CONTRATO INDIVIDUAL DE TRABALHO', pageWidth / 2, y, { align: 'center' });
@@ -92,8 +92,9 @@ function gerarPDF(template: string, colaborador: any, empresa: any) {
         doc.setFont('helvetica', 'normal');
       });
       break;
+    }
 
-    case 'declaracao_vinculo':
+    case 'declaracao_vinculo': {
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('DECLARAÇÃO DE VÍNCULO EMPREGATÍCIO', pageWidth / 2, y, { align: 'center' });
@@ -104,8 +105,9 @@ function gerarPDF(template: string, colaborador: any, empresa: any) {
       const declLines = doc.splitTextToSize(declText, pageWidth - 2 * margin);
       doc.text(declLines, margin, y);
       break;
+    }
 
-    case 'aviso_ferias':
+    case 'aviso_ferias': {
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('AVISO DE FÉRIAS', pageWidth / 2, y, { align: 'center' });
@@ -116,8 +118,9 @@ function gerarPDF(template: string, colaborador: any, empresa: any) {
       const feriasLines = doc.splitTextToSize(feriasText, pageWidth - 2 * margin);
       doc.text(feriasLines, margin, y);
       break;
+    }
 
-    default:
+    default: {
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       const titles: Record<string, string> = {
@@ -142,6 +145,7 @@ function gerarPDF(template: string, colaborador: any, empresa: any) {
       );
       doc.text(genericText, margin, y);
       break;
+    }
   }
 
   // Footer with signatures

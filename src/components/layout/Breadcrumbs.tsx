@@ -85,7 +85,7 @@ export function Breadcrumbs({ className }: { className?: string }) {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(seg);
     const isNumericId = /^\d+$/.test(seg);
     
-    let label = seg;
+    let label: string;
     if (isUuid || isNumericId) {
       label = 'Detalhes';
     } else {

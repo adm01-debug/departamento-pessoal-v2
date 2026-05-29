@@ -32,7 +32,7 @@ export function PontoStreakCard() {
   });
 
   const stats = useMemo(() => {
-    let pontual = 0, atrasado = 0, ausente = 0, currentStreak = 0, bestStreak = 0, tempStreak = 0;
+    let pontual = 0, atrasado = 0, ausente = 0, bestStreak = 0, tempStreak = 0;
 
     const sorted = [...registros30d].sort((a: any, b: any) => a.data.localeCompare(b.data));
     sorted.forEach((r: any) => {
@@ -48,7 +48,7 @@ export function PontoStreakCard() {
         if (tempStreak > bestStreak) bestStreak = tempStreak;
       }
     });
-    currentStreak = tempStreak;
+    const currentStreak = tempStreak;
 
     const total = pontual + atrasado;
     const taxa = total > 0 ? (pontual / total) * 100 : 0;
