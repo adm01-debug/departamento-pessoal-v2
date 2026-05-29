@@ -36,7 +36,7 @@ export const authService = {
   /**
    * Verifica a sessão atual
    */
-  async getSession(): Promise<unknown> {
+  async getSession(): Promise<any> {
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;

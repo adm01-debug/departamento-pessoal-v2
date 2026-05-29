@@ -18,7 +18,7 @@ export const faltasService = {
   
   },
   
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('faltas').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -27,7 +27,7 @@ export const faltasService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('faltas').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;

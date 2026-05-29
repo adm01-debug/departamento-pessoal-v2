@@ -42,7 +42,7 @@ export async function listarCentrosCusto(empresaId?: string): Promise<unknown[]>
   return data || [];
 }
 
-export async function criarCentroCusto(centro: DataRecord): Promise<unknown> {
+export async function criarCentroCusto(centro: DataRecord): Promise<any> {
   const { data, error } = await supabase.from('centros_custo')
     .insert([centro])
     .select()
@@ -74,7 +74,7 @@ export async function listarContasBancarias(colaboradorId: string): Promise<unkn
   return data || [];
 }
 
-export async function criarContaBancaria(conta: DataRecord): Promise<unknown> {
+export async function criarContaBancaria(conta: DataRecord): Promise<any> {
   const { data, error } = await supabase.from('contas_bancarias')
     .insert([conta])
     .select()
@@ -106,7 +106,7 @@ export async function obterDadosEstagiario(colaboradorId: string): Promise<unkno
   return data;
 }
 
-export async function salvarDadosEstagiario(colaboradorId: string, dados: DataRecord): Promise<unknown> {
+export async function salvarDadosEstagiario(colaboradorId: string, dados: DataRecord): Promise<any> {
   try {
     const res = await obterDadosEstagiario(colaboradorId);
     const existing = (res ?? null) as DataRecord | null;
@@ -145,7 +145,7 @@ export async function listarDocumentosPessoais(colaboradorId: string): Promise<u
   return data || [];
 }
 
-export async function criarDocumentoPessoal(doc: DataRecord): Promise<unknown> {
+export async function criarDocumentoPessoal(doc: DataRecord): Promise<any> {
   const { data, error } = await supabase.from('documentos_pessoais')
     .insert([doc])
     .select()
@@ -172,7 +172,7 @@ export async function listarFeriasAprovacoes(feriasId: string): Promise<unknown[
   return data || [];
 }
 
-export async function criarFeriasAprovacao(aprovacao: DataRecord): Promise<unknown> {
+export async function criarFeriasAprovacao(aprovacao: DataRecord): Promise<any> {
   const { data, error } = await supabase.from('ferias_aprovacoes')
     .insert([aprovacao])
     .select()
@@ -199,7 +199,7 @@ export async function listarFeriasArquivos(feriasId: string): Promise<unknown[]>
   return data || [];
 }
 
-export async function criarFeriasArquivo(arquivo: DataRecord): Promise<unknown> {
+export async function criarFeriasArquivo(arquivo: DataRecord): Promise<any> {
   const { data, error } = await supabase.from('ferias_arquivos')
     .insert([arquivo])
     .select()
@@ -220,7 +220,7 @@ export async function listarDependentesBeneficios(dependenteId: string): Promise
   return data || [];
 }
 
-export async function vincularDependenteBeneficio(vinculo: DataRecord): Promise<unknown> {
+export async function vincularDependenteBeneficio(vinculo: DataRecord): Promise<any> {
   const { data, error } = await supabase.from('dependentes_beneficios')
     .upsert([vinculo], { onConflict: 'dependente_id,beneficio_id' })
     .select()

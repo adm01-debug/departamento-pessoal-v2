@@ -24,7 +24,7 @@ class DesligamentoService extends BaseService<any> {
     return { data: data || [], total: count || 0 };
   }
 
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     try {
       if (!d.colaborador_id) throw new Error('Colaborador é obrigatório');
       if (!d.data_desligamento) throw new Error('Data de desligamento é obrigatória');
@@ -55,7 +55,7 @@ class DesligamentoService extends BaseService<any> {
     }
   }
 
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     if (!id) throw new Error('ID é obrigatório');
 
     try {

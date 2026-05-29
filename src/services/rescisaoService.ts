@@ -32,7 +32,7 @@ export const rescisaoService = {
     }
   },
 
-  async calcularESalvar(id: string, params: any): Promise<unknown> {
+  async calcularESalvar(id: string, params: any): Promise<any> {
     if (!id) throw new Error('ID do desligamento é obrigatório');
 
     try {
@@ -108,7 +108,7 @@ export const rescisaoService = {
     }
   },
 
-  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<unknown> {
+  async homologar(id: string, etapa: 'rh' | 'financeiro' | 'juridico' | 'colaborador' = 'rh', parecer?: string): Promise<any> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')
@@ -169,7 +169,7 @@ export const rescisaoService = {
     }
   },
 
-  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<unknown> {
+  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador'): Promise<any> {
     try {
       const hash = btoa(`rescisao-${id}-${tipo}-${new Date().getTime()}`).slice(0, 32);
       const updateData: any = {};
@@ -206,7 +206,7 @@ export const rescisaoService = {
     }
   },
 
-  async processarPagamento(id: string, comprovanteUrl?: string): Promise<unknown> {
+  async processarPagamento(id: string, comprovanteUrl?: string): Promise<any> {
     try {
       const { data: d, error: fetchError } = await supabase
         .from('desligamentos')

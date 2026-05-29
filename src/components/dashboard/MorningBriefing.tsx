@@ -121,7 +121,7 @@ export function MorningBriefing() {
   const [runningAction, setRunningAction] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleAction = async (id: string, fn: () => Promise<unknown>, successMsg: string) => {
+  const handleAction = async (id: string, fn: () => Promise<any>, successMsg: string) => {
     setRunningAction(id);
     try {
       await fn();

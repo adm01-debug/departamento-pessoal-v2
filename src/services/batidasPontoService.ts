@@ -20,7 +20,7 @@ export const batidasPontoService = {
     return result || [];
   
   },
-  async registrar(d: any): Promise<unknown> {
+  async registrar(d: any): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('batidas_ponto').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -28,7 +28,7 @@ export const batidasPontoService = {
     return data;
   
   },
-  async ajustar(id: string, d: any): Promise<unknown> {
+  async ajustar(id: string, d: any): Promise<any> {
     try {
       const { data: anterior } = await (supabase as Record<string, unknown>).from('batidas_ponto').select('*').eq('id', id).single();
       
@@ -57,7 +57,7 @@ export const batidasPontoService = {
     }
   
   },
-  async fecharPeriodo(empresaId: string, dataInicio: string, dataFim: string): Promise<unknown> {
+  async fecharPeriodo(empresaId: string, dataInicio: string, dataFim: string): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('periodos_ponto').insert({
       empresa_id: empresaId,

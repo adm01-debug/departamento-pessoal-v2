@@ -10,7 +10,7 @@ export const controleAcessoService = {
   
   },
   
-  async registrar(d: any): Promise<unknown> {
+  async registrar(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('controle_acesso').insert(d).select().maybeSingle();
     if (error) throw error;

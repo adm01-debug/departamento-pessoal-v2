@@ -26,7 +26,7 @@ export const contratoService = {
   
   },
   
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('contratos').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -35,7 +35,7 @@ export const contratoService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     
     const { data, error } = await supabase.from('contratos').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -44,11 +44,11 @@ export const contratoService = {
   
   },
   
-  async encerrar(id: string, motivo: string): Promise<unknown> {
+  async encerrar(id: string, motivo: string): Promise<any> {
     return this.atualizar(id, { status: 'encerrado', observacoes: motivo });
   },
   
-  async renovar(id: string, novaDataFim: string): Promise<unknown> {
+  async renovar(id: string, novaDataFim: string): Promise<any> {
     return this.atualizar(id, { data_fim: novaDataFim, status: 'ativo' });
   },
 };

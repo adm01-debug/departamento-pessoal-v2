@@ -42,7 +42,7 @@ export const pontoService = {
       metadata?: Record<string, any>;
       foto_biometria_url?: string | null;
     }
-  ): Promise<unknown> {
+  ): Promise<any> {
     if (!colaboradorId) throw new Error('Colaborador é obrigatório para registrar ponto.');
     
     try {
@@ -183,7 +183,7 @@ export const pontoService = {
   
   },
   
-  async validarBiometria(batidaId: string, colaboradorId: string, fotoBase64: string): Promise<unknown> {
+  async validarBiometria(batidaId: string, colaboradorId: string, fotoBase64: string): Promise<any> {
     
     const { data, error } = await supabase.functions.invoke('validar-biometria', {
       body: { batidaId, colaboradorId, fotoBase64 }

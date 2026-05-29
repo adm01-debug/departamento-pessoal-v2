@@ -10,7 +10,7 @@ export const episService = {
   
   },
   
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('epis').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const episService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<unknown> {
+  async atualizar(id: string, d: any): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('epis').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -55,7 +55,7 @@ export const episEntregasService = {
   
   },
   
-  async criar(d: any): Promise<unknown> {
+  async criar(d: any): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('epis_entregas').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -64,7 +64,7 @@ export const episEntregasService = {
   
   },
   
-  async registrarDevolucao(id: string, dataDevolucao: string): Promise<unknown> {
+  async registrarDevolucao(id: string, dataDevolucao: string): Promise<any> {
     
     const { data, error } = await (supabase as Record<string, unknown>).from('epis_entregas').update({ data_devolucao: dataDevolucao }).eq('id', id).select().maybeSingle();
     if (error) throw error;

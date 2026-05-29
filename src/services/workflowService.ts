@@ -10,7 +10,7 @@ export const workflowService = {
   
   },
   
-  async criarDefinicao(d: any): Promise<unknown> {
+  async criarDefinicao(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('workflows_definicoes').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -19,7 +19,7 @@ export const workflowService = {
   
   },
   
-  async atualizarDefinicao(id: string, d: any): Promise<unknown> {
+  async atualizarDefinicao(id: string, d: any): Promise<any> {
     
     const { data, error } = await supabase.from('workflows_definicoes').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -43,7 +43,7 @@ export const workflowService = {
   
   },
   
-  async criarEtapa(d: any): Promise<unknown> {
+  async criarEtapa(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('workflows_etapas').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -69,7 +69,7 @@ export const workflowService = {
   
   },
   
-  async criarExecucao(d: any): Promise<unknown> {
+  async criarExecucao(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('workflows_execucoes').insert(d).select().maybeSingle();
     if (error) throw error;
@@ -78,7 +78,7 @@ export const workflowService = {
   
   },
   
-  async atualizarExecucao(id: string, d: any): Promise<unknown> {
+  async atualizarExecucao(id: string, d: any): Promise<any> {
     
     const { data, error } = await supabase.from('workflows_execucoes').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
@@ -87,7 +87,7 @@ export const workflowService = {
   
   },
   
-  async registrarHistorico(d: any): Promise<unknown> {
+  async registrarHistorico(d: any): Promise<any> {
     
     const { data, error } = await supabase.from('workflows_historico').insert(d).select().maybeSingle();
     if (error) throw error;
