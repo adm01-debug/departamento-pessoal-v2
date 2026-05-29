@@ -26,7 +26,7 @@ export const provisoesService = {
       // FGTS sobre as provisões (8%)
       const fgtsProvisao = Number(((provisao13 + provisaoFerias) * 0.08).toFixed(2));
 
-      await (supabase as Record<string, unknown>).from('provisoes_folha').upsert({
+      await (supabase as any).from('provisoes_folha').upsert({
         colaborador_id: colab.id,
         empresa_id: empresaId,
         competencia,

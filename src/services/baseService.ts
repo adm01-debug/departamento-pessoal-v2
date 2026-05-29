@@ -27,7 +27,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   ) {}
 
   protected getQuery() {
-    return (supabase as Record<string, unknown>).from(this.table);
+    return (supabase as any).from(this.table);
   }
 
   async listar(options: ListOptions = {}): Promise<ListResponse<T>> {

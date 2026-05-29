@@ -60,7 +60,7 @@ export default function PontoPage() {
 
   const { data: registroHoje, refetch: refetchRegistro } = useQuery({
     queryKey: ['registro-ponto-hoje', user?.id, today],
-    queryFn: async () => { if (!user?.id) return null; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return null; const { data, error } = await (supabase as Record<string, unknown>).from('registros_ponto').select('*').eq('colaborador_id', colab.id).eq('data', today).maybeSingle(); if (error) throw error; return data; },
+    queryFn: async () => { if (!user?.id) return null; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return null; const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).eq('data', today).maybeSingle(); if (error) throw error; return data; },
     enabled: !!user?.id, refetchInterval: 30000,
   });
 
@@ -68,7 +68,7 @@ export default function PontoPage() {
 
   const { data: registrosSemana = [] } = useQuery({
     queryKey: ['registros-semana', user?.id],
-    queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as Record<string, unknown>).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', w.toISOString().split('T')[0]).order('data', { ascending: false }); if (error) throw error; return data || []; },
+    queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', w.toISOString().split('T')[0]).order('data', { ascending: false }); if (error) throw error; return data || []; },
     enabled: !!user?.id,
   });
 

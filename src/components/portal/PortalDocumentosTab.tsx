@@ -120,7 +120,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
       if (uploadErr) throw uploadErr;
 
       // 2. Mark document as signed
-      await (supabase as Record<string, unknown>).from('documentos_assinatura').insert({
+      await (supabase as any).from('documentos_assinatura').insert({
         documento_id: docToSign.id,
         colaborador_id: colaboradorId,
         assinatura_base64: base64,
@@ -129,7 +129,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
       });
 
       // Update status if column exists
-      await (supabase as Record<string, unknown>).from('documentos').update({ status: 'assinado' }).eq('id', docToSign.id);
+      await (supabase as any).from('documentos').update({ status: 'assinado' }).eq('id', docToSign.id);
 
       queryClient.invalidateQueries({ queryKey: ['portal-documentos'] });
       toast.success('Documento assinado com sucesso!');

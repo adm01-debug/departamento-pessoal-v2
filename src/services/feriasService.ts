@@ -74,19 +74,19 @@ class FeriasService extends BaseService<Ferias> {
   }
 
   async criarPeriodoAquisitivo(d: any): Promise<any> {
-    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').insert(d).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').insert(d).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
   async atualizarPeriodoAquisitivo(id: string, d: any): Promise<any> {
-    const { data, error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
   async excluirPeriodoAquisitivo(id: string): Promise<void> {
-    const { error } = await (supabase as Record<string, unknown>).from('periodos_aquisitivos').delete().eq('id', id);
+    const { error } = await (supabase as any).from('periodos_aquisitivos').delete().eq('id', id);
     if (error) throw error;
   }
 

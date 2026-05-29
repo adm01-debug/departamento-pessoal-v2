@@ -417,7 +417,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
         }
       )
       .subscribe();
-    return () => { (supabase as Record<string, unknown>).removeChannel(channel); };
+    return () => { (supabase as any).removeChannel(channel); };
   }, [empresaId]);
 
   const filteredPendencias = useMemo(() => {
