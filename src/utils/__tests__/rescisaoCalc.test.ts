@@ -15,8 +15,10 @@ describe('calcINSS — Tabela Progressiva 2026', () => {
   describe('edge cases', () => {
     it('salary = 0 → INSS = 0', () => expect(calcINSS(0)).toBe(0));
     it('salary = -100 → INSS = 0', () => expect(calcINSS(-100)).toBe(0));
-    it('salary = 0.01 → tiny INSS', () => expect(calcINSS(0.01)).toBeCloseTo(0.01 * 0.075, 4));
-    it('salary = 1 → 1 × 7.5%', () => expect(calcINSS(1)).toBeCloseTo(0.075, 4));
+    // INSS é arredondado a centavos (R$). Para salários ínfimos o arredondamento domina:
+    // 0.01 × 7.5% = 0.00075 → R$ 0.00 ; 1 × 7.5% = 0.075 → R$ 0.08.
+    it('salary = 0.01 → INSS arredondado a centavos = 0', () => expect(calcINSS(0.01)).toBe(0));
+    it('salary = 1 → 1 × 7.5% arredondado = 0.08', () => expect(calcINSS(1)).toBe(0.08));
   });
 
   describe('faixa 1 — 7.5% até R$ 1.518,00', () => {

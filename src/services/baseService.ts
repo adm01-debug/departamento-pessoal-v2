@@ -70,6 +70,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async buscarPorId(id: string): Promise<T | null> {
+    if (!id) throw new Error('ID é obrigatório');
     try {
       const { data, error } = await this.getQuery()
         .select('*')
