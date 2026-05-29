@@ -78,15 +78,19 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-tabs', '@radix-ui/react-tooltip', '@radix-ui/react-dropdown-menu'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-charts': ['recharts'],
-          'vendor-supabase': ['@supabase/supabase-js'],
-          // jspdf, jspdf-autotable, xlsx are loaded on-demand via dynamic import
-          'vendor-motion': ['framer-motion'],
-          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+        // Forma de função exigida pelo Vite 8 (rolldown). A forma de objeto
+        // dispara "manualChunks is not a function" durante o build.
+        manualChunks(id: string) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/.test(id)) return 'vendor-react';
+          if (/[\\/]node_modules[\\/]@radix-ui[\\/]/.test(id)) return 'vendor-ui';
+          if (/[\\/]node_modules[\\/]@tanstack[\\/]/.test(id)) return 'vendor-query';
+          if (/[\\/]node_modules[\\/]recharts[\\/]/.test(id)) return 'vendor-charts';
+          if (/[\\/]node_modules[\\/]@supabase[\\/]/.test(id)) return 'vendor-supabase';
+          if (/[\\/]node_modules[\\/]framer-motion[\\/]/.test(id)) return 'vendor-motion';
+          if (/[\\/]node_modules[\\/](react-hook-form|@hookform[\\/]resolvers|zod)[\\/]/.test(id)) return 'vendor-forms';
+          // jspdf, jspdf-autotable, xlsx são carregados sob demanda via import dinâmico
+          return undefined;
         },
       },
     },
