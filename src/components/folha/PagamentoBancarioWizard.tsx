@@ -27,6 +27,8 @@ export function PagamentoBancarioWizard({ folhaId }: { folhaId?: string }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [method, setMethod] = useState<'cnab' | 'pix' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  // Protocolo gerado uma única vez na montagem (evita Date.now() instável durante o render).
+  const [protocolo] = useState(() => `OP-${Date.now().toString().slice(-8)}`);
   const { empresaAtual } = useEmpresas();
 
   const handleProcess = async () => {
@@ -205,7 +207,7 @@ export function PagamentoBancarioWizard({ folhaId }: { folhaId?: string }) {
                 <div className="p-4 bg-muted/20 rounded-2xl w-full border border-border/30 space-y-2 mb-6">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Protocolo:</span>
-                    <span className="font-mono font-bold">OP-{Date.now().toString().slice(-8)}</span>
+                    <span className="font-mono font-bold">{protocolo}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Autenticação Digital:</span>

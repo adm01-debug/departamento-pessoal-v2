@@ -18,17 +18,14 @@ export function SystemHealthTab() {
   const [loading, setLoading] = useState<string | null>(null);
   const [cleanupResult, setCleanupResult] = useState<unknown>(null);
   const [backupResult, setBackupResult] = useState<unknown>(null);
+  const [backupId, setBackupId] = useState('');
 
   const runHealthcheck = async () => {
     setLoading('health');
     try {
       const result = await edgeFunctionsService.healthcheck();
-      if (true) {
-        setHealthData(result);
-        toast.success(`Sistema: ${(result as Record<string, unknown>).status}`);
-      } else {
-        toast.error('Erro inesperado');
-      }
+      setHealthData(result);
+      toast.success(`Sistema: ${(result as Record<string, unknown>).status}`);
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -40,12 +37,8 @@ export function SystemHealthTab() {
     setLoading('cleanup');
     try {
       const result = await edgeFunctionsService.limpezaDados();
-      if (true) {
-        setCleanupResult(result);
-        toast.success(`${(result as Record<string, unknown>).total_cleaned} registros limpos!`);
-      } else {
-        toast.error('Erro inesperado');
-      }
+      setCleanupResult(result);
+      toast.success(`${(result as Record<string, unknown>).total_cleaned} registros limpos!`);
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -57,12 +50,9 @@ export function SystemHealthTab() {
     setLoading('backup');
     try {
       const result = await edgeFunctionsService.backupServidor();
-      if (true) {
-        setBackupResult(result);
-        toast.success((result as Record<string, unknown>).message);
-      } else {
-        toast.error('Erro inesperado');
-      }
+      setBackupResult(result);
+      setBackupId(crypto.randomUUID().slice(0, 8).toUpperCase());
+      toast.success((result as Record<string, unknown>).message as string);
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -73,12 +63,8 @@ export function SystemHealthTab() {
   const runAlertasDP = async () => {
     setLoading('alertas');
     try {
-      const result = await edgeFunctionsService.dispararAlertasDP();
-      if (true) {
-        toast.success('Alertas de DP disparados com sucesso!');
-      } else {
-        toast.error('Erro inesperado');
-      }
+      await edgeFunctionsService.dispararAlertasDP();
+      toast.success('Alertas de DP disparados com sucesso!');
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -90,11 +76,7 @@ export function SystemHealthTab() {
     setLoading('agendamentos');
     try {
       const result = await edgeFunctionsService.processarAgendamentos();
-      if (true) {
-        toast.success(`${(result as Record<string, unknown>).processados || 0} agendamentos processados!`);
-      } else {
-        toast.error('Erro inesperado');
-      }
+      toast.success(`${(result as Record<string, unknown>).processados || 0} agendamentos processados!`);
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -105,12 +87,8 @@ export function SystemHealthTab() {
   const runSincronizarBitrix = async () => {
     setLoading('bitrix');
     try {
-      const result = await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
-      if (true) {
-        toast.success('Sincronização Bitrix24 iniciada!');
-      } else {
-        toast.error('Erro inesperado');
-      }
+      await edgeFunctionsService.sincronizarBitrix({ action: 'sync_all' });
+      toast.success('Sincronização Bitrix24 iniciada!');
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -121,12 +99,8 @@ export function SystemHealthTab() {
   const runLimparCache = async () => {
     setLoading('cache');
     try {
-      const result = await edgeFunctionsService.cache({ action: 'invalidate' });
-      if (true) {
-        toast.success('Cache do sistema limpo com sucesso!');
-      } else {
-        toast.error('Erro inesperado');
-      }
+      await edgeFunctionsService.cache({ action: 'invalidate' });
+      toast.success('Cache do sistema limpo com sucesso!');
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -279,7 +253,7 @@ export function SystemHealthTab() {
               <div className="pt-6 mt-4 flex items-center justify-between border-t border-border/10">
                 <div className="space-y-1">
                   <p className="text-sm font-bold text-primary">{backupResult.message || 'Backup processado com sucesso'}</p>
-                  <p className="text-[10px] text-muted-foreground font-mono">ID: {Math.random().toString(36).substring(7).toUpperCase()}</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">ID: {backupId}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Registros Totais</p>
