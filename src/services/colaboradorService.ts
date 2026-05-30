@@ -21,7 +21,9 @@ class ColaboradorService extends BaseService<Colaborador> {
     
     const { status, departamento, cargo, empresaId } = filters;
 
-    let query = this.getQuery().select('*', { count: 'exact' });
+    // Explicit column selection to prevent failures on missing optional columns in external DB
+    const columns = 'id, nome_completo, cpf, email, status, data_admissao, empresa_id, matricula, foto_url, telefone';
+    let query = this.getQuery().select(columns, { count: 'exact' });
 
     if (empresaId) query = query.eq('empresa_id', empresaId);
     if (status && status !== 'all') query = query.eq('status', status);
@@ -51,7 +53,7 @@ class ColaboradorService extends BaseService<Colaborador> {
     const countPromises = statuses.map(async (status) => {
       let query = supabase
         .from('colaboradores')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('status', status);
       
       if (empresaId) query = query.eq('empresa_id', empresaId);

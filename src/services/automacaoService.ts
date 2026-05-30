@@ -60,12 +60,14 @@ export const automacaoService = {
       .from('asos')
       .select('*, colaborador:colaboradores(id, nome_completo, telefone)')
       .eq('empresa_id', empresaId)
-      .eq('data_vencimento', dataFormatada);
+      .eq('data_validade' as any, dataFormatada);
 
     if (!asos) return;
 
     for (const aso of asos) {
-      const colab = (aso as Record<string, unknown>).colaborador;
+      const colab = (aso as any).colaborador;
+      if (!colab) continue;
+      
       const mensagem = `Olá ${colab.nome_completo}, seu exame médico (ASO) vence em 30 dias (${dataAlerta.toLocaleDateString('pt-BR')}). Favor agendar com o RH.`;
       
       await criarNotificacao({
@@ -91,13 +93,13 @@ export const automacaoService = {
     const { data: periodos } = await supabase
       .from('periodos_experiencia')
       .select('*, colaborador:colaboradores(id, nome_completo, empresa_id)')
-      .eq('empresa_id', empresaId)
-      .or(`data_fim_primeiro_periodo.eq.${dataFormatada},data_fim_segundo_periodo.eq.${dataFormatada}`);
+      .or(`primeira_etapa_fim.eq.${dataFormatada},segunda_etapa_fim.eq.${dataFormatada}` as any);
 
     if (!periodos) return;
 
     for (const periodo of periodos) {
-      const colab = (periodo as Record<string, unknown>).colaborador;
+      const colab = (periodo as any).colaborador;
+      if (!colab || colab.empresa_id !== empresaId) continue;
       
       await criarNotificacao({
         titulo: 'Término de Experiência Próximo',

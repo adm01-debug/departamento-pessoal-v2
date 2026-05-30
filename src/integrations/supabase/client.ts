@@ -108,9 +108,9 @@ const callBridge = async <T = any>(
       const errorMsg = json.error || `Erro HTTP ${res.status}`;
       console.error('🔴 [BRIDGE_SCHEMA_ERROR]', action, target, errorMsg);
 
-      // Erros de função/tabela ausente NÃO devem poluir a UI com toast.
+      // Erros de função/tabela/coluna ausente NÃO devem poluir a UI com toast.
       // Apenas propagamos o erro para quem chamou tratar (ou ignorar).
-      const isMissingObject = /Could not find the (function|table)|schema cache|does not exist/i.test(errorMsg);
+      const isMissingObject = /Could not find the (function|table)|schema cache|does not exist|column .* does not exist/i.test(errorMsg);
       if (!isMissingObject) {
         toast.error(`Erro de banco: ${errorMsg}`, {
           duration: 6000,
