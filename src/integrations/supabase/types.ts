@@ -19613,7 +19613,7 @@ export type Database = {
       }
       pg_all_foreign_keys: {
         Row: {
-          fk_columns: any[] | null
+          fk_columns: unknown[] | null
           fk_constraint_name: unknown
           fk_schema_name: unknown
           fk_table_name: unknown
@@ -19623,7 +19623,7 @@ export type Database = {
           match_type: string | null
           on_delete: string | null
           on_update: string | null
-          pk_columns: any[] | null
+          pk_columns: unknown[] | null
           pk_constraint_name: unknown
           pk_index_name: unknown
           pk_schema_name: unknown
@@ -20823,8 +20823,8 @@ export type Database = {
       _cleanup: { Args: never; Returns: boolean }
       _contract_on: { Args: { "": string }; Returns: unknown }
       _currtest: { Args: never; Returns: number }
-      _db_privs: { Args: never; Returns: any[] }
-      _extensions: { Args: never; Returns: any[] }
+      _db_privs: { Args: never; Returns: unknown[] }
+      _extensions: { Args: never; Returns: unknown[] }
       _get: { Args: { "": string }; Returns: number }
       _get_latest: { Args: { "": string }; Returns: number[] }
       _get_note: { Args: { "": string }; Returns: string }
@@ -20833,7 +20833,7 @@ export type Database = {
       _query: { Args: { "": string }; Returns: string }
       _refine_vol: { Args: { "": string }; Returns: string }
       _retval: { Args: { "": string }; Returns: string }
-      _table_privs: { Args: never; Returns: any[] }
+      _table_privs: { Args: never; Returns: unknown[] }
       _temptypes: { Args: { "": string }; Returns: string }
       _todo: { Args: never; Returns: string }
       anonimizar_dados_pessoais: {
