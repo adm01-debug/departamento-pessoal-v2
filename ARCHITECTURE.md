@@ -1,160 +1,70 @@
-# 🏗️  Arquitetura do Sistema
+# Arquitetura e Fluxo de Dados - RH ERP
 
-## 📊 Visão Geral
+Este documento descreve a arquitetura técnica da aplicação, focando na integração customizada entre o Frontend e o Banco de Dados Corporativo Externo.
 
-Sistema web para gerenciamento completo de Departamento Pessoal com compliance total à legislação trabalhista brasileira.
+## 1. Visão Geral da Arquitetura
 
-## 🎯 Stack Tecnológico
+A aplicação utiliza uma arquitetura baseada em **React (Vite)** com **TypeScript**, organizada em camadas para separação de preocupações:
 
-### Frontend
-- **React 18** - UI Library
-- **TypeScript** - Type Safety
-- **Vite** - Build Tool
-- **Tailwind CSS** - Styling
-- **shadcn/ui** - Component Library
+- **Frontend (UI):** Componentes React + Tailwind CSS (Shadcn UI).
+- **Hooks:** Orquestração de estado e cache (TanStack Query).
+- **Services:** Abstração de regras de negócio e chamadas de dados.
+- **Bridge (Edge Function):** Gateway que traduz comandos do frontend para o banco corporativo.
 
-### State Management
-- **React Query** - Server State
-- **Context API** - Global State
-- **React Hook Form** - Form State
+## 2. Diagrama de Sequência: Fluxo de Dados
 
-### Backend/Database
-- **Supabase** - Backend as a Service
-- **PostgreSQL** - Database
-- **Row Level Security** - Autorização
+```mermaid
+sequenceDiagram
+    participant UI as Componente (React)
+    participant Hook as useColaboradores (Hook)
+    participant Service as ColaboradorService
+    participant Proxy as Supabase Proxy (Client)
+    participant Edge as Edge Function (Bridge)
+    participant DB as Banco Corporativo (Externo)
 
-## 📁 Estrutura de Pastas
-
-```
-src/
-├── calculators/     # Cálculos trabalhistas (INSS, IRRF, etc)
-├── components/      # Componentes React reutilizáveis
-│   ├── ui/         # Componentes base (shadcn)
-│   └── forms/      # Componentes de formulário
-├── contexts/        # Contextos React
-├── hooks/           # Custom React Hooks
-├── lib/            # Utilitários e helpers
-│   ├── validators/ # Validadores eSocial
-│   └── utils/      # Funções auxiliares
-├── pages/          # Páginas da aplicação
-├── services/       # Integrações (API, Supabase)
-├── types/          # Definições TypeScript
-└── config/         # Configurações
+    UI->>Hook: Montagem/Filtro
+    Hook->>Service: listar({ status: 'ativo' })
+    Service->>Proxy: from('colaboradores').select('*')
+    Proxy->>Proxy: Intercepta chamada (JS Proxy)
+    Proxy->>Edge: POST /external-db-bridge { action: 'select', table: 'colaboradores' }
+    Edge->>Edge: Valida Sessão & Higieniza Dados
+    Edge->>DB: Executa Query SQL Real
+    DB-->>Edge: Retorna Conjunto de Dados
+    Edge->>Edge: Registra Telemetria (Performance)
+    Edge-->>Proxy: JSON { data: [...], count: 150 }
+    Proxy-->>Service: BridgeResponse
+    Service-->>Hook: ListResponse<Colaborador>
+    Hook-->>UI: Atualiza Estado (Re-render)
 ```
 
-## 🔄 Fluxo de Dados
+## 3. Estrutura de Pastas
 
-```
-User Interface (React)
-      ↓
-React Query (Cache)
-      ↓
-Services (API Layer)
-      ↓
-Supabase (Database)
-```
+| Pasta | Responsabilidade |
+| :--- | :--- |
+| `src/pages/` | Definição de rotas e layouts de alto nível. |
+| `src/components/` | UI Reutilizável (Botões, Cards, Modais). |
+| `src/hooks/` | Estado da UI e orquestração de dados via React Query. |
+| `src/services/` | Comunicação com API e abstração de tabelas. Estende `BaseService`. |
+| `src/integrations/` | Configurações do Supabase e o `dbBridgeProxy`. |
 
-## 🧮 Calculadoras
+## 4. Contrato da Edge Function `external-db-bridge`
 
-Sistema de cálculos 100% conforme legislação:
+A Edge Function intercepta requisições do frontend para garantir telemetria e compatibilidade de schema.
 
-- **INSS** - Contribuição previdenciária
-- **IRRF** - Imposto de renda
-- **FGTS** - Fundo de garantia
-- **Férias** - Cálculo de férias
-- **13º Salário** - Gratificação natalina
-- **Rescisão** - Cálculo rescisório
-- **Horas Extras** - Adicional de horas
-- **Adicionais** - Noturno, periculosidade, insalubridade
+### Requisição (POST)
+- `action`: `'select' | 'insert' | 'update' | 'delete' | 'rpc' | 'upsert'`
+- `table`: Nome da tabela alvo.
+- `filters`: Array de objetos `{ column, op, value }`.
+- `data`: Dados para operações de escrita.
+- `limit/offset`: Parâmetros de paginação.
 
-## 📋 Integrações Governamentais
+### Resposta
+- `data`: Dados retornados do banco.
+- `count`: Total de registros (quando solicitado).
+- `duration_ms`: Tempo de resposta do banco externo.
 
-### eSocial
-- Eventos S-1000 a S-8299
-- Validação offline completa
-- Geração de XML
+## 5. Diretrizes para Desenvolvedores
 
-### Outros
-- CAGED
-- RAIS
-- DIRF
-- DCTFWeb
-- SEFIP
-- REINF
-
-## 🔐 Segurança
-
-### Autenticação
-- Supabase Auth
-- JWT Tokens
-- Refresh Tokens
-
-### Autorização
-- Row Level Security (RLS)
-- Role-Based Access Control (RBAC)
-- Políticas no Supabase
-
-### Dados Sensíveis
-- Criptografia em repouso
-- HTTPS obrigatório
-- Dados pessoais anonimizados em logs
-
-## 🚀 Performance
-
-### Otimizações
-- Code Splitting
-- Lazy Loading
-- Tree Shaking
-- Bundle Optimization
-
-### Caching
-- React Query Cache
-- Service Worker (futuro)
-- CDN para assets
-
-## 🧪 Testes
-
-### Tipos
-- Unitários (Vitest - futuro)
-- Integração
-- E2E (Cypress - futuro)
-
-### Cobertura Alvo
-- Calculadoras: 100%
-- Services: 80%
-- Components: 60%
-
-## 📈 Monitoramento
-
-### Métricas
-- Tempo de build
-- Bundle size
-- Performance scores
-- Error rates
-
-### Ferramentas
-- Lighthouse
-- Vite Bundle Analyzer
-- Sentry (futuro)
-
-## 🔮 Roadmap
-
-### Curto Prazo (V18)
-- [ ] Testes completos
-- [ ] CI/CD
-- [ ] Documentação API
-
-### Médio Prazo (V19)
-- [ ] PWA
-- [ ] Offline-first
-- [ ] Mobile app
-
-### Longo Prazo (V20+)
-- [ ] Inteligência artificial
-- [ ] Automação avançada
-- [ ] Integrações ERP
-
----
-
-**Versão:** 18.0  
-**Última atualização:** Janeiro 2026
+1. **Nunca use o cliente Supabase original:** Sempre importe o `supabase` de `@/integrations/supabase/client` para garantir que a chamada passe pelo Proxy.
+2. **Use o BaseService:** Ao criar um novo serviço, estenda `BaseService<T>` para herdar funcionalidades de CRUD automaticamente.
+3. **Tipagem:** Embora o Proxy use `any` internamente para flexibilidade de schema, sempre tipagem as interfaces de retorno nos Hooks e Componentes.
