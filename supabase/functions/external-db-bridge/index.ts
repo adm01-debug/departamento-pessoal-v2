@@ -222,7 +222,13 @@ Deno.serve(async (req) => {
       });
 
       if (selectError) {
-        return new Response(JSON.stringify({ error: selectError.message }), {
+        console.error(`[external-db-bridge] SELECT error on table ${table}:`, selectError);
+        return new Response(JSON.stringify({ 
+          error: selectError.message,
+          details: selectError.details,
+          hint: selectError.hint,
+          code: selectError.code
+        }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

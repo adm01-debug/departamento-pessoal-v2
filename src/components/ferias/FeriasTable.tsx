@@ -56,7 +56,7 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
               <TableCell className="font-body font-medium">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8 border border-border/50">
-                    <AvatarImage src={s.colaborador?.avatar_url} />
+                    <AvatarImage src={s.colaborador?.foto_url} />
                     <AvatarFallback className="bg-primary/5 text-primary text-[10px]">
                       {s.colaborador?.nome_completo?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || <User className="h-3 w-3" />}
                     </AvatarFallback>
