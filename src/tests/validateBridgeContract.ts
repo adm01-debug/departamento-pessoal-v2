@@ -24,7 +24,7 @@ async function validateBridge() {
     },
     {
       name: 'RPC (Função de Banco)',
-      payload: { action: 'rpc', fn: 'get_system_stats', params: {} }
+      payload: { action: 'rpc', fn: 'get_colaboradores_count', params: { p_empresa_id: '123' } }
     }
   ];
 
