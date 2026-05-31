@@ -40,8 +40,9 @@ export function useRealtimeDashboard() {
   useEffect(() => {
     // Escuta mudanças em tabelas críticas para o Dashboard
     const tables = ['admissoes', 'desligamentos', 'ferias', 'folhas_pagamento', 'registros_ponto'];
+    const channelName = `dashboard-updates-${empresaAtualId ?? 'global'}-${crypto.randomUUID()}`;
     
-    const channel = supabase.channel('dashboard-updates')
+    const channel = supabase.channel(channelName)
       .on('postgres_changes', { 
         event: '*', 
         schema: 'public',
