@@ -3,12 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import type { Database } from './types';
 
-// Configurações do Supabase EXTERNO (corporativo - hncgwjbzdajfdztqgefe).
-// HARDCODED de propósito: o .env do Lovable Cloud aponta para outro projeto
-// (ciziytrrjjotlsjzshnm) e NÃO deve sobrescrever estes valores. Os usuários
-// reais (ex.: adm01@promobrindes.com.br) existem APENAS no banco corporativo.
-const SUPABASE_URL = 'https://hncgwjbzdajfdztqgefe.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE';
+// Configurações do Lovable Cloud (projeto ciziytrrjjotlsjzshnm).
+// O banco corporativo (hncgwjbzdajfdztqgefe) foi descontinuado por chave API
+// inválida — migramos para o backend gerenciado pelo Lovable Cloud.
+const SUPABASE_URL = 'https://ciziytrrjjotlsjzshnm.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpeml5dHJyampvdGxzanpzaG5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NzU5NjQsImV4cCI6MjA5NDA1MTk2NH0.Ld9R1Rf5CH06IMUxDYvOXZoIqNmrGlwrpdO-eBrVMRQ';
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
