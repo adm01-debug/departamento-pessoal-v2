@@ -57,8 +57,8 @@ async function validateBridge() {
       }
 
       console.log('✅ PASS');
-    } catch (err) {
-      console.log(`❌ FAIL: ${err.message}`);
+    } catch (err: any) {
+      console.log(`❌ FAIL: ${err.message || 'Erro desconhecido'}`);
       process.exit(1);
     }
   }

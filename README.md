@@ -119,11 +119,18 @@ src/
 | Isenção IRRF | Até R$ 5.000 |
 | Salário Família | R$ 67,54 (até R$ 1.980,38) |
 
-## 📋 Auditoria e Conformidade
+## 📋 Documentação e Auditoria
 
-Para garantir a excelência e conformidade do sistema, realizamos auditorias periódicas.
-- [Relatório de Auditoria Enterprise (Markdown)](./AUDIT_REPORT.md)
-- [Relatório de Auditoria Enterprise (PDF)](./AUDIT_REPORT.pdf) _(Gerado via CI/CD)_
+Para garantir a excelência e conformidade do sistema, mantemos documentação técnica rigorosa:
+- [📖 Guia de Arquitetura e Fluxo de Dados](./ARCHITECTURE.md) - Essencial para novos desenvolvedores.
+- [📊 Relatório de Auditoria Enterprise](./AUDIT_REPORT.md) - Status de saúde do sistema.
+
+### Validando a Infraestrutura
+Para verificar se a conexão com o banco corporativo está operacional e respeitando os contratos:
+```bash
+bun src/tests/validateBridgeContract.ts
+```
+
 
 ## 📄 Licença
 
