@@ -222,12 +222,26 @@ Deno.serve(async (req) => {
       });
 
       if (selectError) {
-        console.error(`[external-db-bridge] SELECT error on table ${table}:`, selectError);
+        let enhancedError = selectError.message;
+        if (selectError.message.includes("more than one relationship")) {
+          enhancedError = `Ambiguity Error: ${selectError.message}. Hint: Specify the foreign key using 'table!fk_name' syntax. Columns requested: ${selectColumns}`;
+        } else if (selectError.message.includes("column") && selectError.message.includes("does not exist")) {
+          enhancedError = `Schema Mismatch: ${selectError.message}. Verify that the column exists in the external database. Table: ${table}, Columns: ${selectColumns}`;
+        }
+
+        console.error(`[external-db-bridge] SELECT error on table ${table}:`, {
+          message: selectError.message,
+          enhanced: enhancedError,
+          columns: selectColumns,
+          filters
+        });
+
         return new Response(JSON.stringify({ 
-          error: selectError.message,
+          error: enhancedError,
           details: selectError.details,
           hint: selectError.hint,
-          code: selectError.code
+          code: selectError.code,
+          original_error: selectError.message
         }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
