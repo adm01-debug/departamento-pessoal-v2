@@ -14,7 +14,7 @@ class AfastamentoService extends BaseService<any> {
 
     const selectStr = `
       *,
-      colaborador:colaboradores(nome_completo, departamento)
+      colaborador:colaboradores!fk_afastamentos_colaborador(nome_completo, departamento)
     `;
     
     let query = this.getQuery().select(selectStr, { count: 'exact' });
@@ -124,7 +124,7 @@ class AfastamentoService extends BaseService<any> {
   async listarProrrogacoes(afastamentoId?: string): Promise<any[]> {
     let query = (supabase as any)
       .from('prorrogacoes_afastamento')
-      .select('*, afastamento:afastamentos(*, colaborador:colaboradores(nome_completo))');
+      .select('*, afastamento:afastamentos!fk_afastamentos_colaborador(*, colaborador:colaboradores!fk_afastamentos_colaborador(nome_completo))');
     
     if (afastamentoId) query = query.eq('afastamento_id', afastamentoId);
     

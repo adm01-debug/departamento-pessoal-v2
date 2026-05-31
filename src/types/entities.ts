@@ -75,6 +75,10 @@ export interface Ferias {
   empresa_id: string;
   created_at?: string;
   colaborador_nome?: string;
+  colaborador?: {
+    nome_completo: string;
+    foto_url: string | null;
+  };
 }
 
 export interface Documento {
