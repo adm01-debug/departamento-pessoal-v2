@@ -57,7 +57,6 @@ export interface Colaborador {
   version?: number;
   created_at?: string;
   foto_url?: string;
-  foto_url?: string;
   data_admissao?: string;
   salario_base?: number;
   cidade?: string;

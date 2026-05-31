@@ -257,7 +257,13 @@ Deno.serve(async (req) => {
       });
 
       if (insertError) {
-        return new Response(JSON.stringify({ error: insertError.message }), {
+        console.error(`[external-db-bridge] INSERT error on table ${table}:`, insertError);
+        return new Response(JSON.stringify({ 
+          error: insertError.message,
+          details: insertError.details,
+          hint: insertError.hint,
+          code: insertError.code
+        }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -286,7 +292,13 @@ Deno.serve(async (req) => {
       });
 
       if (upsertError) {
-        return new Response(JSON.stringify({ error: upsertError.message }), {
+        console.error(`[external-db-bridge] UPSERT error on table ${table}:`, upsertError);
+        return new Response(JSON.stringify({ 
+          error: upsertError.message,
+          details: upsertError.details,
+          hint: upsertError.hint,
+          code: upsertError.code
+        }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -322,7 +334,13 @@ Deno.serve(async (req) => {
       });
 
       if (updateError) {
-        return new Response(JSON.stringify({ error: updateError.message }), {
+        console.error(`[external-db-bridge] UPDATE error on table ${table}:`, updateError);
+        return new Response(JSON.stringify({ 
+          error: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code
+        }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -357,7 +375,13 @@ Deno.serve(async (req) => {
       });
 
       if (deleteError) {
-        return new Response(JSON.stringify({ error: deleteError.message }), {
+        console.error(`[external-db-bridge] DELETE error on table ${table}:`, deleteError);
+        return new Response(JSON.stringify({ 
+          error: deleteError.message,
+          details: deleteError.details,
+          hint: deleteError.hint,
+          code: deleteError.code
+        }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -401,7 +425,13 @@ Deno.serve(async (req) => {
       });
 
       if (rpcError) {
-        return new Response(JSON.stringify({ error: rpcError.message }), {
+        console.error(`[external-db-bridge] RPC error for function ${rpcName}:`, rpcError);
+        return new Response(JSON.stringify({ 
+          error: rpcError.message,
+          details: (rpcError as any).details,
+          hint: (rpcError as any).hint,
+          code: (rpcError as any).code
+        }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
