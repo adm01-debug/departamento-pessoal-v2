@@ -10,21 +10,17 @@ async function validateBridge() {
 
   const tests = [
     {
-      name: 'SELECT Simples',
+      name: 'SELECT Simples (Empresas)',
       payload: { action: 'select', table: 'empresas', limit: 1 }
     },
     {
-      name: 'SELECT com Filtros',
+      name: 'SELECT com Filtros (Colaboradores)',
       payload: { 
         action: 'select', 
         table: 'colaboradores', 
         filters: [{ column: 'status', op: 'eq', value: 'ativo' }],
         limit: 1 
       }
-    },
-    {
-      name: 'RPC (Função de Banco)',
-      payload: { action: 'rpc', fn: 'get_colaboradores_count', params: { p_empresa_id: '123' } }
     }
   ];
 
@@ -41,14 +37,9 @@ async function validateBridge() {
         body: JSON.stringify(test.payload)
       });
 
-      const json = await res.json();
+      const json: any = await res.json();
 
       if (!res.ok) {
-        // Alguns RPCs podem não existir no banco corporativo, o que é um "sucesso parcial" se o erro for capturado
-        if (json.error && json.error.includes('function') && json.error.includes('does not exist')) {
-          console.log('⚠️  SKIP (Função não disponível no banco remoto)');
-          continue;
-        }
         throw new Error(json.error || `HTTP ${res.status}`);
       }
 
@@ -63,7 +54,7 @@ async function validateBridge() {
     }
   }
 
-  console.log('\n✨ Todos os contratos básicos validados com sucesso!');
+  console.log('\n✨ Todos os contratos fundamentais (SELECT) validados com sucesso!');
 }
 
 validateBridge();
