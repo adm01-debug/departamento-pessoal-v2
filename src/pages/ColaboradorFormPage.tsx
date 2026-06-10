@@ -77,13 +77,14 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
 
 export default function ColaboradorFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { success, error: notifyError } = useNotification();
-  const { handleServerError } = useServerValidation<FormData>();
+  const { handleServerError } = useServerValidation<FormInput>();
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
@@ -97,7 +98,7 @@ export default function ColaboradorFormPage() {
   });
 
 
-  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch, setError } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isDirty }, setValue, reset, watch, setError } = useForm<FormInput, unknown, FormData>({
     resolver: zodResolver(schema),
     defaultValues: { 
       status: 'ativo', 
