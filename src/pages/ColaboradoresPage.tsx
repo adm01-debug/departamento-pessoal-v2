@@ -180,7 +180,7 @@ export default function ColaboradoresPage() {
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 shadow-sm bg-card/50">
+              <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 shadow-xs bg-card/50">
                 <Download className="h-4 w-4" />
                 <span>Exportar Dados</span>
               </Button>
@@ -226,7 +226,7 @@ export default function ColaboradoresPage() {
                 className={cn(
                   "p-4 rounded-2xl border transition-all text-left group relative overflow-hidden",
                   isActive 
-                    ? "bg-primary/5 border-primary shadow-sm" 
+                    ? "bg-primary/5 border-primary shadow-xs" 
                     : "bg-card/50 border-border/40 hover:border-primary/20 hover:bg-card"
                 )}
               >
@@ -287,7 +287,7 @@ export default function ColaboradoresPage() {
         >
           <TableCell className="py-4 pl-6">
             <div className="flex items-center gap-4">
-              <UserAvatar name={c.nome_completo} size="md" className="rounded-xl shadow-sm group-hover:scale-110 transition-transform" />
+              <UserAvatar name={c.nome_completo} size="md" className="rounded-xl shadow-xs group-hover:scale-110 transition-transform" />
               <div>
                 <p className="font-display font-bold text-base leading-tight group-hover:text-primary transition-colors">{c.nome_completo}</p>
                 <p className="text-xs text-muted-foreground font-body mt-0.5">{c.email || 'Sem e-mail cadastrado'}</p>

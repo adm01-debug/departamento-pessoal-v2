@@ -6,7 +6,7 @@ export function S2220ASO({ dados }: { dados: any }) {
   return (
     <div className="space-y-4 font-body">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-3 flex items-center gap-3">
             <User className="h-4 w-4 text-primary" />
             <div>
@@ -15,7 +15,7 @@ export function S2220ASO({ dados }: { dados: any }) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-3 flex items-center gap-3">
             <Calendar className="h-4 w-4 text-primary" />
             <div>
@@ -59,7 +59,7 @@ export function S2240AgentesNocivos({ dados }: { dados: any }) {
   
   return (
     <div className="space-y-4 font-body">
-      <Card className="border-border/30 shadow-sm bg-muted/5">
+      <Card className="border-border/30 shadow-xs bg-muted/5">
         <CardContent className="p-3 flex items-center gap-3">
           <User className="h-4 w-4 text-primary" />
           <div>

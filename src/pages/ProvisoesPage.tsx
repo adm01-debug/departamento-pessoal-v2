@@ -182,7 +182,7 @@ export default function ProvisoesPage() {
 
           <TabsContent value="relatorio" className="space-y-6">
             {inconsistencias && inconsistencias.length > 0 && (
-              <Card className="border-warning/30 bg-warning/5 rounded-2xl overflow-hidden shadow-sm">
+              <Card className="border-warning/30 bg-warning/5 rounded-2xl overflow-hidden shadow-xs">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-warning/10 text-warning">
@@ -235,7 +235,7 @@ export default function ProvisoesPage() {
                   type="month" 
                   value={competencia} 
                   onChange={(e) => setCompetencia(e.target.value)}
-                  className="bg-background border border-border/40 rounded-lg px-3 py-1.5 text-sm font-body focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  className="bg-background border border-border/40 rounded-lg px-3 py-1.5 text-sm font-body focus:ring-2 focus:ring-primary/20 outline-hidden transition-all"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -262,7 +262,7 @@ export default function ProvisoesPage() {
             </div>
 
             {trendData && trendData.length > 1 && (
-              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm bg-muted/10">
+              <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs bg-muted/10">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xs font-display flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
                     <BarChart3 className="h-3.5 w-3.5" /> Tendência de Provisões (Últimos Meses)
@@ -338,7 +338,7 @@ export default function ProvisoesPage() {
           </TabsContent>
 
           <TabsContent value="auditoria" className="space-y-6">
-            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
               <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-sm font-display flex items-center gap-2">
                   <History className="h-4 w-4 text-primary" /> Histórico de Execuções (Edge Function)
@@ -386,7 +386,7 @@ export default function ProvisoesPage() {
         </Tabs>
 
         {selectedLog && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedLog(null)}>
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-xs z-50 flex items-center justify-center p-4" onClick={() => setSelectedLog(null)}>
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }} 
               animate={{ opacity: 1, scale: 1 }} 

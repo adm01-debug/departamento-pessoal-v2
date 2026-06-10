@@ -137,7 +137,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
 
   return (
     <div className="space-y-6">
-      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="border-border/40 shadow-xs rounded-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row items-stretch border-b border-border/40">
             <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-border/40 bg-muted/10">
@@ -187,7 +187,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
         </CardContent>
       </Card>
 
-      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="border-border/40 shadow-xs rounded-2xl overflow-hidden">
         <CardHeader className="bg-muted/30 pb-4 flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-display flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />

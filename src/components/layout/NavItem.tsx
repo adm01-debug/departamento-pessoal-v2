@@ -72,7 +72,7 @@ export const NavItem = React.memo(function NavItem({
     >
       {icon && (
         <span className={cn(
-          "flex-shrink-0",
+          "shrink-0",
           active ? "text-foreground" : "text-muted-foreground"
         )}>
           {icon}

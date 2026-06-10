@@ -123,7 +123,7 @@ export default function ConfiguracoesPage() {
               <TabsTrigger 
                 key={tab.value} 
                 value={tab.value} 
-                className="rounded-xl px-4 py-2 text-xs font-body font-medium transition-all data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm min-w-fit"
+                className="rounded-xl px-4 py-2 text-xs font-body font-medium transition-all data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs min-w-fit"
               >
                 {tab.label}
               </TabsTrigger>

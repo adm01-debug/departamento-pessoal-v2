@@ -66,7 +66,7 @@ export default function CargosPage() {
       }
       stats={
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-          <Card className="border-border/30 rounded-2xl bg-card/50 shadow-sm">
+          <Card className="border-border/30 rounded-2xl bg-card/50 shadow-xs">
             <CardContent className="p-4">
               <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Total Cargos</p>
               <h3 className="text-2xl font-display font-bold">{total}</h3>

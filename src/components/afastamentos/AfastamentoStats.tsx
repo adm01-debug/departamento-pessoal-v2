@@ -35,7 +35,7 @@ export function AfastamentoStats({ stats }: AfastamentoStatsProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="border-none shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden group">
+            <Card className="border-none shadow-xs hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden group">
               <CardContent className="p-5 flex flex-col items-center text-center relative">
                 <div className={cn("p-3 rounded-xl mb-3 transition-transform group-hover:scale-110", kpi.bg)}>
                   <kpi.icon className={cn("h-6 w-6", kpi.color)} />
@@ -57,7 +57,7 @@ export function AfastamentoStats({ stats }: AfastamentoStatsProps) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="border-border/40 bg-card/50 backdrop-blur-sm shadow-sm">
+        <Card className="border-border/40 bg-card/50 backdrop-blur-xs shadow-xs">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-1 flex-1">

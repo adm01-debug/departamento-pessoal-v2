@@ -156,7 +156,7 @@ export default function ColaboradorFormPage() {
         backTo="/colaboradores"
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" className="h-11 rounded-xl px-4 shadow-sm bg-card/50" onClick={() => navigate('/colaboradores')}>
+            <Button variant="outline" className="h-11 rounded-xl px-4 shadow-xs bg-card/50" onClick={() => navigate('/colaboradores')}>
               Cancelar
             </Button>
             <Button 
@@ -176,7 +176,7 @@ export default function ColaboradorFormPage() {
               <TabsTrigger 
                 key={tab.id} 
                 value={tab.id} 
-                className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm px-6 gap-2"
+                className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-xs px-6 gap-2"
               >
                 <tab.icon className="h-4 w-4" />
                 <span className="hidden sm:inline">{tab.label}</span>

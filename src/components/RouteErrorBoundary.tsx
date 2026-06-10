@@ -67,7 +67,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
             )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-            <Button variant="outline" onClick={this.handleRetry} className="flex-1 h-11 rounded-xl gap-2 shadow-sm">
+            <Button variant="outline" onClick={this.handleRetry} className="flex-1 h-11 rounded-xl gap-2 shadow-xs">
               <RefreshCw className="h-4 w-4" /> Tentar novamente
             </Button>
             <Button onClick={this.handleGoHome} className="flex-1 h-11 rounded-xl gap-2 bg-foreground text-background hover:bg-foreground/90">

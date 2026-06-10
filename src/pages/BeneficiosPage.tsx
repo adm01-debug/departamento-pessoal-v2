@@ -136,7 +136,7 @@ export default function BeneficiosPage() {
         </TabsContent>
 
         <TabsContent value="auditoria" className="space-y-6">
-           <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+           <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
              <CardHeader className="bg-muted/30 pb-4">
                <CardTitle className="text-sm font-display flex items-center justify-between">
                  <div className="flex items-center gap-2">

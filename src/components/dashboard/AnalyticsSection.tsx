@@ -73,7 +73,7 @@ function IndicatorRow({ label, value, maxValue = 10, suffix = "%" }: {
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] as const, delay: 0.3 }}
-          className={cn("h-full rounded-full bg-gradient-to-r shadow-sm", getColor())}
+          className={cn("h-full rounded-full bg-gradient-to-r shadow-xs", getColor())}
         />
       </div>
     </div>
@@ -1180,7 +1180,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                 {notifications.map((n) => (
                   <div key={n.id} className={cn(
                     "p-4 rounded-2xl border transition-all relative group",
-                    n.lida ? "bg-muted/10 border-border/10 opacity-60" : "bg-primary/5 border-primary/20 shadow-sm"
+                    n.lida ? "bg-muted/10 border-border/10 opacity-60" : "bg-primary/5 border-primary/20 shadow-xs"
                   )}>
                     <div className="flex gap-4">
                       <div className={cn(

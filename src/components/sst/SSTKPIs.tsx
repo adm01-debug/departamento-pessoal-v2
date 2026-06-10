@@ -79,7 +79,7 @@ export function SSTKPIs({ validos, vencendo, vencidos, totalEpis, totalEntregas 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="border-border/40 bg-card/60 backdrop-blur-md shadow-sm rounded-3xl overflow-hidden">
+        <Card className="border-border/40 bg-card/60 backdrop-blur-md shadow-xs rounded-3xl overflow-hidden">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
               <div className="flex items-center gap-4 flex-1">

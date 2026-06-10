@@ -336,7 +336,7 @@ export function PontoAdjustmentRequests() {
                           .map((log: any) => (
                             <div key={log.id} className="relative pl-8">
                               <div className="absolute left-0 top-1.5 h-4 w-4 rounded-full border-2 border-primary bg-background z-10" />
-                              <div className="bg-card rounded-xl p-4 border shadow-sm">
+                              <div className="bg-card rounded-xl p-4 border shadow-xs">
                                 <div className="flex items-center justify-between mb-2">
                                   <span className="font-bold text-xs capitalize text-primary">{log.acao}</span>
                                   <span className="text-[10px] text-muted-foreground">{new Date(log.created_at).toLocaleString('pt-BR')}</span>

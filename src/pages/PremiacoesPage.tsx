@@ -108,7 +108,7 @@ export default function PremiacoesPage() {
         gradient="from-amber-500 to-orange-600"
       >
         <div className="grid gap-4 md:grid-cols-4 mb-8">
-          <Card className="border-border/40 shadow-sm bg-gradient-to-br from-card to-muted/20">
+          <Card className="border-border/40 shadow-xs bg-gradient-to-br from-card to-muted/20">
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Aprovado</p>
@@ -121,7 +121,7 @@ export default function PremiacoesPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/40 shadow-sm">
+          <Card className="border-border/40 shadow-xs">
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Pendente (Calculado)</p>
@@ -132,7 +132,7 @@ export default function PremiacoesPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/40 shadow-sm">
+          <Card className="border-border/40 shadow-xs">
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Campanhas Ativas</p>
@@ -143,7 +143,7 @@ export default function PremiacoesPage() {
             </CardContent>
           </Card>
 
-          <Card className={`border-border/40 shadow-sm ${stats.divergenciaCount > 0 ? 'bg-amber-500/5' : 'bg-primary/5'}`}>
+          <Card className={`border-border/40 shadow-xs ${stats.divergenciaCount > 0 ? 'bg-amber-500/5' : 'bg-primary/5'}`}>
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Conciliação (Divergências)</p>
@@ -257,7 +257,7 @@ export default function PremiacoesPage() {
           <TabsContent value="pagamentos" className="space-y-6">
             <RewardsApprovalHub pagamentos={pagamentos} />
             
-            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm mt-8 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-xs mt-8 bg-card/50 backdrop-blur-xs">
               <CardHeader className="bg-muted/30 border-b border-border/10 p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
@@ -271,7 +271,7 @@ export default function PremiacoesPage() {
                     <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
                       <Filter className="h-3 w-3 text-muted-foreground" />
                       <select 
-                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        className="bg-transparent text-[10px] font-bold outline-hidden border-none"
                         value={periodoFiltro}
                         onChange={(e) => setPeriodoFiltro(e.target.value)}
                       >
@@ -282,7 +282,7 @@ export default function PremiacoesPage() {
                     </div>
                     <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
                       <select 
-                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        className="bg-transparent text-[10px] font-bold outline-hidden border-none"
                         value={unidadeFiltro}
                         onChange={(e) => setUnidadeFiltro(e.target.value)}
                       >
@@ -293,7 +293,7 @@ export default function PremiacoesPage() {
                     </div>
                     <div className="flex items-center gap-2 bg-background border border-border/50 rounded-xl px-3 py-1.5">
                       <select 
-                        className="bg-transparent text-[10px] font-bold outline-none border-none"
+                        className="bg-transparent text-[10px] font-bold outline-hidden border-none"
                         value={faixaMetaFiltro}
                         onChange={(e) => setFaixaMetaFiltro(e.target.value)}
                       >
@@ -372,7 +372,7 @@ export default function PremiacoesPage() {
           </TabsContent>
 
           <TabsContent value="auditoria" className="space-y-6">
-            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-sm">
+            <Card className="border-border/30 rounded-2xl overflow-hidden shadow-xs">
               <CardHeader className="bg-muted/30 border-b border-border/30 py-4">
                 <div className="flex items-center gap-2">
                   <History className="h-4 w-4 text-primary" />

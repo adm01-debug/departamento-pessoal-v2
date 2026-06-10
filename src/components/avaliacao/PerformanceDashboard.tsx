@@ -47,7 +47,7 @@ export function PerformanceDashboard({ stats, feedbacks, metas }: { stats: any, 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Star className="h-4 w-4 text-warning" /> Distribuição de Notas (Feedbacks)
@@ -78,7 +78,7 @@ export function PerformanceDashboard({ stats, feedbacks, metas }: { stats: any, 
           </CardContent>
         </Card>
 
-        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" /> Progresso de Metas (Top 5)

@@ -238,8 +238,8 @@ export default function PontoPage() {
 
         <Tabs defaultValue="meu-ponto" className="space-y-6">
           <TabsList className="bg-muted/50 p-1 rounded-xl">
-            <TabsTrigger value="meu-ponto" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Meu Ponto</TabsTrigger>
-            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm flex items-center gap-2">
+            <TabsTrigger value="meu-ponto" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-xs">Meu Ponto</TabsTrigger>
+            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-xs flex items-center gap-2">
               Gestão da Equipe
               <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-[10px] animate-bounce">
                 3
@@ -257,7 +257,7 @@ export default function PontoPage() {
                 <PontoWeekSummary registrosSemana={registrosSemana} />
                 {bancoResumo && (
                   <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}>
-                    <Card className="border border-border/30 shadow-sm rounded-2xl overflow-hidden bg-gradient-to-br from-card to-accent/5">
+                    <Card className="border border-border/30 shadow-xs rounded-2xl overflow-hidden bg-gradient-to-br from-card to-accent/5">
                       <div className={cn("h-[2px]", bancoResumo.tipo === 'credito' ? "bg-success" : "bg-destructive")} />
                       <CardContent className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">

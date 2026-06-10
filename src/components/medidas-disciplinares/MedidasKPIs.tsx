@@ -90,7 +90,7 @@ export function MedidasKPIs({ stats }: MedidasKPIsProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
                 >
-                  <Card className={`border ${kpi.borderColor} ${kpi.bgColor} shadow-sm rounded-2xl cursor-default hover:shadow-md transition-shadow`}>
+                  <Card className={`border ${kpi.borderColor} ${kpi.bgColor} shadow-xs rounded-2xl cursor-default hover:shadow-md transition-shadow`}>
                     <CardContent className="pt-4 pb-3 px-4">
                       <div className="flex items-center justify-between mb-2">
                         <Icon className={`h-4 w-4 ${kpi.color}`} />

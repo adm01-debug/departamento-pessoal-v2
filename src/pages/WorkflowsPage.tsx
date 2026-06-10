@@ -370,7 +370,7 @@ export default function WorkflowsPage() {
               <div className="space-y-4 relative before:absolute before:inset-0 before:left-2.5 before:w-0.5 before:bg-muted before:z-0">
                 {/* Initial Trigger Log */}
                 <div className="relative pl-8 z-10">
-                  <div className="absolute left-0 top-1 p-1 rounded-full bg-primary text-white shadow-sm ring-4 ring-background">
+                  <div className="absolute left-0 top-1 p-1 rounded-full bg-primary text-white shadow-xs ring-4 ring-background">
                     <Play className="h-3 w-3" />
                   </div>
                   <div className="bg-muted/10 p-3 rounded-xl border border-border/30">
@@ -384,7 +384,7 @@ export default function WorkflowsPage() {
 
                 {/* Email Delivery Log (Simulated but showing in log) */}
                 <div className="relative pl-8 z-10 opacity-70">
-                  <div className="absolute left-0 top-1 p-1 rounded-full bg-info text-white shadow-sm ring-4 ring-background">
+                  <div className="absolute left-0 top-1 p-1 rounded-full bg-info text-white shadow-xs ring-4 ring-background">
                     <Mail className="h-3 w-3" />
                   </div>
                   <div className="bg-muted/10 p-3 rounded-xl border border-border/30">
@@ -398,7 +398,7 @@ export default function WorkflowsPage() {
 
                 {/* DB Sync Log */}
                 <div className="relative pl-8 z-10 opacity-50">
-                  <div className="absolute left-0 top-1 p-1 rounded-full bg-success text-white shadow-sm ring-4 ring-background">
+                  <div className="absolute left-0 top-1 p-1 rounded-full bg-success text-white shadow-xs ring-4 ring-background">
                     <CheckCircle className="h-3 w-3" />
                   </div>
                   <div className="bg-muted/10 p-3 rounded-xl border border-border/30">

@@ -101,7 +101,7 @@ export function RewardsSimulator() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2 border-border/30 rounded-2xl shadow-sm bg-card/50 backdrop-blur-sm">
+        <Card className="md:col-span-2 border-border/30 rounded-2xl shadow-xs bg-card/50 backdrop-blur-xs">
           <CardContent className="p-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
@@ -178,7 +178,7 @@ export function RewardsSimulator() {
             <CardContent className="p-6">
               <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Payout Estimado</p>
               <h2 className="text-4xl font-bold mt-2 tracking-tighter">{formatCurrency(totalBudget)}</h2>
-              <div className="mt-8 p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+              <div className="mt-8 p-3 bg-white/10 rounded-2xl backdrop-blur-xs">
                 <div className="flex justify-between text-[10px] font-bold mb-2 uppercase tracking-tighter">
                   <span>Eficiência de Capital</span>
                   <span>{roi.toFixed(2)}x</span>
@@ -190,7 +190,7 @@ export function RewardsSimulator() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/30 rounded-3xl shadow-sm bg-gradient-to-br from-success/10 to-transparent border-l-4 border-l-success">
+          <Card className="border-border/30 rounded-3xl shadow-xs bg-gradient-to-br from-success/10 to-transparent border-l-4 border-l-success">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-4 w-4 text-success" />
@@ -204,7 +204,7 @@ export function RewardsSimulator() {
           </Card>
 
           {scenarios.length > 0 && (
-            <Card className="border-border/30 rounded-3xl shadow-sm bg-muted/30">
+            <Card className="border-border/30 rounded-3xl shadow-xs bg-muted/30">
               <CardHeader className="p-4 pb-0 flex-row items-center justify-between space-y-0">
                 <div className="flex items-center gap-2">
                   <History className="h-3 w-3 text-muted-foreground" />

@@ -97,7 +97,7 @@ export default function HoleritesPage() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters Sidebar */}
-          <Card className="lg:col-span-1 border-border/40 shadow-sm h-fit">
+          <Card className="lg:col-span-1 border-border/40 shadow-xs h-fit">
             <CardHeader className="pb-3 border-b border-border/5">
               <CardTitle className="text-sm font-display flex items-center gap-2">
                 <Filter className="w-4 h-4 text-primary" /> Filtros
@@ -139,7 +139,7 @@ export default function HoleritesPage() {
                 { label: 'Total Líquido', value: totals.liquido, gradient: 'from-blue-500 to-indigo-500' },
               ].map((kpi, i) => (
                 <motion.div key={kpi.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                  <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                  <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all">
                     <div className={cn("h-1 bg-gradient-to-r", kpi.gradient)} />
                     <CardContent className="p-5">
                       <p className="text-xs text-muted-foreground font-medium mb-1">{kpi.label}</p>
@@ -215,7 +215,7 @@ export default function HoleritesPage() {
                                   <Button 
                                     size="icon" 
                                     variant="ghost" 
-                                    className="h-9 w-9 rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm group-hover:scale-110"
+                                    className="h-9 w-9 rounded-xl hover:bg-primary hover:text-white transition-all shadow-xs group-hover:scale-110"
                                     onClick={() => handleDownload(h)}
                                     title="Baixar Holerite PDF"
                                   >

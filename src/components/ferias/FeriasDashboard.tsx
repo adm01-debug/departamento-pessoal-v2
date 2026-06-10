@@ -49,7 +49,7 @@ export function FeriasDashboard({ data }: FeriasDashboardProps) {
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden bg-gradient-to-b from-background to-muted/5">
+      <Card className="border-border/40 shadow-xs rounded-2xl overflow-hidden bg-gradient-to-b from-background to-muted/5">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-display font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <Calendar className="h-4 w-4 text-primary" /> Férias nos Últimos 6 Meses
@@ -77,7 +77,7 @@ export function FeriasDashboard({ data }: FeriasDashboardProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden bg-gradient-to-b from-background to-muted/5">
+      <Card className="border-border/40 shadow-xs rounded-2xl overflow-hidden bg-gradient-to-b from-background to-muted/5">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-display font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <AlertCircle className="h-4 w-4 text-primary" /> Distribuição por Status
@@ -108,7 +108,7 @@ export function FeriasDashboard({ data }: FeriasDashboardProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-border/40 shadow-sm rounded-2xl md:col-span-2">
+      <Card className="border-border/40 shadow-xs rounded-2xl md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
           <CardTitle className="text-sm font-display font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <User className="h-4 w-4 text-primary" /> Próximos Colaboradores em Gozo

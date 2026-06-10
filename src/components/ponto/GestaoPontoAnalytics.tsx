@@ -187,7 +187,7 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border border-border/40 shadow-xs rounded-2xl overflow-hidden">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" /> Distribuição de Status
@@ -218,7 +218,7 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border border-border/40 shadow-xs rounded-2xl overflow-hidden">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Activity className="h-4 w-4 text-info" /> Fluxo de Entradas por Horário
@@ -247,7 +247,7 @@ export function GestaoPontoAnalytics({ registros }: { registros: any[] }) {
           </CardContent>
         </Card>
 
-        <Card className="border-destructive/20 bg-destructive/5 lg:col-span-2 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border-destructive/20 bg-destructive/5 lg:col-span-2 shadow-xs rounded-2xl overflow-hidden">
           <CardHeader className="pb-2 border-b border-destructive/10">
             <CardTitle className="text-sm font-display flex items-center gap-2 text-destructive">
               <Gavel className="h-4 w-4" /> Monitor de Riscos Trabalhistas (MTP 671 / CLT)

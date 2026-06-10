@@ -90,7 +90,7 @@ export function GlobalAuditLogTab() {
               <select 
                 value={tabelaFilter}
                 onChange={(e) => setTabelaFilter(e.target.value)}
-                className="bg-transparent border-none text-xs font-body focus:ring-0 outline-none"
+                className="bg-transparent border-none text-xs font-body focus:ring-0 outline-hidden"
               >
                 <option value="todas">Todas as Entidades</option>
                 {getTabelas().map((t: any) => (

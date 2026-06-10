@@ -170,7 +170,7 @@ export function GestaoRegistrosPonto() {
                         <select 
                           value={tipoExcecao} 
                           onChange={(e) => setTipoExcecao(e.target.value)}
-                          className="w-full h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-sm focus:ring-1 focus:ring-primary"
+                          className="w-full h-8 rounded-lg border border-input bg-background px-2 py-1 text-[10px] shadow-xs focus:ring-1 focus:ring-primary"
                         >
                           <option value="todas">Todas as Batidas</option>
                           <option value="atrasos">Apenas Atrasos</option>
@@ -182,7 +182,7 @@ export function GestaoRegistrosPonto() {
                   </PopoverContent>
                 </Popover>
                 
-                <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-sm bg-background">
+                <div className="flex items-center border rounded-lg overflow-hidden h-8 shadow-xs bg-background">
                   <Button 
                     variant="ghost" 
                     size="sm" 

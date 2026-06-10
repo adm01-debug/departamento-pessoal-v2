@@ -67,7 +67,7 @@ export default function DepartamentosPage() {
         addLabel="Novo Departamento"
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" className="h-11 rounded-xl font-bold bg-card/50 shadow-sm" onClick={() => navigate('/organograma')}>
+            <Button variant="outline" className="h-11 rounded-xl font-bold bg-card/50 shadow-xs" onClick={() => navigate('/organograma')}>
               <GitBranch className="h-4 w-4 mr-2" />Ver Organograma
             </Button>
           </div>

@@ -92,7 +92,7 @@ export const GuidedTour = memo(function GuidedTour() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 bg-background/60 backdrop-blur-xs z-[200]"
             onClick={close}
           />
 

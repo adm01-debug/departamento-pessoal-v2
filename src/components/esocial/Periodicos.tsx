@@ -13,7 +13,7 @@ export function S1200Remuneracao({ dados }: { dados: any }) {
   return (
     <div className="space-y-4 font-body">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-3 flex items-center gap-3">
             <User className="h-4 w-4 text-primary" />
             <div>
@@ -22,7 +22,7 @@ export function S1200Remuneracao({ dados }: { dados: any }) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-3 flex items-center gap-3">
             <Calendar className="h-4 w-4 text-primary" />
             <div>
@@ -34,7 +34,7 @@ export function S1200Remuneracao({ dados }: { dados: any }) {
       </div>
       
       {dmDev.map((dm: any, idx: number) => (
-        <div key={idx} className="space-y-2 border rounded-xl overflow-hidden shadow-sm">
+        <div key={idx} className="space-y-2 border rounded-xl overflow-hidden shadow-xs">
           <div className="bg-muted/50 px-4 py-2 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Hash className="h-3 w-3 text-muted-foreground" />
@@ -81,7 +81,7 @@ export function S1210Pagamentos({ dados }: { dados: any }) {
 
       <div className="grid grid-cols-1 gap-3">
         {pgtos.map((p: any, idx: number) => (
-          <Card key={idx} className="border-border/30 shadow-sm hover:shadow-md transition-all">
+          <Card key={idx} className="border-border/30 shadow-xs hover:shadow-md transition-all">
             <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-success/10 border border-success/20">

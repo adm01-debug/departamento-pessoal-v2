@@ -183,7 +183,7 @@ export function RelatoriosAgendadosTab({ empresaId }: { empresaId: string }) {
       </div>
 
       {/* Logs Card */}
-      <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+      <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
         <CardHeader className="bg-muted/20 border-b border-border/20 py-4 px-6 flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-sm font-display flex items-center gap-2">

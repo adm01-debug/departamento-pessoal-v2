@@ -41,7 +41,7 @@ export function DashboardHeader({ greeting, isLoading, onRefresh }: DashboardHea
             size="sm"
             onClick={onRefresh}
             disabled={isLoading}
-            className="gap-2 rounded-xl border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all font-body h-10 shadow-sm"
+            className="gap-2 rounded-xl border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all font-body h-10 shadow-xs"
           >
             <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
             <span className="hidden sm:inline">Sincronizar</span>
@@ -49,7 +49,7 @@ export function DashboardHeader({ greeting, isLoading, onRefresh }: DashboardHea
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-10 rounded-xl gap-2 shadow-sm">
+              <Button variant="outline" size="sm" className="h-10 rounded-xl gap-2 shadow-xs">
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">Exportar</span>
               </Button>
@@ -79,19 +79,19 @@ export function DashboardHeader({ greeting, isLoading, onRefresh }: DashboardHea
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input 
             placeholder="Pesquisar colaboradores, departamentos ou processos..." 
-            className="pl-10 h-11 rounded-xl bg-card/50 border-border/40 focus:bg-background transition-all shadow-sm"
+            className="pl-10 h-11 rounded-xl bg-card/50 border-border/40 focus:bg-background transition-all shadow-xs"
           />
         </div>
         
         <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
-          <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 whitespace-nowrap bg-card/50 shadow-sm border-primary/20 text-primary font-bold">
+          <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 whitespace-nowrap bg-card/50 shadow-xs border-primary/20 text-primary font-bold">
             <Calendar className="h-4 w-4" />
             05/2026
           </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 whitespace-nowrap bg-card/50 shadow-sm">
+              <Button variant="outline" className="h-11 rounded-xl gap-2 px-4 whitespace-nowrap bg-card/50 shadow-xs">
                 <Filter className="h-4 w-4 text-primary" />
                 Todos os Departamentos
               </Button>

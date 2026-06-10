@@ -105,7 +105,7 @@ export function PontoAuditTimeline({ filterTabela }: { filterTabela?: string }) 
                 transition={{ delay: idx * 0.05 }}
                 className="relative pl-8 group"
               >
-                <div className="absolute left-0 top-1.5 h-[24px] w-[24px] rounded-full bg-background border-2 border-primary flex items-center justify-center z-10 group-hover:scale-110 transition-transform shadow-sm">
+                <div className="absolute left-0 top-1.5 h-[24px] w-[24px] rounded-full bg-background border-2 border-primary flex items-center justify-center z-10 group-hover:scale-110 transition-transform shadow-xs">
                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                 </div>
                 

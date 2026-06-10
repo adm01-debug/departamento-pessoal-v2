@@ -176,7 +176,7 @@ export const EventTimeline = memo(function EventTimeline({ events: initialEvents
               >
                 {/* Timeline line + dot */}
                 <div className="flex flex-col items-center shrink-0">
-                  <div className={cn('p-1.5 rounded-lg bg-gradient-to-br shadow-sm', config.gradient)}>
+                  <div className={cn('p-1.5 rounded-lg bg-gradient-to-br shadow-xs', config.gradient)}>
                     <Icon className="h-3 w-3 text-primary-foreground" />
                   </div>
                   {!isLast && (

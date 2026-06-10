@@ -96,7 +96,7 @@ export function AfastamentoTable({ data, onEdit, onProrrogacao, onDocuments, onT
                           <span className={`text-xs font-mono px-1.5 py-0.5 rounded cursor-help border transition-all duration-300 ${
                             af.cid?.codigo?.toLowerCase().includes(window.location.search.toLowerCase()) || 
                             af.cid?.descricao?.toLowerCase().includes(window.location.search.toLowerCase())
-                              ? "bg-orange-500 text-white border-orange-600 scale-110 shadow-sm"
+                              ? "bg-orange-500 text-white border-orange-600 scale-110 shadow-xs"
                               : "bg-muted text-muted-foreground border-border/50"
                           }`}>
                             {af.cid?.codigo || af.cid}

@@ -42,7 +42,7 @@ export function CandidatoTimeline({ candidaturaId }: CandidatoTimelineProps) {
         timeline.map((item: any) => (
           <div key={item.id} className="relative pl-10">
             <div className={cn(
-              "absolute left-0 top-1 w-9 h-9 rounded-full bg-background border-2 flex items-center justify-center z-10 shadow-sm",
+              "absolute left-0 top-1 w-9 h-9 rounded-full bg-background border-2 flex items-center justify-center z-10 shadow-xs",
               item.type === 'entrevista' ? "border-blue-400 text-blue-500" :
               item.type === 'teste' ? "border-purple-400 text-purple-500" :
               "border-slate-400 text-slate-500"
@@ -52,7 +52,7 @@ export function CandidatoTimeline({ candidaturaId }: CandidatoTimelineProps) {
               {item.type === 'anotacao' && <MessageSquare className="h-4 w-4" />}
             </div>
 
-            <Card className="border-border/40 shadow-sm overflow-hidden bg-card/50">
+            <Card className="border-border/40 shadow-xs overflow-hidden bg-card/50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">

@@ -81,7 +81,7 @@ export function PagamentoBancarioWizard({ folhaId }: { folhaId?: string }) {
       <DialogContent className="max-w-xl overflow-hidden p-0 gap-0 border-border/40">
         <div className="bg-gradient-to-r from-success to-primary p-6 text-white">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm">
+            <div className="p-2 rounded-xl bg-white/20 backdrop-blur-xs">
               <Landmark className="h-5 w-5" />
             </div>
             <div>

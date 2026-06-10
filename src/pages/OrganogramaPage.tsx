@@ -40,7 +40,7 @@ export default function OrganogramaPage() {
       >
         {/* Dashboard de Estrutura */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="border-border/30 rounded-3xl shadow-sm bg-card/50 overflow-hidden relative group">
+          <Card className="border-border/30 rounded-3xl shadow-xs bg-card/50 overflow-hidden relative group">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Building2 className="h-16 w-16" />
             </div>
@@ -53,7 +53,7 @@ export default function OrganogramaPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/30 rounded-3xl shadow-sm bg-card/50 overflow-hidden relative group">
+          <Card className="border-border/30 rounded-3xl shadow-xs bg-card/50 overflow-hidden relative group">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Users className="h-16 w-16" />
             </div>
@@ -64,7 +64,7 @@ export default function OrganogramaPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/30 rounded-3xl shadow-sm bg-card/50 p-6 flex flex-col justify-center">
+          <Card className="border-border/30 rounded-3xl shadow-xs bg-card/50 p-6 flex flex-col justify-center">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 

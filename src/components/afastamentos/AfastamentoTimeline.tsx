@@ -39,7 +39,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
           <div className="absolute -left-[25px] top-1 h-4 w-4 rounded-full border-2 border-primary bg-background flex items-center justify-center">
             <div className="h-1.5 w-1.5 rounded-full bg-primary" />
           </div>
-          <Card className="border-border/50 shadow-sm">
+          <Card className="border-border/50 shadow-xs">
             <CardHeader className="py-3 px-4 bg-muted/30">
               <div className="flex justify-between items-center">
                 <Badge variant="outline" className="text-[10px] uppercase font-bold">Registro Inicial</Badge>
@@ -77,7 +77,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
             <div className="absolute -left-[25px] top-1 h-4 w-4 rounded-full border-2 border-orange-500 bg-background flex items-center justify-center">
               <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />
             </div>
-            <Card className="border-orange-100 shadow-sm">
+            <Card className="border-orange-100 shadow-xs">
               <CardHeader className="py-3 px-4 bg-orange-50/50">
                 <div className="flex justify-between items-center">
                   <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 border-none text-[10px] uppercase font-bold">
@@ -119,7 +119,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex items-center gap-3 p-3 bg-white border border-orange-100 rounded-lg shadow-sm">
+                  <div className="flex items-center gap-3 p-3 bg-white border border-orange-100 rounded-lg shadow-xs">
                     <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
                       <Plus className="h-4 w-4" />
                     </div>
@@ -131,7 +131,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 bg-white border border-orange-100 rounded-lg shadow-sm">
+                  <div className="flex items-center gap-3 p-3 bg-white border border-orange-100 rounded-lg shadow-xs">
                     <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                       <Clock className="h-4 w-4" />
                     </div>
@@ -173,7 +173,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
             <div className="absolute -left-[25px] top-1 h-4 w-4 rounded-full border-2 border-blue-500 bg-background flex items-center justify-center">
               <Stethoscope className="h-2.5 w-2.5 text-blue-500" />
             </div>
-            <Card className="border-blue-100 bg-blue-50/20 shadow-sm">
+            <Card className="border-blue-100 bg-blue-50/20 shadow-xs">
               <CardHeader className="py-3 px-4 bg-blue-50/40">
                 <div className="flex justify-between items-center">
                   <Badge className="bg-blue-100 text-blue-700 border-none text-[10px] uppercase font-bold">
@@ -213,7 +213,7 @@ export function AfastamentoTimeline({ afastamentoId }: AfastamentoTimelineProps)
                         </div>
                       )}
 
-                      <div className="p-2 bg-white rounded border border-blue-100 text-[11px] shadow-sm">
+                      <div className="p-2 bg-white rounded border border-blue-100 text-[11px] shadow-xs">
                         <span className="font-bold text-blue-800 uppercase block mb-1 flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" />
                           Local da Perícia:

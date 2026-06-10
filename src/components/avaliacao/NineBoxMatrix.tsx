@@ -88,7 +88,7 @@ export function NineBoxMatrix({ data }: { data: any[] }) {
                         {employees.slice(0, 4).map((e: any, idx: number) => (
                           <div 
                             key={e.id || idx} 
-                            className="h-6 w-6 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[10px] font-bold shadow-sm" 
+                            className="h-6 w-6 rounded-full bg-white/60 border border-black/5 flex items-center justify-center text-[10px] font-bold shadow-xs" 
                             title={e.avaliado?.nome_completo}
                           >
                             {e.avaliado?.nome_completo?.charAt(0)}
