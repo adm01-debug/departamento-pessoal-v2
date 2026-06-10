@@ -21,7 +21,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.3.4",
+    "@hookform/resolvers": "^5.4.0",
     "@lovable.dev/cloud-auth-js": "^1.0.0",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.1.11",

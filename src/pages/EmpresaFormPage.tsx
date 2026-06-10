@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { empresaService } from '@/services';
 import { Empresa } from '@/types/entities';
-import { empresaSchema, type EmpresaSchema } from '@/schemas';
+import { empresaSchema, type EmpresaSchema, type EmpresaSchemaInput } from '@/schemas';
 
 import { useNotification } from '@/contexts';
 import { 
@@ -34,7 +34,7 @@ export default function EmpresaFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { success, error: notifyError } = useNotification();
-  const { handleServerError } = useServerValidation<EmpresaSchema>();
+  const { handleServerError } = useServerValidation<EmpresaSchemaInput>();
   const [activeTab, setActiveTab] = useState('geral');
   const isEditing = !!id;
 
@@ -45,7 +45,7 @@ export default function EmpresaFormPage() {
   });
 
 
-  const { register, handleSubmit, setValue, reset, watch, setError, formState: { errors, isDirty } } = useForm<EmpresaSchema>({
+  const { register, handleSubmit, setValue, reset, watch, setError, formState: { errors, isDirty } } = useForm<EmpresaSchemaInput, unknown, EmpresaSchema>({
     resolver: zodResolver(empresaSchema),
     defaultValues: { ativa: true },
   });

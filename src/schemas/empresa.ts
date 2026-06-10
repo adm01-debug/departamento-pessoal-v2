@@ -15,3 +15,4 @@ export const empresaSchema = z.object({
   ativa: z.boolean().default(true),
 });
 export type EmpresaSchema = z.infer<typeof empresaSchema>;
+export type EmpresaSchemaInput = z.input<typeof empresaSchema>;
