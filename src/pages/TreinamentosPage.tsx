@@ -130,7 +130,7 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
               key={v.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center justify-between p-3 bg-white/50 border border-border/40 rounded-xl hover:shadow-sm transition-all group"
+              className="flex items-center justify-between p-3 bg-white/50 border border-border/40 rounded-xl hover:shadow-xs transition-all group"
             >
               <div className="flex items-center gap-3">
                 <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">

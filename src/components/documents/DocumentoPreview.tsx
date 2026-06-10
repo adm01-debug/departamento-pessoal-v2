@@ -42,7 +42,7 @@ export function DocumentoPreview({ documento, isOpen, onClose }: DocumentoPrevie
           {isPDF ? (
             <iframe 
               src={`${documento.url}#toolbar=0`} 
-              className="w-full h-full border-0 rounded-lg shadow-sm"
+              className="w-full h-full border-0 rounded-lg shadow-xs"
               title="Preview PDF"
             />
           ) : isImage ? (
@@ -52,7 +52,7 @@ export function DocumentoPreview({ documento, isOpen, onClose }: DocumentoPrevie
               className="max-w-full max-h-full object-contain rounded-lg shadow-lg" 
             />
           ) : (
-            <div className="text-center space-y-4 p-12 bg-background rounded-3xl border border-dashed shadow-sm">
+            <div className="text-center space-y-4 p-12 bg-background rounded-3xl border border-dashed shadow-xs">
               <FileText className="h-16 w-16 mx-auto text-muted-foreground/30" />
               <div>
                 <h3 className="font-display font-semibold">Visualização não disponível</h3>

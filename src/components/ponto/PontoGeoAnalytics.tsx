@@ -47,7 +47,7 @@ export function PontoGeoAnalytics({ batidas }: { batidas: any[] }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
       <div className="lg:col-span-2 space-y-6">
-        <Card className="border border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border border-border/40 shadow-xs rounded-2xl overflow-hidden">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Compass className="h-4 w-4 text-primary" /> Distribuição Geográfica de Batidas
@@ -97,10 +97,10 @@ export function PontoGeoAnalytics({ batidas }: { batidas: any[] }) {
               </ResponsiveContainer>
               
               <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-                <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm p-2 rounded-lg border text-[10px]">
+                <div className="flex items-center gap-2 bg-background/80 backdrop-blur-xs p-2 rounded-lg border text-[10px]">
                   <div className="h-2 w-2 rounded-full bg-primary" /> Dentro do Raio
                 </div>
-                <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm p-2 rounded-lg border text-[10px]">
+                <div className="flex items-center gap-2 bg-background/80 backdrop-blur-xs p-2 rounded-lg border text-[10px]">
                   <div className="h-2 w-2 rounded-full bg-destructive" /> Fora do Raio
                 </div>
               </div>
@@ -110,7 +110,7 @@ export function PontoGeoAnalytics({ batidas }: { batidas: any[] }) {
       </div>
 
       <div className="space-y-6">
-        <Card className="border border-border/40 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border border-border/40 shadow-xs rounded-2xl overflow-hidden">
           <CardHeader className="bg-muted/30 pb-2 text-center">
             <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Índice de Geofencing</CardTitle>
           </CardHeader>
@@ -158,7 +158,7 @@ export function PontoGeoAnalytics({ batidas }: { batidas: any[] }) {
           </CardContent>
         </Card>
 
-        <Card className="bg-primary/5 border-primary/20 shadow-sm rounded-2xl">
+        <Card className="bg-primary/5 border-primary/20 shadow-xs rounded-2xl">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-3 bg-primary/20 rounded-xl text-primary"><Navigation className="h-6 w-6" /></div>
             <div>

@@ -77,7 +77,7 @@ export const EmpresaSelector = memo(function EmpresaSelector() {
             className="flex items-center justify-between gap-2"
           >
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <Building2 className={item.vinculada ? "h-4 w-4 text-primary flex-shrink-0" : "h-4 w-4 text-muted-foreground flex-shrink-0 opacity-50"} />
+              <Building2 className={item.vinculada ? "h-4 w-4 text-primary shrink-0" : "h-4 w-4 text-muted-foreground shrink-0 opacity-50"} />
               <div className="flex flex-col min-w-0">
                 <span className="truncate font-medium text-sm">
                   {item.empresa.nome_fantasia || item.empresa.razao_social}
@@ -87,7 +87,7 @@ export const EmpresaSelector = memo(function EmpresaSelector() {
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               {item.empresa.id === empresaAtual?.id && (
                 <Check className="h-4 w-4 text-primary" />
               )}

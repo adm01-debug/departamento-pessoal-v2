@@ -338,7 +338,7 @@ export default function DashboardExecutivoPage() {
         <TabsContent value="estrategia" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Personnel Cost Projection */}
-            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
               <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-sm font-display flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-primary" /> Projeção de Fluxo de Caixa (Pessoal)
@@ -375,7 +375,7 @@ export default function DashboardExecutivoPage() {
             </Card>
 
             {/* Budget vs Actual */}
-            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
               <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-sm font-display flex items-center gap-2">
                   <Landmark className="h-4 w-4 text-warning" /> Aderência Orçamentária por Depto.

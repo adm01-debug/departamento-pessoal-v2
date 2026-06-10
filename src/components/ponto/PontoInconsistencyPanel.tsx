@@ -130,7 +130,7 @@ export function PontoInconsistencyPanel({ registros }: { registros: any[] }) {
     <AnimatePresence>
       {resolvedIds.length > 0 && inconsistencies.length === 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <Card className="border-success/30 bg-success/5 shadow-sm">
+          <Card className="border-success/30 bg-success/5 shadow-xs">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-success/20 rounded-full text-success"><CheckCircle2 className="h-5 w-5" /></div>
@@ -148,7 +148,7 @@ export function PontoInconsistencyPanel({ registros }: { registros: any[] }) {
   );
 
   return (
-    <Card className="border-warning/30 bg-warning/5 shadow-sm mb-6 overflow-hidden">
+    <Card className="border-warning/30 bg-warning/5 shadow-xs mb-6 overflow-hidden">
       <div className="h-1 bg-gradient-to-r from-warning/40 via-warning to-warning/40" />
       <CardHeader className="py-3 px-4 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-sm font-display flex items-center gap-2 text-warning-foreground">
@@ -169,7 +169,7 @@ export function PontoInconsistencyPanel({ registros }: { registros: any[] }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95, x: 20 }}
                 key={inc.id} 
-                className="group relative bg-background/95 p-3 rounded-xl border border-border/60 shadow-sm hover:shadow-md transition-all duration-300"
+                className="group relative bg-background/95 p-3 rounded-xl border border-border/60 shadow-xs hover:shadow-md transition-all duration-300"
               >
                 <div className="flex items-start gap-3 mb-3">
                   <div className={cn("mt-0.5 p-2 rounded-lg transition-colors", 

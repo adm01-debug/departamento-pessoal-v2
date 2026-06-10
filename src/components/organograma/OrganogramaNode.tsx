@@ -24,7 +24,7 @@ export function OrganogramaNode({ node, level = 0 }: OrganogramaNodeProps) {
       <Card 
         className={cn(
           "border border-border/30 rounded-2xl overflow-hidden transition-all hover:shadow-md",
-          isExpanded ? "shadow-sm bg-accent/5" : "bg-card"
+          isExpanded ? "shadow-xs bg-accent/5" : "bg-card"
         )}
       >
         <CardContent className="p-3">

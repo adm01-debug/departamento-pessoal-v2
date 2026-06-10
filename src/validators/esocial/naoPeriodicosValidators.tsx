@@ -109,7 +109,7 @@ export function S2200Admissao({ dados }: { dados: any }) {
   return (
     <div className="space-y-4 font-body">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-4 flex items-start gap-3">
             <User className="h-4 w-4 text-primary mt-1" />
             <div>
@@ -124,7 +124,7 @@ export function S2200Admissao({ dados }: { dados: any }) {
           </CardContent>
         </Card>
 
-        <Card className="border-primary/20 shadow-sm bg-primary/5">
+        <Card className="border-primary/20 shadow-xs bg-primary/5">
           <CardContent className="p-4 flex items-start gap-3">
             <Calendar className="h-4 w-4 text-primary mt-1" />
             <div>
@@ -172,7 +172,7 @@ export function S2230Afastamento({ dados }: { dados: any }) {
   return (
     <div className="space-y-4 font-body">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-4 flex items-start gap-3">
             <User className="h-4 w-4 text-primary mt-1" />
             <div>
@@ -183,7 +183,7 @@ export function S2230Afastamento({ dados }: { dados: any }) {
           </CardContent>
         </Card>
 
-        <Card className="border-destructive/20 shadow-sm bg-destructive/5">
+        <Card className="border-destructive/20 shadow-xs bg-destructive/5">
           <CardContent className="p-4 flex items-start gap-3">
             <Activity className="h-4 w-4 text-destructive mt-1" />
             <div>
@@ -196,13 +196,13 @@ export function S2230Afastamento({ dados }: { dados: any }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
+        <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
           <Calendar className="h-5 w-5 text-primary mb-1.5" />
           <Label className="text-[10px] text-primary uppercase font-bold tracking-wider">Início</Label>
           <p className="text-lg font-display font-bold text-primary">{dados.dtIniAfast || '-'}</p>
         </div>
         
-        <div className="p-4 bg-muted/20 border border-border/30 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
+        <div className="p-4 bg-muted/20 border border-border/30 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
           <Clock className="h-5 w-5 text-muted-foreground mb-1.5" />
           <Label className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Término Previsto</Label>
           <p className="text-lg font-display font-bold text-muted-foreground">{dados.dtTermAfast || 'Em Aberto'}</p>

@@ -128,7 +128,7 @@ export function ColaboradorDocuments({ colaboradorId }: { colaboradorId: string 
         </Dialog>
       </div>
 
-      <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+      <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30">

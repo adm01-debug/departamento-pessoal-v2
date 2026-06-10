@@ -50,7 +50,7 @@ export function DataTableToolbar({
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            className="pl-10 h-11 rounded-xl bg-card/50 border-border/40 focus:bg-background transition-all shadow-sm"
+            className="pl-10 h-11 rounded-xl bg-card/50 border-border/40 focus:bg-background transition-all shadow-xs"
           />
           <AnimatePresence>
             {search && (
@@ -77,7 +77,7 @@ export function DataTableToolbar({
           <div className="hidden sm:flex items-center gap-2 mr-2">
             {filters?.slice(0, 2).map((filter) => (
               <Select key={filter.key} value={filter.value} onValueChange={filter.onChange}>
-                <SelectTrigger className="h-11 min-w-[140px] rounded-xl bg-card/50 border-border/40 shadow-sm">
+                <SelectTrigger className="h-11 min-w-[140px] rounded-xl bg-card/50 border-border/40 shadow-xs">
                   <SelectValue placeholder={filter.label} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -113,7 +113,7 @@ export function DataTableToolbar({
                 size="sm" 
                 onClick={onRefresh}
                 disabled={isRefreshing}
-                className="h-11 w-11 p-0 rounded-xl bg-card/50 shadow-sm transition-all active:scale-95"
+                className="h-11 w-11 p-0 rounded-xl bg-card/50 shadow-xs transition-all active:scale-95"
                 title="Atualizar dados"
               >
                 <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
@@ -125,7 +125,7 @@ export function DataTableToolbar({
                 variant="outline" 
                 size="sm" 
                 onClick={onExport}
-                className="h-11 rounded-xl px-4 gap-2 bg-card/50 shadow-sm hidden sm:flex"
+                className="h-11 rounded-xl px-4 gap-2 bg-card/50 shadow-xs hidden sm:flex"
               >
                 <Download className="h-4 w-4" />
                 <span className="hidden lg:inline">Exportar</span>

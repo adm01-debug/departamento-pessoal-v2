@@ -112,7 +112,7 @@ export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps)
             {aprovacoes?.map((aprov: any) => (
               <div key={aprov.id} className="relative pl-12">
                 <div className={cn(
-                  "absolute left-0 p-2 rounded-full border shadow-sm z-10 transition-transform hover:scale-110 bg-background",
+                  "absolute left-0 p-2 rounded-full border shadow-xs z-10 transition-transform hover:scale-110 bg-background",
                   aprov.status === 'aprovado' ? "border-green-500 text-green-500" : "border-destructive text-destructive"
                 )}>
                   {aprov.status === 'aprovado' ? <Check className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
@@ -136,7 +136,7 @@ export function FeriasAuditTimeline({ solicitacaoId }: FeriasAuditTimelineProps)
               const dados = (log.dados_novos as any) || {};
               return (
                 <div key={log.id} className="relative pl-12">
-                  <div className="absolute left-0 p-2 rounded-full bg-background border border-border shadow-sm z-10 transition-transform hover:scale-110">
+                  <div className="absolute left-0 p-2 rounded-full bg-background border border-border shadow-xs z-10 transition-transform hover:scale-110">
                     {getIcon(log.acao, dados)}
                   </div>
                   <div className="p-3 rounded-xl border border-border/20 bg-muted/10 hover:bg-muted/20 transition-colors space-y-2">

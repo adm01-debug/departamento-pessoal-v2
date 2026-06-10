@@ -64,7 +64,7 @@ export function ESocialTimeline({ eventos }: ESocialTimelineProps) {
             className="relative"
           >
             <div className={cn(
-              "absolute -left-[31px] p-1.5 rounded-full border shadow-sm z-10",
+              "absolute -left-[31px] p-1.5 rounded-full border shadow-xs z-10",
               item.status === 'enviado' ? "bg-success/10 border-success/30 text-success" : 
               item.status === 'erro' ? "bg-destructive/10 border-destructive/30 text-destructive" :
               "bg-muted border-border/50 text-muted-foreground"

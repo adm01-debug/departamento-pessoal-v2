@@ -44,7 +44,7 @@ export function CalendarioFerias() {
   };
 
   return (
-    <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
+    <Card className="border-border/40 shadow-xs rounded-2xl overflow-hidden">
       <CardHeader className="bg-muted/30 pb-4 border-b border-border/40">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-display flex items-center gap-2">

@@ -30,7 +30,7 @@ export function FolhaDashboard({ competencia }: FolhaDashboardProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <Card className="border-border/40 shadow-sm rounded-2xl h-full">
+        <Card className="border-border/40 shadow-xs rounded-2xl h-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-display flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" /> Tendência de Custo
@@ -60,7 +60,7 @@ export function FolhaDashboard({ competencia }: FolhaDashboardProps) {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <Card className="border-border/40 shadow-sm rounded-2xl h-full">
+        <Card className="border-border/40 shadow-xs rounded-2xl h-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-display flex items-center gap-2">
               <Users className="h-4 w-4 text-info" /> Headcount vs Custo Médio
@@ -86,7 +86,7 @@ export function FolhaDashboard({ competencia }: FolhaDashboardProps) {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <Card className="border-border/40 shadow-sm rounded-2xl h-full">
+        <Card className="border-border/40 shadow-xs rounded-2xl h-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-display flex items-center gap-2">
               <PieIcon className="h-4 w-4 text-success" /> Composição de Custos

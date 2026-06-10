@@ -325,7 +325,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
 
       <div className="flex-1 max-w-3xl w-full mx-auto p-4 md:p-8 space-y-6">
         {/* Stepper Card */}
-        <Card className="border-0 shadow-sm rounded-3xl overflow-hidden bg-white">
+        <Card className="border-0 shadow-xs rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-6">
             <div className="space-y-4">
               <div className="flex justify-between items-center px-2">

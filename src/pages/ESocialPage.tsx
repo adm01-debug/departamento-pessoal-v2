@@ -208,19 +208,19 @@ export default function ESocialPage() {
           <Tabs defaultValue="eventos" className="space-y-6">
 
         <TabsList className="bg-muted/30 p-1 rounded-2xl border border-border/20 flex-wrap h-auto">
-          <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="eventos" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-xs">
             <LayoutDashboard className="h-4 w-4" /> Eventos
           </TabsTrigger>
-          <TabsTrigger value="conciliacao" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="conciliacao" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-xs">
             <BarChart3 className="h-4 w-4" /> Conciliação
           </TabsTrigger>
-          <TabsTrigger value="logs" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="logs" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-xs">
             <ShieldCheck className="h-4 w-4" /> Logs de Transmissão
           </TabsTrigger>
-          <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="timeline" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-xs">
             <History className="h-4 w-4" /> Timeline
           </TabsTrigger>
-          <TabsTrigger value="config" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsTrigger value="config" className="rounded-xl gap-2 data-[state=active]:bg-background data-[state=active]:shadow-xs">
             <Settings2 className="h-4 w-4" /> Configurações
           </TabsTrigger>
         </TabsList>
@@ -630,7 +630,7 @@ export default function ESocialPage() {
                       certificados.map((c: any) => (
                         <div key={c.id} className={cn(
                           "p-4 rounded-xl border flex items-center justify-between transition-all",
-                          config?.certificado_id === c.id ? "border-primary bg-primary/5 shadow-sm" : "border-border/20"
+                          config?.certificado_id === c.id ? "border-primary bg-primary/5 shadow-xs" : "border-border/20"
                         )}>
                           <div className="flex items-center gap-3">
                             <div className={cn("p-2 rounded-lg", c.ativo ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}>
@@ -843,7 +843,7 @@ export default function ESocialPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-background rounded-xl border shadow-sm">
+              <div className="p-4 bg-background rounded-xl border shadow-xs">
                 <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3 block">Conteúdo Estruturado</Label>
                 <ESocialEventViewer 
                   tipo={selectedEvento?.tipo_evento} 

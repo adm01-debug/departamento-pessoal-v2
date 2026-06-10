@@ -151,7 +151,7 @@ export default function DescontosPage() {
           </div>
 
           <TabsContent value="emprestimos" className="space-y-4">
-            <Card className="border-none shadow-sm overflow-hidden rounded-2xl">
+            <Card className="border-none shadow-xs overflow-hidden rounded-2xl">
               <CardContent className="p-0">
                 {loadEmp ? <div className="p-12 flex justify-center"><Spinner /></div> : (
                   <EmprestimosTable emprestimos={emprestimos} fmt={fmt} />
@@ -161,7 +161,7 @@ export default function DescontosPage() {
           </TabsContent>
 
           <TabsContent value="adiantamentos" className="space-y-4">
-            <Card className="border-none shadow-sm overflow-hidden rounded-2xl">
+            <Card className="border-none shadow-xs overflow-hidden rounded-2xl">
               <CardContent className="p-0">
                 {loadAdi ? <div className="p-12 flex justify-center"><Spinner /></div> : (
                   <AdiantamentosTable 

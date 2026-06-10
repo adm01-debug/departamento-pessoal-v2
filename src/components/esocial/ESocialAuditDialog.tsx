@@ -143,7 +143,7 @@ export function ESocialAuditDialog({ open, onOpenChange, eventos }: ESocialAudit
                 animate={{ opacity: 1, scale: 1 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-background border border-border/50 shadow-sm">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-background border border-border/50 shadow-xs">
                   <div>
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Score de Conformidade</p>
                     <p className="text-3xl font-display font-bold text-primary">{results?.score}%</p>

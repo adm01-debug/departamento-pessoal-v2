@@ -98,7 +98,7 @@ export function FolhaESocialSync({ competencia }: { competencia: string }) {
 
 
   return (
-    <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+    <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
       <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-h3 font-display flex items-center gap-2">
           <div className="p-1.5 rounded-lg bg-gradient-to-br from-info to-info/70">

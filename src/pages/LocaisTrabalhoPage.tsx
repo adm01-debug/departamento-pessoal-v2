@@ -81,7 +81,7 @@ export default function LocaisTrabalhoPage() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <Card className="border-primary/20 bg-primary/5 rounded-2xl mb-6 shadow-sm">
+              <Card className="border-primary/20 bg-primary/5 rounded-2xl mb-6 shadow-xs">
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">

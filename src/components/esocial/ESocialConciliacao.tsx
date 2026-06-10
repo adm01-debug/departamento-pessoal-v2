@@ -57,7 +57,7 @@ export function ESocialConciliacao() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-border/30 shadow-sm bg-success/5">
+        <Card className="border-border/30 shadow-xs bg-success/5">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground uppercase">Total Sistema</span>
@@ -67,7 +67,7 @@ export function ESocialConciliacao() {
           </CardContent>
         </Card>
         
-        <Card className="border-border/30 shadow-sm bg-primary/5">
+        <Card className="border-border/30 shadow-xs bg-primary/5">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground uppercase">Total Governo (S-5001)</span>
@@ -77,7 +77,7 @@ export function ESocialConciliacao() {
           </CardContent>
         </Card>
 
-        <Card className="border-border/30 shadow-sm bg-destructive/5">
+        <Card className="border-border/30 shadow-xs bg-destructive/5">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground uppercase">Divergência Total</span>

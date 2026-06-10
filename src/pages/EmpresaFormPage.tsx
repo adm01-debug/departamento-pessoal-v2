@@ -130,7 +130,7 @@ export default function EmpresaFormPage() {
               <TabsTrigger 
                 key={tab.id} 
                 value={tab.id} 
-                className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-sm px-6 gap-2"
+                className="rounded-lg font-body data-[state=active]:bg-card data-[state=active]:shadow-xs px-6 gap-2"
               >
                 <tab.icon className="h-4 w-4" />
                 <span className="hidden sm:inline">{tab.label}</span>

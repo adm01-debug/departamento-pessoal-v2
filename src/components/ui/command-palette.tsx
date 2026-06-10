@@ -286,7 +286,7 @@ export function CommandPalette({
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-150 group',
                 selectedIndex === idx
-                  ? 'bg-accent/80 shadow-sm'
+                  ? 'bg-accent/80 shadow-xs'
                   : 'hover:bg-accent/40'
               )}
             >
@@ -338,7 +338,7 @@ export function CommandPalette({
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Buscar por nome, CPF, CNPJ, páginas..."
-            className="flex-1 h-14 bg-transparent border-none outline-none text-base font-body placeholder:text-muted-foreground/50"
+            className="flex-1 h-14 bg-transparent border-none outline-hidden text-base font-body placeholder:text-muted-foreground/50"
           />
           <kbd className="hidden sm:inline-flex h-6 items-center rounded border border-border/50 bg-muted px-2 text-[11px] font-mono text-muted-foreground">
             ESC

@@ -56,7 +56,7 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="rounded-xl gap-2 shadow-sm">
+            <Button size="sm" className="rounded-xl gap-2 shadow-xs">
               <Plus className="h-4 w-4" /> Vincular Benefício
             </Button>
           </DialogTrigger>

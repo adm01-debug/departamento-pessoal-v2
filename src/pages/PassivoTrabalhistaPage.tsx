@@ -149,7 +149,7 @@ export default function PassivoTrabalhistaPage() {
           { label: 'Encargos Provisionados', value: data?.chargesLiability || 0, icon: Landmark, gradient: 'from-info to-info/70', desc: 'Estimativa de impostos sobre o passivo' },
         ].map((kpi, i) => (
           <motion.div key={kpi.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm h-full">
+            <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs h-full">
               <div className={cn("h-1 bg-gradient-to-r", kpi.gradient)} />
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -176,7 +176,7 @@ export default function PassivoTrabalhistaPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card className="lg:col-span-2 border border-border/30 rounded-2xl shadow-sm">
+        <Card className="lg:col-span-2 border border-border/30 rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-display flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-destructive" />
@@ -215,7 +215,7 @@ export default function PassivoTrabalhistaPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/30 rounded-2xl shadow-sm">
+        <Card className="border border-border/30 rounded-2xl shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-display flex items-center gap-2">
               <PieChart className="h-5 w-5 text-primary" />
@@ -259,7 +259,7 @@ export default function PassivoTrabalhistaPage() {
         </Card>
       </div>
 
-      <Card className="border border-border/30 rounded-2xl shadow-sm overflow-hidden">
+      <Card className="border border-border/30 rounded-2xl shadow-xs overflow-hidden">
         <CardHeader className="bg-muted/30 border-b border-border/30">
           <CardTitle className="text-base font-display flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-warning" />

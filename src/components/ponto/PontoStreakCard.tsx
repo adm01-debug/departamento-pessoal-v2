@@ -131,7 +131,7 @@ export function PontoStreakCard() {
             { icon: XCircle, label: 'Ausências', value: stats.ausente, color: 'text-destructive', bg: 'bg-destructive/10' },
             { icon: Target, label: 'Taxa %', value: `${stats.taxa.toFixed(0)}%`, color: 'text-info', bg: 'bg-info/10' },
           ].map(({ icon: Icon, label, value, color, bg }) => (
-            <Card key={label} className="border border-border/30 shadow-sm rounded-xl overflow-hidden">
+            <Card key={label} className="border border-border/30 shadow-xs rounded-xl overflow-hidden">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <div className={`p-2 rounded-lg ${bg}`}>

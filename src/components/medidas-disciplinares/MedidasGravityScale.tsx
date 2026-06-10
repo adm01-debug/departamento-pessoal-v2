@@ -63,7 +63,7 @@ export function MedidasGravityScale({ medidas }: GravityScaleProps) {
             <div className="flex items-center gap-1">
               {levels.map((level, i) => (
                 <div key={level.tipo} className="flex items-center gap-1">
-                  <div className={`h-3 flex-1 rounded-sm ${level.color} min-w-[40px]`} />
+                  <div className={`h-3 flex-1 rounded-xs ${level.color} min-w-[40px]`} />
                   {i < levels.length - 1 && (
                     <span className="text-[10px] text-muted-foreground/50">→</span>
                   )}

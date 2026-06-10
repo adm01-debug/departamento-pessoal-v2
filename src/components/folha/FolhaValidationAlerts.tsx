@@ -80,7 +80,7 @@ export function FolhaValidationAlerts({ resumo, competencia }: { resumo: FolhaRe
   };
 
   return (
-    <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+    <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
       <CardHeader className="pb-3 border-b border-border/10 bg-muted/20">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2.5 text-h3 font-display">

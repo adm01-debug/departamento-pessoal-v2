@@ -169,7 +169,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       <DialogContent className="max-w-xl overflow-hidden p-0 gap-0">
         <div className="bg-gradient-to-r from-primary to-primary-glow p-6 text-primary-foreground">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm">
+            <div className="p-2 rounded-xl bg-white/20 backdrop-blur-xs">
               <Calculator className="h-5 w-5" />
             </div>
             <div>

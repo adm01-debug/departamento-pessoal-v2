@@ -118,7 +118,7 @@ export function FeriasInsights({ stats }: FeriasInsightsProps) {
               className={`flex flex-col gap-3 p-4 rounded-xl ${insight.bgColor} border ${insight.borderColor} hover:shadow-md transition-all group`}
             >
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-background shadow-sm shrink-0">
+                <div className="p-2 rounded-lg bg-background shadow-xs shrink-0">
                   <insight.icon className={`h-4 w-4 ${insight.color}`} />
                 </div>
                 <div className="space-y-1">

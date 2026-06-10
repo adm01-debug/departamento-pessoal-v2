@@ -153,7 +153,7 @@ export function RubricasDialog() {
         </DialogHeader>
 
         {isAdding && (
-          <div className="mt-4 p-4 border rounded-xl bg-muted/30 space-y-4 animate-in fade-in slide-in-from-top-2 shadow-sm">
+          <div className="mt-4 p-4 border rounded-xl bg-muted/30 space-y-4 animate-in fade-in slide-in-from-top-2 shadow-xs">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="codigo">Código</Label>

@@ -123,7 +123,7 @@ export default function RecrutamentoPage() {
                 <TabsContent value="pipeline" className="mt-0">
                   <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar min-h-[600px] select-none">
                     {ETAPAS.map((etapa) => (
-                      <div key={etapa.id} className="flex-shrink-0 w-72 flex flex-col gap-3">
+                      <div key={etapa.id} className="shrink-0 w-72 flex flex-col gap-3">
                         <div className="flex items-center justify-between px-2">
                           <h3 className="font-display font-semibold text-sm flex items-center gap-2">
                             {etapa.label}
@@ -143,7 +143,7 @@ export default function RecrutamentoPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-white p-4 rounded-xl shadow-sm border border-border/40 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group relative"
+                                className="bg-white p-4 rounded-xl shadow-xs border border-border/40 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group relative"
                                 onClick={() => setSelectedCandidatura(cand)}
                               >
                                 <div className="flex justify-between items-start mb-2">
@@ -207,7 +207,7 @@ export default function RecrutamentoPage() {
                 <TabsContent value="vagas" className="mt-0">
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {vagas.map((vaga: any) => (
-                      <Card key={vaga.id} className="rounded-2xl border-border/40 hover:border-primary/30 hover:shadow-xl transition-all group overflow-hidden bg-card/50 backdrop-blur-sm">
+                      <Card key={vaga.id} className="rounded-2xl border-border/40 hover:border-primary/30 hover:shadow-xl transition-all group overflow-hidden bg-card/50 backdrop-blur-xs">
                         <CardHeader className="pb-3">
                           <div className="flex justify-between items-start mb-2">
                             <Badge 
@@ -248,7 +248,7 @@ export default function RecrutamentoPage() {
                                   {candidaturas.filter((c: any) => c.vaga_id === vaga.id).length}
                                 </span>
                               </div>
-                              <Button className="rounded-xl h-9 px-4 text-xs font-bold shadow-sm group-hover:shadow-md transition-all">
+                              <Button className="rounded-xl h-9 px-4 text-xs font-bold shadow-xs group-hover:shadow-md transition-all">
                                 Gerenciar Vaga
                                 <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                               </Button>
@@ -271,7 +271,7 @@ export default function RecrutamentoPage() {
 
                 {/* CANDIDATOS */}
                 <TabsContent value="candidatos" className="mt-0">
-                   <Card className="rounded-3xl border-border/40 overflow-hidden shadow-sm">
+                   <Card className="rounded-3xl border-border/40 overflow-hidden shadow-xs">
                      <CardContent className="p-0">
                        <div className="overflow-x-auto">
                          <table className="w-full text-sm">
@@ -331,7 +331,7 @@ export default function RecrutamentoPage() {
                       { label: 'Processos Ativos', value: candidaturas.length, icon: UserSearch, color: 'text-primary' },
                       { label: 'Taxa de Conversão', value: '4.2%', icon: BarChart3, color: 'text-warning' },
                     ].map((stat, i) => (
-                      <Card key={i} className="rounded-2xl border-border/40 shadow-sm">
+                      <Card key={i} className="rounded-2xl border-border/40 shadow-xs">
                         <CardContent className="p-6 flex items-center gap-4">
                           <div className={cn("h-12 w-12 rounded-xl bg-muted/30 flex items-center justify-center", stat.color)}>
                             <stat.icon className="h-6 w-6" />
@@ -345,7 +345,7 @@ export default function RecrutamentoPage() {
                     ))}
                   </div>
 
-                  <Card className="rounded-3xl border-border/40 overflow-hidden shadow-sm h-64">
+                  <Card className="rounded-3xl border-border/40 overflow-hidden shadow-xs h-64">
                     <CardHeader className="pb-0"><CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Distribuição por Etapa</CardTitle></CardHeader>
                     <CardContent className="h-full flex items-end gap-2 px-8 pb-8 pt-4">
                       {ETAPAS.map(e => {

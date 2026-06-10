@@ -23,7 +23,7 @@ export function SyncErrorState({ error, onRetry, entityName = "dados" }: SyncErr
 
   return (
     <div className="flex flex-col items-center justify-center p-8 w-full max-w-2xl mx-auto space-y-4">
-      <Alert variant="destructive" className="border-destructive/30 bg-destructive/5 rounded-2xl shadow-sm overflow-hidden">
+      <Alert variant="destructive" className="border-destructive/30 bg-destructive/5 rounded-2xl shadow-xs overflow-hidden">
         <AlertCircle className="h-5 w-5" />
         <AlertTitle className="font-display font-bold">Erro de Sincronização</AlertTitle>
         <AlertDescription className="font-body text-sm mt-1">

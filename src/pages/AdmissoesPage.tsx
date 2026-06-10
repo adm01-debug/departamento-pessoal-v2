@@ -273,7 +273,7 @@ export default function AdmissoesPage() {
         </TabsContent>
 
         <TabsContent value="auditoria">
-           <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+           <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
              <CardHeader className="bg-muted/30">
                <CardTitle className="text-sm font-display flex items-center gap-2">
                  <History className="h-4 w-4 text-primary" /> Histórico de Auditoria - Admissões

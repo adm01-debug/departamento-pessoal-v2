@@ -32,7 +32,7 @@ export function AdmissaoChecklist({ documentos, onValidate, isAdmin = false }: A
   const progresso = total > 0 ? (concluidos / total) * 100 : 0;
 
   return (
-    <Card className="border-border/40 shadow-elevated rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm">
+    <Card className="border-border/40 shadow-elevated rounded-2xl overflow-hidden bg-card/50 backdrop-blur-xs">
       <CardHeader className="pb-3 border-b border-border/10">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-display font-bold flex items-center gap-2">

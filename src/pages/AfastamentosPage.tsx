@@ -140,7 +140,7 @@ export default function AfastamentosPage() {
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Buscar por colaborador..." 
-                className="pl-9 bg-card shadow-sm border-primary/20 focus:border-primary transition-all"
+                className="pl-9 bg-card shadow-xs border-primary/20 focus:border-primary transition-all"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -152,7 +152,7 @@ export default function AfastamentosPage() {
               </div>
               <Input 
                 placeholder="Filtrar por CID-10..." 
-                className="pl-9 bg-card shadow-sm border-orange-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="pl-9 bg-card shadow-xs border-orange-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
                 value={filtros.cid || ''}
                 onChange={(e) => setFiltros({ ...filtros, cid: e.target.value })}
               />
@@ -160,7 +160,7 @@ export default function AfastamentosPage() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="shadow-sm border-muted-foreground/20 hover:bg-accent">
+                <Button variant="outline" className="shadow-xs border-muted-foreground/20 hover:bg-accent">
                   <Filter className="h-4 w-4 mr-2" />
                   {selectedTipo ? tipoLabels[selectedTipo] : 'Filtrar Tipo'}
                 </Button>
@@ -189,7 +189,7 @@ export default function AfastamentosPage() {
             </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="shadow-sm" title="Exportar Dados">
+                <Button variant="outline" size="icon" className="shadow-xs" title="Exportar Dados">
                   <Download className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -252,7 +252,7 @@ export default function AfastamentosPage() {
             </TabsContent>
 
             <TabsContent value="prorrogacoes" className="mt-0">
-              <Card className="border border-border/50 shadow-sm rounded-xl overflow-hidden">
+              <Card className="border border-border/50 shadow-xs rounded-xl overflow-hidden">
                 <CardHeader className="bg-muted/30 pb-4">
                   <CardTitle className="text-lg font-display">Histórico de Prorrogações</CardTitle>
                 </CardHeader>
@@ -297,7 +297,7 @@ export default function AfastamentosPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="border border-border/50 shadow-sm rounded-xl">
+            <Card className="border border-border/50 shadow-xs rounded-xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary" />
@@ -341,7 +341,7 @@ export default function AfastamentosPage() {
               </CardContent>
             </Card>
 
-            <Card className="border border-border/50 shadow-sm rounded-xl bg-card">
+            <Card className="border border-border/50 shadow-xs rounded-xl bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                   <TrendingUp className="h-3.5 w-3.5 text-primary" />

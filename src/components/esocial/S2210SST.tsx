@@ -6,7 +6,7 @@ export function S2210SST({ dados }: { dados: any }) {
   return (
     <div className="space-y-4 font-body">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-border/30 shadow-sm bg-muted/5">
+        <Card className="border-border/30 shadow-xs bg-muted/5">
           <CardContent className="p-4 flex items-start gap-3">
             <User className="h-4 w-4 text-primary mt-1" />
             <div>
@@ -17,7 +17,7 @@ export function S2210SST({ dados }: { dados: any }) {
           </CardContent>
         </Card>
 
-        <Card className="border-destructive/20 shadow-sm bg-destructive/5">
+        <Card className="border-destructive/20 shadow-xs bg-destructive/5">
           <CardContent className="p-4 flex items-start gap-3">
             <Calendar className="h-4 w-4 text-destructive mt-1" />
             <div>

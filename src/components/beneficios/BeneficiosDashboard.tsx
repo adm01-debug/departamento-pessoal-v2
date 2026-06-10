@@ -53,7 +53,7 @@ export function BeneficiosDashboard({ beneficios }: { beneficios: any[] }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" /> Adesão por Tipo de Benefício
@@ -84,7 +84,7 @@ export function BeneficiosDashboard({ beneficios }: { beneficios: any[] }) {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-sm">
+        <Card className="border border-border/30 rounded-2xl overflow-hidden shadow-xs">
           <CardHeader className="bg-muted/30 pb-2">
             <CardTitle className="text-sm font-display flex items-center gap-2">
               <Wallet className="h-4 w-4 text-info" /> Custo Mensal por Benefício (Top 5)
