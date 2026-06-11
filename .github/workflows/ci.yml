@@ -59,8 +59,11 @@ jobs:
         if: failure()
         run: |
           {
+            echo "===== MOBILE_PONTO_DIAG ====="
+            grep -a "MOBILE_PONTO_DIAG" e2e-log.txt 2>/dev/null || echo "(diag não encontrado)"
+            echo
             echo "===== e2e-log tail ====="
-            tail -c 80000 e2e-log.txt 2>/dev/null || echo "(sem e2e-log.txt)"
+            tail -c 60000 e2e-log.txt 2>/dev/null || echo "(sem e2e-log.txt)"
             echo
             echo "===== error-context (ARIA snapshots) ====="
             for f in $(find test-results -name error-context.md 2>/dev/null | grep -Ei 'relatorios|ponto'); do
