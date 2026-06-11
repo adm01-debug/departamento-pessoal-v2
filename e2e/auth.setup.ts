@@ -17,6 +17,11 @@ const PASSWORD = process.env.E2E_USER_PASSWORD ?? 'Admin@2026!';
 setup('autentica usuário de teste', async ({ page }) => {
   await page.goto('/login');
 
+  // Marca o GuidedTour como concluído ANTES de salvar o storageState:
+  // sem isso, o tour auto-abre 2s após o load e seu backdrop (z-[200])
+  // intercepta todos os cliques dos testes autenticados.
+  await page.evaluate(() => localStorage.setItem('dp-tour-completed', 'true'));
+
   // Caso a sessão já esteja persistida pelo dev, o app redireciona para /dashboard.
   if (page.url().includes('/dashboard')) {
     await page.context().storageState({ path: AUTH_FILE });

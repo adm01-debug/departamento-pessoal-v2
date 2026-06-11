@@ -1,17 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
 import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
-import { v4 as uuidv4 } from 'uuid';
-const getCorrelationHeaders = () => ({
-  'x-request-id': uuidv4(),
-});
+
+// Não enviar headers customizados (ex.: x-request-id): as edge functions
+// publicadas não os incluem em Access-Control-Allow-Headers, e o preflight
+// CORS bloqueia a chamada inteira no browser. Reintroduzir correlação apenas
+// depois que as functions forem republicadas permitindo o header.
 
 const handleInvoke = async <T>(name: string, options: any, breaker = genericBreaker): Promise<T> => {
   try {
     return await breaker.execute(async () => {
-      const { data, error } = await supabase.functions.invoke(name, {
-        ...options,
-        headers: { ...getCorrelationHeaders(), ...options.headers },
-      });
+      const { data, error } = await supabase.functions.invoke(name, options);
       if (error) {
         throw new Error(error.message || `Erro ao chamar função ${name}`);
       }
