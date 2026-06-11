@@ -27,6 +27,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Deploy Preview to Netlify
+        # Skip gracioso quando os secrets do Netlify não estão configurados —
+        # sem isso o job falha em repositórios sem o site provisionado.
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
         uses: nwtgck/actions-netlify@v3.0
         with:
           publish-dir: './dist'

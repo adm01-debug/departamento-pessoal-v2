@@ -55,13 +55,16 @@ export default defineConfig({
       },
     },
     // 4) Smoke mobile crítico (ponto offline, portal colaborador)
+    // Usa storageState próprio: sessões Supabase têm refresh token single-use,
+    // então partilhar o user.json com o projeto desktop faz o GoTrue revogar a
+    // sessão quando há rotação, derrubando o último projeto a rodar.
     {
       name: 'mobile-smoke',
       testMatch: /mobile\/.*\.spec\.ts/,
       dependencies: ['setup'],
       use: {
         ...devices['Pixel 7'],
-        storageState: 'e2e/.auth/user.json',
+        storageState: 'e2e/.auth/user-mobile.json',
       },
     },
   ],

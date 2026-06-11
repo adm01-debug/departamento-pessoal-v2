@@ -56,7 +56,7 @@ jobs:
       # TEMP(debug e2e): publica o tail do log num branch para diagnóstico
       # remoto enquanto a API de logs está indisponível. Remover antes do merge.
       - name: Persist e2e log (debug)
-        if: failure()
+        if: always()
         run: |
           {
             echo "===== MOBILE_PONTO_DIAG ====="
@@ -74,7 +74,7 @@ jobs:
           } > /tmp/e2e-tail.txt
           BLOB=$(git hash-object -w /tmp/e2e-tail.txt)
           TREE=$(printf "100644 blob %s\te2e-tail.txt\n" "$BLOB" | git mktree)
-          COMMIT=$(GIT_AUTHOR_NAME=ci-debug GIT_AUTHOR_EMAIL=ci@debug GIT_COMMITTER_NAME=ci-debug GIT_COMMITTER_EMAIL=ci@debug git commit-tree "$TREE" -m "e2e debug log run=${GITHUB_RUN_ID}")
+          COMMIT=$(GIT_AUTHOR_NAME=ci-debug GIT_AUTHOR_EMAIL=ci@debug GIT_COMMITTER_NAME=ci-debug GIT_COMMITTER_EMAIL=ci@debug git commit-tree "$TREE" -m "e2e debug log run=${GITHUB_RUN_ID} status=${{ job.status }} sha=${GITHUB_SHA}")
           git push -f origin "$COMMIT:refs/heads/ci-e2e-debug"
 
       - name: Supabase Edge Functions Test
@@ -124,7 +124,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Deploy to Netlify
-        if: success()
+        # Skip gracioso quando os secrets do Netlify não estão configurados —
+        # sem isso o job falha em repositórios sem o site provisionado.
+        if: ${{ success() && secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
         uses: nwtgck/actions-netlify@v3.0
         with:
           publish-dir: './dist'

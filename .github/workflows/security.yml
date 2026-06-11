@@ -18,8 +18,13 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Bun Audit
-        run: bun pm audit
+        # `bun pm audit` não existe — o comando é `bun audit`. Gate em
+        # high/critical para não quebrar a main com advisories de baixo risco.
+        run: bun audit --audit-level=high
 
       - name: Run SonarCloud Scan (Optional/Placeholder)
         run: echo "SonarCloud scan would run here if configured"
