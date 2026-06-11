@@ -242,6 +242,7 @@ export default function App() {
         <Route path="descontos" element={<LazyPage Component={DescontosPage} />} />
         <Route path="exames" element={<LazyPage Component={ExamesPage} />} />
         <Route path="holerites" element={<LazyPage Component={HoleritesPage} />} />
+        <Route path="relatorios" element={<LazyPage Component={RelatoriosPage} />} />
         <Route path="portal" element={<LazyPage Component={PortalPage} />} />
         <Route path="workflows" element={<LazyPage Component={WorkflowsPage} />} />
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
