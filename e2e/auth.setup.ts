@@ -12,9 +12,12 @@ const PASSWORD = process.env.E2E_USER_PASSWORD ?? 'Admin@2026!';
  * Os specs autenticados reusam esse arquivo, evitando múltiplos logins.
  *
  * Cada família de projetos recebe um storageState PRÓPRIO (login separado):
- * refresh tokens do Supabase são single-use; se dois contextos partilham a
+ * refresh tokens do Supabase são single-use; se dois projetos partilham a
  * mesma sessão e um deles a rotaciona, o GoTrue revoga a família inteira e
- * o projeto que rodar por último (mobile) é expulso para /login.
+ * o projeto que rodar depois é expulso para /login.
+ *
+ * Usar { page } em ambos os setups é suficiente: Playwright cria um contexto
+ * de browser SEPARADO por teste, gerando sessões Supabase independentes.
  */
 async function login(page: Page, file: string) {
   await page.goto('/login');
@@ -54,12 +57,6 @@ setup('autentica usuário de teste', async ({ page }) => {
   await login(page, AUTH_FILE);
 });
 
-setup('autentica usuário de teste (mobile)', async ({ browser }) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  try {
-    await login(page, AUTH_FILE_MOBILE);
-  } finally {
-    await context.close();
-  }
+setup('autentica usuário de teste (mobile)', async ({ page }) => {
+  await login(page, AUTH_FILE_MOBILE);
 });
