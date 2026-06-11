@@ -166,7 +166,7 @@ export default function CalculadoraRescisaoPage() {
     } finally {
       setSaving(false);
     }
-  }, [result, form, user]);
+  }, [result, form, user, colaboradores, empresaAtual]);
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
   return (

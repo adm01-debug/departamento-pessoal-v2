@@ -177,7 +177,7 @@ export function CommandPalette({
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [open, setOpen, setQuery, setSelectedIndex]);
 
   // Build dynamic items from DB results
   const dynamicItems = useMemo<CommandItem[]>(() => {
@@ -241,7 +241,7 @@ export function CommandPalette({
     if (item.action) item.action();
     setOpen(false);
     setQuery('');
-  }, [navigate, query]);
+  }, [navigate, query, setOpen, setQuery]);
 
   // Keyboard nav
   useEffect(() => {

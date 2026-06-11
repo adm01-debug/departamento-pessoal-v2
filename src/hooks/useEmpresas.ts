@@ -146,7 +146,7 @@ export function useEmpresas(): UseEmpresasReturn {
         return () => clearTimeout(timer);
       }
     }
-  }, [userEmpresas?.length, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
+  }, [userEmpresas, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
 
   // Criar empresa
   const criarEmpresa = useMutation({

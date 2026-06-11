@@ -54,9 +54,33 @@ export default tseslint.config(
   {
     // Componentes de UI "vendored" (shadcn/ui) usam @ts-nocheck e ficam fora do
     // typecheck (excluídos no tsconfig). Permitimos diretivas ts-comment aqui.
+    // react-refresh: componentes shadcn exportam variantes (buttonVariants, etc.)
+    // junto com o componente — padrão intencional, não afeta HMR de produção.
     files: ["src/components/ui/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
+    // Contextos e providers colocam Context + hook + Provider no mesmo arquivo
+    // (padrão React canônico). Fast-refresh não é afetado porque nenhum desses
+    // arquivos é hot-reloaded individualmente em fluxo de edição normal.
+    files: [
+      "src/contexts/**/*.{ts,tsx}",
+      "src/providers/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
+    // Validadores eSocial/folha exportam funções puras de validação, não componentes.
+    // O arquivo usa extensão .tsx apenas para poder importar componentes de UI
+    // usados na exibição de resultado — sem exports de componente próprio.
+    files: ["src/validators/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
     },
   },
 );

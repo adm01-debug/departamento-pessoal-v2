@@ -74,7 +74,10 @@ export default function NotificacoesPage() {
     },
   });
 
-  const notificacoes = notificacoesDB || notificacoesHook || [];
+  const notificacoes = useMemo(
+    () => notificacoesDB || notificacoesHook || [],
+    [notificacoesDB, notificacoesHook],
+  );
 
   const filtradas = useMemo(() => {
     return notificacoes.filter((n: any) => {

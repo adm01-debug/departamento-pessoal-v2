@@ -222,6 +222,7 @@ export const GuidedTour = memo(function GuidedTour() {
 });
 
 /* Hook to restart tour */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGuidedTour() {
   const restart = () => {
     localStorage.removeItem(STORAGE_KEY);
