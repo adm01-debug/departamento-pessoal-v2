@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,15 +28,10 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
     nome_empresa: '',
   });
 
-  useEffect(() => {
-    if (open && empresaAtual?.id) {
-      loadConfig();
-    }
-  }, [open, empresaAtual?.id]);
-
-  const loadConfig = async () => {
+  const loadConfig = useCallback(async () => {
+    if (!empresaAtual?.id) return;
     try {
-      const data = await cnabService.getConfig(empresaAtual!.id);
+      const data = await cnabService.getConfig(empresaAtual.id);
       if (data) {
         setConfig({
           banco_codigo: data.banco_codigo,
@@ -53,7 +48,11 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [empresaAtual?.id, empresaAtual?.razao_social]);
+
+  useEffect(() => {
+    if (open) loadConfig();
+  }, [open, loadConfig]);
 
   const handleSaveConfig = async () => {
     if (!empresaAtual?.id) return;

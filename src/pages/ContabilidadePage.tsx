@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, FileSpreadsheet, History, Download, Zap, RefreshCcw, Table as TableIcon, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { contabilidadeService, folhaService } from '@/services';
 import { toast } from 'sonner';
@@ -22,18 +22,13 @@ export default function ContabilidadePage() {
   const [processing, setProcessing] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');
 
-  useEffect(() => {
-    if (empresaAtual?.id) {
-      loadData();
-    }
-  }, [empresaAtual?.id]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
+    if (!empresaAtual?.id) return;
     try {
       setLoading(true);
       const [lan, pla, fls] = await Promise.all([
-        contabilidadeService.listLancamentos(empresaAtual!.id),
-        contabilidadeService.listPlanoContas(empresaAtual!.id),
+        contabilidadeService.listLancamentos(empresaAtual.id),
+        contabilidadeService.listPlanoContas(empresaAtual.id),
         folhaService.list()
       ]);
       setLancamentos(lan || []);
@@ -45,7 +40,11 @@ export default function ContabilidadePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [empresaAtual?.id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const gerarLancamentos = async () => {
     if (!selectedFolha) {
