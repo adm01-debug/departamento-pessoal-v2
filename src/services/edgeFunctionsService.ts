@@ -1,17 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
 import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
-import { v4 as uuidv4 } from 'uuid';
-const getCorrelationHeaders = () => ({
-  'x-request-id': uuidv4(),
-});
+
+// NOTA: não enviamos headers customizados (ex.: 'x-request-id') nas invocações de
+// edge functions. O CORS das funções (supabase/functions/_shared/contract.ts) só
+// permite: authorization, x-client-info, apikey, content-type, x-hub-signature-256.
+// Um header fora dessa lista faz o preflight (OPTIONS) cross-origin falhar e
+// derruba TODAS as chamadas no browser. Correlação, se necessária, deve ir no body.
 
 const handleInvoke = async <T>(name: string, options: any, breaker = genericBreaker): Promise<T> => {
   try {
     return await breaker.execute(async () => {
-      const { data, error } = await supabase.functions.invoke(name, {
-        ...options,
-        headers: { ...getCorrelationHeaders(), ...options.headers },
-      });
+      const { data, error } = await supabase.functions.invoke(name, options);
       if (error) {
         throw new Error(error.message || `Erro ao chamar função ${name}`);
       }

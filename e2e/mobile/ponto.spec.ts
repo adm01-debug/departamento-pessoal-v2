@@ -8,8 +8,10 @@ test.describe('Ponto Mobile (smoke)', () => {
   test('renderiza tela de ponto em viewport mobile', async ({ page }) => {
     await page.goto('/ponto');
 
-    await expect(page.getByRole('heading', { name: /ponto/i }).first())
-      .toBeVisible({ timeout: 15_000 });
+    // A tela de ponto usa um cabeçalho de saudação personalizada ("Olá, {nome}"),
+    // então confirmamos que a rota correta carregou pelo título do documento
+    // (definido via Helmet em PageTitle: "Registro de Ponto | Sistema DP").
+    await expect(page).toHaveTitle(/ponto/i, { timeout: 15_000 });
 
     // Botão principal de batida (entrada/saída/registrar)
     const botaoBatida = page
