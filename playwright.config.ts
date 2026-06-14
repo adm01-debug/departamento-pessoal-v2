@@ -64,6 +64,18 @@ export default defineConfig({
         storageState: 'e2e/.auth/user.json',
       },
     },
+    // 5) Cleanup — logout roda POR ÚLTIMO (depende de authenticated + mobile-smoke).
+    // O signOut global revoga o refresh token compartilhado no storageState; isolar
+    // aqui evita a corrida de sessão que derrubava mobile-smoke e flakava /relatorios.
+    {
+      name: 'cleanup',
+      testMatch: /cleanup\/.*\.spec\.ts/,
+      dependencies: ['authenticated', 'mobile-smoke'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/user.json',
+      },
+    },
   ],
   webServer: {
     command: 'bun run dev',
