@@ -17,8 +17,15 @@ const PASSWORD = process.env.E2E_USER_PASSWORD ?? 'Admin@2026!';
 setup('autentica usuário de teste', async ({ page }) => {
   await page.goto('/login');
 
+  // Desabilita a experiência de onboarding (tour guiado), cujo overlay full-screen
+  // (z-[200]) intercepta cliques e quebra os testes de navegação autenticados.
+  const disableOnboarding = async () => {
+    await page.evaluate(() => localStorage.setItem('dp-tour-completed', 'true'));
+  };
+
   // Caso a sessão já esteja persistida pelo dev, o app redireciona para /dashboard.
   if (page.url().includes('/dashboard')) {
+    await disableOnboarding();
     await page.context().storageState({ path: AUTH_FILE });
     return;
   }
@@ -33,5 +40,6 @@ setup('autentica usuário de teste', async ({ page }) => {
   // Aguarda redirect autenticado (qualquer rota dentro do app)
   await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 20_000 });
 
+  await disableOnboarding();
   await page.context().storageState({ path: AUTH_FILE });
 });
