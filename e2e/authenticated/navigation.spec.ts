@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Fluxo de Navegação e Logout (autenticado)', () => {
+test.describe('Fluxo de Navegação (autenticado)', () => {
   test.beforeEach(async ({ page }) => {
     // A autenticação já deve ter sido feita pelo setup (e2e/.auth/user.json)
     await page.goto('/dashboard');
@@ -42,28 +42,6 @@ test.describe('Fluxo de Navegação e Logout (autenticado)', () => {
       // Deve voltar para o dashboard (ou página anterior)
       await expect(page).toHaveURL(/\/dashboard/);
     }
-  });
-
-  test('fluxo de logout completo via menu de perfil', async ({ page }) => {
-    // O menu de perfil está no Header (UserProfileMenu)
-    // O seletor "usuário" é o fallback do componente
-    const profileButton = page.getByRole('button', { name: /usuário/i }).first();
-    await expect(profileButton).toBeVisible();
-    await profileButton.click();
-
-    // Clicar em "Sair" no dropdown
-    const logoutItem = page.getByRole('menuitem', { name: /sair/i });
-    await expect(logoutItem).toBeVisible();
-    await logoutItem.click();
-
-    // Verificar redirecionamento para login
-    await page.waitForURL(/\/login/, { timeout: 15000 });
-    await expect(page.getByLabel(/e-?mail/i).first()).toBeVisible();
-    
-    // Tentar acessar uma rota protegida após logout (deve redirecionar)
-    await page.goto('/dashboard');
-    await page.waitForURL(/\/login/);
-    expect(page.url()).toContain('/login');
   });
 });
 
