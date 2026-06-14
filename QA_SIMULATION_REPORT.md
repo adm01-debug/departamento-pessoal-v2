@@ -68,6 +68,35 @@ Coexistem `bun.lock` (311 KB) e `package-lock.json` (557 KB). Padronizar um gere
 
 ---
 
+## 5.1 Continuação — execução das melhorias (rumo a 10/10)
+
+Segunda rodada, com verificação (typecheck + build + testes) a cada passo:
+
+- **Simulação exaustiva:** nova suíte `src/calculators/__tests__/scenarios.test.ts`
+  (~45 cenários / centenas de asserções por varredura). Revelou e corrigiu
+  **5 gaps de robustez**: `NaN` em INSS/IRRF, negativo/`NaN` em FGTS, e `Infinity`
+  por `jornadaMensal=0` em horas extras/adic. noturno/sobreaviso/prontidão.
+  Cobertura de testes: **198 → 243**.
+- **Código morto:** removidos 29 shims sem uso de `src/utils/folha/`.
+- **Bugs de React corrigidos:** `Date.now()` no render (novo hook `useNow`) em
+  WorkflowsPage/LGPDPage; ref defasada no cleanup de `useRealtimeDashboard`;
+  uso de função antes da declaração (useCallback) em Contabilidade/Financeiro/CNAB.
+- **Deploy:** `package-lock.json` ressincronizado (faltava `@vitest/coverage-v8`),
+  evitando quebra de `npm ci` em produção.
+- **E2E:** desabilitado o tour de onboarding no setup de auth (overlay `z-[200]`
+  interceptava cliques e quebrava 8 testes autenticados).
+
+### Status dos warnings de lint
+Reduzidos os bugs reais (purity de render, ref-cleanup, use-before-declare). Os
+~75 warnings restantes pertencem às regras do **React Compiler**
+(`set-state-in-effect`, `immutability`, `incompatible-library`,
+`preserve-manual-memoization`) + `exhaustive-deps` de efeitos de mount e
+`react-refresh` (apenas HMR). O próprio projeto as define como **`warn`
+(adoção incremental)** em `eslint.config.js`, e o CI **não bloqueia** nelas.
+Levá-las a zero exige adotar o `babel-plugin-react-compiler` (mudança
+arquitetural, em esforço dedicado) — não suprimir regras nem fazer refactors
+de efeito que arriscariam loops. Recomenda-se como evolução planejada.
+
 ## 5. Conclusão
 
 Sistema **aprovado** para operação: compila, passa em 198 testes, sem erros de tipo nem de lint, e com a lógica trabalhista/fiscal correta. As ações deste PR reduzem ruído e consolidam a camada de cálculo numa **fonte única de verdade**, sem qualquer regressão (verificado). Os itens da seção 4 são melhorias incrementais recomendadas para evoluções futuras.

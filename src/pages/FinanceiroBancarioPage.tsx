@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Landmark, FileDown, History, Settings, CheckCircle, AlertCircle, Loader2, Download, Plus, Banknote, Globe, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { cnabService, CNABConfig, folhaService } from '@/services';
 import { toast } from 'sonner';
@@ -28,19 +28,14 @@ export default function FinanceiroBancarioPage() {
   const [selectedFolha, setSelectedFolha] = useState('');
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
-  useEffect(() => {
-    if (empresaAtual?.id) {
-      loadData();
-    }
-  }, [empresaAtual?.id]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
+    if (!empresaAtual?.id) return;
     try {
       setLoading(true);
       const [conf, rem, pix, fls] = await Promise.all([
-        cnabService.getConfig(empresaAtual!.id),
-        cnabService.listRemessas(empresaAtual!.id),
-        cnabService.listPixLotes(empresaAtual!.id),
+        cnabService.getConfig(empresaAtual.id),
+        cnabService.listRemessas(empresaAtual.id),
+        cnabService.listPixLotes(empresaAtual.id),
         folhaService.list()
       ]);
       setConfig(conf);
@@ -53,7 +48,11 @@ export default function FinanceiroBancarioPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [empresaAtual?.id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleSaveConfig = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

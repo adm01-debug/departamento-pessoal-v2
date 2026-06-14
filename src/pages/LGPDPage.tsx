@@ -1,5 +1,6 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
+import { useNow } from '@/hooks/useNow';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,7 @@ const MAPEAMENTO_DADOS = [
 
 export default function LGPDPage() {
   const { empresaAtual } = useEmpresas();
+  const now = useNow();
   const qc = useQueryClient();
   const [openSol, setOpenSol] = useState(false);
   const [formSol, setFormSol] = useState({ colaborador_id: '', tipo: 'acesso', descricao: '' });
@@ -70,7 +72,7 @@ export default function LGPDPage() {
   const vencendo = solicitacoes.filter((s: any) => {
     if (s.status !== 'pendente') return false;
     const prazo = new Date(s.prazo_legal);
-    const diff = (prazo.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+    const diff = (prazo.getTime() - now) / (1000 * 60 * 60 * 24);
     return diff <= 5 && diff >= 0;
   }).length;
 
@@ -191,7 +193,7 @@ export default function LGPDPage() {
                   <TableBody>
                     {solicitacoes.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 font-body">Nenhuma solicitação</TableCell></TableRow> :
                       solicitacoes.map((s: any) => {
-                        const prazoCritico = s.status === 'pendente' && s.prazo_legal && ((new Date(s.prazo_legal).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) <= 5;
+                        const prazoCritico = s.status === 'pendente' && s.prazo_legal && ((new Date(s.prazo_legal).getTime() - now) / (1000 * 60 * 60 * 24)) <= 5;
                         return (
                           <TableRow key={s.id} className={cn("hover:bg-accent/30 transition-colors", prazoCritico && "bg-destructive/5")}>
                             <TableCell className="font-body font-medium">{(s as any).colaborador?.nome_completo || '—'}</TableCell>

@@ -77,7 +77,7 @@ export function calcularFerias(salarioBase: number, diasFerias: number = 30, dia
 }
 
 export function calcularHorasExtras(salarioBase: number, horasExtras50: number = 0, horasExtras100: number = 0, jornadaMensal: number = 220, diasUteis: number = 26, domingosEFeriados: number = 4) {
-  const valorHora = salarioBase / jornadaMensal;
+  const valorHora = jornadaMensal > 0 ? salarioBase / jornadaMensal : 0;
   const valor50 = Math.round(valorHora * 1.5 * horasExtras50 * 100) / 100;
   const valor100 = Math.round(valorHora * 2.0 * horasExtras100 * 100) / 100;
   const totalExtras = Math.round((valor50 + valor100) * 100) / 100;
@@ -92,7 +92,7 @@ export function calcularDSR(totalVariaveis: number, diasUteis: number, domingosE
 }
 
 export function calcularAdicionalNoturno(salarioBase: number, horasNoturnas: number, jornadaMensal: number = 220, percentual: number = 20): number {
-  const valorHora = salarioBase / jornadaMensal;
+  const valorHora = jornadaMensal > 0 ? salarioBase / jornadaMensal : 0;
   return Math.round(valorHora * (percentual / 100) * horasNoturnas * 100) / 100;
 }
 
@@ -140,12 +140,12 @@ export function calcularAuxilioDoenca(mediaSalarial: number): number {
 }
 
 export function calcularSobreaviso(salarioBase: number, horas: number, jornadaMensal: number = 220): number {
-  const valorHora = salarioBase / jornadaMensal;
+  const valorHora = jornadaMensal > 0 ? salarioBase / jornadaMensal : 0;
   return Math.round(valorHora * (1 / 3) * horas * 100) / 100;
 }
 
 export function calcularProntidao(salarioBase: number, horas: number, jornadaMensal: number = 220): number {
-  const valorHora = salarioBase / jornadaMensal;
+  const valorHora = jornadaMensal > 0 ? salarioBase / jornadaMensal : 0;
   return Math.round(valorHora * (2 / 3) * horas * 100) / 100;
 }
 

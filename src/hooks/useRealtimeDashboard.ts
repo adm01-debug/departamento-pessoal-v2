@@ -38,6 +38,8 @@ export function useRealtimeDashboard() {
   };
 
   useEffect(() => {
+    // Captura a referência atual para uso seguro no cleanup (evita ref defasada)
+    const pendingTimeouts = timeouts.current;
     // Escuta mudanças em tabelas críticas para o Dashboard
     const tables = ['admissoes', 'desligamentos', 'ferias', 'folhas_pagamento', 'registros_ponto'];
     const channelName = `dashboard-updates-${empresaAtualId ?? 'global'}-${crypto.randomUUID()}`;
@@ -62,7 +64,7 @@ export function useRealtimeDashboard() {
 
     return () => {
       void supabase.removeChannel(channel);
-      Object.values(timeouts.current).forEach(clearTimeout);
+      Object.values(pendingTimeouts).forEach(clearTimeout);
     };
   }, [queryClient, empresaAtualId]);
 

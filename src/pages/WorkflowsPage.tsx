@@ -1,5 +1,6 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
+import { useNow } from '@/hooks/useNow';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,7 @@ const ETAPAS_PADRAO = [
 
 export default function WorkflowsPage() {
   const { empresaAtual } = useEmpresas();
+  const now = useNow();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [selectedExec, setSelectedExec] = useState<any>(null);
@@ -95,7 +97,7 @@ export default function WorkflowsPage() {
   const slaAtrasados = execucoes.filter((e: any) => {
     if (e.status !== 'pendente' && e.status !== 'em_andamento') return false;
     const created = new Date(e.created_at);
-    const diffHours = (Date.now() - created.getTime()) / (1000 * 60 * 60);
+    const diffHours = (now - created.getTime()) / (1000 * 60 * 60);
     return diffHours > 48;
   }).length;
 
@@ -255,7 +257,7 @@ export default function WorkflowsPage() {
                   ) : execucoes.map((e: any) => {
                     const config = statusConfig[e.status] || statusConfig.pendente;
                     const StatusIcon = config.icon;
-                    const horasDecorridas = Math.round((Date.now() - new Date(e.created_at).getTime()) / (1000 * 60 * 60));
+                    const horasDecorridas = Math.round((now - new Date(e.created_at).getTime()) / (1000 * 60 * 60));
                     const slaExcedido = (e.status === 'pendente' || e.status === 'em_andamento') && horasDecorridas > 48;
                     const canAct = e.status === 'pendente' || e.status === 'em_andamento';
 
