@@ -9,8 +9,8 @@ import {
 } from './tabelas';
 
 export function calcularINSS(salarioBruto: number): number {
-  if (salarioBruto <= 0) return 0;
-  
+  if (!(salarioBruto > 0)) return 0; // captura também NaN/negativos
+
   let descontoTotal = 0;
   let baseRestante = Math.min(salarioBruto, TETO_INSS_2026);
   
@@ -31,6 +31,7 @@ export function calcularINSS(salarioBruto: number): number {
 }
 
 export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outrasDeducoes: number = 0, isPensaoAlimenticia: boolean = false): number {
+  if (!(salarioBruto > 0)) return 0; // captura também NaN/negativos
   const descontoINSS = calcularINSS(salarioBruto);
   
   // Opção 1: Deduções Legais
@@ -59,5 +60,6 @@ export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outr
 }
 
 export function calcularFGTS(salarioBruto: number): number {
+  if (!(salarioBruto > 0)) return 0; // captura também NaN/negativos
   return Math.round(salarioBruto * ALIQUOTA_FGTS * 100) / 100;
 }
