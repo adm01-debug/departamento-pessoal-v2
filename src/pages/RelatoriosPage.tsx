@@ -101,11 +101,60 @@ async function fetchReportData(id: string, empresaId?: string) {
       }; 
     }
     case 'turnover': {
-      const { data, error } = await supabase.from('vw_kpi_turnover').select('*');
-      if (error) throw error;
+      // Multi-tenant: agrega no client filtrando por empresa_id (view vw_kpi_turnover é global)
+      const inicio = new Date();
+      inicio.setFullYear(inicio.getFullYear() - 1);
+      const inicioISO = inicio.toISOString().slice(0, 10);
+
+      const [desligRes, ativosRes, admRes] = await Promise.all([
+        supabase
+          .from('desligamentos')
+          .select('data_desligamento')
+          .eq('empresa_id', empresaId)
+          .gte('data_desligamento', inicioISO),
+        supabase
+          .from('colaboradores')
+          .select('id', { count: 'exact', head: true })
+          .eq('empresa_id', empresaId)
+          .eq('status', 'ativo'),
+        supabase
+          .from('colaboradores')
+          .select('data_admissao')
+          .eq('empresa_id', empresaId)
+          .gte('data_admissao', inicioISO),
+      ]);
+      if (desligRes.error) throw desligRes.error;
+      if (admRes.error) throw admRes.error;
+
+      const ativos = ativosRes.count ?? 0;
+      const byMes = new Map<string, { admissoes: number; desligamentos: number }>();
+      (desligRes.data || []).forEach((d: any) => {
+        const m = String(d.data_desligamento).slice(0, 7);
+        const cur = byMes.get(m) || { admissoes: 0, desligamentos: 0 };
+        cur.desligamentos += 1;
+        byMes.set(m, cur);
+      });
+      (admRes.data || []).forEach((a: any) => {
+        const m = String(a.data_admissao).slice(0, 7);
+        const cur = byMes.get(m) || { admissoes: 0, desligamentos: 0 };
+        cur.admissoes += 1;
+        byMes.set(m, cur);
+      });
+
+      const rows = Array.from(byMes.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([competencia, v]) => ({
+          competencia,
+          admissoes: v.admissoes,
+          desligamentos: v.desligamentos,
+          taxa_turnover: ativos > 0
+            ? Number((((v.admissoes + v.desligamentos) / 2 / ativos) * 100).toFixed(2))
+            : 0,
+        }));
+
       return {
         title: 'Análise de Turnover',
-        rows: data || [],
+        rows,
         columns: ['competencia', 'taxa_turnover', 'admissoes', 'desligamentos']
       };
     }
