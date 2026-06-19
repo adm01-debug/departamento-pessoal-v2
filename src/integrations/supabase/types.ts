@@ -6763,14 +6763,17 @@ export type Database = {
       }
       empresas: {
         Row: {
+          aliquota_simples: number | null
           ativa: boolean | null
           bairro: string | null
           cep: string | null
           cidade: string | null
           cnpj: string | null
           complemento: string | null
+          cor_identificacao: string | null
           created_at: string
           email: string | null
+          fap: number | null
           id: string
           inscricao_estadual: string | null
           inscricao_municipal: string | null
@@ -6778,20 +6781,27 @@ export type Database = {
           logradouro: string | null
           nome_fantasia: string | null
           numero: string | null
+          ordem_exibicao: number | null
+          rat: number | null
           razao_social: string
+          regime_tributario: Database["public"]["Enums"]["regime_tributario"]
           telefone: string | null
+          terceiros: number | null
           uf: string | null
           updated_at: string
         }
         Insert: {
+          aliquota_simples?: number | null
           ativa?: boolean | null
           bairro?: string | null
           cep?: string | null
           cidade?: string | null
           cnpj?: string | null
           complemento?: string | null
+          cor_identificacao?: string | null
           created_at?: string
           email?: string | null
+          fap?: number | null
           id?: string
           inscricao_estadual?: string | null
           inscricao_municipal?: string | null
@@ -6799,20 +6809,27 @@ export type Database = {
           logradouro?: string | null
           nome_fantasia?: string | null
           numero?: string | null
+          ordem_exibicao?: number | null
+          rat?: number | null
           razao_social: string
+          regime_tributario?: Database["public"]["Enums"]["regime_tributario"]
           telefone?: string | null
+          terceiros?: number | null
           uf?: string | null
           updated_at?: string
         }
         Update: {
+          aliquota_simples?: number | null
           ativa?: boolean | null
           bairro?: string | null
           cep?: string | null
           cidade?: string | null
           cnpj?: string | null
           complemento?: string | null
+          cor_identificacao?: string | null
           created_at?: string
           email?: string | null
+          fap?: number | null
           id?: string
           inscricao_estadual?: string | null
           inscricao_municipal?: string | null
@@ -6820,8 +6837,12 @@ export type Database = {
           logradouro?: string | null
           nome_fantasia?: string | null
           numero?: string | null
+          ordem_exibicao?: number | null
+          rat?: number | null
           razao_social?: string
+          regime_tributario?: Database["public"]["Enums"]["regime_tributario"]
           telefone?: string | null
+          terceiros?: number | null
           uf?: string | null
           updated_at?: string
         }
@@ -20851,6 +20872,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"][]
       }
+      get_user_scope_empresas: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -20916,6 +20938,11 @@ export type Database = {
         | "contrato"
         | "assinatura"
         | "esocial"
+      regime_tributario:
+        | "simples_nacional"
+        | "lucro_presumido"
+        | "lucro_real"
+        | "mei"
       sexo: "masculino" | "feminino"
       status_afastamento: "ativo" | "encerrado" | "cancelado" | "prorrogado"
       status_colaborador:
@@ -21110,6 +21137,12 @@ export const Constants = {
         "contrato",
         "assinatura",
         "esocial",
+      ],
+      regime_tributario: [
+        "simples_nacional",
+        "lucro_presumido",
+        "lucro_real",
+        "mei",
       ],
       sexo: ["masculino", "feminino"],
       status_afastamento: ["ativo", "encerrado", "cancelado", "prorrogado"],
