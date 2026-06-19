@@ -149,7 +149,7 @@ export default function App() {
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-        <Route index element={<DashboardPage />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="dashboard-executivo" element={<LazyPage Component={DashboardExecutivoPage} />} />
         
@@ -247,6 +247,7 @@ export default function App() {
         <Route path="design-system" element={<LazyPage Component={DesignSystemPage} />} />
         <Route path="integracoes" element={<LazyPage Component={IntegracoesPage} />} />
         <Route path="banco-horas" element={<LazyPage Component={BancoHorasPage} />} />
+        <Route path="relatorios" element={<LazyPage Component={RelatoriosPage} />} />
         
         <Route path="premiacoes" element={<LazyPage Component={PremiacoesPage} />} />
         <Route path="*" element={<LazyPage Component={NotFoundPage} />} />

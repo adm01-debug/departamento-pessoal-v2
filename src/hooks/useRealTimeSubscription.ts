@@ -31,7 +31,8 @@ export function useRealTimeSubscription(
   useEffect(() => {
     if (!empresaId) return;
 
-    const channelName = `rt-${table}-${empresaId}`;
+    // UUID único evita colisão quando o mesmo hook é montado por múltiplos componentes
+    const channelName = `rt-${table}-${empresaId}-${crypto.randomUUID()}`;
     const channel = supabase
       .channel(channelName)
       .on(
