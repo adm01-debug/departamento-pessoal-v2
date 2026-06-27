@@ -30,7 +30,7 @@ export interface Empresa {
   logo_url: string | null;
   ativa: boolean;
   // Arquitetura de grupo (Onda 1)
-  regime_tributario: RegimeTributario | null;
+  regime_tributario: RegimeTributario;
   aliquota_simples: number | null;
   fap: number | null;
   rat: number | null;
