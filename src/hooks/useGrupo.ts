@@ -25,7 +25,7 @@ export interface EmpresaGrupo {
   nome_fantasia: string | null;
   cnpj: string | null;
   ativa: boolean;
-  regime_tributario: RegimeTributario | null;
+  regime_tributario: RegimeTributario;
   aliquota_simples: number | null;
   fap: number | null;
   rat: number | null;
