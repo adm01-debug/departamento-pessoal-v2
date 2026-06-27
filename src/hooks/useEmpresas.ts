@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import type { RegimeTributario } from "@/constants/regimes";
+
 export interface Empresa {
   id: string;
   cnpj: string | null;
@@ -27,9 +29,20 @@ export interface Empresa {
   email: string | null;
   logo_url: string | null;
   ativa: boolean;
+  // Arquitetura de grupo (Onda 1)
+  regime_tributario: RegimeTributario | null;
+  aliquota_simples: number | null;
+  fap: number | null;
+  rat: number | null;
+  terceiros: number | null;
+  cor_identificacao: string | null;
+  ordem_exibicao: number | null;
   created_at: string;
   updated_at: string;
 }
+
+/** Modo de visualização dos dados de empresa. */
+export type EmpresaModo = "consolidado" | "empresa_unica";
 
 export interface UserEmpresa {
   id: string;
