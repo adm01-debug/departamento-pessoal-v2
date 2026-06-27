@@ -309,8 +309,16 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
             <div className="flex items-center gap-0.5">
               {!collapsed && <NotificationBell />}
               {!collapsed && <ThemeToggle />}
-              <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="h-8 w-8 hover:bg-sidebar-accent">
-                {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCollapsed(!collapsed)}
+                className="h-8 w-8 hover:bg-sidebar-accent"
+                aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
+                aria-expanded={!collapsed}
+                title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+              >
+                {collapsed ? <ChevronRight className="h-4 w-4" aria-hidden /> : <ChevronLeft className="h-4 w-4" aria-hidden />}
               </Button>
             </div>
           </div>

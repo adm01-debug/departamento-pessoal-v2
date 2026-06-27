@@ -8,7 +8,8 @@ export function useBeneficios() {
   const empresaId = empresaAtual?.id;
 
   const crud = useGenericCrud<unknown>({
-    queryKey: 'beneficios',
+    // Inclui empresaId na queryKey para evitar reuso de cache cross-tenant.
+    queryKey: `beneficios:${empresaId ?? 'none'}`,
     service: beneficioService,
     filters: { empresa_id: empresaId },
   });
