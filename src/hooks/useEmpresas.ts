@@ -105,7 +105,7 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
 
 export function useEmpresas(): UseEmpresasReturn {
   const queryClient = useQueryClient();
-  const { empresaAtualId, setEmpresaAtual } = useEmpresaStore();
+  const { empresaAtualId, modo, setEmpresaAtual, setModo } = useEmpresaStore();
 
   // Buscar empresas do usuário
   const { data: userEmpresas, isLoading: loadingEmpresas } = useQuery({
