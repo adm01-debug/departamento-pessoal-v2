@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import type { RegimeTributario } from "@/constants/regimes";
+
 export interface Empresa {
   id: string;
   cnpj: string | null;
@@ -27,9 +29,20 @@ export interface Empresa {
   email: string | null;
   logo_url: string | null;
   ativa: boolean;
+  // Arquitetura de grupo (Onda 1)
+  regime_tributario: RegimeTributario;
+  aliquota_simples: number | null;
+  fap: number | null;
+  rat: number | null;
+  terceiros: number | null;
+  cor_identificacao: string | null;
+  ordem_exibicao: number | null;
   created_at: string;
   updated_at: string;
 }
+
+/** Modo de visualização dos dados de empresa. */
+export type EmpresaModo = "consolidado" | "empresa_unica";
 
 export interface UserEmpresa {
   id: string;
@@ -42,18 +55,25 @@ export interface UserEmpresa {
 
 interface EmpresaStore {
   empresaAtualId: string | null;
+  modo: EmpresaModo;
   setEmpresaAtual: (id: string | null) => void;
+  setModo: (modo: EmpresaModo) => void;
 }
 
-// Store para empresa selecionada (persiste no localStorage)
+// Store para empresa selecionada (persiste no localStorage).
+// `modo`: 'consolidado' = todas as empresas do grupo (default);
+//         'empresa_unica' = filtra por `empresaAtualId`.
 export const useEmpresaStore = create<EmpresaStore>()(
   persist(
     (set) => ({
       empresaAtualId: null,
+      modo: "consolidado",
       setEmpresaAtual: (id) => set({ empresaAtualId: id }),
+      setModo: (modo) => set({ modo }),
     }),
     {
       name: "empresa-storage",
+      version: 2,
     }
   )
 );
@@ -63,6 +83,9 @@ export interface UseEmpresasReturn {
   todasEmpresas: Empresa[] | undefined;
   empresaAtual: Empresa | null;
   empresaAtualId: string | null;
+  modo: EmpresaModo;
+  isConsolidado: boolean;
+  setModo: (modo: EmpresaModo) => void;
   loadingEmpresas: boolean;
   loadingTodas: boolean;
   criarEmpresa: any;
@@ -82,7 +105,7 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
 
 export function useEmpresas(): UseEmpresasReturn {
   const queryClient = useQueryClient();
-  const { empresaAtualId, setEmpresaAtual } = useEmpresaStore();
+  const { empresaAtualId, modo, setEmpresaAtual, setModo } = useEmpresaStore();
 
   // Buscar empresas do usuário
   const { data: userEmpresas, isLoading: loadingEmpresas } = useQuery({
@@ -294,6 +317,9 @@ export function useEmpresas(): UseEmpresasReturn {
     todasEmpresas,
     empresaAtual: empresaEfetiva ?? null,
     empresaAtualId: empresaEfetiva?.id || null,
+    modo,
+    isConsolidado: modo === "consolidado",
+    setModo,
     loadingEmpresas,
     loadingTodas,
     criarEmpresa,
