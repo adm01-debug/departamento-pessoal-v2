@@ -55,18 +55,25 @@ export interface UserEmpresa {
 
 interface EmpresaStore {
   empresaAtualId: string | null;
+  modo: EmpresaModo;
   setEmpresaAtual: (id: string | null) => void;
+  setModo: (modo: EmpresaModo) => void;
 }
 
-// Store para empresa selecionada (persiste no localStorage)
+// Store para empresa selecionada (persiste no localStorage).
+// `modo`: 'consolidado' = todas as empresas do grupo (default);
+//         'empresa_unica' = filtra por `empresaAtualId`.
 export const useEmpresaStore = create<EmpresaStore>()(
   persist(
     (set) => ({
       empresaAtualId: null,
+      modo: "consolidado",
       setEmpresaAtual: (id) => set({ empresaAtualId: id }),
+      setModo: (modo) => set({ modo }),
     }),
     {
       name: "empresa-storage",
+      version: 2,
     }
   )
 );
@@ -76,6 +83,9 @@ export interface UseEmpresasReturn {
   todasEmpresas: Empresa[] | undefined;
   empresaAtual: Empresa | null;
   empresaAtualId: string | null;
+  modo: EmpresaModo;
+  isConsolidado: boolean;
+  setModo: (modo: EmpresaModo) => void;
   loadingEmpresas: boolean;
   loadingTodas: boolean;
   criarEmpresa: any;
