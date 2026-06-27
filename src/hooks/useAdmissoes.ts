@@ -11,15 +11,17 @@ export function useAdmissoes() {
   const query = useQuery<any[]>({
     queryKey: ['admissoes', empresaId],
     queryFn: () => admissaoService.listarAdmissoes(empresaId),
-    enabled: true,
+    // Guard: evita fetch sem tenant (possível vazamento cross-empresa via RLS frouxa).
+    enabled: !!empresaId,
   });
 
-
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ['admissoes', empresaId] });
 
   const criarMutation = useMutation({
     mutationFn: (data: any) => admissaoService.criar({ ...data, empresa_id: empresaId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admissoes'] });
+      void invalidate();
       toast.success('Admissão criada com sucesso');
     },
     onError: (err: Error) => toast.error(err.message),
@@ -28,7 +30,7 @@ export function useAdmissoes() {
   const atualizarMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => admissaoService.atualizar(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admissoes'] });
+      void invalidate();
       toast.success('Admissão atualizada');
     },
     onError: (err: Error) => toast.error(err.message),

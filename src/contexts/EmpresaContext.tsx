@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEmpresas, type Empresa } from '@/hooks/useEmpresas';
 
 interface EmpresaContextType {
@@ -17,6 +18,7 @@ const EmpresaContext = createContext<EmpresaContextType | undefined>(undefined);
  * useEmpresas() now share the same single source of truth.
  */
 export function EmpresaProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const {
     userEmpresas,
     empresaAtual,
@@ -33,9 +35,16 @@ export function EmpresaProvider({ children }: { children: ReactNode }) {
     if (empresa) trocarEmpresa(empresa.id);
   };
 
+  // Implementação real do contrato: invalida o cache de vínculos do usuário
+  // e a lista global de empresas, forçando refetch em background.
   const refresh = async () => {
-    // React Query handles refetching automatically via invalidateQueries
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['user-empresas'] }),
+      queryClient.invalidateQueries({ queryKey: ['todas-empresas'] }),
+      queryClient.invalidateQueries({ queryKey: ['grupo-empresas-escopo'] }),
+    ]);
   };
+
 
   return (
     <EmpresaContext.Provider

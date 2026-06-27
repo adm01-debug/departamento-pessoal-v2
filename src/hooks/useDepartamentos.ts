@@ -8,7 +8,8 @@ export function useDepartamentos() {
   const empresaId = empresaAtual?.id;
 
   const crud = useGenericCrud<Departamento>({
-    queryKey: 'departamentos',
+    // Inclui empresaId na queryKey para evitar reuso de cache cross-tenant.
+    queryKey: `departamentos:${empresaId ?? 'none'}`,
     service: departamentoService,
     initialPageSize: 10,
     filters: empresaId ? { empresa_id: empresaId } : {},

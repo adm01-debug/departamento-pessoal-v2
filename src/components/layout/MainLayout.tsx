@@ -1,5 +1,5 @@
 // src/components/layout/MainLayout.tsx
-import { useState, type ReactNode, memo, useMemo, useEffect } from 'react';
+import { useState, type ReactNode, memo, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Sidebar } from './index';
@@ -10,7 +10,6 @@ import { CommandPalette } from '@/components/ui/command-palette';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBackGesture } from '@/hooks/useBackGesture';
-import { supabase } from '@/integrations/supabase/client';
 
 interface MainLayoutProps {
   children?: ReactNode;
@@ -23,7 +22,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const { user, isReady, signOut } = useAuth();
+  const { user } = useAuth();
 
   // Ativa o gesto de swipe para voltar em mobile
   useBackGesture();
@@ -34,23 +33,11 @@ export function MainLayout({ children }: MainLayoutProps) {
     [user?.name, user?.email]
   );
 
-  useEffect(() => {
-    const handleInactivity = () => {
-      // Opcional: Implementar logout automático por inatividade se necessário para compliance
-    };
-    
-    const channel = supabase.channel('system-health')
-      .on('presence', { event: 'sync' }, () => {
-        // Telemetria silenciosa de sessão ativa
-      })
-      .subscribe();
+  // Nota: o guardião de sessão (isReady) está no ProtectedRoute; não duplicar aqui
+  // para evitar unmount/remount do layout quando a sessão revalida.
+  // Canal Realtime 'system-health' removido — era código morto (callback vazio)
+  // e causava acúmulo de WebSockets em Strict Mode/HMR.
 
-    return () => {
-      channel?.unsubscribe();
-    };
-  }, []);
-
-  if (!isReady) return null; // Prevenção de flash de layout antes do carregamento da sessão
 
   return (
     <div className="flex h-screen bg-background">
