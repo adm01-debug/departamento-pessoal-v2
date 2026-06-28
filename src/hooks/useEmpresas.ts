@@ -5,6 +5,7 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -106,36 +107,36 @@ const ensureSingleResult = <T>(data: T | null, entity: string): T => {
 export function useEmpresas(): UseEmpresasReturn {
   const queryClient = useQueryClient();
   const { empresaAtualId, modo, setEmpresaAtual, setModo } = useEmpresaStore();
+  const { user, isAdmin } = useAuth();
 
   // Buscar empresas do usuário
   const { data: userEmpresas, isLoading: loadingEmpresas } = useQuery({
-    queryKey: ["user-empresas"],
+    queryKey: ["user-empresas", user?.id],
+    enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return [];
-
+      if (!user?.id) return [];
       const { data, error } = await supabase
         .from("user_empresas")
         .select(`*`)
-        .eq("user_id", userData.user.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
       return data as (UserEmpresa & { empresa: Empresa })[];
     },
   });
 
-  // Listar todas as empresas (para admin)
+  // Listar todas as empresas (apenas para admin — evita chamadas desnecessárias)
   const { data: todasEmpresas, isLoading: loadingTodas } = useQuery({
     queryKey: ["todas-empresas"],
+    enabled: isAdmin,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase.from("empresas").select("*").order("razao_social");
 
       if (error) {
-        // Usuários sem permissão de listagem global não devem quebrar a UI.
         if (error.code === "42501") return [];
         throw error;
       }
