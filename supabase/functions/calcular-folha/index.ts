@@ -48,6 +48,9 @@ function calcIRRF(base: number): number {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
+
   const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
   if (errorResponse) return errorResponse;
 
