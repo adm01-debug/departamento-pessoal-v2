@@ -36,6 +36,9 @@ serve(async (req: Request): Promise<Response> => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
