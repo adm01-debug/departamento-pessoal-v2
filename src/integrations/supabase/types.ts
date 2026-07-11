@@ -20833,11 +20833,11 @@ export type Database = {
       cleanup_security_logs: { Args: never; Returns: undefined }
       detectar_fraude_ponto: {
         Args: {
-          batida_id: string
-          colaborador_id: string
-          lat_nova: number
-          lng_nova: number
-          time_nova: string
+          _batida_id: string
+          _colaborador_id: string
+          _lat_nova: number
+          _lng_nova: number
+          _time_nova: string
         }
         Returns: undefined
       }
