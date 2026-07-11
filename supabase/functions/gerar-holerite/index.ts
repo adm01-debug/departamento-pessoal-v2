@@ -128,6 +128,7 @@ serve(async (req: Request): Promise<Response> => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
+    captureException(error, { fn: 'gerar-holerite' });
     const message = error instanceof Error ? error.message : 'Erro interno no servidor';
     return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }
