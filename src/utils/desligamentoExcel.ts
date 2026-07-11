@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import ExcelJS from 'exceljs';
 
 const TIPO_LABELS: Record<string, string> = {
   sem_justa_causa: 'Sem Justa Causa',
@@ -22,17 +23,19 @@ export async function exportarDesligamentosExcel(desligamentos: any[]) {
     return;
   }
 
-  const XLSX = await import('xlsx');
-
   const rows = desligamentos.map((d: any) => ({
-    'Colaborador': d.colaborador?.nome_completo || '—',
-    'Data Desligamento': d.data_desligamento ? new Date(d.data_desligamento).toLocaleDateString('pt-BR') : '—',
-    'Tipo': TIPO_LABELS[d.tipo] || d.tipo || '—',
-    'Status': STATUS_LABELS[d.status] || d.status || '—',
-    'Motivo': d.motivo || '—',
+    Colaborador: d.colaborador?.nome_completo || '—',
+    'Data Desligamento': d.data_desligamento
+      ? new Date(d.data_desligamento).toLocaleDateString('pt-BR')
+      : '—',
+    Tipo: TIPO_LABELS[d.tipo] || d.tipo || '—',
+    Status: STATUS_LABELS[d.status] || d.status || '—',
+    Motivo: d.motivo || '—',
     'Salário Base': d.salario_base || 0,
     'Valor Líquido': d.valor_liquido || 0,
-    'Aviso Prévio': d.data_aviso_previo ? new Date(d.data_aviso_previo).toLocaleDateString('pt-BR') : '—',
+    'Aviso Prévio': d.data_aviso_previo
+      ? new Date(d.data_aviso_previo).toLocaleDateString('pt-BR')
+      : '—',
     'Saldo Salário': d.saldo_salario || 0,
     '13º Proporcional': d.decimo_terceiro || 0,
     'Férias Proporcionais': d.ferias_proporcionais || 0,
@@ -41,15 +44,28 @@ export async function exportarDesligamentosExcel(desligamentos: any[]) {
     'Total Descontos': d.total_descontos || 0,
   }));
 
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Desligamentos');
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Desligamentos');
+  const headers = Object.keys(rows[0]);
+  ws.addRow(headers);
+  for (const r of rows) ws.addRow(headers.map((h) => (r as any)[h]));
 
-  const colWidths = Object.keys(rows[0]).map((key) => ({
-    wch: Math.max(key.length, ...rows.map((r: any) => String(r[key]).length)) + 2,
+  ws.columns = headers.map((key) => ({
+    header: key,
+    key,
+    width: Math.max(key.length, ...rows.map((r: any) => String(r[key]).length)) + 2,
   }));
-  ws['!cols'] = colWidths;
 
-  XLSX.writeFile(wb, `Desligamentos_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Desligamentos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+
   toast.success('Planilha exportada com sucesso!');
 }
