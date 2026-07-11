@@ -11,6 +11,9 @@ const corsHeaders = {
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
+
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
