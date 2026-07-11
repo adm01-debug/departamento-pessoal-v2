@@ -80,11 +80,14 @@ serve(async (req: Request): Promise<Response> => {
     // Auditoria do recebimento (event_id UNIQUE serve como lock lógico contra corridas)
     const { error: insertErr } = await supabase.from('webhook_logs').insert({
       event_id: webhookData.event_id,
+      evento: webhookData.event,
       payload: webhookData,
       headers: Object.fromEntries(req.headers.entries()),
       status: 'received',
-      version: webhookData.version
+      version: webhookData.version,
+      tentativa: 1,
     });
+
 
     // Se corrida entre 2 workers → conflito de UNIQUE → tratamos como replay
     if (insertErr && (insertErr.code === '23505' || /duplicate|unique/i.test(insertErr.message))) {
