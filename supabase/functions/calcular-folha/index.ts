@@ -95,6 +95,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ success: true, competencia, total_colaboradores: colaboradores.length, ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, Math.round(v * 100) / 100])), itens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error: any) {
+    captureException(error, { fn: 'calcular-folha' });
     return createErrorResponse(error.message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });
