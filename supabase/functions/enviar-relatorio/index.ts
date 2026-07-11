@@ -251,6 +251,7 @@ serve(async (req: Request): Promise<Response> => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Erro desconhecido";
     console.error("Erro enviar-relatorio:", msg);
+    captureException(error, { fn: "enviar-relatorio" });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
