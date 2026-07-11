@@ -1,6 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const FAIXAS_INSS = [
   { limite: 1518.00, aliquota: 0.075 },
