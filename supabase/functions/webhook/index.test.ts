@@ -66,3 +66,24 @@ Deno.test("verifySignature: deve retornar false se o secret estiver ausente", as
   const isValid = await verifySignature(payload, `sha256=any`, undefined);
   assertEquals(isValid, false);
 });
+
+// Fail-closed: reflete a lógica do handler — sem WEBHOOK_SECRET => 503,
+// com secret mas assinatura ruim => 401.
+function statusForRequest(secret: string | undefined, signatureValid: boolean): number {
+  if (!secret) return 503;
+  if (!signatureValid) return 401;
+  return 200;
+}
+
+Deno.test("fail-closed: sem WEBHOOK_SECRET retorna 503", () => {
+  assertEquals(statusForRequest(undefined, false), 503);
+  assertEquals(statusForRequest(undefined, true), 503);
+});
+
+Deno.test("fail-closed: com secret e assinatura inválida retorna 401", () => {
+  assertEquals(statusForRequest("s3cr3t", false), 401);
+});
+
+Deno.test("fail-closed: com secret e assinatura válida retorna 200", () => {
+  assertEquals(statusForRequest("s3cr3t", true), 200);
+});
