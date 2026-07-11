@@ -1,17 +1,26 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://esm.sh/zod@3.23.8';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-interface GerarGuiasRequest {
-  empresaId: string;
-  competencia: string;
-  tipo: 'GPS' | 'DARF' | 'FGTS' | 'FGTS_DIGITAL' | 'TODAS' | 'GFD';
+const BodySchema = z.object({
+  empresaId: z.string().uuid(),
+  competencia: z.string().regex(/^\d{4}-\d{2}$/, 'competência deve estar no formato YYYY-MM'),
+  tipo: z.enum(['GPS', 'DARF', 'FGTS', 'FGTS_DIGITAL', 'TODAS', 'GFD']),
+});
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 const calcularINSS = (base: number): number => {
@@ -32,23 +41,54 @@ const calcularIRRF = (base: number): number => {
 };
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') return jsonResponse({ success: false, error: 'Method not allowed' }, 405);
 
   const csrf = await verifyCsrf(req);
   if (!csrf.ok) return csrf.response!;
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const { empresaId, competencia, tipo }: GerarGuiasRequest = await req.json();
-
-    if (!empresaId || !competencia) {
-      throw new Error('Campos obrigatórios: empresaId, competencia');
+    // Auth obrigatório
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return jsonResponse({ success: false, error: 'Autenticação obrigatória' }, 401);
     }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) return jsonResponse({ success: false, error: 'Sessão inválida' }, 401);
+    const userId = userData.user.id;
+
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    // Zod
+    let raw: unknown;
+    try { raw = await req.json(); } catch { return jsonResponse({ success: false, error: 'JSON inválido' }, 400); }
+    const parsed = BodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return jsonResponse({ success: false, error: 'Payload inválido', details: parsed.error.flatten() }, 400);
+    }
+    const { empresaId, competencia, tipo } = parsed.data;
+
+    // Tenant scope — dados fiscais são sensíveis
+    const { data: belongs } = await supabase.rpc('user_belongs_to_empresa', {
+      _user_id: userId, _empresa_id: empresaId,
+    });
+    const { data: isAdm } = await supabase.rpc('is_admin', { _user_id: userId });
+    if (!belongs && !isAdm) return jsonResponse({ success: false, error: 'Sem acesso a esta empresa' }, 403);
+
+    // Audit log
+    await supabase.from('audit_log').insert({
+      tabela: 'guias_fiscais', registro_id: empresaId, acao: 'GENERATE_GUIA',
+      user_id: userId,
+      dados_novos: { tipo, competencia, empresa_id: empresaId },
+    });
 
     // Buscar colaboradores ativos da empresa
     const { data: colaboradores, error: colError } = await supabase
@@ -58,6 +98,7 @@ serve(async (req: Request): Promise<Response> => {
       .eq('status', 'ativo');
 
     if (colError) throw colError;
+
 
     const totalColaboradores = colaboradores?.length || 0;
 
