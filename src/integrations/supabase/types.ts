@@ -10924,24 +10924,30 @@ export type Database = {
         Row: {
           created_at: string | null
           data_programada: string
+          dry_run: boolean
           executado: boolean | null
           id: string
+          processed_at: string | null
           registro_id: string
           tabela: string
         }
         Insert: {
           created_at?: string | null
           data_programada: string
+          dry_run?: boolean
           executado?: boolean | null
           id?: string
+          processed_at?: string | null
           registro_id: string
           tabela: string
         }
         Update: {
           created_at?: string | null
           data_programada?: string
+          dry_run?: boolean
           executado?: boolean | null
           id?: string
+          processed_at?: string | null
           registro_id?: string
           tabela?: string
         }
