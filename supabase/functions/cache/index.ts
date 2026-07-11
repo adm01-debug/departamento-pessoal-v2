@@ -1,104 +1,223 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
+import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Onda 23: cache tenant-isolado. O Map em memória é PER-INSTANCE e SEM
+// segmentação — sem isolamento por usuário/empresa, um consumidor podia
+// ler/poluir cache de outro. Aqui aplicamos:
+//  - JWT obrigatória
+//  - Namespacing forçado por user_id (+ empresa_id quando aplicável)
+//  - Whitelist rígida de tabelas para query_cached
+//  - empresa_id obrigatório e escopado em query_cached
+//  - TTL clamp [5s, 15min] e limite de payload
 
-// In-memory cache store (per edge function instance)
-const cacheStore = new Map<string, { data: any; expiresAt: number }>();
+const BodySchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('get'), key: z.string().min(1).max(256) }),
+  z.object({
+    action: z.literal('set'),
+    key: z.string().min(1).max(256),
+    ttlSeconds: z.number().int().min(5).max(900).optional(),
+    value: z.any(),
+  }),
+  z.object({ action: z.literal('invalidate'), key: z.string().min(1).max(256) }),
+  z.object({
+    action: z.literal('query_cached'),
+    table: z.string().min(1).max(64),
+    empresaId: z.string().uuid(),
+    ttlSeconds: z.number().int().min(5).max(900).optional(),
+    query: z.object({
+      select: z.string().max(256).optional(),
+      limit: z.number().int().min(1).max(1000).optional(),
+      orderBy: z.string().max(64).optional(),
+      ascending: z.boolean().optional(),
+    }).optional(),
+  }),
+  z.object({ action: z.literal('stats') }),
+]);
+
+const ALLOWED_TABLES = new Set([
+  'colaboradores', 'departamentos', 'cargos', 'folhas_pagamento',
+  'holerites', 'ferias', 'afastamentos', 'beneficios',
+]);
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+
+const MAX_ENTRIES = 5000;
+const MAX_VALUE_BYTES = 256 * 1024; // 256KB por entrada
+
+interface CacheEntry { data: unknown; expiresAt: number; bytes: number }
+const cacheStore = new Map<string, CacheEntry>();
+let totalBytes = 0;
+
+function evictExpired() {
+  const now = Date.now();
+  for (const [k, v] of cacheStore.entries()) {
+    if (v.expiresAt <= now) {
+      totalBytes -= v.bytes;
+      cacheStore.delete(k);
+    }
+  }
+}
+
+function evictLRUIfNeeded() {
+  while (cacheStore.size >= MAX_ENTRIES) {
+    const oldest = cacheStore.keys().next().value; // Map mantém ordem de inserção
+    if (!oldest) break;
+    const e = cacheStore.get(oldest);
+    if (e) totalBytes -= e.bytes;
+    cacheStore.delete(oldest);
+  }
+}
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
 
-    const { action, key, ttlSeconds, table, query } = await req.json();
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (!jwt) return createErrorResponse('Não autenticado', 401, 'UNAUTHORIZED');
 
-    if (action === 'get') {
-      const cached = cacheStore.get(key);
-      if (cached && cached.expiresAt > Date.now()) {
-        return new Response(JSON.stringify({ success: true, hit: true, data: cached.data }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      return new Response(JSON.stringify({ success: true, hit: false, data: null }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-
-    } else if (action === 'set') {
-      const ttl = (ttlSeconds || 300) * 1000;
-      cacheStore.set(key, { data: query, expiresAt: Date.now() + ttl });
-      return new Response(JSON.stringify({ success: true, key, expiresIn: ttlSeconds || 300 }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-
-    } else if (action === 'invalidate') {
-      if (key === '*') {
-        const size = cacheStore.size;
-        cacheStore.clear();
-        return new Response(JSON.stringify({ success: true, cleared: size }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      const existed = cacheStore.delete(key);
-      return new Response(JSON.stringify({ success: true, existed }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-
-    } else if (action === 'query_cached') {
-      // Query a table with caching
-      if (!table) throw new Error('table é obrigatório para query_cached');
-      const cacheKey = `table:${table}:${JSON.stringify(query || {})}`;
-      const cached = cacheStore.get(cacheKey);
-      
-      if (cached && cached.expiresAt > Date.now()) {
-        return new Response(JSON.stringify({ success: true, hit: true, data: cached.data, source: 'cache' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      // Query database
-      let q = supabase.from(table).select(query?.select || '*');
-      if (query?.limit) q = q.limit(query.limit);
-      if (query?.orderBy) q = q.order(query.orderBy, { ascending: query.ascending ?? true });
-      
-      const { data, error } = await q;
-      if (error) throw error;
-
-      // Cache result
-      const ttl = (ttlSeconds || 60) * 1000;
-      cacheStore.set(cacheKey, { data, expiresAt: Date.now() + ttl });
-
-      return new Response(JSON.stringify({ success: true, hit: false, data, source: 'database' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-
-    } else if (action === 'stats') {
-      // Clean expired entries
-      const now = Date.now();
-      let expired = 0;
-      for (const [k, v] of cacheStore.entries()) {
-        if (v.expiresAt <= now) { cacheStore.delete(k); expired++; }
-      }
-      return new Response(JSON.stringify({
-        success: true,
-        stats: { entries: cacheStore.size, expired_cleaned: expired, timestamp: new Date().toISOString() },
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${jwt}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     }
+    const userId = userData.user.id;
 
-    return new Response(JSON.stringify({ success: false, error: 'Ação inválida. Use: get, set, invalidate, query_cached, stats' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
+    const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
+    if (!parsed.success) return createValidationErrorResponse(parsed.error);
+    const body = parsed.data;
+
+    const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ success: false, error: message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
-    });
+
+    evictExpired();
+
+    // Namespacing forçado — impossível ler cache de outro usuário
+    const ns = (k: string, extra = '') => `u:${userId}:${extra}${k}`;
+
+    switch (body.action) {
+      case 'get': {
+        const entry = cacheStore.get(ns(body.key));
+        if (entry && entry.expiresAt > Date.now()) {
+          return json({ success: true, hit: true, data: entry.data });
+        }
+        return json({ success: true, hit: false, data: null });
+      }
+
+      case 'set': {
+        const serialized = JSON.stringify(body.value ?? null);
+        if (serialized.length > MAX_VALUE_BYTES) {
+          return createErrorResponse('Payload excede 256KB', 413, 'PAYLOAD_TOO_LARGE');
+        }
+        const ttl = (body.ttlSeconds ?? 300) * 1000;
+        const key = ns(body.key);
+        const prev = cacheStore.get(key);
+        if (prev) totalBytes -= prev.bytes;
+        evictLRUIfNeeded();
+        cacheStore.set(key, {
+          data: body.value ?? null,
+          expiresAt: Date.now() + ttl,
+          bytes: serialized.length,
+        });
+        totalBytes += serialized.length;
+        return json({ success: true, key: body.key, expiresIn: ttl / 1000 });
+      }
+
+      case 'invalidate': {
+        const key = ns(body.key);
+        const prev = cacheStore.get(key);
+        if (prev) totalBytes -= prev.bytes;
+        const existed = cacheStore.delete(key);
+        return json({ success: true, existed });
+      }
+
+      case 'query_cached': {
+        if (!ALLOWED_TABLES.has(body.table)) {
+          return createErrorResponse('Tabela não permitida em cache', 403, 'FORBIDDEN_TABLE');
+        }
+        // Tenant scope obrigatório
+        const { data: belongs } = await admin.rpc('user_belongs_to_empresa', {
+          _user_id: userId,
+          _empresa_id: body.empresaId,
+        });
+        if (!belongs) {
+          const { data: isAdmin } = await admin.rpc('is_admin', { _user_id: userId });
+          if (!isAdmin) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
+        }
+
+        const cacheKey = ns(
+          `t:${body.table}:${body.empresaId}:${JSON.stringify(body.query ?? {})}`,
+          'q:',
+        );
+        const entry = cacheStore.get(cacheKey);
+        if (entry && entry.expiresAt > Date.now()) {
+          return json({ success: true, hit: true, data: entry.data, source: 'cache' });
+        }
+
+        // select whitelist simples — apenas identificadores/wildcards/vírgulas
+        const rawSel = body.query?.select ?? '*';
+        const safeSel = /^[a-zA-Z0-9_,\s\*\(\)]+$/.test(rawSel) ? rawSel : '*';
+
+        let q = admin.from(body.table).select(safeSel).eq('empresa_id', body.empresaId);
+        q = q.limit(body.query?.limit ?? 100);
+        if (body.query?.orderBy && /^[a-zA-Z0-9_]+$/.test(body.query.orderBy)) {
+          q = q.order(body.query.orderBy, { ascending: body.query.ascending ?? true });
+        }
+
+        const { data, error } = await q;
+        if (error) {
+          console.warn('query_cached erro:', error.message);
+          return createErrorResponse('Falha ao consultar', 500, 'QUERY_ERROR');
+        }
+
+        const serialized = JSON.stringify(data ?? []);
+        if (serialized.length <= MAX_VALUE_BYTES) {
+          evictLRUIfNeeded();
+          cacheStore.set(cacheKey, {
+            data,
+            expiresAt: Date.now() + (body.ttlSeconds ?? 60) * 1000,
+            bytes: serialized.length,
+          });
+          totalBytes += serialized.length;
+        }
+        return json({ success: true, hit: false, data, source: 'database' });
+      }
+
+      case 'stats': {
+        return json({
+          success: true,
+          stats: {
+            entries: cacheStore.size,
+            approx_bytes: totalBytes,
+            timestamp: new Date().toISOString(),
+          },
+        });
+      }
+    }
+  } catch (err) {
+    await captureException(err, { function: 'cache' });
+    return createErrorResponse('Erro interno', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
+
+function json(body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
