@@ -62,28 +62,66 @@ serve(async (req: Request): Promise<Response> => {
 
     const webhookData = data!;
 
-    // Auditoria do recebimento
-    await supabase.from('webhook_logs').insert({
+    // Idempotência: se event_id já foi processado, retornamos 200 com replay=true
+    // sem re-executar side-effects (garante at-least-once → exactly-once semântica).
+    const { data: existing } = await supabase
+      .from('webhook_logs')
+      .select('id, status')
+      .eq('event_id', webhookData.event_id)
+      .maybeSingle();
+
+    if (existing) {
+      return new Response(
+        JSON.stringify({ success: true, replay: true, event_id: webhookData.event_id }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
+    // Auditoria do recebimento (event_id UNIQUE serve como lock lógico contra corridas)
+    const { error: insertErr } = await supabase.from('webhook_logs').insert({
+      event_id: webhookData.event_id,
       payload: webhookData,
       headers: Object.fromEntries(req.headers.entries()),
       status: 'received',
       version: webhookData.version
     });
 
+    // Se corrida entre 2 workers → conflito de UNIQUE → tratamos como replay
+    if (insertErr && (insertErr.code === '23505' || /duplicate|unique/i.test(insertErr.message))) {
+      return new Response(
+        JSON.stringify({ success: true, replay: true, event_id: webhookData.event_id }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+    if (insertErr) {
+      console.error('Erro ao registrar webhook_log:', insertErr);
+      return createErrorResponse('Erro ao registrar webhook', 500, 'LOG_ERROR');
+    }
+
     // Lógica de versionamento
     let result;
-    if (webhookData.version === 'v2') {
-      result = await processWebhookV2(webhookData, supabase);
-    } else {
-      result = await processWebhookV1(webhookData, supabase);
+    try {
+      if (webhookData.version === 'v2') {
+        result = await processWebhookV2(webhookData, supabase);
+      } else {
+        result = await processWebhookV1(webhookData, supabase);
+      }
+      await supabase.from('webhook_logs').update({ status: 'processed' }).eq('event_id', webhookData.event_id);
+    } catch (procErr) {
+      await supabase.from('webhook_logs').update({
+        status: 'failed',
+        erro: (procErr as Error).message
+      }).eq('event_id', webhookData.event_id);
+      throw procErr;
     }
 
     return new Response(
-      JSON.stringify({ success: true, data: result, version: webhookData.version }),
+      JSON.stringify({ success: true, data: result, version: webhookData.version, event_id: webhookData.event_id }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   });
 });
+
 
 
 async function processWebhookV1(body: any, supabase: any) {
