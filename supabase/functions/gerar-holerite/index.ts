@@ -2,6 +2,8 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { holeriteSchema } from '../_shared/schemas/common.ts';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 // Tabelas INSS 2026
 const calcularINSS = (base: number): number => {
@@ -26,6 +28,9 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
+
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
 
   const { data, errorResponse } = await validateRequest(req, holeriteSchema);
   if (errorResponse) return errorResponse;
@@ -123,6 +128,7 @@ serve(async (req: Request): Promise<Response> => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
+    captureException(error, { fn: 'gerar-holerite' });
     const message = error instanceof Error ? error.message : 'Erro interno no servidor';
     return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
   }

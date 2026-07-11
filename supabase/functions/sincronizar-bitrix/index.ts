@@ -1,5 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +10,9 @@ const corsHeaders = {
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
 
   try {
     const supabase = createClient(
@@ -144,6 +149,7 @@ serve(async (req: Request): Promise<Response> => {
       data: { ...results, totals: { processed: totalProcessed, success: totalSuccess, errors: totalErrors } },
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error: unknown) {
+    captureException(error, { fn: 'sincronizar-bitrix' });
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(JSON.stringify({ success: false, error: message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,

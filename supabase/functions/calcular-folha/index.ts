@@ -1,6 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const FAIXAS_INSS = [
   { limite: 1518.00, aliquota: 0.075 },
@@ -46,6 +48,9 @@ function calcIRRF(base: number): number {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
+
   const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
   if (errorResponse) return errorResponse;
 
@@ -90,6 +95,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ success: true, competencia, total_colaboradores: colaboradores.length, ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, Math.round(v * 100) / 100])), itens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error: any) {
+    captureException(error, { fn: 'calcular-folha' });
     return createErrorResponse(error.message, 500, 'INTERNAL_SERVER_ERROR');
   }
 });

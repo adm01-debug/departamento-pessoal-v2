@@ -1,5 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,6 +35,9 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
+
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -166,6 +171,7 @@ serve(async (req: Request): Promise<Response> => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
+    captureException(error, { fn: 'gerar-guias' });
     const message = error instanceof Error ? error.message : 'Erro desconhecido';
     return new Response(
       JSON.stringify({ success: false, error: message }),

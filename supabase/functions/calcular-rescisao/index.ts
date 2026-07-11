@@ -1,3 +1,6 @@
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -19,6 +22,8 @@ function calcIRRF(b: number): number {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
   try {
     const { salario_base, data_admissao, data_desligamento, tipo_rescisao = 'sem_justa_causa', saldo_fgts = 0, ferias_vencidas = false } = await req.json();
     if (!salario_base || !data_admissao || !data_desligamento) return new Response(JSON.stringify({ error: 'Campos obrigatórios faltando' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -56,6 +61,7 @@ Deno.serve(async (req) => {
       tempo_servico_meses: totalMeses, tempo_servico_anos: anos,
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    captureException(error, { fn: 'calcular-rescisao' });
+    return new Response(JSON.stringify({ error: (error as Error).message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });
