@@ -8,9 +8,11 @@ import ImportacaoPage from '@/pages/ImportacaoPage';
 
 // --- Mocks ---------------------------------------------------------------
 
-const toastSuccess = vi.fn();
-const toastError = vi.fn();
-const toastInfo = vi.fn();
+const { toastSuccess, toastError, toastInfo } = vi.hoisted(() => ({
+  toastSuccess: vi.fn(),
+  toastError: vi.fn(),
+  toastInfo: vi.fn(),
+}));
 vi.mock('sonner', () => ({
   toast: { success: toastSuccess, error: toastError, info: toastInfo },
 }));
@@ -20,9 +22,10 @@ vi.mock('@/contexts', () => ({
   useEmpresa: () => ({ empresaAtual: { id: 'empresa-1' } }),
 }));
 
-// Supabase: existing colaboradores query + insert
-const supabaseSelectResult = { data: [] as any[], error: null };
-const insertMock = vi.fn(async () => ({ error: null }));
+const { supabaseSelectResult, insertMock } = vi.hoisted(() => ({
+  supabaseSelectResult: { data: [] as any[], error: null as any },
+  insertMock: vi.fn(async () => ({ error: null })),
+}));
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: () => ({
