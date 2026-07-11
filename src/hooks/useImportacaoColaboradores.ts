@@ -76,9 +76,15 @@ export function useImportacaoColaboradores() {
   const processarArquivo = useCallback(async (file: File) => {
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rawData = XLSX.utils.sheet_to_json<unknown>(sheet, { header: 1 });
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(data);
+      const sheet = workbook.worksheets[0];
+      const rawData: unknown[][] = [];
+      sheet.eachRow({ includeEmpty: false }, (row) => {
+        // row.values is 1-indexed; drop the leading undefined
+        const vals = (row.values as unknown[]).slice(1);
+        rawData.push(vals);
+      });
 
       if (rawData.length < 2) throw new Error('Planilha vazia');
 
