@@ -1,23 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { exportarDesligamentosExcel } from '../desligamentoExcel';
 
-// Mock xlsx
-vi.mock('xlsx', () => ({
-  default: {
-    utils: {
-      json_to_sheet: vi.fn(() => ({})),
-      book_new: vi.fn(() => ({})),
-      book_append_sheet: vi.fn(),
-    },
-    writeFile: vi.fn(),
-  },
-  utils: {
-    json_to_sheet: vi.fn(() => ({})),
-    book_new: vi.fn(() => ({})),
-    book_append_sheet: vi.fn(),
-  },
-  writeFile: vi.fn(),
-}));
+
 
 // Mock sonner
 vi.mock('sonner', () => ({
