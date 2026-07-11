@@ -24,3 +24,11 @@ class ResizeObserver {
 }
 
 window.ResizeObserver = ResizeObserver;
+
+// Polyfill URL.createObjectURL / revokeObjectURL for jsdom (used by Excel/PDF exports).
+if (typeof URL.createObjectURL !== 'function') {
+  (URL as any).createObjectURL = vi.fn(() => 'blob:mock');
+}
+if (typeof URL.revokeObjectURL !== 'function') {
+  (URL as any).revokeObjectURL = vi.fn();
+}
