@@ -10,7 +10,7 @@ import { Upload, FileSpreadsheet, CheckCircle, AlertTriangle, XCircle, Download,
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { useImportacaoColaboradores } from '@/hooks/useImportacaoColaboradores';
 
 interface ImportRow {
