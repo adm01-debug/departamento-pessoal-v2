@@ -18980,36 +18980,48 @@ export type Database = {
           created_at: string
           duracao_ms: number | null
           erro: string | null
+          event_id: string | null
           evento: string
+          headers: Json | null
           id: string
           payload: Json | null
           resposta: string | null
+          status: string | null
           status_code: number | null
           tentativa: number | null
+          version: string | null
           webhook_id: string
         }
         Insert: {
           created_at?: string
           duracao_ms?: number | null
           erro?: string | null
+          event_id?: string | null
           evento: string
+          headers?: Json | null
           id?: string
           payload?: Json | null
           resposta?: string | null
+          status?: string | null
           status_code?: number | null
           tentativa?: number | null
+          version?: string | null
           webhook_id: string
         }
         Update: {
           created_at?: string
           duracao_ms?: number | null
           erro?: string | null
+          event_id?: string | null
           evento?: string
+          headers?: Json | null
           id?: string
           payload?: Json | null
           resposta?: string | null
+          status?: string | null
           status_code?: number | null
           tentativa?: number | null
+          version?: string | null
           webhook_id?: string
         }
         Relationships: [
