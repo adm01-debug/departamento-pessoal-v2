@@ -120,6 +120,10 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // MP-005: CSRF fail-closed em state-changing.
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
+
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
