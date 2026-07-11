@@ -32,26 +32,61 @@ serve(async (req: Request): Promise<Response> => {
   const csrf = await verifyCsrf(req);
   if (!csrf.ok) return csrf.response!;
 
+  // Auth obrigatório — holerite contém PII (CPF, banco, agência, conta)
+  const authHeader = req.headers.get('Authorization') ?? '';
+  if (!authHeader.startsWith('Bearer ')) {
+    return createErrorResponse('Autenticação obrigatória', 401, 'UNAUTHORIZED');
+  }
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+  const userClient = createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: userData, error: userErr } = await userClient.auth.getUser();
+  if (userErr || !userData?.user) {
+    return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
+  }
+  const userId = userData.user.id;
+
   const { data, errorResponse } = await validateRequest(req, holeriteSchema);
   if (errorResponse) return errorResponse;
 
   const { colaboradorId, competencia } = data!;
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Buscar dados do colaborador
+    // Buscar dados do colaborador (com empresa_id para gate de tenant)
     const { data: colaborador, error: colError } = await supabase
       .from('colaboradores')
-      .select('nome_completo, cpf, cargo, departamento, salario_base, data_admissao, banco_nome, agencia, conta')
+      .select('nome_completo, cpf, cargo, departamento, salario_base, data_admissao, banco_nome, agencia, conta, empresa_id, user_id')
       .eq('id', colaboradorId)
       .maybeSingle();
 
     if (colError || !colaborador) {
       return createErrorResponse('Colaborador não encontrado', 404, 'NOT_FOUND');
     }
+
+    // Tenant scope: usuário deve ser dono do holerite, admin, OU pertencer à empresa
+    const { data: belongs } = await supabase.rpc('user_belongs_to_empresa', {
+      _user_id: userId, _empresa_id: colaborador.empresa_id,
+    });
+    const { data: isAdm } = await supabase.rpc('is_admin', { _user_id: userId });
+    const isOwner = colaborador.user_id === userId;
+    if (!isOwner && !belongs && !isAdm) {
+      return createErrorResponse('Sem acesso a este holerite', 403, 'FORBIDDEN');
+    }
+
+    // Audit log — leitura de PII sensível
+    await supabase.from('audit_log').insert({
+      tabela: 'holerite', registro_id: colaboradorId, acao: 'READ_HOLERITE',
+      user_id: userId,
+      dados_novos: { competencia, empresa_id: colaborador.empresa_id },
+    });
+
 
     // Buscar registros de ponto do mês
     const [ano, mes] = competencia.split('-').map(Number);
