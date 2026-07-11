@@ -42,7 +42,18 @@ serve(async (req: Request): Promise<Response> => {
     const signature = req.headers.get('x-hub-signature-256');
     const payloadText = await req.clone().text();
 
-    if (secret && !(await verifySignature(payloadText, signature, secret))) {
+    // Fail-closed: sem secret configurado, recusa TODAS as requisições (503).
+    if (!secret) {
+      console.error('WEBHOOK_SECRET não configurado — recusando webhook (fail-closed)');
+      return createErrorResponse(
+        'Webhook não configurado no servidor',
+        503,
+        'WEBHOOK_NOT_CONFIGURED'
+      );
+    }
+
+    // Assinatura ausente ou inválida => 401.
+    if (!(await verifySignature(payloadText, signature, secret))) {
       return createErrorResponse('Assinatura inválida', 401, 'INVALID_SIGNATURE');
     }
 
