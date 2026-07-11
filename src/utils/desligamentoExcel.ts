@@ -1,5 +1,8 @@
 import { toast } from 'sonner';
-import ExcelJS from 'exceljs';
+import {
+  buildTabularWorkbook,
+  downloadWorkbook,
+} from './importacao/excelDownload';
 
 const TIPO_LABELS: Record<string, string> = {
   sem_justa_causa: 'Sem Justa Causa',
@@ -17,55 +20,40 @@ const STATUS_LABELS: Record<string, string> = {
   cancelado: 'Cancelado',
 };
 
+const HEADERS = [
+  'Colaborador', 'Data Desligamento', 'Tipo', 'Status', 'Motivo',
+  'Salário Base', 'Valor Líquido', 'Aviso Prévio', 'Saldo Salário',
+  '13º Proporcional', 'Férias Proporcionais', 'Multa FGTS',
+  'Total Proventos', 'Total Descontos',
+];
+
+function rowFor(d: any): unknown[] {
+  return [
+    d.colaborador?.nome_completo || '—',
+    d.data_desligamento ? new Date(d.data_desligamento).toLocaleDateString('pt-BR') : '—',
+    TIPO_LABELS[d.tipo] || d.tipo || '—',
+    STATUS_LABELS[d.status] || d.status || '—',
+    d.motivo || '—',
+    d.salario_base || 0,
+    d.valor_liquido || 0,
+    d.data_aviso_previo ? new Date(d.data_aviso_previo).toLocaleDateString('pt-BR') : '—',
+    d.saldo_salario || 0,
+    d.decimo_terceiro || 0,
+    d.ferias_proporcionais || 0,
+    d.multa_fgts || 0,
+    d.total_proventos || 0,
+    d.total_descontos || 0,
+  ];
+}
+
 export async function exportarDesligamentosExcel(desligamentos: any[]) {
   if (desligamentos.length === 0) {
     toast.error('Nenhum desligamento para exportar');
     return;
   }
-
-  const rows = desligamentos.map((d: any) => ({
-    Colaborador: d.colaborador?.nome_completo || '—',
-    'Data Desligamento': d.data_desligamento
-      ? new Date(d.data_desligamento).toLocaleDateString('pt-BR')
-      : '—',
-    Tipo: TIPO_LABELS[d.tipo] || d.tipo || '—',
-    Status: STATUS_LABELS[d.status] || d.status || '—',
-    Motivo: d.motivo || '—',
-    'Salário Base': d.salario_base || 0,
-    'Valor Líquido': d.valor_liquido || 0,
-    'Aviso Prévio': d.data_aviso_previo
-      ? new Date(d.data_aviso_previo).toLocaleDateString('pt-BR')
-      : '—',
-    'Saldo Salário': d.saldo_salario || 0,
-    '13º Proporcional': d.decimo_terceiro || 0,
-    'Férias Proporcionais': d.ferias_proporcionais || 0,
-    'Multa FGTS': d.multa_fgts || 0,
-    'Total Proventos': d.total_proventos || 0,
-    'Total Descontos': d.total_descontos || 0,
-  }));
-
-  const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet('Desligamentos');
-  const headers = Object.keys(rows[0]);
-  ws.addRow(headers);
-  for (const r of rows) ws.addRow(headers.map((h) => (r as any)[h]));
-
-  ws.columns = headers.map((key) => ({
-    header: key,
-    key,
-    width: Math.max(key.length, ...rows.map((r: any) => String(r[key]).length)) + 2,
-  }));
-
-  const buf = await wb.xlsx.writeBuffer();
-  const blob = new Blob([buf], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Desligamentos_${new Date().toISOString().slice(0, 10)}.xlsx`;
-  a.click();
-  URL.revokeObjectURL(url);
-
+  const rows = desligamentos.map(rowFor);
+  const wb = buildTabularWorkbook('Desligamentos', HEADERS, rows);
+  const filename = `Desligamentos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  await downloadWorkbook(wb, filename);
   toast.success('Planilha exportada com sucesso!');
 }

@@ -1,31 +1,23 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
-import ExcelJS from 'exceljs';
+import {
+  buildTabularWorkbook,
+  downloadWorkbook,
+} from '@/utils/importacao/excelDownload';
 
-function downloadBuffer(buf: ArrayBuffer, filename: string) {
-  const blob = new Blob([buf], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
+/**
+ * Generic Excel export hook. Delegates workbook construction and download to the
+ * shared helpers in `src/utils/importacao/excelDownload.ts`, so column layout and
+ * MIME/filename handling stay consistent with the import template flow.
+ */
 export function useExcelExport() {
   const exportarExcel = useCallback(
     async (titulo: string, dados: any[], colunas: string[]) => {
       try {
-        const wb = new ExcelJS.Workbook();
-        const ws = wb.addWorksheet(titulo.substring(0, 31) || 'Sheet1');
-        ws.addRow(colunas);
-        for (const item of dados) {
-          ws.addRow(colunas.map((c) => item?.[c] ?? ''));
-        }
-        const buf = await wb.xlsx.writeBuffer();
-        downloadBuffer(buf, `${titulo.toLowerCase().replace(/\s+/g, '-')}.xlsx`);
+        const rows = dados.map((item) => colunas.map((c) => item?.[c] ?? ''));
+        const wb = buildTabularWorkbook(titulo, colunas, rows);
+        const filename = `${titulo.toLowerCase().replace(/\s+/g, '-')}.xlsx`;
+        await downloadWorkbook(wb, filename);
         toast.success('Excel exportado com sucesso!');
       } catch (e: any) {
         toast.error('Erro ao gerar Excel: ' + e.message);
