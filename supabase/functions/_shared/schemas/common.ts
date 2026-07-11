@@ -5,11 +5,13 @@ export const metricasSchema = z.object({
 });
 
 export const webhookSchema = z.object({
-  event: z.string().min(1, 'Evento é obrigatório'),
+  event_id: z.string().min(1, 'event_id é obrigatório para idempotência').max(128),
+  event: z.string().min(1, 'Evento é obrigatório').max(128),
   data: z.record(z.any()),
   timestamp: z.string().datetime().optional(),
   version: z.string().optional().default('v1'),
 });
+
 
 export const healthcheckSchema = z.object({}).strict();
 
