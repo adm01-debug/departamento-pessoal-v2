@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { verifyCsrf } from "../_shared/csrf.ts";
+import { captureException } from "../_shared/sentry.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -117,6 +119,10 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // MP-005: CSRF fail-closed em state-changing.
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
 
   try {
     const supabase = createClient(
@@ -245,6 +251,7 @@ serve(async (req: Request): Promise<Response> => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Erro desconhecido";
     console.error("Erro enviar-relatorio:", msg);
+    captureException(error, { fn: "enviar-relatorio" });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
