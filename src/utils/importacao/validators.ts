@@ -38,6 +38,10 @@ export function parseDate(val: unknown): string | null {
 
 export function parseSalario(val: unknown): number | undefined {
   if (val === null || val === undefined || val === '') return undefined;
-  const n = Number(String(val).replace(/[^\d.,-]/g, '').replace(',', '.'));
+  let s = String(val).replace(/[^\d.,-]/g, '');
+  // pt-BR: if both '.' and ',' appear, '.' is thousands and ',' is decimal
+  if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '').replace(',', '.');
+  else s = s.replace(',', '.');
+  const n = Number(s);
   return Number.isFinite(n) ? n : undefined;
 }
