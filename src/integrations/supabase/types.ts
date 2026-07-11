@@ -11262,6 +11262,42 @@ export type Database = {
         }
         Relationships: []
       }
+      login_lockouts: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          identifier: string
+          identifier_type: string
+          is_locked: boolean
+          last_attempt: string
+          lockout_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          identifier: string
+          identifier_type?: string
+          is_locked?: boolean
+          last_attempt?: string
+          lockout_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          identifier?: string
+          identifier_type?: string
+          is_locked?: boolean
+          last_attempt?: string
+          lockout_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       login_rate_limits: {
         Row: {
           created_at: string
