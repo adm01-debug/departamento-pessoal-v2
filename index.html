@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- MP-004: CSP em modo relatório para rollout seguro; endurecer para enforce após validação -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.lovable.app https://*.lovable.dev https://*.sentry.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.app https://*.lovable.dev https://api.hibp.com https://*.sentry.io https://viacep.com.br https://brasilapi.com.br; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>Sistema DP - Departamento Pessoal</title>
     <meta name="description" content="Sistema de Departamento Pessoal - Gestão completa de RH, folha de pagamento, ponto e benefícios">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
