@@ -6,6 +6,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Whitelist de relatórios permitidos. Qualquer valor fora daqui é recusado
+// para evitar exfiltração arbitrária via este endpoint.
+const RELATORIOS_PERMITIDOS = new Set([
+  "lista_colaboradores",
+  "folha_resumo",
+  "ferias_proximas",
+  "afastamentos_ativos",
+  "indicadores_dp",
+]);
+
+const FORMATOS_PERMITIDOS = new Set(["json", "csv"]);
+const BUCKET = "relatorios-privados";
+const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24; // 24h
+
 interface EnviarRelatorioRequest {
   agendamentoId?: string;
   tipoRelatorio: string;
@@ -14,149 +28,199 @@ interface EnviarRelatorioRequest {
   parametros?: Record<string, unknown>;
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
+function isEmail(s: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+async function coletarDados(
+  supabase: ReturnType<typeof createClient>,
+  tipo: string,
+  parametros?: Record<string, unknown>,
+): Promise<{ dados: unknown; totalRegistros: number }> {
+  switch (tipo) {
+    case "lista_colaboradores": {
+      const { data, error } = await supabase
+        .from("colaboradores")
+        .select("id,nome_completo,email,status,cargo_id,departamento_id")
+        .eq("status", "ativo");
+      if (error) throw error;
+      return { dados: data ?? [], totalRegistros: data?.length ?? 0 };
+    }
+    case "folha_resumo": {
+      const competencia =
+        (parametros?.competencia as string | undefined) ??
+        new Date().toISOString().slice(0, 7);
+      const { data, error } = await supabase
+        .from("folhas_pagamento")
+        .select("id,competencia,total_liquido,total_proventos,total_descontos,status")
+        .eq("competencia", competencia)
+        .maybeSingle();
+      if (error) throw error;
+      return { dados: data, totalRegistros: data ? 1 : 0 };
+    }
+    case "ferias_proximas": {
+      const inicio = new Date();
+      const fim = new Date();
+      fim.setDate(fim.getDate() + 30);
+      const { data, error } = await supabase
+        .from("ferias")
+        .select("id,colaborador_id,data_inicio,data_fim,status")
+        .gte("data_inicio", inicio.toISOString())
+        .lte("data_inicio", fim.toISOString());
+      if (error) throw error;
+      return { dados: data ?? [], totalRegistros: data?.length ?? 0 };
+    }
+    case "afastamentos_ativos": {
+      const { data, error } = await supabase
+        .from("afastamentos")
+        .select("id,colaborador_id,tipo,data_inicio,data_fim,status")
+        .eq("status", "ativo");
+      if (error) throw error;
+      return { dados: data ?? [], totalRegistros: data?.length ?? 0 };
+    }
+    case "indicadores_dp": {
+      const { count: ativos } = await supabase
+        .from("colaboradores")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "ativo");
+      const { count: afastados } = await supabase
+        .from("colaboradores")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "afastado");
+      return {
+        dados: { total_ativos: ativos ?? 0, total_afastados: afastados ?? 0 },
+        totalRegistros: 2,
+      };
+    }
+    default:
+      throw new Error(`Tipo de relatório não suportado: ${tipo}`);
+  }
+}
+
+function toCsv(dados: unknown): string {
+  const arr = Array.isArray(dados) ? dados : [dados];
+  if (arr.length === 0 || !arr[0] || typeof arr[0] !== "object") return "";
+  const headers = Object.keys(arr[0] as Record<string, unknown>);
+  const escape = (v: unknown) => {
+    const s = v == null ? "" : String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  return [
+    headers.join(","),
+    ...arr.map((r) =>
+      headers.map((h) => escape((r as Record<string, unknown>)[h])).join(","),
+    ),
+  ].join("\n");
+}
+
+serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
 
-    const { agendamentoId, tipoRelatorio, formato, emailDestinatario, parametros }: EnviarRelatorioRequest = await req.json();
+    const body = (await req.json()) as EnviarRelatorioRequest;
+    const { agendamentoId, tipoRelatorio, formato, emailDestinatario, parametros } = body;
 
-    console.log(`Processando relatório: ${tipoRelatorio} para ${emailDestinatario}`);
-
-    // Buscar dados do relatório baseado no tipo
-    let dadosRelatorio: Record<string, unknown> = {};
-    
-    switch (tipoRelatorio) {
-      case "lista_colaboradores":
-        const { data: colaboradores } = await supabase
-          .from("colaboradores")
-          .select("*")
-          .eq("status", "ativo");
-        dadosRelatorio = { colaboradores, total: colaboradores?.length || 0 };
-        break;
-        
-      case "folha_resumo":
-        const competencia = parametros?.competencia || new Date().toISOString().slice(0, 7);
-        const { data: folha } = await supabase
-          .from("folhas_pagamento")
-          .select("*")
-          .eq("competencia", competencia)
-          .single();
-        dadosRelatorio = { folha };
-        break;
-        
-      case "ferias_proximas":
-        const dataLimite = new Date();
-        dataLimite.setDate(dataLimite.getDate() + 30);
-        const { data: ferias } = await supabase
-          .from("ferias")
-          .select("*, colaboradores(nome_completo)")
-          .gte("data_inicio", new Date().toISOString())
-          .lte("data_inicio", dataLimite.toISOString());
-        dadosRelatorio = { ferias, total: ferias?.length || 0 };
-        break;
-        
-      case "afastamentos_ativos":
-        const { data: afastamentos } = await supabase
-          .from("afastamentos")
-          .select("*, colaboradores(nome_completo)")
-          .eq("status", "ativo");
-        dadosRelatorio = { afastamentos, total: afastamentos?.length || 0 };
-        break;
-        
-      case "indicadores_dp": {
-        const { count: totalColaboradores, error: totalColaboradoresError } = await supabase
-          .from("colaboradores")
-          .select("id", { count: "exact", head: true })
-          .eq("status", "ativo");
-
-        if (totalColaboradoresError) throw totalColaboradoresError;
-
-        const { count: totalAfastados, error: totalAfastadosError } = await supabase
-          .from("colaboradores")
-          .select("id", { count: "exact", head: true })
-          .eq("status", "afastado");
-
-        if (totalAfastadosError) throw totalAfastadosError;
-
-        dadosRelatorio = {
-          total_colaboradores: totalColaboradores ?? 0,
-          total_afastados: totalAfastados ?? 0,
-        };
-        break;
-      }
-        
-      default:
-        dadosRelatorio = { mensagem: "Tipo de relatório não implementado" };
+    // Validações de input (fail-closed).
+    if (!tipoRelatorio || !RELATORIOS_PERMITIDOS.has(tipoRelatorio)) {
+      return new Response(
+        JSON.stringify({ error: "tipoRelatorio inválido ou não permitido" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+    if (!formato || !FORMATOS_PERMITIDOS.has(formato)) {
+      return new Response(
+        JSON.stringify({ error: "formato inválido (use json ou csv)" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+    if (!emailDestinatario || !isEmail(emailDestinatario)) {
+      return new Response(
+        JSON.stringify({ error: "emailDestinatario inválido" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
     }
 
-    // Simular geração do relatório
-    const relatorioGerado = {
-      tipo: tipoRelatorio,
-      formato,
-      dados: dadosRelatorio,
-      geradoEm: new Date().toISOString(),
-    };
+    // 1. Coletar dados só das colunas necessárias (sem CPF, salário, etc).
+    const { dados, totalRegistros } = await coletarDados(supabase, tipoRelatorio, parametros);
 
-    // Log do envio (simulado - sem Resend configurado)
+    // 2. Serializar e subir para bucket PRIVADO.
+    const conteudo = formato === "csv" ? toCsv(dados) : JSON.stringify(dados, null, 2);
+    const path = `${tipoRelatorio}/${crypto.randomUUID()}.${formato}`;
+    const { error: upErr } = await supabase.storage
+      .from(BUCKET)
+      .upload(path, new Blob([conteudo], { type: formato === "csv" ? "text/csv" : "application/json" }), {
+        upsert: false,
+      });
+    if (upErr) throw new Error(`Falha ao subir relatório: ${upErr.message}`);
+
+    // 3. Gerar signed URL de curta duração.
+    const { data: signed, error: signErr } = await supabase.storage
+      .from(BUCKET)
+      .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+    if (signErr || !signed?.signedUrl) {
+      throw new Error(`Falha ao gerar signed URL: ${signErr?.message}`);
+    }
+
+    // 4. E-mail com METADADOS APENAS — sem dump do conteúdo (LGPD).
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    let statusEnvio = "sucesso";
-    let mensagemEnvio = "";
+    let statusEnvio: "sucesso" | "erro" | "simulado" = "simulado";
+    let mensagemEnvio = "Envio simulado (RESEND_API_KEY não configurada)";
 
     if (resendApiKey) {
-      // Se tiver API key, tentar enviar email real
       try {
-        const response = await fetch("https://api.resend.com/emails", {
+        const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${resendApiKey}`,
+            Authorization: `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
             from: "Sistema DP <onboarding@resend.dev>",
             to: [emailDestinatario],
-            subject: `Relatório: ${tipoRelatorio} - ${new Date().toLocaleDateString("pt-BR")}`,
+            subject: `Relatório: ${tipoRelatorio} — ${new Date().toLocaleDateString("pt-BR")}`,
             html: `
-              <h1>Relatório Automático</h1>
+              <h1>Relatório disponível</h1>
               <p><strong>Tipo:</strong> ${tipoRelatorio}</p>
               <p><strong>Formato:</strong> ${formato}</p>
+              <p><strong>Total de registros:</strong> ${totalRegistros}</p>
               <p><strong>Gerado em:</strong> ${new Date().toLocaleString("pt-BR")}</p>
-              <hr/>
-              <pre>${JSON.stringify(dadosRelatorio, null, 2)}</pre>
+              <p><strong>Validade do link:</strong> 24 horas</p>
+              <p>
+                <a href="${signed.signedUrl}"
+                   style="background:#84cc16;color:#111;padding:10px 16px;border-radius:6px;text-decoration:none;">
+                  Baixar relatório
+                </a>
+              </p>
+              <p style="color:#666;font-size:12px;">
+                Este e-mail contém apenas metadados. Os dados sensíveis estão protegidos
+                por link assinado e requerem acesso autorizado.
+              </p>
             `,
           }),
         });
-        
-        if (!response.ok) {
-          throw new Error(`Resend API error: ${response.status}`);
-        }
-        mensagemEnvio = "Email enviado com sucesso";
-      } catch (emailError: unknown) {
-        console.error("Erro ao enviar email:", emailError);
+        if (!res.ok) throw new Error(`Resend API: ${res.status}`);
+        statusEnvio = "sucesso";
+        mensagemEnvio = "Email com link assinado enviado";
+      } catch (e) {
         statusEnvio = "erro";
-        mensagemEnvio = `Erro no envio: ${emailError instanceof Error ? emailError.message : "Erro desconhecido"}`;
+        mensagemEnvio = e instanceof Error ? e.message : "erro desconhecido no envio";
+        console.error("Erro Resend:", mensagemEnvio);
       }
-    } else {
-      // Sem API key - apenas simular
-      console.log("RESEND_API_KEY não configurada - simulando envio");
-      mensagemEnvio = "Envio simulado (RESEND_API_KEY não configurada)";
     }
 
-    // Registrar log se tiver agendamento associado
     if (agendamentoId) {
       await supabase.from("log_envio_relatorios").insert({
         agendamento_id: agendamentoId,
         status: statusEnvio,
         mensagem: mensagemEnvio,
       });
-
-      // Atualizar último envio
       await supabase
         .from("relatorios_agendados")
         .update({ ultimo_envio: new Date().toISOString() })
@@ -168,24 +232,22 @@ const handler = async (req: Request): Promise<Response> => {
         success: true,
         status: statusEnvio,
         mensagem: mensagemEnvio,
-        relatorio: relatorioGerado,
+        metadados: {
+          tipo: tipoRelatorio,
+          formato,
+          totalRegistros,
+          expiresInSeconds: SIGNED_URL_TTL_SECONDS,
+          path,
+        },
       }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
     );
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
-    console.error("Erro na função enviar-relatorio:", errorMessage);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Erro desconhecido";
+    console.error("Erro enviar-relatorio:", msg);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
-};
-
-serve(handler);
+});
