@@ -33,18 +33,23 @@ export default defineConfig({
     navigationTimeout: 20_000,
   },
   projects: [
-    // 1) Setup global de autenticação
+    // 1) Setup global de autenticação (admin)
     {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
     },
-    // 2) Specs públicas (login, contratação externa)
+    // 1b) Setup de usuário não-admin (para specs RBAC)
+    {
+      name: 'setup-non-admin',
+      testMatch: /auth-non-admin\.setup\.ts/,
+    },
+    // 2) Specs públicas (login, contratação externa, API auth errors)
     {
       name: 'public',
       testMatch: /public\/.*\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
-    // 3) Specs autenticadas (reusam storageState gerado pelo setup)
+    // 3) Specs autenticadas (reusam storageState admin)
     {
       name: 'authenticated',
       testMatch: /authenticated\/.*\.spec\.ts/,
@@ -52,6 +57,16 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/user.json',
+      },
+    },
+    // 3b) Specs autenticadas como usuário SEM privilégios (RBAC)
+    {
+      name: 'authenticated-non-admin',
+      testMatch: /authenticated-non-admin\/.*\.spec\.ts/,
+      dependencies: ['setup-non-admin'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/user-non-admin.json',
       },
     },
     // 4) Smoke mobile crítico (ponto offline, portal colaborador)
@@ -65,12 +80,10 @@ export default defineConfig({
       },
     },
     // 5) Cleanup — logout roda POR ÚLTIMO (depende de authenticated + mobile-smoke).
-    // O signOut global revoga o refresh token compartilhado no storageState; isolar
-    // aqui evita a corrida de sessão que derrubava mobile-smoke e flakava /relatorios.
     {
       name: 'cleanup',
       testMatch: /cleanup\/.*\.spec\.ts/,
-      dependencies: ['authenticated', 'mobile-smoke'],
+      dependencies: ['authenticated', 'authenticated-non-admin', 'mobile-smoke'],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/user.json',
