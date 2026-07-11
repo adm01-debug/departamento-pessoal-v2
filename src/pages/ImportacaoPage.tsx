@@ -1,75 +1,17 @@
 import { PageTitle } from '@/components/PageTitle';
 import { useState, useRef } from 'react';
 import { PageLayout } from '@/components/layout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { Upload, FileSpreadsheet, CheckCircle, AlertTriangle, XCircle, Download, Loader2, FileText } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle, AlertTriangle, XCircle, Download, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import ExcelJS from 'exceljs';
 import { useImportacaoColaboradores } from '@/hooks/useImportacaoColaboradores';
-
-interface ImportRow {
-  nome_completo: string;
-  cpf: string;
-  email?: string;
-  telefone?: string;
-  cargo?: string;
-  departamento?: string;
-  salario_base?: number;
-  data_admissao?: string;
-  data_nascimento?: string;
-  pis?: string;
-  rg?: string;
-  status: 'valido' | 'erro' | 'duplicado';
-  erros: string[];
-}
-
-function validarCPF(cpf: string): boolean {
-  const clean = cpf.replace(/\D/g, '');
-  if (clean.length !== 11 || /^(\d)\1{10}$/.test(clean)) return false;
-  let sum = 0;
-  for (let i = 0; i < 9; i++) sum += parseInt(clean[i]) * (10 - i);
-  let rest = (sum * 10) % 11;
-  if (rest === 10) rest = 0;
-  if (rest !== parseInt(clean[9])) return false;
-  sum = 0;
-  for (let i = 0; i < 10; i++) sum += parseInt(clean[i]) * (11 - i);
-  rest = (sum * 10) % 11;
-  if (rest === 10) rest = 0;
-  return rest === parseInt(clean[10]);
-}
-
-function normalizarCPF(cpf: string): string {
-  return cpf?.toString().replace(/\D/g, '').padStart(11, '0') || '';
-}
-
-const COLUMN_MAP: Record<string, string> = {
-  'nome': 'nome_completo', 'nome completo': 'nome_completo', 'nome_completo': 'nome_completo', 'colaborador': 'nome_completo',
-  'cpf': 'cpf', 'cpf_cnpj': 'cpf',
-  'email': 'email', 'e-mail': 'email', 'e_mail': 'email',
-  'telefone': 'telefone', 'celular': 'telefone', 'fone': 'telefone', 'tel': 'telefone',
-  'cargo': 'cargo', 'funcao': 'cargo', 'função': 'cargo',
-  'departamento': 'departamento', 'depto': 'departamento', 'setor': 'departamento',
-  'salario': 'salario_base', 'salário': 'salario_base', 'salario_base': 'salario_base', 'remuneracao': 'salario_base',
-  'admissao': 'data_admissao', 'data_admissao': 'data_admissao', 'data admissão': 'data_admissao', 'data de admissão': 'data_admissao',
-  'nascimento': 'data_nascimento', 'data_nascimento': 'data_nascimento', 'data nascimento': 'data_nascimento',
-  'pis': 'pis', 'pis_pasep': 'pis', 'nit': 'pis',
-  'rg': 'rg', 'identidade': 'rg',
-};
-
-function mapColumns(headers: string[]): Record<number, string> {
-  const map: Record<number, string> = {};
-  headers.forEach((h, i) => {
-    const normalized = h.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (COLUMN_MAP[normalized]) map[i] = COLUMN_MAP[normalized];
-  });
-  return map;
-}
+import { downloadTemplate as downloadImportTemplate } from '@/utils/importacao/template';
 
 export default function ImportacaoPage() {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -92,28 +34,21 @@ export default function ImportacaoPage() {
 
   const handleImport = async () => {
     await importar();
-    // Simplified result fetch for UI consistency
-    setImportResult({ 
-        success: rows.filter(r => r.status === 'valido').length, 
-        errors: rows.filter(r => r.status === 'erro').length, 
-        duplicates: rows.filter(r => r.status === 'duplicado').length 
+    setImportResult({
+      success: rows.filter((r) => r.status === 'valido').length,
+      errors: rows.filter((r) => r.status === 'erro').length,
+      duplicates: rows.filter((r) => r.status === 'duplicado').length,
     });
     setStep('done');
   };
 
   const downloadTemplate = async () => {
-    const wb = new ExcelJS.Workbook();
-    const ws = wb.addWorksheet('Modelo');
-    ws.addRow(['Nome Completo', 'CPF', 'Email', 'Telefone', 'Cargo', 'Departamento', 'Salário', 'Data Admissão', 'Data Nascimento', 'PIS', 'RG']);
-    ws.addRow(['João Silva', '123.456.789-00', 'joao@email.com', '(11)99999-9999', 'Analista', 'TI', '5000', '01/03/2024', '15/06/1990', '123.45678.90-1', '12.345.678-9']);
-    const buf = await wb.xlsx.writeBuffer();
-    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'modelo_importacao_colaboradores.xlsx';
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Modelo baixado!');
+    try {
+      await downloadImportTemplate();
+      toast.success('Modelo baixado!');
+    } catch (err: any) {
+      toast.error('Erro ao gerar modelo: ' + (err?.message ?? 'desconhecido'));
+    }
   };
 
   const validCount = rows.filter(r => r.status === 'valido').length;
