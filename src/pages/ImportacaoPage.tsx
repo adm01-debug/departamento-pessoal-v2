@@ -10,7 +10,7 @@ import { Upload, FileSpreadsheet, CheckCircle, AlertTriangle, XCircle, Download,
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { useImportacaoColaboradores } from '@/hooks/useImportacaoColaboradores';
 
 interface ImportRow {
@@ -101,14 +101,18 @@ export default function ImportacaoPage() {
     setStep('done');
   };
 
-  const downloadTemplate = () => {
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Nome Completo', 'CPF', 'Email', 'Telefone', 'Cargo', 'Departamento', 'Salário', 'Data Admissão', 'Data Nascimento', 'PIS', 'RG'],
-      ['João Silva', '123.456.789-00', 'joao@email.com', '(11)99999-9999', 'Analista', 'TI', '5000', '01/03/2024', '15/06/1990', '123.45678.90-1', '12.345.678-9'],
-    ]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Modelo');
-    XLSX.writeFile(wb, 'modelo_importacao_colaboradores.xlsx');
+  const downloadTemplate = async () => {
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Modelo');
+    ws.addRow(['Nome Completo', 'CPF', 'Email', 'Telefone', 'Cargo', 'Departamento', 'Salário', 'Data Admissão', 'Data Nascimento', 'PIS', 'RG']);
+    ws.addRow(['João Silva', '123.456.789-00', 'joao@email.com', '(11)99999-9999', 'Analista', 'TI', '5000', '01/03/2024', '15/06/1990', '123.45678.90-1', '12.345.678-9']);
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'modelo_importacao_colaboradores.xlsx';
+    a.click();
+    URL.revokeObjectURL(url);
     toast.success('Modelo baixado!');
   };
 
