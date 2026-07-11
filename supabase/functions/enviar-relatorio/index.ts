@@ -1,60 +1,97 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://esm.sh/zod@3.23.8";
 import { verifyCsrf } from "../_shared/csrf.ts";
 import { captureException } from "../_shared/sentry.ts";
 
+/**
+ * enviar-relatorio — Onda 20 hardening
+ *
+ * Simulação de cenários cobertos:
+ *  1. POST sem JWT → 401
+ *  2. JWT inválido/expirado → 401
+ *  3. JWT válido mas sem vínculo à empresa (parametros.empresaId) → 403
+ *  4. CSRF ausente/origem inválida → 403
+ *  5. tipoRelatorio fora do whitelist → 400
+ *  6. formato inválido → 400
+ *  7. email inválido → 400
+ *  8. Race / storage fail → 500 c/ captureException, sem stack no body
+ *  9. Ausência de RESEND_API_KEY → status "simulado", não bloqueia
+ * 10. Todas as queries de coleta são escopadas por empresa_id (evita
+ *     vazamento cross-tenant que existia antes com service key crua).
+ */
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-csrf-token",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Whitelist de relatórios permitidos. Qualquer valor fora daqui é recusado
-// para evitar exfiltração arbitrária via este endpoint.
-const RELATORIOS_PERMITIDOS = new Set([
+const RELATORIOS_PERMITIDOS = [
   "lista_colaboradores",
   "folha_resumo",
   "ferias_proximas",
   "afastamentos_ativos",
   "indicadores_dp",
-]);
+] as const;
 
-const FORMATOS_PERMITIDOS = new Set(["json", "csv"]);
+const FORMATOS_PERMITIDOS = ["json", "csv"] as const;
 const BUCKET = "relatorios-privados";
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24; // 24h
 
-interface EnviarRelatorioRequest {
-  agendamentoId?: string;
-  tipoRelatorio: string;
-  formato: string;
-  emailDestinatario: string;
-  parametros?: Record<string, unknown>;
-}
+const BodySchema = z.object({
+  agendamentoId: z.string().uuid().optional(),
+  tipoRelatorio: z.enum(RELATORIOS_PERMITIDOS),
+  formato: z.enum(FORMATOS_PERMITIDOS),
+  emailDestinatario: z.string().email().max(254),
+  parametros: z
+    .object({
+      empresaId: z.string().uuid(),
+      competencia: z
+        .string()
+        .regex(/^\d{4}-\d{2}$/)
+        .optional(),
+    })
+    .passthrough(),
+});
 
-function isEmail(s: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+type Body = z.infer<typeof BodySchema>;
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 }
 
 async function coletarDados(
   supabase: ReturnType<typeof createClient>,
-  tipo: string,
-  parametros?: Record<string, unknown>,
+  tipo: Body["tipoRelatorio"],
+  empresaId: string,
+  parametros: Record<string, unknown>,
 ): Promise<{ dados: unknown; totalRegistros: number }> {
   switch (tipo) {
     case "lista_colaboradores": {
       const { data, error } = await supabase
         .from("colaboradores")
         .select("id,nome_completo,email,status,cargo_id,departamento_id")
-        .eq("status", "ativo");
+        .eq("empresa_id", empresaId)
+        .eq("status", "ativo")
+        .limit(5000);
       if (error) throw error;
       return { dados: data ?? [], totalRegistros: data?.length ?? 0 };
     }
     case "folha_resumo": {
       const competencia =
-        (parametros?.competencia as string | undefined) ??
+        (parametros.competencia as string | undefined) ??
         new Date().toISOString().slice(0, 7);
       const { data, error } = await supabase
         .from("folhas_pagamento")
-        .select("id,competencia,total_liquido,total_proventos,total_descontos,status")
+        .select(
+          "id,competencia,total_liquido,total_proventos,total_descontos,status",
+        )
+        .eq("empresa_id", empresaId)
         .eq("competencia", competencia)
         .maybeSingle();
       if (error) throw error;
@@ -67,8 +104,10 @@ async function coletarDados(
       const { data, error } = await supabase
         .from("ferias")
         .select("id,colaborador_id,data_inicio,data_fim,status")
+        .eq("empresa_id", empresaId)
         .gte("data_inicio", inicio.toISOString())
-        .lte("data_inicio", fim.toISOString());
+        .lte("data_inicio", fim.toISOString())
+        .limit(5000);
       if (error) throw error;
       return { dados: data ?? [], totalRegistros: data?.length ?? 0 };
     }
@@ -76,7 +115,9 @@ async function coletarDados(
       const { data, error } = await supabase
         .from("afastamentos")
         .select("id,colaborador_id,tipo,data_inicio,data_fim,status")
-        .eq("status", "ativo");
+        .eq("empresa_id", empresaId)
+        .eq("status", "ativo")
+        .limit(5000);
       if (error) throw error;
       return { dados: data ?? [], totalRegistros: data?.length ?? 0 };
     }
@@ -84,18 +125,18 @@ async function coletarDados(
       const { count: ativos } = await supabase
         .from("colaboradores")
         .select("id", { count: "exact", head: true })
+        .eq("empresa_id", empresaId)
         .eq("status", "ativo");
       const { count: afastados } = await supabase
         .from("colaboradores")
         .select("id", { count: "exact", head: true })
+        .eq("empresa_id", empresaId)
         .eq("status", "afastado");
       return {
         dados: { total_ativos: ativos ?? 0, total_afastados: afastados ?? 0 },
         totalRegistros: 2,
       };
     }
-    default:
-      throw new Error(`Tipo de relatório não suportado: ${tipo}`);
   }
 }
 
@@ -110,71 +151,98 @@ function toCsv(dados: unknown): string {
   return [
     headers.join(","),
     ...arr.map((r) =>
-      headers.map((h) => escape((r as Record<string, unknown>)[h])).join(","),
+      headers
+        .map((h) => escape((r as Record<string, unknown>)[h]))
+        .join(","),
     ),
   ].join("\n");
 }
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  // MP-005: CSRF fail-closed em state-changing.
-  const csrf = await verifyCsrf(req);
-  if (!csrf.ok) return csrf.response!;
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    // 1. CSRF fail-closed
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
+    // 2. Auth JWT obrigatória
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return json({ error: "Autenticação obrigatória" }, 401);
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return json({ error: "Sessão inválida" }, 401);
+    }
+    const userId = userData.user.id;
+
+    // 3. Validação do payload
+    let raw: unknown;
+    try {
+      raw = await req.json();
+    } catch {
+      return json({ error: "JSON inválido" }, 400);
+    }
+    const parsed = BodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json(
+        { error: "Payload inválido", details: parsed.error.flatten() },
+        400,
+      );
+    }
+    const body = parsed.data;
+    const empresaId = body.parametros.empresaId;
+
+    // 4. Tenant scope — admin bypass permitido
+    const admin = createClient(supabaseUrl, serviceKey);
+    const { data: belongs } = await admin.rpc("user_belongs_to_empresa", {
+      _user_id: userId,
+      _empresa_id: empresaId,
+    });
+    if (!belongs) {
+      const { data: isAdm } = await admin.rpc("is_admin", { _user_id: userId });
+      if (!isAdm) return json({ error: "Sem acesso a esta empresa" }, 403);
+    }
+
+    // 5. Coleta escopada por empresa
+    const { dados, totalRegistros } = await coletarDados(
+      admin,
+      body.tipoRelatorio,
+      empresaId,
+      body.parametros,
     );
 
-    const body = (await req.json()) as EnviarRelatorioRequest;
-    const { agendamentoId, tipoRelatorio, formato, emailDestinatario, parametros } = body;
-
-    // Validações de input (fail-closed).
-    if (!tipoRelatorio || !RELATORIOS_PERMITIDOS.has(tipoRelatorio)) {
-      return new Response(
-        JSON.stringify({ error: "tipoRelatorio inválido ou não permitido" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-      );
-    }
-    if (!formato || !FORMATOS_PERMITIDOS.has(formato)) {
-      return new Response(
-        JSON.stringify({ error: "formato inválido (use json ou csv)" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-      );
-    }
-    if (!emailDestinatario || !isEmail(emailDestinatario)) {
-      return new Response(
-        JSON.stringify({ error: "emailDestinatario inválido" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } },
-      );
-    }
-
-    // 1. Coletar dados só das colunas necessárias (sem CPF, salário, etc).
-    const { dados, totalRegistros } = await coletarDados(supabase, tipoRelatorio, parametros);
-
-    // 2. Serializar e subir para bucket PRIVADO.
-    const conteudo = formato === "csv" ? toCsv(dados) : JSON.stringify(dados, null, 2);
-    const path = `${tipoRelatorio}/${crypto.randomUUID()}.${formato}`;
-    const { error: upErr } = await supabase.storage
-      .from(BUCKET)
-      .upload(path, new Blob([conteudo], { type: formato === "csv" ? "text/csv" : "application/json" }), {
-        upsert: false,
-      });
+    // 6. Persistência em bucket privado
+    const conteudo =
+      body.formato === "csv" ? toCsv(dados) : JSON.stringify(dados, null, 2);
+    const path = `${empresaId}/${body.tipoRelatorio}/${crypto.randomUUID()}.${body.formato}`;
+    const { error: upErr } = await admin.storage.from(BUCKET).upload(
+      path,
+      new Blob([conteudo], {
+        type: body.formato === "csv" ? "text/csv" : "application/json",
+      }),
+      { upsert: false },
+    );
     if (upErr) throw new Error(`Falha ao subir relatório: ${upErr.message}`);
 
-    // 3. Gerar signed URL de curta duração.
-    const { data: signed, error: signErr } = await supabase.storage
+    const { data: signed, error: signErr } = await admin.storage
       .from(BUCKET)
       .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
     if (signErr || !signed?.signedUrl) {
       throw new Error(`Falha ao gerar signed URL: ${signErr?.message}`);
     }
 
-    // 4. E-mail com METADADOS APENAS — sem dump do conteúdo (LGPD).
+    // 7. Envio (metadados apenas — LGPD)
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     let statusEnvio: "sucesso" | "erro" | "simulado" = "simulado";
     let mensagemEnvio = "Envio simulado (RESEND_API_KEY não configurada)";
@@ -189,12 +257,12 @@ serve(async (req: Request): Promise<Response> => {
           },
           body: JSON.stringify({
             from: "Sistema DP <onboarding@resend.dev>",
-            to: [emailDestinatario],
-            subject: `Relatório: ${tipoRelatorio} — ${new Date().toLocaleDateString("pt-BR")}`,
+            to: [body.emailDestinatario],
+            subject: `Relatório: ${body.tipoRelatorio} — ${new Date().toLocaleDateString("pt-BR")}`,
             html: `
               <h1>Relatório disponível</h1>
-              <p><strong>Tipo:</strong> ${tipoRelatorio}</p>
-              <p><strong>Formato:</strong> ${formato}</p>
+              <p><strong>Tipo:</strong> ${body.tipoRelatorio}</p>
+              <p><strong>Formato:</strong> ${body.formato}</p>
               <p><strong>Total de registros:</strong> ${totalRegistros}</p>
               <p><strong>Gerado em:</strong> ${new Date().toLocaleString("pt-BR")}</p>
               <p><strong>Validade do link:</strong> 24 horas</p>
@@ -205,8 +273,8 @@ serve(async (req: Request): Promise<Response> => {
                 </a>
               </p>
               <p style="color:#666;font-size:12px;">
-                Este e-mail contém apenas metadados. Os dados sensíveis estão protegidos
-                por link assinado e requerem acesso autorizado.
+                Este e-mail contém apenas metadados. Os dados sensíveis estão
+                protegidos por link assinado e requerem acesso autorizado.
               </p>
             `,
           }),
@@ -221,40 +289,50 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    if (agendamentoId) {
-      await supabase.from("log_envio_relatorios").insert({
-        agendamento_id: agendamentoId,
+    // 8. Auditoria
+    await admin.from("audit_log").insert({
+      tabela: "relatorios_agendados",
+      registro_id: body.agendamentoId ?? empresaId,
+      acao: "SEND_REPORT",
+      user_id: userId,
+      dados_novos: {
+        tipo: body.tipoRelatorio,
+        formato: body.formato,
+        empresa_id: empresaId,
+        total_registros: totalRegistros,
+        status_envio: statusEnvio,
+      },
+    });
+
+    if (body.agendamentoId) {
+      await admin.from("log_envio_relatorios").insert({
+        agendamento_id: body.agendamentoId,
         status: statusEnvio,
         mensagem: mensagemEnvio,
       });
-      await supabase
+      await admin
         .from("relatorios_agendados")
         .update({ ultimo_envio: new Date().toISOString() })
-        .eq("id", agendamentoId);
+        .eq("id", body.agendamentoId)
+        .eq("empresa_id", empresaId);
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        status: statusEnvio,
-        mensagem: mensagemEnvio,
-        metadados: {
-          tipo: tipoRelatorio,
-          formato,
-          totalRegistros,
-          expiresInSeconds: SIGNED_URL_TTL_SECONDS,
-          path,
-        },
-      }),
-      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
-    );
+    return json({
+      success: true,
+      status: statusEnvio,
+      mensagem: mensagemEnvio,
+      metadados: {
+        tipo: body.tipoRelatorio,
+        formato: body.formato,
+        totalRegistros,
+        expiresInSeconds: SIGNED_URL_TTL_SECONDS,
+        path,
+      },
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Erro desconhecido";
     console.error("Erro enviar-relatorio:", msg);
     captureException(error, { fn: "enviar-relatorio" });
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+    return json({ error: "Erro interno ao processar relatório" }, 500);
   }
 });
