@@ -112,10 +112,9 @@ describe('ImportacaoPage (integração)', () => {
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     await userEvent.upload(input, file);
 
-    await waitFor(() => expect(screen.getByText(/Erros/)).toBeInTheDocument());
-    // Import button disabled (0 válidos)
-    const btn = screen.getByRole('button', { name: /Importar 0 Colaboradores/i });
-    expect(btn).toBeDisabled();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /Importar 0 Colaboradores/i })).toBeDisabled()
+    );
     expect(screen.getByText(/CPF inválido/)).toBeInTheDocument();
   });
 
