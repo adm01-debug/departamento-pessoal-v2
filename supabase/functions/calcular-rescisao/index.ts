@@ -22,6 +22,8 @@ function calcIRRF(b: number): number {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
   try {
     const { salario_base, data_admissao, data_desligamento, tipo_rescisao = 'sem_justa_causa', saldo_fgts = 0, ferias_vencidas = false } = await req.json();
     if (!salario_base || !data_admissao || !data_desligamento) return new Response(JSON.stringify({ error: 'Campos obrigatórios faltando' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
