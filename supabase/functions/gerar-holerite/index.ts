@@ -29,6 +29,9 @@ serve(async (req: Request): Promise<Response> => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  const csrf = await verifyCsrf(req);
+  if (!csrf.ok) return csrf.response!;
+
   const { data, errorResponse } = await validateRequest(req, holeriteSchema);
   if (errorResponse) return errorResponse;
 
