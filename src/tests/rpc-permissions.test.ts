@@ -26,7 +26,7 @@ describe('RPC permissions — anon role', () => {
       p_identifier: 'test@example.com',
       p_identifier_type: 'email',
     });
-    expect(error?.message).not.toMatch(/permission denied/i);
+    expect(error?.message ?? '').not.toMatch(/permission denied/i);
   });
 
   it('record_failed_login continua acessível sem sessão', async () => {
@@ -34,7 +34,7 @@ describe('RPC permissions — anon role', () => {
       p_identifier: 'test@example.com',
       p_identifier_type: 'email',
     });
-    expect(error?.message).not.toMatch(/permission denied/i);
+    expect(error?.message ?? '').not.toMatch(/permission denied/i);
   });
 
   it('has_role NÃO pode ser executada por anon', async () => {
