@@ -1,20 +1,57 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://esm.sh/zod@3.23.8';
 import { assinarXMLEsocial } from './utils/signer.ts';
 import { corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { withMonitoring } from '../_shared/monitor.ts';
 
+const BodySchema = z.object({
+  empresaId: z.string().uuid(),
+  eventoId: z.string().uuid(),
+});
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') return createErrorResponse('Method not allowed', 405, 'METHOD_NOT_ALLOWED');
 
-  return withMonitoring(req, 'enviar-esocial', async (supabase) => {
-    const body = await req.json();
-    const { empresaId, eventoId } = body;
+  // Auth + tenant scope explícito antes de qualquer processamento
+  const authHeader = req.headers.get('Authorization') ?? '';
+  if (!authHeader.startsWith('Bearer ')) {
+    return createErrorResponse('Autenticação obrigatória', 401, 'UNAUTHORIZED');
+  }
 
-    if (!empresaId || !eventoId) {
-      return createErrorResponse('Empresa ID e Evento ID são obrigatórios', 400, 'MISSING_PARAMS');
-    }
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
+  const userClient = createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: userData, error: userErr } = await userClient.auth.getUser();
+  if (userErr || !userData?.user) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
+  const userId = userData.user.id;
+
+  let raw: unknown;
+  try { raw = await req.json(); } catch { return createErrorResponse('JSON inválido', 400, 'BAD_REQUEST'); }
+  const parsed = BodySchema.safeParse(raw);
+  if (!parsed.success) return createErrorResponse('Payload inválido', 400, 'VALIDATION_ERROR');
+  const { empresaId, eventoId } = parsed.data;
+
+  const adminClient = createClient(supabaseUrl, serviceKey);
+  const { data: belongs } = await adminClient.rpc('user_belongs_to_empresa', {
+    _user_id: userId, _empresa_id: empresaId,
+  });
+  const { data: isAdm } = await adminClient.rpc('is_admin', { _user_id: userId });
+  if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
+
+  // Reinjetar body para withMonitoring consumir o mesmo payload (recria Request)
+  const rebuilt = new Request(req.url, {
+    method: req.method,
+    headers: req.headers,
+    body: JSON.stringify({ empresaId, eventoId }),
+  });
+
+  return withMonitoring(rebuilt, 'enviar-esocial', async (supabase) => {
     const startTime = Date.now();
 
     // 1. Obter dados do evento e empresa
