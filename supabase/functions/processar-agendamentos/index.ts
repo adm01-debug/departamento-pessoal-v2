@@ -32,21 +32,18 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Encontrados ${agendamentos?.length || 0} agendamentos para processar`);
 
-    const resultados = [];
+    // MP-013: concorrência controlada (Promise.all + limite manual de 5) em vez de loop síncrono
+    const CONCURRENCY = 5;
+    const lista = agendamentos ?? [];
+    const resultados: unknown[] = [];
 
-    for (const agendamento of agendamentos || []) {
+    const processarUm = async (agendamento: Record<string, unknown>) => {
       try {
-        // Verificar se deve executar baseado na frequência
         const deveExecutar = verificarExecucao(agendamento, agora);
-        
         if (!deveExecutar) {
-          console.log(`Agendamento ${agendamento.id} não deve executar agora`);
-          continue;
+          return { id: agendamento.id, status: "skipped" };
         }
 
-        console.log(`Executando agendamento: ${agendamento.nome}`);
-
-        // Chamar função de envio de relatório
         const response = await fetch(`${supabaseUrl}/functions/v1/enviar-relatorio`, {
           method: "POST",
           headers: {
@@ -66,40 +63,37 @@ const handler = async (req: Request): Promise<Response> => {
           const errorText = await response.text();
           throw new Error(`Falha ao enviar relatório (${response.status}): ${errorText}`);
         }
-
         const resultado = await response.json();
-
-        // Calcular próximo envio
         const proximoEnvio = calcularProximoEnvio(agendamento);
-        
+
         await supabase
           .from("relatorios_agendados")
           .update({ proximo_envio: proximoEnvio.toISOString() })
           .eq("id", agendamento.id);
 
-        resultados.push({
+        return {
           id: agendamento.id,
           nome: agendamento.nome,
           status: "processado",
           resultado,
           proximo_envio: proximoEnvio,
-        });
+        };
       } catch (agendamentoError) {
-        console.error(`Erro no agendamento ${agendamento.id}:`, agendamentoError);
-        
+        const msg = agendamentoError instanceof Error ? agendamentoError.message : "Erro desconhecido";
+        console.error(`Erro no agendamento ${agendamento.id}:`, msg);
         await supabase.from("log_envio_relatorios").insert({
           agendamento_id: agendamento.id,
           status: "erro",
-          mensagem: agendamentoError instanceof Error ? agendamentoError.message : "Erro desconhecido",
+          mensagem: msg,
         });
-
-        resultados.push({
-          id: agendamento.id,
-          nome: agendamento.nome,
-          status: "erro",
-          erro: agendamentoError instanceof Error ? agendamentoError.message : "Erro desconhecido",
-        });
+        return { id: agendamento.id, nome: agendamento.nome, status: "erro", erro: msg };
       }
+    };
+
+    for (let i = 0; i < lista.length; i += CONCURRENCY) {
+      const batch = lista.slice(i, i + CONCURRENCY);
+      const results = await Promise.all(batch.map(processarUm));
+      resultados.push(...results);
     }
 
     return new Response(
