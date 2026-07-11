@@ -149,6 +149,7 @@ serve(async (req: Request): Promise<Response> => {
       data: { ...results, totals: { processed: totalProcessed, success: totalSuccess, errors: totalErrors } },
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error: unknown) {
+    captureException(error, { fn: 'sincronizar-bitrix' });
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(JSON.stringify({ success: false, error: message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
