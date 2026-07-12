@@ -185,11 +185,12 @@ serve(async (req: Request): Promise<Response> => {
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) {
+    const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(jwt);
+    if (claimsErr || !claimsData?.claims?.sub) {
       return json({ error: "Sessão inválida" }, 401);
     }
-    const userId = userData.user.id;
+    const userId = String(claimsData.claims.sub);
 
     // 3. Validação do payload
     let raw: unknown;
