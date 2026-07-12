@@ -5,7 +5,7 @@ import {
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
-  Trophy, MessageSquareText
+  Trophy, MessageSquareText, Activity
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -132,6 +132,8 @@ const menuGroups: MenuGroup[] = [
       { icon: Gift, label: 'Promo Brindes', path: '/promo-brindes', color: 'text-warning' },
       { icon: GitBranch, label: 'Vínculos Promo', path: '/promo-brindes/vinculos', color: 'text-info' },
       { icon: ClipboardList, label: 'Integrações', path: '/integracoes', color: 'text-info' },
+      { icon: Activity, label: 'Telemetria', path: '/admin/telemetria', color: 'text-primary' },
+      { icon: ShieldCheck, label: 'Idempotência', path: '/admin/idempotencia', color: 'text-success' },
     ]
   },
 ];
