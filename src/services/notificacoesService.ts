@@ -57,7 +57,7 @@ export async function notificarAjustePonto(
     if (colab) {
       // profiles.email não existe; user_id do destinatário será resolvido pelo trigger
       // ou pela função de notificação a partir de colaboradores.usuario_id, se aplicável.
-      const targetUserId: string | null = null;
+      const targetUserId: string | undefined = undefined;
 
       return criarNotificacao({
         titulo: `Ajuste de Ponto ${status === 'aprovado' ? 'Aprovado' : 'Recusado'}`,
