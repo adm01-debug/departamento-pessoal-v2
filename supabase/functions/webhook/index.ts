@@ -32,9 +32,10 @@ async function verifySignature(payload: string, signature: string | null, secret
   }
 }
 
-// Onda 29: hardening — payload cap, replay TTL via timestamp, redação de headers sensíveis.
+// Onda 29/35: hardening — payload cap, replay TTL via timestamp obrigatório em prod, redação.
 const MAX_PAYLOAD_BYTES = 1_048_576; // 1 MiB
 const REPLAY_TTL_SECONDS = 300; // 5 min
+const REQUIRE_TIMESTAMP = (Deno.env.get('WEBHOOK_REQUIRE_TIMESTAMP') ?? 'true').toLowerCase() === 'true';
 const SENSITIVE_HEADERS = new Set([
   'authorization', 'cookie', 'set-cookie', 'x-api-key', 'apikey',
   'x-hub-signature-256', 'x-hub-signature', 'x-webhook-signature',
