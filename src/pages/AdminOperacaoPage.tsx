@@ -288,6 +288,49 @@ export default function AdminOperacaoPage() {
           </div>
          )}
       </SectionCard>
+
+      {/* Security Alerts */}
+      <SectionCard title="Alertas de Segurança Ativos" icon={Bell} badge={`${alerts.data?.length ?? 0} não resolvidos${criticalAlerts > 0 ? ` · ${criticalAlerts} críticos` : ''}`}>
+        {alerts.isLoading ? <Skeleton className="h-24" /> :
+         !alerts.data?.length ? <EmptyState msg="Nenhum alerta ativo. Sistema saudável ✓" /> : (
+          <div className="space-y-2">
+            {alerts.data.map(a => {
+              const isCritical = a.severity === 'critical' || a.severity === 'high';
+              return (
+                <div key={a.id} className={`flex items-start justify-between gap-3 p-3 rounded-md border ${isCritical ? 'border-destructive/50 bg-destructive/5' : 'border-border/50'}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant={a.severity === 'critical' ? 'destructive' : a.severity === 'high' ? 'destructive' : 'secondary'} className="uppercase text-[10px]">
+                        {a.severity}
+                      </Badge>
+                      <p className="font-mono text-sm font-medium">{a.type}</p>
+                      {a.ip_address && <span className="text-xs text-muted-foreground font-mono">IP: {a.ip_address}</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: ptBR })}
+                      {' · '}{Math.round(Number(a.age_minutes))}min de vida
+                    </p>
+                    {a.details && (
+                      <pre className="text-xs text-muted-foreground mt-1 font-mono truncate max-w-full overflow-hidden">
+                        {typeof a.details === 'string' ? a.details : JSON.stringify(a.details).slice(0, 200)}
+                      </pre>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1 shrink-0"
+                    disabled={resolveAlert.isPending}
+                    onClick={() => resolveAlert.mutate(a.id)}
+                  >
+                    <Check className="h-3.5 w-3.5" /> Resolver
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+         )}
+      </SectionCard>
     </div>
   );
 }
