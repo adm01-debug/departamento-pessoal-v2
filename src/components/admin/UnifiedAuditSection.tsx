@@ -35,7 +35,7 @@ export function UnifiedAuditSection() {
     queryKey: ['admin-op', 'audit-unified', sourceFilter],
     enabled,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('search_audit_unified' as never, {
+      const { data, error } = await supabase.rpc('search_audit_unified', {
         _source_table: sourceFilter || null,
         _limit: AUDIT_UNIFIED_LIMIT,
       } as never);
