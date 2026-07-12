@@ -83,7 +83,7 @@ export default function AdminOperacaoPage() {
   const cron = useQuery({
     queryKey: ['admin-op', 'cron-health'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_cron_jobs_health' as never);
+      const { data, error } = await supabase.rpc('get_cron_jobs_health');
       if (error) throw error;
       return (data ?? []) as CronRow[];
     },
@@ -93,7 +93,7 @@ export default function AdminOperacaoPage() {
   const alerts = useQuery({
     queryKey: ['admin-op', 'security-alerts'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_security_alerts_summary' as never, { _limit: 50 } as never);
+      const { data, error } = await supabase.rpc('get_security_alerts_summary', { _limit: 50 });
       if (error) throw error;
       return (data ?? []) as AlertRow[];
     },
@@ -104,7 +104,7 @@ export default function AdminOperacaoPage() {
   const qc = useQueryClient();
   const resolveAlert = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc('resolve_security_alert' as never, { _id: id } as never);
+      const { error } = await supabase.rpc('resolve_security_alert', { _id: id });
       if (error) throw error;
     },
     onSuccess: () => {
