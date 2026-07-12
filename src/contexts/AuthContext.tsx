@@ -79,11 +79,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
+  // Ref espelha `isReady` para leitura no callback do timeout de inicialização
+  // sem re-executar o useEffect (que re-subscreveria em onAuthStateChange).
+  const isReadyRef = useRef(false);
 
   const markReady = useCallback(() => {
     setLoading(false);
     setIsReady(true);
+    isReadyRef.current = true;
   }, []);
+
 
   const enrichUserWithRoles = useCallback(async (supabaseUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
     const roles = await fetchUserRolesWithTimeout(supabaseUser.id);
