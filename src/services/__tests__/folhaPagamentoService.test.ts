@@ -31,7 +31,7 @@ describe('folhaPagamentoService', () => {
       });
       const mockUpsert = vi.fn().mockResolvedValue({ error: null });
 
-      (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
+      (supabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         if (table === 'colaboradores') {
           return { select: mockSelect, eq: mockEq, single: mockSingle };
         }
@@ -56,7 +56,7 @@ describe('folhaPagamentoService', () => {
   describe('fecharFolha', () => {
     it('should throw error if there are critical alerts', async () => {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
-      (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([
+      (validadorFolha.validarFolha as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
         { gravidade: 'alta', mensagem: 'Erro crítico' }
       ]);
 
@@ -65,13 +65,13 @@ describe('folhaPagamentoService', () => {
 
     it('should invoke fechar-folha edge function with optimistic version and return audit_hash', async () => {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
-      (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([]);
+      (validadorFolha.validarFolha as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
 
       const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: { version: 3, empresa_id: 'emp-1', status: 'aberta' },
         error: null,
       });
-      (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
+      (supabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         if (table === 'folhas_pagamento') {
           return {
             select: vi.fn().mockReturnThis(),
@@ -82,7 +82,7 @@ describe('folhaPagamentoService', () => {
         return {};
       });
 
-      (supabase.functions.invoke as Record<string, unknown>).mockResolvedValueOnce({
+      (supabase.functions.invoke as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         data: { ok: true, version: 4, audit_hash: 'abc123', warnings: [] },
         error: null,
       });
@@ -99,9 +99,9 @@ describe('folhaPagamentoService', () => {
 
     it('should propagate VERSION_CONFLICT error from edge function', async () => {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
-      (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([]);
+      (validadorFolha.validarFolha as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
 
-      (supabase.from as Record<string, unknown>).mockImplementation(() => ({
+      (supabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockResolvedValue({
@@ -110,7 +110,7 @@ describe('folhaPagamentoService', () => {
         }),
       }));
 
-      (supabase.functions.invoke as Record<string, unknown>).mockResolvedValueOnce({
+      (supabase.functions.invoke as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         data: null,
         error: { message: 'Folha foi alterada por outro processo. Recarregue e tente novamente.' },
       });
@@ -121,7 +121,7 @@ describe('folhaPagamentoService', () => {
 
   describe('reabrirFolha', () => {
     it('should require motivo and call reabrir-folha with current version', async () => {
-      (supabase.from as Record<string, unknown>).mockImplementation(() => ({
+      (supabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockResolvedValue({
@@ -129,7 +129,7 @@ describe('folhaPagamentoService', () => {
           error: null,
         }),
       }));
-      (supabase.functions.invoke as Record<string, unknown>).mockResolvedValueOnce({
+      (supabase.functions.invoke as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         data: { ok: true, version: 6, audit_hash: 'xyz789' },
         error: null,
       });
@@ -153,7 +153,7 @@ describe('folhaPagamentoService', () => {
     });
 
     it('should reject when folha is not fechada', async () => {
-      (supabase.from as Record<string, unknown>).mockImplementation(() => ({
+      (supabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockResolvedValue({
