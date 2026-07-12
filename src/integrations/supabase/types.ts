@@ -839,6 +839,54 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log_unified: {
+        Row: {
+          action: string | null
+          empresa_id: string | null
+          entity: string | null
+          entity_id: string | null
+          id: string
+          ingested_at: string
+          ip_address: unknown
+          occurred_at: string
+          payload: Json | null
+          source_id: string | null
+          source_table: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          empresa_id?: string | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ingested_at?: string
+          ip_address?: unknown
+          occurred_at?: string
+          payload?: Json | null
+          source_id?: string | null
+          source_table: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          empresa_id?: string | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ingested_at?: string
+          ip_address?: unknown
+          occurred_at?: string
+          payload?: Json | null
+          source_id?: string | null
+          source_table?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -21316,6 +21364,29 @@ export type Database = {
       }
       resolve_security_alert: { Args: { _id: string }; Returns: boolean }
       run_rls_tests: { Args: never; Returns: string[] }
+      search_audit_unified: {
+        Args: {
+          _empresa_id?: string
+          _from?: string
+          _limit?: number
+          _source_table?: string
+          _to?: string
+          _user_id?: string
+        }
+        Returns: {
+          action: string
+          empresa_id: string
+          entity: string
+          entity_id: string
+          id: string
+          ip_address: unknown
+          occurred_at: string
+          payload: Json
+          source_id: string
+          source_table: string
+          user_id: string
+        }[]
+      }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
