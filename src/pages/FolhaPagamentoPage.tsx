@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { useIdempotencyKey } from '@/hooks/useIdempotencyKey';
 import { auditLogger } from '@/utils/auditLogger';
 import { Card, CardContent } from '@/components/ui/card';
 import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard, FolhaESocialSync } from '@/components/folha';
