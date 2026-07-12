@@ -115,18 +115,51 @@ Deno.serve(async (req) => {
     if (idem.conflict) return idem.conflict;
     idempotencyId = idem.id;
 
-    // Bloqueia recálculo de folha FECHADA
+    // Bloqueia recálculo de folha em estados terminais (fechada / aprovada / transmitida ao eSocial).
+    // Estes estados representam consolidação contábil ou envio externo — qualquer recálculo
+    // exigiria reabrir a folha via fluxo auditado (`reabrir-folha`).
+    const BLOCKED_STATUSES = new Set(['fechada', 'aprovada', 'transmitida', 'homologada']);
     const { data: folhaExistente } = await admin
       .from('folhas_pagamento')
-      .select('id, status')
+      .select('id, status, version, esocial_status')
       .eq('empresa_id', empresa_id)
       .eq('competencia', competencia)
       .maybeSingle();
 
-    if (folhaExistente?.status === 'fechada') {
+    if (folhaExistente && BLOCKED_STATUSES.has(String(folhaExistente.status))) {
+      // Auditoria bloqueante (best-effort) — registra tentativa negada de recálculo.
+      try {
+        await admin.from('audit_log').insert({
+          tabela: 'folhas_pagamento',
+          registro_id: folhaExistente.id,
+          acao: 'PAYROLL_CALC_BLOCKED',
+          user_id: userId,
+          dados_novos: {
+            empresa_id,
+            competencia,
+            status_atual: folhaExistente.status,
+            esocial_status: folhaExistente.esocial_status ?? null,
+            version: folhaExistente.version ?? null,
+            idempotency_id: idempotencyId ?? null,
+            reason: 'PAYROLL_LOCKED',
+          },
+        });
+      } catch { /* auditoria não-bloqueante para o retorno de erro */ }
+
       await failIdempotency(admin, idempotencyId);
-      return createErrorResponse('Folha fechada — recálculo bloqueado', 409, 'PAYROLL_LOCKED');
+      return new Response(
+        JSON.stringify({
+          error: `Folha em estado '${folhaExistente.status}' — recálculo bloqueado. Reabra a folha antes de recalcular.`,
+          code: 'PAYROLL_LOCKED',
+          folha_id: folhaExistente.id,
+          status_atual: folhaExistente.status,
+          competencia,
+          reabrir_endpoint: 'reabrir-folha',
+        }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
     }
+
 
     // Contagem prévia p/ hard-cap
     const { count: totalColabs } = await admin
