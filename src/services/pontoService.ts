@@ -2,6 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { pontoMonitorService } from './pontoMonitorService';
 import CryptoJS from 'crypto-js';
 import { format } from 'date-fns';
+import { formatDateLocalISO } from '@/utils/dateLocal';
+
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3;
   const φ1 = (lat1 * Math.PI) / 180;
