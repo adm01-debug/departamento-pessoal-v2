@@ -1,19 +1,21 @@
 import { PageTitle } from '@/components/PageTitle';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw, Clock } from 'lucide-react';
+import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw, Clock, Bell, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface DlqRow { tipo_tarefa: string; total_dlq: number; mais_recente: string | null; ultimo_erro_sample: string | null }
 interface ConflictRow { competencia: string; conflitos: number; ultimo_em: string }
 interface TelemetryRow { query_sample: string; calls: number; mean_ms: number; max_ms: number; total_ms: number; cache_hit_pct: number }
 interface IdemRow { endpoint: string; total_24h: number; failed_24h: number; failure_rate_pct: number; last_seen_at: string }
 interface CronRow { jobname: string; schedule: string; active: boolean; last_run: string | null; last_status: string | null; last_duration_ms: number | null; last_error: string | null; runs_24h: number; failures_24h: number }
+interface AlertRow { id: string; type: string; severity: string; ip_address: string | null; user_id: string | null; details: any; created_at: string; age_minutes: number }
 
 function SectionCard({ title, icon: Icon, children, badge }: { title: string; icon: any; children: React.ReactNode; badge?: string }) {
   return (
