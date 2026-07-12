@@ -111,9 +111,34 @@ Deno.serve(async (req) => {
       empresaId: empresa_id,
       userId,
     });
+
+    // Auditoria detalhada de conflito/replay/duplicidade de Idempotency-Key.
+    // Best-effort — falha no audit_log NUNCA bloqueia a resposta ao cliente.
+    if (idem.reason && idem.reason !== 'NEW') {
+      try {
+        await admin.from('audit_log').insert({
+          tabela: 'idempotency_keys',
+          registro_id: idem.existingId ?? idem.id ?? crypto.randomUUID(),
+          acao: `IDEMPOTENCY_${idem.reason}`,
+          user_id: userId,
+          dados_novos: {
+            endpoint: 'calcular-folha',
+            empresa_id,
+            competencia,
+            key_hash: idem.keyHash ?? null,
+            request_hash: idem.requestHash ?? null,
+            existing_id: idem.existingId ?? null,
+            outcome: idem.replay ? 'replay_served' : idem.conflict ? 'conflict_rejected' : 'retry_allowed',
+            timestamp: new Date().toISOString(),
+          },
+        });
+      } catch { /* noop */ }
+    }
+
     if (idem.replay) return idem.replay;
     if (idem.conflict) return idem.conflict;
     idempotencyId = idem.id;
+
 
     // Bloqueia recálculo de folha em estados terminais (fechada / aprovada / transmitida ao eSocial).
     // Estes estados representam consolidação contábil ou envio externo — qualquer recálculo
