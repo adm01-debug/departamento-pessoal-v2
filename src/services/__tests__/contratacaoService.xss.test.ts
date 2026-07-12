@@ -103,7 +103,8 @@ describe('contratacaoService.gerarTemplateContrato — regressão XSS', () => {
       // 3) Nenhuma tag <script> executável
       expect(html.toLowerCase()).not.toMatch(/<script\b/);
       // 4) Nenhum handler on* injetado pelo payload
-      expect(html).not.toMatch(/ on(error|load|focus|click)=/i);
+      // 4) Nenhum handler on* dentro de uma tag REAL (texto escapado é inofensivo)
+      expect(html).not.toMatch(/<[a-z][^>]*\son\w+=/i);
     }
   );
 
