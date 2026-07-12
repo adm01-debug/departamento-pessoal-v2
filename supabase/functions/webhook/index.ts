@@ -32,6 +32,22 @@ async function verifySignature(payload: string, signature: string | null, secret
   }
 }
 
+// Onda 29: hardening — payload cap, replay TTL via timestamp, redação de headers sensíveis.
+const MAX_PAYLOAD_BYTES = 1_048_576; // 1 MiB
+const REPLAY_TTL_SECONDS = 300; // 5 min
+const SENSITIVE_HEADERS = new Set([
+  'authorization', 'cookie', 'set-cookie', 'x-api-key', 'apikey',
+  'x-hub-signature-256', 'x-hub-signature', 'x-webhook-signature',
+]);
+
+function redactHeaders(headers: Headers): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of headers.entries()) {
+    out[k] = SENSITIVE_HEADERS.has(k.toLowerCase()) ? '[REDACTED]' : v;
+  }
+  return out;
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -40,7 +56,13 @@ serve(async (req: Request): Promise<Response> => {
   return withMonitoring(req, 'webhook', async (supabase) => {
     const secret = Deno.env.get('WEBHOOK_SECRET');
     const signature = req.headers.get('x-hub-signature-256');
+    const timestampHeader = req.headers.get('x-webhook-timestamp');
     const payloadText = await req.clone().text();
+
+    // Payload cap — evita DoS por corpo gigante
+    if (payloadText.length > MAX_PAYLOAD_BYTES) {
+      return createErrorResponse('Payload muito grande', 413, 'PAYLOAD_TOO_LARGE');
+    }
 
     // Fail-closed: sem secret configurado, recusa TODAS as requisições (503).
     if (!secret) {
@@ -52,10 +74,25 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Assinatura ausente ou inválida => 401.
-    if (!(await verifySignature(payloadText, signature, secret))) {
+    // Replay TTL: se timestamp vier, deve estar dentro da janela.
+    if (timestampHeader) {
+      const ts = Number(timestampHeader);
+      if (!Number.isFinite(ts)) {
+        return createErrorResponse('Timestamp inválido', 401, 'INVALID_TIMESTAMP');
+      }
+      const skewSec = Math.abs(Date.now() / 1000 - ts);
+      if (skewSec > REPLAY_TTL_SECONDS) {
+        return createErrorResponse('Timestamp fora da janela', 401, 'TIMESTAMP_EXPIRED');
+      }
+    }
+
+    // Assinatura ausente ou inválida => 401. (crypto.subtle.verify é timing-safe.)
+    // Se timestamp presente, assina "<timestamp>.<body>" para bloquear replay com novo ts.
+    const signedPayload = timestampHeader ? `${timestampHeader}.${payloadText}` : payloadText;
+    if (!(await verifySignature(signedPayload, signature, secret))) {
       return createErrorResponse('Assinatura inválida', 401, 'INVALID_SIGNATURE');
     }
+
 
     const { data, errorResponse } = await validateRequest(req, webhookSchema);
     if (errorResponse) return errorResponse;
