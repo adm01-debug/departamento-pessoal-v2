@@ -246,6 +246,8 @@ serve(async (req: Request): Promise<Response> => {
       folha_id: folhaId,
       version: updated.version,
       audit_hash: auditHash,
+      warnings: integrityWarnings,
+      integrity_precheck: integritySnapshot,
     }, 200, { 'X-Audit-Hash': auditHash });
   } catch (e) {
     console.error('[reabrir-folha] erro inesperado:', (e as Error)?.message);
