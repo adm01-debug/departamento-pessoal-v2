@@ -19,6 +19,7 @@ const EmpresasPage = lazy(() => import('@/pages/EmpresasPage'));
 const EmpresaFormPage = lazy(() => import('@/pages/EmpresaFormPage'));
 const FolhaPage = lazy(() => import('@/pages/FolhaPage'));
 const FolhaPagamentoPage = lazy(() => import('@/pages/FolhaPagamentoPage'));
+const FolhaCompliancePage = lazy(() => import('@/pages/FolhaCompliancePage'));
 const FeriasPage = lazy(() => import('@/pages/FeriasPage'));
 const PontoPage = lazy(() => import('@/pages/PontoPage'));
 const BeneficiosPage = lazy(() => import('@/pages/BeneficiosPage'));
@@ -171,6 +172,7 @@ export default function App() {
         {/* Folha e Financeiro */}
         <Route path="folha" element={<LazyPage Component={FolhaPage} />} />
         <Route path="folha/calcular" element={<LazyPage Component={FolhaPagamentoPage} />} />
+        <Route path="folha/compliance" element={<LazyPage Component={FolhaCompliancePage} />} />
         <Route path="rubricas" element={<LazyPage Component={RubricasPage} />} />
         <Route path="provisoes" element={<LazyPage Component={ProvisoesPage} />} />
         <Route path="passivo-trabalhista" element={<LazyPage Component={PassivoTrabalhistaPage} />} />

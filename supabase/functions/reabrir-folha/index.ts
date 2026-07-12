@@ -17,6 +17,7 @@ import {
 } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -41,17 +42,8 @@ const BodySchema = z.object({
   override_esocial: z.boolean().optional().default(false),
 }).strict();
 
-async function sha256Hex(input: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
-function canonicalize(obj: unknown): string {
-  if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
-  if (Array.isArray(obj)) return '[' + obj.map(canonicalize).join(',') + ']';
-  const keys = Object.keys(obj as Record<string, unknown>).sort();
-  return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonicalize((obj as Record<string, unknown>)[k])).join(',') + '}';
-}
+
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
@@ -212,7 +204,7 @@ serve(async (req: Request): Promise<Response> => {
       user_id: userId,
       reopened_at: reopenedAt,
     };
-    const auditHash = await sha256Hex(canonicalize(snapshot));
+    const auditHash = await integrityHash(snapshot);
 
     const { error: auditErr } = await admin.from('audit_log').insert({
       tabela: 'folhas_pagamento',

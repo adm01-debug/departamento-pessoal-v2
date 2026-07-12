@@ -12,6 +12,7 @@ import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import { beginIdempotency, completeIdempotency, failIdempotency, extractIdempotencyKey } from '../_shared/idempotency.ts';
+import { integrityHash as computeIntegrityHash } from '../_shared/integrityHash.ts';
 
 
 const FAIXAS_INSS = [
@@ -35,18 +36,8 @@ const MAX_COLABORADORES = 50_000;
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
 
-function canonicalize(value: unknown): string {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value ?? null);
-  if (Array.isArray(value)) return `[${value.map(canonicalize).join(',')}]`;
-  const keys = Object.keys(value as Record<string, unknown>).sort();
-  return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalize((value as Record<string, unknown>)[k])}`).join(',')}}`;
-}
 
-async function sha256Hex(input: string): Promise<string> {
-  const bytes = new TextEncoder().encode(input);
-  const digest = await crypto.subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
+
 
 
 function calcINSS(salario: number): number {
@@ -281,7 +272,7 @@ Deno.serve(async (req) => {
       itens_count: itens.length,
       totais,
     };
-    const integrityHash = await sha256Hex(canonicalize(integritySnapshot));
+    const integrityHash = await computeIntegrityHash(integritySnapshot);
 
     // Auditoria detalhada (financeira + idempotência + integridade)
     await admin.from('audit_log').insert({
