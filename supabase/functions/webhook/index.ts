@@ -75,8 +75,12 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Replay TTL: se timestamp vier, deve estar dentro da janela.
-    if (timestampHeader) {
+    // Replay TTL: timestamp obrigatório por default (fail-closed contra replay).
+    if (!timestampHeader) {
+      if (REQUIRE_TIMESTAMP) {
+        return createErrorResponse('Timestamp obrigatório (x-webhook-timestamp)', 401, 'TIMESTAMP_REQUIRED');
+      }
+    } else {
       const ts = Number(timestampHeader);
       if (!Number.isFinite(ts)) {
         return createErrorResponse('Timestamp inválido', 401, 'INVALID_TIMESTAMP');
