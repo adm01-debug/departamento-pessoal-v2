@@ -21259,6 +21259,19 @@ export type Database = {
           total_ms: number
         }[]
       }
+      get_security_alerts_summary: {
+        Args: { _limit?: number }
+        Returns: {
+          age_minutes: number
+          created_at: string
+          details: Json
+          id: string
+          ip_address: string
+          severity: string
+          type: string
+          user_id: string
+        }[]
+      }
       get_user_default_empresa: { Args: { _user_id: string }; Returns: string }
       get_user_empresas: { Args: { _user_id: string }; Returns: string[] }
       get_user_roles: {
@@ -21301,6 +21314,7 @@ export type Database = {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: undefined
       }
+      resolve_security_alert: { Args: { _id: string }; Returns: boolean }
       run_rls_tests: { Args: never; Returns: string[] }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
