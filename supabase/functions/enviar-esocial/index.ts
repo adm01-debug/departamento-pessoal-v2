@@ -91,7 +91,20 @@ serve(async (req: Request): Promise<Response> => {
     ]);
     if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
 
+    // Idempotência transacional (Idempotency-Key header ou body)
+    const idemKey = extractIdempotencyKey(req, raw);
+    const idem = await beginIdempotency(supabase, {
+      endpoint: 'enviar-esocial',
+      key: idemKey,
+      requestBody: { empresaId, eventoId },
+      empresaId,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+
     const startTime = Date.now();
+
 
     // 1. Buscar evento (com validação de empresa cruzada)
     const { data: evento, error: eError } = await supabase
