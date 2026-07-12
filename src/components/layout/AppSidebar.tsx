@@ -5,7 +5,7 @@ import {
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
-  Trophy, MessageSquareText
+  Trophy, MessageSquareText, Activity
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
