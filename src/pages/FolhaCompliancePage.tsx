@@ -127,10 +127,11 @@ export default function FolhaCompliancePage() {
 
   return (
     <PageLayout>
-      <PageTitle
-        title="Compliance da Folha"
-        subtitle="Trilha imutável de cálculos, fechamentos e reaberturas com hash de integridade SHA-256"
-      />
+      <PageTitle title="Compliance da Folha" />
+      <p className="-mt-4 mb-4 text-sm text-muted-foreground">
+        Trilha imutável de cálculos, fechamentos e reaberturas com hash de integridade SHA-256.
+      </p>
+
 
       <Card>
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
