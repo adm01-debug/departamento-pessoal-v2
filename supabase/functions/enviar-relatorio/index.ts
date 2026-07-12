@@ -220,6 +220,26 @@ serve(async (req: Request): Promise<Response> => {
       if (!isAdm) return json({ error: "Sem acesso a esta empresa" }, 403);
     }
 
+    // 4b. Anti-exfiltração: emailDestinatario deve pertencer a um usuário
+    // vinculado à empresa (evita envio de dados internos para email externo).
+    const { data: destinatarioUser } = await admin
+      .from("profiles")
+      .select("user_id, email")
+      .eq("email", body.emailDestinatario)
+      .maybeSingle();
+    if (!destinatarioUser?.user_id) {
+      return json({ error: "Destinatário não é usuário do sistema" }, 403);
+    }
+    const { data: destBelongs } = await admin.rpc("user_belongs_to_empresa", {
+      _user_id: destinatarioUser.user_id, _empresa_id: empresaId,
+    });
+    if (destBelongs !== true) {
+      const { data: destIsAdm } = await admin.rpc("is_admin", { _user_id: destinatarioUser.user_id });
+      if (destIsAdm !== true) {
+        return json({ error: "Destinatário não pertence à empresa" }, 403);
+      }
+    }
+
     // 5. Coleta escopada por empresa
     const { dados, totalRegistros } = await coletarDados(
       admin,
