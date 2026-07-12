@@ -19,6 +19,7 @@ const EmpresasPage = lazy(() => import('@/pages/EmpresasPage'));
 const EmpresaFormPage = lazy(() => import('@/pages/EmpresaFormPage'));
 const FolhaPage = lazy(() => import('@/pages/FolhaPage'));
 const FolhaPagamentoPage = lazy(() => import('@/pages/FolhaPagamentoPage'));
+const FolhaCompliancePage = lazy(() => import('@/pages/FolhaCompliancePage'));
 const FeriasPage = lazy(() => import('@/pages/FeriasPage'));
 const PontoPage = lazy(() => import('@/pages/PontoPage'));
 const BeneficiosPage = lazy(() => import('@/pages/BeneficiosPage'));
