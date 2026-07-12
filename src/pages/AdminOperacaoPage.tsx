@@ -4,11 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw, Clock, Bell, Check } from 'lucide-react';
+import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw, Clock, Bell, Check, ScrollText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface DlqRow { tipo_tarefa: string; total_dlq: number; mais_recente: string | null; ultimo_erro_sample: string | null }
 interface ConflictRow { competencia: string; conflitos: number; ultimo_em: string }
