@@ -887,6 +887,54 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log_unified_archive: {
+        Row: {
+          action: string | null
+          empresa_id: string | null
+          entity: string | null
+          entity_id: string | null
+          id: string
+          ingested_at: string
+          ip_address: unknown
+          occurred_at: string
+          payload: Json | null
+          source_id: string | null
+          source_table: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          empresa_id?: string | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ingested_at?: string
+          ip_address?: unknown
+          occurred_at?: string
+          payload?: Json | null
+          source_id?: string | null
+          source_table: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          empresa_id?: string | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ingested_at?: string
+          ip_address?: unknown
+          occurred_at?: string
+          payload?: Json | null
+          source_id?: string | null
+          source_table?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -21343,6 +21391,13 @@ export type Database = {
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
       limpar_govbr_states_expirados: { Args: never; Returns: undefined }
+      maintenance_archive_old_audit: {
+        Args: { _batch?: number; _days?: number }
+        Returns: {
+          archived: number
+          purged: number
+        }[]
+      }
       maintenance_weekly_analyze: { Args: never; Returns: undefined }
       process_lgpd_cleanup_queue: { Args: never; Returns: number }
       processar_ajuste_aprovado: {
