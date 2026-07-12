@@ -61,7 +61,17 @@ export default tseslint.config(
           message:
             "Não use `.toISOString().split('T')[0]` para gerar data local — causa off-by-one em fusos negativos. Use `todayLocalISO()` ou `formatDateLocalISO()` de `@/utils/dateLocal`.",
         },
+        {
+          // Bloqueia `supabase.rpc('foo' as never, ...)` e `.from('bar' as never)`.
+          // Se o TypeScript não conhece a RPC/tabela, é sinal de que os tipos
+          // precisam ser regenerados — não de suprimir o erro com `as never`.
+          selector:
+            "CallExpression[callee.property.name=/^(rpc|from)$/] > TSAsExpression[typeAnnotation.type='TSNeverKeyword']",
+          message:
+            "Não use `as never` em supabase.rpc()/.from() — anula o type-check do argumento. Regenere `src/integrations/supabase/types.ts` (as RPCs/tabelas já estão tipadas).",
+        },
       ],
+
     },
   },
   {
