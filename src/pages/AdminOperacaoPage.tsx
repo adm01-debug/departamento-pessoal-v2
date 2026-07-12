@@ -226,6 +226,40 @@ export default function AdminOperacaoPage() {
           </div>
          )}
       </SectionCard>
+
+      {/* Cron Jobs Health */}
+      <SectionCard title="Cron Jobs — Rotinas Automáticas" icon={Clock} badge={`${cron.data?.length ?? 0} jobs`}>
+        {cron.isLoading ? <Skeleton className="h-24" /> :
+         !cron.data?.length ? <EmptyState msg="Nenhum job Lovable agendado." /> : (
+          <div className="space-y-2">
+            {cron.data.map(r => {
+              const failed = r.last_status && r.last_status !== 'succeeded';
+              return (
+                <div key={r.jobname} className={`flex items-start justify-between gap-3 p-3 rounded-md border ${failed ? 'border-destructive/50' : 'border-border/50'}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-mono text-sm font-medium truncate">{r.jobname}</p>
+                      {!r.active && <Badge variant="outline" className="text-xs">inativo</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      <span className="font-mono">{r.schedule}</span>
+                      {r.last_run && <> · última: {formatDistanceToNow(new Date(r.last_run), { addSuffix: true, locale: ptBR })}</>}
+                      {r.last_duration_ms != null && <> · {Number(r.last_duration_ms).toFixed(0)}ms</>}
+                    </p>
+                    {r.last_error && <p className="text-xs text-destructive mt-1 truncate">{r.last_error}</p>}
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge variant={failed ? 'destructive' : r.last_status === 'succeeded' ? 'secondary' : 'outline'}>
+                      {r.last_status ?? 'sem execução'}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{r.runs_24h} runs/24h{r.failures_24h > 0 && ` · ${r.failures_24h} falhas`}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+         )}
+      </SectionCard>
     </div>
   );
 }
