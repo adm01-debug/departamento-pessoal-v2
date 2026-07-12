@@ -117,7 +117,7 @@ export const contratacaoService = {
 
   async enviarLinkCandidato(admissaoId: string, email: string): Promise<any> {
     
-    const token = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const token = secureToken(24);
     const expiracao = new Date();
     expiracao.setDate(expiracao.getDate() + 7);
 
