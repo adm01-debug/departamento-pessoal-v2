@@ -115,22 +115,17 @@ export function CampaignWizard({ isOpen, onClose, empresaId }: CampaignWizardPro
                   <Plus className="h-3 w-3 mr-1" /> Adicionar Regra
                 </Button>
               </div>
-              {rules.map((rule, idx) => (
+              {rules.map((rule, idx) => {
+                const patch = (changes: Record<string, unknown>) =>
+                  setRules(rules.map((r, i) => (i === idx ? { ...r, ...changes } : r)));
+                return (
                 <div key={idx} className="p-3 border rounded-xl space-y-3 relative group">
                   <Button variant="ghost" size="icon" className="h-6 w-6 absolute right-2 top-2 text-destructive opacity-0 group-hover:opacity-100" onClick={() => setRules(rules.filter((_, i) => i !== idx))}>
                     <Trash2 className="h-3 w-3" />
                   </Button>
                   <div className="grid grid-cols-2 gap-3">
-                    <Input placeholder="Nome da Regra" value={rule.nome} onChange={e => {
-                      const newRules = [...rules];
-                      newRules[idx].nome = e.target.value;
-                      setRules(newRules);
-                    }} />
-                    <Select value={rule.tipo_calculo} onValueChange={v => {
-                      const newRules = [...rules];
-                      newRules[idx].tipo_calculo = v;
-                      setRules(newRules);
-                    }}>
+                    <Input placeholder="Nome da Regra" value={rule.nome} onChange={e => patch({ nome: e.target.value })} />
+                    <Select value={rule.tipo_calculo} onValueChange={v => patch({ tipo_calculo: v })}>
                       <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="valor_fixo">Valor Fixo</SelectItem>
@@ -140,19 +135,11 @@ export function CampaignWizard({ isOpen, onClose, empresaId }: CampaignWizardPro
                     </Select>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <Input type="number" placeholder="Valor/Base" value={rule.valor_base} onChange={e => {
-                      const newRules = [...rules];
-                      newRules[idx].valor_base = Number(e.target.value);
-                      setRules(newRules);
-                    }} />
-                    <Input placeholder="Critério (Ex: Meta > 100%)" value={rule.condicao_metrica} onChange={e => {
-                      const newRules = [...rules];
-                      newRules[idx].condicao_metrica = e.target.value;
-                      setRules(newRules);
-                    }} />
+                    <Input type="number" placeholder="Valor/Base" value={rule.valor_base} onChange={e => patch({ valor_base: Number(e.target.value) })} />
+                    <Input placeholder="Critério (Ex: Meta > 100%)" value={rule.condicao_metrica} onChange={e => patch({ condicao_metrica: e.target.value })} />
                   </div>
                 </div>
-              ))}
+              );})}
             </div>
           )}
         </div>

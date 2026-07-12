@@ -24,7 +24,7 @@ vi.mock('@/contexts', () => ({
 
 const { supabaseSelectResult, insertMock } = vi.hoisted(() => ({
   supabaseSelectResult: { data: [] as any[], error: null as any },
-  insertMock: vi.fn(async () => ({ error: null })),
+  insertMock: vi.fn(async (_payload: any) => ({ error: null })),
 }));
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {

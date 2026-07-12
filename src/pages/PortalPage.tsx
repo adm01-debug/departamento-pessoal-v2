@@ -20,16 +20,23 @@ function usePortalCompleto(userId: string | undefined) {
     staleTime: 3 * 60 * 1000,
     queryFn: async () => {
       const hoje = format(new Date(), 'yyyy-MM-dd');
-      const [{ data: profile }, { data: notificacoes }, { data: pontoHoje }, { data: feriasPendentes }, { data: holerites }, { data: beneficios }, { data: comunicados }, { data: treinamentos }] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', userId!).maybeSingle(),
-        supabase.from('notificacoes').select('id, titulo, mensagem, lida, created_at, tipo').eq('user_id', userId!).eq('lida', false).order('created_at', { ascending: false }).limit(8),
-        supabase.from('registros_ponto').select('entrada_1, saida_1, entrada_2, saida_2, horas_trabalhadas, horas_extras, atraso_minutos').eq('data', hoje).limit(1).maybeSingle(),
-        supabase.from('ferias').select('data_inicio, data_fim, status, dias_total').in('status', ['pendente', 'aprovada']).order('data_inicio', { ascending: true }).limit(5),
-        supabase.from('folhas_pagamento').select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3),
-        supabase.from('beneficios').select('nome, tipo, valor, status').eq('status', 'ativo').limit(6),
-        supabase.from('comunicados').select('id, titulo, tipo, created_at').eq('ativo', true).order('created_at', { ascending: false }).limit(5),
-        supabase.from('treinamentos').select('id, nome, status, data_inicio').in('status', ['pendente', 'em_andamento']).limit(3),
+      const db = supabase as any;
+      const [p1, p2] = await Promise.all([
+        Promise.all([
+          db.from('profiles').select('*').eq('user_id', userId!).maybeSingle(),
+          db.from('notificacoes').select('id, titulo, mensagem, lida, created_at, tipo').eq('user_id', userId!).eq('lida', false).order('created_at', { ascending: false }).limit(8),
+          db.from('registros_ponto').select('entrada_1, saida_1, entrada_2, saida_2, horas_trabalhadas, horas_extras, atraso_minutos').eq('data', hoje).limit(1).maybeSingle(),
+          db.from('ferias').select('data_inicio, data_fim, status, dias_total').in('status', ['pendente', 'aprovada']).order('data_inicio', { ascending: true }).limit(5),
+        ]),
+        Promise.all([
+          db.from('folhas_pagamento').select('competencia, total_liquido, total_proventos').order('competencia', { ascending: false }).limit(3),
+          db.from('beneficios').select('nome, tipo, valor, status').eq('status', 'ativo').limit(6),
+          db.from('comunicados').select('id, titulo, tipo, created_at').eq('ativo', true).order('created_at', { ascending: false }).limit(5),
+          db.from('treinamentos').select('id, nome, status, data_inicio').in('status', ['pendente', 'em_andamento']).limit(3),
+        ]),
       ]);
+      const [{ data: profile }, { data: notificacoes }, { data: pontoHoje }, { data: feriasPendentes }] = p1;
+      const [{ data: holerites }, { data: beneficios }, { data: comunicados }, { data: treinamentos }] = p2;
       return { profile, notificacoes: notificacoes || [], pontoHoje, feriasPendentes: feriasPendentes || [], holerites: holerites || [], beneficios: beneficios || [], comunicados: comunicados || [], treinamentos: treinamentos || [] };
     },
   });

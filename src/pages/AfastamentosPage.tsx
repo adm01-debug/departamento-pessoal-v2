@@ -60,7 +60,7 @@ export default function AfastamentosPage() {
     ativos: afastamentos.filter((a: any) => a.status === 'ativo').length,
     pendentes: afastamentos.filter((a: any) => a.status === 'pendente').length,
     finalizados: afastamentos.filter((a: any) => a.status === 'finalizado' || a.status === 'concluido').length,
-    diasTotais: afastamentos.reduce((sum: number, a: any) => sum + (a.dias_total || 0), 0),
+    diasTotais: afastamentos.reduce<number>((sum, a: any) => sum + Number(a.dias_total || 0), 0),
   };
 
   const filteredAfastamentos = afastamentos.filter((a: any) => {
@@ -375,7 +375,7 @@ export default function AfastamentosPage() {
                 <div className="mt-4 space-y-3 pt-2 border-t">
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
                     <span className="text-muted-foreground">Impacto Direto</span>
-                    <span className="text-foreground">{afastamentos.reduce((acc: number, a: any) => acc + (a.dias_empresa || 0), 0)} dias pagos</span>
+                    <span className="text-foreground">{afastamentos.reduce<number>((acc, a: any) => acc + Number(a.dias_empresa || 0), 0)} dias pagos</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
                     <span className="text-muted-foreground">Previdência</span>

@@ -55,15 +55,9 @@ export async function notificarAjustePonto(
       .maybeSingle();
 
     if (colab) {
-      let targetUserId = null;
-      if (colab.email) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('email' as any, colab.email)
-          .maybeSingle();
-        targetUserId = (profile as any)?.user_id;
-      }
+      // profiles.email não existe; user_id do destinatário será resolvido pelo trigger
+      // ou pela função de notificação a partir de colaboradores.usuario_id, se aplicável.
+      const targetUserId: string | undefined = undefined;
 
       return criarNotificacao({
         titulo: `Ajuste de Ponto ${status === 'aprovado' ? 'Aprovado' : 'Recusado'}`,

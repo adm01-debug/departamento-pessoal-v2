@@ -26,7 +26,7 @@ export default function DespesasPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ colaborador_id: '', categoria: 'transporte', descricao: '', valor: '', data_despesa: '' });
 
-  const { data: despesas = [], isLoading } = useQuery({ queryKey: ['despesas', empresaAtual?.id], queryFn: () => despesaService.listar(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: despesas = [], isLoading } = useQuery({ queryKey: ['despesas', empresaAtual?.id], queryFn: () => despesaService.listar(empresaAtual!.id), enabled: !!empresaAtual?.id });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   const criar = useMutation({

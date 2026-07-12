@@ -1,13 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 export const despesaService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
-    let q = supabase.from('despesas').select('*, colaborador:colaboradores(nome_completo)').order('data_despesa', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
-    const { data, error } = await q;
+  async listar(empresaId: string, opts: { from?: number; to?: number } = {}): Promise<any[]> {
+    if (!empresaId) throw new Error('empresaId é obrigatório para listar despesas (multi-tenant).');
+    const from = opts.from ?? 0;
+    const to = opts.to ?? 499;
+    const { data, error } = await supabase
+      .from('despesas')
+      .select('*, colaborador:colaboradores(nome_completo)')
+      .eq('empresa_id', empresaId)
+      .order('data_despesa', { ascending: false })
+      .range(from, to);
     if (error) throw error;
     return data || [];
-  
   },
   
   async criar(d: any): Promise<any> {

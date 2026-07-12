@@ -56,11 +56,11 @@ export const automacaoService = {
     dataAlerta.setDate(dataAlerta.getDate() + 30); // 30 dias de antecedência
     const dataFormatada = dataAlerta.toISOString().split('T')[0];
 
-    const { data: asos } = await supabase
+    const { data: asos } = await (supabase as any)
       .from('asos')
       .select('*, colaborador:colaboradores(id, nome_completo, telefone)')
       .eq('empresa_id', empresaId)
-      .eq('data_validade' as any, dataFormatada);
+      .eq('data_validade', dataFormatada);
 
     if (!asos) return;
 
