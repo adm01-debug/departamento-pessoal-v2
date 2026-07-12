@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { UnifiedAuditSection } from '@/components/admin/UnifiedAuditSection';
 
 interface DlqRow { tipo_tarefa: string; total_dlq: number; mais_recente: string | null; ultimo_erro_sample: string | null }
 interface ConflictRow { competencia: string; conflitos: number; ultimo_em: string }
