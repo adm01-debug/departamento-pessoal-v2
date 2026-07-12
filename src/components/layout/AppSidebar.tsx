@@ -134,6 +134,7 @@ const menuGroups: MenuGroup[] = [
       { icon: ClipboardList, label: 'Integrações', path: '/integracoes', color: 'text-info' },
       { icon: Activity, label: 'Telemetria', path: '/admin/telemetria', color: 'text-primary' },
       { icon: ShieldCheck, label: 'Idempotência', path: '/admin/idempotencia', color: 'text-success' },
+      { icon: Activity, label: 'Operação (Painel)', path: '/admin/operacao', color: 'text-primary' },
     ]
   },
 ];
