@@ -248,9 +248,10 @@ serve(async (req: Request): Promise<Response> => {
       body.parametros,
     );
 
-    // 6. Persistência em bucket privado
+    // 6. Persistência em bucket privado + hash do conteúdo (não-repúdio)
     const conteudo =
       body.formato === "csv" ? toCsv(dados) : JSON.stringify(dados, null, 2);
+    const contentHash = await sha256Hex(conteudo);
     const path = `${empresaId}/${body.tipoRelatorio}/${crypto.randomUUID()}.${body.formato}`;
     const { error: upErr } = await admin.storage.from(BUCKET).upload(
       path,
