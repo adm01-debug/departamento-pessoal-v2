@@ -8762,40 +8762,58 @@ export type Database = {
       fila_processamento: {
         Row: {
           created_at: string | null
+          dlq: boolean
+          dlq_movido_em: string | null
           empresa_id: string | null
           erro_log: string | null
           id: string
+          max_tentativas: number
           payload: Json | null
           progresso: number | null
+          proxima_tentativa_em: string | null
           resultado: Json | null
           status: string
+          tentativas: number
           tipo_tarefa: string
+          ultimo_erro: string | null
           updated_at: string | null
           usuario_id: string | null
         }
         Insert: {
           created_at?: string | null
+          dlq?: boolean
+          dlq_movido_em?: string | null
           empresa_id?: string | null
           erro_log?: string | null
           id?: string
+          max_tentativas?: number
           payload?: Json | null
           progresso?: number | null
+          proxima_tentativa_em?: string | null
           resultado?: Json | null
           status?: string
+          tentativas?: number
           tipo_tarefa: string
+          ultimo_erro?: string | null
           updated_at?: string | null
           usuario_id?: string | null
         }
         Update: {
           created_at?: string | null
+          dlq?: boolean
+          dlq_movido_em?: string | null
           empresa_id?: string | null
           erro_log?: string | null
           id?: string
+          max_tentativas?: number
           payload?: Json | null
           progresso?: number | null
+          proxima_tentativa_em?: string | null
           resultado?: Json | null
           status?: string
+          tentativas?: number
           tipo_tarefa?: string
+          ultimo_erro?: string | null
           updated_at?: string | null
           usuario_id?: string | null
         }
@@ -19917,6 +19935,19 @@ export type Database = {
         }
         Relationships: []
       }
+      v_slow_queries_top50: {
+        Row: {
+          cache_hit_pct: number | null
+          calls: number | null
+          max_ms: number | null
+          mean_ms: number | null
+          query_sample: string | null
+          rows: number | null
+          stddev_ms: number | null
+          total_ms: number | null
+        }
+        Relationships: []
+      }
       vw_alertas_compensacao: {
         Row: {
           colaborador_id: string | null
@@ -21138,6 +21169,15 @@ export type Database = {
         Args: { p_colaborador_id: string }
         Returns: number
       }
+      get_dlq_stats: {
+        Args: never
+        Returns: {
+          mais_recente: string
+          tipo_tarefa: string
+          total_dlq: number
+          ultimo_erro_sample: string
+        }[]
+      }
       get_idempotency_health: {
         Args: never
         Returns: {
@@ -21156,6 +21196,17 @@ export type Database = {
         Returns: {
           mes_ref: string
           total_estimado: number
+        }[]
+      }
+      get_query_telemetry: {
+        Args: { _limit?: number }
+        Returns: {
+          cache_hit_pct: number
+          calls: number
+          max_ms: number
+          mean_ms: number
+          query_sample: string
+          total_ms: number
         }[]
       }
       get_user_default_empresa: { Args: { _user_id: string }; Returns: string }
