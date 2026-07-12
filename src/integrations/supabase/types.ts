@@ -21180,11 +21180,14 @@ export type Database = {
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
       limpar_govbr_states_expirados: { Args: never; Returns: undefined }
+      process_lgpd_cleanup_queue: { Args: never; Returns: number }
       processar_ajuste_aprovado: {
         Args: { p_solicitacao_id: string }
         Returns: undefined
       }
       purge_expired_idempotency_keys: { Args: never; Returns: number }
+      purge_expired_security_data: { Args: never; Returns: Json }
+      purge_old_lock_conflicts: { Args: never; Returns: number }
       record_failed_login: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: {
