@@ -4,7 +4,7 @@ import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldC
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
