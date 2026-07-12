@@ -21,6 +21,14 @@ const BodySchema = z.object({
 
 const SIMULATE = (Deno.env.get('ESOCIAL_SIMULATE') ?? 'true').toLowerCase() === 'true';
 
+const NO_STORE = { 'Cache-Control': 'no-store' };
+
+async function sha256Hex(s: string): Promise<string> {
+  const buf = new TextEncoder().encode(s);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 /** Escape XML — bloqueia injection via qualquer campo dinâmico. */
 function xmlEscape(v: unknown): string {
   if (v === null || v === undefined) return '';
