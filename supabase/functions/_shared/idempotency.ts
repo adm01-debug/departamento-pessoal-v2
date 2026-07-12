@@ -24,6 +24,15 @@ export interface BeginIdempotencyParams {
   userId?: string | null;
 }
 
+export type IdempotencyReason =
+  | 'NEW'
+  | 'REPLAY'
+  | 'KEY_INVALID'
+  | 'KEY_REUSE'
+  | 'IN_PROGRESS'
+  | 'STORE_ERROR'
+  | 'RETRY_AFTER_FAILURE';
+
 export interface BeginIdempotencyResult {
   /** Header não fornecido — segue fluxo sem idempotência */
   skipped: boolean;
@@ -33,7 +42,15 @@ export interface BeginIdempotencyResult {
   replay?: Response;
   /** Resposta pronta para retornar (conflito de idempotência) */
   conflict?: Response;
+  /** Razão da decisão — usar para auditoria */
+  reason?: IdempotencyReason;
+  /** ID do registro pré-existente (em replay/conflict), para correlação de auditoria */
+  existingId?: string;
+  /** Hashes calculados (para auditoria) */
+  keyHash?: string;
+  requestHash?: string;
 }
+
 
 async function sha256Hex(input: string): Promise<string> {
   const bytes = new TextEncoder().encode(input);
