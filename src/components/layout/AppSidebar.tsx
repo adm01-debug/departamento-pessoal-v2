@@ -132,6 +132,8 @@ const menuGroups: MenuGroup[] = [
       { icon: Gift, label: 'Promo Brindes', path: '/promo-brindes', color: 'text-warning' },
       { icon: GitBranch, label: 'Vínculos Promo', path: '/promo-brindes/vinculos', color: 'text-info' },
       { icon: ClipboardList, label: 'Integrações', path: '/integracoes', color: 'text-info' },
+      { icon: Activity, label: 'Telemetria', path: '/admin/telemetria', color: 'text-primary' },
+      { icon: ShieldCheck, label: 'Idempotência', path: '/admin/idempotencia', color: 'text-success' },
     ]
   },
 ];
