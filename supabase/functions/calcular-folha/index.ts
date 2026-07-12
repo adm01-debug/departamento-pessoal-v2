@@ -307,9 +307,12 @@ Deno.serve(async (req) => {
       folha_id: upserted?.id,
       competencia,
       total_colaboradores: totalColabs,
+      integrity_hash: integrityHash,
+      integrity_alg: 'sha256-canonical',
       ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
       itens,
     };
+
 
     await completeIdempotency(admin, idempotencyId, 200, responseBody);
 
