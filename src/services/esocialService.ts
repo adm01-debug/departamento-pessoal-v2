@@ -1,4 +1,4 @@
-import { todayLocalISO } from '@/utils/dateLocal';
+import { currentCompetenciaLocal, todayLocalISO } from '@/utils/dateLocal';
 import { supabase } from '@/integrations/supabase/client';
 import { validarEvento, getValidadoresDisponiveis, type ValidationResult } from '@/validators/esocialValidators';
 import { gerarXmlESocial } from '@/utils/esocialXmlGenerator';
@@ -122,7 +122,7 @@ export async function criarEvento(evento: {
     .insert([{
       empresa_id: evento.empresa_id,
       tipo_evento: evento.tipo_evento,
-      competencia: evento.competencia || new Date().toISOString().slice(0, 7),
+      competencia: evento.competencia || currentCompetenciaLocal(),
       dados: (evento.dados || {}) as any,
       status: 'pendente',
       xml: xml

@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { formatDateLocalISO } from '@/utils/dateLocal';
 
 export interface CNABConfig {
   banco_codigo: string;
@@ -180,7 +181,7 @@ export const cnabService = {
     const formatAmount = (val: number) => pad(Math.round(val * 100), 15, '0', 'left');
 
     const today = new Date();
-    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+    const dateStr = formatDateLocalISO(today).replace(/-/g, '');
     const timeStr = today.toTimeString().slice(0, 8).replace(/:/g, '');
 
     const header = pad(config.banco_codigo, 3, '0', 'left') + '00000' + pad('', 9) + '2' + pad('', 14, '0') + pad(config.convenio, 20) + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('BANCO', 30) + pad('', 10) + '1' + dateStr + timeStr + pad(sequence, 6, '0', 'left') + '081' + '00000' + pad('', 69);

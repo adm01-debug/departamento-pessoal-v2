@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import {
+import { todayLocalISO } from '@/utils/dateLocal';
   buildTabularWorkbook,
   downloadWorkbook,
 } from './importacao/excelDownload';
@@ -53,7 +54,7 @@ export async function exportarDesligamentosExcel(desligamentos: any[]) {
   }
   const rows = desligamentos.map(rowFor);
   const wb = buildTabularWorkbook('Desligamentos', HEADERS, rows);
-  const filename = `Desligamentos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const filename = `Desligamentos_${todayLocalISO()}.xlsx`;
   await downloadWorkbook(wb, filename);
   toast.success('Planilha exportada com sucesso!');
 }

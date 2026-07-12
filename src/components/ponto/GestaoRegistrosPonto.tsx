@@ -19,12 +19,13 @@ import { toast } from 'sonner';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
+import { formatDateLocalISO, todayLocalISO } from '@/utils/dateLocal';
 
 export function GestaoRegistrosPonto() {
   const { empresaAtual } = useEmpresas();
   const [selecionados, setSelecionados] = useState<string[]>([]);
-  const [filtroData, setFiltroData] = useState(new Date().toISOString().split('T')[0]);
-  const [filtroFim, setFiltroFim] = useState(new Date().toISOString().split('T')[0]);
+  const [filtroData, setFiltroData] = useState(todayLocalISO());
+  const [filtroFim, setFiltroFim] = useState(todayLocalISO());
   const [tipoExcecao, setTipoExcecao] = useState('todas');
   const [busca, setBusca] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -96,7 +97,7 @@ export function GestaoRegistrosPonto() {
   const mudarDia = (offset: number) => {
     const d = new Date(filtroData + 'T12:00:00');
     d.setDate(d.getDate() + offset);
-    setFiltroData(d.toISOString().split('T')[0]);
+    setFiltroData(formatDateLocalISO(d));
   };
 
   const exportData = (format: 'csv' | 'pdf') => {

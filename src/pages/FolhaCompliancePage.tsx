@@ -22,6 +22,7 @@ import { Download, ShieldCheck, Loader2, FileSearch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MetricasFolhaDashboard } from '@/components/folha/MetricasFolhaDashboard';
+import { todayLocalISO } from '@/utils/dateLocal';
 
 type ComplianceRow = {
   audit_id: string | null;
@@ -120,7 +121,7 @@ export default function FolhaCompliancePage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `folha-compliance-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `folha-compliance-${todayLocalISO()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`${filtered.length} evento(s) exportado(s)`);

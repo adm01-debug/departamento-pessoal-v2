@@ -18,6 +18,7 @@ import { QuickActionsGrid } from "@/components/dashboard/QuickActionsGrid";
 import { AnalyticsSection } from "@/components/dashboard/AnalyticsSection";
 import { KPICardSkeleton } from "@/components/ui/module-skeleton";
 import { useRealtimeDashboard } from "@/hooks/useRealtimeDashboard";
+import { formatCompetenciaLocal } from '@/utils/dateLocal';
 
 /* ─── Data Hooks ─── */
 interface DashboardStats {
@@ -50,7 +51,7 @@ function useDashboardStats(enabled: boolean) {
       if (!empresaAtualId) throw new Error("Empresa não selecionada");
 
       const now = new Date();
-      const mesAtual = now.toISOString().slice(0, 7);
+      const mesAtual = formatCompetenciaLocal(now);
       const em30Dias = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
       const inicioMes = `${mesAtual}-01`;
 

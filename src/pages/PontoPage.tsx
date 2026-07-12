@@ -28,6 +28,7 @@ import { CardSkeleton } from '@/components/ui/module-skeleton';
 import { PontoLeaderboard } from '@/components/ponto/PontoLeaderboard';
 import { GestaoPontoAnalytics } from '@/components/ponto/GestaoPontoAnalytics';
 import { PontoGeoAnalytics } from '@/components/ponto/PontoGeoAnalytics';
+import { formatDateLocalISO, todayLocalISO } from '@/utils/dateLocal';
 
 
 interface BancoHorasResumo {
@@ -56,7 +57,7 @@ export default function PontoPage() {
   });
 
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayLocalISO();
 
   const { data: registroHoje, refetch: refetchRegistro } = useQuery({
     queryKey: ['registro-ponto-hoje', user?.id, today],
@@ -68,7 +69,7 @@ export default function PontoPage() {
 
   const { data: registrosSemana = [] } = useQuery({
     queryKey: ['registros-semana', user?.id],
-    queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', w.toISOString().split('T')[0]).order('data', { ascending: false }); if (error) throw error; return data || []; },
+    queryFn: async () => { if (!user?.id) return []; const { data: colab } = await supabase.from('colaboradores').select('id').eq('email', user.email || '').maybeSingle(); if (!colab) return []; const w = new Date(); w.setDate(w.getDate() - 7); const { data, error } = await (supabase as any).from('registros_ponto').select('*').eq('colaborador_id', colab.id).gte('data', formatDateLocalISO(w)).order('data', { ascending: false }); if (error) throw error; return data || []; },
     enabled: !!user?.id,
   });
 
@@ -184,7 +185,7 @@ export default function PontoPage() {
 
   const processarPontoServidor = async () => {
     if (!empresaAtual?.id) return; setProcessando(true);
-    try { const w = new Date(); w.setDate(w.getDate() - 7); await edgeFunctionsService.processarPonto({ empresaId: empresaAtual.id, dataInicio: w.toISOString().split('T')[0], dataFim: new Date().toISOString().split('T')[0] }); toast.success('Ponto processado!'); refetchRegistro(); refetchBatidas(); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setProcessando(false); }
+    try { const w = new Date(); w.setDate(w.getDate() - 7); await edgeFunctionsService.processarPonto({ empresaId: empresaAtual.id, dataInicio: formatDateLocalISO(w), dataFim: todayLocalISO() }); toast.success('Ponto processado!'); refetchRegistro(); refetchBatidas(); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setProcessando(false); }
   };
 
   return (

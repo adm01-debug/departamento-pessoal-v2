@@ -22,6 +22,7 @@ import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { useFolha } from '@/hooks/useFolha';
 import {
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -101,7 +102,7 @@ export default function FolhaPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <CalculoFolhaWizard competencia={new Date().toISOString().slice(0, 7)} />
+          <CalculoFolhaWizard competencia={currentCompetenciaLocal()} />
         </div>
 
       }

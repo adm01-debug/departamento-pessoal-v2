@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { formatDateLocalISO } from '@/utils/dateLocal';
 
 export interface BackupRecord {
   id: string;
@@ -73,7 +74,7 @@ export async function exportarBackupCSV(
 
   const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const now = new Date();
-  const fileName = `backup_dp_${now.toISOString().slice(0, 10)}_${now.toTimeString().slice(0, 5).replace(':', 'h')}.csv`;
+  const fileName = `backup_dp_${formatDateLocalISO(now)}_${now.toTimeString().slice(0, 5).replace(':', 'h')}.csv`;
 
   return {
     blob,
@@ -113,7 +114,7 @@ export async function exportarBackupJSON(
 
   const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
   const now = new Date();
-  const fileName = `backup_dp_${now.toISOString().slice(0, 10)}_${now.toTimeString().slice(0, 5).replace(':', 'h')}.json`;
+  const fileName = `backup_dp_${formatDateLocalISO(now)}_${now.toTimeString().slice(0, 5).replace(':', 'h')}.json`;
 
   return {
     blob,

@@ -1,4 +1,4 @@
-import { todayLocalISO } from '@/utils/dateLocal';
+import { currentCompetenciaLocal, todayLocalISO } from '@/utils/dateLocal';
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -45,7 +45,7 @@ export default function ValesPage() {
 
   // === Recargas ===
   const [openRec, setOpenRec] = useState(false);
-  const [recForm, setRecForm] = useState({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '', mes_referencia: new Date().toISOString().slice(0, 7) });
+  const [recForm, setRecForm] = useState({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '', mes_referencia: currentCompetenciaLocal() });
 
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores-vale', empresaAtual?.id],
@@ -78,7 +78,7 @@ export default function ValesPage() {
       });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['recargas-vale'] }); setOpenRec(false); setRecForm({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '', mes_referencia: new Date().toISOString().slice(0, 7) }); toast.success('Recarga registrada'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['recargas-vale'] }); setOpenRec(false); setRecForm({ colaborador_id: '', vale_id: '', valor: '', data_recarga: '', mes_referencia: currentCompetenciaLocal() }); toast.success('Recarga registrada'); },
     onError: () => toast.error('Erro ao registrar recarga'),
   });
 
