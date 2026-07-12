@@ -83,7 +83,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
         .eq('empresa_id', empresaAtualId!)
         .is('aprovado', false)
         .gte('data', `${ano}-${mes}-01`)
-        .lte('data', new Date(parseInt(ano), parseInt(mes), 0).toISOString().split('T')[0]);
+        .lte('data', formatDateLocalISO(new Date(parseInt(ano, 10), parseInt(mes, 10), 0)));
       return count || 0;
     },
     enabled: isOpen && currentStep === 1,
