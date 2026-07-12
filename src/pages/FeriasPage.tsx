@@ -46,7 +46,7 @@ export default function FeriasPage() {
   const [calcLoading, setCalcLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
-  const [calcResult, setCalcResult] = useState<UnknownRecord | null>(null);
+  const [calcResult, setCalcResult] = useState<CalculoFeriasResult | null>(null);
   const queryClient = useQueryClient();
   
   const { ferias, totalCount, isLoading, refetch } = useFerias({ 
