@@ -178,7 +178,7 @@ export const pontoService = {
       .from('registros_ponto')
       .select('*')
       .eq('colaborador_id', colaboradorId)
-      .gte('data', weekAgo.toISOString().split('T')[0])
+      .gte('data', formatDateLocalISO(weekAgo))
       .order('data', { ascending: false });
     if (error) throw error;
     return data || [];
