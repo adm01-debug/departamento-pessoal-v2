@@ -111,11 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     const authInitTimeout = window.setTimeout(() => {
-      if (isMounted && !isReady) {
+      if (isMounted && !isReadyRef.current) {
         loggerService.warn('Auth initialization timed out');
         markReady();
       }
     }, AUTH_INIT_TIMEOUT_MS);
+
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!isMounted) return;
