@@ -19840,6 +19840,20 @@ export type Database = {
         }
         Relationships: []
       }
+      v_idempotency_metrics: {
+        Row: {
+          completed_24h: number | null
+          conflict_24h: number | null
+          endpoint: string | null
+          failed_24h: number | null
+          failure_rate_pct_24h: number | null
+          last_seen_at: string | null
+          pending_24h: number | null
+          total_24h: number | null
+          total_7d: number | null
+        }
+        Relationships: []
+      }
       vw_alertas_compensacao: {
         Row: {
           colaborador_id: string | null
@@ -21044,6 +21058,19 @@ export type Database = {
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
         Returns: number
+      }
+      get_idempotency_health: {
+        Args: never
+        Returns: {
+          completed_24h: number
+          conflict_24h: number
+          endpoint: string
+          failed_24h: number
+          failure_rate_pct: number
+          last_seen_at: string
+          pending_24h: number
+          total_24h: number
+        }[]
       }
       get_personnel_cost_projection: {
         Args: { p_empresa_id: string; p_months: number }
