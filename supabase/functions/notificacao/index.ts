@@ -127,7 +127,7 @@ serve(async (req: Request): Promise<Response> => {
 
         return new Response(JSON.stringify({ success: true, enviadas }), {
           status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
         });
       }
 
@@ -147,7 +147,7 @@ serve(async (req: Request): Promise<Response> => {
         if (error) throw error;
         return new Response(JSON.stringify({ notificacoes: list }), {
           status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
         });
       }
 

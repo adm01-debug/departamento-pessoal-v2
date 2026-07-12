@@ -110,7 +110,7 @@ serve(async (req: Request): Promise<Response> => {
     if (existing) {
       return new Response(
         JSON.stringify({ success: true, replay: true, event_id: webhookData.event_id }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, status: 200 }
       );
     }
 
@@ -133,7 +133,7 @@ serve(async (req: Request): Promise<Response> => {
     if (insertErr && (insertErr.code === '23505' || /duplicate|unique/i.test(insertErr.message))) {
       return new Response(
         JSON.stringify({ success: true, replay: true, event_id: webhookData.event_id }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, status: 200 }
       );
     }
     if (insertErr) {
@@ -160,7 +160,7 @@ serve(async (req: Request): Promise<Response> => {
 
     return new Response(
       JSON.stringify({ success: true, data: result, version: webhookData.version, event_id: webhookData.event_id }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
     );
   });
 });
