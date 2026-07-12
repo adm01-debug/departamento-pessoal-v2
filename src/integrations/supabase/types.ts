@@ -19921,6 +19921,19 @@ export type Database = {
         }
         Relationships: []
       }
+      v_audit_events_unified: {
+        Row: {
+          acao: string | null
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          entidade: string | null
+          entidade_id: string | null
+          source_table: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       v_idempotency_metrics: {
         Row: {
           completed_24h: number | null
@@ -21164,6 +21177,29 @@ export type Database = {
         }[]
       }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
+      get_audit_trail_by_entity: {
+        Args: { _entidade: string; _entidade_id: string; _limit?: number }
+        Returns: {
+          acao: string
+          created_at: string
+          dados_anteriores: Json
+          dados_novos: Json
+          source_table: string
+          user_id: string
+        }[]
+      }
+      get_audit_trail_by_user: {
+        Args: { _limit?: number; _user_id: string }
+        Returns: {
+          acao: string
+          created_at: string
+          dados_anteriores: Json
+          dados_novos: Json
+          entidade: string
+          entidade_id: string
+          source_table: string
+        }[]
+      }
       get_auth_empresa_id: { Args: never; Returns: string }
       get_colaborador_banco_horas: {
         Args: { p_colaborador_id: string }
