@@ -68,7 +68,8 @@ export default function PontoKioskPage() {
 
       setSelectedColab(colab);
       setStep('facial_scan');
-      speak(`Olá ${colab.nome_completo.split(' ')[0]}, olhe para a câmera para identificação facial.`);
+      const firstName = (colab.nome_completo ?? 'Colaborador').split(' ')[0];
+      speak(`Olá ${firstName}, olhe para a câmera para identificação facial.`);
       setTimeout(() => {
         setStep('action');
         speak(`Identidade confirmada. Selecione o tipo de registro.`);
