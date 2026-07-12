@@ -1,0 +1,235 @@
+// reabrir-folha — Onda 40: hardening completo
+// - CSRF fail-closed + JWT via getClaims()
+// - Zod strict: motivo obrigatório (10..500), override_esocial opcional
+// - Tenant scope obrigatório via user_belongs_to_empresa / is_admin
+// - Optimistic locking via coluna `version`
+// - Bloqueios de compliance:
+//     * ESOCIAL_LOCK: folha com esocial_status='enviado' exige override_esocial + role admin
+//     * AUDIT_WINDOW_LOCK: reabertura > 90 dias do fechamento exige role admin
+// - Auditoria BLOQUEANTE não-repudiável com snapshot pré-reabertura + hash SHA-256
+// - Cache-Control: no-store em todas as respostas
+
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
+import {
+  corsHeaders, createErrorResponse, validateRequest,
+} from '../_shared/contract.ts';
+import { verifyCsrf } from '../_shared/csrf.ts';
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+
+const AUDIT_WINDOW_DAYS = 90;
+
+const NO_STORE = {
+  ...corsHeaders,
+  'Content-Type': 'application/json',
+  'Cache-Control': 'no-store',
+};
+
+const jsonOk = (body: Record<string, unknown>, status = 200, extra: Record<string, string> = {}): Response =>
+  new Response(JSON.stringify(body), { status, headers: { ...NO_STORE, ...extra } });
+
+const BodySchema = z.object({
+  empresaId: z.string().uuid(),
+  folhaId: z.string().uuid(),
+  version: z.number().int().nonnegative(),
+  motivo: z.string().trim().min(10, 'Motivo deve ter ao menos 10 caracteres').max(500),
+  override_esocial: z.boolean().optional().default(false),
+}).strict();
+
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function canonicalize(obj: unknown): string {
+  if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
+  if (Array.isArray(obj)) return '[' + obj.map(canonicalize).join(',') + ']';
+  const keys = Object.keys(obj as Record<string, unknown>).sort();
+  return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonicalize((obj as Record<string, unknown>)[k])).join(',') + '}';
+}
+
+serve(async (req: Request): Promise<Response> => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return createErrorResponse('Method not allowed', 405, 'METHOD_NOT_ALLOWED');
+  }
+
+  try {
+    // 1) CSRF fail-closed
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
+    // 2) JWT via getClaims()
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
+    if (!jwt) return createErrorResponse('Não autenticado', 401, 'UNAUTHORIZED');
+
+    const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${jwt}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(jwt);
+    if (claimsErr || !claimsData?.claims?.sub) {
+      return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
+    }
+    const userId = String(claimsData.claims.sub);
+    const userEmail = String(claimsData.claims.email ?? '');
+
+    // 3) Validação Zod strict
+    const { data: body, errorResponse } = await validateRequest(req, BodySchema);
+    if (errorResponse) return errorResponse;
+    const { empresaId, folhaId, version, motivo, override_esocial } = body!;
+
+    const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    // 4) Tenant scope + role admin (para overrides)
+    const [{ data: belongs }, { data: isAdmin }] = await Promise.all([
+      admin.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: empresaId }),
+      admin.rpc('is_admin', { _user_id: userId }),
+    ]);
+    if (belongs !== true && isAdmin !== true) {
+      return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
+    }
+
+    // 5) Carregar folha
+    const { data: folha, error: folhaErr } = await admin
+      .from('folhas_pagamento')
+      .select('id, empresa_id, status, version, competencia, data_fechamento, esocial_status, total_proventos, total_descontos, total_liquido')
+      .eq('id', folhaId)
+      .eq('empresa_id', empresaId)
+      .maybeSingle();
+
+    if (folhaErr) return createErrorResponse('Erro ao carregar folha', 500, 'FOLHA_LOAD_ERROR');
+    if (!folha) return createErrorResponse('Folha não encontrada', 404, 'FOLHA_NOT_FOUND');
+    if (folha.status !== 'fechada') {
+      return createErrorResponse(
+        `Folha não está fechada (status atual: ${folha.status})`,
+        409, 'FOLHA_NOT_CLOSED',
+      );
+    }
+    if (folha.version !== version) {
+      return createErrorResponse(
+        `Versão desatualizada (esperado: ${folha.version})`,
+        409, 'VERSION_CONFLICT',
+      );
+    }
+
+    // 6) Compliance: eSocial já transmitido
+    if (folha.esocial_status === 'enviado') {
+      if (!override_esocial) {
+        return createErrorResponse(
+          'Folha já transmitida ao eSocial — reabertura requer override explícito',
+          403, 'ESOCIAL_LOCK',
+        );
+      }
+      if (isAdmin !== true) {
+        return createErrorResponse(
+          'Override do eSocial requer role admin',
+          403, 'ESOCIAL_OVERRIDE_DENIED',
+        );
+      }
+    }
+
+    // 7) Compliance: janela de auditoria contábil (90 dias)
+    if (folha.data_fechamento) {
+      const closedAtMs = new Date(folha.data_fechamento).getTime();
+      const ageDays = (Date.now() - closedAtMs) / 86_400_000;
+      if (ageDays > AUDIT_WINDOW_DAYS && isAdmin !== true) {
+        return createErrorResponse(
+          `Folha fechada há mais de ${AUDIT_WINDOW_DAYS} dias — reabertura requer role admin`,
+          403, 'AUDIT_WINDOW_LOCK',
+        );
+      }
+    }
+
+    // 8) Optimistic lock update
+    const reopenedAt = new Date().toISOString();
+    const { data: updated, error: updErr } = await admin
+      .from('folhas_pagamento')
+      .update({
+        status: 'aberta',
+        reaberta_em: reopenedAt,
+        reaberta_por: userId,
+        motivo_reabertura: motivo,
+        version: folha.version + 1,
+        updated_at: reopenedAt,
+      })
+      .eq('id', folhaId)
+      .eq('version', folha.version)
+      .eq('status', 'fechada')
+      .select('id, version')
+      .maybeSingle();
+
+    if (updErr) return createErrorResponse('Erro ao reabrir folha', 500, 'FOLHA_UPDATE_ERROR');
+    if (!updated) {
+      return createErrorResponse(
+        'Folha foi alterada por outro processo. Recarregue e tente novamente.',
+        409, 'VERSION_CONFLICT',
+      );
+    }
+
+    // 9) Auditoria bloqueante não-repudiável (snapshot pré-reabertura)
+    const snapshot = {
+      folhaId,
+      empresaId,
+      competencia: folha.competencia,
+      status_anterior: 'fechada',
+      status_novo: 'aberta',
+      version_anterior: folha.version,
+      version_nova: updated.version,
+      total_proventos: Number(folha.total_proventos ?? 0),
+      total_descontos: Number(folha.total_descontos ?? 0),
+      total_liquido: Number(folha.total_liquido ?? 0),
+      esocial_status: folha.esocial_status,
+      override_esocial: Boolean(override_esocial),
+      motivo,
+      data_fechamento_anterior: folha.data_fechamento,
+      user_id: userId,
+      reopened_at: reopenedAt,
+    };
+    const auditHash = await sha256Hex(canonicalize(snapshot));
+
+    const { error: auditErr } = await admin.from('audit_log').insert({
+      tabela: 'folhas_pagamento',
+      registro_id: folhaId,
+      acao: 'REOPEN',
+      dados_anteriores: {
+        status: 'fechada',
+        version: folha.version,
+        data_fechamento: folha.data_fechamento,
+        esocial_status: folha.esocial_status,
+      },
+      dados_novos: { ...snapshot, audit_hash: auditHash },
+      user_id: userId,
+      user_email: userEmail || null,
+    });
+    if (auditErr) {
+      // Reverter para preservar trilha
+      await admin.from('folhas_pagamento').update({
+        status: 'fechada',
+        reaberta_em: null,
+        reaberta_por: null,
+        motivo_reabertura: null,
+        version: folha.version,
+        updated_at: new Date().toISOString(),
+      }).eq('id', folhaId).eq('version', updated.version);
+      return createErrorResponse('Auditoria falhou — reabertura revertida', 500, 'AUDIT_FAILED');
+    }
+
+    return jsonOk({
+      ok: true,
+      folha_id: folhaId,
+      version: updated.version,
+      audit_hash: auditHash,
+    }, 200, { 'X-Audit-Hash': auditHash });
+  } catch (e) {
+    console.error('[reabrir-folha] erro inesperado:', (e as Error)?.message);
+    return createErrorResponse('Erro interno', 500, 'INTERNAL_ERROR');
+  }
+});
