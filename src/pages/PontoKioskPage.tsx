@@ -276,7 +276,7 @@ export default function PontoKioskPage() {
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
                 <User className="h-8 w-8 text-primary" />
               </div>
-              <CardTitle className="font-display">Olá, {selectedColab.nome_completo.split(' ')[0]}!</CardTitle>
+              <CardTitle className="font-display">Olá, {(selectedColab.nome_completo ?? 'Colaborador').split(' ')[0]}!</CardTitle>
               <p className="text-sm text-muted-foreground">O que deseja fazer agora?</p>
             </CardHeader>
             <CardContent>
