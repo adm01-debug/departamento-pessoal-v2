@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { supabase } from '@/integrations/supabase/client';
 import { validarEvento, getValidadoresDisponiveis, type ValidationResult } from '@/validators/esocialValidators';
 import { gerarXmlESocial } from '@/utils/esocialXmlGenerator';
@@ -244,7 +245,7 @@ export async function gerarEventosPeriodo(empresaId: string, competencia: string
             cpfTrab: colaborador.cpf,
             perApur: competencia,
             infoPgto: [{
-              dtPgto: new Date().toISOString().split('T')[0],
+              dtPgto: todayLocalISO(),
               tpPgto: 1,
               vlrLiq: Number(item.total_liquido || 0)
             }]

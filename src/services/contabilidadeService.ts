@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { supabase } from '@/integrations/supabase/client';
 export const contabilidadeService = {
   async listLancamentos(empresaId: string): Promise<any[]> {
@@ -56,7 +57,7 @@ export const contabilidadeService = {
         {
           empresa_id: empresaId,
           folha_id: folhaId,
-          data_lancamento: new Date().toISOString().split('T')[0],
+          data_lancamento: todayLocalISO(),
           descricao: `Provisão de Folha de Pagamento - Competência ${folha.competencia}`,
           valor: folha.total_liquido,
           conta_debito_id: contaDespesaSalarios.id,

@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBeneficiosColaborador } from '@/hooks/useBeneficiosColaborador';
 import { useBeneficios } from '@/hooks/useBeneficios';
@@ -25,7 +26,7 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
       beneficio_id: '',
       valor: 0,
       desconto: 0,
-      data_inicio: new Date().toISOString().split('T')[0],
+      data_inicio: todayLocalISO(),
       quantidade_diaria: 2
     }
   });

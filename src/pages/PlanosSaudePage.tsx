@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -32,7 +33,7 @@ function BeneficiariosPlanoSection({ planoId }: { planoId: string }) {
   });
 
   const criar = useMutation({
-    mutationFn: () => beneficiariosPlanoService.criar({ ...form, plano_saude_id: planoId, status: 'ativo', data_inclusao: new Date().toISOString().split('T')[0] }),
+    mutationFn: () => beneficiariosPlanoService.criar({ ...form, plano_saude_id: planoId, status: 'ativo', data_inclusao: todayLocalISO() }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['beneficiarios-plano', planoId] }); setOpen(false); setForm({ nome: '', cpf: '', parentesco: '', tipo: 'dependente' }); toast.success('Beneficiário incluído!'); },
     onError: () => toast.error('Erro ao incluir beneficiário'),
   });
