@@ -189,7 +189,7 @@ serve(async (req: Request): Promise<Response> => {
       user_id: userId,
       closed_at: closedAt,
     };
-    const auditHash = await sha256Hex(canonicalize(snapshot));
+    const auditHash = await integrityHash(snapshot);
 
     const { error: auditErr } = await admin.from('audit_log').insert({
       tabela: 'folhas_pagamento',
