@@ -144,7 +144,8 @@ export const contratacaoService = {
       const mensagem = encodeURIComponent(`Olá! 👋 Boas-vindas à nossa equipe!\n\nSeu processo de admissão digital está pronto. Acesse pelo link seguro: ${link}\n\nCódigo de Acesso: *${token}*`);
       
       try {
-        const { data: admissao } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).single();
+        const { data: admissao, error: admErr } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).maybeSingle();
+        if (admErr) throw admErr;
         if (admissao?.empresa_id) {
           const { whatsappService } = await import('./whatsappService');
           await whatsappService.sendMessage({ 
