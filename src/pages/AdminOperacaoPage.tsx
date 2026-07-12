@@ -75,11 +75,22 @@ export default function AdminOperacaoPage() {
     staleTime: 60_000,
   });
 
+  const cron = useQuery({
+    queryKey: ['admin-op', 'cron-health'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_cron_jobs_health' as never);
+      if (error) throw error;
+      return (data ?? []) as CronRow[];
+    },
+    staleTime: 60_000,
+  });
+
   const refetchAll = () => {
     dlq.refetch();
     conflitos.refetch();
     telemetry.refetch();
     idem.refetch();
+    cron.refetch();
   };
 
   const totalDlq = dlq.data?.reduce((s, r) => s + Number(r.total_dlq || 0), 0) ?? 0;
