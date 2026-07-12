@@ -59,7 +59,10 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
         .single();
       
       if (admissao?.email) {
-        const token = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const bytes = new Uint8Array(24);
+        crypto.getRandomValues(bytes);
+        const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const token = Array.from(bytes, b => ALPHABET[b % ALPHABET.length]).join('');
         const expiracao = new Date();
         expiracao.setDate(expiracao.getDate() + 7);
 
