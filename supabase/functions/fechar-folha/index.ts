@@ -107,7 +107,7 @@ serve(async (req: Request): Promise<Response> => {
     // 5) Carregar folha
     const { data: folha, error: folhaErr } = await admin
       .from('folhas_pagamento')
-      .select('id, empresa_id, status, version, total_proventos, total_descontos, total_liquido, competencia')
+      .select('id, empresa_id, status, version, total_proventos, total_descontos, total_liquido, total_fgts, competencia')
       .eq('id', folhaId)
       .eq('empresa_id', empresaId)
       .maybeSingle();
@@ -127,30 +127,23 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // 6) Integridade financeira: recomputar somas dos holerites
-    const { data: holerites, error: holErr } = await admin
-      .from('holerites')
-      .select('total_proventos, total_descontos, liquido')
-      .eq('folha_id', folhaId);
-
-    if (holErr) return createErrorResponse('Erro ao verificar holerites', 500, 'HOLERITE_LOAD_ERROR');
-    const count = holerites?.length ?? 0;
-    if (count === 0) {
-      return createErrorResponse('Folha sem holerites — não pode ser fechada', 422, 'FOLHA_EMPTY');
-    }
-
-    const sumProv = holerites!.reduce((s, h) => s + Number(h.total_proventos ?? 0), 0);
-    const sumDesc = holerites!.reduce((s, h) => s + Number(h.total_descontos ?? 0), 0);
-    const sumLiq  = holerites!.reduce((s, h) => s + Number(h.liquido ?? 0), 0);
-
-    if (!approxEq(sumProv, folha.total_proventos) ||
-        !approxEq(sumDesc, folha.total_descontos) ||
-        !approxEq(sumLiq,  folha.total_liquido)) {
+    // 6) Integridade financeira: holerites + folha_itens (cruzamento duplo)
+    const integrity = await verifyFolhaIntegrity(admin, folhaId, folha);
+    if (!integrity.ok) {
+      const httpStatus = integrity.code === 'FOLHA_EMPTY' ? 422 : 422;
+      console.warn('[fechar-folha] integrity failure', {
+        folha_id: folhaId,
+        code: integrity.code,
+        details: integrity.details,
+      });
       return createErrorResponse(
-        'Integridade financeira violada: soma dos holerites diverge da folha',
-        422, 'INTEGRITY_MISMATCH',
+        'Integridade financeira violada',
+        httpStatus,
+        integrity.code,
       );
     }
+
+    const { sum_proventos: sumProv, sum_descontos: sumDesc, sum_liquido: sumLiq, sum_fgts: sumFgts, holerites_count: count, itens_count: itensCount } = integrity;
 
     // 7) Optimistic lock update
     const closedAt = new Date().toISOString();
