@@ -9025,8 +9025,13 @@ export type Database = {
           data_fechamento: string | null
           data_pagamento: string | null
           empresa_id: string | null
+          esocial_status: string
+          fechada_por: string | null
           id: string
+          motivo_reabertura: string | null
           observacoes: string | null
+          reaberta_em: string | null
+          reaberta_por: string | null
           status: Database["public"]["Enums"]["status_folha"]
           tipo: string
           total_colaboradores: number | null
@@ -9036,7 +9041,7 @@ export type Database = {
           total_liquido: number | null
           total_proventos: number | null
           updated_at: string
-          version: number | null
+          version: number
         }
         Insert: {
           alerta_calculo?: Json | null
@@ -9047,8 +9052,13 @@ export type Database = {
           data_fechamento?: string | null
           data_pagamento?: string | null
           empresa_id?: string | null
+          esocial_status?: string
+          fechada_por?: string | null
           id?: string
+          motivo_reabertura?: string | null
           observacoes?: string | null
+          reaberta_em?: string | null
+          reaberta_por?: string | null
           status?: Database["public"]["Enums"]["status_folha"]
           tipo?: string
           total_colaboradores?: number | null
@@ -9058,7 +9068,7 @@ export type Database = {
           total_liquido?: number | null
           total_proventos?: number | null
           updated_at?: string
-          version?: number | null
+          version?: number
         }
         Update: {
           alerta_calculo?: Json | null
@@ -9069,8 +9079,13 @@ export type Database = {
           data_fechamento?: string | null
           data_pagamento?: string | null
           empresa_id?: string | null
+          esocial_status?: string
+          fechada_por?: string | null
           id?: string
+          motivo_reabertura?: string | null
           observacoes?: string | null
+          reaberta_em?: string | null
+          reaberta_por?: string | null
           status?: Database["public"]["Enums"]["status_folha"]
           tipo?: string
           total_colaboradores?: number | null
@@ -9080,7 +9095,7 @@ export type Database = {
           total_liquido?: number | null
           total_proventos?: number | null
           updated_at?: string
-          version?: number | null
+          version?: number
         }
         Relationships: [
           {
