@@ -80,11 +80,12 @@ export async function beginIdempotency(
   params: BeginIdempotencyParams,
 ): Promise<BeginIdempotencyResult> {
   const rawKey = params.key?.trim();
-  if (!rawKey) return { skipped: true };
+  if (!rawKey) return { skipped: true, reason: 'NEW' };
 
   if (!KEY_REGEX.test(rawKey)) {
     return {
       skipped: false,
+      reason: 'KEY_INVALID',
       conflict: createErrorResponse(
         `Idempotency-Key inválida (${KEY_MIN}-${KEY_MAX} chars alfanuméricos)`,
         400,
@@ -111,7 +112,7 @@ export async function beginIdempotency(
     .maybeSingle();
 
   if (!insertErr && inserted?.id) {
-    return { skipped: false, id: inserted.id };
+    return { skipped: false, id: inserted.id, reason: 'NEW', keyHash, requestHash };
   }
 
   // Colisão — carrega registro existente
@@ -123,9 +124,11 @@ export async function beginIdempotency(
     .maybeSingle();
 
   if (!existing) {
-    // Erro real de insert, não conflito
     return {
       skipped: false,
+      reason: 'STORE_ERROR',
+      keyHash,
+      requestHash,
       conflict: createErrorResponse(
         "Falha ao registrar idempotência",
         500,
@@ -137,6 +140,10 @@ export async function beginIdempotency(
   if (existing.request_hash !== requestHash) {
     return {
       skipped: false,
+      reason: 'KEY_REUSE',
+      existingId: existing.id,
+      keyHash,
+      requestHash,
       conflict: createErrorResponse(
         "Idempotency-Key já usada com payload diferente",
         409,
@@ -148,6 +155,10 @@ export async function beginIdempotency(
   if (existing.status === "in_progress") {
     return {
       skipped: false,
+      reason: 'IN_PROGRESS',
+      existingId: existing.id,
+      keyHash,
+      requestHash,
       conflict: createErrorResponse(
         "Requisição idempotente em andamento — tente novamente em instantes",
         409,
@@ -159,6 +170,10 @@ export async function beginIdempotency(
   if (existing.status === "completed" && existing.response_body) {
     return {
       skipped: false,
+      reason: 'REPLAY',
+      existingId: existing.id,
+      keyHash,
+      requestHash,
       replay: new Response(JSON.stringify(existing.response_body), {
         status: existing.response_status ?? 200,
         headers: {
@@ -173,6 +188,7 @@ export async function beginIdempotency(
   // status = 'failed' — permite nova tentativa reciclando o registro
   await admin
     .from("idempotency_keys")
+
     .update({ status: "in_progress", request_hash: requestHash, response_body: null, response_status: null, completed_at: null })
     .eq("id", existing.id);
   return { skipped: false, id: existing.id };
