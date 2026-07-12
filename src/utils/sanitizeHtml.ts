@@ -27,8 +27,26 @@ function ensureAnchorHook(): void {
   if (hookRegistered || typeof window === 'undefined') return;
   DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     if (!(node instanceof Element)) return;
+    // (1) Tabnabbing hardening on target=_blank anchors.
     if (node.tagName === 'A' && node.hasAttribute('target')) {
       node.setAttribute('rel', 'noopener noreferrer');
+    }
+    // (2) CSS-level XSS: DOMPurify keeps `style` values verbatim. Strip any
+    //     value containing a URL-injection scheme or CSS `expression()`.
+    //     Applies only when the style attribute survived (contract preset).
+    if (node.hasAttribute('style')) {
+      const raw = node.getAttribute('style') ?? '';
+      const lowered = raw.toLowerCase();
+      if (
+        lowered.includes('javascript:') ||
+        lowered.includes('vbscript:') ||
+        lowered.includes('data:text/html') ||
+        lowered.includes('expression(') ||
+        lowered.includes('behavior:') ||
+        lowered.includes('-moz-binding')
+      ) {
+        node.removeAttribute('style');
+      }
     }
   });
   hookRegistered = true;
