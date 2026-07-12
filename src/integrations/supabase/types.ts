@@ -10283,6 +10283,51 @@ export type Database = {
           },
         ]
       }
+      idempotency_keys: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          empresa_id: string | null
+          endpoint: string
+          expires_at: string
+          id: string
+          key_hash: string
+          request_hash: string
+          response_body: Json | null
+          response_status: number | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          endpoint: string
+          expires_at?: string
+          id?: string
+          key_hash: string
+          request_hash: string
+          response_body?: Json | null
+          response_status?: number | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          endpoint?: string
+          expires_at?: string
+          id?: string
+          key_hash?: string
+          request_hash?: string
+          response_body?: Json | null
+          response_status?: number | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       identidades_genero: {
         Row: {
           created_at: string
@@ -20961,6 +21006,7 @@ export type Database = {
         Args: { p_solicitacao_id: string }
         Returns: undefined
       }
+      purge_expired_idempotency_keys: { Args: never; Returns: number }
       record_failed_login: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: {
