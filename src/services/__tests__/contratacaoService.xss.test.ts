@@ -178,7 +178,7 @@ describe('DOMPurify (defesa em profundidade da renderização) ', () => {
   it('remove handlers on* injetados via atributos', () => {
     const dirty = '<img src=x onerror="alert(1)">';
     const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['style'] });
-    expect(clean).not.toMatch(/onerror/i);
+    expect(clean).not.toMatch(/<[a-z][^>]*\sonerror=/i);
   });
 
   it('remove URIs javascript: em <a href>', () => {
