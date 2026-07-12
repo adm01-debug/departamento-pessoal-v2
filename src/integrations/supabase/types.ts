@@ -21205,6 +21205,20 @@ export type Database = {
         Args: { p_colaborador_id: string }
         Returns: number
       }
+      get_cron_jobs_health: {
+        Args: never
+        Returns: {
+          active: boolean
+          failures_24h: number
+          jobname: string
+          last_duration_ms: number
+          last_error: string
+          last_run: string
+          last_status: string
+          runs_24h: number
+          schedule: string
+        }[]
+      }
       get_dlq_stats: {
         Args: never
         Returns: {

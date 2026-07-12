@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -13,6 +13,7 @@ interface DlqRow { tipo_tarefa: string; total_dlq: number; mais_recente: string 
 interface ConflictRow { competencia: string; conflitos: number; ultimo_em: string }
 interface TelemetryRow { query_sample: string; calls: number; mean_ms: number; max_ms: number; total_ms: number; cache_hit_pct: number }
 interface IdemRow { endpoint: string; total_24h: number; failed_24h: number; failure_rate_pct: number; last_seen_at: string }
+interface CronRow { jobname: string; schedule: string; active: boolean; last_run: string | null; last_status: string | null; last_duration_ms: number | null; last_error: string | null; runs_24h: number; failures_24h: number }
 
 function SectionCard({ title, icon: Icon, children, badge }: { title: string; icon: any; children: React.ReactNode; badge?: string }) {
   return (
@@ -74,11 +75,22 @@ export default function AdminOperacaoPage() {
     staleTime: 60_000,
   });
 
+  const cron = useQuery({
+    queryKey: ['admin-op', 'cron-health'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_cron_jobs_health' as never);
+      if (error) throw error;
+      return (data ?? []) as CronRow[];
+    },
+    staleTime: 60_000,
+  });
+
   const refetchAll = () => {
     dlq.refetch();
     conflitos.refetch();
     telemetry.refetch();
     idem.refetch();
+    cron.refetch();
   };
 
   const totalDlq = dlq.data?.reduce((s, r) => s + Number(r.total_dlq || 0), 0) ?? 0;
@@ -211,6 +223,40 @@ export default function AdminOperacaoPage() {
                 </Badge>
               </div>
             ))}
+          </div>
+         )}
+      </SectionCard>
+
+      {/* Cron Jobs Health */}
+      <SectionCard title="Cron Jobs — Rotinas Automáticas" icon={Clock} badge={`${cron.data?.length ?? 0} jobs`}>
+        {cron.isLoading ? <Skeleton className="h-24" /> :
+         !cron.data?.length ? <EmptyState msg="Nenhum job Lovable agendado." /> : (
+          <div className="space-y-2">
+            {cron.data.map(r => {
+              const failed = r.last_status && r.last_status !== 'succeeded';
+              return (
+                <div key={r.jobname} className={`flex items-start justify-between gap-3 p-3 rounded-md border ${failed ? 'border-destructive/50' : 'border-border/50'}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-mono text-sm font-medium truncate">{r.jobname}</p>
+                      {!r.active && <Badge variant="outline" className="text-xs">inativo</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      <span className="font-mono">{r.schedule}</span>
+                      {r.last_run && <> · última: {formatDistanceToNow(new Date(r.last_run), { addSuffix: true, locale: ptBR })}</>}
+                      {r.last_duration_ms != null && <> · {Number(r.last_duration_ms).toFixed(0)}ms</>}
+                    </p>
+                    {r.last_error && <p className="text-xs text-destructive mt-1 truncate">{r.last_error}</p>}
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge variant={failed ? 'destructive' : r.last_status === 'succeeded' ? 'secondary' : 'outline'}>
+                      {r.last_status ?? 'sem execução'}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{r.runs_24h} runs/24h{r.failures_24h > 0 && ` · ${r.failures_24h} falhas`}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
          )}
       </SectionCard>
