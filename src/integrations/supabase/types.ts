@@ -297,6 +297,7 @@ export type Database = {
           dias_inss: number | null
           dias_total: number | null
           empresa_id: string | null
+          hash_integridade: string | null
           id: string
           local_pericia: string | null
           medico_crm: string | null
@@ -330,6 +331,7 @@ export type Database = {
           dias_inss?: number | null
           dias_total?: number | null
           empresa_id?: string | null
+          hash_integridade?: string | null
           id?: string
           local_pericia?: string | null
           medico_crm?: string | null
@@ -363,6 +365,7 @@ export type Database = {
           dias_inss?: number | null
           dias_total?: number | null
           empresa_id?: string | null
+          hash_integridade?: string | null
           id?: string
           local_pericia?: string | null
           medico_crm?: string | null
