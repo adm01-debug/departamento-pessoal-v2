@@ -25,7 +25,7 @@ export default function AdminIdempotenciaPage() {
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['idempotency-health'],
     queryFn: async (): Promise<IdempotencyRow[]> => {
-      const { data, error } = await supabase.rpc('get_idempotency_health' as never);
+      const { data, error } = await supabase.rpc('get_idempotency_health');
       if (error) throw error;
       return (data ?? []) as IdempotencyRow[];
     },

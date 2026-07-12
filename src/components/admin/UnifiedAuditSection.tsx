@@ -38,7 +38,7 @@ export function UnifiedAuditSection() {
       const { data, error } = await supabase.rpc('search_audit_unified', {
         _source_table: sourceFilter || null,
         _limit: AUDIT_UNIFIED_LIMIT,
-      } as never);
+      });
       if (error) throw error;
       return (data ?? []) as AuditRow[];
     },
