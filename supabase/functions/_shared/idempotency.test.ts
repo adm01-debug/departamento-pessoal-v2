@@ -237,7 +237,8 @@ Deno.test("idempotency: mesma key com payload divergente → KEY_REUSE (409)", a
   assert(reuse.conflict);
   assertEquals(reuse.conflict!.status, 409);
   const body = await reuse.conflict!.json();
-  assertEquals(body.code, "IDEMPOTENCY_KEY_REUSE");
+  assertEquals(body.error.code, "IDEMPOTENCY_KEY_REUSE");
+
 });
 
 Deno.test("idempotency: canonicalização ignora ordem de chaves no payload", async () => {
