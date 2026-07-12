@@ -12,7 +12,6 @@ import { desligamentoService } from '@/services/desligamentoService';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-
 interface Props {
   open: boolean;
   onClose: () => void;

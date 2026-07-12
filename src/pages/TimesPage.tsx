@@ -15,7 +15,6 @@ import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Plus, Users, Trash2, Edit2 } from 'lucide-react';
-
 export default function TimesPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();

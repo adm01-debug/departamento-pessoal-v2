@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts';
 import { supabase } from '@/integrations/supabase/client';
-
 interface PontoClockRegisterProps {
   time: Date;
   loading: string | null;

@@ -17,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ESocialComplianceScore } from '@/components/esocial/ESocialComplianceScore';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';

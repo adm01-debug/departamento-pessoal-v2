@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Separator } from '@/components/ui/separator';
-
 export function CalendarioFerias() {
   const { ferias } = useFerias();
   const [currentDate, setCurrentDate] = useState(new Date());

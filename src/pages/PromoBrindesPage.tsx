@@ -14,7 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Plus, Gift, Trash2, Edit2, Search, Package } from 'lucide-react';
-
 export default function PromoBrindesPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);

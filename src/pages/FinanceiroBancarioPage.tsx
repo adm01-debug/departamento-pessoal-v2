@@ -16,7 +16,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { todayLocalISO } from '@/utils/dateLocal';
-
 export default function FinanceiroBancarioPage() {
   const { empresaAtual } = useEmpresas();
   const [config, setConfig] = useState<CNABConfig | null>(null);

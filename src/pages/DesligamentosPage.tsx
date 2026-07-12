@@ -25,8 +25,6 @@ import {
   NovoDesligamentoDialog,
   TurnoverChart,
 } from '@/components/desligamentos';
-
-
 export default function DesligamentosPage() {
   const { desligamentos, isLoading } = useDesligamentos();
   const navigate = useNavigate();
@@ -34,7 +32,7 @@ export default function DesligamentosPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [tipoFilter, setTipoFilter] = useState('todos');
-  const [selectedDesligamento, setSelectedDesligamento] = useState<any | null>(null);
+  const [selectedDesligamento, setSelectedDesligamento] = useState<any>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showNovo, setShowNovo] = useState(false);
   const [showChart, setShowChart] = useState(true);

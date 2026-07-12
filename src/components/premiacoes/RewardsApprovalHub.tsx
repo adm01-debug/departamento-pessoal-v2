@@ -27,7 +27,6 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-
 interface ApprovalHubProps {
   pagamentos: any[];
 }

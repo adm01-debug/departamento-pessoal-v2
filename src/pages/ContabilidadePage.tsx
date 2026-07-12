@@ -12,7 +12,6 @@ import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
 export default function ContabilidadePage() {
   const { empresaAtual } = useEmpresas();
   const [lancamentos, setLancamentos] = useState<any[]>([]);

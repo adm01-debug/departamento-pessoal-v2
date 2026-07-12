@@ -11,8 +11,6 @@ import {
   Activity, Database, HardDrive, CheckCircle, XCircle, Trash2, Download,
   RefreshCw, Loader2, Bell, Zap, Clock
 } from 'lucide-react';
-
-
 export function SystemHealthTab() {
   const [healthData, setHealthData] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);

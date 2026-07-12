@@ -21,7 +21,6 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { DocumentoTimeline } from '@/components/documents/DocumentoTimeline';
 import { DocumentoPreview } from '@/components/documents/DocumentoPreview';
 import { useSearchParams } from 'react-router-dom';
-
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG', 'CPF', 'CTPS', 'Comprovante', 'Outro'];
 

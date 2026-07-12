@@ -22,7 +22,6 @@ import { toast } from 'sonner';
 import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow, ArrowRight, Users, AlertTriangle, Timer, History, Zap, Mail, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
 const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
   pendente: { color: 'bg-warning/15 text-warning border-0', icon: Clock, label: 'Pendente' },
   em_andamento: { color: 'bg-info/15 text-info border-0', icon: Play, label: 'Em Andamento' },

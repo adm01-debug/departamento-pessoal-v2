@@ -5,7 +5,6 @@ import { useEmpresas } from './useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
 import { toast } from 'sonner';
 import { useGenericCrud } from './useGenericCrud';
-
 export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;

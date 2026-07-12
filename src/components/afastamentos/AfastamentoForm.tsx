@@ -16,7 +16,6 @@ import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as Calenda
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
-
 const schema = z.object({
   colaborador_id: z.string().min(1, 'Colaborador é obrigatório'),
   tipo: z.string().min(1, 'Tipo é obrigatório'),

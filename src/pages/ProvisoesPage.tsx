@@ -32,8 +32,6 @@ import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
-
-
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }

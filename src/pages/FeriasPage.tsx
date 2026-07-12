@@ -24,8 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarioFerias } from '@/components/ferias/CalendarioFerias';
 import { GerenciamentoPeriodos } from '@/components/ferias/GerenciamentoPeriodos';
 import { calculoFerias } from '@/utils/calculoFerias';
-
-
 const statusOptions = [
   { value: 'pendente', label: 'Pendente' },
   { value: 'aprovada', label: 'Aprovada' },
