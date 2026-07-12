@@ -15,12 +15,13 @@ import {
   corsHeaders, createErrorResponse, validateRequest,
 } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
+import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
-const TOLERANCE = 0.01; // R$ 0,01 de tolerância em arredondamento
+// Tolerância delegada a `_shared/folhaIntegrity.ts` (R$ 0,01)
 
 const NO_STORE = {
   ...corsHeaders,
@@ -50,11 +51,6 @@ function canonicalize(obj: unknown): string {
   return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonicalize((obj as Record<string, unknown>)[k])).join(',') + '}';
 }
 
-function approxEq(a: number | null | undefined, b: number | null | undefined): boolean {
-  const av = Number(a ?? 0);
-  const bv = Number(b ?? 0);
-  return Math.abs(av - bv) <= TOLERANCE;
-}
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
@@ -106,7 +102,7 @@ serve(async (req: Request): Promise<Response> => {
     // 5) Carregar folha
     const { data: folha, error: folhaErr } = await admin
       .from('folhas_pagamento')
-      .select('id, empresa_id, status, version, total_proventos, total_descontos, total_liquido, competencia')
+      .select('id, empresa_id, status, version, total_proventos, total_descontos, total_liquido, total_fgts, competencia')
       .eq('id', folhaId)
       .eq('empresa_id', empresaId)
       .maybeSingle();
@@ -126,30 +122,23 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // 6) Integridade financeira: recomputar somas dos holerites
-    const { data: holerites, error: holErr } = await admin
-      .from('holerites')
-      .select('total_proventos, total_descontos, liquido')
-      .eq('folha_id', folhaId);
-
-    if (holErr) return createErrorResponse('Erro ao verificar holerites', 500, 'HOLERITE_LOAD_ERROR');
-    const count = holerites?.length ?? 0;
-    if (count === 0) {
-      return createErrorResponse('Folha sem holerites — não pode ser fechada', 422, 'FOLHA_EMPTY');
-    }
-
-    const sumProv = holerites!.reduce((s, h) => s + Number(h.total_proventos ?? 0), 0);
-    const sumDesc = holerites!.reduce((s, h) => s + Number(h.total_descontos ?? 0), 0);
-    const sumLiq  = holerites!.reduce((s, h) => s + Number(h.liquido ?? 0), 0);
-
-    if (!approxEq(sumProv, folha.total_proventos) ||
-        !approxEq(sumDesc, folha.total_descontos) ||
-        !approxEq(sumLiq,  folha.total_liquido)) {
+    // 6) Integridade financeira: holerites + folha_itens (cruzamento duplo)
+    const integrity = await verifyFolhaIntegrity(admin, folhaId, folha);
+    if (!integrity.ok) {
+      const httpStatus = integrity.code === 'FOLHA_EMPTY' ? 422 : 422;
+      console.warn('[fechar-folha] integrity failure', {
+        folha_id: folhaId,
+        code: integrity.code,
+        details: integrity.details,
+      });
       return createErrorResponse(
-        'Integridade financeira violada: soma dos holerites diverge da folha',
-        422, 'INTEGRITY_MISMATCH',
+        'Integridade financeira violada',
+        httpStatus,
+        integrity.code,
       );
     }
+
+    const { sum_proventos: sumProv, sum_descontos: sumDesc, sum_liquido: sumLiq, sum_fgts: sumFgts, holerites_count: count, itens_count: itensCount } = integrity;
 
     // 7) Optimistic lock update
     const closedAt = new Date().toISOString();
@@ -203,7 +192,9 @@ serve(async (req: Request): Promise<Response> => {
       total_proventos: sumProv,
       total_descontos: sumDesc,
       total_liquido: sumLiq,
+      total_fgts: sumFgts,
       holerites_count: count,
+      itens_count: itensCount,
       user_id: userId,
       closed_at: closedAt,
     };

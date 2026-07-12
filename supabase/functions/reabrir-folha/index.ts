@@ -16,6 +16,7 @@ import {
   corsHeaders, createErrorResponse, validateRequest,
 } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
+import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -148,6 +149,23 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    // 7.5) Pré-check de integridade financeira (não bloqueante: reabrir pode
+    // ser justamente para corrigir divergências). Registrado no snapshot para
+    // rastreabilidade e para permitir comparação pós-recálculo.
+    const integrity = await verifyFolhaIntegrity(admin, folhaId, folha);
+    const integritySnapshot = integrity.ok
+      ? {
+          ok: true as const,
+          holerites_count: integrity.holerites_count,
+          itens_count: integrity.itens_count,
+          sum_proventos: integrity.sum_proventos,
+          sum_descontos: integrity.sum_descontos,
+          sum_liquido: integrity.sum_liquido,
+          sum_fgts: integrity.sum_fgts,
+        }
+      : { ok: false as const, code: integrity.code, details: integrity.details };
+    const integrityWarnings = integrity.ok ? [] : [`INTEGRITY_${integrity.code}`];
+
     // 8) Optimistic lock update
     const reopenedAt = new Date().toISOString();
     const { data: updated, error: updErr } = await admin
@@ -190,6 +208,7 @@ serve(async (req: Request): Promise<Response> => {
       override_esocial: Boolean(override_esocial),
       motivo,
       data_fechamento_anterior: folha.data_fechamento,
+      integrity_precheck: integritySnapshot,
       user_id: userId,
       reopened_at: reopenedAt,
     };
@@ -227,6 +246,8 @@ serve(async (req: Request): Promise<Response> => {
       folha_id: folhaId,
       version: updated.version,
       audit_hash: auditHash,
+      warnings: integrityWarnings,
+      integrity_precheck: integritySnapshot,
     }, 200, { 'X-Audit-Hash': auditHash });
   } catch (e) {
     console.error('[reabrir-folha] erro inesperado:', (e as Error)?.message);
