@@ -11,6 +11,8 @@ import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/co
 import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import { beginIdempotency, completeIdempotency, failIdempotency, extractIdempotencyKey } from '../_shared/idempotency.ts';
+
 
 const FAIXAS_INSS = [
   { limite: 1518.00, aliquota: 0.075 },
