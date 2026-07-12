@@ -16707,6 +16707,7 @@ export type Database = {
           created_by: string | null
           data_acidente: string
           empresa_id: string | null
+          hash_integridade: string | null
           houve_afastamento: boolean | null
           houve_obito: boolean | null
           id: string
@@ -16723,6 +16724,7 @@ export type Database = {
           created_by?: string | null
           data_acidente: string
           empresa_id?: string | null
+          hash_integridade?: string | null
           houve_afastamento?: boolean | null
           houve_obito?: boolean | null
           id?: string
@@ -16739,6 +16741,7 @@ export type Database = {
           created_by?: string | null
           data_acidente?: string
           empresa_id?: string | null
+          hash_integridade?: string | null
           houve_afastamento?: boolean | null
           houve_obito?: boolean | null
           id?: string
