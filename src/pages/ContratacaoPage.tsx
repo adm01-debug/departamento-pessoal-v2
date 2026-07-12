@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import DOMPurify from 'dompurify';
+import { sanitizeContractHtml } from '@/utils/sanitizeHtml';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -564,7 +564,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
                     
                     <div className="p-6 md:p-10 rounded-3xl border-2 border-slate-100 bg-slate-50 shadow-inner max-h-[500px] overflow-y-auto">
                       {contractHtml ? (
-                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(contractHtml, { ADD_ATTR: ['style'] }) }} className="prose prose-sm max-w-none" />
+                        <div dangerouslySetInnerHTML={{ __html: sanitizeContractHtml(contractHtml) }} className="prose prose-sm max-w-none" />
                       ) : (
                         <div className="flex flex-col items-center justify-center py-12 gap-4">
                           <Loader2 className="w-8 h-8 animate-spin text-primary" />
