@@ -6,10 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts';
 import { motion } from 'framer-motion';
 import {
-import { formatDateLocalISO } from '@/utils/dateLocal';
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell,
 } from 'recharts';
+import { formatDateLocalISO } from '@/utils/dateLocal';
+
 
 export function PontoCharts() {
   const { user } = useAuth();
