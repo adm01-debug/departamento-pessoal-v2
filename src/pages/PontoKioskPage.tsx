@@ -305,7 +305,7 @@ export default function PontoKioskPage() {
               <Clock className="h-12 w-12 text-success animate-pulse" />
             </div>
             <h2 className="text-3xl font-display font-bold mb-2">Ponto Registrado!</h2>
-            <p className="text-muted-foreground">Bom trabalho, {selectedColab?.nome_completo.split(' ')[0]}.</p>
+            <p className="text-muted-foreground">Bom trabalho, {(selectedColab?.nome_completo ?? 'Colaborador').split(' ')[0]}.</p>
           </div>
         )}
       </div>
