@@ -3351,6 +3351,8 @@ export type Database = {
           conselho_profissional: string | null
           conta: string | null
           cpf: string
+          cpf_hash: string | null
+          cpf_last4: string | null
           created_at: string
           created_by: string | null
           ctps_data_emissao: string | null
@@ -3498,6 +3500,8 @@ export type Database = {
           conselho_profissional?: string | null
           conta?: string | null
           cpf: string
+          cpf_hash?: string | null
+          cpf_last4?: string | null
           created_at?: string
           created_by?: string | null
           ctps_data_emissao?: string | null
@@ -3645,6 +3649,8 @@ export type Database = {
           conselho_profissional?: string | null
           conta?: string | null
           cpf?: string
+          cpf_hash?: string | null
+          cpf_last4?: string | null
           created_at?: string
           created_by?: string | null
           ctps_data_emissao?: string | null
