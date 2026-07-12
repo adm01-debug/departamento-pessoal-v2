@@ -45,7 +45,9 @@ serve(async (req: Request): Promise<Response> => {
     }
     const body = parsed.data;
 
-    const supabase = createClient(supabaseUrl, serviceKey);
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     // 'assinar' é público — protegido pelo token de admissão (UUID + expiração + one-shot).
     // 'verificar' também é público (o candidato precisa checar o estado antes de assinar).
@@ -129,6 +131,7 @@ serve(async (req: Request): Promise<Response> => {
 
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
     });
     const { data: userData, error: userErr } = await userClient.auth.getUser();
     if (userErr || !userData?.user) return json({ success: false, error: 'Sessão inválida' }, 401);
@@ -145,8 +148,8 @@ serve(async (req: Request): Promise<Response> => {
 
     return json({ success: true, data: tokens });
   } catch (error: unknown) {
-    captureException(error, { fn: 'assinaturaDigital' });
-    const message = error instanceof Error ? error.message : 'Erro desconhecido';
-    return json({ success: false, error: message }, 500);
+    try { captureException(error, { fn: 'assinaturaDigital' }); } catch { /* noop */ }
+    // Erro genérico — assinatura envolve dados sensíveis, nunca vazar detalhes
+    return json({ success: false, error: 'Erro interno na assinatura digital', code: 'INTERNAL_SERVER_ERROR' }, 500);
   }
 });
