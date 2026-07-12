@@ -13,21 +13,25 @@ import { assinarXMLEsocial } from './utils/signer.ts';
 import { corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const BodySchema = z.object({
   empresaId: z.string().uuid(),
   eventoId: z.string().uuid(),
+  idempotency_key: z.string().optional(),
+  idempotencyKey: z.string().optional(),
 });
 
 const SIMULATE = (Deno.env.get('ESOCIAL_SIMULATE') ?? 'true').toLowerCase() === 'true';
 
 const NO_STORE = { 'Cache-Control': 'no-store' };
 
-async function sha256Hex(s: string): Promise<string> {
-  const buf = new TextEncoder().encode(s);
-  const h = await crypto.subtle.digest('SHA-256', buf);
-  return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
 /** Escape XML — bloqueia injection via qualquer campo dinâmico. */
 function xmlEscape(v: unknown): string {
@@ -87,7 +91,20 @@ serve(async (req: Request): Promise<Response> => {
     ]);
     if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
 
+    // Idempotência transacional (Idempotency-Key header ou body)
+    const idemKey = extractIdempotencyKey(req, raw);
+    const idem = await beginIdempotency(supabase, {
+      endpoint: 'enviar-esocial',
+      key: idemKey,
+      requestBody: { empresaId, eventoId },
+      empresaId,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+
     const startTime = Date.now();
+
 
     // 1. Buscar evento (com validação de empresa cruzada)
     const { data: evento, error: eError } = await supabase
@@ -177,28 +194,51 @@ serve(async (req: Request): Promise<Response> => {
       .eq('id', eventoId)
       .eq('empresa_id', empresaId);
 
-    // 7. Auditoria bloqueante (não-repúdio) com hash do XML+resposta
-    const auditHash = await sha256Hex(xmlAssinado + '|' + responseXml + '|' + (protocolo ?? ''));
+    // 7. Auditoria bloqueante (não-repúdio) com integrity_hash canônico
+    const auditPayload = {
+      empresa_id: empresaId,
+      evento_id: eventoId,
+      tipo_evento: evento.tipo_evento,
+      ambiente,
+      success,
+      tentativas,
+      protocolo: protocolo ?? null,
+      recibo: recibo ?? null,
+      xml_hash: hash,
+      xml_len: xmlAssinado.length,
+      response_len: responseXml.length,
+    };
+    const auditHash = await integrityHash(auditPayload);
     const { error: auditErr } = await supabase.from('audit_log').insert({
       tabela: 'esocial_eventos',
       registro_id: eventoId,
       acao: 'ESOCIAL_TRANSMIT',
       user_id: userId,
-      dados_novos: {
-        empresa_id: empresaId, tipo_evento: evento.tipo_evento,
-        ambiente, success, tentativas, hash, audit_hash: auditHash,
-      },
+      dados_novos: { ...auditPayload, integrity_hash: auditHash },
     });
-    if (auditErr) throw auditErr;
+    if (auditErr) {
+      await failIdempotency(supabase, idem.id);
+      throw auditErr;
+    }
 
-    return new Response(JSON.stringify({
-      success, protocolo, recibo, error: erroGov?.mensagem, tentativas, audit_hash: auditHash,
-    }), { headers: { ...corsHeaders, ...NO_STORE, 'Content-Type': 'application/json' } });
+    const responseBody = {
+      success,
+      protocolo,
+      recibo,
+      error: erroGov?.mensagem,
+      tentativas,
+      integrity_hash: auditHash,
+    };
+    await completeIdempotency(supabase, idem.id, 200, responseBody);
+    return new Response(JSON.stringify(responseBody), {
+      headers: { ...corsHeaders, ...NO_STORE, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     try { captureException(error, { fn: 'enviar-esocial' }); } catch { /* noop */ }
     return createErrorResponse('Erro interno na transmissão eSocial', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
+
 
 function montarXMLEvento(
   tipo: string,
