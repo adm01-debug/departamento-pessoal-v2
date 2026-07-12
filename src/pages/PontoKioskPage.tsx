@@ -21,17 +21,6 @@ export default function PontoKioskPage() {
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  useEffect(() => {
-    setOfflineQueueSize(pontoOfflineService.getQueueSize());
-    const interval = setInterval(() => {
-      setOfflineQueueSize(pontoOfflineService.getQueueSize());
-      if (navigator.onLine && !isSyncing && pontoOfflineService.getQueueSize() > 0) {
-        handleSync();
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [isSyncing]);
-
   const handleSync = useCallback(async () => {
     if (isSyncing || !navigator.onLine) return;
     setIsSyncing(true);
@@ -47,6 +36,18 @@ export default function PontoKioskPage() {
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }
   }, [isSyncing]);
+
+  useEffect(() => {
+    setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    const interval = setInterval(() => {
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+      if (navigator.onLine && !isSyncing && pontoOfflineService.getQueueSize() > 0) {
+        handleSync();
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [isSyncing, handleSync]);
+
 
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
 

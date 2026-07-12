@@ -161,16 +161,16 @@ export function useEmpresas(): UseEmpresasReturn {
   const empresaEfetiva = empresaAtualData || empresaDefault || empresaPrimeiraVinculada || empresaPrimeiraGlobal;
 
 
+  const primeiraEmpresaId = userEmpresas?.[0]?.empresa_id ?? null;
   useEffect(() => {
     // Sincroniza o ID no store apenas se houver uma empresa disponível e NENHUMA seleção ativa
-    if (userEmpresas && userEmpresas.length > 0 && !empresaAtualId) {
-      const targetId = empresaDefault?.id || (userEmpresas[0] ? userEmpresas[0].empresa_id : null);
-      if (targetId) {
-        const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
-        return () => clearTimeout(timer);
-      }
+    if (primeiraEmpresaId && !empresaAtualId) {
+      const targetId = empresaDefault?.id ?? primeiraEmpresaId;
+      const timer = setTimeout(() => setEmpresaAtual(targetId), 0);
+      return () => clearTimeout(timer);
     }
-  }, [userEmpresas?.length, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
+  }, [primeiraEmpresaId, empresaAtualId, empresaDefault?.id, setEmpresaAtual]);
+
 
   // Criar empresa
   const criarEmpresa = useMutation({

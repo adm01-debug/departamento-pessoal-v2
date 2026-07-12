@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, AuthError } from '@supabase/supabase-js';
 import DOMPurify from 'dompurify';
@@ -79,11 +79,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
+  // Ref espelha `isReady` para leitura no callback do timeout de inicialização
+  // sem re-executar o useEffect (que re-subscreveria em onAuthStateChange).
+  const isReadyRef = useRef(false);
 
   const markReady = useCallback(() => {
     setLoading(false);
     setIsReady(true);
+    isReadyRef.current = true;
   }, []);
+
 
   const enrichUserWithRoles = useCallback(async (supabaseUser: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
     const roles = await fetchUserRolesWithTimeout(supabaseUser.id);
@@ -106,11 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     const authInitTimeout = window.setTimeout(() => {
-      if (isMounted && !isReady) {
+      if (isMounted && !isReadyRef.current) {
         loggerService.warn('Auth initialization timed out');
         markReady();
       }
     }, AUTH_INIT_TIMEOUT_MS);
+
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!isMounted) return;

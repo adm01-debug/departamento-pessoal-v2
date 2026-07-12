@@ -4,7 +4,7 @@ import { Clock, LogIn, Coffee, LogOut, MapPin, WifiOff, RefreshCw, Scan, ShieldC
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -38,24 +38,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    setOfflineQueueSize(pontoOfflineService.getQueueSize());
-    
-    if (navigator.onLine) {
-      handleSync();
-    }
-
-    const interval = setInterval(() => {
-      setOfflineQueueSize(pontoOfflineService.getQueueSize());
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-      if (stream) stream.getTracks().forEach(track => track.stop());
-    };
-  }, [stream]);
-
-  const handleSync = async () => {
+  const handleSync = useCallback(async () => {
     if (isSyncing || !navigator.onLine) return;
     setIsSyncing(true);
     try {
@@ -69,7 +52,25 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
       setIsSyncing(false);
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }
-  };
+  }, [isSyncing]);
+
+  useEffect(() => {
+    setOfflineQueueSize(pontoOfflineService.getQueueSize());
+
+    if (navigator.onLine) {
+      handleSync();
+    }
+
+    const interval = setInterval(() => {
+      setOfflineQueueSize(pontoOfflineService.getQueueSize());
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      if (stream) stream.getTracks().forEach(track => track.stop());
+    };
+  }, [stream, handleSync]);
+
 
   const startScan = async (tipo: any) => {
     setSelectedTipo(tipo);
