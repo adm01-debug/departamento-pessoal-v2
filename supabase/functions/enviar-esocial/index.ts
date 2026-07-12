@@ -177,21 +177,23 @@ serve(async (req: Request): Promise<Response> => {
       .eq('id', eventoId)
       .eq('empresa_id', empresaId);
 
-    // 7. Auditoria
-    supabase.from('audit_log').insert({
+    // 7. Auditoria bloqueante (não-repúdio) com hash do XML+resposta
+    const auditHash = await sha256Hex(xmlAssinado + '|' + responseXml + '|' + (protocolo ?? ''));
+    const { error: auditErr } = await supabase.from('audit_log').insert({
       tabela: 'esocial_eventos',
       registro_id: eventoId,
       acao: 'ESOCIAL_TRANSMIT',
       user_id: userId,
       dados_novos: {
         empresa_id: empresaId, tipo_evento: evento.tipo_evento,
-        ambiente, success, tentativas, hash,
+        ambiente, success, tentativas, hash, audit_hash: auditHash,
       },
-    }).then(() => {}, () => {});
+    });
+    if (auditErr) throw auditErr;
 
     return new Response(JSON.stringify({
-      success, protocolo, recibo, error: erroGov?.mensagem, tentativas,
-    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      success, protocolo, recibo, error: erroGov?.mensagem, tentativas, audit_hash: auditHash,
+    }), { headers: { ...corsHeaders, ...NO_STORE, 'Content-Type': 'application/json' } });
   } catch (error) {
     try { captureException(error, { fn: 'enviar-esocial' }); } catch { /* noop */ }
     return createErrorResponse('Erro interno na transmissão eSocial', 500, 'INTERNAL_SERVER_ERROR');
