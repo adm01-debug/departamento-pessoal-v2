@@ -11,6 +11,13 @@ import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
 import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const noStore = { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const MAX_ITENS = 10_000;
@@ -34,12 +41,10 @@ const bodySchema = z.object({
   empresa_id: z.string().uuid(),
   banco_codigo: z.string().regex(/^\d{3}$/, 'Código do banco em 3 dígitos'),
   itens: z.array(itemSchema).min(1).max(MAX_ITENS),
+  idempotency_key: z.string().optional(),
+  idempotencyKey: z.string().optional(),
 });
 
-async function sha256Hex(input: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
