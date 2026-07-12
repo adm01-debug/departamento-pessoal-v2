@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Activity, GitBranch, ShieldAlert, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -13,6 +13,7 @@ interface DlqRow { tipo_tarefa: string; total_dlq: number; mais_recente: string 
 interface ConflictRow { competencia: string; conflitos: number; ultimo_em: string }
 interface TelemetryRow { query_sample: string; calls: number; mean_ms: number; max_ms: number; total_ms: number; cache_hit_pct: number }
 interface IdemRow { endpoint: string; total_24h: number; failed_24h: number; failure_rate_pct: number; last_seen_at: string }
+interface CronRow { jobname: string; schedule: string; active: boolean; last_run: string | null; last_status: string | null; last_duration_ms: number | null; last_error: string | null; runs_24h: number; failures_24h: number }
 
 function SectionCard({ title, icon: Icon, children, badge }: { title: string; icon: any; children: React.ReactNode; badge?: string }) {
   return (
