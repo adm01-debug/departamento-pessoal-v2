@@ -61,6 +61,9 @@ function calcIRRF(base: number): number {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  let idempotencyId: string | undefined;
+  let admin: ReturnType<typeof createClient> | undefined;
+
   try {
     const csrf = await verifyCsrf(req.clone());
     if (!csrf.ok) return csrf.response!;
@@ -82,20 +85,35 @@ Deno.serve(async (req) => {
     if (userErr || !userData?.user) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     const userId = userData.user.id;
 
+    const idempotencyKey = extractIdempotencyKey(req);
+
     const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
     if (errorResponse) return errorResponse;
     const { empresa_id, competencia } = data!;
 
-    const admin = createClient(supabaseUrl, serviceKey, {
+    admin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // Tenant scope
+    // Tenant scope (antes de qualquer efeito colateral / idempotência)
     const [{ data: belongs }, { data: isAdm }] = await Promise.all([
       admin.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: empresa_id }),
       admin.rpc('is_admin', { _user_id: userId }),
     ]);
     if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
+
+    // Idempotência — Onda 41
+    // Payload canonicalizado (empresa_id + competencia + userId) evita replay cruzado entre usuários.
+    const idem = await beginIdempotency(admin, {
+      endpoint: 'calcular-folha',
+      key: idempotencyKey,
+      requestBody: { empresa_id, competencia, user_id: userId },
+      empresaId: empresa_id,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+    idempotencyId = idem.id;
 
     // Bloqueia recálculo de folha FECHADA
     const { data: folhaExistente } = await admin
@@ -106,6 +124,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (folhaExistente?.status === 'fechada') {
+      await failIdempotency(admin, idempotencyId);
       return createErrorResponse('Folha fechada — recálculo bloqueado', 409, 'PAYROLL_LOCKED');
     }
 
@@ -117,9 +136,11 @@ Deno.serve(async (req) => {
       .eq('status', 'ativo');
 
     if (!totalColabs) {
+      await failIdempotency(admin, idempotencyId);
       return createErrorResponse('Nenhum colaborador ativo', 404, 'NOT_FOUND');
     }
     if (totalColabs > MAX_COLABORADORES) {
+      await failIdempotency(admin, idempotencyId);
       return createErrorResponse(`Limite excedido (${MAX_COLABORADORES})`, 413, 'PAYLOAD_TOO_LARGE');
     }
 
@@ -187,20 +208,31 @@ Deno.serve(async (req) => {
       dados_novos: {
         empresa_id, competencia,
         total_colaboradores: totalColabs,
+        idempotency_id: idempotencyId ?? null,
         ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
       },
     });
 
-    return new Response(JSON.stringify({
+    const responseBody = {
       success: true,
       folha_id: upserted?.id,
       competencia,
       total_colaboradores: totalColabs,
       ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
       itens,
-    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    };
+
+    await completeIdempotency(admin, idempotencyId, 200, responseBody);
+
+    return new Response(JSON.stringify(responseBody), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     try { captureException(error, { fn: 'calcular-folha' }); } catch { /* noop */ }
+    if (admin && idempotencyId) {
+      try { await failIdempotency(admin, idempotencyId); } catch { /* noop */ }
+    }
     return createErrorResponse('Erro interno no cálculo de folha', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
+
