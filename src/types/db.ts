@@ -32,3 +32,16 @@ export type Update<T extends TableName> = Database['public']['Tables'][T]['Updat
  * silenciosamente quando a API responde em outro formato.
  */
 export type UnknownRecord = Record<string, unknown>;
+
+/**
+ * Variante permissiva de `Row<T>` para casos onde:
+ *   - O SELECT no Supabase é parcial (`.select('id, nome_completo')`)
+ *   - A query inclui joins com aliases não modelados no schema gerado
+ *     (ex.: `candidato:candidatos(*)`).
+ *
+ * Preserva autocomplete dos campos conhecidos mas aceita chaves extras.
+ * Use quando `Row<T>` estrito quebrar consumidores legítimos — não como
+ * atalho para evitar tipar corretamente.
+ */
+export type LooseRow<T extends TableName> = Partial<Row<T>> & Record<string, unknown>;
+
