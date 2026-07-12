@@ -11,6 +11,13 @@ import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
 import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const noStore = { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const MAX_ITENS = 10_000;
@@ -34,12 +41,10 @@ const bodySchema = z.object({
   empresa_id: z.string().uuid(),
   banco_codigo: z.string().regex(/^\d{3}$/, 'Código do banco em 3 dígitos'),
   itens: z.array(itemSchema).min(1).max(MAX_ITENS),
+  idempotency_key: z.string().optional(),
+  idempotencyKey: z.string().optional(),
 });
 
-async function sha256Hex(input: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -88,29 +93,22 @@ Deno.serve(async (req) => {
       return createErrorResponse('Acesso negado', 403, 'FORBIDDEN');
     }
 
-    // Idempotência
-    const idempotencyKey = req.headers.get('idempotency-key');
-    if (idempotencyKey) {
-      const { data: recent } = await service
-        .from('auditoria')
-        .select('entidade_id, created_at')
-        .eq('empresa_id', empresa_id)
-        .eq('acao', 'CNAB_REMESSA_GERADA')
-        .contains('dados_novos', { idempotency_key: idempotencyKey })
-        .gte('created_at', new Date(Date.now() - 10 * 60 * 1000).toISOString())
-        .limit(1)
-        .maybeSingle();
-      if (recent?.entidade_id) {
-        return new Response(
-          JSON.stringify({ success: true, id: recent.entidade_id, replay: true }),
-          { status: 200, headers: noStore },
-        );
-      }
-    }
+    // Idempotência transacional (shared helper)
+    const idemKey = extractIdempotencyKey(req, parsed.data);
+    const idem = await beginIdempotency(service, {
+      endpoint: 'cnab-remessa',
+      key: idemKey,
+      requestBody: { empresa_id, banco_codigo, itens },
+      empresaId: empresa_id,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
 
     // Cap financeiro
     const totalCentavos = itens.reduce((acc, i) => acc + BigInt(i.valor_centavos), 0n);
     if (totalCentavos > MAX_TOTAL_CENTAVOS) {
+      await failIdempotency(service, idem.id);
       return createErrorResponse(
         `Total do lote excede R$ ${Number(MAX_TOTAL_CENTAVOS) / 100}`,
         422, 'AMOUNT_ABOVE_LIMIT',
@@ -141,7 +139,10 @@ Deno.serve(async (req) => {
       })
       .select('id')
       .single();
-    if (remErr || !remessa) throw remErr ?? new Error('Falha ao criar remessa');
+    if (remErr || !remessa) {
+      await failIdempotency(service, idem.id);
+      throw remErr ?? new Error('Falha ao criar remessa');
+    }
 
     // Itens
     const linhas = itens.map((i) => ({
@@ -161,14 +162,20 @@ Deno.serve(async (req) => {
     }));
     const { error: itErr } = await service.from('cnab_itens').insert(linhas);
     if (itErr) {
-      // rollback best-effort
       await service.from('cnab_remessas').delete().eq('id', remessa.id);
+      await failIdempotency(service, idem.id);
       throw itErr;
     }
 
-    const payloadHash = await sha256Hex(
-      JSON.stringify({ empresa_id, banco_codigo, sequencial, itens }),
-    );
+    const auditPayload = {
+      empresa_id,
+      banco_codigo,
+      remessa_id: remessa.id,
+      sequencial,
+      total_itens: itens.length,
+      total_centavos: Number(totalCentavos),
+    };
+    const auditHash = await integrityHash(auditPayload);
 
     await service.from('auditoria').insert({
       acao: 'CNAB_REMESSA_GERADA',
@@ -176,29 +183,22 @@ Deno.serve(async (req) => {
       entidade_id: remessa.id,
       empresa_id,
       usuario_id: userId,
-      dados_novos: {
-        banco_codigo,
-        sequencial,
-        total_itens: itens.length,
-        total_centavos: Number(totalCentavos),
-        payload_sha256: payloadHash,
-        idempotency_key: idempotencyKey ?? null,
-      },
+      dados_novos: { ...auditPayload, integrity_hash: auditHash },
     });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        id: remessa.id,
-        sequencial_arquivo: sequencial,
-        total_itens: itens.length,
-        total_centavos: Number(totalCentavos),
-        payload_sha256: payloadHash,
-      }),
-      { status: 201, headers: noStore },
-    );
+    const responseBody = {
+      success: true,
+      id: remessa.id,
+      sequencial_arquivo: sequencial,
+      total_itens: itens.length,
+      total_centavos: Number(totalCentavos),
+      integrity_hash: auditHash,
+    };
+    await completeIdempotency(service, idem.id, 201, responseBody);
+    return new Response(JSON.stringify(responseBody), { status: 201, headers: noStore });
   } catch (err) {
     await captureException(err, { function: 'cnab-remessa' });
     return createErrorResponse('Erro ao gerar remessa CNAB', 500, 'INTERNAL_ERROR');
   }
 });
+
