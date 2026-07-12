@@ -271,19 +271,36 @@ Deno.serve(async (req) => {
       .single();
     if (upErr) throw upErr;
 
-    // Auditoria
+    // Snapshot canônico dos totais + contagem de itens → SHA-256 (integridade financeira não-repudiável).
+    // Permite verificação posterior: qualquer alteração no cálculo produz hash diferente.
+    const integritySnapshot = {
+      empresa_id,
+      competencia,
+      total_colaboradores: totalColabs,
+      itens_count: itens.length,
+      totais,
+    };
+    const integrityHash = await sha256Hex(canonicalize(integritySnapshot));
+
+    // Auditoria detalhada (financeira + idempotência + integridade)
     await admin.from('audit_log').insert({
       tabela: 'folhas_pagamento',
       registro_id: upserted?.id ?? crypto.randomUUID(),
       acao: 'PAYROLL_CALC',
       user_id: userId,
       dados_novos: {
-        empresa_id, competencia,
+        empresa_id,
+        competencia,
         total_colaboradores: totalColabs,
+        itens_count: itens.length,
         idempotency_id: idempotencyId ?? null,
+        integrity_hash: integrityHash,
+        integrity_alg: 'sha256-canonical',
+        calculated_at: new Date().toISOString(),
         ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
       },
     });
+
 
     const responseBody = {
       success: true,
