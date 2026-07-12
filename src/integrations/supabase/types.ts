@@ -9036,6 +9036,39 @@ export type Database = {
           },
         ]
       }
+      folha_lock_conflicts: {
+        Row: {
+          competencia: string | null
+          created_at: string
+          empresa_id: string | null
+          folha_id: string
+          id: string
+          user_id: string | null
+          version_atual: number
+          version_esperada: number
+        }
+        Insert: {
+          competencia?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          folha_id: string
+          id?: string
+          user_id?: string | null
+          version_atual: number
+          version_esperada: number
+        }
+        Update: {
+          competencia?: string | null
+          created_at?: string
+          empresa_id?: string | null
+          folha_id?: string
+          id?: string
+          user_id?: string | null
+          version_atual?: number
+          version_esperada?: number
+        }
+        Relationships: []
+      }
       folhas_pagamento: {
         Row: {
           alerta_calculo: Json | null
@@ -21090,6 +21123,14 @@ export type Database = {
       fn_link_gov_br_account: {
         Args: { _cpf: string; _nivel: string; _user_id: string }
         Returns: undefined
+      }
+      folha_conflict_stats: {
+        Args: { _days?: number }
+        Returns: {
+          competencia: string
+          conflitos: number
+          ultimo_em: string
+        }[]
       }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
       get_auth_empresa_id: { Args: never; Returns: string }
