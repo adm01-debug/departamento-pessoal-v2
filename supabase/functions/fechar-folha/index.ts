@@ -192,7 +192,9 @@ serve(async (req: Request): Promise<Response> => {
       total_proventos: sumProv,
       total_descontos: sumDesc,
       total_liquido: sumLiq,
+      total_fgts: sumFgts,
       holerites_count: count,
+      itens_count: itensCount,
       user_id: userId,
       closed_at: closedAt,
     };
