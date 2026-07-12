@@ -33,7 +33,7 @@ export default function PontoKioskPage() {
     return () => clearInterval(interval);
   }, [isSyncing]);
 
-  const handleSync = async () => {
+  const handleSync = useCallback(async () => {
     if (isSyncing || !navigator.onLine) return;
     setIsSyncing(true);
     try {
@@ -47,7 +47,7 @@ export default function PontoKioskPage() {
       setIsSyncing(false);
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }
-  };
+  }, [isSyncing]);
 
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
 
@@ -68,7 +68,8 @@ export default function PontoKioskPage() {
 
       setSelectedColab(colab);
       setStep('facial_scan');
-      speak(`Olá ${colab.nome_completo.split(' ')[0]}, olhe para a câmera para identificação facial.`);
+      const firstName = (colab.nome_completo ?? 'Colaborador').split(' ')[0];
+      speak(`Olá ${firstName}, olhe para a câmera para identificação facial.`);
       setTimeout(() => {
         setStep('action');
         speak(`Identidade confirmada. Selecione o tipo de registro.`);
@@ -275,7 +276,7 @@ export default function PontoKioskPage() {
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
                 <User className="h-8 w-8 text-primary" />
               </div>
-              <CardTitle className="font-display">Olá, {selectedColab.nome_completo.split(' ')[0]}!</CardTitle>
+              <CardTitle className="font-display">Olá, {(selectedColab.nome_completo ?? 'Colaborador').split(' ')[0]}!</CardTitle>
               <p className="text-sm text-muted-foreground">O que deseja fazer agora?</p>
             </CardHeader>
             <CardContent>
@@ -304,7 +305,7 @@ export default function PontoKioskPage() {
               <Clock className="h-12 w-12 text-success animate-pulse" />
             </div>
             <h2 className="text-3xl font-display font-bold mb-2">Ponto Registrado!</h2>
-            <p className="text-muted-foreground">Bom trabalho, {selectedColab?.nome_completo.split(' ')[0]}.</p>
+            <p className="text-muted-foreground">Bom trabalho, {(selectedColab?.nome_completo ?? 'Colaborador').split(' ')[0]}.</p>
           </div>
         )}
       </div>

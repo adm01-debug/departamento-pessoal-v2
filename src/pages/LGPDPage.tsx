@@ -1,4 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
+import { formatDateLocalISO, addDaysLocal } from '@/utils/dateLocal';
 import { useState, useMemo } from 'react';
 import { useNow } from '@/hooks/useNow';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -52,7 +53,7 @@ export default function LGPDPage() {
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
 
   const criarSol = useMutation({
-    mutationFn: () => lgpdService.criarSolicitacao({ ...formSol, empresa_id: empresaAtual?.id, prazo_legal: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }),
+    mutationFn: () => lgpdService.criarSolicitacao({ ...formSol, empresa_id: empresaAtual?.id, prazo_legal: formatDateLocalISO(addDaysLocal(new Date(), 15)) }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['lgpd_solicitacoes'] }); setOpenSol(false); toast.success('Solicitação LGPD registrada!'); setFormSol({ colaborador_id: '', tipo: 'acesso', descricao: '' }); },
     onError: () => toast.error('Erro ao registrar'),
   });

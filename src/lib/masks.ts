@@ -57,15 +57,15 @@ export function validateCPF(cpf: string): boolean {
   const cleaned = cpf.replace(/\D/g, '');
   if (cleaned.length !== 11 || /^(\d)\1{10}$/.test(cleaned)) return false;
   let sum = 0;
-  for (let i = 0; i < 9; i++) sum += parseInt(cleaned.charAt(i)) * (10 - i);
+  for (let i = 0; i < 9; i++) sum += parseInt(cleaned.charAt(i), 10) * (10 - i);
   let rest = 11 - (sum % 11);
   if (rest === 10 || rest === 11) rest = 0;
-  if (rest !== parseInt(cleaned.charAt(9))) return false;
+  if (rest !== parseInt(cleaned.charAt(9), 10)) return false;
   sum = 0;
-  for (let i = 0; i < 10; i++) sum += parseInt(cleaned.charAt(i)) * (11 - i);
+  for (let i = 0; i < 10; i++) sum += parseInt(cleaned.charAt(i), 10) * (11 - i);
   rest = 11 - (sum % 11);
   if (rest === 10 || rest === 11) rest = 0;
-  return rest === parseInt(cleaned.charAt(10));
+  return rest === parseInt(cleaned.charAt(10), 10);
 }
 
 export function validatePIS(pis: string): boolean {
@@ -73,10 +73,10 @@ export function validatePIS(pis: string): boolean {
   if (cleaned.length !== 11) return false;
   const weights = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
   let sum = 0;
-  for (let i = 0; i < 10; i++) sum += parseInt(cleaned.charAt(i)) * weights[i];
+  for (let i = 0; i < 10; i++) sum += parseInt(cleaned.charAt(i), 10) * weights[i];
   const rest = 11 - (sum % 11);
   const digit = rest === 10 || rest === 11 ? 0 : rest;
-  return digit === parseInt(cleaned.charAt(10));
+  return digit === parseInt(cleaned.charAt(10), 10);
 }
 
 export function validateRG(rg: string): boolean {
@@ -103,14 +103,14 @@ export function validateCNPJ(cnpj: string): boolean {
   if (cleaned.length !== 14 || /^(\d)\1{13}$/.test(cleaned)) return false;
   let sum = 0;
   const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-  for (let i = 0; i < 12; i++) sum += parseInt(cleaned.charAt(i)) * w1[i];
+  for (let i = 0; i < 12; i++) sum += parseInt(cleaned.charAt(i), 10) * w1[i];
   let rest = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-  if (rest !== parseInt(cleaned.charAt(12))) return false;
+  if (rest !== parseInt(cleaned.charAt(12), 10)) return false;
   sum = 0;
   const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-  for (let i = 0; i < 13; i++) sum += parseInt(cleaned.charAt(i)) * w2[i];
+  for (let i = 0; i < 13; i++) sum += parseInt(cleaned.charAt(i), 10) * w2[i];
   rest = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-  return rest === parseInt(cleaned.charAt(13));
+  return rest === parseInt(cleaned.charAt(13), 10);
 }
 
 // Masks object for MaskedInput component

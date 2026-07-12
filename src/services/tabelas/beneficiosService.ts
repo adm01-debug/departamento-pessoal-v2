@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { supabase } from '@/integrations/supabase/client';
 
 export const beneficiariosPlanoService = {
@@ -11,7 +12,7 @@ export const beneficiariosPlanoService = {
     if (error) throw error;
   },
   excluir: async (id: string) => {
-    const { error } = await supabase.from('beneficiarios_plano').update({ status: 'excluido', data_exclusao: new Date().toISOString().split('T')[0] }).eq('id', id);
+    const { error } = await supabase.from('beneficiarios_plano').update({ status: 'excluido', data_exclusao: todayLocalISO() }).eq('id', id);
     if (error) throw error;
   },
 };

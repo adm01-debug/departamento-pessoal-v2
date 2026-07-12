@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { PageTitle } from '@/components/PageTitle';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -72,7 +73,7 @@ export default function ValesPage() {
         colaborador_id: d.colaborador_id || null,
         vale_id: d.vale_id || null,
         valor: Number(d.valor),
-        data_recarga: d.data_recarga || new Date().toISOString().split('T')[0],
+        data_recarga: d.data_recarga || todayLocalISO(),
         status: 'processado',
       });
       if (error) throw error;

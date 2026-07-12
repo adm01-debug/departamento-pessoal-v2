@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -108,7 +109,7 @@ export default function EPIsPage() {
   });
 
   const devolverEpi = useMutation({
-    mutationFn: (id: string) => episEntregasService.registrarDevolucao(id, new Date().toISOString().split('T')[0]),
+    mutationFn: (id: string) => episEntregasService.registrarDevolucao(id, todayLocalISO()),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Devolução registrada!'); },
   });
 

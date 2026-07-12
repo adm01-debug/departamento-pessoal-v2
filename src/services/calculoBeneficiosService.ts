@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/utils/dateLocal';
 import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
 
@@ -72,7 +73,7 @@ export const valeAlimentacaoService = {
   async registrarRecarga(dados: { colaborador_id: string, vale_id?: string, valor: number, mes_referencia: string, origem_recurso?: string }) {
     const { data, error } = await supabase.from('recargas_vale').insert({
       ...dados,
-      data_recarga: new Date().toISOString().split('T')[0],
+      data_recarga: todayLocalISO(),
       status: 'processado'
     }).select().single();
 
@@ -190,7 +191,7 @@ export const dependentesService = {
       .from('dependentes') as any)
       .insert({
         ...dados,
-        data_inicio_vigencia: dados.data_inicio_vigencia || new Date().toISOString().split('T')[0]
+        data_inicio_vigencia: dados.data_inicio_vigencia || todayLocalISO()
       })
       .select()
       .single();
