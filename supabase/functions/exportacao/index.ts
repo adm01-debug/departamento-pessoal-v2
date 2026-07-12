@@ -106,7 +106,7 @@ serve(async (req) => {
     if (action === 'colaboradores') {
       let q = admin.from('colaboradores')
         .select('nome_completo, cpf, cargo, departamento, data_admissao, salario, status, email, telefone')
-        .limit(HARD_CAP + 1); // +1 para detectar truncamento
+        .limit(HARD_CAP + 1);
       if (empresaId) q = q.eq('empresa_id', empresaId);
       if (filters?.status) q = q.eq('status', filters.status);
       const { data, error } = await q;
@@ -115,11 +115,18 @@ serve(async (req) => {
       const truncated = (data?.length ?? 0) > HARD_CAP;
       const rows = truncated ? (data ?? []).slice(0, HARD_CAP) : (data ?? []);
 
-      await admin.from('audit_log').insert({
+      // Auditoria BLOQUEANTE com hash não-repudiável do payload exportado
+      const auditHash = await sha256Hex(JSON.stringify(rows) + userId + (empresaId ?? ''));
+      const { error: auditErr } = await admin.from('audit_log').insert({
         tabela: 'colaboradores', registro_id: crypto.randomUUID(), acao: 'EXPORT',
         user_id: userId,
-        dados_novos: { total: rows.length, format, empresa_id: empresaId ?? null, truncated },
+        dados_novos: {
+          total: rows.length, format, empresa_id: empresaId ?? null, truncated,
+          audit_hash: auditHash, exported_at: new Date().toISOString(),
+          columns: ['nome_completo','cpf','cargo','departamento','data_admissao','salario','status','email','telefone'],
+        },
       });
+      if (auditErr) return createErrorResponse('Auditoria obrigatória falhou', 500, 'AUDIT_FAILED');
 
       if (format === 'csv') {
         const hdr = 'Nome,CPF,Cargo,Departamento,Admissão,Salário,Status,Email,Telefone';
@@ -129,7 +136,7 @@ serve(async (req) => {
         );
         return csvResponse([hdr, ...csvRows].join('\r\n'), 'colaboradores.csv');
       }
-      return json({ data: rows, total: rows.length, truncated });
+      return json({ data: rows, total: rows.length, truncated, audit_hash: auditHash });
     }
 
     if (action === 'folha') {
@@ -144,11 +151,17 @@ serve(async (req) => {
       const truncated = (data?.length ?? 0) > HARD_CAP;
       const rows = truncated ? (data ?? []).slice(0, HARD_CAP) : (data ?? []);
 
-      await admin.from('audit_log').insert({
+      const auditHash = await sha256Hex(JSON.stringify(rows) + userId + (empresaId ?? ''));
+      const { error: auditErr } = await admin.from('audit_log').insert({
         tabela: 'folhas_pagamento', registro_id: crypto.randomUUID(), acao: 'EXPORT',
         user_id: userId,
-        dados_novos: { total: rows.length, format, empresa_id: empresaId ?? null, truncated },
+        dados_novos: {
+          total: rows.length, format, empresa_id: empresaId ?? null, truncated,
+          competencia: filters?.competencia ?? null,
+          audit_hash: auditHash, exported_at: new Date().toISOString(),
+        },
       });
+      if (auditErr) return createErrorResponse('Auditoria obrigatória falhou', 500, 'AUDIT_FAILED');
 
       if (format === 'csv') {
         const hdr = 'Nome,CPF,Competência,Bruto,INSS,IRRF,FGTS,Líquido';
@@ -159,7 +172,7 @@ serve(async (req) => {
         );
         return csvResponse([hdr, ...csvRows].join('\r\n'), 'folha.csv');
       }
-      return json({ data: rows, total: rows.length, truncated });
+      return json({ data: rows, total: rows.length, truncated, audit_hash: auditHash });
     }
 
     return createErrorResponse('Ação inválida', 400, 'INVALID_ACTION');
