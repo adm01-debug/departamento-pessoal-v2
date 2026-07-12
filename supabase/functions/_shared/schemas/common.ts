@@ -33,16 +33,23 @@ export const calcularFolhaSchema = z.object({
   competencia: z.string().regex(/^\d{4}-\d{2}$/, 'Formato de competência inválido (AAAA-MM)'),
 });
 
-export const notificacaoSchema = z.object({
-  action: z.enum(['enviar', 'listar']),
-  empresaId: z.string().uuid().optional(),
-  tipo: z.enum(['info', 'aviso', 'erro', 'sucesso']).optional(),
-  destinatarios: z.array(z.object({
-    user_id: z.string().uuid(),
-  })).optional(),
-  assunto: z.string().optional(),
-  conteudo: z.string().optional(),
-});
+// Discriminated union strict — bloqueia qualquer campo extra do body.
+export const notificacaoSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('enviar'),
+    empresaId: z.string().uuid(),
+    tipo: z.enum(['info', 'aviso', 'erro', 'sucesso']).default('info'),
+    destinatarios: z.array(
+      z.object({ user_id: z.string().uuid() }).strict()
+    ).min(1).max(500),
+    assunto: z.string().trim().min(1).max(200),
+    conteudo: z.string().trim().min(1).max(5000),
+  }).strict(),
+  z.object({
+    action: z.literal('listar'),
+    empresaId: z.string().uuid().optional(),
+  }).strict(),
+]);
 
 export const auditoriaSchema = z.object({
   action: z.enum(['registrar', 'listar', 'resumo']),
