@@ -3179,6 +3179,7 @@ export type Database = {
           created_at: string | null
           data_geracao: string | null
           empresa_id: string
+          hash_integridade: string | null
           id: string
           sequencial_arquivo: number
           status: string
@@ -3192,6 +3193,7 @@ export type Database = {
           created_at?: string | null
           data_geracao?: string | null
           empresa_id: string
+          hash_integridade?: string | null
           id?: string
           sequencial_arquivo: number
           status?: string
@@ -3205,6 +3207,7 @@ export type Database = {
           created_at?: string | null
           data_geracao?: string | null
           empresa_id?: string
+          hash_integridade?: string | null
           id?: string
           sequencial_arquivo?: number
           status?: string
