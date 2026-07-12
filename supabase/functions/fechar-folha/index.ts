@@ -16,6 +16,7 @@ import {
 } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
