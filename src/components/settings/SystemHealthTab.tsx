@@ -11,14 +11,11 @@ import {
   Activity, Database, HardDrive, CheckCircle, XCircle, Trash2, Download,
   RefreshCw, Loader2, Bell, Zap, Clock
 } from 'lucide-react';
-import type { UnknownRecord } from '@/types/db';
-
-
 export function SystemHealthTab() {
-  const [healthData, setHealthData] = useState<Record<string, any> | null>(null);
+  const [healthData, setHealthData] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
-  const [cleanupResult, setCleanupResult] = useState<Record<string, any> | null>(null);
-  const [backupResult, setBackupResult] = useState<Record<string, any> | null>(null);
+  const [cleanupResult, setCleanupResult] = useState<any>(null);
+  const [backupResult, setBackupResult] = useState<any>(null);
   const [backupId, setBackupId] = useState('');
 
   const runHealthcheck = async () => {

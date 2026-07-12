@@ -12,13 +12,11 @@ import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Row } from '@/types/db';
-
 export default function ContabilidadePage() {
   const { empresaAtual } = useEmpresas();
-  const [lancamentos, setLancamentos] = useState<Row<'lancamentos_contabeis'>[]>([]);
-  const [planoContas, setPlanoContas] = useState<Row<'plano_contas'>[]>([]);
-  const [folhas, setFolhas] = useState<Row<'folhas_pagamento'>[]>([]);
+  const [lancamentos, setLancamentos] = useState<any[]>([]);
+  const [planoContas, setPlanoContas] = useState<any[]>([]);
+  const [folhas, setFolhas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');

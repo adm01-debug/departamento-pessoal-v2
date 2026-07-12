@@ -16,8 +16,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import type { Row } from '@/types/db';
-
 interface GerenciamentoPeriodosProps {
   colaboradorId?: string;
 }
@@ -27,7 +25,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   const qc = useQueryClient();
   const [selectedColabId, setSelectedColabId] = useState(initialColaboradorId || '');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingPeriodo, setEditingPeriodo] = useState<Row<'periodos_aquisitivos'> | null>(null);
+  const [editingPeriodo, setEditingPeriodo] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [form, setForm] = useState({
     data_inicio: '',

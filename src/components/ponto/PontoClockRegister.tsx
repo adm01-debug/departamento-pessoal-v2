@@ -10,8 +10,6 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts';
 import { supabase } from '@/integrations/supabase/client';
-import type { UnknownRecord } from '@/types/db';
-
 interface PontoClockRegisterProps {
   time: Date;
   loading: string | null;
@@ -34,7 +32,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
   const [isSyncing, setIsSyncing] = useState(false);
   const [showFaceScan, setShowFaceScan] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
-  const [selectedTipo, setSelectedTipo] = useState<UnknownRecord | null>(null);
+  const [selectedTipo, setSelectedTipo] = useState<any>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);

@@ -16,14 +16,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { todayLocalISO } from '@/utils/dateLocal';
-import type { LooseRow } from '@/types/db';
-
 export default function FinanceiroBancarioPage() {
   const { empresaAtual } = useEmpresas();
   const [config, setConfig] = useState<CNABConfig | null>(null);
-  const [remessas, setRemessas] = useState<LooseRow<'cnab_remessas'>[]>([]);
-  const [pixLotes, setPixLotes] = useState<LooseRow<'pix_lotes'>[]>([]);
-  const [folhas, setFolhas] = useState<LooseRow<'folhas_pagamento'>[]>([]);
+  const [remessas, setRemessas] = useState<any[]>([]);
+  const [pixLotes, setPixLotes] = useState<any[]>([]);
+  const [folhas, setFolhas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [processingRetorno, setProcessingRetorno] = useState(false);
