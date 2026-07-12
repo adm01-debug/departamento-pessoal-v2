@@ -111,65 +111,127 @@ export const folhaPagamentoService = {
   },
 
   /**
-   * Finaliza e fecha a folha de competência
+   * Finaliza e fecha a folha de competência.
+   *
+   * Locking otimista: lê `version` + `empresa_id` da folha, delega o fechamento
+   * autoritativo à edge function `fechar-folha` (que executa
+   * `UPDATE ... WHERE version=X AND status='aberta'`). Se outro processo
+   * alterou a folha entre a leitura e o UPDATE, a edge function retorna
+   * `VERSION_CONFLICT` e o erro é propagado — a UI deve recarregar e reexibir
+   * ao usuário. Nenhum retry silencioso: fechamento duplicado é intolerável.
    */
-  fecharFolha: async (folhaId: string): Promise<{ success: boolean; hash?: string }> => {
+  fecharFolha: async (
+    folhaId: string,
+    opts?: { observacoes?: string },
+  ): Promise<{ success: boolean; version: number; audit_hash: string; warnings: string[] }> => {
     try {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
       const alertas = await validadorFolha.validarFolha(folhaId);
-      
-      const alertasCriticos = alertas.filter(a => a.gravidade === 'alta');
+      const alertasCriticos = alertas.filter((a) => a.gravidade === 'alta');
       if (alertasCriticos.length > 0) {
-        throw new Error(`Não é possível fechar a folha: existem ${alertasCriticos.length} alertas críticos.`);
+        throw new Error(
+          `Não é possível fechar a folha: existem ${alertasCriticos.length} alertas críticos.`,
+        );
       }
 
-      const { data: itens } = await supabase
-        .from('folha_itens')
-        .select('*')
-        .eq('folha_id', folhaId);
-      
-      const totalFolha = itens?.reduce((acc, curr) => acc + Number((curr as Record<string, unknown>).valor_liquido || 0), 0) || 0;
-      const hashIntegridade = btoa(`folha-${folhaId}-${totalFolha}-${new Date().toISOString()}`).substring(0, 32);
-
-      const { data: currentFolha } = await supabase
+      // 1) Snapshot de version + empresa_id (necessário para optimistic lock)
+      const { data: folha, error: folhaErr } = await supabase
         .from('folhas_pagamento')
-        .select('version')
+        .select('version, empresa_id, status')
         .eq('id', folhaId)
-        .single();
+        .maybeSingle();
 
-      const { error } = await supabase
-        .from('folhas_pagamento')
-        .update({ 
-          status: 'fechada',
-          data_fechamento: new Date().toISOString()
-        })
-        .eq('id', folhaId)
-        .eq('version', currentFolha?.version || 1);
-
-      if (error) throw error;
-      
-      const { data: folhaData } = await supabase
-        .from('folhas_pagamento')
-        .select('competencia, empresa_id')
-        .eq('id', folhaId)
-        .single();
-      
-      if (folhaData) {
-        const { provisoesService } = await import('@/services/folha/provisoesService');
-        await provisoesService.calcularProvisoesMensais(folhaData.empresa_id || '', folhaData.competencia);
+      if (folhaErr) throw folhaErr;
+      if (!folha) throw new Error('Folha não encontrada');
+      if (folha.status !== 'aberta') {
+        throw new Error(`Folha não está aberta (status: ${folha.status})`);
       }
 
-      await supabase.from('folha_auditoria').insert({
-        folha_id: folhaId,
-        tipo_evento: 'fechamento_folha',
-        mensagem: 'Folha de pagamento fechada e assinada digitalmente.',
-        severidade: 'info',
-        detalhes: { hashIntegridade, totalLiquidoGlobal: totalFolha } as any
+      // 2) Delega para edge function autoritativa (locking + integridade + auditoria)
+      const { data, error } = await supabase.functions.invoke('fechar-folha', {
+        body: {
+          empresaId: folha.empresa_id,
+          folhaId,
+          version: folha.version ?? 1,
+          ...(opts?.observacoes ? { observacoes: opts.observacoes } : {}),
+        },
       });
 
-      return ({ success: true, hash: hashIntegridade });
-    } catch (e: any) {
-      throw new Error(e.message || 'Erro crítico ao fechar folha', { cause: e });
+      if (error) {
+        const msg = (error as { message?: string })?.message
+          ?? (data as { error?: { message?: string } })?.error?.message
+          ?? 'Falha ao fechar folha';
+        throw new Error(msg);
+      }
+
+      const payload = data as { ok?: boolean; version?: number; audit_hash?: string; warnings?: string[] };
+      if (!payload?.ok) throw new Error('Resposta inválida do servidor');
+
+      return {
+        success: true,
+        version: payload.version ?? (folha.version ?? 1) + 1,
+        audit_hash: payload.audit_hash ?? '',
+        warnings: payload.warnings ?? [],
+      };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Erro crítico ao fechar folha';
+      throw new Error(msg, { cause: e });
+    }
+  },
+
+  /**
+   * Reabre uma folha fechada com locking otimista + auditoria bloqueante.
+   *
+   * Requer `motivo` (10..500 chars). Se a folha já foi transmitida ao eSocial,
+   * exige `override_esocial=true` + role admin. Se fechada há mais de 90 dias,
+   * também exige role admin (janela de auditoria contábil).
+   */
+  reabrirFolha: async (
+    folhaId: string,
+    motivo: string,
+    opts?: { override_esocial?: boolean },
+  ): Promise<{ success: boolean; version: number; audit_hash: string }> => {
+    try {
+      const { data: folha, error: folhaErr } = await supabase
+        .from('folhas_pagamento')
+        .select('version, empresa_id, status')
+        .eq('id', folhaId)
+        .maybeSingle();
+
+      if (folhaErr) throw folhaErr;
+      if (!folha) throw new Error('Folha não encontrada');
+      if (folha.status !== 'fechada') {
+        throw new Error(`Folha não está fechada (status: ${folha.status})`);
+      }
+
+      const { data, error } = await supabase.functions.invoke('reabrir-folha', {
+        body: {
+          empresaId: folha.empresa_id,
+          folhaId,
+          version: folha.version ?? 1,
+          motivo,
+          override_esocial: opts?.override_esocial ?? false,
+        },
+      });
+
+      if (error) {
+        const msg = (error as { message?: string })?.message
+          ?? (data as { error?: { message?: string } })?.error?.message
+          ?? 'Falha ao reabrir folha';
+        throw new Error(msg);
+      }
+
+      const payload = data as { ok?: boolean; version?: number; audit_hash?: string };
+      if (!payload?.ok) throw new Error('Resposta inválida do servidor');
+
+      return {
+        success: true,
+        version: payload.version ?? (folha.version ?? 1) + 1,
+        audit_hash: payload.audit_hash ?? '',
+      };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Erro crítico ao reabrir folha';
+      throw new Error(msg, { cause: e });
     }
   },
 
