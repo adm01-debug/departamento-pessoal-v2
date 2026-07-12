@@ -316,8 +316,11 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    // 8. Auditoria
-    await admin.from("audit_log").insert({
+    // 8. Auditoria BLOQUEANTE não-repudiável
+    const auditPayloadHash = await sha256Hex(
+      contentHash + userId + empresaId + body.tipoRelatorio + body.emailDestinatario,
+    );
+    const { error: auditErr } = await admin.from("audit_log").insert({
       tabela: "relatorios_agendados",
       registro_id: body.agendamentoId ?? empresaId,
       acao: "SEND_REPORT",
@@ -328,8 +331,17 @@ serve(async (req: Request): Promise<Response> => {
         empresa_id: empresaId,
         total_registros: totalRegistros,
         status_envio: statusEnvio,
+        email_destinatario_hash: await sha256Hex(body.emailDestinatario),
+        content_sha256: contentHash,
+        audit_hash: auditPayloadHash,
+        storage_path: path,
+        sent_at: new Date().toISOString(),
       },
     });
+    if (auditErr) {
+      console.error("[enviar-relatorio] AUDIT_BLOCKING_FAILURE:", auditErr.message);
+      return json({ error: "Auditoria obrigatória falhou" }, 500);
+    }
 
     if (body.agendamentoId) {
       await admin.from("log_envio_relatorios").insert({
