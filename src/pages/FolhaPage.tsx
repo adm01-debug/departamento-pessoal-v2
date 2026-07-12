@@ -22,12 +22,13 @@ import { useExcelExport } from '@/hooks/useExcelExport';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { useFolha } from '@/hooks/useFolha';
 import {
-import { currentCompetenciaLocal } from '@/utils/dateLocal';
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
+
 
 function formatCurrency(value: number): string {
 
