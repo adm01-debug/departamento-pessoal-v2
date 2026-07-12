@@ -67,12 +67,20 @@ function canonicalize(value: unknown): string {
   return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalize((value as Record<string, unknown>)[k])}`).join(",")}}`;
 }
 
-export function extractIdempotencyKey(req: Request): string | null {
-  return (
+export function extractIdempotencyKey(req: Request, bodyFallback?: unknown): string | null {
+  const fromHeader =
     req.headers.get("Idempotency-Key") ??
     req.headers.get("idempotency-key") ??
-    null
-  );
+    null;
+  if (fromHeader) return fromHeader;
+  // Fallback: alguns clientes (ex.: browser via supabase-js) podem não conseguir
+  // enviar headers custom em preflights antigos; aceitamos idempotency_key no body.
+  if (bodyFallback && typeof bodyFallback === "object") {
+    const candidate = (bodyFallback as Record<string, unknown>).idempotency_key
+      ?? (bodyFallback as Record<string, unknown>).idempotencyKey;
+    if (typeof candidate === "string" && candidate.length > 0) return candidate;
+  }
+  return null;
 }
 
 export async function beginIdempotency(

@@ -99,11 +99,12 @@ Deno.serve(async (req) => {
     if (userErr || !userData?.user) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     const userId = userData.user.id;
 
-    const idempotencyKey = extractIdempotencyKey(req);
-
     const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
     if (errorResponse) return errorResponse;
     const { empresa_id, competencia } = data!;
+    // Extrai a chave de idempotência DEPOIS de parsear o body — permite fallback via body
+    // (alguns navegadores/proxies removem headers custom em preflights antigos).
+    const idempotencyKey = extractIdempotencyKey(req, data);
 
     admin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },

@@ -56,11 +56,20 @@ export const edgeFunctionsService = {
     colaborador_id?: string;
   }) => handleInvoke('calcular-ferias', { body: params }),
 
-  /** Calcula folha via edge function server-side com resiliência */
+  /** Calcula folha via edge function server-side com resiliência + idempotência.
+   *  A `idempotencyKey` viaja no body (o CORS já aceita header, mas body é mais robusto
+   *  contra proxies que removem headers custom em preflights antigos). */
   calcularFolha: async (params: {
     empresaId: string;
     competencia: string;
-  }) => handleInvoke('calcular-folha', { body: params }),
+    idempotencyKey?: string;
+  }) => handleInvoke('calcular-folha', {
+    body: {
+      empresa_id: params.empresaId,
+      competencia: params.competencia,
+      ...(params.idempotencyKey ? { idempotency_key: params.idempotencyKey } : {}),
+    },
+  }),
 
   /** Calcula rescisão via edge function */
   calcularRescisao: async (params: {

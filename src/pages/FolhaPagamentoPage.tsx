@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { useIdempotencyKey } from '@/hooks/useIdempotencyKey';
 import { auditLogger } from '@/utils/auditLogger';
 import { Card, CardContent } from '@/components/ui/card';
 import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard, FolhaESocialSync } from '@/components/folha';
@@ -131,14 +132,24 @@ export default function FolhaPagamentoPage() {
     onError: (error: Error) => toast.error(`Erro: ${error.message}`),
   });
 
+  const { key: idemKey, reset: idemReset } = useIdempotencyKey();
   const calcularFolhaServidor = async () => {
     setCalcServidor(true);
+    const [mes, ano] = competencia.split('/');
+    const empresaId = empresaAtual?.id || '';
+    const compServer = `${ano}-${mes}`;
+    const intent = `calcular-folha:${empresaId}:${compServer}`;
     try {
-      const [mes, ano] = competencia.split('/');
-      await edgeFunctionsService.calcularFolha({ empresaId: empresaAtual?.id || '', competencia: `${ano}-${mes}` });
+      await edgeFunctionsService.calcularFolha({
+        empresaId,
+        competencia: compServer,
+        idempotencyKey: idemKey(intent),
+      });
+      idemReset(intent); // sucesso → habilita nova operação legítima
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       toast.success('Folha calculada no servidor com sucesso!');
     } catch (err: any) {
+      // Falha: mantém a mesma chave para permitir REPLAY seguro em retry manual
       toast.error(`Erro: ${err.message}`);
     } finally {
       setCalcServidor(false);
