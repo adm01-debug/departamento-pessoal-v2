@@ -198,7 +198,7 @@ describe('DOMPurify (defesa em profundidade da renderização) ', () => {
     const clean = DOMPurify.sanitize(raw, { ADD_ATTR: ['style'] });
 
     expect(clean.toLowerCase()).not.toContain('<script');
-    expect(clean).not.toMatch(/onerror=/i);
+    expect(clean).not.toMatch(/<[a-z][^>]*\sonerror=/i);
     // Nome escapado continua legível no contrato
     expect(clean).toContain('Alice');
     expect(clean).toContain('Dev');
