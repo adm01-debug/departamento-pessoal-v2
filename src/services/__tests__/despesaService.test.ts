@@ -41,7 +41,7 @@ function buildListarChain(result: { data: unknown[] | null; error: unknown }): C
 }
 
 describe('despesaService.listar — isolamento multi-tenant', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('lança erro quando empresaId é string vazia (multi-tenant guard)', async () => {
     await expect(despesaService.listar('')).rejects.toThrow(/empresaId é obrigatório/i);
