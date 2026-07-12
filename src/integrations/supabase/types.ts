@@ -21343,6 +21343,7 @@ export type Database = {
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
       limpar_govbr_states_expirados: { Args: never; Returns: undefined }
+      maintenance_weekly_analyze: { Args: never; Returns: undefined }
       process_lgpd_cleanup_queue: { Args: never; Returns: number }
       processar_ajuste_aprovado: {
         Args: { p_solicitacao_id: string }
