@@ -115,15 +115,18 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // Auditoria do recebimento (event_id UNIQUE serve como lock lógico contra corridas)
+    // Auditoria do recebimento (event_id UNIQUE serve como lock lógico contra corridas).
+    // Redigimos headers sensíveis para evitar vazar tokens em logs/DB.
     const { error: insertErr } = await supabase.from('webhook_logs').insert({
       event_id: webhookData.event_id,
       evento: webhookData.event,
       payload: webhookData,
-      headers: Object.fromEntries(req.headers.entries()),
+      headers: redactHeaders(req.headers),
       status: 'received',
       version: webhookData.version,
       tentativa: 1,
     });
+
 
 
     // Se corrida entre 2 workers → conflito de UNIQUE → tratamos como replay
