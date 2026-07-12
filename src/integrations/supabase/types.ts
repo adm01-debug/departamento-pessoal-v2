@@ -8083,6 +8083,7 @@ export type Database = {
           enviado_contabilidade_em: string | null
           enviado_contabilidade_por: string | null
           ferias_coletiva_id: string | null
+          hash_integridade: string | null
           id: string
           justificativa: string | null
           motivo_cancelamento: string | null
@@ -8138,6 +8139,7 @@ export type Database = {
           enviado_contabilidade_em?: string | null
           enviado_contabilidade_por?: string | null
           ferias_coletiva_id?: string | null
+          hash_integridade?: string | null
           id?: string
           justificativa?: string | null
           motivo_cancelamento?: string | null
@@ -8193,6 +8195,7 @@ export type Database = {
           enviado_contabilidade_em?: string | null
           enviado_contabilidade_por?: string | null
           ferias_coletiva_id?: string | null
+          hash_integridade?: string | null
           id?: string
           justificativa?: string | null
           motivo_cancelamento?: string | null
