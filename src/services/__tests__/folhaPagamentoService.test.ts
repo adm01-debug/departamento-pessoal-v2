@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: vi.fn(),
+    functions: { invoke: vi.fn() },
   },
 }));
 
@@ -62,42 +63,108 @@ describe('folhaPagamentoService', () => {
       await expect(folhaPagamentoService.fecharFolha('folha-1')).rejects.toThrow(/existem 1 alertas críticos/);
     });
 
-    it('should update folha status to fechada if no critical alerts', async () => {
+    it('should invoke fechar-folha edge function with optimistic version and return audit_hash', async () => {
       const { validadorFolha } = await import('@/utils/folha/validadorFolha');
       (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([]);
 
-      const mockUpdate = vi.fn().mockReturnThis();
-      const mockEq = vi.fn().mockReturnThis();
-      const mockSelect = vi.fn().mockReturnThis();
-      const mockSingle = vi.fn().mockResolvedValue({ data: null, error: null }); // For the competency fetch
-      const mockInsert = vi.fn().mockResolvedValue({ error: null });
-
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
+        data: { version: 3, empresa_id: 'emp-1', status: 'aberta' },
+        error: null,
+      });
       (supabase.from as Record<string, unknown>).mockImplementation((table: string) => {
         if (table === 'folhas_pagamento') {
           return {
-            update: mockUpdate,
-            eq: mockEq,
-            select: mockSelect,
-            single: mockSingle,
-          };
-        }
-        if (table === 'folha_itens') {
-          return {
             select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-          };
-        }
-        if (table === 'folha_auditoria') {
-          return {
-            insert: mockInsert,
+            eq: vi.fn().mockReturnThis(),
+            maybeSingle: mockMaybeSingle,
           };
         }
         return {};
       });
 
+      (supabase.functions.invoke as Record<string, unknown>).mockResolvedValueOnce({
+        data: { ok: true, version: 4, audit_hash: 'abc123', warnings: [] },
+        error: null,
+      });
+
       const result = await folhaPagamentoService.fecharFolha('folha-1');
+
       expect(result.success).toBe(true);
-      expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ status: 'fechada' }));
+      expect(result.version).toBe(4);
+      expect(result.audit_hash).toBe('abc123');
+      expect(supabase.functions.invoke).toHaveBeenCalledWith('fechar-folha', {
+        body: { empresaId: 'emp-1', folhaId: 'folha-1', version: 3 },
+      });
+    });
+
+    it('should propagate VERSION_CONFLICT error from edge function', async () => {
+      const { validadorFolha } = await import('@/utils/folha/validadorFolha');
+      (validadorFolha.validarFolha as Record<string, unknown>).mockResolvedValueOnce([]);
+
+      (supabase.from as Record<string, unknown>).mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        maybeSingle: vi.fn().mockResolvedValue({
+          data: { version: 3, empresa_id: 'emp-1', status: 'aberta' },
+          error: null,
+        }),
+      }));
+
+      (supabase.functions.invoke as Record<string, unknown>).mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Folha foi alterada por outro processo. Recarregue e tente novamente.' },
+      });
+
+      await expect(folhaPagamentoService.fecharFolha('folha-1')).rejects.toThrow(/outro processo/);
+    });
+  });
+
+  describe('reabrirFolha', () => {
+    it('should require motivo and call reabrir-folha with current version', async () => {
+      (supabase.from as Record<string, unknown>).mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        maybeSingle: vi.fn().mockResolvedValue({
+          data: { version: 5, empresa_id: 'emp-1', status: 'fechada' },
+          error: null,
+        }),
+      }));
+      (supabase.functions.invoke as Record<string, unknown>).mockResolvedValueOnce({
+        data: { ok: true, version: 6, audit_hash: 'xyz789' },
+        error: null,
+      });
+
+      const result = await folhaPagamentoService.reabrirFolha(
+        'folha-1',
+        'Correção retroativa por erro de cálculo de INSS',
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.version).toBe(6);
+      expect(supabase.functions.invoke).toHaveBeenCalledWith('reabrir-folha', {
+        body: {
+          empresaId: 'emp-1',
+          folhaId: 'folha-1',
+          version: 5,
+          motivo: 'Correção retroativa por erro de cálculo de INSS',
+          override_esocial: false,
+        },
+      });
+    });
+
+    it('should reject when folha is not fechada', async () => {
+      (supabase.from as Record<string, unknown>).mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        maybeSingle: vi.fn().mockResolvedValue({
+          data: { version: 5, empresa_id: 'emp-1', status: 'aberta' },
+          error: null,
+        }),
+      }));
+
+      await expect(
+        folhaPagamentoService.reabrirFolha('folha-1', 'Motivo qualquer aqui'),
+      ).rejects.toThrow(/não está fechada/);
     });
   });
 });
