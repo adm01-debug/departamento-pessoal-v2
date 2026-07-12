@@ -29,7 +29,7 @@ serve(async (req: Request): Promise<Response> => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  const csrf = await verifyCsrf(req);
+  const csrf = await verifyCsrf(req.clone());
   if (!csrf.ok) return csrf.response!;
 
   // Auth obrigatório — holerite contém PII (CPF, banco, agência, conta)
@@ -44,6 +44,7 @@ serve(async (req: Request): Promise<Response> => {
 
   const userClient = createClient(supabaseUrl, anonKey, {
     global: { headers: { Authorization: authHeader } },
+    auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data: userData, error: userErr } = await userClient.auth.getUser();
   if (userErr || !userData?.user) {
@@ -57,7 +58,9 @@ serve(async (req: Request): Promise<Response> => {
   const { colaboradorId, competencia } = data!;
 
   try {
-    const supabase = createClient(supabaseUrl, serviceKey);
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     // Buscar dados do colaborador (com empresa_id para gate de tenant)
     const { data: colaborador, error: colError } = await supabase
@@ -163,8 +166,8 @@ serve(async (req: Request): Promise<Response> => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
-    captureException(error, { fn: 'gerar-holerite' });
-    const message = error instanceof Error ? error.message : 'Erro interno no servidor';
-    return createErrorResponse(message, 500, 'INTERNAL_SERVER_ERROR');
+    try { captureException(error, { fn: 'gerar-holerite' }); } catch { /* noop */ }
+    // Erro genérico — nunca vazar mensagem/stack ao cliente (PII sensível)
+    return createErrorResponse('Erro interno ao gerar holerite', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
