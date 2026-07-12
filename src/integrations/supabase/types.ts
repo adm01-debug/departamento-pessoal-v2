@@ -9027,6 +9027,7 @@ export type Database = {
           empresa_id: string | null
           esocial_status: string
           fechada_por: string | null
+          hash_integridade: string | null
           id: string
           motivo_reabertura: string | null
           observacoes: string | null
@@ -9054,6 +9055,7 @@ export type Database = {
           empresa_id?: string | null
           esocial_status?: string
           fechada_por?: string | null
+          hash_integridade?: string | null
           id?: string
           motivo_reabertura?: string | null
           observacoes?: string | null
@@ -9081,6 +9083,7 @@ export type Database = {
           empresa_id?: string | null
           esocial_status?: string
           fechada_por?: string | null
+          hash_integridade?: string | null
           id?: string
           motivo_reabertura?: string | null
           observacoes?: string | null
