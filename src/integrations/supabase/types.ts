@@ -675,6 +675,7 @@ export type Database = {
           data_exame: string
           data_validade: string | null
           empresa_id: string | null
+          hash_integridade: string | null
           id: string
           medico_crm: string | null
           medico_nome: string | null
@@ -691,6 +692,7 @@ export type Database = {
           data_exame: string
           data_validade?: string | null
           empresa_id?: string | null
+          hash_integridade?: string | null
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
@@ -707,6 +709,7 @@ export type Database = {
           data_exame?: string
           data_validade?: string | null
           empresa_id?: string | null
+          hash_integridade?: string | null
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
