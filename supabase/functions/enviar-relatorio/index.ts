@@ -61,8 +61,13 @@ type Body = z.infer<typeof BodySchema>;
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function coletarDados(
@@ -180,11 +185,12 @@ serve(async (req: Request): Promise<Response> => {
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) {
+    const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(jwt);
+    if (claimsErr || !claimsData?.claims?.sub) {
       return json({ error: "Sessão inválida" }, 401);
     }
-    const userId = userData.user.id;
+    const userId = String(claimsData.claims.sub);
 
     // 3. Validação do payload
     let raw: unknown;
@@ -214,6 +220,26 @@ serve(async (req: Request): Promise<Response> => {
       if (!isAdm) return json({ error: "Sem acesso a esta empresa" }, 403);
     }
 
+    // 4b. Anti-exfiltração: emailDestinatario deve pertencer a um usuário
+    // vinculado à empresa (evita envio de dados internos para email externo).
+    const { data: destinatarioUser } = await admin
+      .from("profiles")
+      .select("user_id, email")
+      .eq("email", body.emailDestinatario)
+      .maybeSingle();
+    if (!destinatarioUser?.user_id) {
+      return json({ error: "Destinatário não é usuário do sistema" }, 403);
+    }
+    const { data: destBelongs } = await admin.rpc("user_belongs_to_empresa", {
+      _user_id: destinatarioUser.user_id, _empresa_id: empresaId,
+    });
+    if (destBelongs !== true) {
+      const { data: destIsAdm } = await admin.rpc("is_admin", { _user_id: destinatarioUser.user_id });
+      if (destIsAdm !== true) {
+        return json({ error: "Destinatário não pertence à empresa" }, 403);
+      }
+    }
+
     // 5. Coleta escopada por empresa
     const { dados, totalRegistros } = await coletarDados(
       admin,
@@ -222,9 +248,10 @@ serve(async (req: Request): Promise<Response> => {
       body.parametros,
     );
 
-    // 6. Persistência em bucket privado
+    // 6. Persistência em bucket privado + hash do conteúdo (não-repúdio)
     const conteudo =
       body.formato === "csv" ? toCsv(dados) : JSON.stringify(dados, null, 2);
+    const contentHash = await sha256Hex(conteudo);
     const path = `${empresaId}/${body.tipoRelatorio}/${crypto.randomUUID()}.${body.formato}`;
     const { error: upErr } = await admin.storage.from(BUCKET).upload(
       path,
@@ -289,8 +316,11 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    // 8. Auditoria
-    await admin.from("audit_log").insert({
+    // 8. Auditoria BLOQUEANTE não-repudiável
+    const auditPayloadHash = await sha256Hex(
+      contentHash + userId + empresaId + body.tipoRelatorio + body.emailDestinatario,
+    );
+    const { error: auditErr } = await admin.from("audit_log").insert({
       tabela: "relatorios_agendados",
       registro_id: body.agendamentoId ?? empresaId,
       acao: "SEND_REPORT",
@@ -301,8 +331,17 @@ serve(async (req: Request): Promise<Response> => {
         empresa_id: empresaId,
         total_registros: totalRegistros,
         status_envio: statusEnvio,
+        email_destinatario_hash: await sha256Hex(body.emailDestinatario),
+        content_sha256: contentHash,
+        audit_hash: auditPayloadHash,
+        storage_path: path,
+        sent_at: new Date().toISOString(),
       },
     });
+    if (auditErr) {
+      console.error("[enviar-relatorio] AUDIT_BLOCKING_FAILURE:", auditErr.message);
+      return json({ error: "Auditoria obrigatória falhou" }, 500);
+    }
 
     if (body.agendamentoId) {
       await admin.from("log_envio_relatorios").insert({
