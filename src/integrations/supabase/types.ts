@@ -11646,6 +11646,7 @@ export type Database = {
           documento_url: string | null
           empresa_id: string | null
           evidenciado_por: Json | null
+          hash_integridade: string | null
           id: string
           id_registro_anterior: string | null
           motivo_recusa: string | null
@@ -11676,6 +11677,7 @@ export type Database = {
           documento_url?: string | null
           empresa_id?: string | null
           evidenciado_por?: Json | null
+          hash_integridade?: string | null
           id?: string
           id_registro_anterior?: string | null
           motivo_recusa?: string | null
@@ -11706,6 +11708,7 @@ export type Database = {
           documento_url?: string | null
           empresa_id?: string | null
           evidenciado_por?: Json | null
+          hash_integridade?: string | null
           id?: string
           id_registro_anterior?: string | null
           motivo_recusa?: string | null
