@@ -109,9 +109,13 @@ export function sanitizeHtml(dirty: unknown, options: SanitizeOptions = {}): str
     ? [...BASE_FORBID_TAGS, ...options.extraForbidTags]
     : BASE_FORBID_TAGS;
 
+  const forbidAttr = options.allowStyle
+    ? EVENT_HANDLER_ATTRS
+    : [...EVENT_HANDLER_ATTRS, 'style'];
+
   return DOMPurify.sanitize(dirty, {
     FORBID_TAGS: forbidTags,
-    FORBID_ATTR: EVENT_HANDLER_ATTRS,
+    FORBID_ATTR: forbidAttr,
     ALLOWED_URI_REGEXP: SAFE_URI_REGEXP,
     ADD_ATTR: options.allowStyle ? ['style', 'target'] : ['target'],
     ALLOW_DATA_ATTR: false,
