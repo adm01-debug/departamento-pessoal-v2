@@ -20527,6 +20527,78 @@ export type Database = {
           },
         ]
       }
+      vw_folha_compliance: {
+        Row: {
+          acao: string | null
+          audit_id: string | null
+          competencia: string | null
+          dados_novos: Json | null
+          empresa_id: string | null
+          event_at: string | null
+          folha_id: string | null
+          holerites_count: number | null
+          integrity_hash: string | null
+          ip_address: string | null
+          itens_count: number | null
+          motivo: string | null
+          override_esocial: boolean | null
+          total_descontos: number | null
+          total_fgts: number | null
+          total_liquido: number | null
+          total_proventos: number | null
+          user_email: string | null
+          user_id: string | null
+          version_anterior: number | null
+          version_nova: number | null
+        }
+        Insert: {
+          acao?: string | null
+          audit_id?: string | null
+          competencia?: never
+          dados_novos?: Json | null
+          empresa_id?: never
+          event_at?: string | null
+          folha_id?: string | null
+          holerites_count?: never
+          integrity_hash?: never
+          ip_address?: string | null
+          itens_count?: never
+          motivo?: never
+          override_esocial?: never
+          total_descontos?: never
+          total_fgts?: never
+          total_liquido?: never
+          total_proventos?: never
+          user_email?: string | null
+          user_id?: string | null
+          version_anterior?: never
+          version_nova?: never
+        }
+        Update: {
+          acao?: string | null
+          audit_id?: string | null
+          competencia?: never
+          dados_novos?: Json | null
+          empresa_id?: never
+          event_at?: string | null
+          folha_id?: string | null
+          holerites_count?: never
+          integrity_hash?: never
+          ip_address?: string | null
+          itens_count?: never
+          motivo?: never
+          override_esocial?: never
+          total_descontos?: never
+          total_fgts?: never
+          total_liquido?: never
+          total_proventos?: never
+          user_email?: string | null
+          user_id?: string | null
+          version_anterior?: never
+          version_nova?: never
+        }
+        Relationships: []
+      }
       vw_folha_ponto_mensal: {
         Row: {
           colaborador_id: string | null
