@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SignatureCanvas } from '@/components/ui/signature/SignatureCanvas';
+import type { Row } from '@/types/db';
 
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Atestado', 'Certificado', 'Comprovante', 'Contrato', 'RG', 'CPF', 'Outro'];
@@ -26,7 +27,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [docToSign, setDocToSign] = useState<any>(null);
+  const [docToSign, setDocToSign] = useState<Row<'documentos_assinatura'> | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 

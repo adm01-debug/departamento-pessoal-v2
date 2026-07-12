@@ -21,6 +21,7 @@ import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { DocumentoTimeline } from '@/components/documents/DocumentoTimeline';
 import { DocumentoPreview } from '@/components/documents/DocumentoPreview';
 import { useSearchParams } from 'react-router-dom';
+import type { Row, UnknownRecord } from '@/types/db';
 
 const BUCKET = 'documentos';
 const TIPOS_DOCUMENTO = ['Contrato', 'Atestado', 'Holerite', 'Certificado', 'RG', 'CPF', 'CTPS', 'Comprovante', 'Outro'];
@@ -37,11 +38,11 @@ export default function DocumentosPage() {
   const [colaboradorId, setColaboradorId] = useState(urlColaboradorId || '');
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [selectedDocForOcr, setSelectedDocForOcr] = useState<any>(null);
-  const [ocrResult, setOcrResult] = useState<any>(null);
+  const [selectedDocForOcr, setSelectedDocForOcr] = useState<Row<'documentos'> | null>(null);
+  const [ocrResult, setOcrResult] = useState<UnknownRecord | null>(null);
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
-  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<any>(null);
-  const [selectedDocForPreview, setSelectedDocForPreview] = useState<any>(null);
+  const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<Row<'documentos'> | null>(null);
+  const [selectedDocForPreview, setSelectedDocForPreview] = useState<Row<'documentos'> | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {

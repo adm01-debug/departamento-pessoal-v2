@@ -12,13 +12,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Row } from '@/types/db';
 
 export default function PontoKioskPage() {
   const [time, setTime] = useState(new Date());
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'pin' | 'facial_scan' | 'action' | 'success'>('pin');
-  const [selectedColab, setSelectedColab] = useState<any>(null);
+  const [selectedColab, setSelectedColab] = useState<Row<'colaboradores'> | null>(null);
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 

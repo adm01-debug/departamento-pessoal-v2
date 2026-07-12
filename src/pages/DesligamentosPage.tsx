@@ -17,6 +17,7 @@ import { exportarDesligamentosExcel } from '@/utils/desligamentoExcel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 import {
+import type { Row } from '@/types/db';
   DesligamentoKPIs,
   DesligamentoFilters,
   StatusBadge,
@@ -34,7 +35,7 @@ export default function DesligamentosPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [tipoFilter, setTipoFilter] = useState('todos');
-  const [selectedDesligamento, setSelectedDesligamento] = useState<any | null>(null);
+  const [selectedDesligamento, setSelectedDesligamento] = useState<Row<'desligamentos'> | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showNovo, setShowNovo] = useState(false);
   const [showChart, setShowChart] = useState(true);

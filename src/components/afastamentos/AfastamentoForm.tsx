@@ -16,6 +16,7 @@ import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as Calenda
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import type { Row } from '@/types/db';
 
 const schema = z.object({
   colaborador_id: z.string().min(1, 'Colaborador é obrigatório'),
@@ -42,9 +43,9 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
   const { colaboradores } = useColaboradores();
   const [diasInfo, setDiasInfo] = useState({ total: 0, empresa: 0, inss: 0 });
   const [cidSearch, setCidSearch] = useState('');
-  const [cidResults, setCidResults] = useState<any[]>([]);
-  const [selectedCid, setSelectedCid] = useState<any>(initialData?.cid || null);
-  const [historicoRecente, setHistoricoRecente] = useState<any[]>([]);
+  const [cidResults, setCidResults] = useState<Row<'cid10'>[]>([]);
+  const [selectedCid, setSelectedCid] = useState<Row<'cid10'> | null>(initialData?.cid || null);
+  const [historicoRecente, setHistoricoRecente] = useState<Row<'afastamentos'>[]>([]);
 
   const [isVerificandoHistorico, setIsVerificandoHistorico] = useState(false);
 

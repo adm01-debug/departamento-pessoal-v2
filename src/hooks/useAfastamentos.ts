@@ -5,11 +5,12 @@ import { useEmpresas } from './useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
 import { toast } from 'sonner';
 import { useGenericCrud } from './useGenericCrud';
+import type { UnknownRecord } from '@/types/db';
 
 export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
-  const [filtros, setFiltros] = useState<any>({});
+  const [filtros, setFiltros] = useState<UnknownRecord | null>({});
 
   const crud = useGenericCrud<unknown>({
     queryKey: 'afastamentos',

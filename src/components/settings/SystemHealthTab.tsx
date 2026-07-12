@@ -8,16 +8,17 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
+import type { UnknownRecord } from '@/types/db';
   Activity, Database, HardDrive, CheckCircle, XCircle, Trash2, Download,
   RefreshCw, Loader2, Bell, Zap, Clock
 } from 'lucide-react';
 
 
 export function SystemHealthTab() {
-  const [healthData, setHealthData] = useState<any>(null);
+  const [healthData, setHealthData] = useState<UnknownRecord | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
-  const [cleanupResult, setCleanupResult] = useState<any>(null);
-  const [backupResult, setBackupResult] = useState<any>(null);
+  const [cleanupResult, setCleanupResult] = useState<UnknownRecord | null>(null);
+  const [backupResult, setBackupResult] = useState<UnknownRecord | null>(null);
   const [backupId, setBackupId] = useState('');
 
   const runHealthcheck = async () => {

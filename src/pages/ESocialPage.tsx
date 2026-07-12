@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ESocialComplianceScore } from '@/components/esocial/ESocialComplianceScore';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import type { Row } from '@/types/db';
 
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,7 +49,7 @@ export default function ESocialPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedEvento, setSelectedEvento] = useState<any>(null);
+  const [selectedEvento, setSelectedEvento] = useState<Row<'esocial_eventos'> | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCompetencia, setSelectedCompetencia] = useState(currentCompetenciaLocal());

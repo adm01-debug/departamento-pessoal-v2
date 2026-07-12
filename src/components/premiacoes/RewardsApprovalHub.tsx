@@ -20,6 +20,7 @@ import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+import type { Row } from '@/types/db';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -34,7 +35,7 @@ interface ApprovalHubProps {
 
 export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
   const queryClient = useQueryClient();
-  const [selectedPagamento, setSelectedPagamento] = React.useState<any>(null);
+  const [selectedPagamento, setSelectedPagamento] = useState<Row<'premiacoes_pagamentos'> | null>(null);
   const [comentario, setComentario] = React.useState('');
   const [isReconcileOpen, setIsReconcileOpen] = React.useState(false);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = React.useState(false);

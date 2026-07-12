@@ -39,6 +39,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRealTimeSubscription } from '@/hooks/useRealTimeSubscription';
+import type { Row } from '@/types/db';
 
 const MotionCard = motion.create(Card);
 
@@ -350,7 +351,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
   useRealTimeSubscription('pendencias', ['pendencias', empresaId], empresaId);
 
   // Notifications State & Logic
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Row<'notificacoes'>[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   useEffect(() => {

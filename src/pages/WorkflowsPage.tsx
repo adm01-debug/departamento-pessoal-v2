@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow, ArrowRight, Users, AlertTriangle, Timer, History, Zap, Mail, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import type { Row } from '@/types/db';
 
 const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
   pendente: { color: 'bg-warning/15 text-warning border-0', icon: Clock, label: 'Pendente' },
@@ -46,7 +47,7 @@ export default function WorkflowsPage() {
   const now = useNow();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [selectedExec, setSelectedExec] = useState<any>(null);
+  const [selectedExec, setSelectedExec] = useState<Row<'workflows_execucoes'> | null>(null);
   const [showLog, setShowLog] = useState(false);
   const [form, setForm] = useState({ nome: '', descricao: '', tipo: 'ferias', etapas: ETAPAS_PADRAO.slice(0, 2) });
   const [numEtapas, setNumEtapas] = useState(2);
