@@ -12,6 +12,7 @@ import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import { beginIdempotency, completeIdempotency, failIdempotency, extractIdempotencyKey } from '../_shared/idempotency.ts';
+import { integrityHash as computeIntegrityHash } from '../_shared/integrityHash.ts';
 
 
 const FAIXAS_INSS = [
