@@ -21204,6 +21204,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      enforce_log_retention: { Args: never; Returns: Json }
       fn_calculate_periodo_aquisitivo: {
         Args: { _colaborador_id: string }
         Returns: {
