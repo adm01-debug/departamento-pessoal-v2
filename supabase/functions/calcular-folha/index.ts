@@ -1,3 +1,11 @@
+// Onda 25 — Hardening crítico do motor de folha:
+// • JWT obrigatório + CSRF fail-closed
+// • Tenant scope estrito (user_belongs_to_empresa + is_admin fallback)
+// • Bloqueio de recálculo de folha FECHADA
+// • Chunking (batches de 500 colaboradores) para evitar OOM
+// • Precisão financeira via helper round2 + banker-safe
+// • Auditoria PAYROLL_CALC em audit_log
+// • Sem vazamento de PII em erros; captureException em falhas
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { calcularFolhaSchema } from '../_shared/schemas/common.ts';
@@ -20,13 +28,16 @@ const FAIXAS_IRRF = [
 ];
 
 const TETO_INSS = 8157.41;
+const CHUNK_SIZE = 500;
+const MAX_COLABORADORES = 50_000;
+
+const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
 
 function calcINSS(salario: number): number {
-  if (salario <= 0) return 0;
+  if (!Number.isFinite(salario) || salario <= 0) return 0;
   let desc = 0;
   const baseCalculo = Math.min(salario, TETO_INSS);
   let rest = baseCalculo;
-  
   for (let i = 0; i < FAIXAS_INSS.length; i++) {
     const limAnt = i === 0 ? 0 : FAIXAS_INSS[i - 1].limite;
     const f = Math.min(rest, FAIXAS_INSS[i].limite - limAnt);
@@ -34,13 +45,13 @@ function calcINSS(salario: number): number {
     desc += f * FAIXAS_INSS[i].aliquota;
     rest -= f;
   }
-  return Math.round(desc * 100) / 100;
+  return round2(desc);
 }
 
 function calcIRRF(base: number): number {
-  if (base <= 0) return 0;
+  if (!Number.isFinite(base) || base <= 0) return 0;
   for (const f of FAIXAS_IRRF) {
-    if (base <= f.limite) return Math.max(0, Math.round((base * f.aliquota - f.deducao) * 100) / 100);
+    if (base <= f.limite) return Math.max(0, round2(base * f.aliquota - f.deducao));
   }
   return 0;
 }
@@ -48,54 +59,146 @@ function calcIRRF(base: number): number {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-  const csrf = await verifyCsrf(req);
-  if (!csrf.ok) return csrf.response!;
-
-  const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
-  if (errorResponse) return errorResponse;
-
-  const { empresa_id, competencia } = data!;
-
   try {
-    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
 
-    const { data: colaboradores, error: colabErr } = await supabase
-      .from('colaboradores').select('id, nome_completo, salario_base, cargo, departamento')
-      .eq('empresa_id', empresa_id).eq('status', 'ativo');
-
-    if (colabErr) throw colabErr;
-    if (!colaboradores?.length) {
-      return createErrorResponse('Nenhum colaborador ativo encontrado para esta empresa', 404, 'NOT_FOUND');
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return createErrorResponse('Autenticação obrigatória', 401, 'UNAUTHORIZED');
     }
 
-    const itens = colaboradores.map(c => {
-      const bruto = c.salario_base || 0;
-      const inss = calcINSS(bruto);
-      const irrf = calcIRRF(bruto - inss);
-      const fgts = Number((bruto * 0.08).toFixed(2));
-      const descontos = Number((inss + irrf).toFixed(2));
-      return { colaborador_id: c.id, nome: c.nome_completo, cargo: c.cargo, salario_bruto: bruto, inss, irrf, fgts, total_descontos: descontos, salario_liquido: Number((bruto - descontos).toFixed(2)) };
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
+    const userId = userData.user.id;
+
+    const { data, errorResponse } = await validateRequest(req, calcularFolhaSchema);
+    if (errorResponse) return errorResponse;
+    const { empresa_id, competencia } = data!;
+
+    const admin = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const totais = { bruto: 0, descontos: 0, liquido: 0, fgts: 0 };
-    itens.forEach(i => { 
-      totais.bruto = Number((totais.bruto + i.salario_bruto).toFixed(2));
-      totais.descontos = Number((totais.descontos + i.total_descontos).toFixed(2));
-      totais.liquido = Number((totais.liquido + i.salario_liquido).toFixed(2));
-      totais.fgts = Number((totais.fgts + i.fgts).toFixed(2));
+    // Tenant scope
+    const [{ data: belongs }, { data: isAdm }] = await Promise.all([
+      admin.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: empresa_id }),
+      admin.rpc('is_admin', { _user_id: userId }),
+    ]);
+    if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
+
+    // Bloqueia recálculo de folha FECHADA
+    const { data: folhaExistente } = await admin
+      .from('folhas_pagamento')
+      .select('id, status')
+      .eq('empresa_id', empresa_id)
+      .eq('competencia', competencia)
+      .maybeSingle();
+
+    if (folhaExistente?.status === 'fechada') {
+      return createErrorResponse('Folha fechada — recálculo bloqueado', 409, 'PAYROLL_LOCKED');
+    }
+
+    // Contagem prévia p/ hard-cap
+    const { count: totalColabs } = await admin
+      .from('colaboradores')
+      .select('id', { count: 'exact', head: true })
+      .eq('empresa_id', empresa_id)
+      .eq('status', 'ativo');
+
+    if (!totalColabs) {
+      return createErrorResponse('Nenhum colaborador ativo', 404, 'NOT_FOUND');
+    }
+    if (totalColabs > MAX_COLABORADORES) {
+      return createErrorResponse(`Limite excedido (${MAX_COLABORADORES})`, 413, 'PAYLOAD_TOO_LARGE');
+    }
+
+    // Chunked fetch
+    const itens: Array<Record<string, unknown>> = [];
+    const totais = { bruto: 0, descontos: 0, liquido: 0, fgts: 0, inss: 0, irrf: 0 };
+
+    for (let offset = 0; offset < totalColabs; offset += CHUNK_SIZE) {
+      const { data: colabs, error: e } = await admin
+        .from('colaboradores')
+        .select('id, nome_completo, salario_base, cargo, departamento')
+        .eq('empresa_id', empresa_id)
+        .eq('status', 'ativo')
+        .range(offset, offset + CHUNK_SIZE - 1);
+      if (e) throw e;
+      if (!colabs?.length) break;
+
+      for (const c of colabs) {
+        const bruto = Number(c.salario_base) || 0;
+        const inss = calcINSS(bruto);
+        const irrf = calcIRRF(bruto - inss);
+        const fgts = round2(bruto * 0.08);
+        const descontos = round2(inss + irrf);
+        const liquido = round2(bruto - descontos);
+
+        itens.push({
+          colaborador_id: c.id,
+          nome: c.nome_completo,
+          cargo: c.cargo,
+          salario_bruto: bruto,
+          inss, irrf, fgts,
+          total_descontos: descontos,
+          salario_liquido: liquido,
+        });
+
+        totais.bruto = round2(totais.bruto + bruto);
+        totais.descontos = round2(totais.descontos + descontos);
+        totais.liquido = round2(totais.liquido + liquido);
+        totais.fgts = round2(totais.fgts + fgts);
+        totais.inss = round2(totais.inss + inss);
+        totais.irrf = round2(totais.irrf + irrf);
+      }
+    }
+
+    const { data: upserted, error: upErr } = await admin
+      .from('folhas_pagamento')
+      .upsert({
+        empresa_id, competencia, status: 'calculada',
+        total_bruto: totais.bruto,
+        total_descontos: totais.descontos,
+        total_liquido: totais.liquido,
+        total_colaboradores: totalColabs,
+        data_calculo: new Date().toISOString(),
+      }, { onConflict: 'empresa_id,competencia' })
+      .select('id')
+      .single();
+    if (upErr) throw upErr;
+
+    // Auditoria
+    await admin.from('audit_log').insert({
+      tabela: 'folhas_pagamento',
+      registro_id: upserted?.id ?? crypto.randomUUID(),
+      acao: 'PAYROLL_CALC',
+      user_id: userId,
+      dados_novos: {
+        empresa_id, competencia,
+        total_colaboradores: totalColabs,
+        ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
+      },
     });
 
-    await supabase.from('folhas_pagamento').upsert({
-      empresa_id, competencia, status: 'calculada',
-      total_bruto: totais.bruto,
-      total_descontos: totais.descontos,
-      total_liquido: totais.liquido,
-      total_colaboradores: colaboradores.length,
-    }, { onConflict: 'empresa_id,competencia' });
-
-    return new Response(JSON.stringify({ success: true, competencia, total_colaboradores: colaboradores.length, ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, Math.round(v * 100) / 100])), itens }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error: any) {
-    captureException(error, { fn: 'calcular-folha' });
-    return createErrorResponse(error.message, 500, 'INTERNAL_SERVER_ERROR');
+    return new Response(JSON.stringify({
+      success: true,
+      folha_id: upserted?.id,
+      competencia,
+      total_colaboradores: totalColabs,
+      ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
+      itens,
+    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (error) {
+    try { captureException(error, { fn: 'calcular-folha' }); } catch { /* noop */ }
+    return createErrorResponse('Erro interno no cálculo de folha', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
