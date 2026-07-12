@@ -21015,6 +21015,14 @@ export type Database = {
         Args: { check_email: string; check_ip: string }
         Returns: Json
       }
+      check_idempotency_anomalies: {
+        Args: never
+        Returns: {
+          endpoint: string
+          reason: string
+          severity: string
+        }[]
+      }
       check_login_lock: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: {
