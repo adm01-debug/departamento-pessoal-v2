@@ -103,7 +103,7 @@ serve(async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({
         success: true, protocolo: evento.protocolo, recibo: evento.recibo,
         alreadySent: true, tentativas: evento.tentativas_envio ?? 0,
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { headers: { ...corsHeaders, ...NO_STORE, 'Content-Type': 'application/json' } });
     }
 
     // 2. Config
