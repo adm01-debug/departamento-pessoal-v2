@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Download, ShieldCheck, Loader2, FileSearch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { MetricasFolhaDashboard } from '@/components/folha/MetricasFolhaDashboard';
 
 type ComplianceRow = {
   audit_id: string | null;
@@ -131,6 +132,11 @@ export default function FolhaCompliancePage() {
       <p className="-mt-4 mb-4 text-sm text-muted-foreground">
         Trilha imutável de cálculos, fechamentos e reaberturas com hash de integridade SHA-256.
       </p>
+
+      <div className="mb-6">
+        <MetricasFolhaDashboard />
+      </div>
+
 
 
       <Card>
