@@ -35,6 +35,20 @@ const MAX_COLABORADORES = 50_000;
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
 
+function canonicalize(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value ?? null);
+  if (Array.isArray(value)) return `[${value.map(canonicalize).join(',')}]`;
+  const keys = Object.keys(value as Record<string, unknown>).sort();
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalize((value as Record<string, unknown>)[k])}`).join(',')}}`;
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const bytes = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+
 function calcINSS(salario: number): number {
   if (!Number.isFinite(salario) || salario <= 0) return 0;
   let desc = 0;
@@ -111,9 +125,34 @@ Deno.serve(async (req) => {
       empresaId: empresa_id,
       userId,
     });
+
+    // Auditoria detalhada de conflito/replay/duplicidade de Idempotency-Key.
+    // Best-effort — falha no audit_log NUNCA bloqueia a resposta ao cliente.
+    if (idem.reason && idem.reason !== 'NEW') {
+      try {
+        await admin.from('audit_log').insert({
+          tabela: 'idempotency_keys',
+          registro_id: idem.existingId ?? idem.id ?? crypto.randomUUID(),
+          acao: `IDEMPOTENCY_${idem.reason}`,
+          user_id: userId,
+          dados_novos: {
+            endpoint: 'calcular-folha',
+            empresa_id,
+            competencia,
+            key_hash: idem.keyHash ?? null,
+            request_hash: idem.requestHash ?? null,
+            existing_id: idem.existingId ?? null,
+            outcome: idem.replay ? 'replay_served' : idem.conflict ? 'conflict_rejected' : 'retry_allowed',
+            timestamp: new Date().toISOString(),
+          },
+        });
+      } catch { /* noop */ }
+    }
+
     if (idem.replay) return idem.replay;
     if (idem.conflict) return idem.conflict;
     idempotencyId = idem.id;
+
 
     // Bloqueia recálculo de folha em estados terminais (fechada / aprovada / transmitida ao eSocial).
     // Estes estados representam consolidação contábil ou envio externo — qualquer recálculo
@@ -232,28 +271,48 @@ Deno.serve(async (req) => {
       .single();
     if (upErr) throw upErr;
 
-    // Auditoria
+    // Snapshot canônico dos totais + contagem de itens → SHA-256 (integridade financeira não-repudiável).
+    // Permite verificação posterior: qualquer alteração no cálculo produz hash diferente.
+    const integritySnapshot = {
+      empresa_id,
+      competencia,
+      total_colaboradores: totalColabs,
+      itens_count: itens.length,
+      totais,
+    };
+    const integrityHash = await sha256Hex(canonicalize(integritySnapshot));
+
+    // Auditoria detalhada (financeira + idempotência + integridade)
     await admin.from('audit_log').insert({
       tabela: 'folhas_pagamento',
       registro_id: upserted?.id ?? crypto.randomUUID(),
       acao: 'PAYROLL_CALC',
       user_id: userId,
       dados_novos: {
-        empresa_id, competencia,
+        empresa_id,
+        competencia,
         total_colaboradores: totalColabs,
+        itens_count: itens.length,
         idempotency_id: idempotencyId ?? null,
+        integrity_hash: integrityHash,
+        integrity_alg: 'sha256-canonical',
+        calculated_at: new Date().toISOString(),
         ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
       },
     });
+
 
     const responseBody = {
       success: true,
       folha_id: upserted?.id,
       competencia,
       total_colaboradores: totalColabs,
+      integrity_hash: integrityHash,
+      integrity_alg: 'sha256-canonical',
       ...Object.fromEntries(Object.entries(totais).map(([k, v]) => [`total_${k}`, v])),
       itens,
     };
+
 
     await completeIdempotency(admin, idempotencyId, 200, responseBody);
 
