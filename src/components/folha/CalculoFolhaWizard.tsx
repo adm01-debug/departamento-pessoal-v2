@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useFolhaAuditoria } from '@/hooks/useFolhaAuditoria';
+import { formatDateLocalISO } from '@/utils/dateLocal';
+
 import {
   Dialog,
   DialogContent,
