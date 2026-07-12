@@ -87,17 +87,43 @@ export default function AdminOperacaoPage() {
     staleTime: 60_000,
   });
 
+  const alerts = useQuery({
+    queryKey: ['admin-op', 'security-alerts'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_security_alerts_summary' as never, { _limit: 50 } as never);
+      if (error) throw error;
+      return (data ?? []) as AlertRow[];
+    },
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
+
+  const qc = useQueryClient();
+  const resolveAlert = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc('resolve_security_alert' as never, { _id: id } as never);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Alerta resolvido');
+      qc.invalidateQueries({ queryKey: ['admin-op', 'security-alerts'] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? 'Falha ao resolver alerta'),
+  });
+
   const refetchAll = () => {
     dlq.refetch();
     conflitos.refetch();
     telemetry.refetch();
     idem.refetch();
     cron.refetch();
+    alerts.refetch();
   };
 
   const totalDlq = dlq.data?.reduce((s, r) => s + Number(r.total_dlq || 0), 0) ?? 0;
   const totalConflitos = conflitos.data?.reduce((s, r) => s + Number(r.conflitos || 0), 0) ?? 0;
   const idemFailingHigh = idem.data?.filter(r => Number(r.failure_rate_pct) > 5).length ?? 0;
+  const criticalAlerts = alerts.data?.filter(a => a.severity === 'critical' || a.severity === 'high').length ?? 0;
 
   return (
     <div className="space-y-6">
