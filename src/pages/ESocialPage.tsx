@@ -29,6 +29,7 @@ import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
 import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
 import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
 
 
 const tiposEvento = [
@@ -50,7 +51,7 @@ export default function ESocialPage() {
   const [selectedEvento, setSelectedEvento] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedCompetencia, setSelectedCompetencia] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedCompetencia, setSelectedCompetencia] = useState(currentCompetenciaLocal());
   const [isValidating, setIsValidating] = useState<string | null>(null);
   const [auditOpen, setAuditOpen] = useState(false);
 

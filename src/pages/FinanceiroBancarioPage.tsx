@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { todayLocalISO } from '@/utils/dateLocal';
 
 export default function FinanceiroBancarioPage() {
   const { empresaAtual } = useEmpresas();
@@ -97,7 +98,7 @@ export default function FinanceiroBancarioPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `REMESSA_${config.banco_codigo}_${new Date().toISOString().slice(0,10)}.rem`;
+      a.download = `REMESSA_${config.banco_codigo}_${todayLocalISO()}.rem`;
       a.click();
       
       toast.success('Remessa CNAB gerada com sucesso');
@@ -124,7 +125,7 @@ export default function FinanceiroBancarioPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `PIX_LOTE_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `PIX_LOTE_${todayLocalISO()}.csv`;
       a.click();
       
       toast.success('Lote PIX gerado com sucesso');

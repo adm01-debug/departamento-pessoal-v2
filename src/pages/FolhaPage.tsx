@@ -27,6 +27,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
+
 
 function formatCurrency(value: number): string {
 
@@ -101,7 +103,7 @@ export default function FolhaPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <CalculoFolhaWizard competencia={new Date().toISOString().slice(0, 7)} />
+          <CalculoFolhaWizard competencia={currentCompetenciaLocal()} />
         </div>
 
       }

@@ -1,3 +1,4 @@
+import { formatDateLocalISO } from '@/utils/dateLocal';
 /**
  * Pure validators/normalizers for colaborador mass import.
  * No I/O, no side effects — safe to unit test.
@@ -27,13 +28,13 @@ export function parseDate(val: unknown): string | null {
   if (val === null || val === undefined || val === '') return null;
   if (typeof val === 'number') {
     const d = new Date((val - 25569) * 86400 * 1000);
-    return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+    return isNaN(d.getTime()) ? null : formatDateLocalISO(d);
   }
   const s = String(val);
   const parts = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (parts) return `${parts[3]}-${parts[2]}-${parts[1]}`;
   const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+  return isNaN(d.getTime()) ? null : formatDateLocalISO(d);
 }
 
 export function parseSalario(val: unknown): number | undefined {

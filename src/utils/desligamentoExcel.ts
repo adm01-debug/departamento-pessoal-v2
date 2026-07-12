@@ -3,6 +3,8 @@ import {
   buildTabularWorkbook,
   downloadWorkbook,
 } from './importacao/excelDownload';
+import { todayLocalISO } from '@/utils/dateLocal';
+
 
 const TIPO_LABELS: Record<string, string> = {
   sem_justa_causa: 'Sem Justa Causa',
@@ -53,7 +55,7 @@ export async function exportarDesligamentosExcel(desligamentos: any[]) {
   }
   const rows = desligamentos.map(rowFor);
   const wb = buildTabularWorkbook('Desligamentos', HEADERS, rows);
-  const filename = `Desligamentos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const filename = `Desligamentos_${todayLocalISO()}.xlsx`;
   await downloadWorkbook(wb, filename);
   toast.success('Planilha exportada com sucesso!');
 }

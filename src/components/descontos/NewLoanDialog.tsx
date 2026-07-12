@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Info, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { todayLocalISO } from '@/utils/dateLocal';
 
 export function NewLoanDialog({ colaboradores, onSave }: any) {
   const [open, setOpen] = useState(false);
@@ -15,7 +16,7 @@ export function NewLoanDialog({ colaboradores, onSave }: any) {
     instituicao_financeira: '',
     valor_total: '',
     numero_parcelas: '',
-    data_inicio: new Date().toISOString().split('T')[0]
+    data_inicio: todayLocalISO()
   });
 
   // Compliance Engine: Calculate Margin

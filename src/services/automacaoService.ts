@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { whatsappService } from './whatsappService';
 import { criarNotificacao } from './notificacoesService';
+import { formatDateLocalISO } from '@/utils/dateLocal';
 
 export const automacaoService = {
   /**
@@ -54,7 +55,7 @@ export const automacaoService = {
   async notificarASOVencendo(empresaId: string) {
     const dataAlerta = new Date();
     dataAlerta.setDate(dataAlerta.getDate() + 30); // 30 dias de antecedência
-    const dataFormatada = dataAlerta.toISOString().split('T')[0];
+    const dataFormatada = formatDateLocalISO(dataAlerta);
 
     const { data: asos } = await (supabase as any)
       .from('asos')
@@ -88,7 +89,7 @@ export const automacaoService = {
   async notificarTerminoExperiencia(empresaId: string) {
     const dataAlerta = new Date();
     dataAlerta.setDate(dataAlerta.getDate() + 7); // 7 dias de antecedência
-    const dataFormatada = dataAlerta.toISOString().split('T')[0];
+    const dataFormatada = formatDateLocalISO(dataAlerta);
 
     const { data: periodos } = await supabase
       .from('periodos_experiencia')

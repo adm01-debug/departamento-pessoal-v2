@@ -18,6 +18,7 @@ import { usePDFExport } from '@/hooks/usePDFExport';
 import { RelatoriosAnalyticsTab } from '@/components/relatorios/RelatoriosAnalyticsTab';
 import { RelatoriosExportTab } from '@/components/relatorios/RelatoriosExportTab';
 import { RelatoriosAgendadosTab } from '@/components/relatorios/RelatoriosAgendadosTab';
+import { currentCompetenciaLocal, formatDateLocalISO } from '@/utils/dateLocal';
 
 const relatorios = [
   { id: 'colaboradores', title: 'Resumo Colaboradores', description: 'Colaboradores ativos com dados completos', icon: Users, gradient: 'from-info to-info/70' },
@@ -47,7 +48,7 @@ async function fetchReportData(id: string, empresaId?: string) {
       }; 
     }
     case 'folha': { 
-      const comp = new Date().toISOString().slice(0, 7); 
+      const comp = currentCompetenciaLocal(); 
       const { data, error } = await supabase
         .from('folhas_pagamento')
         .select('*')
@@ -104,7 +105,7 @@ async function fetchReportData(id: string, empresaId?: string) {
       // Multi-tenant: agrega no client filtrando por empresa_id (view vw_kpi_turnover é global)
       const inicio = new Date();
       inicio.setFullYear(inicio.getFullYear() - 1);
-      const inicioISO = inicio.toISOString().slice(0, 10);
+      const inicioISO = formatDateLocalISO(inicio);
 
       const [desligRes, ativosRes, admRes] = await Promise.all([
         supabase
@@ -159,7 +160,7 @@ async function fetchReportData(id: string, empresaId?: string) {
       };
     }
     case 'encargos': {
-      const comp = new Date().toISOString().slice(0, 7);
+      const comp = currentCompetenciaLocal();
       const { data, error } = await supabase
         .from('folhas_pagamento')
         .select('competencia, total_fgts, total_inss_patronal, total_liquido')

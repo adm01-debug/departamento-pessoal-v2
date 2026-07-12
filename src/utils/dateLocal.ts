@@ -47,3 +47,21 @@ export function addDaysLocal(date: Date, days: number): Date {
   copy.setDate(copy.getDate() + days);
   return copy;
 }
+
+/**
+ * Formata competência (`YYYY-MM`) no fuso local. Evita o mesmo off-by-one:
+ * às 21h30 de 31/07 em UTC-3, `toISOString().slice(0,7)` retorna `2026-08`
+ * (mês errado) — quebra filtros de folha, holerite e provisões.
+ */
+export function formatCompetenciaLocal(date: Date = new Date()): string {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+
+/** Atalho: competência atual (`YYYY-MM`) no fuso do usuário. */
+export function currentCompetenciaLocal(): string {
+  return formatCompetenciaLocal(new Date());
+}
+

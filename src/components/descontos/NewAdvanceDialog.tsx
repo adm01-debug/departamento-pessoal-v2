@@ -5,13 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { HandCoins } from 'lucide-react';
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
 
 export function NewAdvanceDialog({ colaboradores, onSave }: any) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     colaborador_id: '',
     valor_solicitado: '',
-    competencia_desconto: new Date().toISOString().slice(0, 7),
+    competencia_desconto: currentCompetenciaLocal(),
     motivo: ''
   });
 

@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts';
 import { motion } from 'framer-motion';
+import { formatDateLocalISO } from '@/utils/dateLocal';
 
 export function PontoStreakCard() {
   const { user } = useAuth();
@@ -23,7 +24,7 @@ export function PontoStreakCard() {
         .from('registros_ponto')
         .select('data, atraso_minutos, horas_trabalhadas, entrada_1')
         .eq('colaborador_id', colab.id)
-        .gte('data', d.toISOString().split('T')[0])
+        .gte('data', formatDateLocalISO(d))
         .order('data', { ascending: true });
       if (error) throw error;
       return data || [];

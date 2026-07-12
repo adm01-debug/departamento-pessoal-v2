@@ -2,6 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { pontoMonitorService } from './pontoMonitorService';
 import CryptoJS from 'crypto-js';
 import { format } from 'date-fns';
+import { formatDateLocalISO } from '@/utils/dateLocal';
+
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3;
   const φ1 = (lat1 * Math.PI) / 180;
@@ -176,7 +178,7 @@ export const pontoService = {
       .from('registros_ponto')
       .select('*')
       .eq('colaborador_id', colaboradorId)
-      .gte('data', weekAgo.toISOString().split('T')[0])
+      .gte('data', formatDateLocalISO(weekAgo))
       .order('data', { ascending: false });
     if (error) throw error;
     return data || [];

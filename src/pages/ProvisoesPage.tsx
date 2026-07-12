@@ -31,6 +31,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
 
 
 function formatCurrency(value: number): string {
@@ -38,7 +39,7 @@ function formatCurrency(value: number): string {
 }
 
 export default function ProvisoesPage() {
-  const [competencia, setCompetencia] = useState(new Date().toISOString().substring(0, 7));
+  const [competencia, setCompetencia] = useState(currentCompetenciaLocal());
   const [selectedLog, setSelectedLog] = useState<any>(null);
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();

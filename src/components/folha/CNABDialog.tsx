@@ -8,6 +8,7 @@ import { FileDown, Settings2, Loader2, Landmark, CheckCircle2, Zap, ShieldCheck 
 import { cnabService, CNABConfig } from '@/services/cnabService';
 import { toast } from 'sonner';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { todayLocalISO } from '@/utils/dateLocal';
 
 interface CNABDialogProps {
   folhaId: string;
@@ -77,7 +78,7 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `CNAB240_PAGTO_REM_${new Date().toISOString().slice(0, 10)}.rem`;
+      a.download = `CNAB240_PAGTO_REM_${todayLocalISO()}.rem`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -101,7 +102,7 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `LOTE_PIX_SALARIOS_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `LOTE_PIX_SALARIOS_${todayLocalISO()}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

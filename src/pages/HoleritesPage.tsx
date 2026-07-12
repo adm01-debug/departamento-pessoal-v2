@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
 import { toast } from 'sonner';
+import { currentCompetenciaLocal } from '@/utils/dateLocal';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(value);
@@ -21,7 +22,7 @@ function formatCurrency(value: number): string {
 
 export default function HoleritesPage() {
   const [busca, setBusca] = useState('');
-  const [mesFiltro, setMesFiltro] = useState(new Date().toISOString().substring(0, 7));
+  const [mesFiltro, setMesFiltro] = useState(currentCompetenciaLocal());
 
   const { data: holerites, isLoading } = useQuery({
     queryKey: ['holerites', mesFiltro],

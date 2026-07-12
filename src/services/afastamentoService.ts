@@ -1,5 +1,6 @@
 import { BaseService, ListOptions, ListResponse } from './baseService';
 import { supabase } from '@/integrations/supabase/client';
+import { formatDateLocalISO } from '@/utils/dateLocal';
 
 class AfastamentoService extends BaseService<any> {
   constructor() {
@@ -34,7 +35,7 @@ class AfastamentoService extends BaseService<any> {
     const { data, error } = await this.getQuery()
       .select('*')
       .eq('colaborador_id', colaboradorId)
-      .gte('data_inicio', dataLimite.toISOString().split('T')[0])
+      .gte('data_inicio', formatDateLocalISO(dataLimite))
       .order('data_inicio', { ascending: false });
       
     if (error) throw error;

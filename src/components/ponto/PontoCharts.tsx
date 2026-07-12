@@ -9,6 +9,8 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell,
 } from 'recharts';
+import { formatDateLocalISO } from '@/utils/dateLocal';
+
 
 export function PontoCharts() {
   const { user } = useAuth();
@@ -25,7 +27,7 @@ export function PontoCharts() {
         .from('registros_ponto')
         .select('data, atraso_minutos, horas_trabalhadas, entrada_1, entrada_esperada')
         .eq('colaborador_id', colab.id)
-        .gte('data', d.toISOString().split('T')[0])
+        .gte('data', formatDateLocalISO(d))
         .order('data', { ascending: true });
       if (error) throw error;
       return data || [];
