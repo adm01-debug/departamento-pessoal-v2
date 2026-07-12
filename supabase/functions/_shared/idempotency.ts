@@ -191,7 +191,7 @@ export async function beginIdempotency(
 
     .update({ status: "in_progress", request_hash: requestHash, response_body: null, response_status: null, completed_at: null })
     .eq("id", existing.id);
-  return { skipped: false, id: existing.id };
+  return { skipped: false, id: existing.id, reason: 'RETRY_AFTER_FAILURE', existingId: existing.id, keyHash, requestHash };
 }
 
 export async function completeIdempotency(
