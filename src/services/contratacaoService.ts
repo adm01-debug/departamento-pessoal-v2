@@ -1,6 +1,26 @@
 import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
 import { Database } from '@/integrations/supabase/types';
+import DOMPurify from 'dompurify';
+
+// Escapa HTML para prevenir XSS em dados vindos do usuário/candidato.
+const esc = (v: unknown): string => {
+  if (v === null || v === undefined) return '—';
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+// Token criptograficamente seguro (24 chars alfanuméricos).
+const secureToken = (len = 24): string => {
+  const bytes = new Uint8Array(len);
+  crypto.getRandomValues(bytes);
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from(bytes, b => alphabet[b % alphabet.length]).join('');
+};
 
 type Empresa = Database['public']['Tables']['empresas']['Row'];
 type Admissao = Database['public']['Tables']['admissoes']['Row'];
