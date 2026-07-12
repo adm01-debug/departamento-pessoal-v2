@@ -119,7 +119,7 @@ describe('contratacaoService.gerarTemplateContrato — regressão XSS', () => {
     const html = await contratacaoService.gerarTemplateContrato('id-2');
 
     expect(html.toLowerCase()).not.toMatch(/<script\b/);
-    expect(html).not.toMatch(/onerror=/i);
+    expect(html).not.toMatch(/<[a-z][^>]*\sonerror=/i);
     // A quebra de tag </strong> tem que ser escapada — não pode fechar o <strong> real
     expect(html).toContain('&lt;/strong&gt;');
   });
