@@ -7020,6 +7020,7 @@ export type Database = {
           empresa_id: string | null
           entregue_por: string | null
           epi_id: string
+          hash_integridade: string | null
           id: string
           motivo: string | null
           observacoes: string | null
@@ -7034,6 +7035,7 @@ export type Database = {
           empresa_id?: string | null
           entregue_por?: string | null
           epi_id: string
+          hash_integridade?: string | null
           id?: string
           motivo?: string | null
           observacoes?: string | null
@@ -7048,6 +7050,7 @@ export type Database = {
           empresa_id?: string | null
           entregue_por?: string | null
           epi_id?: string
+          hash_integridade?: string | null
           id?: string
           motivo?: string | null
           observacoes?: string | null
