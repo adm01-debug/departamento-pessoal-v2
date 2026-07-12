@@ -51,11 +51,6 @@ function canonicalize(obj: unknown): string {
   return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonicalize((obj as Record<string, unknown>)[k])).join(',') + '}';
 }
 
-function approxEq(a: number | null | undefined, b: number | null | undefined): boolean {
-  const av = Number(a ?? 0);
-  const bv = Number(b ?? 0);
-  return Math.abs(av - bv) <= TOLERANCE;
-}
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
