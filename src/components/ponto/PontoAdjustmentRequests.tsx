@@ -16,12 +16,12 @@ import { exportPortaria671PDF } from '@/services/exportService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format, parseISO } from 'date-fns';
-import type { Row } from '@/types/db';
+import type { LooseRow } from '@/types/db';
 
 export function PontoAdjustmentRequests() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
-  const [selectedRequest, setSelectedRequest] = useState<Row<'solicitacoes_ajuste_ponto'> | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<LooseRow<'solicitacoes_ajuste_ponto'> | null>(null);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 

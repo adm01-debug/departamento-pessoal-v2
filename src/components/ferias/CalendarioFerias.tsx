@@ -15,7 +15,7 @@ import type { UnknownRecord } from '@/types/db';
 export function CalendarioFerias() {
   const { ferias } = useFerias();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedEvent, setSelectedEvent] = useState<UnknownRecord | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Record<string, any> | null>(null);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);

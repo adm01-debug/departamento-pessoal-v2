@@ -15,10 +15,10 @@ import type { UnknownRecord } from '@/types/db';
 
 
 export function SystemHealthTab() {
-  const [healthData, setHealthData] = useState<UnknownRecord | null>(null);
+  const [healthData, setHealthData] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
-  const [cleanupResult, setCleanupResult] = useState<UnknownRecord | null>(null);
-  const [backupResult, setBackupResult] = useState<UnknownRecord | null>(null);
+  const [cleanupResult, setCleanupResult] = useState<Record<string, any> | null>(null);
+  const [backupResult, setBackupResult] = useState<Record<string, any> | null>(null);
   const [backupId, setBackupId] = useState('');
 
   const runHealthcheck = async () => {
