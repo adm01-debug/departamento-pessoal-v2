@@ -1,5 +1,5 @@
 import { PageTitle } from '@/components/PageTitle';
-import DOMPurify from 'dompurify';
+import { sanitizeContractHtml } from '@/utils/sanitizeHtml';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
