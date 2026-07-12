@@ -74,6 +74,33 @@ Deno.serve(async (req: Request) => {
       auditByAcao[r.acao ?? 'unknown'] = (auditByAcao[r.acao ?? 'unknown'] ?? 0) + 1;
     }
 
+    // Alertas Slack (opt-in via SLACK_WEBHOOK_URL). No-op se não configurado.
+    // Thresholds conservadores; ajustar via env se necessário.
+    const conflictCount = idempByStatus['conflict'] ?? 0;
+    const failedCount = idempByStatus['failed'] ?? 0;
+    const conflictThreshold = Number(Deno.env.get('FOLHA_ALERT_CONFLICT_THRESHOLD') ?? '20');
+    const failedThreshold = Number(Deno.env.get('FOLHA_ALERT_FAILED_THRESHOLD') ?? '5');
+    const slackUrl = Deno.env.get('SLACK_WEBHOOK_URL');
+    let alerted = false;
+    if (slackUrl && (conflictCount >= conflictThreshold || failedCount >= failedThreshold)) {
+      try {
+        await fetch(slackUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text:
+              `:warning: *Folha — anomalia nas últimas 24h*\n` +
+              `• conflitos idempotência: *${conflictCount}* (limite ${conflictThreshold})\n` +
+              `• falhas: *${failedCount}* (limite ${failedThreshold})\n` +
+              `• eventos folha: ${JSON.stringify(auditByAcao)}`,
+          }),
+        });
+        alerted = true;
+      } catch (e) {
+        console.error('[folha-metrics] slack falhou:', (e as Error)?.message);
+      }
+    }
+
     return jsonOk({
       window_hours: 24,
       generated_at: new Date().toISOString(),
@@ -85,6 +112,11 @@ Deno.serve(async (req: Request) => {
       folha_audit: {
         total: (audit ?? []).length,
         by_acao: auditByAcao,
+      },
+      alerts: {
+        slack_configured: Boolean(slackUrl),
+        triggered: alerted,
+        thresholds: { conflict: conflictThreshold, failed: failedThreshold },
       },
     });
   } catch (e) {
