@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: vi.fn(),
+    functions: { invoke: vi.fn() },
   },
 }));
 
