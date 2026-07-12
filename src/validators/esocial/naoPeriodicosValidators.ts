@@ -1,7 +1,6 @@
 // Validadores eSocial — eventos não periódicos
 import { ValidationResult, ValidationError, required, cpfValido, dataValida, ESocialData } from './helpers';
 
-const baseValidation = (): ValidationResult => ({ valid: true, errors: [], warnings: [] });
 const finishValidation = (errors: ValidationError[]): ValidationResult => ({
   valid: errors.length === 0,
   errors,
