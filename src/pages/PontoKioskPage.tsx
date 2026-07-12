@@ -33,7 +33,7 @@ export default function PontoKioskPage() {
     return () => clearInterval(interval);
   }, [isSyncing]);
 
-  const handleSync = async () => {
+  const handleSync = useCallback(async () => {
     if (isSyncing || !navigator.onLine) return;
     setIsSyncing(true);
     try {
@@ -47,7 +47,7 @@ export default function PontoKioskPage() {
       setIsSyncing(false);
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     }
-  };
+  }, [isSyncing]);
 
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i); }, []);
 
