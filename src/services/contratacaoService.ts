@@ -54,15 +54,15 @@ export const contratacaoService = {
           <strong>CNPJ:</strong> ${empresa?.cnpj || '—'}<br>
           <strong>ENDEREÇO:</strong> ${empresa?.logradouro || '—'}, ${empresa?.numero || '—'} - ${empresa?.cidade || '—'}/${empresa?.uf || '—'}</p>
 
-          <p><strong>EMPREGADO:</strong> ${admissao.nome}<br>
-          <strong>CPF:</strong> ${admissao.cpf || '—'}<br>
-          <strong>ENDEREÇO:</strong> {(admissao.metadata as Record<string, any>)?.endereco || 'Residência informada no cadastro'}</p>
+          <p><strong>EMPREGADO:</strong> ${esc(admissao.nome)}<br>
+          <strong>CPF:</strong> ${esc(admissao.cpf || '—')}<br>
+          <strong>ENDEREÇO:</strong> ${esc((admissao.metadata as Record<string, any>)?.endereco || 'Residência informada no cadastro')}</p>
         </div>
 
         <p>As partes acima qualificadas celebram o presente contrato sob as cláusulas seguintes:</p>
 
         <h3 style="color: #2c5282;">CLÁUSULA 1ª - DA FUNÇÃO</h3>
-        <p>O EMPREGADO é contratado para exercer a função de <strong>${admissao.cargo}</strong>, junto ao departamento de <strong>${admissao.departamento}</strong>, comprometendo-se a realizar todas as tarefas inerentes ao cargo com diligência e ética profissional.</p>
+        <p>O EMPREGADO é contratado para exercer a função de <strong>${esc(admissao.cargo)}</strong>, junto ao departamento de <strong>${esc(admissao.departamento)}</strong>, comprometendo-se a realizar todas as tarefas inerentes ao cargo com diligência e ética profissional.</p>
 
         <h3 style="color: #2c5282;">CLÁUSULA 2ª - DA REMUNERAÇÃO</h3>
         <p>Pelo trabalho realizado, o EMPREGADOR pagará ao EMPREGADO o salário mensal bruto de <strong>R$ ${Number(admissao.salario_proposto).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>, pago até o quinto dia útil do mês subsequente ao vencido.</p>
@@ -76,7 +76,7 @@ export const contratacaoService = {
         <div style="margin-top: 60px; border: 1px dashed #cbd5e0; padding: 20px; text-align: center; border-radius: 8px; background: #f8fafc;">
           <p style="margin: 0; font-weight: bold; color: #4a5568;">CERTIFICADO DE ASSINATURA DIGITAL</p>
           <p style="font-size: 12px; color: #718096; margin: 5px 0;">Este documento será assinado eletronicamente mediante token de segurança único.</p>
-          <p style="font-size: 10px; color: #a0aec0;">ID de Admissão: ${admissao.id}<br>Data de Geração: ${new Date().toLocaleString('pt-BR')}</p>
+          <p style="font-size: 10px; color: #a0aec0;">ID de Admissão: ${esc(admissao.id)}<br>Data de Geração: ${new Date().toLocaleString('pt-BR')}</p>
         </div>
       </div>
     `;
