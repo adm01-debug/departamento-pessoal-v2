@@ -151,25 +151,17 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Idempotência
-      const idem = req.headers.get('idempotency-key')?.slice(0, 128) ?? null;
-      if (idem) {
-        const { data: existing } = await service
-          .from('pix_lotes')
-          .select('id, status, valor_total, quantidade_pagamentos, created_at')
-          .eq('empresa_id', payload.empresa_id)
-          .gte('created_at', new Date(Date.now() - 10 * 60_000).toISOString())
-          .eq('quantidade_pagamentos', payload.itens.length)
-          .eq('valor_total', Number(soma) / 100)
-          .limit(1)
-          .maybeSingle();
-        if (existing) {
-          return new Response(
-            JSON.stringify({ success: true, alreadyCreated: true, lote_id: existing.id }),
-            { status: 200, headers: noStore },
-          );
-        }
-      }
+      // Idempotência transacional (shared helper)
+      const idemKey = extractIdempotencyKey(req, payload);
+      const idem = await beginIdempotency(service, {
+        endpoint: 'pix-lote:criar',
+        key: idemKey,
+        requestBody: { empresa_id: payload.empresa_id, itens: payload.itens, valor_total_centavos: payload.valor_total_centavos },
+        empresaId: payload.empresa_id,
+        userId,
+      });
+      if (idem.replay) return idem.replay;
+      if (idem.conflict) return idem.conflict;
 
       // Insert lote
       const { data: lote, error: loteErr } = await service
@@ -182,7 +174,10 @@ Deno.serve(async (req) => {
         })
         .select('id')
         .single();
-      if (loteErr || !lote) throw loteErr ?? new Error('Falha ao criar lote');
+      if (loteErr || !lote) {
+        await failIdempotency(service, idem.id);
+        throw loteErr ?? new Error('Falha ao criar lote');
+      }
 
       // Insert itens
       const itensInsert = payload.itens.map((i) => ({
@@ -197,8 +192,18 @@ Deno.serve(async (req) => {
       const { error: itensErr } = await service.from('pix_itens').insert(itensInsert);
       if (itensErr) {
         await service.from('pix_lotes').delete().eq('id', lote.id);
+        await failIdempotency(service, idem.id);
         throw itensErr;
       }
+
+      const auditPayload = {
+        empresa_id: payload.empresa_id,
+        lote_id: lote.id,
+        quantidade: payload.itens.length,
+        valor_total_centavos: Number(soma),
+        exige_dupla_aprovacao: soma >= DUPLA_APROVACAO_CENTAVOS,
+      };
+      const auditHash = await integrityHash(auditPayload);
 
       await service.from('auditoria').insert({
         acao: 'PIX_LOTE_CRIADO',
@@ -207,26 +212,27 @@ Deno.serve(async (req) => {
         empresa_id: payload.empresa_id,
         usuario_id: userId,
         dados_novos: {
-          quantidade: payload.itens.length,
-          valor_total_centavos: Number(soma),
+          ...auditPayload,
           amostra: payload.itens.slice(0, 3).map((i) => ({
             tipo: i.tipo_chave,
             chave_mascarada: mascarar(i.tipo_chave, i.chave_pix),
             valor_centavos: i.valor_centavos,
           })),
-          exige_dupla_aprovacao: soma >= DUPLA_APROVACAO_CENTAVOS,
+          integrity_hash: auditHash,
         },
       });
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          lote_id: lote.id,
-          exige_dupla_aprovacao: soma >= DUPLA_APROVACAO_CENTAVOS,
-        }),
-        { status: 201, headers: noStore },
-      );
+      const responseBody = {
+        success: true,
+        lote_id: lote.id,
+        exige_dupla_aprovacao: soma >= DUPLA_APROVACAO_CENTAVOS,
+        integrity_hash: auditHash,
+      };
+      await completeIdempotency(service, idem.id, 201, responseBody);
+      return new Response(JSON.stringify(responseBody), { status: 201, headers: noStore });
     }
+
+
 
     // ---------- APROVAR ----------
     const { data: lote, error: findErr } = await service
