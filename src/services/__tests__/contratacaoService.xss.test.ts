@@ -159,7 +159,7 @@ describe('contratacaoService.gerarTemplateContrato — regressão XSS', () => {
 });
 
 describe('DOMPurify (defesa em profundidade da renderização) ', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('mesmo que o template produzisse <script>, DOMPurify removeria', () => {
     const dirty = '<div><script>alert(1)</script><p>ok</p></div>';

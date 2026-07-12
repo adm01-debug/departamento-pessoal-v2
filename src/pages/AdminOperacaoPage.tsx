@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { UnifiedAuditSection } from '@/components/admin/UnifiedAuditSection';
 
 interface DlqRow { tipo_tarefa: string; total_dlq: number; mais_recente: string | null; ultimo_erro_sample: string | null }
 interface ConflictRow { competencia: string; conflitos: number; ultimo_em: string }
@@ -339,73 +340,6 @@ export default function AdminOperacaoPage() {
   );
 }
 
-interface AuditRow {
-  id: string; source_table: string; source_id: string | null; empresa_id: string | null;
-  user_id: string | null; action: string | null; entity: string | null; entity_id: string | null;
-  payload: any; ip_address: string | null; occurred_at: string;
-}
+// UnifiedAuditSection foi extraído para src/components/admin/UnifiedAuditSection.tsx
+// para viabilizar testes de integração isolados.
 
-function UnifiedAuditSection() {
-  const [sourceFilter, setSourceFilter] = useState<string>('');
-  const [enabled, setEnabled] = useState(false);
-
-  const audit = useQuery({
-    queryKey: ['admin-op', 'audit-unified', sourceFilter],
-    enabled,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('search_audit_unified' as never, {
-        _source_table: sourceFilter || null,
-        _limit: 100,
-      } as never);
-      if (error) throw error;
-      return (data ?? []) as AuditRow[];
-    },
-    staleTime: 30_000,
-  });
-
-  return (
-    <SectionCard title="Log de Auditoria Unificado (30d)" icon={ScrollText} badge={`${audit.data?.length ?? 0} eventos`}>
-      <div className="flex flex-wrap gap-2 mb-3">
-        <Input
-          placeholder="Filtrar por tabela (ex: folha_auditoria) — vazio = todas"
-          value={sourceFilter}
-          onChange={(e) => setSourceFilter(e.target.value.trim())}
-          className="max-w-sm"
-        />
-        <Button size="sm" variant="outline" onClick={() => { setEnabled(true); audit.refetch(); }}>
-          <RefreshCw className="h-4 w-4 mr-1" /> Buscar
-        </Button>
-      </div>
-      {!enabled ? <EmptyState msg="Clique em Buscar para carregar os últimos 100 eventos consolidados." /> :
-       audit.isLoading ? <Skeleton className="h-24" /> :
-       audit.isError ? <EmptyState msg="Falha ao carregar log unificado (requer admin)." /> :
-       !audit.data?.length ? <EmptyState msg="Nenhum evento no período." /> : (
-        <div className="space-y-2 max-h-[500px] overflow-y-auto">
-          {audit.data.map(r => (
-            <div key={r.id} className="p-3 rounded-md border border-border/50 text-sm">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="font-mono text-[10px]">{r.source_table}</Badge>
-                {r.action && <Badge variant="secondary" className="text-[10px]">{r.action}</Badge>}
-                {r.entity && <span className="font-mono text-xs text-muted-foreground">{r.entity}{r.entity_id ? `#${r.entity_id}` : ''}</span>}
-                <span className="text-xs text-muted-foreground ml-auto">
-                  {formatDistanceToNow(new Date(r.occurred_at), { addSuffix: true, locale: ptBR })}
-                </span>
-              </div>
-              {(r.user_id || r.ip_address) && (
-                <p className="text-xs text-muted-foreground mt-1 font-mono">
-                  {r.user_id && <>user: {r.user_id.slice(0, 8)}… </>}
-                  {r.ip_address && <>· ip: {r.ip_address}</>}
-                </p>
-              )}
-              {r.payload && Object.keys(r.payload).length > 0 && (
-                <pre className="text-[11px] text-muted-foreground mt-1 font-mono truncate overflow-hidden">
-                  {JSON.stringify(r.payload).slice(0, 240)}
-                </pre>
-              )}
-            </div>
-          ))}
-        </div>
-       )}
-    </SectionCard>
-  );
-}
