@@ -13,21 +13,25 @@ import { assinarXMLEsocial } from './utils/signer.ts';
 import { corsHeaders, createErrorResponse } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const BodySchema = z.object({
   empresaId: z.string().uuid(),
   eventoId: z.string().uuid(),
+  idempotency_key: z.string().optional(),
+  idempotencyKey: z.string().optional(),
 });
 
 const SIMULATE = (Deno.env.get('ESOCIAL_SIMULATE') ?? 'true').toLowerCase() === 'true';
 
 const NO_STORE = { 'Cache-Control': 'no-store' };
 
-async function sha256Hex(s: string): Promise<string> {
-  const buf = new TextEncoder().encode(s);
-  const h = await crypto.subtle.digest('SHA-256', buf);
-  return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
 /** Escape XML — bloqueia injection via qualquer campo dinâmico. */
 function xmlEscape(v: unknown): string {
