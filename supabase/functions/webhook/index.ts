@@ -32,6 +32,22 @@ async function verifySignature(payload: string, signature: string | null, secret
   }
 }
 
+// Onda 29: hardening — payload cap, replay TTL via timestamp, redação de headers sensíveis.
+const MAX_PAYLOAD_BYTES = 1_048_576; // 1 MiB
+const REPLAY_TTL_SECONDS = 300; // 5 min
+const SENSITIVE_HEADERS = new Set([
+  'authorization', 'cookie', 'set-cookie', 'x-api-key', 'apikey',
+  'x-hub-signature-256', 'x-hub-signature', 'x-webhook-signature',
+]);
+
+function redactHeaders(headers: Headers): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of headers.entries()) {
+    out[k] = SENSITIVE_HEADERS.has(k.toLowerCase()) ? '[REDACTED]' : v;
+  }
+  return out;
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -40,7 +56,13 @@ serve(async (req: Request): Promise<Response> => {
   return withMonitoring(req, 'webhook', async (supabase) => {
     const secret = Deno.env.get('WEBHOOK_SECRET');
     const signature = req.headers.get('x-hub-signature-256');
+    const timestampHeader = req.headers.get('x-webhook-timestamp');
     const payloadText = await req.clone().text();
+
+    // Payload cap — evita DoS por corpo gigante
+    if (payloadText.length > MAX_PAYLOAD_BYTES) {
+      return createErrorResponse('Payload muito grande', 413, 'PAYLOAD_TOO_LARGE');
+    }
 
     // Fail-closed: sem secret configurado, recusa TODAS as requisições (503).
     if (!secret) {
@@ -52,10 +74,25 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Assinatura ausente ou inválida => 401.
-    if (!(await verifySignature(payloadText, signature, secret))) {
+    // Replay TTL: se timestamp vier, deve estar dentro da janela.
+    if (timestampHeader) {
+      const ts = Number(timestampHeader);
+      if (!Number.isFinite(ts)) {
+        return createErrorResponse('Timestamp inválido', 401, 'INVALID_TIMESTAMP');
+      }
+      const skewSec = Math.abs(Date.now() / 1000 - ts);
+      if (skewSec > REPLAY_TTL_SECONDS) {
+        return createErrorResponse('Timestamp fora da janela', 401, 'TIMESTAMP_EXPIRED');
+      }
+    }
+
+    // Assinatura ausente ou inválida => 401. (crypto.subtle.verify é timing-safe.)
+    // Se timestamp presente, assina "<timestamp>.<body>" para bloquear replay com novo ts.
+    const signedPayload = timestampHeader ? `${timestampHeader}.${payloadText}` : payloadText;
+    if (!(await verifySignature(signedPayload, signature, secret))) {
       return createErrorResponse('Assinatura inválida', 401, 'INVALID_SIGNATURE');
     }
+
 
     const { data, errorResponse } = await validateRequest(req, webhookSchema);
     if (errorResponse) return errorResponse;
@@ -73,27 +110,30 @@ serve(async (req: Request): Promise<Response> => {
     if (existing) {
       return new Response(
         JSON.stringify({ success: true, replay: true, event_id: webhookData.event_id }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, status: 200 }
       );
     }
 
     // Auditoria do recebimento (event_id UNIQUE serve como lock lógico contra corridas)
+    // Auditoria do recebimento (event_id UNIQUE serve como lock lógico contra corridas).
+    // Redigimos headers sensíveis para evitar vazar tokens em logs/DB.
     const { error: insertErr } = await supabase.from('webhook_logs').insert({
       event_id: webhookData.event_id,
       evento: webhookData.event,
       payload: webhookData,
-      headers: Object.fromEntries(req.headers.entries()),
+      headers: redactHeaders(req.headers),
       status: 'received',
       version: webhookData.version,
       tentativa: 1,
     });
 
 
+
     // Se corrida entre 2 workers → conflito de UNIQUE → tratamos como replay
     if (insertErr && (insertErr.code === '23505' || /duplicate|unique/i.test(insertErr.message))) {
       return new Response(
         JSON.stringify({ success: true, replay: true, event_id: webhookData.event_id }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }, status: 200 }
       );
     }
     if (insertErr) {
@@ -120,7 +160,7 @@ serve(async (req: Request): Promise<Response> => {
 
     return new Response(
       JSON.stringify({ success: true, data: result, version: webhookData.version, event_id: webhookData.event_id }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
     );
   });
 });
