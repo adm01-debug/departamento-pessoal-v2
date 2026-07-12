@@ -272,7 +272,7 @@ Deno.serve(async (req) => {
       itens_count: itens.length,
       totais,
     };
-    const integrityHash = await sha256Hex(canonicalize(integritySnapshot));
+    const integrityHash = await computeIntegrityHash(integritySnapshot);
 
     // Auditoria detalhada (financeira + idempotência + integridade)
     await admin.from('audit_log').insert({
