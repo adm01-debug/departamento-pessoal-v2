@@ -49,8 +49,30 @@ export default tseslint.config(
       "react-hooks/purity": "warn",
       "react-hooks/immutability": "warn",
       "react-hooks/preserve-manual-memoization": "warn",
+      // Guard anti-regressão do bug de timezone (turno anterior). O padrão
+      // `new Date().toISOString().split('T')[0]` grava a data em UTC — usuários
+      // em UTC-3 registrando à noite salvam o dia seguinte no banco. Sempre use
+      // `todayLocalISO()` / `formatDateLocalISO()` de `@/utils/dateLocal`.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.object.callee.property.name='toISOString'][callee.property.name=/^(split|substring|substr|slice)$/]",
+          message:
+            "Não use `.toISOString().split('T')[0]` para gerar data local — causa off-by-one em fusos negativos. Use `todayLocalISO()` ou `formatDateLocalISO()` de `@/utils/dateLocal`.",
+        },
+      ],
     },
   },
+  {
+    // O próprio utilitário canônico e as edge functions (Deno, server-side em UTC)
+    // podem usar `toISOString()` livremente — não representam o bug de fuso local.
+    files: ["src/utils/dateLocal.ts", "supabase/functions/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
+    },
+  },
+
   {
     // Componentes de UI "vendored" (shadcn/ui) usam @ts-nocheck e ficam fora do
     // typecheck (excluídos no tsconfig). Permitimos diretivas ts-comment aqui.
