@@ -6,8 +6,9 @@ import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Cache-Control': 'no-store',
 };
 
 const BodySchema = z.discriminatedUnion('action', [
@@ -103,24 +104,29 @@ serve(async (req: Request): Promise<Response> => {
         body.ipAddress ??
         'unknown';
 
-      const { error: updateErr } = await supabase
+      const { data: updated, error: updateErr } = await supabase
         .from('admissao_tokens')
         .update({
           contrato_assinado: true,
           assinado_em: nowIso,
           assinatura_base64: body.assinaturaBase64,
           ip_assinatura: clientIp,
+          hash_assinatura: hashHex,
         })
         .eq('id', body.tokenId)
-        .eq('contrato_assinado', false); // proteção contra race condition (double-sign)
+        .eq('contrato_assinado', false) // proteção contra race condition (double-sign)
+        .select('id')
+        .maybeSingle();
       if (updateErr) throw updateErr;
+      if (!updated) return json({ success: false, error: 'Contrato já assinado' }, 409);
 
-      await supabase.from('audit_log').insert({
+      const { error: auditErr } = await supabase.from('audit_log').insert({
         tabela: 'admissao_tokens',
         registro_id: body.tokenId,
         acao: 'ASSINATURA_DIGITAL',
         dados_novos: { hash: hashHex, ip: clientIp, timestamp: nowIso },
       });
+      if (auditErr) throw auditErr;
 
       return json({ success: true, data: { hash: hashHex, assinado_em: nowIso } });
     }
@@ -133,10 +139,11 @@ serve(async (req: Request): Promise<Response> => {
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) return json({ success: false, error: 'Sessão inválida' }, 401);
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims?.sub) return json({ success: false, error: 'Sessão inválida' }, 401);
 
-    const { data: isAdm } = await supabase.rpc('is_admin', { _user_id: userData.user.id });
+    const { data: isAdm } = await supabase.rpc('is_admin', { _user_id: claimsData.claims.sub });
     if (!isAdm) return json({ success: false, error: 'Requer perfil administrador' }, 403);
 
     const { data: tokens, error } = await supabase

@@ -41,11 +41,12 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) {
+    const jwtToken = jwt;
+    const { data: claimsData, error: userErr } = await userClient.auth.getClaims(jwtToken);
+    if (userErr || !claimsData?.claims?.sub) {
       return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     }
-    const user = userData.user;
+    const user = { id: claimsData.claims.sub as string };
 
     // 3) Validação
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
@@ -142,7 +143,15 @@ serve(async (req: Request): Promise<Response> => {
       data: snapshot,
     });
 
+    // Hash SHA-256 de integridade (não-repúdio + verificação pós-upload)
+    const payloadBytes = new TextEncoder().encode(payloadStr);
+    const hashBuf = await crypto.subtle.digest('SHA-256', payloadBytes);
+    const payloadHash = Array.from(new Uint8Array(hashBuf))
+      .map((b) => b.toString(16).padStart(2, '0')).join('');
+    const bytesSize = payloadBytes.byteLength;
+
     let signedUrl: string | null = null;
+    let integrityVerified = false;
     if (destino === 'storage') {
       const { error: upErr } = await admin.storage
         .from('backups')
@@ -154,20 +163,43 @@ serve(async (req: Request): Promise<Response> => {
         await captureException(upErr, { function: 'backup-automatico', empresaId });
         return createErrorResponse('Falha ao gravar backup', 500, 'STORAGE_ERROR');
       }
+
+      // Verificação de integridade: re-download e compara hash
+      try {
+        const { data: dl, error: dlErr } = await admin.storage.from('backups').download(path);
+        if (dlErr || !dl) throw dlErr ?? new Error('download vazio');
+        const dlBuf = new Uint8Array(await dl.arrayBuffer());
+        const verifyBuf = await crypto.subtle.digest('SHA-256', dlBuf);
+        const verifyHash = Array.from(new Uint8Array(verifyBuf))
+          .map((b) => b.toString(16).padStart(2, '0')).join('');
+        integrityVerified = verifyHash === payloadHash;
+        if (!integrityVerified) {
+          await captureException(new Error('Backup integrity mismatch'), { path, expected: payloadHash, got: verifyHash });
+          return createErrorResponse('Falha de integridade no backup', 500, 'INTEGRITY_ERROR');
+        }
+      } catch (verifyErr) {
+        await captureException(verifyErr, { function: 'backup-automatico:verify', path });
+        return createErrorResponse('Falha ao verificar integridade do backup', 500, 'INTEGRITY_ERROR');
+      }
+
       const { data: signed } = await admin.storage
         .from('backups')
         .createSignedUrl(path, 60 * 60 * 24); // 24h TTL
       signedUrl = signed?.signedUrl ?? null;
     }
 
-    // 7) Audit log
-    await admin.from('audit_log').insert({
+    // 7) Audit log com hash de integridade
+    const { error: auditErr } = await admin.from('audit_log').insert({
       user_id: user.id,
       empresa_id: empresaId,
       acao: 'BACKUP_RUN',
       entidade: 'backup',
-      dados_novos: { path, counts, tables: targetTables, destino },
+      dados_novos: {
+        path, counts, tables: targetTables, destino,
+        sha256: payloadHash, bytes: bytesSize, integrity_verified: integrityVerified,
+      },
     });
+    if (auditErr) throw auditErr;
 
     return new Response(JSON.stringify({
       ok: true,
@@ -175,10 +207,13 @@ serve(async (req: Request): Promise<Response> => {
       counts,
       path: destino === 'storage' ? path : null,
       signed_url: signedUrl,
+      sha256: payloadHash,
+      bytes: bytesSize,
+      integrity_verified: integrityVerified,
       inline: destino === 'inline' ? snapshot : undefined,
     }), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Cache-Control': 'no-store', 'Content-Type': 'application/json' },
     });
   } catch (err) {
     await captureException(err, { function: 'backup-automatico' });

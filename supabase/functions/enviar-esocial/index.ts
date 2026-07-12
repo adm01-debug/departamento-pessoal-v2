@@ -21,6 +21,14 @@ const BodySchema = z.object({
 
 const SIMULATE = (Deno.env.get('ESOCIAL_SIMULATE') ?? 'true').toLowerCase() === 'true';
 
+const NO_STORE = { 'Cache-Control': 'no-store' };
+
+async function sha256Hex(s: string): Promise<string> {
+  const buf = new TextEncoder().encode(s);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 /** Escape XML — bloqueia injection via qualquer campo dinâmico. */
 function xmlEscape(v: unknown): string {
   if (v === null || v === undefined) return '';
@@ -56,9 +64,10 @@ serve(async (req: Request): Promise<Response> => {
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    if (userErr || !userData?.user) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
-    const userId = userData.user.id;
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims?.sub) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
+    const userId = claimsData.claims.sub as string;
 
     // Payload
     let raw: unknown;
@@ -94,7 +103,7 @@ serve(async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({
         success: true, protocolo: evento.protocolo, recibo: evento.recibo,
         alreadySent: true, tentativas: evento.tentativas_envio ?? 0,
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }), { headers: { ...corsHeaders, ...NO_STORE, 'Content-Type': 'application/json' } });
     }
 
     // 2. Config
@@ -168,21 +177,23 @@ serve(async (req: Request): Promise<Response> => {
       .eq('id', eventoId)
       .eq('empresa_id', empresaId);
 
-    // 7. Auditoria
-    supabase.from('audit_log').insert({
+    // 7. Auditoria bloqueante (não-repúdio) com hash do XML+resposta
+    const auditHash = await sha256Hex(xmlAssinado + '|' + responseXml + '|' + (protocolo ?? ''));
+    const { error: auditErr } = await supabase.from('audit_log').insert({
       tabela: 'esocial_eventos',
       registro_id: eventoId,
       acao: 'ESOCIAL_TRANSMIT',
       user_id: userId,
       dados_novos: {
         empresa_id: empresaId, tipo_evento: evento.tipo_evento,
-        ambiente, success, tentativas, hash,
+        ambiente, success, tentativas, hash, audit_hash: auditHash,
       },
-    }).then(() => {}, () => {});
+    });
+    if (auditErr) throw auditErr;
 
     return new Response(JSON.stringify({
-      success, protocolo, recibo, error: erroGov?.mensagem, tentativas,
-    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      success, protocolo, recibo, error: erroGov?.mensagem, tentativas, audit_hash: auditHash,
+    }), { headers: { ...corsHeaders, ...NO_STORE, 'Content-Type': 'application/json' } });
   } catch (error) {
     try { captureException(error, { fn: 'enviar-esocial' }); } catch { /* noop */ }
     return createErrorResponse('Erro interno na transmissão eSocial', 500, 'INTERNAL_SERVER_ERROR');
