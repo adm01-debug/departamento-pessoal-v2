@@ -226,6 +226,7 @@ export default function App() {
         {/* Admin */}
         <Route path="admin/telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />
         <Route path="admin/idempotencia" element={<AdminRoute><LazyPage Component={AdminIdempotenciaPage} /></AdminRoute>} />
+        <Route path="admin/operacao" element={<AdminRoute><LazyPage Component={AdminOperacaoPage} /></AdminRoute>} />
         
         {/* Outras páginas legadas ou em migração */}
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
