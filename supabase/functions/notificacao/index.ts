@@ -73,9 +73,11 @@ serve(async (req: Request): Promise<Response> => {
           );
         }
 
-        // Sanitização mínima de tamanho (evita abuso)
-        const safeAssunto = (assunto ?? 'Notificação').slice(0, 200);
-        const safeConteudo = (conteudo ?? '').slice(0, 5000);
+        // Sanitização: strip de tags HTML + cap de tamanho (evita XSS no cliente e abuso).
+        const stripHtml = (s: string) => s.replace(/<[^>]*>/g, '').replace(/[\u0000-\u001F\u007F]/g, '');
+        const safeAssunto = stripHtml(assunto ?? 'Notificação').slice(0, 200);
+        const safeConteudo = stripHtml(conteudo ?? '').slice(0, 5000);
+
 
         let enviadas = 0;
         for (const dest of destinatarios) {
