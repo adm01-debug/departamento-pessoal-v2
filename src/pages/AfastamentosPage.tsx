@@ -60,7 +60,7 @@ export default function AfastamentosPage() {
     ativos: afastamentos.filter((a: any) => a.status === 'ativo').length,
     pendentes: afastamentos.filter((a: any) => a.status === 'pendente').length,
     finalizados: afastamentos.filter((a: any) => a.status === 'finalizado' || a.status === 'concluido').length,
-    diasTotais: afastamentos.reduce((sum: number, a: any) => sum + (a.dias_total || 0), 0),
+    diasTotais: afastamentos.reduce<number>((sum, a: any) => sum + Number(a.dias_total || 0), 0),
   };
 
   const filteredAfastamentos = afastamentos.filter((a: any) => {
