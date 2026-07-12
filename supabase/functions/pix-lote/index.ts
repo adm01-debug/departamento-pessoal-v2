@@ -13,6 +13,13 @@ import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
 import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+import { integrityHash } from '../_shared/integrityHash.ts';
 
 const MAX_ITENS = 5_000;
 const MAX_VALOR_LOTE_CENTAVOS = 500_000_000n; // R$ 5.000.000,00
@@ -68,12 +75,15 @@ const bodySchema = z.discriminatedUnion('action', [
     empresa_id: z.string().uuid(),
     itens: z.array(itemSchema).min(1).max(MAX_ITENS),
     valor_total_centavos: z.number().int().positive(),
+    idempotency_key: z.string().optional(),
+    idempotencyKey: z.string().optional(),
   }),
   z.object({
     action: z.literal('aprovar'),
     lote_id: z.string().uuid(),
   }),
 ]);
+
 
 // ---------- Handler ----------
 Deno.serve(async (req) => {
