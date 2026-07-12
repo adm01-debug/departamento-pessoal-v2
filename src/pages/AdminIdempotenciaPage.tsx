@@ -50,10 +50,7 @@ export default function AdminIdempotenciaPage() {
   return (
     <div className="space-y-6 p-4 md:p-6">
       <div className="flex items-center justify-between">
-        <PageTitle
-          title="Idempotência — Saúde Operacional"
-          subtitle="Monitoramento em tempo real das chaves transacionais (24h)"
-        />
+        <PageTitle title="Idempotência — Saúde Operacional" />
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           Atualizar
