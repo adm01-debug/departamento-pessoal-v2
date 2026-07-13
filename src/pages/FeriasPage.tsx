@@ -113,7 +113,7 @@ export default function FeriasPage() {
         dias_ferias: parseInt(calcForm.diasFerias) || 30,
         dias_abono: parseInt(calcForm.diasAbono) || 0,
       });
-      setCalcResult(result);
+      setCalcResult(result as Record<string, any>);
       toast.success('Cálculo validado pelo servidor');
     } catch (err: any) {
       console.error('Erro no cálculo server-side:', err);
