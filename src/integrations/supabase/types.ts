@@ -21224,6 +21224,7 @@ export type Database = {
     }
     Functions: {
       _is_admin_bypass: { Args: never; Returns: boolean }
+      _purge_audit_log_internal: { Args: { _dias?: number }; Returns: number }
       anonimizar_dados_pessoais: {
         Args: { target_id: string }
         Returns: undefined
