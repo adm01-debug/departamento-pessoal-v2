@@ -134,6 +134,14 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    // Rate limit — importações são custosas: 10 execuções / min / usuário
+    if (action !== 'template') {
+      const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+      const rl = await checkRateLimit(admin, { key: `importacao:${userId}`, limit: 10, windowSec: 60 });
+      if (!rl.allowed) return rateLimitResponse(rl);
+    }
+
+
     // 4) Tenant scope — obrigatório para tabelas multi-tenant
     if (TENANT_SCOPED_TABLES.has(tabela) && !empresaId && action !== 'template') {
       return createErrorResponse('empresaId é obrigatório para esta tabela', 400, 'EMPRESA_REQUIRED');

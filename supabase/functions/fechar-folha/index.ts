@@ -79,6 +79,12 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    // Rate limit — fechamento de folha é ação crítica: 5 req / min / usuário
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `fechar-folha:${userId}`, limit: 5, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
+
     // 4) Tenant scope
     const { data: belongs } = await admin.rpc('user_belongs_to_empresa', {
       _user_id: userId, _empresa_id: empresaId,
