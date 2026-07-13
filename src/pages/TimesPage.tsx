@@ -38,7 +38,7 @@ export default function TimesPage() {
   const handleSubmit = useMutation({
     mutationFn: async (d: any) => {
       if (editingItem) {
-        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id);
+        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id!);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id });
