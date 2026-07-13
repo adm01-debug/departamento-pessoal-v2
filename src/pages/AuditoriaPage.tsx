@@ -19,7 +19,6 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { LooseRow } from '@/types/db';
 const acaoColors: Record<string, string> = {
   INSERT: 'bg-success/15 text-success border-0',
   UPDATE: 'bg-info/15 text-info border-0',
@@ -30,7 +29,7 @@ export default function AuditoriaPage() {
   const [search, setSearch] = useState('');
   const [tabelaFilter, setTabelaFilter] = useState('todos');
   const [acaoFilter, setAcaoFilter] = useState('todos');
-  const [selectedLog, setSelectedLog] = useState<LooseRow<'auditoria'> | null>(null);
+  const [selectedLog, setSelectedLog] = useState<Record<string, any> | null>(null);
   const { exportarExcel } = useExcelExport();
 
   const { data: logs, isLoading } = useQuery({

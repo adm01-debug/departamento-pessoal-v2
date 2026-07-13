@@ -27,14 +27,13 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import type { LooseRow } from '@/types/db';
 interface ApprovalHubProps {
   pagamentos: any[];
 }
 
 export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
   const queryClient = useQueryClient();
-  const [selectedPagamento, setSelectedPagamento] = React.useState<LooseRow<'premiacoes_pagamentos'> | null>(null);
+  const [selectedPagamento, setSelectedPagamento] = React.useState<Record<string, any> | null>(null);
   const [comentario, setComentario] = React.useState('');
   const [isReconcileOpen, setIsReconcileOpen] = React.useState(false);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = React.useState(false);

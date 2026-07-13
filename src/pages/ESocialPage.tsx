@@ -29,7 +29,6 @@ import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
 import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
-import type { LooseRow } from '@/types/db';
 
 
 const tiposEvento = [
@@ -48,7 +47,7 @@ export default function ESocialPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedEvento, setSelectedEvento] = useState<LooseRow<'esocial_eventos'> | null>(null);
+  const [selectedEvento, setSelectedEvento] = useState<Record<string, any> | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCompetencia, setSelectedCompetencia] = useState(currentCompetenciaLocal());
