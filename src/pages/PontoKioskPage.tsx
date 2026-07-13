@@ -91,6 +91,7 @@ export default function PontoKioskPage() {
         dispositivoId: 'KIOSK-01'
       };
 
+      if (!selectedColab) return;
       if (!navigator.onLine) {
         await pontoOfflineService.queueRegistro({
           tipo,
