@@ -380,7 +380,7 @@ export default function WorkflowsPage() {
                     <p className="text-[10px] text-muted-foreground font-body mt-1">
                       A engine de workflows iniciou o processamento via `trigger_workflow_automation`.
                     </p>
-                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{new Date(selectedExec?.created_at).toLocaleString()}</span>
+                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{new Date(selectedExec?.created_at ?? Date.now()).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -394,7 +394,7 @@ export default function WorkflowsPage() {
                     <p className="text-[10px] text-muted-foreground font-body mt-1">
                       E-mail disparado para o aprovador Nível 1 (Gestor Direto).
                     </p>
-                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{new Date(selectedExec?.created_at).toLocaleString()}</span>
+                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{new Date(selectedExec?.created_at ?? Date.now()).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -428,7 +428,7 @@ export default function WorkflowsPage() {
           <DialogFooter className="p-6 bg-muted/30 border-t border-border/40">
             <Button variant="outline" className="rounded-xl font-body" onClick={() => setShowLog(false)}>Fechar Rastro</Button>
             {selectedExec?.status === 'pendente' && (
-              <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body" onClick={() => { aprovar.mutate(selectedExec.id); setShowLog(false); }}>
+              <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow font-body" onClick={() => { aprovar.mutate(selectedExec.id!); setShowLog(false); }}>
                 Forçar Aprovação
               </Button>
             )}
