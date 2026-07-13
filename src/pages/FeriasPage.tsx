@@ -43,7 +43,7 @@ export default function FeriasPage() {
   const [calcLoading, setCalcLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
-  const [calcResult, setCalcResult] = useState<any>(null);
+  const [calcResult, setCalcResult] = useState<Record<string, any> | null>(null);
   const queryClient = useQueryClient();
   
   const { ferias, totalCount, isLoading, refetch } = useFerias({ 
@@ -113,7 +113,7 @@ export default function FeriasPage() {
         dias_ferias: parseInt(calcForm.diasFerias) || 30,
         dias_abono: parseInt(calcForm.diasAbono) || 0,
       });
-      setCalcResult(result);
+      setCalcResult(result as Record<string, any>);
       toast.success('Cálculo validado pelo servidor');
     } catch (err: any) {
       console.error('Erro no cálculo server-side:', err);

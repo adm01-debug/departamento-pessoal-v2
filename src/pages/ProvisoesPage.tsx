@@ -32,13 +32,14 @@ import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
+import type { LooseRow } from '@/types/db';
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 export default function ProvisoesPage() {
   const [competencia, setCompetencia] = useState(currentCompetenciaLocal());
-  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [selectedLog, setSelectedLog] = useState<LooseRow<'provisao_logs'> | null>(null);
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
 

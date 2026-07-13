@@ -15,11 +15,12 @@ import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Plus, Users, Trash2, Edit2 } from 'lucide-react';
+import type { LooseRow } from '@/types/db';
 export default function TimesPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<LooseRow<'times'> | null>(null);
   const [form, setForm] = useState({ nome: '', descricao: '' });
 
   const { data: times = [], isLoading } = useQuery({
@@ -37,7 +38,7 @@ export default function TimesPage() {
   const handleSubmit = useMutation({
     mutationFn: async (d: any) => {
       if (editingItem) {
-        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id);
+        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id!);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id });

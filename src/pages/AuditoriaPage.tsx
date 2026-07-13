@@ -29,7 +29,7 @@ export default function AuditoriaPage() {
   const [search, setSearch] = useState('');
   const [tabelaFilter, setTabelaFilter] = useState('todos');
   const [acaoFilter, setAcaoFilter] = useState('todos');
-  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [selectedLog, setSelectedLog] = useState<Record<string, any> | null>(null);
   const { exportarExcel } = useExcelExport();
 
   const { data: logs, isLoading } = useQuery({

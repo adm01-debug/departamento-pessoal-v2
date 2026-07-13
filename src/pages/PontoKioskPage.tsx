@@ -17,7 +17,7 @@ export default function PontoKioskPage() {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'pin' | 'facial_scan' | 'action' | 'success'>('pin');
-  const [selectedColab, setSelectedColab] = useState<any>(null);
+  const [selectedColab, setSelectedColab] = useState<Record<string, any> | null>(null);
   const [offlineQueueSize, setOfflineQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -91,6 +91,7 @@ export default function PontoKioskPage() {
         dispositivoId: 'KIOSK-01'
       };
 
+      if (!selectedColab) return;
       if (!navigator.onLine) {
         await pontoOfflineService.queueRegistro({
           tipo,

@@ -19,7 +19,7 @@ import { format, parseISO } from 'date-fns';
 export function PontoAdjustmentRequests() {
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequest, setSelectedRequest] = useState<Record<string, any> | null>(null);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 

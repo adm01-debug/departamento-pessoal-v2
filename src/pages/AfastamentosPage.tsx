@@ -52,7 +52,7 @@ export default function AfastamentosPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDocOpen, setIsDocOpen] = useState(false);
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
-  const [selectedAfastamento, setSelectedAfastamento] = useState<any>(null);
+  const [selectedAfastamento, setSelectedAfastamento] = useState<Record<string, any> | null>(null);
 
   const stats = {
     total: afastamentos.length,
