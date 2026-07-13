@@ -122,10 +122,13 @@ export default function AdminSecurityPage() {
   return (
     <div className="container mx-auto space-y-6 p-6">
       <PageTitle
-        icon={ShieldAlert}
         title="Central de Segurança"
         description="Alertas de anomalias detectadas automaticamente pelo sistema"
       />
+      <div className="flex items-center gap-2">
+        <ShieldAlert className="h-6 w-6 text-primary" aria-hidden />
+        <h1 className="text-2xl font-bold">Central de Segurança</h1>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
