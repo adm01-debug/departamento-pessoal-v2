@@ -15,12 +15,12 @@ import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Plus, Users, Trash2, Edit2 } from 'lucide-react';
-import type { Row } from '@/types/db';
+import type { LooseRow } from '@/types/db';
 export default function TimesPage() {
   const { empresaAtual } = useEmpresas();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Row<'times'> | null>(null);
+  const [editingItem, setEditingItem] = useState<LooseRow<'times'> | null>(null);
   const [form, setForm] = useState({ nome: '', descricao: '' });
 
   const { data: times = [], isLoading } = useQuery({

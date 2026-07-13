@@ -14,12 +14,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Plus, Gift, Trash2, Edit2, Search, Package } from 'lucide-react';
-import type { Row } from '@/types/db';
+import type { LooseRow } from '@/types/db';
 export default function PromoBrindesPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingItem, setEditingItem] = useState<Row<'promo_brindes'> | null>(null);
+  const [editingItem, setEditingItem] = useState<LooseRow<'promo_brindes'> | null>(null);
   const [form, setForm] = useState({
     nome: '',
     descricao: '',

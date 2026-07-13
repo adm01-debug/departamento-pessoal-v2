@@ -24,7 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarioFerias } from '@/components/ferias/CalendarioFerias';
 import { GerenciamentoPeriodos } from '@/components/ferias/GerenciamentoPeriodos';
 import { calculoFerias } from '@/utils/calculoFerias';
-import type { UnknownRecord } from '@/types/db';
 const statusOptions = [
   { value: 'pendente', label: 'Pendente' },
   { value: 'aprovada', label: 'Aprovada' },
@@ -44,7 +43,7 @@ export default function FeriasPage() {
   const [calcLoading, setCalcLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
-  const [calcResult, setCalcResult] = useState<UnknownRecord | null>(null);
+  const [calcResult, setCalcResult] = useState<Record<string, any> | null>(null);
   const queryClient = useQueryClient();
   
   const { ferias, totalCount, isLoading, refetch } = useFerias({ 

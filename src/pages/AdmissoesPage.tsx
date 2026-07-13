@@ -25,7 +25,7 @@ import { contratacaoService } from '@/services/contratacaoService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { OnboardingDashboard } from '@/components/admissoes/OnboardingDashboard';
 import OnboardingPageContent from '@/components/admissoes/OnboardingPageContent';
-import type { Row } from '@/types/db';
+import type { LooseRow } from '@/types/db';
 
 
 const etapaLabels: Record<string, string> = {
@@ -59,7 +59,7 @@ export default function AdmissoesPage() {
   const [search, setSearch] = useState('');
   const [etapaFilter, setEtapaFilter] = useState('todos');
   const [sendingLink, setSendingLink] = useState<string | null>(null);
-  const [selectedAdmissao, setSelectedAdmissao] = useState<Row<'admissoes'> | null>(null);
+  const [selectedAdmissao, setSelectedAdmissao] = useState<LooseRow<'admissoes'> | null>(null);
 
   const handleEnviarLink = async (admissao: any) => {
     if (!admissao.email) {
