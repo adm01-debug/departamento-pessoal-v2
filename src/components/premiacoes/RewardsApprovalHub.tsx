@@ -20,6 +20,7 @@ import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+import type { LooseRow } from '@/types/db';
   Dialog,
   DialogContent,
   DialogHeader,

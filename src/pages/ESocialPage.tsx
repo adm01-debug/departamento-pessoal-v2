@@ -29,6 +29,7 @@ import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
 import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
+import type { Row } from '@/types/db';
 
 
 const tiposEvento = [

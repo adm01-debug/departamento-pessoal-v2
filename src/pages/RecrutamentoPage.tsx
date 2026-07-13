@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { CandidatoTimeline } from '@/components/recrutamento/CandidatoTimeline';
+import type { LooseRow } from '@/types/db';
 const ETAPAS = [
   { id: 'triagem', label: 'Triagem', color: 'bg-slate-100 border-slate-200' },
   { id: 'entrevista', label: 'Entrevista', color: 'bg-blue-50 border-blue-200' },

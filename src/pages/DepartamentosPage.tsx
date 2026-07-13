@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { NovoDepartamentoDialog } from '@/components/departamentos/NovoDepartamentoDialog';
 import { EntityPageContainer } from '@/components/layout/EntityPageContainer';
 import { Departamento } from '@/types/entities';
+import type { Row } from '@/types/db';
 export default function DepartamentosPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editando, setEditando] = useState<Row<'departamentos'> | null>(null);

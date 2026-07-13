@@ -17,6 +17,7 @@ import { exportarDesligamentosExcel } from '@/utils/desligamentoExcel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PontoAuditTimeline } from '@/components/ponto/PontoAuditTimeline';
 import {
+import type { Row } from '@/types/db';
   DesligamentoKPIs,
   DesligamentoFilters,
   StatusBadge,

@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { Row } from '@/types/db';
 const acaoColors: Record<string, string> = {
   INSERT: 'bg-success/15 text-success border-0',
   UPDATE: 'bg-info/15 text-info border-0',
