@@ -21441,7 +21441,29 @@ export type Database = {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: undefined
       }
-      resolve_security_alert: { Args: { _id: string }; Returns: boolean }
+      resolve_security_alert:
+        | {
+            Args: { _alert_id: string; _note?: string }
+            Returns: {
+              created_at: string | null
+              details: Json | null
+              id: string
+              ip_address: string | null
+              resolved: boolean | null
+              resolved_at: string | null
+              resolved_by: string | null
+              severity: string
+              type: string
+              user_id: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "security_alerts"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | { Args: { _id: string }; Returns: boolean }
       run_rls_tests: { Args: never; Returns: string[] }
       search_audit_unified: {
         Args: {
