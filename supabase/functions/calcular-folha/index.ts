@@ -101,6 +101,11 @@ Deno.serve(async (req) => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    // Rate limit — cálculo de folha é pesado: 20 req / min / usuário
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `calc-folha:${userId}`, limit: 20, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Tenant scope (antes de qualquer efeito colateral / idempotência)
     const [{ data: belongs }, { data: isAdm }] = await Promise.all([
       admin.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: empresa_id }),
