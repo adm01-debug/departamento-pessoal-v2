@@ -20,7 +20,6 @@ import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-import type { LooseRow } from '@/types/db';
   Dialog,
   DialogContent,
   DialogHeader,
@@ -28,6 +27,7 @@ import type { LooseRow } from '@/types/db';
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import type { LooseRow } from '@/types/db';
 interface ApprovalHubProps {
   pagamentos: any[];
 }
