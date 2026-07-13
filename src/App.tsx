@@ -90,6 +90,7 @@ const DashboardExecutivoPage = lazy(() => import('@/pages/DashboardExecutivoPage
 const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
 const AdminIdempotenciaPage = lazy(() => import('@/pages/AdminIdempotenciaPage'));
 const AdminOperacaoPage = lazy(() => import('@/pages/AdminOperacaoPage'));
+const AdminSecurityPage = lazy(() => import('@/pages/AdminSecurityPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
@@ -227,6 +228,7 @@ export default function App() {
         <Route path="admin/telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />
         <Route path="admin/idempotencia" element={<AdminRoute><LazyPage Component={AdminIdempotenciaPage} /></AdminRoute>} />
         <Route path="admin/operacao" element={<AdminRoute><LazyPage Component={AdminOperacaoPage} /></AdminRoute>} />
+        <Route path="admin/security" element={<AdminRoute><LazyPage Component={AdminSecurityPage} /></AdminRoute>} />
         
         {/* Outras páginas legadas ou em migração */}
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
