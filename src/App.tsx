@@ -90,6 +90,7 @@ const DashboardExecutivoPage = lazy(() => import('@/pages/DashboardExecutivoPage
 const AdminTelemetriaPage = lazy(() => import('@/pages/AdminTelemetriaPage'));
 const AdminIdempotenciaPage = lazy(() => import('@/pages/AdminIdempotenciaPage'));
 const AdminOperacaoPage = lazy(() => import('@/pages/AdminOperacaoPage'));
+const AdminSecurityPage = lazy(() => import('@/pages/AdminSecurityPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
