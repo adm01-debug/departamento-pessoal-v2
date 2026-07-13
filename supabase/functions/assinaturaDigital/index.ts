@@ -50,6 +50,16 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    // Rate limit por IP — endpoints públicos (assinar/verificar) precisam de proteção
+    // contra brute force de tokens: 20 req / min / IP
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || req.headers.get('x-real-ip')
+      || 'anon';
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `assinatura:${body.action}:${ip}`, limit: 20, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
+
     // 'assinar' é público — protegido pelo token de admissão (UUID + expiração + one-shot).
     // 'verificar' também é público (o candidato precisa checar o estado antes de assinar).
     // 'listar' é operação administrativa: exige auth + admin.
