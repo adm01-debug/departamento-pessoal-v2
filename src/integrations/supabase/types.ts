@@ -20030,6 +20030,24 @@ export type Database = {
         }
         Relationships: []
       }
+      v_audit_trail: {
+        Row: {
+          acao: string | null
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          empresa_id: string | null
+          id: string | null
+          registro_id: string | null
+          status_anterior: string | null
+          status_novo: string | null
+          tabela: string | null
+          user_email: string | null
+          user_id: string | null
+          user_nome: string | null
+        }
+        Relationships: []
+      }
       v_idempotency_metrics: {
         Row: {
           completed_24h: number | null
@@ -21405,6 +21423,7 @@ export type Database = {
         Args: { p_solicitacao_id: string }
         Returns: undefined
       }
+      purge_audit_log_old: { Args: { _dias?: number }; Returns: number }
       purge_expired_idempotency_keys: { Args: never; Returns: number }
       purge_expired_security_data: { Args: never; Returns: Json }
       purge_old_lock_conflicts: { Args: never; Returns: number }
