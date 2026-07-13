@@ -21205,6 +21205,7 @@ export type Database = {
       }
     }
     Functions: {
+      _is_admin_bypass: { Args: never; Returns: boolean }
       anonimizar_dados_pessoais: {
         Args: { target_id: string }
         Returns: undefined
@@ -21447,6 +21448,10 @@ export type Database = {
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
+      }
+      validate_status_transition: {
+        Args: { _allowed: Json; _new: string; _old: string; _table: string }
+        Returns: undefined
       }
     }
     Enums: {
