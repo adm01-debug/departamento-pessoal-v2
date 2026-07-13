@@ -47,7 +47,7 @@ export default function ESocialPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedEvento, setSelectedEvento] = useState<any>(null);
+  const [selectedEvento, setSelectedEvento] = useState<Row<'esocial_eventos'> | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCompetencia, setSelectedCompetencia] = useState(currentCompetenciaLocal());

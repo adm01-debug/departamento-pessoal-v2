@@ -58,7 +58,7 @@ export default function AdmissoesPage() {
   const [search, setSearch] = useState('');
   const [etapaFilter, setEtapaFilter] = useState('todos');
   const [sendingLink, setSendingLink] = useState<string | null>(null);
-  const [selectedAdmissao, setSelectedAdmissao] = useState<any>(null);
+  const [selectedAdmissao, setSelectedAdmissao] = useState<Row<'admissoes'> | null>(null);
 
   const handleEnviarLink = async (admissao: any) => {
     if (!admissao.email) {

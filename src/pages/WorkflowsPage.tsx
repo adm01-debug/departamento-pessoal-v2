@@ -45,7 +45,7 @@ export default function WorkflowsPage() {
   const now = useNow();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [selectedExec, setSelectedExec] = useState<any>(null);
+  const [selectedExec, setSelectedExec] = useState<Row<'workflows_execucoes'> | null>(null);
   const [showLog, setShowLog] = useState(false);
   const [form, setForm] = useState({ nome: '', descricao: '', tipo: 'ferias', etapas: ETAPAS_PADRAO.slice(0, 2) });
   const [numEtapas, setNumEtapas] = useState(2);

@@ -38,7 +38,7 @@ function formatCurrency(value: number): string {
 
 export default function ProvisoesPage() {
   const [competencia, setCompetencia] = useState(currentCompetenciaLocal());
-  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [selectedLog, setSelectedLog] = useState<Row<'provisao_logs'> | null>(null);
   const { empresaAtual } = useEmpresas();
   const queryClient = useQueryClient();
 

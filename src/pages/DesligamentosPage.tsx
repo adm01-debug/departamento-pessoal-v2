@@ -32,7 +32,7 @@ export default function DesligamentosPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [tipoFilter, setTipoFilter] = useState('todos');
-  const [selectedDesligamento, setSelectedDesligamento] = useState<any>(null);
+  const [selectedDesligamento, setSelectedDesligamento] = useState<Row<'desligamentos'> | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showNovo, setShowNovo] = useState(false);
   const [showChart, setShowChart] = useState(true);
