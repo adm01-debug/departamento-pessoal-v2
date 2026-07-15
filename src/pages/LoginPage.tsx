@@ -14,6 +14,7 @@ import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeO
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import govbrLogo from '@/assets/govbr-logo.svg';
 
 const features = [
   { icon: Users, label: 'Gestão completa de Colaboradores', desc: 'Cadastro, documentos, benefícios e histórico' },
@@ -393,7 +394,7 @@ export default function LoginPage() {
                       ) : (
                         <>
                           <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-10 transition-opacity" />
-                          <img src="https://www.gov.br/governodigital/pt-br/identidade-digital-gov.br/imagens/govbr-logo.png" alt="Gov.br" className="h-4 w-auto" />
+                          <img src={govbrLogo} alt="Gov.br" className="h-4 w-auto" />
                           <span className="truncate font-bold">Gov.br</span>
                         </>
                       )}
