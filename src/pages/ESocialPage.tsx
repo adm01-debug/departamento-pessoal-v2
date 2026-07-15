@@ -581,120 +581,14 @@ export default function ESocialPage() {
 
 
 
-      {/* Detalhes do Evento */}
-      <Dialog open={!!selectedEvento} onOpenChange={(o) => { if(!o) setSelectedEvento(null); }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 border-border/30 shadow-elevated rounded-2xl">
-          <DialogHeader className="p-6 pb-2">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-primary/10 rounded-xl">
-                <FileCheck className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <DialogTitle className="font-display text-xl">{selectedEvento?.tipo_evento} - Detalhes da Transmissão</DialogTitle>
-                <DialogDescription className="font-body">
-                  Histórico de envio e retorno do eSocial
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+      <ESocialEventDetailsDialog
+        selectedEvento={selectedEvento}
+        onClose={() => setSelectedEvento(null)}
+        statusVariant={statusVariant}
+        onExportXML={handleExportXML}
+        onValidar={handleValidar}
+      />
 
-          <ScrollArea className="flex-1 p-6 pt-2">
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <Card className="bg-muted/30 border-none shadow-none">
-                <CardContent className="p-4 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Status</span>
-                  <StatusBadge status={selectedEvento?.status || 'pendente'} variant={statusVariant(selectedEvento?.status || 'pendente') as any} />
-                </CardContent>
-              </Card>
-              <Card className="bg-muted/30 border-none shadow-none">
-                <CardContent className="p-4 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Data de Envio</span>
-                  <span className="text-sm font-medium">{formatDate(selectedEvento?.data_envio || selectedEvento?.created_at)}</span>
-                </CardContent>
-              </Card>
-              <Card className="bg-muted/30 border-none shadow-none">
-                <CardContent className="p-4 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Recibo / Protocolo</span>
-                  <span className="text-sm font-mono">{selectedEvento?.protocolo || 'Aguardando transmissão'}</span>
-                </CardContent>
-              </Card>
-              <Card className="bg-muted/30 border-none shadow-none">
-                <CardContent className="p-4 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Ambiente</span>
-                  <Badge variant="outline" className="w-fit flex gap-1 items-center"><Globe className="h-3 w-3" /> Produção</Badge>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-4 bg-background rounded-xl border shadow-xs">
-                <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3 block">Conteúdo Estruturado</Label>
-                <ESocialEventViewer 
-                  tipo={selectedEvento?.tipo_evento} 
-                  dados={selectedEvento?.dados_evento || selectedEvento?.dados || {}} 
-                />
-              </div>
-
-              {selectedEvento?.mensagem_erro && (
-                <div className="p-4 rounded-xl border border-destructive/20 bg-destructive/5 text-destructive text-sm font-body">
-                  <p className="font-bold flex items-center gap-1.5 mb-1"><AlertCircle className="h-4 w-4" /> Erro na Transmissão:</p>
-                  {selectedEvento.mensagem_erro}
-                </div>
-              )}
-
-              <div>
-                <Label className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5 block">Dados do Evento (JSON)</Label>
-                <div className="relative group/json">
-                  <pre className="text-[10px] p-4 bg-muted rounded-xl border font-mono max-h-[300px] overflow-auto">
-                    {JSON.stringify(selectedEvento?.dados_evento || selectedEvento?.dados || {}, null, 2)}
-                  </pre>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover/json:opacity-100 transition-opacity"
-                    onClick={() => {
-                      navigator.clipboard.writeText(JSON.stringify(selectedEvento?.dados_evento || selectedEvento?.dados || {}, null, 2));
-                      toast.success("JSON copiado");
-                    }}
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {selectedEvento?.xml && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <Label className="text-[11px] uppercase tracking-widest text-muted-foreground block">Conteúdo XML Assinado</Label>
-                    <Badge variant="outline" className="text-[9px] h-4 gap-1 border-primary/20 bg-primary/5 text-primary">
-                      <ShieldCheck className="h-2.5 w-2.5" /> SHA-256 Assinado
-                    </Badge>
-                  </div>
-                  <pre className="text-[10px] p-4 bg-primary/5 rounded-xl border border-primary/10 font-mono max-h-[300px] overflow-auto text-primary/80">
-                    {selectedEvento.xml}
-                  </pre>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-          
-          <div className="p-4 bg-muted/20 border-t border-border/20 flex justify-between items-center">
-            <div className="flex gap-2">
-              {selectedEvento?.xml && (
-                <Button variant="outline" size="sm" onClick={() => handleExportXML(selectedEvento)} className="rounded-xl h-9 gap-2">
-                  <Download className="h-4 w-4" /> Exportar XML
-                </Button>
-              )}
-              {selectedEvento?.status === 'pendente' && (
-                <Button variant="outline" size="sm" onClick={() => handleValidar(selectedEvento)} className="rounded-xl h-9 gap-2">
-                  <ShieldCheck className="h-4 w-4" /> Validar Agora
-                </Button>
-              )}
-            </div>
-            <Button variant="default" onClick={() => setSelectedEvento(null)} className="rounded-xl h-9 px-6">Fechar</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
       <ESocialAuditDialog 
         open={auditOpen} 
         onOpenChange={setAuditOpen} 
