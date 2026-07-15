@@ -19923,6 +19923,30 @@ export type Database = {
           },
         ]
       }
+      mv_anomalies_hourly: {
+        Row: {
+          abertos: number | null
+          hora: string | null
+          resolvidos: number | null
+          severidade: string | null
+          tipo: string | null
+          total: number | null
+        }
+        Relationships: []
+      }
+      mv_status_change_daily: {
+        Row: {
+          acao: string | null
+          dia: string | null
+          primeiro_evento: string | null
+          registros_distintos: number | null
+          tabela: string | null
+          total: number | null
+          ultimo_evento: string | null
+          usuarios_distintos: number | null
+        }
+        Relationships: []
+      }
       pontos_abertos: {
         Row: {
           colaborador_id: string | null
@@ -21437,6 +21461,7 @@ export type Database = {
           lockout_minutes: number
         }[]
       }
+      refresh_dashboard_mvs: { Args: never; Returns: Json }
       reset_login_attempts: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: undefined
