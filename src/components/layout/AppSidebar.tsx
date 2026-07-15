@@ -232,8 +232,11 @@ const ColaboradoresCount = memo(function ColaboradoresCount() {
 });
 
 const SecurityAlertsCount = memo(function SecurityAlertsCount() {
+  const queryClient = useQueryClient();
+  const queryKey = ['sidebar-security-alerts-count'];
+
   const { data: count } = useQuery({
-    queryKey: ['sidebar-security-alerts-count'],
+    queryKey,
     queryFn: async () => {
       const { count, error } = await supabase
         .from('security_alerts')
@@ -243,9 +246,29 @@ const SecurityAlertsCount = memo(function SecurityAlertsCount() {
       return count || 0;
     },
     staleTime: 30_000,
-    refetchInterval: 60_000,
+    refetchInterval: 60_000, // fallback caso realtime caia
     retry: false,
   });
+
+  // Realtime: invalida contador e página de alertas ao detectar mudança
+  useEffect(() => {
+    const channel = supabase
+      .channel(`sidebar-security-alerts-${Math.random().toString(36).slice(2)}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'security_alerts' },
+        () => {
+          queryClient.invalidateQueries({ queryKey });
+          queryClient.invalidateQueries({ queryKey: ['admin-security-alerts'] });
+          queryClient.invalidateQueries({ queryKey: ['security_alerts'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   if (!count) return null;
 
@@ -255,6 +278,7 @@ const SecurityAlertsCount = memo(function SecurityAlertsCount() {
     </span>
   );
 });
+
 
 const SystemStatus = memo(function SystemStatus({ collapsed }: { collapsed: boolean }) {
   const { data: isHealthy, isLoading } = useQuery({
