@@ -135,6 +135,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Activity, label: 'Telemetria', path: '/admin/telemetria', color: 'text-primary' },
       { icon: ShieldCheck, label: 'Idempotência', path: '/admin/idempotencia', color: 'text-success' },
       { icon: Activity, label: 'Operação (Painel)', path: '/admin/operacao', color: 'text-primary' },
+      { icon: ShieldAlert, label: 'Segurança (Alertas)', path: '/admin/security', color: 'text-destructive' },
     ]
   },
 ];
