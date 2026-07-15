@@ -9,9 +9,7 @@ import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { premiacoesService } from '@/services/premiacoesService';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-const formatCurrency = (val: number) => 
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+import { formatCurrency, formatDateTime } from '@/utils/format';
 
 export function RewardsSimulator() {
   const queryClient = useQueryClient();
@@ -219,7 +217,7 @@ export function RewardsSimulator() {
                   <div key={s.id} className="group relative flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/10 hover:border-primary/30 transition-all cursor-pointer" onClick={() => loadScenario(s)}>
                     <div className="flex justify-between items-center">
                       <span className="text-[11px] font-bold">{s.name}</span>
-                      <span className="text-[9px] text-muted-foreground">{new Date(s.created_at).toLocaleTimeString()}</span>
+                      <span className="text-[9px] text-muted-foreground">{formatDateTime(s.created_at)}</span>
                     </div>
                     <div className="flex justify-between items-end mt-1">
                       <span className="text-[10px] font-mono font-bold text-primary">{formatCurrency(s.resultados.totalBudget)}</span>
