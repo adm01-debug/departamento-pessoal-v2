@@ -36,17 +36,19 @@ describe('format — datas', () => {
     expect(formatDate('2026-07-15')).toBe('15/07/2026');
   });
 
-  it('Date instance formatado corretamente', () => {
-    expect(formatDate(new Date(2026, 6, 15))).toBe('15/07/2026');
+  it('Date com meio-dia UTC não faz shift de dia', () => {
+    // Usa 15:00 UTC → 12:00 America/Sao_Paulo, seguro de shift em qualquer runtime
+    expect(formatDate(new Date(Date.UTC(2026, 6, 15, 15, 0)))).toBe('15/07/2026');
   });
 
   it('timestamp numérico formatado corretamente', () => {
-    const ts = new Date(2026, 6, 15, 10, 0, 0).getTime();
+    const ts = Date.UTC(2026, 6, 15, 15, 0);
     expect(formatDate(ts)).toBe('15/07/2026');
   });
 
-  it('formatDateTime inclui hora e minuto', () => {
-    const d = new Date(2026, 6, 15, 14, 32);
+  it('formatDateTime inclui hora e minuto no fuso BR', () => {
+    // 17:32 UTC = 14:32 America/Sao_Paulo
+    const d = new Date(Date.UTC(2026, 6, 15, 17, 32));
     expect(formatDateTime(d)).toMatch(/15\/07\/2026.*14:32/);
   });
 
