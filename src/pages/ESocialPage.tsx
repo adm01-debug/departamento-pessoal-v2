@@ -109,10 +109,8 @@ export default function ESocialPage() {
     return <Send className="h-5 w-5 text-warning" />;
   };
 
-  const formatDate = (d: string | null) => {
-    if (!d) return '-';
-    return new Date(d).toLocaleDateString('pt-BR');
-  };
+
+
 
   const handleCriar = () => {
     if (!novoTipo || !empresaAtual?.id) return;
