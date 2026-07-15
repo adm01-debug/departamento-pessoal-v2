@@ -231,6 +231,31 @@ const ColaboradoresCount = memo(function ColaboradoresCount() {
   );
 });
 
+const SecurityAlertsCount = memo(function SecurityAlertsCount() {
+  const { data: count } = useQuery({
+    queryKey: ['sidebar-security-alerts-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('security_alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('resolved', false);
+      if (error) return 0; // RLS/permissão → some silenciosamente
+      return count || 0;
+    },
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    retry: false,
+  });
+
+  if (!count) return null;
+
+  return (
+    <span className="ml-auto bg-destructive/10 text-destructive text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-1 ring-destructive/30 animate-pulse">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+});
+
 const SystemStatus = memo(function SystemStatus({ collapsed }: { collapsed: boolean }) {
   const { data: isHealthy, isLoading } = useQuery({
     queryKey: ['system-health'],
