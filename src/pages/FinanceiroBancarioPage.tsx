@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { todayLocalISO } from '@/utils/dateLocal';
+import { formatDate } from '@/utils/format';
 export default function FinanceiroBancarioPage() {
   const { empresaAtual } = useEmpresas();
   const [config, setConfig] = useState<CNABConfig | null>(null);
@@ -350,7 +351,7 @@ export default function FinanceiroBancarioPage() {
                         </TableRow>
                       ) : remessas.map(r => (
                         <TableRow key={r.id}>
-                          <TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>{formatDate(r.created_at)}</TableCell>
                           <TableCell>{r.banco_codigo}</TableCell>
                           <TableCell>{r.sequencial_arquivo}</TableCell>
                           <TableCell>{r.total_pagamentos}</TableCell>
@@ -387,7 +388,7 @@ export default function FinanceiroBancarioPage() {
                         </TableRow>
                       ) : pixLotes.map(l => (
                         <TableRow key={l.id}>
-                          <TableCell>{new Date(l.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>{formatDate(l.created_at)}</TableCell>
                           <TableCell>{l.quantidade_pagamentos}</TableCell>
                           <TableCell className="text-right font-medium">{formatCurrency(l.valor_total)}</TableCell>
                           <TableCell><StatusBadge status={l.status} variant="success" /></TableCell>
@@ -437,13 +438,13 @@ export default function FinanceiroBancarioPage() {
                       <TableRow>
                         <TableCell className="font-medium">USD → BRL</TableCell>
                         <TableCell>5.2410</TableCell>
-                        <TableCell>{new Date().toLocaleDateString()}</TableCell>
+                        <TableCell>{formatDate(new Date())}</TableCell>
                         <TableCell><StatusBadge status="ativo" variant="success" /></TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">EUR → BRL</TableCell>
                         <TableCell>5.6822</TableCell>
-                        <TableCell>{new Date().toLocaleDateString()}</TableCell>
+                        <TableCell>{formatDate(new Date())}</TableCell>
                         <TableCell><StatusBadge status="ativo" variant="success" /></TableCell>
                       </TableRow>
                     </TableBody>

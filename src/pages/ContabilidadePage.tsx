@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { formatDate } from '@/utils/format';
 export default function ContabilidadePage() {
   const { empresaAtual } = useEmpresas();
   const [lancamentos, setLancamentos] = useState<any[]>([]);
@@ -197,7 +198,7 @@ export default function ContabilidadePage() {
                         <TableRow><TableCell colSpan={5} className="text-center py-12 text-muted-foreground">Nenhum lançamento contábil encontrado</TableCell></TableRow>
                       ) : lancamentos.map(l => (
                         <TableRow key={l.id} className="hover:bg-accent/30 transition-colors">
-                          <TableCell className="font-body">{new Date(l.data_lancamento).toLocaleDateString()}</TableCell>
+                          <TableCell className="font-body">{formatDate(l.data_lancamento)}</TableCell>
                           <TableCell className="font-body max-w-[200px] truncate" title={l.descricao}>{l.descricao}</TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
