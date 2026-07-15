@@ -13,6 +13,7 @@ import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
 import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon, Zap, History as HistoryIcon } from 'lucide-react';
+import { formatDate } from '@/utils/format';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
@@ -171,7 +172,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
               <div className="space-y-1.5">
                 {historicoRecente.map(h => (
                   <div key={h.id} className="text-[11px] flex justify-between items-center text-blue-800">
-                    <span>{new Date(h.data_inicio).toLocaleDateString()} - {h.dias_total} dias</span>
+                    <span>{formatDate(h.data_inicio)} - {h.dias_total} dias</span>
                     <Badge variant="outline" className="h-4 text-[9px] bg-white/50 border-blue-200">CID: {h.cid?.codigo || 'N/A'}</Badge>
                   </div>
                 ))}

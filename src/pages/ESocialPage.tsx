@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ESocialComplianceScore } from '@/components/esocial/ESocialComplianceScore';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { formatDate } from '@/utils/format';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -638,7 +639,7 @@ export default function ESocialPage() {
                             </div>
                             <div>
                               <p className="font-bold text-sm">{c.subject}</p>
-                              <p className="text-[10px] text-muted-foreground uppercase">Expira em: {new Date(c.valid_to).toLocaleDateString()}</p>
+                              <p className="text-[10px] text-muted-foreground uppercase">Expira em: {formatDate(c.valid_to)}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">

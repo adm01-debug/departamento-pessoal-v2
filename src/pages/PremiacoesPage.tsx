@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { RewardsSimulator } from '@/components/premiacoes/RewardsSimulator';
 import { RewardsApprovalHub } from '@/components/premiacoes/RewardsApprovalHub';
 import { CampaignWizard } from '@/components/premiacoes/CampaignWizard';
+import { formatDate, formatDateTime } from '@/utils/format';
 import { toast } from 'sonner';
 
 const formatCurrency = (val: number) => 
@@ -199,7 +200,7 @@ export default function PremiacoesPage() {
                           <Calendar className="h-3 w-3" /> Período
                         </p>
                         <p className="text-xs font-semibold">
-                          {new Date(c.data_inicio).toLocaleDateString()} - {new Date(c.data_fim).toLocaleDateString()}
+                          {formatDate(c.data_inicio)} - {formatDate(c.data_fim)}
                         </p>
                       </div>
                       <div className="space-y-1">
@@ -396,7 +397,7 @@ export default function PremiacoesPage() {
                       {auditoria.map((a: any) => (
                         <tr key={a.id} className="hover:bg-accent/5 transition-colors">
                           <td className="p-4 text-xs font-medium whitespace-nowrap">
-                            {new Date(a.created_at).toLocaleString()}
+                            {formatDateTime(a.created_at)}
                           </td>
                           <td className="p-4 text-xs">
                             RH / Admin

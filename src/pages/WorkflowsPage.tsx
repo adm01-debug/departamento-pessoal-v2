@@ -18,6 +18,7 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { workflowService } from '@/services/workflowService';
 import { useEmpresas } from '@/hooks';
+import { formatDateTime } from '@/utils/format';
 import { toast } from 'sonner';
 import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow, ArrowRight, Users, AlertTriangle, Timer, History, Zap, Mail, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -380,7 +381,7 @@ export default function WorkflowsPage() {
                     <p className="text-[10px] text-muted-foreground font-body mt-1">
                       A engine de workflows iniciou o processamento via `trigger_workflow_automation`.
                     </p>
-                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{new Date(selectedExec?.created_at ?? Date.now()).toLocaleString()}</span>
+                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{formatDateTime(selectedExec?.created_at ?? Date.now())}</span>
                   </div>
                 </div>
 
@@ -394,7 +395,7 @@ export default function WorkflowsPage() {
                     <p className="text-[10px] text-muted-foreground font-body mt-1">
                       E-mail disparado para o aprovador Nível 1 (Gestor Direto).
                     </p>
-                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{new Date(selectedExec?.created_at ?? Date.now()).toLocaleString()}</span>
+                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{formatDateTime(selectedExec?.created_at ?? Date.now())}</span>
                   </div>
                 </div>
 
