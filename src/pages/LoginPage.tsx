@@ -394,7 +394,7 @@ export default function LoginPage() {
                       ) : (
                         <>
                           <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-10 transition-opacity" />
-                          <img src="https://www.gov.br/governodigital/pt-br/identidade-digital-gov.br/imagens/govbr-logo.png" alt="Gov.br" className="h-4 w-auto" />
+                          <img src={govbrLogo} alt="Gov.br" className="h-4 w-auto" />
                           <span className="truncate font-bold">Gov.br</span>
                         </>
                       )}
