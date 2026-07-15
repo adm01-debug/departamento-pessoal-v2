@@ -14,6 +14,7 @@ import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeO
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import govbrLogo from '@/assets/govbr-logo.svg';
 
 const features = [
   { icon: Users, label: 'Gestão completa de Colaboradores', desc: 'Cadastro, documentos, benefícios e histórico' },
