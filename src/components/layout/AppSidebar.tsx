@@ -5,7 +5,7 @@ import {
   Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
   FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
   Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
-  Trophy, MessageSquareText, Activity
+  Trophy, MessageSquareText, Activity, ShieldAlert
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -135,6 +135,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Activity, label: 'Telemetria', path: '/admin/telemetria', color: 'text-primary' },
       { icon: ShieldCheck, label: 'Idempotência', path: '/admin/idempotencia', color: 'text-success' },
       { icon: Activity, label: 'Operação (Painel)', path: '/admin/operacao', color: 'text-primary' },
+      { icon: ShieldAlert, label: 'Segurança (Alertas)', path: '/admin/security', color: 'text-destructive' },
     ]
   },
 ];
@@ -171,6 +172,7 @@ const SidebarMenuItem = memo(function SidebarMenuItem({ item, isActive, collapse
         <>
           <span className="text-sm font-medium truncate flex-1">{item.label}</span>
           {item.path === '/colaboradores' && <ColaboradoresCount />}
+          {item.path === '/admin/security' && <SecurityAlertsCount />}
           {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
         </>
       )}
@@ -225,6 +227,31 @@ const ColaboradoresCount = memo(function ColaboradoresCount() {
   return (
     <span className="ml-auto bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-1 ring-primary/20">
       {count}
+    </span>
+  );
+});
+
+const SecurityAlertsCount = memo(function SecurityAlertsCount() {
+  const { data: count } = useQuery({
+    queryKey: ['sidebar-security-alerts-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('security_alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('resolved', false);
+      if (error) return 0; // RLS/permissão → some silenciosamente
+      return count || 0;
+    },
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    retry: false,
+  });
+
+  if (!count) return null;
+
+  return (
+    <span className="ml-auto bg-destructive/10 text-destructive text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-1 ring-destructive/30 animate-pulse">
+      {count > 99 ? '99+' : count}
     </span>
   );
 });
