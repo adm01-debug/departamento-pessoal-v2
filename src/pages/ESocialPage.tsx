@@ -24,11 +24,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ESocialEventViewer } from '@/components/esocial/ESocialEventViewer';
 import { ESocialAIInsights } from '@/components/esocial/ESocialAIInsights';
 import { ESocialConciliacao } from '@/components/esocial/ESocialConciliacao';
 import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
 import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
+import { ESocialLogsTab, ESocialConfigTab, ESocialEventDetailsDialog } from '@/components/esocial/tabs';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
 
 
