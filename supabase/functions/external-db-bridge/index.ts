@@ -150,6 +150,72 @@ function classifySeverity(durationMs: number, hasError: boolean): TelemetryMeta[
   if (durationMs >= SLOW_QUERY_THRESHOLD_MS) return "slow";
   return "ok";
 }
+// ---------- Buffer batch de telemetria (reduz INSERTs de 446/s → ~10/s) ----------
+// Estratégia:
+//   - Buffer in-isolate (Deno mantém isolates warm entre requests, então o
+//     buffer sobrevive entre invocações e o batch acontece organicamente).
+//   - Flush quando: buffer atinge MAX_BATCH, ou passou FLUSH_INTERVAL_MS
+//     desde o último flush, o que ocorrer primeiro.
+//   - Eventos `error` continuam sendo enviados individualmente para não perder
+//     sinais críticos em cold-start / crash de isolate.
+type TelemetryRow = {
+  operation: string;
+  table_name: string | null;
+  rpc_name: string | null;
+  duration_ms: number;
+  record_count: number | null;
+  query_limit: number | null;
+  query_offset: number | null;
+  count_mode: string | null;
+  severity: string;
+  error_message: string | null;
+  user_id: string | null;
+};
+const TELEMETRY_MAX_BATCH = 25;
+const TELEMETRY_FLUSH_INTERVAL_MS = 2000;
+const telemetryBuffer: TelemetryRow[] = [];
+let telemetryLastFlush = Date.now();
+let telemetryFlushInFlight: Promise<void> | null = null;
+
+function getServiceClient() {
+  const localUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!localUrl || !serviceKey) return null;
+  return createClient(localUrl, serviceKey);
+}
+
+async function flushTelemetry(): Promise<void> {
+  if (telemetryBuffer.length === 0) return;
+  if (telemetryFlushInFlight) return telemetryFlushInFlight;
+
+  const batch = telemetryBuffer.splice(0, telemetryBuffer.length);
+  telemetryLastFlush = Date.now();
+  const client = getServiceClient();
+  if (!client) return;
+
+  telemetryFlushInFlight = (async () => {
+    try {
+      const { error } = await client.from("query_telemetry").insert(batch);
+      if (error) console.warn("[telemetry-batch] persist falhou:", error.message);
+    } catch (e) {
+      console.warn("[telemetry-batch] exceção:", (e as Error).message);
+    } finally {
+      telemetryFlushInFlight = null;
+    }
+  })();
+  return telemetryFlushInFlight;
+}
+
+function enqueueTelemetry(row: TelemetryRow) {
+  telemetryBuffer.push(row);
+  const sizeReady = telemetryBuffer.length >= TELEMETRY_MAX_BATCH;
+  const timeReady = Date.now() - telemetryLastFlush >= TELEMETRY_FLUSH_INTERVAL_MS;
+  if (sizeReady || timeReady) {
+    // Fire-and-forget — não bloqueia a request
+    flushTelemetry().catch(() => {});
+  }
+}
+
 function emitTelemetry(meta: TelemetryMeta) {
   const icon =
     meta.status === "very_slow" ? "🔴" : meta.status === "slow" ? "🟡" : meta.status === "error" ? "❌" : "✅";
@@ -162,28 +228,35 @@ function emitTelemetry(meta: TelemetryMeta) {
   else if (meta.status === "error") console.error(line + ` error=${meta.error}`);
   else console.info(line);
 
-  if (meta.status !== "ok") {
-    try {
-      const localUrl = Deno.env.get("SUPABASE_URL");
-      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-      if (localUrl && serviceKey) {
-        const localClient = createClient(localUrl, serviceKey);
-        localClient.from("query_telemetry").insert({
-          operation: meta.operation,
-          table_name: meta.table || null,
-          rpc_name: meta.rpcName || null,
-          duration_ms: meta.durationMs,
-          record_count: meta.recordCount ?? null,
-          query_limit: meta.limit ?? null,
-          query_offset: meta.offset ?? null,
-          count_mode: meta.countMode || null,
-          severity: meta.status,
-          error_message: meta.error || null,
-          user_id: meta.userId || null,
-        }).then(({ error }) => { if (error) console.warn("[telemetry-persist]", error.message); });
-      }
-    } catch { /* fire-and-forget */ }
+  if (meta.status === "ok") return;
+
+  const row: TelemetryRow = {
+    operation: meta.operation,
+    table_name: meta.table || null,
+    rpc_name: meta.rpcName || null,
+    duration_ms: meta.durationMs,
+    record_count: meta.recordCount ?? null,
+    query_limit: meta.limit ?? null,
+    query_offset: meta.offset ?? null,
+    count_mode: meta.countMode || null,
+    severity: meta.status,
+    error_message: meta.error || null,
+    user_id: meta.userId || null,
+  };
+
+  // Erros vão direto (não podem ser perdidos em cold-start).
+  if (meta.status === "error") {
+    const client = getServiceClient();
+    if (client) {
+      client.from("query_telemetry").insert(row).then(
+        ({ error }) => { if (error) console.warn("[telemetry-persist]", error.message); },
+      );
+    }
+    return;
   }
+
+  // slow / very_slow → batched
+  enqueueTelemetry(row);
 }
 
 // -------------------- Sanitização de valores --------------------
