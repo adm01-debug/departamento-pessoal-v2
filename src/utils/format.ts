@@ -51,6 +51,11 @@ export function parseDateSafe(input: DateInput): Date | null {
 
 /** Formata data curta: `15/07/2026`. */
 export function formatDate(input: DateInput, fallback = DEFAULT_FALLBACK): string {
+  // Date-only string: formata sem conversão de fuso (evita off-by-one)
+  if (typeof input === 'string') {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
+    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+  }
   const d = parseDateSafe(input);
   if (!d) return fallback;
   return new Intl.DateTimeFormat(LOCALE_BR, {
