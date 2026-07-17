@@ -93,9 +93,9 @@ export default function AdminPontoDivergenciasPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('colaboradores')
-        .select('id,nome,matricula')
+        .select('id,nome:nome_completo,matricula')
         .eq('empresa_id', empresaId!)
-        .eq('status', 'ativo')
+        .eq('status', 'Ativo')
         .order('nome')
         .limit(500);
       if (error) throw error;
@@ -309,7 +309,7 @@ export default function AdminPontoDivergenciasPage() {
                     </TableCell>
                     <TableCell className="font-mono text-xs">{d.pis || '—'}</TableCell>
                     <TableCell className="tabular-nums text-xs">
-                      {d.data_hora_afdt ? formatDataHoraBR(d.data_hora_afdt) : '—'}
+                      {d.data_hora_afdt ? formatDateTime(d.data_hora_afdt) : '—'}
                     </TableCell>
                     <TableCell className="tabular-nums text-xs">
                       {d.delta_segundos ?? '—'}
