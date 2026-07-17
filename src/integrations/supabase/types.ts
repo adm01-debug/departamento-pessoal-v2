@@ -23380,6 +23380,14 @@ export type Database = {
         Returns: Json
       }
       sst_regimento_dashboard: { Args: { p_empresa_id: string }; Returns: Json }
+      sst_regimento_notificar_pendentes: {
+        Args: { p_empresa_id: string }
+        Returns: {
+          ja_assinados: number
+          notificados: number
+          sem_user: number
+        }[]
+      }
       sst_regimento_publicar: {
         Args: { p_documento_id: string }
         Returns: Json

@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send } from 'lucide-react';
+import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send, Bell } from 'lucide-react';
 
 type Documento = {
   id: string;
@@ -38,6 +38,7 @@ const AdminRegimentoInternoPage = () => {
   const [novoTitulo, setNovoTitulo] = useState('');
   const [novoConteudo, setNovoConteudo] = useState('');
   const [saving, setSaving] = useState(false);
+  const [notificando, setNotificando] = useState(false);
 
   const proximaVersao = useMemo(
     () => (documentos.length ? Math.max(...documentos.map((d) => d.versao)) + 1 : 1),
@@ -114,6 +115,30 @@ const AdminRegimentoInternoPage = () => {
       toast.error('Falha ao publicar');
     }
   };
+  const notificarPendentes = async () => {
+    if (!empresaAtual?.id || notificando) return;
+    setNotificando(true);
+    try {
+      const { data, error } = await supabase.rpc('sst_regimento_notificar_pendentes', {
+        p_empresa_id: empresaAtual.id,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : (data as any);
+      const notif = row?.notificados ?? 0;
+      const semUser = row?.sem_user ?? 0;
+      if (notif === 0) {
+        toast.info('Nenhum colaborador pendente para notificar agora (dedupe de 7 dias).');
+      } else {
+        toast.success(`${notif} colaborador(es) notificado(s)${semUser ? ` · ${semUser} sem usuário` : ''}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Falha ao notificar pendentes', { description: err?.message });
+    } finally {
+      setNotificando(false);
+    }
+  };
+
 
   return (
     <div className="p-6 space-y-6">
@@ -175,7 +200,19 @@ const AdminRegimentoInternoPage = () => {
         </Card>
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Adesão</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold">{dash?.adesao_pct ?? 0}%</div></CardContent>
+          <CardContent className="space-y-2">
+            <div className="text-3xl font-bold">{dash?.adesao_pct ?? 0}%</div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full gap-1"
+              onClick={notificarPendentes}
+              disabled={notificando || !dash?.documento}
+            >
+              {notificando ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
+              Notificar pendentes
+            </Button>
+          </CardContent>
         </Card>
       </div>
 
