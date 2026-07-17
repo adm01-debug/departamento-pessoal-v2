@@ -200,7 +200,19 @@ const AdminRegimentoInternoPage = () => {
         </Card>
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Adesão</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold">{dash?.adesao_pct ?? 0}%</div></CardContent>
+          <CardContent className="space-y-2">
+            <div className="text-3xl font-bold">{dash?.adesao_pct ?? 0}%</div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full gap-1"
+              onClick={notificarPendentes}
+              disabled={notificando || !dash?.documento}
+            >
+              {notificando ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
+              Notificar pendentes
+            </Button>
+          </CardContent>
         </Card>
       </div>
 
