@@ -61,7 +61,7 @@ const AdminRegimentoInternoPage = () => {
     if (!empresaAtual?.id) return;
     setLoading(true);
     try {
-      const [docsRes, dashRes] = await Promise.all([
+      const [docsRes, dashRes, pendRes] = await Promise.all([
         supabase
           .from('sst_regimento_documentos')
           .select('*')
@@ -69,11 +69,13 @@ const AdminRegimentoInternoPage = () => {
           .order('versao', { ascending: false })
           .limit(50),
         supabase.rpc('sst_regimento_dashboard', { p_empresa_id: empresaAtual.id }),
+        supabase.rpc('sst_regimento_pendentes_lista', { p_empresa_id: empresaAtual.id }),
       ]);
       if (docsRes.error) throw docsRes.error;
       if (dashRes.error) throw dashRes.error;
       setDocumentos((docsRes.data ?? []) as Documento[]);
       setDash(dashRes.data as unknown as Dashboard);
+      setPendentes((pendRes.error ? [] : (pendRes.data ?? [])) as Pendente[]);
     } catch (err) {
       console.error(err);
       toast.error('Falha ao carregar Regimento Interno');
