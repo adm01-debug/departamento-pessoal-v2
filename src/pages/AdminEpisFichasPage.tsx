@@ -74,9 +74,7 @@ export default function AdminEpisFichasPage() {
     <div className="space-y-6 p-6">
       <PageHeader
         title="Fichas de EPI (NR-6)"
-        subtitle="Controle digital de entregas com evidência e assinatura eletrônica"
-        icon={<HardHat className="h-5 w-5 text-primary-foreground" />}
-        gradient="from-warning to-primary"
+        description="Controle digital de entregas com evidência e assinatura eletrônica"
       />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
