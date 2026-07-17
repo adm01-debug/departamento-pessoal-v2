@@ -21717,6 +21717,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      associar_pis_colaborador_afdt: {
+        Args: { _colaborador_id: string; _divergencia_id: string }
+        Returns: undefined
+      }
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
       calculate_lockout_duration: {
         Args: { attempts: number }
@@ -21750,6 +21754,10 @@ export type Database = {
         Returns: Json
       }
       cleanup_security_logs: { Args: never; Returns: undefined }
+      criar_batida_da_divergencia_afdt: {
+        Args: { _divergencia_id: string; _tipo?: string }
+        Returns: string
+      }
       detectar_fraude_ponto: {
         Args: {
           _batida_id: string
@@ -21991,6 +21999,10 @@ export type Database = {
             }
           }
         | { Args: { _id: string }; Returns: boolean }
+      resolver_divergencia_afdt: {
+        Args: { _divergencia_id: string; _observacao?: string }
+        Returns: undefined
+      }
       run_rls_tests: { Args: never; Returns: string[] }
       search_audit_unified: {
         Args: {
