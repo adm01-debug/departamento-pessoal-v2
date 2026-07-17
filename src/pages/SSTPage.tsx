@@ -14,6 +14,7 @@ import { useEmpresa } from '@/contexts';
 import { toast } from 'sonner';
 import { Shield, Plus } from 'lucide-react';
 import { SSTKPIs, SSTExamesTab, SSTEPIsTab, SSTProgramasTab, SSTRiscosTab, SSTNRsTab, SSTIncidentesTab } from '@/components/sst';
+import { GerarPgrButton } from '@/components/sst/GerarPgrButton';
 
 const RISCO_LEVELS = [
   { label: 'Trivial', value: 1 },
