@@ -1,7 +1,8 @@
 import { PageTitle } from '@/components/PageTitle';
 import { PageLayout } from '@/components/layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserCircle, DollarSign, FileText, Edit } from 'lucide-react';
+import { UserCircle, DollarSign, FileText, Edit, ShieldCheck } from 'lucide-react';
+import { PortalRegimentoCard } from '@/components/portal/PortalRegimentoCard';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
