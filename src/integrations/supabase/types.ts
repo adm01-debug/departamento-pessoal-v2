@@ -909,57 +909,113 @@ export type Database = {
       }
       asos: {
         Row: {
+          agendamento_id: string | null
           arquivo_url: string | null
+          assinado_em: string | null
+          assinatura_medico_hash: string | null
           clinica: string | null
+          clinica_partner_id: string | null
           colaborador_id: string
           created_at: string
           data_exame: string
           data_validade: string | null
+          emitido_por_partner_user: string | null
           empresa_id: string | null
           hash_integridade: string | null
           id: string
           medico_crm: string | null
           medico_nome: string | null
+          motivo_cancelamento: string | null
           observacoes: string | null
+          recebido_rh_em: string | null
+          recebido_rh_por: string | null
+          restricao_data_fim: string | null
+          restricoes: Json
+          restricoes_descricao: string | null
           resultado: string | null
+          status: string
           tipo: string
           updated_at: string
+          validado_em: string | null
+          validado_por: string | null
         }
         Insert: {
+          agendamento_id?: string | null
           arquivo_url?: string | null
+          assinado_em?: string | null
+          assinatura_medico_hash?: string | null
           clinica?: string | null
+          clinica_partner_id?: string | null
           colaborador_id: string
           created_at?: string
           data_exame: string
           data_validade?: string | null
+          emitido_por_partner_user?: string | null
           empresa_id?: string | null
           hash_integridade?: string | null
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
+          motivo_cancelamento?: string | null
           observacoes?: string | null
+          recebido_rh_em?: string | null
+          recebido_rh_por?: string | null
+          restricao_data_fim?: string | null
+          restricoes?: Json
+          restricoes_descricao?: string | null
           resultado?: string | null
+          status?: string
           tipo: string
           updated_at?: string
+          validado_em?: string | null
+          validado_por?: string | null
         }
         Update: {
+          agendamento_id?: string | null
           arquivo_url?: string | null
+          assinado_em?: string | null
+          assinatura_medico_hash?: string | null
           clinica?: string | null
+          clinica_partner_id?: string | null
           colaborador_id?: string
           created_at?: string
           data_exame?: string
           data_validade?: string | null
+          emitido_por_partner_user?: string | null
           empresa_id?: string | null
           hash_integridade?: string | null
           id?: string
           medico_crm?: string | null
           medico_nome?: string | null
+          motivo_cancelamento?: string | null
           observacoes?: string | null
+          recebido_rh_em?: string | null
+          recebido_rh_por?: string | null
+          restricao_data_fim?: string | null
+          restricoes?: Json
+          restricoes_descricao?: string | null
           resultado?: string | null
+          status?: string
           tipo?: string
           updated_at?: string
+          validado_em?: string | null
+          validado_por?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "asos_agendamento_id_fkey"
+            columns: ["agendamento_id"]
+            isOneToOne: false
+            referencedRelation: "exames_agendamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asos_clinica_partner_id_fkey"
+            columns: ["clinica_partner_id"]
+            isOneToOne: false
+            referencedRelation: "clinicas_partners"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "asos_colaborador_id_fkey"
             columns: ["colaborador_id"]
