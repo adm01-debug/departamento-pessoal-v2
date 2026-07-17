@@ -96,7 +96,16 @@ export default function AdminAsoWorkflowPage() {
 
   const transitionMut = useMutation({
     mutationFn: async ({ aso, next }: { aso: AsoRow; next: StatusAso }) => {
-      const patch: Record<string, unknown> = { status: next };
+      const patch: Partial<{
+        status: StatusAso;
+        recebido_rh_em: string;
+        recebido_rh_por: string;
+        validado_em: string;
+        validado_por: string;
+        motivo_cancelamento: string;
+        restricoes_descricao: string;
+        restricao_data_fim: string;
+      }> = { status: next };
       if (next === 'recebido_rh') {
         patch.recebido_rh_em = new Date().toISOString();
         patch.recebido_rh_por = user?.id;
