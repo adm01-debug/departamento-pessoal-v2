@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send, Bell } from 'lucide-react';
+import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send, Bell, UserX, Download } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type Documento = {
   id: string;
@@ -29,11 +30,22 @@ type Dashboard = {
   adesao_pct: number;
 };
 
+type Pendente = {
+  colaborador_id: string;
+  nome: string;
+  email: string | null;
+  cargo: string | null;
+  departamento: string | null;
+  tem_usuario: boolean;
+  ultima_notificacao: string | null;
+};
+
 const AdminRegimentoInternoPage = () => {
   const { empresaAtual } = useEmpresas();
   const [loading, setLoading] = useState(true);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [dash, setDash] = useState<Dashboard | null>(null);
+  const [pendentes, setPendentes] = useState<Pendente[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [novoTitulo, setNovoTitulo] = useState('');
   const [novoConteudo, setNovoConteudo] = useState('');
@@ -49,7 +61,7 @@ const AdminRegimentoInternoPage = () => {
     if (!empresaAtual?.id) return;
     setLoading(true);
     try {
-      const [docsRes, dashRes] = await Promise.all([
+      const [docsRes, dashRes, pendRes] = await Promise.all([
         supabase
           .from('sst_regimento_documentos')
           .select('*')
@@ -57,11 +69,13 @@ const AdminRegimentoInternoPage = () => {
           .order('versao', { ascending: false })
           .limit(50),
         supabase.rpc('sst_regimento_dashboard', { p_empresa_id: empresaAtual.id }),
+        supabase.rpc('sst_regimento_pendentes_lista', { p_empresa_id: empresaAtual.id }),
       ]);
       if (docsRes.error) throw docsRes.error;
       if (dashRes.error) throw dashRes.error;
       setDocumentos((docsRes.data ?? []) as Documento[]);
       setDash(dashRes.data as unknown as Dashboard);
+      setPendentes((pendRes.error ? [] : (pendRes.data ?? [])) as Pendente[]);
     } catch (err) {
       console.error(err);
       toast.error('Falha ao carregar Regimento Interno');
@@ -215,6 +229,81 @@ const AdminRegimentoInternoPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2"><UserX className="h-4 w-4 text-destructive" /> Colaboradores Pendentes ({pendentes.length})</CardTitle>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1"
+            disabled={pendentes.length === 0}
+            onClick={() => {
+              const header = 'Nome;Email;Cargo;Departamento;Tem Usuário;Última Notificação\n';
+              const rows = pendentes.map((p) => [
+                (p.nome ?? '').replace(/;/g, ','),
+                (p.email ?? '').replace(/;/g, ','),
+                (p.cargo ?? '').replace(/;/g, ','),
+                (p.departamento ?? '').replace(/;/g, ','),
+                p.tem_usuario ? 'Sim' : 'Não',
+                p.ultima_notificacao ? new Date(p.ultima_notificacao).toLocaleString('pt-BR') : '—',
+              ].join(';')).join('\n');
+              const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `regimento-pendentes-${new Date().toISOString().slice(0,10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <Download className="h-3 w-3" /> Exportar CSV
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {!dash?.documento ? (
+            <div className="text-sm text-muted-foreground">Publique um documento para acompanhar as pendências.</div>
+          ) : pendentes.length === 0 ? (
+            <div className="text-sm text-muted-foreground">🎉 Todos os colaboradores ativos já assinaram.</div>
+          ) : (
+            <div className="max-h-[420px] overflow-auto rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Colaborador</TableHead>
+                    <TableHead>Cargo</TableHead>
+                    <TableHead>Departamento</TableHead>
+                    <TableHead>Usuário</TableHead>
+                    <TableHead>Última Notificação</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendentes.map((p) => (
+                    <TableRow key={p.colaborador_id}>
+                      <TableCell>
+                        <div className="font-medium">{p.nome}</div>
+                        <div className="text-xs text-muted-foreground">{p.email ?? '—'}</div>
+                      </TableCell>
+                      <TableCell className="text-sm">{p.cargo ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{p.departamento ?? '—'}</TableCell>
+                      <TableCell>
+                        {p.tem_usuario ? (
+                          <Badge variant="secondary">Vinculado</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-destructive border-destructive">Sem acesso</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {p.ultima_notificacao ? new Date(p.ultima_notificacao).toLocaleString('pt-BR') : '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader><CardTitle>Versões</CardTitle></CardHeader>

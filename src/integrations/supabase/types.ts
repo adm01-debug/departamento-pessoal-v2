@@ -23388,6 +23388,18 @@ export type Database = {
           sem_user: number
         }[]
       }
+      sst_regimento_pendentes_lista: {
+        Args: { p_empresa_id: string }
+        Returns: {
+          cargo: string
+          colaborador_id: string
+          departamento: string
+          email: string
+          nome: string
+          tem_usuario: boolean
+          ultima_notificacao: string
+        }[]
+      }
       sst_regimento_publicar: {
         Args: { p_documento_id: string }
         Returns: Json
