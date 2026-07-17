@@ -17,7 +17,7 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { Plus, Receipt, DollarSign, CheckCircle, Clock, XCircle, Trash2, Upload, Eye, DollarSign as DollarIcon } from 'lucide-react';
-import { formatBRL } from '@/utils/format';
+import { formatCurrency } from '@/utils/format';
 
 const statusColors: Record<DespesaStatus, string> = {
   rascunho: 'outline',
@@ -131,8 +131,8 @@ export default function DespesasPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card><CardContent className="pt-4 flex items-center gap-3"><Receipt className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">{despesas.length}</p><p className="text-xs text-muted-foreground">Total</p></div></CardContent></Card>
           <Card><CardContent className="pt-4 flex items-center gap-3"><Clock className="h-8 w-8 text-warning" /><div><p className="text-2xl font-bold">{despesas.filter((d: any) => d.status === 'pendente').length}</p><p className="text-xs text-muted-foreground">Pendentes</p></div></CardContent></Card>
-          <Card><CardContent className="pt-4 flex items-center gap-3"><DollarSign className="h-8 w-8 text-destructive" /><div><p className="text-2xl font-bold">{formatBRL(totalPendente)}</p><p className="text-xs text-muted-foreground">Valor pendente</p></div></CardContent></Card>
-          <Card><CardContent className="pt-4 flex items-center gap-3"><CheckCircle className="h-8 w-8 text-success" /><div><p className="text-2xl font-bold">{formatBRL(totalAprovado)}</p><p className="text-xs text-muted-foreground">Aprovado + folha + pago</p></div></CardContent></Card>
+          <Card><CardContent className="pt-4 flex items-center gap-3"><DollarSign className="h-8 w-8 text-destructive" /><div><p className="text-2xl font-bold">{formatCurrency(totalPendente)}</p><p className="text-xs text-muted-foreground">Valor pendente</p></div></CardContent></Card>
+          <Card><CardContent className="pt-4 flex items-center gap-3"><CheckCircle className="h-8 w-8 text-success" /><div><p className="text-2xl font-bold">{formatCurrency(totalAprovado)}</p><p className="text-xs text-muted-foreground">Aprovado + folha + pago</p></div></CardContent></Card>
         </div>
 
         <div className="flex justify-end mb-4">
@@ -210,7 +210,7 @@ export default function DespesasPage() {
                     <TableCell><Badge variant="outline">{tipoLabels[d.tipo as DespesaTipo] || d.tipo}</Badge></TableCell>
                     <TableCell><Badge variant="outline">{d.categoria}</Badge></TableCell>
                     <TableCell className="max-w-[220px] truncate" title={d.descricao}>{d.descricao}</TableCell>
-                    <TableCell className="font-medium">{formatBRL(Number(d.valor))}</TableCell>
+                    <TableCell className="font-medium">{formatCurrency(Number(d.valor))}</TableCell>
                     <TableCell className="text-xs">{d.data_despesa}</TableCell>
                     <TableCell><Badge variant={statusColors[d.status as DespesaStatus] as any}>{statusLabels[d.status as DespesaStatus] || d.status}</Badge></TableCell>
                     <TableCell>
