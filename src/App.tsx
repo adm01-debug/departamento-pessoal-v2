@@ -248,6 +248,7 @@ export default function App() {
         <Route path="admin/sst/extintores" element={<AdminRoute><LazyPage Component={AdminExtintoresPage} /></AdminRoute>} />
         <Route path="admin/sst/dashboard" element={<AdminRoute><LazyPage Component={AdminSstDashboardPage} /></AdminRoute>} />
         <Route path="admin/sst/cat" element={<AdminRoute><LazyPage Component={AdminCatPage} /></AdminRoute>} />
+        <Route path="admin/sst/regimento" element={<AdminRoute><LazyPage Component={AdminRegimentoInternoPage} /></AdminRoute>} />
         
         
         {/* Outras páginas legadas ou em migração */}
