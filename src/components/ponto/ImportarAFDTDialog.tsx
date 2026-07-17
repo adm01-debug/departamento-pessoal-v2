@@ -51,6 +51,20 @@ export function ImportarAFDTDialog() {
         sem_batida: row?.sem_batida ?? 0,
       });
       toast.success(`Reconciliação concluída: ${row?.ok ?? 0} OK, ${(row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0)} divergências.`);
+      // Dispara notificações agregadas aos membros da empresa (idempotente).
+      const divergenciasTotais = (row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0);
+      if (divergenciasTotais > 0) {
+        const { data: notif, error: notifErr } = await supabase.rpc(
+          'notificar_divergencias_afdt' as never,
+          { _importacao_id: resultado.importacao_id } as never,
+        );
+        if (!notifErr) {
+          const n = Array.isArray(notif) ? (notif[0] as any) : (notif as any);
+          if ((n?.notificacoes_criadas ?? 0) > 0) {
+            toast.info(`${n.notificacoes_criadas} notificação(ões) enviada(s) à equipe.`);
+          }
+        }
+      }
     } catch (e: any) {
       toast.error('Falha na reconciliação: ' + (e?.message ?? 'erro'));
     } finally {
