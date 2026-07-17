@@ -18077,6 +18077,183 @@ export type Database = {
           },
         ]
       }
+      sst_extintores: {
+        Row: {
+          capacidade_kg: number
+          codigo_patrimonio: string
+          created_at: string
+          created_by: string | null
+          data_fabricacao: string | null
+          data_proxima_recarga: string
+          data_proximo_teste_hidrostatico: string
+          data_ultima_recarga: string | null
+          data_ultimo_teste_hidrostatico: string | null
+          deleted_at: string | null
+          empresa_id: string
+          fabricante: string | null
+          id: string
+          latitude: number | null
+          local_trabalho_id: string | null
+          localizacao: string
+          longitude: number | null
+          numero_serie: string | null
+          observacoes: string | null
+          qr_code: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          capacidade_kg: number
+          codigo_patrimonio: string
+          created_at?: string
+          created_by?: string | null
+          data_fabricacao?: string | null
+          data_proxima_recarga: string
+          data_proximo_teste_hidrostatico: string
+          data_ultima_recarga?: string | null
+          data_ultimo_teste_hidrostatico?: string | null
+          deleted_at?: string | null
+          empresa_id: string
+          fabricante?: string | null
+          id?: string
+          latitude?: number | null
+          local_trabalho_id?: string | null
+          localizacao: string
+          longitude?: number | null
+          numero_serie?: string | null
+          observacoes?: string | null
+          qr_code?: string | null
+          status?: string
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          capacidade_kg?: number
+          codigo_patrimonio?: string
+          created_at?: string
+          created_by?: string | null
+          data_fabricacao?: string | null
+          data_proxima_recarga?: string
+          data_proximo_teste_hidrostatico?: string
+          data_ultima_recarga?: string | null
+          data_ultimo_teste_hidrostatico?: string | null
+          deleted_at?: string | null
+          empresa_id?: string
+          fabricante?: string | null
+          id?: string
+          latitude?: number | null
+          local_trabalho_id?: string | null
+          localizacao?: string
+          longitude?: number | null
+          numero_serie?: string | null
+          observacoes?: string | null
+          qr_code?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_extintores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_extintores_local_trabalho_id_fkey"
+            columns: ["local_trabalho_id"]
+            isOneToOne: false
+            referencedRelation: "locais_trabalho"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_extintores_inspecoes: {
+        Row: {
+          acesso_desobstruido: boolean
+          altura_correta: boolean
+          corpo_integro: boolean
+          created_at: string
+          data_inspecao: string
+          empresa_id: string
+          extintor_id: string
+          foto_url: string | null
+          id: string
+          inspetor_id: string | null
+          inspetor_nome: string
+          ip_address: unknown
+          lacre_ok: boolean
+          latitude: number | null
+          longitude: number | null
+          mangueira_ok: boolean
+          observacoes: string | null
+          pressao_ok: boolean
+          resultado: string
+          sinalizacao_ok: boolean
+        }
+        Insert: {
+          acesso_desobstruido?: boolean
+          altura_correta?: boolean
+          corpo_integro?: boolean
+          created_at?: string
+          data_inspecao?: string
+          empresa_id: string
+          extintor_id: string
+          foto_url?: string | null
+          id?: string
+          inspetor_id?: string | null
+          inspetor_nome: string
+          ip_address?: unknown
+          lacre_ok?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          mangueira_ok?: boolean
+          observacoes?: string | null
+          pressao_ok?: boolean
+          resultado: string
+          sinalizacao_ok?: boolean
+        }
+        Update: {
+          acesso_desobstruido?: boolean
+          altura_correta?: boolean
+          corpo_integro?: boolean
+          created_at?: string
+          data_inspecao?: string
+          empresa_id?: string
+          extintor_id?: string
+          foto_url?: string | null
+          id?: string
+          inspetor_id?: string | null
+          inspetor_nome?: string
+          ip_address?: unknown
+          lacre_ok?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          mangueira_ok?: boolean
+          observacoes?: string | null
+          pressao_ok?: boolean
+          resultado?: string
+          sinalizacao_ok?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_extintores_inspecoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_extintores_inspecoes_extintor_id_fkey"
+            columns: ["extintor_id"]
+            isOneToOne: false
+            referencedRelation: "sst_extintores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sst_incidentes: {
         Row: {
           colaborador_id: string | null
@@ -22882,6 +23059,10 @@ export type Database = {
         }[]
       }
       sst_dashboard_sla: { Args: { p_empresa_id: string }; Returns: Json }
+      sst_extintores_dashboard: {
+        Args: { p_empresa_id: string }
+        Returns: Json
+      }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
