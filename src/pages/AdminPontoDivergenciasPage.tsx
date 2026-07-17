@@ -95,7 +95,7 @@ export default function AdminPontoDivergenciasPage() {
         .from('colaboradores')
         .select('id,nome:nome_completo,matricula')
         .eq('empresa_id', empresaId!)
-        .eq('status', 'Ativo')
+        .in('status', ['ativo', 'Ativo', 'ATIVO'])
         .order('nome')
         .limit(500);
       if (error) throw error;
