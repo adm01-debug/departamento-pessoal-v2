@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send } from 'lucide-react';
+import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send, Bell } from 'lucide-react';
 
 type Documento = {
   id: string;
