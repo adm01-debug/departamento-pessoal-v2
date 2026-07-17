@@ -14752,47 +14752,74 @@ export type Database = {
       ponto_espelhos_assinados: {
         Row: {
           arquivo_espelho_url: string | null
+          assinado_em: string | null
+          assinado_ip: unknown
+          assinado_por_user_id: string | null
+          assinado_user_agent: string | null
+          canonical_json: Json | null
           colaborador_id: string | null
+          competencia: string | null
           created_at: string | null
           data_assinatura_colaborador: string | null
           data_assinatura_rh: string | null
+          empresa_id: string | null
           hash_assinatura_colaborador: string | null
           hash_assinatura_rh: string | null
+          hash_sha256: string | null
           id: string
           periodo_fim: string
           periodo_inicio: string
           saldo_banco_horas_periodo: string | null
           status_assinatura: string | null
+          total_batidas: number | null
           total_horas_trabalhadas: string | null
         }
         Insert: {
           arquivo_espelho_url?: string | null
+          assinado_em?: string | null
+          assinado_ip?: unknown
+          assinado_por_user_id?: string | null
+          assinado_user_agent?: string | null
+          canonical_json?: Json | null
           colaborador_id?: string | null
+          competencia?: string | null
           created_at?: string | null
           data_assinatura_colaborador?: string | null
           data_assinatura_rh?: string | null
+          empresa_id?: string | null
           hash_assinatura_colaborador?: string | null
           hash_assinatura_rh?: string | null
+          hash_sha256?: string | null
           id?: string
           periodo_fim: string
           periodo_inicio: string
           saldo_banco_horas_periodo?: string | null
           status_assinatura?: string | null
+          total_batidas?: number | null
           total_horas_trabalhadas?: string | null
         }
         Update: {
           arquivo_espelho_url?: string | null
+          assinado_em?: string | null
+          assinado_ip?: unknown
+          assinado_por_user_id?: string | null
+          assinado_user_agent?: string | null
+          canonical_json?: Json | null
           colaborador_id?: string | null
+          competencia?: string | null
           created_at?: string | null
           data_assinatura_colaborador?: string | null
           data_assinatura_rh?: string | null
+          empresa_id?: string | null
           hash_assinatura_colaborador?: string | null
           hash_assinatura_rh?: string | null
+          hash_sha256?: string | null
           id?: string
           periodo_fim?: string
           periodo_inicio?: string
           saldo_banco_horas_periodo?: string | null
           status_assinatura?: string | null
+          total_batidas?: number | null
           total_horas_trabalhadas?: string | null
         }
         Relationships: [
@@ -14823,6 +14850,44 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
+          },
+        ]
+      }
+      ponto_espelhos_revogacoes: {
+        Row: {
+          espelho_id: string
+          id: string
+          ip: unknown
+          motivo: string
+          revogado_em: string
+          revogado_por_user_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          espelho_id: string
+          id?: string
+          ip?: unknown
+          motivo: string
+          revogado_em?: string
+          revogado_por_user_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          espelho_id?: string
+          id?: string
+          ip?: unknown
+          motivo?: string
+          revogado_em?: string
+          revogado_por_user_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ponto_espelhos_revogacoes_espelho_id_fkey"
+            columns: ["espelho_id"]
+            isOneToOne: false
+            referencedRelation: "ponto_espelhos_assinados"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -21773,6 +21838,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      assinar_espelho_ponto: {
+        Args: {
+          _colaborador_id: string
+          _competencia: string
+          _ip?: unknown
+          _user_agent?: string
+        }
+        Returns: Json
+      }
       associar_pis_colaborador_afdt: {
         Args: { _colaborador_id: string; _divergencia_id: string }
         Returns: undefined
@@ -21846,6 +21920,10 @@ export type Database = {
         }[]
       }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
+      gerar_canonical_espelho_ponto: {
+        Args: { _colaborador_id: string; _competencia: string }
+        Returns: Json
+      }
       get_audit_trail_by_entity: {
         Args: { _entidade: string; _entidade_id: string; _limit?: number }
         Returns: {
@@ -22067,6 +22145,15 @@ export type Database = {
         Args: { _divergencia_id: string; _observacao?: string }
         Returns: undefined
       }
+      revogar_espelho_ponto: {
+        Args: {
+          _espelho_id: string
+          _ip?: unknown
+          _motivo: string
+          _user_agent?: string
+        }
+        Returns: Json
+      }
       run_rls_tests: { Args: never; Returns: string[] }
       search_audit_unified: {
         Args: {
@@ -22099,6 +22186,7 @@ export type Database = {
         Args: { _allowed: Json; _new: string; _old: string; _table: string }
         Returns: undefined
       }
+      verificar_espelho_ponto: { Args: { _espelho_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "gestor" | "rh" | "user"
