@@ -7937,6 +7937,187 @@ export type Database = {
           },
         ]
       }
+      epis_fichas: {
+        Row: {
+          assinada_em: string | null
+          colaborador_id: string
+          created_at: string
+          empresa_id: string
+          evidencia_foto_path: string | null
+          hash_sha256: string | null
+          id: string
+          metadata: Json
+          motivo: string | null
+          observacoes: string | null
+          responsavel_id: string | null
+          responsavel_nome: string
+          status: string
+          tipo_movimento: string
+          updated_at: string
+        }
+        Insert: {
+          assinada_em?: string | null
+          colaborador_id: string
+          created_at?: string
+          empresa_id: string
+          evidencia_foto_path?: string | null
+          hash_sha256?: string | null
+          id?: string
+          metadata?: Json
+          motivo?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          responsavel_nome: string
+          status?: string
+          tipo_movimento?: string
+          updated_at?: string
+        }
+        Update: {
+          assinada_em?: string | null
+          colaborador_id?: string
+          created_at?: string
+          empresa_id?: string
+          evidencia_foto_path?: string | null
+          hash_sha256?: string | null
+          id?: string
+          metadata?: Json
+          motivo?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          responsavel_nome?: string
+          status?: string
+          tipo_movimento?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epis_fichas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epis_fichas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epis_fichas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epis_fichas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+        ]
+      }
+      epis_fichas_assinaturas: {
+        Row: {
+          assinado_em: string
+          assinatura_dados: string
+          assinatura_tipo: string
+          ficha_id: string
+          hash_sha256: string
+          id: string
+          ip_address: unknown
+          user_agent: string | null
+        }
+        Insert: {
+          assinado_em?: string
+          assinatura_dados: string
+          assinatura_tipo: string
+          ficha_id: string
+          hash_sha256: string
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+        }
+        Update: {
+          assinado_em?: string
+          assinatura_dados?: string
+          assinatura_tipo?: string
+          ficha_id?: string
+          hash_sha256?: string
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epis_fichas_assinaturas_ficha_id_fkey"
+            columns: ["ficha_id"]
+            isOneToOne: true
+            referencedRelation: "epis_fichas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      epis_fichas_itens: {
+        Row: {
+          ca: string | null
+          ca_validade: string | null
+          created_at: string
+          data_devolucao: string | null
+          data_entrega: string
+          descricao: string
+          epi_id: string | null
+          ficha_id: string
+          id: string
+          quantidade: number
+          status_item: string
+        }
+        Insert: {
+          ca?: string | null
+          ca_validade?: string | null
+          created_at?: string
+          data_devolucao?: string | null
+          data_entrega?: string
+          descricao: string
+          epi_id?: string | null
+          ficha_id: string
+          id?: string
+          quantidade?: number
+          status_item?: string
+        }
+        Update: {
+          ca?: string | null
+          ca_validade?: string | null
+          created_at?: string
+          data_devolucao?: string | null
+          data_entrega?: string
+          descricao?: string
+          epi_id?: string | null
+          ficha_id?: string
+          id?: string
+          quantidade?: number
+          status_item?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epis_fichas_itens_epi_id_fkey"
+            columns: ["epi_id"]
+            isOneToOne: false
+            referencedRelation: "epis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epis_fichas_itens_ficha_id_fkey"
+            columns: ["ficha_id"]
+            isOneToOne: false
+            referencedRelation: "epis_fichas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       escalas: {
         Row: {
           ativo: boolean | null
