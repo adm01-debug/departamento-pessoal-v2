@@ -29,8 +29,34 @@ export function ImportarAFDTDialog() {
   const [open, setOpen] = useState(false);
   const [tipo, setTipo] = useState<Tipo>('AFDT');
   const [loading, setLoading] = useState(false);
+  const [reconciliando, setReconciliando] = useState(false);
+  const [reconc, setReconc] = useState<{ total: number; ok: number; sem_colaborador: number; sem_batida: number } | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleReconciliar = async () => {
+    if (!resultado?.importacao_id) return;
+    setReconciliando(true);
+    try {
+      const { data, error } = await supabase.rpc('reconciliar_afdt' as never, {
+        _importacao_id: resultado.importacao_id,
+        _janela_seg: 300,
+      } as never);
+      if (error) throw error;
+      const row = Array.isArray(data) ? (data[0] as any) : (data as any);
+      setReconc({
+        total: row?.total ?? 0,
+        ok: row?.ok ?? 0,
+        sem_colaborador: row?.sem_colaborador ?? 0,
+        sem_batida: row?.sem_batida ?? 0,
+      });
+      toast.success(`Reconciliação concluída: ${row?.ok ?? 0} OK, ${(row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0)} divergências.`);
+    } catch (e: any) {
+      toast.error('Falha na reconciliação: ' + (e?.message ?? 'erro'));
+    } finally {
+      setReconciliando(false);
+    }
+  };
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
