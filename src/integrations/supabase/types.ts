@@ -8457,6 +8457,68 @@ export type Database = {
           },
         ]
       }
+      exames_agendamentos: {
+        Row: {
+          aso_id: string | null
+          clinica_id: string
+          colaborador_id: string
+          colaborador_lat: number | null
+          colaborador_lng: number | null
+          created_at: string
+          criado_por: string | null
+          data_agendada: string
+          distancia_km: number | null
+          empresa_id: string
+          id: string
+          observacoes: string | null
+          status: string
+          tipo_exame: string
+          updated_at: string
+        }
+        Insert: {
+          aso_id?: string | null
+          clinica_id: string
+          colaborador_id: string
+          colaborador_lat?: number | null
+          colaborador_lng?: number | null
+          created_at?: string
+          criado_por?: string | null
+          data_agendada: string
+          distancia_km?: number | null
+          empresa_id: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+          tipo_exame: string
+          updated_at?: string
+        }
+        Update: {
+          aso_id?: string | null
+          clinica_id?: string
+          colaborador_id?: string
+          colaborador_lat?: number | null
+          colaborador_lng?: number | null
+          created_at?: string
+          criado_por?: string | null
+          data_agendada?: string
+          distancia_km?: number | null
+          empresa_id?: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+          tipo_exame?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exames_agendamentos_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinicas_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faltas: {
         Row: {
           aprovado_em: string | null
@@ -22065,6 +22127,27 @@ export type Database = {
         Returns: Json
       }
       cleanup_security_logs: { Args: never; Returns: undefined }
+      clinicas_proximas: {
+        Args: {
+          p_empresa_id: string
+          p_lat: number
+          p_limit?: number
+          p_lng: number
+          p_raio_km?: number
+          p_tipo_exame?: string
+        }
+        Returns: {
+          cidade: string
+          distancia_km: number
+          id: string
+          nome_fantasia: string
+          razao_social: string
+          sla_medio_min: number
+          telefone: string
+          tipos_exame: string[]
+          uf: string
+        }[]
+      }
       criar_batida_da_divergencia_afdt: {
         Args: { _divergencia_id: string; _tipo?: string }
         Returns: string
@@ -22078,6 +22161,10 @@ export type Database = {
           _time_nova: string
         }
         Returns: undefined
+      }
+      distancia_haversine: {
+        Args: { lat1: number; lat2: number; lng1: number; lng2: number }
+        Returns: number
       }
       enforce_log_retention: { Args: never; Returns: Json }
       fn_calculate_periodo_aquisitivo: {
