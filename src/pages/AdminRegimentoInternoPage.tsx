@@ -231,6 +231,81 @@ const AdminRegimentoInternoPage = () => {
       </div>
 
       <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2"><UserX className="h-4 w-4 text-destructive" /> Colaboradores Pendentes ({pendentes.length})</CardTitle>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1"
+            disabled={pendentes.length === 0}
+            onClick={() => {
+              const header = 'Nome;Email;Cargo;Departamento;Tem Usuário;Última Notificação\n';
+              const rows = pendentes.map((p) => [
+                (p.nome ?? '').replace(/;/g, ','),
+                (p.email ?? '').replace(/;/g, ','),
+                (p.cargo ?? '').replace(/;/g, ','),
+                (p.departamento ?? '').replace(/;/g, ','),
+                p.tem_usuario ? 'Sim' : 'Não',
+                p.ultima_notificacao ? new Date(p.ultima_notificacao).toLocaleString('pt-BR') : '—',
+              ].join(';')).join('\n');
+              const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `regimento-pendentes-${new Date().toISOString().slice(0,10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <Download className="h-3 w-3" /> Exportar CSV
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {!dash?.documento ? (
+            <div className="text-sm text-muted-foreground">Publique um documento para acompanhar as pendências.</div>
+          ) : pendentes.length === 0 ? (
+            <div className="text-sm text-muted-foreground">🎉 Todos os colaboradores ativos já assinaram.</div>
+          ) : (
+            <div className="max-h-[420px] overflow-auto rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Colaborador</TableHead>
+                    <TableHead>Cargo</TableHead>
+                    <TableHead>Departamento</TableHead>
+                    <TableHead>Usuário</TableHead>
+                    <TableHead>Última Notificação</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendentes.map((p) => (
+                    <TableRow key={p.colaborador_id}>
+                      <TableCell>
+                        <div className="font-medium">{p.nome}</div>
+                        <div className="text-xs text-muted-foreground">{p.email ?? '—'}</div>
+                      </TableCell>
+                      <TableCell className="text-sm">{p.cargo ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{p.departamento ?? '—'}</TableCell>
+                      <TableCell>
+                        {p.tem_usuario ? (
+                          <Badge variant="secondary">Vinculado</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-destructive border-destructive">Sem acesso</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {p.ultima_notificacao ? new Date(p.ultima_notificacao).toLocaleString('pt-BR') : '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader><CardTitle>Versões</CardTitle></CardHeader>
         <CardContent>
           {loading ? (
