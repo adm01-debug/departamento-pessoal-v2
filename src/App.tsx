@@ -95,6 +95,7 @@ const AdminPontoDivergenciasPage = lazy(() => import('@/pages/AdminPontoDivergen
 const AdminClinicasPartnersPage = lazy(() => import('@/pages/AdminClinicasPartnersPage'));
 const AdminAgendamentoExamesPage = lazy(() => import('@/pages/AdminAgendamentoExamesPage'));
 const AdminAsoWorkflowPage = lazy(() => import('@/pages/AdminAsoWorkflowPage'));
+const AdminSstDashboardPage = lazy(() => import('@/pages/AdminSstDashboardPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
@@ -239,6 +240,7 @@ export default function App() {
         <Route path="admin/sst/clinicas" element={<AdminRoute><LazyPage Component={AdminClinicasPartnersPage} /></AdminRoute>} />
         <Route path="admin/sst/agendamentos" element={<AdminRoute><LazyPage Component={AdminAgendamentoExamesPage} /></AdminRoute>} />
         <Route path="admin/sst/aso" element={<AdminRoute><LazyPage Component={AdminAsoWorkflowPage} /></AdminRoute>} />
+        <Route path="admin/sst/dashboard" element={<AdminRoute><LazyPage Component={AdminSstDashboardPage} /></AdminRoute>} />
         
         {/* Outras páginas legadas ou em migração */}
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
