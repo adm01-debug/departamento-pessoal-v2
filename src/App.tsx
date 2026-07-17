@@ -93,6 +93,7 @@ const AdminOperacaoPage = lazy(() => import('@/pages/AdminOperacaoPage'));
 const AdminSecurityPage = lazy(() => import('@/pages/AdminSecurityPage'));
 const AdminPontoDivergenciasPage = lazy(() => import('@/pages/AdminPontoDivergenciasPage'));
 const AdminClinicasPartnersPage = lazy(() => import('@/pages/AdminClinicasPartnersPage'));
+const AdminAgendamentoExamesPage = lazy(() => import('@/pages/AdminAgendamentoExamesPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
