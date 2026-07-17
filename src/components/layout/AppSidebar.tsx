@@ -117,6 +117,23 @@ const menuGroups: MenuGroup[] = [
     ]
   },
   {
+    id: 'sst',
+    label: 'SST / Saúde Ocupacional',
+    icon: ShieldCheck,
+    color: 'text-success',
+    items: [
+      { icon: LayoutDashboard, label: 'Dashboard SST', path: '/admin/sst/dashboard', color: 'text-success' },
+      { icon: Shield, label: 'Visão Geral SST', path: '/sst', color: 'text-success' },
+      { icon: Building2, label: 'Clínicas Parceiras', path: '/admin/sst/clinicas', color: 'text-info' },
+      { icon: CalendarClock, label: 'Agendamento de Exames', path: '/admin/sst/agendamentos', color: 'text-info' },
+      { icon: FileCheck, label: 'ASO Workflow', path: '/admin/sst/aso', color: 'text-primary' },
+      { icon: Fingerprint, label: 'Fichas de EPI', path: '/admin/sst/epis', color: 'text-warning' },
+      { icon: ShieldAlert, label: 'Extintores (NR-23)', path: '/admin/sst/extintores', color: 'text-destructive' },
+      { icon: FileText, label: 'CAT Eletrônica', path: '/admin/sst/cat', color: 'text-warning' },
+      { icon: ClipboardList, label: 'Regimento Interno', path: '/admin/sst/regimento', color: 'text-primary' },
+    ]
+  },
+  {
     id: 'administracao',
     label: 'Administração',
     icon: Settings,
