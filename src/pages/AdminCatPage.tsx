@@ -62,15 +62,15 @@ export default function AdminCatPage() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const form = useForm({
+  const form = useForm<CatForm>({
     resolver: zodResolver(catSchema) as never,
     defaultValues: {
-      tipo_cat: 'inicial' as const,
-      tipo_acidente: 'tipico' as const,
+      tipo_cat: 'inicial',
+      tipo_acidente: 'tipico',
       houve_afastamento: false,
       houve_obito: false,
       houve_internacao: false,
-    },
+    } as Partial<CatForm>,
   });
 
   const empresaId = empresaAtual?.id;
