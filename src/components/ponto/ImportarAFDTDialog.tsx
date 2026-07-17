@@ -7,7 +7,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { FileUp, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { FileUp, Loader2, CheckCircle2, AlertTriangle, GitCompare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
