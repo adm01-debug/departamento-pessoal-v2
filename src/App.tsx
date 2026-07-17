@@ -238,6 +238,7 @@ export default function App() {
         <Route path="admin/ponto/divergencias" element={<AdminRoute><LazyPage Component={AdminPontoDivergenciasPage} /></AdminRoute>} />
         <Route path="admin/sst/clinicas" element={<AdminRoute><LazyPage Component={AdminClinicasPartnersPage} /></AdminRoute>} />
         <Route path="admin/sst/agendamentos" element={<AdminRoute><LazyPage Component={AdminAgendamentoExamesPage} /></AdminRoute>} />
+        <Route path="admin/sst/aso" element={<AdminRoute><LazyPage Component={AdminAsoWorkflowPage} /></AdminRoute>} />
         
         {/* Outras páginas legadas ou em migração */}
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
