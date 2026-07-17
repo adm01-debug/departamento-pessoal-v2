@@ -18742,6 +18742,144 @@ export type Database = {
         }
         Relationships: []
       }
+      sst_regimento_assinaturas: {
+        Row: {
+          assinado_em: string
+          colaborador_id: string
+          created_at: string
+          documento_id: string
+          empresa_id: string
+          hash_assinatura: string
+          hash_documento: string
+          id: string
+          ip_origem: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          assinado_em?: string
+          colaborador_id: string
+          created_at?: string
+          documento_id: string
+          empresa_id: string
+          hash_assinatura: string
+          hash_documento: string
+          id?: string
+          ip_origem?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          assinado_em?: string
+          colaborador_id?: string
+          created_at?: string
+          documento_id?: string
+          empresa_id?: string
+          hash_assinatura?: string
+          hash_documento?: string
+          id?: string
+          ip_origem?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_regimento_assinaturas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_regimento_assinaturas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_regimento_assinaturas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_regimento_assinaturas_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "sst_regimento_assinaturas_documento_id_fkey"
+            columns: ["documento_id"]
+            isOneToOne: false
+            referencedRelation: "sst_regimento_documentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_regimento_assinaturas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_regimento_documentos: {
+        Row: {
+          conteudo_html: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          hash_sha256: string | null
+          id: string
+          observacoes: string | null
+          publicado_em: string | null
+          publicado_por: string | null
+          status: string
+          titulo: string
+          updated_at: string
+          versao: number
+        }
+        Insert: {
+          conteudo_html: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          hash_sha256?: string | null
+          id?: string
+          observacoes?: string | null
+          publicado_em?: string | null
+          publicado_por?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string
+          versao?: number
+        }
+        Update: {
+          conteudo_html?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          hash_sha256?: string | null
+          id?: string
+          observacoes?: string | null
+          publicado_em?: string | null
+          publicado_por?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_regimento_documentos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sst_regimento_interno: {
         Row: {
           artigo_clt_base: string | null
@@ -23230,6 +23368,20 @@ export type Database = {
       sst_dashboard_sla: { Args: { p_empresa_id: string }; Returns: Json }
       sst_extintores_dashboard: {
         Args: { p_empresa_id: string }
+        Returns: Json
+      }
+      sst_regimento_assinar: {
+        Args: {
+          p_colaborador_id: string
+          p_documento_id: string
+          p_ip?: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
+      sst_regimento_dashboard: { Args: { p_empresa_id: string }; Returns: Json }
+      sst_regimento_publicar: {
+        Args: { p_documento_id: string }
         Returns: Json
       }
       user_belongs_to_empresa: {
