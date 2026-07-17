@@ -86,11 +86,12 @@ export default function AdminCatPage() {
           .eq('empresa_id', empresaId)
           .order('data_acidente', { ascending: false })
           .limit(500),
-        supabase.from('colaboradores').select('id,nome').eq('empresa_id', empresaId).limit(500),
+        supabase.from('colaboradores').select('id,nome_completo').eq('empresa_id', empresaId).limit(500),
         supabase.rpc('sst_cat_dashboard', { p_empresa_id: empresaId }),
       ]);
       setCats((cs as CatRow[]) || []);
-      setColaboradores((cols as { id: string; nome: string }[]) || []);
+      const colsData = (cols as { id: string; nome_completo: string }[] | null) || [];
+      setColaboradores(colsData.map(c => ({ id: c.id, nome: c.nome_completo })));
       setDashboard((dash as Record<string, unknown>) || {});
     } catch (e) {
       toast.error('Falha ao carregar CATs');
