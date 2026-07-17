@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { Shield, Plus } from 'lucide-react';
 import { SSTKPIs, SSTExamesTab, SSTEPIsTab, SSTProgramasTab, SSTRiscosTab, SSTNRsTab, SSTIncidentesTab } from '@/components/sst';
 import { GerarPgrButton } from '@/components/sst/GerarPgrButton';
+import { GerarLtcatOsButton } from '@/components/sst/GerarLtcatOsButton';
 
 const RISCO_LEVELS = [
   { label: 'Trivial', value: 1 },
@@ -95,6 +96,7 @@ export default function SSTPage() {
         actions={
           <div className="flex gap-2">
           <GerarPgrButton />
+          <GerarLtcatOsButton />
           <Dialog open={openIncidente} onOpenChange={setOpenIncidente}>
             <DialogTrigger asChild>
               <Button className="rounded-xl bg-gradient-to-r from-destructive to-warning font-body">
