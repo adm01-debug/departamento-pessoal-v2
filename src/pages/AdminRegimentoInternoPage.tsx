@@ -115,6 +115,30 @@ const AdminRegimentoInternoPage = () => {
       toast.error('Falha ao publicar');
     }
   };
+  const notificarPendentes = async () => {
+    if (!empresaAtual?.id || notificando) return;
+    setNotificando(true);
+    try {
+      const { data, error } = await supabase.rpc('sst_regimento_notificar_pendentes', {
+        p_empresa_id: empresaAtual.id,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : (data as any);
+      const notif = row?.notificados ?? 0;
+      const semUser = row?.sem_user ?? 0;
+      if (notif === 0) {
+        toast.info('Nenhum colaborador pendente para notificar agora (dedupe de 7 dias).');
+      } else {
+        toast.success(`${notif} colaborador(es) notificado(s)${semUser ? ` · ${semUser} sem usuário` : ''}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Falha ao notificar pendentes', { description: err?.message });
+    } finally {
+      setNotificando(false);
+    }
+  };
+
 
   return (
     <div className="p-6 space-y-6">
