@@ -460,6 +460,69 @@ export type Database = {
           },
         ]
       }
+      afdt_divergencias: {
+        Row: {
+          batida_id: string | null
+          colaborador_id: string | null
+          created_at: string
+          data_hora_afdt: string | null
+          delta_segundos: number | null
+          empresa_id: string
+          id: string
+          importacao_id: string
+          observacao: string | null
+          pis: string | null
+          registro_raw_id: string | null
+          resolvido: boolean
+          tipo: string
+        }
+        Insert: {
+          batida_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_hora_afdt?: string | null
+          delta_segundos?: number | null
+          empresa_id: string
+          id?: string
+          importacao_id: string
+          observacao?: string | null
+          pis?: string | null
+          registro_raw_id?: string | null
+          resolvido?: boolean
+          tipo: string
+        }
+        Update: {
+          batida_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          data_hora_afdt?: string | null
+          delta_segundos?: number | null
+          empresa_id?: string
+          id?: string
+          importacao_id?: string
+          observacao?: string | null
+          pis?: string | null
+          registro_raw_id?: string | null
+          resolvido?: boolean
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "afdt_divergencias_importacao_id_fkey"
+            columns: ["importacao_id"]
+            isOneToOne: false
+            referencedRelation: "afdt_importacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "afdt_divergencias_registro_raw_id_fkey"
+            columns: ["registro_raw_id"]
+            isOneToOne: false
+            referencedRelation: "afdt_registros_raw"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       afdt_importacoes: {
         Row: {
           cnpj_empregador: string | null
@@ -21853,6 +21916,15 @@ export type Database = {
       purge_expired_idempotency_keys: { Args: never; Returns: number }
       purge_expired_security_data: { Args: never; Returns: Json }
       purge_old_lock_conflicts: { Args: never; Returns: number }
+      reconciliar_afdt: {
+        Args: { _importacao_id: string; _janela_seg?: number }
+        Returns: {
+          ok: number
+          sem_batida: number
+          sem_colaborador: number
+          total: number
+        }[]
+      }
       record_failed_login: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: {
