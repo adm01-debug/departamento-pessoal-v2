@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { admissaoService } from '@/services/admissaoService';
 import { useQueryClient } from '@tanstack/react-query';
-import { formatDateBR } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { GripVertical } from 'lucide-react';
 
 type Admissao = {
@@ -62,7 +62,7 @@ function KanbanCard({ item, dragging }: { item: Admissao; dragging?: boolean }) 
           </Badge>
         )}
         {item.data_prevista && (
-          <span className="text-[10px] text-muted-foreground">{formatDateBR(item.data_prevista)}</span>
+          <span className="text-[10px] text-muted-foreground">{formatDate(item.data_prevista)}</span>
         )}
       </div>
     </Card>
