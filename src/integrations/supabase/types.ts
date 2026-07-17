@@ -17973,6 +17973,192 @@ export type Database = {
           },
         ]
       }
+      sst_ltcat_laudos: {
+        Row: {
+          agentes_nocivos: Json
+          aposentadoria_especial: Json
+          arquivo_path: string | null
+          conclusao: string | null
+          created_at: string
+          data_emissao: string
+          data_validade: string | null
+          empresa_id: string
+          gerado_por: string | null
+          ghes_avaliados: Json
+          hash_sha256: string | null
+          id: string
+          medicoes: Json
+          metadata: Json
+          responsavel_tecnico_nome: string
+          responsavel_tecnico_registro: string
+          responsavel_tecnico_tipo: string | null
+          status: string
+          titulo: string
+          updated_at: string
+          versao: number
+        }
+        Insert: {
+          agentes_nocivos?: Json
+          aposentadoria_especial?: Json
+          arquivo_path?: string | null
+          conclusao?: string | null
+          created_at?: string
+          data_emissao?: string
+          data_validade?: string | null
+          empresa_id: string
+          gerado_por?: string | null
+          ghes_avaliados?: Json
+          hash_sha256?: string | null
+          id?: string
+          medicoes?: Json
+          metadata?: Json
+          responsavel_tecnico_nome: string
+          responsavel_tecnico_registro: string
+          responsavel_tecnico_tipo?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string
+          versao?: number
+        }
+        Update: {
+          agentes_nocivos?: Json
+          aposentadoria_especial?: Json
+          arquivo_path?: string | null
+          conclusao?: string | null
+          created_at?: string
+          data_emissao?: string
+          data_validade?: string | null
+          empresa_id?: string
+          gerado_por?: string | null
+          ghes_avaliados?: Json
+          hash_sha256?: string | null
+          id?: string
+          medicoes?: Json
+          metadata?: Json
+          responsavel_tecnico_nome?: string
+          responsavel_tecnico_registro?: string
+          responsavel_tecnico_tipo?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+          versao?: number
+        }
+        Relationships: []
+      }
+      sst_ordens_servico: {
+        Row: {
+          arquivo_path: string | null
+          cargo_id: string | null
+          colaborador_id: string | null
+          created_at: string
+          descricao_atividades: string | null
+          empresa_id: string
+          epis_obrigatorios: Json
+          escopo: string
+          gerado_por: string | null
+          hash_sha256: string | null
+          id: string
+          medidas_controle: Json
+          metadata: Json
+          penalidades_descumprimento: string | null
+          procedimentos_emergencia: string | null
+          responsavel_cargo: string | null
+          responsavel_nome: string | null
+          responsavel_registro: string | null
+          riscos: Json
+          status: string
+          titulo: string
+          updated_at: string
+          versao: number
+        }
+        Insert: {
+          arquivo_path?: string | null
+          cargo_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          descricao_atividades?: string | null
+          empresa_id: string
+          epis_obrigatorios?: Json
+          escopo: string
+          gerado_por?: string | null
+          hash_sha256?: string | null
+          id?: string
+          medidas_controle?: Json
+          metadata?: Json
+          penalidades_descumprimento?: string | null
+          procedimentos_emergencia?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          responsavel_registro?: string | null
+          riscos?: Json
+          status?: string
+          titulo: string
+          updated_at?: string
+          versao?: number
+        }
+        Update: {
+          arquivo_path?: string | null
+          cargo_id?: string | null
+          colaborador_id?: string | null
+          created_at?: string
+          descricao_atividades?: string | null
+          empresa_id?: string
+          epis_obrigatorios?: Json
+          escopo?: string
+          gerado_por?: string | null
+          hash_sha256?: string | null
+          id?: string
+          medidas_controle?: Json
+          metadata?: Json
+          penalidades_descumprimento?: string | null
+          procedimentos_emergencia?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          responsavel_registro?: string | null
+          riscos?: Json
+          status?: string
+          titulo?: string
+          updated_at?: string
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_ordens_servico_cargo_id_fkey"
+            columns: ["cargo_id"]
+            isOneToOne: false
+            referencedRelation: "cargos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_ordens_servico_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_ordens_servico_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_ordens_servico_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_ordens_servico_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+        ]
+      }
       sst_programas: {
         Row: {
           arquivo_url: string | null
