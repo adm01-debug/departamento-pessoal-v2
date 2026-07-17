@@ -130,6 +130,7 @@ export default function SSTPage() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         }
       >
         <SSTKPIs validos={stats.validos} vencendo={stats.vencendo} vencidos={stats.vencidos} totalEpis={epis.length} totalEntregas={entregas.length} />
