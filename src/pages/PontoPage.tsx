@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { ImportarAFDTDialog } from '@/components/ponto/ImportarAFDTDialog';
+import { GerarAEJDialog } from '@/components/ponto/GerarAEJDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -207,6 +208,7 @@ export default function PontoPage() {
               </Badge>
             )}
             <ImportarAFDTDialog />
+            <GerarAEJDialog />
             <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={() => window.open('/ponto/kiosk', '_blank')}>
               <Settings className="h-4 w-4" /> Kiosk Mode
             </Button>
