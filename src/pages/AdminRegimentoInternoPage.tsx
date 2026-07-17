@@ -30,11 +30,22 @@ type Dashboard = {
   adesao_pct: number;
 };
 
+type Pendente = {
+  colaborador_id: string;
+  nome: string;
+  email: string | null;
+  cargo: string | null;
+  departamento: string | null;
+  tem_usuario: boolean;
+  ultima_notificacao: string | null;
+};
+
 const AdminRegimentoInternoPage = () => {
   const { empresaAtual } = useEmpresas();
   const [loading, setLoading] = useState(true);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [dash, setDash] = useState<Dashboard | null>(null);
+  const [pendentes, setPendentes] = useState<Pendente[]>([]);
   const [showNew, setShowNew] = useState(false);
   const [novoTitulo, setNovoTitulo] = useState('');
   const [novoConteudo, setNovoConteudo] = useState('');
