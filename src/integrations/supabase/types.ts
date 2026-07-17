@@ -10436,6 +10436,60 @@ export type Database = {
           },
         ]
       }
+      holerite_distribuicoes: {
+        Row: {
+          canal: string
+          colaborador_id: string
+          created_at: string
+          distribuido_por: string | null
+          erro: string | null
+          folha_id: string
+          holerite_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          canal: string
+          colaborador_id: string
+          created_at?: string
+          distribuido_por?: string | null
+          erro?: string | null
+          folha_id: string
+          holerite_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          canal?: string
+          colaborador_id?: string
+          created_at?: string
+          distribuido_por?: string | null
+          erro?: string | null
+          folha_id?: string
+          holerite_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holerite_distribuicoes_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holerite_distribuicoes_holerite_id_fkey"
+            columns: ["holerite_id"]
+            isOneToOne: false
+            referencedRelation: "holerites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       holerites: {
         Row: {
           assinado: boolean | null
