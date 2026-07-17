@@ -161,12 +161,27 @@ export function ImportarAFDTDialog() {
                   <dd className="tabular-nums">{resultado.periodo.inicio} → {resultado.periodo.fim}</dd></>
                 )}
               </dl>
+
+              {reconc && (
+                <div className="mt-3 pt-3 border-t border-border/40 grid grid-cols-4 gap-2 text-center text-xs">
+                  <div><p className="text-muted-foreground">Total</p><p className="font-bold tabular-nums">{reconc.total}</p></div>
+                  <div><p className="text-success">OK</p><p className="font-bold tabular-nums text-success">{reconc.ok}</p></div>
+                  <div><p className="text-warning">S/ colab.</p><p className="font-bold tabular-nums text-warning">{reconc.sem_colaborador}</p></div>
+                  <div><p className="text-destructive">S/ batida</p><p className="font-bold tabular-nums text-destructive">{reconc.sem_batida}</p></div>
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading}>Fechar</Button>
+        <DialogFooter className="gap-2">
+          <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading || reconciliando}>Fechar</Button>
+          {resultado?.importacao_id && (
+            <Button variant="secondary" onClick={handleReconciliar} disabled={reconciliando} className="gap-2">
+              {reconciliando ? <Loader2 className="h-4 w-4 animate-spin" /> : <GitCompare className="h-4 w-4" />}
+              Reconciliar com batidas
+            </Button>
+          )}
           <Button onClick={handleUpload} disabled={loading} className="gap-2">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Importar
