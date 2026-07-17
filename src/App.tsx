@@ -232,6 +232,7 @@ export default function App() {
         <Route path="admin/idempotencia" element={<AdminRoute><LazyPage Component={AdminIdempotenciaPage} /></AdminRoute>} />
         <Route path="admin/operacao" element={<AdminRoute><LazyPage Component={AdminOperacaoPage} /></AdminRoute>} />
         <Route path="admin/security" element={<AdminRoute><LazyPage Component={AdminSecurityPage} /></AdminRoute>} />
+        <Route path="admin/ponto/divergencias" element={<AdminRoute><LazyPage Component={AdminPontoDivergenciasPage} /></AdminRoute>} />
         
         {/* Outras páginas legadas ou em migração */}
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
