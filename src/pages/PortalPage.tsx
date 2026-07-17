@@ -69,11 +69,13 @@ export default function PortalPage() {
             <TabsTrigger value="financeiro"><DollarSign className="mr-1 h-4 w-4" />Financeiro</TabsTrigger>
             <TabsTrigger value="documentos"><FileText className="mr-1 h-4 w-4" />Documentos</TabsTrigger>
             <TabsTrigger value="meus-dados"><Edit className="mr-1 h-4 w-4" />Meus Dados</TabsTrigger>
+            <TabsTrigger value="regimento"><ShieldCheck className="mr-1 h-4 w-4" />Regimento SST</TabsTrigger>
           </TabsList>
           <TabsContent value="visao-geral"><PortalOverviewTab nome={nome} data={data} completude={completude} navigate={navigate} /></TabsContent>
           <TabsContent value="financeiro"><PortalFinanceiroTab holerites={data?.holerites || []} beneficios={data?.beneficios || []} /></TabsContent>
           <TabsContent value="documentos"><PortalDocumentosTab navigate={navigate} colaboradorId={data?.profile?.id} /></TabsContent>
           <TabsContent value="meus-dados"><PortalMeusDadosTab nome={nome} email={user?.email || ''} profile={data?.profile} userId={user?.id || ''} navigate={navigate} /></TabsContent>
+          <TabsContent value="regimento"><PortalRegimentoCard /></TabsContent>
         </Tabs>
       </PageLayout>
     </>
