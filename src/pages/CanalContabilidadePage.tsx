@@ -114,7 +114,7 @@ export default function CanalContabilidadePage() {
     else toast.error('Não foi possível abrir anexo');
   };
 
-  const threadAtiva = threads.find((t: any) => t.id === activeThread);
+  const threadAtiva: any = threads.find((t: any) => t.id === activeThread);
 
   return (
     <>
