@@ -3356,6 +3356,187 @@ export type Database = {
         }
         Relationships: []
       }
+      clinicas_partners: {
+        Row: {
+          aceita_convenio: boolean
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          cnpj: string
+          complemento: string | null
+          created_at: string
+          created_by: string | null
+          crm_responsavel: string | null
+          email: string | null
+          empresa_id: string
+          especialidades: string[]
+          geo_lat: number | null
+          geo_lng: number | null
+          id: string
+          logradouro: string | null
+          nome_fantasia: string | null
+          numero: string | null
+          observacoes: string | null
+          rating: number | null
+          razao_social: string
+          responsavel_tecnico: string | null
+          sla_medio_min: number | null
+          status: string
+          telefone: string | null
+          tipos_exame: string[]
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          aceita_convenio?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cnpj: string
+          complemento?: string | null
+          created_at?: string
+          created_by?: string | null
+          crm_responsavel?: string | null
+          email?: string | null
+          empresa_id: string
+          especialidades?: string[]
+          geo_lat?: number | null
+          geo_lng?: number | null
+          id?: string
+          logradouro?: string | null
+          nome_fantasia?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          rating?: number | null
+          razao_social: string
+          responsavel_tecnico?: string | null
+          sla_medio_min?: number | null
+          status?: string
+          telefone?: string | null
+          tipos_exame?: string[]
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aceita_convenio?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string
+          complemento?: string | null
+          created_at?: string
+          created_by?: string | null
+          crm_responsavel?: string | null
+          email?: string | null
+          empresa_id?: string
+          especialidades?: string[]
+          geo_lat?: number | null
+          geo_lng?: number | null
+          id?: string
+          logradouro?: string | null
+          nome_fantasia?: string | null
+          numero?: string | null
+          observacoes?: string | null
+          rating?: number | null
+          razao_social?: string
+          responsavel_tecnico?: string | null
+          sla_medio_min?: number | null
+          status?: string
+          telefone?: string | null
+          tipos_exame?: string[]
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clinicas_partners_horarios: {
+        Row: {
+          ativo: boolean
+          capacidade_por_slot: number
+          clinica_id: string
+          created_at: string
+          dia_semana: number
+          hora_abertura: string
+          hora_fechamento: string
+          id: string
+          intervalo_slot_min: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          capacidade_por_slot?: number
+          clinica_id: string
+          created_at?: string
+          dia_semana: number
+          hora_abertura: string
+          hora_fechamento: string
+          id?: string
+          intervalo_slot_min?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          capacidade_por_slot?: number
+          clinica_id?: string
+          created_at?: string
+          dia_semana?: number
+          hora_abertura?: string
+          hora_fechamento?: string
+          id?: string
+          intervalo_slot_min?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinicas_partners_horarios_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinicas_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinicas_partners_servicos: {
+        Row: {
+          ativo: boolean
+          clinica_id: string
+          created_at: string
+          id: string
+          prazo_resultado_dias: number | null
+          preco: number | null
+          tipo_exame: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          clinica_id: string
+          created_at?: string
+          id?: string
+          prazo_resultado_dias?: number | null
+          preco?: number | null
+          tipo_exame: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          clinica_id?: string
+          created_at?: string
+          id?: string
+          prazo_resultado_dias?: number | null
+          preco?: number | null
+          tipo_exame?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinicas_partners_servicos_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinicas_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cnab_configuracoes: {
         Row: {
           agencia: string
