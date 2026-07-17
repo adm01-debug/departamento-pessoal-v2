@@ -140,6 +140,9 @@ export default function AdmissoesPage() {
           <TabsTrigger value="gestao" className="rounded-lg gap-2">
             <List className="h-4 w-4" /> Gestão de Candidatos
           </TabsTrigger>
+          <TabsTrigger value="kanban" className="rounded-lg gap-2">
+            <Kanban className="h-4 w-4" /> Kanban
+          </TabsTrigger>
           <TabsTrigger value="onboarding" className="rounded-lg gap-2">
             <Rocket className="h-4 w-4" /> Onboarding
           </TabsTrigger>
@@ -147,6 +150,14 @@ export default function AdmissoesPage() {
             <History className="h-4 w-4" /> Auditoria
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="kanban" className="space-y-4">
+          {isLoading ? (
+            <div className="flex justify-center p-12"><Spinner size="lg" /></div>
+          ) : (
+            <AdmissoesKanban admissoes={(admissoes as any[]) || []} />
+          )}
+        </TabsContent>
 
         <TabsContent value="dashboard" className="space-y-6">
           {isLoading ? (
