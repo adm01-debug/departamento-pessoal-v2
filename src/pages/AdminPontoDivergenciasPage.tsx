@@ -21,7 +21,7 @@ import {
   AlertTriangle, CheckCircle2, UserPlus, Clock, Ban, Loader2, Search, RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatDataHoraBR } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 
 type TipoDiv = 'ok' | 'sem_colaborador' | 'sem_batida' | 'duplicado';
 
