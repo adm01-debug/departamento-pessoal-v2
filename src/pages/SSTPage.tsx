@@ -96,6 +96,7 @@ export default function SSTPage() {
         actions={
           <div className="flex gap-2">
           <GerarPgrButton />
+          <GerarLtcatOsButton />
           <Dialog open={openIncidente} onOpenChange={setOpenIncidente}>
             <DialogTrigger asChild>
               <Button className="rounded-xl bg-gradient-to-r from-destructive to-warning font-body">
