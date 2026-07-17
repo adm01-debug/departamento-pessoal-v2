@@ -38,6 +38,7 @@ const AdminRegimentoInternoPage = () => {
   const [novoTitulo, setNovoTitulo] = useState('');
   const [novoConteudo, setNovoConteudo] = useState('');
   const [saving, setSaving] = useState(false);
+  const [notificando, setNotificando] = useState(false);
 
   const proximaVersao = useMemo(
     () => (documentos.length ? Math.max(...documentos.map((d) => d.versao)) + 1 : 1),
