@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FileText, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useEmpresas } from '@/contexts/EmpresasContext';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 export function GerarLtcatOsButton() {
   const { empresaAtual } = useEmpresas();
