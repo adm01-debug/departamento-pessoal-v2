@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -103,6 +103,29 @@ export default function AdminPontoDivergenciasPage() {
     },
     staleTime: 5 * 60_000,
   });
+
+  // Realtime: refetch em INSERT/UPDATE/DELETE de divergências da empresa atual
+  useEffect(() => {
+    if (!empresaId) return;
+    const channel = supabase
+      .channel(`afdt-div-${empresaId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'afdt_divergencias', filter: `empresa_id=eq.${empresaId}` },
+        (payload) => {
+          qc.invalidateQueries({ queryKey: ['afdt-divergencias'] });
+          if (payload.eventType === 'INSERT') {
+            const row = payload.new as Divergencia;
+            if (row.tipo === 'sem_colaborador') {
+              toast.warning('Nova divergência crítica AFDT (PIS não cadastrado)');
+            }
+          }
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [empresaId, qc]);
+
 
   const divergenciasFiltradas = useMemo(() => {
     if (!busca.trim()) return divergencias;

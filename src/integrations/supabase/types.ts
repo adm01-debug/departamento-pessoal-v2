@@ -21915,6 +21915,14 @@ export type Database = {
         }[]
       }
       maintenance_weekly_analyze: { Args: never; Returns: undefined }
+      notificar_divergencias_afdt: {
+        Args: { _importacao_id: string }
+        Returns: {
+          avisos: number
+          criticas: number
+          notificacoes_criadas: number
+        }[]
+      }
       process_lgpd_cleanup_queue: { Args: never; Returns: number }
       processar_ajuste_aprovado: {
         Args: { p_solicitacao_id: string }
