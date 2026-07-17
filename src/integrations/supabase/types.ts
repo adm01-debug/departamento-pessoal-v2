@@ -4499,6 +4499,164 @@ export type Database = {
           },
         ]
       }
+      contabilidade_contatos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          email: string
+          empresa_id: string
+          escritorio: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          email: string
+          empresa_id: string
+          escritorio?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          email?: string
+          empresa_id?: string
+          escritorio?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabilidade_contatos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabilidade_mensagens: {
+        Row: {
+          anexos: Json
+          autor_id: string | null
+          autor_nome: string | null
+          autor_tipo: string
+          corpo: string
+          created_at: string
+          empresa_id: string
+          id: string
+          lida_em: string | null
+          thread_id: string
+        }
+        Insert: {
+          anexos?: Json
+          autor_id?: string | null
+          autor_nome?: string | null
+          autor_tipo: string
+          corpo: string
+          created_at?: string
+          empresa_id: string
+          id?: string
+          lida_em?: string | null
+          thread_id: string
+        }
+        Update: {
+          anexos?: Json
+          autor_id?: string | null
+          autor_nome?: string | null
+          autor_tipo?: string
+          corpo?: string
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          lida_em?: string | null
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabilidade_mensagens_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contabilidade_mensagens_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "contabilidade_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabilidade_threads: {
+        Row: {
+          aberto_por: string | null
+          assunto: string
+          categoria: string
+          contato_id: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          prioridade: string
+          resolvido_em: string | null
+          status: string
+          ultima_atividade_em: string
+          updated_at: string
+        }
+        Insert: {
+          aberto_por?: string | null
+          assunto: string
+          categoria?: string
+          contato_id?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          prioridade?: string
+          resolvido_em?: string | null
+          status?: string
+          ultima_atividade_em?: string
+          updated_at?: string
+        }
+        Update: {
+          aberto_por?: string | null
+          assunto?: string
+          categoria?: string
+          contato_id?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          prioridade?: string
+          resolvido_em?: string | null
+          status?: string
+          ultima_atividade_em?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabilidade_threads_contato_id_fkey"
+            columns: ["contato_id"]
+            isOneToOne: false
+            referencedRelation: "contabilidade_contatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contabilidade_threads_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contas_bancarias: {
         Row: {
           agencia: string | null
