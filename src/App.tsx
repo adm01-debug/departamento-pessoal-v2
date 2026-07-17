@@ -99,6 +99,7 @@ const AdminSstDashboardPage = lazy(() => import('@/pages/AdminSstDashboardPage')
 const AdminEpisFichasPage = lazy(() => import('@/pages/AdminEpisFichasPage'));
 const AdminExtintoresPage = lazy(() => import('@/pages/AdminExtintoresPage'));
 const AdminCatPage = lazy(() => import('@/pages/AdminCatPage'));
+const AdminRegimentoInternoPage = lazy(() => import('@/pages/AdminRegimentoInternoPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
