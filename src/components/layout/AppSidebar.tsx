@@ -132,6 +132,7 @@ const menuGroups: MenuGroup[] = [
       { icon: FileText, label: 'CAT Eletrônica', path: '/admin/sst/cat', color: 'text-warning' },
       { icon: ClipboardList, label: 'Regimento Interno', path: '/admin/sst/regimento', color: 'text-primary' },
     ]
+  },
   {
     id: 'administracao',
     label: 'Administração',
