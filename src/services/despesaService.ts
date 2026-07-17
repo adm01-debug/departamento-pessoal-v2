@@ -21,12 +21,13 @@ export const despesaService = {
   },
 
   async criar(d: Record<string, any>): Promise<any> {
-    const payload = { ...d, status: d.status || 'pendente', tipo: d.tipo || 'reembolso' };
+    const payload: any = { ...d, status: d.status || 'pendente', tipo: d.tipo || 'reembolso' };
     const { data, error } = await supabase.from('despesas').insert(payload).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de despesa foi retornado.');
     return data;
   },
+
 
   async aprovar(id: string, observacoes?: string): Promise<any> {
     const { data, error } = await supabase.rpc('aprovar_despesa', { _despesa_id: id, _observacoes: observacoes ?? null });
