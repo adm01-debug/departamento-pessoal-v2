@@ -460,6 +460,125 @@ export type Database = {
           },
         ]
       }
+      afdt_importacoes: {
+        Row: {
+          cnpj_empregador: string | null
+          created_at: string
+          data_final: string | null
+          data_inicial: string | null
+          empresa_id: string
+          hash_sha256: string | null
+          id: string
+          importado_por: string | null
+          mensagem_erro: string | null
+          metadata: Json | null
+          nome_arquivo: string
+          status: string
+          tamanho_bytes: number | null
+          tipo: string
+          total_erros: number | null
+          total_linhas: number | null
+          total_registros: number | null
+          updated_at: string
+        }
+        Insert: {
+          cnpj_empregador?: string | null
+          created_at?: string
+          data_final?: string | null
+          data_inicial?: string | null
+          empresa_id: string
+          hash_sha256?: string | null
+          id?: string
+          importado_por?: string | null
+          mensagem_erro?: string | null
+          metadata?: Json | null
+          nome_arquivo: string
+          status?: string
+          tamanho_bytes?: number | null
+          tipo: string
+          total_erros?: number | null
+          total_linhas?: number | null
+          total_registros?: number | null
+          updated_at?: string
+        }
+        Update: {
+          cnpj_empregador?: string | null
+          created_at?: string
+          data_final?: string | null
+          data_inicial?: string | null
+          empresa_id?: string
+          hash_sha256?: string | null
+          id?: string
+          importado_por?: string | null
+          mensagem_erro?: string | null
+          metadata?: Json | null
+          nome_arquivo?: string
+          status?: string
+          tamanho_bytes?: number | null
+          tipo?: string
+          total_erros?: number | null
+          total_linhas?: number | null
+          total_registros?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      afdt_registros_raw: {
+        Row: {
+          colaborador_id: string | null
+          conteudo_original: string | null
+          cpf: string | null
+          created_at: string
+          data_hora_marcacao: string | null
+          empresa_id: string
+          erro: string | null
+          id: string
+          importacao_id: string
+          linha_numero: number | null
+          nsr: number | null
+          pis: string | null
+          tipo_registro: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          conteudo_original?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_hora_marcacao?: string | null
+          empresa_id: string
+          erro?: string | null
+          id?: string
+          importacao_id: string
+          linha_numero?: number | null
+          nsr?: number | null
+          pis?: string | null
+          tipo_registro?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          conteudo_original?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_hora_marcacao?: string | null
+          empresa_id?: string
+          erro?: string | null
+          id?: string
+          importacao_id?: string
+          linha_numero?: number | null
+          nsr?: number | null
+          pis?: string | null
+          tipo_registro?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "afdt_registros_raw_importacao_id_fkey"
+            columns: ["importacao_id"]
+            isOneToOne: false
+            referencedRelation: "afdt_importacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ajustes_ponto: {
         Row: {
           aprovado_em: string | null
