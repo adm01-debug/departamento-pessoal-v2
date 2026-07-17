@@ -98,6 +98,7 @@ const AdminAsoWorkflowPage = lazy(() => import('@/pages/AdminAsoWorkflowPage'));
 const AdminSstDashboardPage = lazy(() => import('@/pages/AdminSstDashboardPage'));
 const AdminEpisFichasPage = lazy(() => import('@/pages/AdminEpisFichasPage'));
 const AdminExtintoresPage = lazy(() => import('@/pages/AdminExtintoresPage'));
+const AdminCatPage = lazy(() => import('@/pages/AdminCatPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
@@ -245,6 +246,8 @@ export default function App() {
         <Route path="admin/sst/epis" element={<AdminRoute><LazyPage Component={AdminEpisFichasPage} /></AdminRoute>} />
         <Route path="admin/sst/extintores" element={<AdminRoute><LazyPage Component={AdminExtintoresPage} /></AdminRoute>} />
         <Route path="admin/sst/dashboard" element={<AdminRoute><LazyPage Component={AdminSstDashboardPage} /></AdminRoute>} />
+        <Route path="admin/sst/cat" element={<AdminRoute><LazyPage Component={AdminCatPage} /></AdminRoute>} />
+        
         
         {/* Outras páginas legadas ou em migração */}
         <Route path="horas-extras" element={<LazyPage Component={HorasExtrasPage} />} />
