@@ -17980,13 +17980,17 @@ export type Database = {
           data_emissao: string
           data_validade: string
           empresa_id: string
+          gerado_por: string | null
+          hash_sha256: string | null
           id: string
+          metadata: Json
           registro_profissional: string | null
           responsavel_tecnico: string | null
           status: string | null
           tipo: string
           titulo: string
           updated_at: string | null
+          versao: number
         }
         Insert: {
           arquivo_url?: string | null
@@ -17994,13 +17998,17 @@ export type Database = {
           data_emissao: string
           data_validade: string
           empresa_id: string
+          gerado_por?: string | null
+          hash_sha256?: string | null
           id?: string
+          metadata?: Json
           registro_profissional?: string | null
           responsavel_tecnico?: string | null
           status?: string | null
           tipo: string
           titulo: string
           updated_at?: string | null
+          versao?: number
         }
         Update: {
           arquivo_url?: string | null
@@ -18008,13 +18016,17 @@ export type Database = {
           data_emissao?: string
           data_validade?: string
           empresa_id?: string
+          gerado_por?: string | null
+          hash_sha256?: string | null
           id?: string
+          metadata?: Json
           registro_profissional?: string | null
           responsavel_tecnico?: string | null
           status?: string | null
           tipo?: string
           titulo?: string
           updated_at?: string | null
+          versao?: number
         }
         Relationships: []
       }

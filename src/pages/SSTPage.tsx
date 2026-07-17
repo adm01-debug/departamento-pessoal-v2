@@ -14,6 +14,7 @@ import { useEmpresa } from '@/contexts';
 import { toast } from 'sonner';
 import { Shield, Plus } from 'lucide-react';
 import { SSTKPIs, SSTExamesTab, SSTEPIsTab, SSTProgramasTab, SSTRiscosTab, SSTNRsTab, SSTIncidentesTab } from '@/components/sst';
+import { GerarPgrButton } from '@/components/sst/GerarPgrButton';
 
 const RISCO_LEVELS = [
   { label: 'Trivial', value: 1 },
@@ -92,6 +93,8 @@ export default function SSTPage() {
         icon={<Shield className="h-5 w-5 text-primary-foreground" />}
         gradient="from-success to-info"
         actions={
+          <div className="flex gap-2">
+          <GerarPgrButton />
           <Dialog open={openIncidente} onOpenChange={setOpenIncidente}>
             <DialogTrigger asChild>
               <Button className="rounded-xl bg-gradient-to-r from-destructive to-warning font-body">
@@ -128,6 +131,7 @@ export default function SSTPage() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         }
       >
         <SSTKPIs validos={stats.validos} vencendo={stats.vencendo} vencidos={stats.vencidos} totalEpis={epis.length} totalEntregas={entregas.length} />
