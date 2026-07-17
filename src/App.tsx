@@ -241,6 +241,7 @@ export default function App() {
         <Route path="admin/sst/clinicas" element={<AdminRoute><LazyPage Component={AdminClinicasPartnersPage} /></AdminRoute>} />
         <Route path="admin/sst/agendamentos" element={<AdminRoute><LazyPage Component={AdminAgendamentoExamesPage} /></AdminRoute>} />
         <Route path="admin/sst/aso" element={<AdminRoute><LazyPage Component={AdminAsoWorkflowPage} /></AdminRoute>} />
+        <Route path="admin/sst/epis" element={<AdminRoute><LazyPage Component={AdminEpisFichasPage} /></AdminRoute>} />
         <Route path="admin/sst/dashboard" element={<AdminRoute><LazyPage Component={AdminSstDashboardPage} /></AdminRoute>} />
         
         {/* Outras páginas legadas ou em migração */}
