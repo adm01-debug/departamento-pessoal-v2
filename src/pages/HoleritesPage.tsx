@@ -96,6 +96,7 @@ export default function HoleritesPage() {
         description="Gestão de demonstrativos de pagamento por competência"
         icon={<FileText className="h-5 w-5 text-primary-foreground" />}
         gradient="from-blue-600 to-indigo-600"
+        actions={<DistribuirHoleritesButton competencia={mesFiltro} />}
       >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters Sidebar */}
