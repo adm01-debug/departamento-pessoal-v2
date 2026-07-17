@@ -87,6 +87,7 @@ const menuGroups: MenuGroup[] = [
       { icon: Receipt, label: 'Despesas', path: '/despesas', color: 'text-destructive' },
       { icon: Landmark, label: 'Bancário (CNAB/Pix)', path: '/financeiro-bancario', color: 'text-info' },
       { icon: BookOpen, label: 'Contabilidade', path: '/contabilidade', color: 'text-primary' },
+      { icon: BookOpen, label: 'Canal Contabilidade', path: '/contabilidade/canal', color: 'text-primary' },
     ]
   },
   {
