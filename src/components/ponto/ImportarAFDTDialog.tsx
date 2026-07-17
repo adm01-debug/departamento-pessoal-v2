@@ -58,7 +58,7 @@ export function ImportarAFDTDialog() {
           'notificar_divergencias_afdt' as never,
           { _importacao_id: resultado.importacao_id } as never,
         );
-        if (!notifErr) {
+        if (!notifErr && notif) {
           const n = Array.isArray(notif) ? (notif[0] as any) : (notif as any);
           if ((n?.notificacoes_criadas ?? 0) > 0) {
             toast.info(`${n.notificacoes_criadas} notificação(ões) enviada(s) à equipe.`);
