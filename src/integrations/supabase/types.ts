@@ -277,6 +277,62 @@ export type Database = {
           },
         ]
       }
+      aej_geracoes: {
+        Row: {
+          colaboradores_sem_pis: number
+          created_at: string
+          empresa_id: string
+          erro: string | null
+          gerado_por: string | null
+          hash_sha256: string
+          id: string
+          periodo_fim: string
+          periodo_inicio: string
+          status: string
+          tamanho_bytes: number
+          total_colaboradores: number
+          total_marcacoes: number
+        }
+        Insert: {
+          colaboradores_sem_pis?: number
+          created_at?: string
+          empresa_id: string
+          erro?: string | null
+          gerado_por?: string | null
+          hash_sha256: string
+          id?: string
+          periodo_fim: string
+          periodo_inicio: string
+          status?: string
+          tamanho_bytes?: number
+          total_colaboradores?: number
+          total_marcacoes?: number
+        }
+        Update: {
+          colaboradores_sem_pis?: number
+          created_at?: string
+          empresa_id?: string
+          erro?: string | null
+          gerado_por?: string | null
+          hash_sha256?: string
+          id?: string
+          periodo_fim?: string
+          periodo_inicio?: string
+          status?: string
+          tamanho_bytes?: number
+          total_colaboradores?: number
+          total_marcacoes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aej_geracoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       afastamentos: {
         Row: {
           aprovado_em: string | null
