@@ -96,6 +96,7 @@ const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
 const FinanceiroBancarioPage = lazy(() => import('@/pages/FinanceiroBancarioPage'));
 const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
+const CanalContabilidadePage = lazy(() => import('@/pages/CanalContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
 const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -181,6 +182,7 @@ export default function App() {
         <Route path="passivo-trabalhista" element={<LazyPage Component={PassivoTrabalhistaPage} />} />
         <Route path="financeiro-bancario" element={<LazyPage Component={FinanceiroBancarioPage} />} />
         <Route path="contabilidade" element={<LazyPage Component={ContabilidadePage} />} />
+        <Route path="contabilidade/canal" element={<LazyPage Component={CanalContabilidadePage} />} />
         
         {/* Estrutura */}
         <Route path="empresas" element={<LazyPage Component={EmpresasPage} />} />
