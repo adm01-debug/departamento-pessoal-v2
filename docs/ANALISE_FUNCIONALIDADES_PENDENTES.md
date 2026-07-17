@@ -15,6 +15,8 @@
 | 4 | **Holerites → PDF real** | ✅ Concluído | `holeritePDF.ts` gera demonstrativo de pagamento completo via jsPDF |
 | 5 | **Campos Customizados → UI CRUD** | ✅ Concluído | Tab "Campos" em Configurações com CRUD completo na tabela `campos_customizados` |
 | 6 | **IPs Bloqueados → UI Admin** | ✅ Concluído | Tab "IPs" em Configurações com gestão de bloqueio/desbloqueio |
+| 7 | **Reembolsos & Despesas → Workflow completo (paridade Convenia)** | ✅ Concluído | Fase A #1: state-machine `pendente→aprovado/rejeitado→integrado_folha/pago`, RPCs `aprovar_despesa`/`rejeitar_despesa`, log de auditoria automático, bucket `comprovantes-despesas` com RLS por empresa, upload de comprovante direto no form, dialog dedicado de rejeição com motivo obrigatório |
+
 
 ### Correções de análise anterior:
 - **ObrigacoesFiscaisPage** — já usava BD real (supabase queries para `guias_fgts`, `guias_inss`, `dctfweb_declaracoes`, `sefip_arquivos`)

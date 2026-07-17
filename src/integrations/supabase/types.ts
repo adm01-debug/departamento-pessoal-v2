@@ -6175,10 +6175,14 @@ export type Database = {
           data_despesa: string
           descricao: string
           empresa_id: string | null
+          folha_id: string | null
           id: string
+          integrado_folha_em: string | null
           observacoes: string | null
           observacoes_aprovador: string | null
+          rejeitado_motivo: string | null
           status: string | null
+          tipo: string
           updated_at: string | null
           valor: number
         }
@@ -6192,10 +6196,14 @@ export type Database = {
           data_despesa: string
           descricao: string
           empresa_id?: string | null
+          folha_id?: string | null
           id?: string
+          integrado_folha_em?: string | null
           observacoes?: string | null
           observacoes_aprovador?: string | null
+          rejeitado_motivo?: string | null
           status?: string | null
+          tipo?: string
           updated_at?: string | null
           valor: number
         }
@@ -6209,10 +6217,14 @@ export type Database = {
           data_despesa?: string
           descricao?: string
           empresa_id?: string | null
+          folha_id?: string | null
           id?: string
+          integrado_folha_em?: string | null
           observacoes?: string | null
           observacoes_aprovador?: string | null
+          rejeitado_motivo?: string | null
           status?: string | null
+          tipo?: string
           updated_at?: string | null
           valor?: number
         }
@@ -6253,6 +6265,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "despesas_folha_id_fkey"
+            columns: ["folha_id"]
+            isOneToOne: false
+            referencedRelation: "folhas_pagamento"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_despesas_colaborador"
             columns: ["colaborador_id"]
             isOneToOne: false
@@ -6285,6 +6304,50 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      despesas_aprovacoes_log: {
+        Row: {
+          acao: string
+          created_at: string
+          despesa_id: string
+          empresa_id: string | null
+          id: string
+          motivo: string | null
+          status_anterior: string | null
+          status_novo: string
+          usuario_id: string
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          despesa_id: string
+          empresa_id?: string | null
+          id?: string
+          motivo?: string | null
+          status_anterior?: string | null
+          status_novo: string
+          usuario_id: string
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          despesa_id?: string
+          empresa_id?: string | null
+          id?: string
+          motivo?: string | null
+          status_anterior?: string | null
+          status_novo?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "despesas_aprovacoes_log_despesa_id_fkey"
+            columns: ["despesa_id"]
+            isOneToOne: false
+            referencedRelation: "despesas"
             referencedColumns: ["id"]
           },
         ]
@@ -21230,6 +21293,36 @@ export type Database = {
         Args: { target_id: string }
         Returns: undefined
       }
+      aprovar_despesa: {
+        Args: { _despesa_id: string; _observacoes?: string }
+        Returns: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          categoria: string
+          colaborador_id: string
+          comprovante_url: string | null
+          created_at: string | null
+          data_despesa: string
+          descricao: string
+          empresa_id: string | null
+          folha_id: string | null
+          id: string
+          integrado_folha_em: string | null
+          observacoes: string | null
+          observacoes_aprovador: string | null
+          rejeitado_motivo: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+          valor: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "despesas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
       calculate_lockout_duration: {
         Args: { attempts: number }
@@ -21438,6 +21531,36 @@ export type Database = {
         }[]
       }
       refresh_dashboard_mvs: { Args: never; Returns: Json }
+      rejeitar_despesa: {
+        Args: { _despesa_id: string; _motivo: string }
+        Returns: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          categoria: string
+          colaborador_id: string
+          comprovante_url: string | null
+          created_at: string | null
+          data_despesa: string
+          descricao: string
+          empresa_id: string | null
+          folha_id: string | null
+          id: string
+          integrado_folha_em: string | null
+          observacoes: string | null
+          observacoes_aprovador: string | null
+          rejeitado_motivo: string | null
+          status: string | null
+          tipo: string
+          updated_at: string | null
+          valor: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "despesas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       reset_login_attempts: {
         Args: { p_identifier: string; p_identifier_type?: string }
         Returns: undefined
