@@ -17919,56 +17919,135 @@ export type Database = {
       sst_cat: {
         Row: {
           agente_causador: string | null
+          agente_causador_codigo: string | null
+          atestado_medico_url: string | null
+          boletim_ocorrencia_url: string | null
+          cat_origem_id: string | null
+          cid_principal: string | null
+          cid_secundarios: string[] | null
           colaborador_id: string | null
           created_at: string | null
           created_by: string | null
           data_acidente: string
+          data_envio_esocial: string | null
+          dias_afastamento_estimado: number | null
           empresa_id: string | null
+          especificacao_local: string | null
+          evento_esocial_id: string | null
           hash_integridade: string | null
+          hora_acidente: string | null
           houve_afastamento: boolean | null
+          houve_internacao: boolean | null
           houve_obito: boolean | null
           id: string
+          iniciativa_cat: string | null
           local_acidente: string | null
+          minutos_trabalhados_antes: number | null
+          numero_cat: string | null
+          observacoes: string | null
           parte_corpo_atingida: string | null
+          parte_corpo_codigo: string | null
+          prazo_limite_envio: string | null
           protocolo_esocial: string | null
+          retifica_cat_id: string | null
+          situacao_geradora: string | null
           status_esocial: string | null
           tipo_acidente: string
+          tipo_cat: string
+          tipo_local: string | null
+          ultimo_dia_trabalhado: string | null
+          updated_at: string | null
         }
         Insert: {
           agente_causador?: string | null
+          agente_causador_codigo?: string | null
+          atestado_medico_url?: string | null
+          boletim_ocorrencia_url?: string | null
+          cat_origem_id?: string | null
+          cid_principal?: string | null
+          cid_secundarios?: string[] | null
           colaborador_id?: string | null
           created_at?: string | null
           created_by?: string | null
           data_acidente: string
+          data_envio_esocial?: string | null
+          dias_afastamento_estimado?: number | null
           empresa_id?: string | null
+          especificacao_local?: string | null
+          evento_esocial_id?: string | null
           hash_integridade?: string | null
+          hora_acidente?: string | null
           houve_afastamento?: boolean | null
+          houve_internacao?: boolean | null
           houve_obito?: boolean | null
           id?: string
+          iniciativa_cat?: string | null
           local_acidente?: string | null
+          minutos_trabalhados_antes?: number | null
+          numero_cat?: string | null
+          observacoes?: string | null
           parte_corpo_atingida?: string | null
+          parte_corpo_codigo?: string | null
+          prazo_limite_envio?: string | null
           protocolo_esocial?: string | null
+          retifica_cat_id?: string | null
+          situacao_geradora?: string | null
           status_esocial?: string | null
           tipo_acidente: string
+          tipo_cat?: string
+          tipo_local?: string | null
+          ultimo_dia_trabalhado?: string | null
+          updated_at?: string | null
         }
         Update: {
           agente_causador?: string | null
+          agente_causador_codigo?: string | null
+          atestado_medico_url?: string | null
+          boletim_ocorrencia_url?: string | null
+          cat_origem_id?: string | null
+          cid_principal?: string | null
+          cid_secundarios?: string[] | null
           colaborador_id?: string | null
           created_at?: string | null
           created_by?: string | null
           data_acidente?: string
+          data_envio_esocial?: string | null
+          dias_afastamento_estimado?: number | null
           empresa_id?: string | null
+          especificacao_local?: string | null
+          evento_esocial_id?: string | null
           hash_integridade?: string | null
+          hora_acidente?: string | null
           houve_afastamento?: boolean | null
+          houve_internacao?: boolean | null
           houve_obito?: boolean | null
           id?: string
+          iniciativa_cat?: string | null
           local_acidente?: string | null
+          minutos_trabalhados_antes?: number | null
+          numero_cat?: string | null
+          observacoes?: string | null
           parte_corpo_atingida?: string | null
+          parte_corpo_codigo?: string | null
+          prazo_limite_envio?: string | null
           protocolo_esocial?: string | null
+          retifica_cat_id?: string | null
+          situacao_geradora?: string | null
           status_esocial?: string | null
           tipo_acidente?: string
+          tipo_cat?: string
+          tipo_local?: string | null
+          ultimo_dia_trabalhado?: string | null
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sst_cat_cat_origem_id_fkey"
+            columns: ["cat_origem_id"]
+            isOneToOne: false
+            referencedRelation: "sst_cat"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sst_cat_colaborador_id_fkey"
             columns: ["colaborador_id"]
@@ -18002,6 +18081,95 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sst_cat_retifica_cat_id_fkey"
+            columns: ["retifica_cat_id"]
+            isOneToOne: false
+            referencedRelation: "sst_cat"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_cat_anexos: {
+        Row: {
+          cat_id: string
+          created_at: string
+          file_name: string
+          file_size_bytes: number | null
+          file_url: string
+          id: string
+          tipo: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          cat_id: string
+          created_at?: string
+          file_name: string
+          file_size_bytes?: number | null
+          file_url: string
+          id?: string
+          tipo: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          cat_id?: string
+          created_at?: string
+          file_name?: string
+          file_size_bytes?: number | null
+          file_url?: string
+          id?: string
+          tipo?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_cat_anexos_cat_id_fkey"
+            columns: ["cat_id"]
+            isOneToOne: false
+            referencedRelation: "sst_cat"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_cat_testemunhas: {
+        Row: {
+          cat_id: string
+          cpf: string | null
+          created_at: string
+          depoimento: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          cat_id: string
+          cpf?: string | null
+          created_at?: string
+          depoimento?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+        }
+        Update: {
+          cat_id?: string
+          cpf?: string | null
+          created_at?: string
+          depoimento?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_cat_testemunhas_cat_id_fkey"
+            columns: ["cat_id"]
+            isOneToOne: false
+            referencedRelation: "sst_cat"
             referencedColumns: ["id"]
           },
         ]
@@ -23058,6 +23226,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      sst_cat_dashboard: { Args: { p_empresa_id: string }; Returns: Json }
       sst_dashboard_sla: { Args: { p_empresa_id: string }; Returns: Json }
       sst_extintores_dashboard: {
         Args: { p_empresa_id: string }
