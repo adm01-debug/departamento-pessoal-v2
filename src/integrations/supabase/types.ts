@@ -22502,6 +22502,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      sst_dashboard_sla: { Args: { p_empresa_id: string }; Returns: Json }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
