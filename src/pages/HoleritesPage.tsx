@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
 import { toast } from 'sonner';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
+import { DistribuirHoleritesButton } from '@/components/folha/DistribuirHoleritesButton';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(value);
