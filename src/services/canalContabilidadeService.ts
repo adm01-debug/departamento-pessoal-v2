@@ -20,7 +20,10 @@ export const canalContabilidadeService = {
     return data || [];
   },
 
-  async criarContato(empresaId: string, payload: { nome: string; email: string; telefone?: string; escritorio?: string }) {
+  async criarContato(
+    empresaId: string,
+    payload: { nome: string; email: string; telefone?: string; escritorio?: string }
+  ) {
     const { data, error } = await supabase
       .from('contabilidade_contatos' as any)
       .insert({ ...payload, empresa_id: empresaId })
@@ -49,13 +52,16 @@ export const canalContabilidadeService = {
     return data || [];
   },
 
-  async criarThread(empresaId: string, payload: {
-    assunto: string;
-    categoria: ThreadCategoria;
-    prioridade?: ThreadPrioridade;
-    contato_id?: string | null;
-    mensagemInicial: string;
-  }) {
+  async criarThread(
+    empresaId: string,
+    payload: {
+      assunto: string;
+      categoria: ThreadCategoria;
+      prioridade?: ThreadPrioridade;
+      contato_id?: string | null;
+      mensagemInicial: string;
+    }
+  ) {
     const { data: user } = await supabase.auth.getUser();
     const { data: thread, error } = await supabase
       .from('contabilidade_threads' as any)
@@ -93,7 +99,13 @@ export const canalContabilidadeService = {
     return data || [];
   },
 
-  async enviarMensagem(threadId: string, empresaId: string, corpo: string, autorTipo: AutorTipo = 'rh', anexos: any[] = []) {
+  async enviarMensagem(
+    threadId: string,
+    empresaId: string,
+    corpo: string,
+    autorTipo: AutorTipo = 'rh',
+    anexos: any[] = []
+  ) {
     if (!corpo?.trim()) throw new Error('Mensagem vazia');
     const { data: user } = await supabase.auth.getUser();
     const { data, error } = await supabase
