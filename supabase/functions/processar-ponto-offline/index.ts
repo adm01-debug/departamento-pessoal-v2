@@ -203,6 +203,8 @@ serve(async (req: Request): Promise<Response> => {
           .from('batidas_ponto')
           .insert({
             colaborador_id: reg.colaborador_id,
+            empresa_id: empresaId,
+            ordem: proximaOrdem,
             tipo: tipoMapped,
             data: timestampDate,
             hora: timestampTime,
