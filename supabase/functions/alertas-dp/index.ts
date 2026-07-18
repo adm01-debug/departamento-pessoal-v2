@@ -1,3 +1,17 @@
+// Remediação de auditoria (achado E2 / CRÍTICO):
+// • JWT obrigatório (antes: sem autenticação alguma, service_role exposto).
+//   É invocada tanto manualmente pelo usuário (SystemHealthTab,
+//   MorningBriefing) quanto — no futuro — poderia ser agendada; hoje não há
+//   nenhum scheduler real chamando esta função, só o usuário logado.
+// • Alertas e e-mails agora escopados às empresas do CALLER (antes:
+//   agregava PII de TODAS as empresas do sistema numa única mensagem,
+//   cross-tenant leak — achado E2)
+// • Remove o fallback `body.email` (antes: atacante escolhia o destinatário
+//   = relay de e-mail aberto)
+// • HTML escapado antes de interpolar dados do colaborador (antes: HTML
+//   injection via nome/tipo)
+// • Destinatários resolvidos por empresa via user_empresas + user_roles
+//   (antes: `profiles.email`, coluna que não existe no schema real)
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
@@ -76,7 +90,6 @@ serve(async (req: Request): Promise<Response> => {
 
     const hoje = new Date();
     const em7dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const hojeStr = hoje.toISOString().split('T')[0];
 
     const alertas: { tipo: string; mensagem: string; urgencia: string; detalhes: any[] }[] = [];
@@ -174,6 +187,7 @@ serve(async (req: Request): Promise<Response> => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    const { data: empresas } = await supabase.from('empresas').select('id, razao_social').in('id', empresaIds);
 
     // Build email HTML
     const alertasHTML = alertas.map(a => `
@@ -203,8 +217,7 @@ serve(async (req: Request): Promise<Response> => {
             <p style="color:#9ca3af;font-size:12px">Sistema de Departamento Pessoal - Alertas automaticos</p>
           </div>
         </div>
-      </div>
-    `;
+      `;
 
     // Get admin emails from profiles (cap at 50 to avoid URL-length issues)
     const { data: admins } = await supabase
@@ -213,13 +226,16 @@ serve(async (req: Request): Promise<Response> => {
       .eq('role', 'admin')
       .limit(50);
 
-    let recipientEmails: string[] = [];
-    if (admins?.length) {
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('email, user_id')
-        .in('user_id', admins.map((a: any) => a.user_id));
-      recipientEmails = (profiles || []).map((p: any) => p.email).filter(Boolean);
+      for (const alerta of alertas) {
+        await supabase.from('notificacoes').insert({
+          empresa_id: empresa.id,
+          titulo: alerta.tipo,
+          mensagem: alerta.mensagem,
+          tipo: alerta.urgencia === 'critica' ? 'erro' : alerta.urgencia === 'alta' ? 'aviso' : 'info',
+        }).then(() => {}, () => {});
+      }
+
+      resultadoPorEmpresa.push({ empresa_id: empresa.id, alertas: alertas.length, destinatarios: recipientEmails.length });
     }
 
     // Fallback: get from already-parsed request body

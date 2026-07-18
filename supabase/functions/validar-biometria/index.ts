@@ -1,4 +1,9 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+// Remediação de auditoria (achado E1 / CRÍTICO):
+// • JWT + CSRF obrigatórios (antes: sem autenticação alguma, service_role exposto)
+// • Tenant scope: caller precisa pertencer à empresa do colaborador ou ser admin
+// • Comparação facial real via Lovable AI Gateway (antes: Math.random())
+// • Sem foto de referência => falha fechada (antes: valid:true, fail-open)
+// • Erros genéricos ao cliente (antes: error.message vazado)
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';

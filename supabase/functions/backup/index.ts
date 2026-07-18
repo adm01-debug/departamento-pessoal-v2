@@ -1,3 +1,8 @@
+// Remediação de auditoria (achado E4 / ALTO):
+// • JWT + is_admin obrigatórios (antes: sem autenticação alguma,
+//   service_role exposto; qualquer um obtinha contagens de todas as
+//   empresas quando empresaId era omitido)
+// • Erros genéricos ao cliente (antes: error.message por tabela vazado)
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
@@ -9,6 +14,12 @@ const TABLES = [
   'afastamentos', 'registros_ponto', 'batidas_ponto', 'beneficios',
   'asos', 'admissoes', 'cargos', 'departamentos', 'jornadas',
 ];
+
+function jsonError(status: number, code: string, message: string) {
+  return new Response(JSON.stringify({ success: false, error: message, code }), {
+    status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
@@ -69,16 +80,16 @@ serve(async (req: Request): Promise<Response> => {
       try {
         let query = adminClient.from(table).select('*');
         if (empresaId) query = query.eq('empresa_id', empresaId);
-        const { data, error } = await query.limit(1000);
+        const { count, error } = await query;
         if (error) {
           console.error(`[backup] table ${table} error:`, error.message);
           results[table] = { error: 'Falha ao exportar tabela', count: 0 };
         } else {
-          results[table] = { count: data?.length || 0 };
-          totalRecords += data?.length || 0;
+          results[table] = { count: count ?? 0 };
+          totalRecords += count ?? 0;
         }
       } catch {
-        results[table] = { error: 'Tabela não acessível', count: 0 };
+        results[table] = { count: 0, error: 'Tabela não acessível' };
       }
     }
 
