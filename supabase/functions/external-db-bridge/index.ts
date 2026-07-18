@@ -302,32 +302,50 @@ function jsonOk(payload: Record<string, unknown>) {
 }
 
 // -------------------- Tenant scope check --------------------
-async function assertTenantScope(
-  localClient: ReturnType<typeof createClient>,
-  userId: string,
+function extractEmpresaIdsFromData(
   data: Record<string, unknown> | Record<string, unknown>[] | undefined,
-  filters?: Array<{ column: string; op: string; value: unknown }>,
-): Promise<{ ok: true } | { ok: false; msg: string }> {
+): Set<string> {
   const empresaIds = new Set<string>();
+  if (!data) return empresaIds;
+  const rows = Array.isArray(data) ? data : [data];
+  for (const r of rows) {
+    const eid = (r as Record<string, unknown>)?.empresa_id;
+    if (typeof eid === "string" && eid) empresaIds.add(eid);
+  }
+  return empresaIds;
+}
 
-  // Extract empresa_id from data payload (INSERT/UPDATE/UPSERT)
-  if (data) {
-    const rows = Array.isArray(data) ? data : [data];
-    for (const r of rows) {
-      const eid = (r as Record<string, unknown>)?.empresa_id;
+function empresaIdColumnFor(table: string): string {
+  return table === "empresas" ? "id" : "empresa_id";
+}
+
+async function lookupEmpresaIdsForWrite(
+  externalClient: ReturnType<typeof createClient>,
+  table: string,
+  filters: Array<{ column: string; op: string; value: unknown }>,
+): Promise<{ ok: true; empresaIds: Set<string> } | { ok: false }> {
+  const col = empresaIdColumnFor(table);
+  let query = externalClient.from(table).select(col);
+  for (const f of filters) {
+    if (f.op === "eq") query = query.eq(f.column, f.value);
+  }
+  const { data, error } = await query;
+  if (error) return { ok: false };
+  const empresaIds = new Set<string>();
+  if (Array.isArray(data)) {
+    for (const row of data as Record<string, unknown>[]) {
+      const eid = row?.[col];
       if (typeof eid === "string" && eid) empresaIds.add(eid);
     }
   }
+  return { ok: true, empresaIds };
+}
 
-  // Extract empresa_id from filters (critical for DELETE which has no data)
-  if (filters) {
-    for (const f of filters) {
-      if (f.column === "empresa_id" && f.op === "eq" && typeof f.value === "string" && f.value) {
-        empresaIds.add(f.value);
-      }
-    }
-  }
-
+async function assertTenantScope(
+  localClient: ReturnType<typeof createClient>,
+  userId: string,
+  empresaIds: Set<string>,
+): Promise<{ ok: true } | { ok: false; msg: string }> {
   if (empresaIds.size === 0) return { ok: true };
 
   // Verifica via RPC has_role(admin) primeiro
@@ -452,6 +470,25 @@ Deno.serve(async (req) => {
     }
   }
 
+  // UPDATE/DELETE só aplicam filtros 'eq' na query real (ver abaixo). Se o
+  // chamador enviar QUALQUER outro operador (neq/gt/like/...), esses filtros
+  // seriam silenciosamente ignorados na hora de montar a query — e com zero
+  // filtros 'eq' efetivos, a mutação atingiria a tabela inteira. Em vez de
+  // aceitar e descartar em silêncio, rejeitamos explicitamente (fail-closed).
+  if (action === "update" || action === "delete") {
+    const nonEq = filters.find((f) => f.op !== "eq");
+    if (nonEq) {
+      return jsonError(
+        400,
+        "UNSUPPORTED_FILTER_FOR_WRITE",
+        `${action} only supports 'eq' filters; operator '${nonEq.op}' on column '${nonEq.column}' would be silently ignored and is rejected instead`,
+      );
+    }
+    if (filters.length === 0) {
+      return jsonError(400, "WRITE_REQUIRES_FILTER", `${action} requires at least one 'eq' filter`);
+    }
+  }
+
   // Externo
   const externalUrl = Deno.env.get("EXTERNAL_DB_URL");
   const externalKey = Deno.env.get("EXTERNAL_DB_KEY");
@@ -467,9 +504,28 @@ Deno.serve(async (req) => {
   // Cliente local (para verificação de tenant scope via RPC has_role/user_belongs_to_empresa)
   const localClient = serviceKey ? createClient(supabaseUrl, serviceKey) : null;
 
-  // Tenant scope check para writes em tabelas de negócio
+  // Tenant scope check para writes em tabelas de negócio.
+  // - insert/upsert: o tenant afetado vem do `empresa_id` nas linhas de `data`.
+  // - update/delete: descobrimos o tenant real das linhas alvo via lookup
+  //   (ver `lookupEmpresaIdsForWrite`) usando os mesmos filtros 'eq' da
+  //   mutação — não dependemos do cliente declarar `empresa_id` explicitamente.
   if (isWrite && user && localClient && table && TENANT_SCOPED_TABLES.has(table)) {
-    const scope = await assertTenantScope(localClient, user.id, data, filters);
+    let empresaIds: Set<string>;
+    if (action === "update" || action === "delete") {
+      const lookup = await lookupEmpresaIdsForWrite(externalClient, table, filters);
+      if (!lookup.ok) {
+        return jsonError(
+          403,
+          "TENANT_SCOPE_LOOKUP_FAILED",
+          `Could not verify tenant scope for ${action} on tenant-scoped table '${table}'`,
+        );
+      }
+      empresaIds = lookup.empresaIds;
+    } else {
+      empresaIds = extractEmpresaIdsFromData(data);
+    }
+
+    const scope = await assertTenantScope(localClient, user.id, empresaIds);
     if (!scope.ok) {
       return jsonError(403, "TENANT_SCOPE_DENIED", scope.msg);
     }
