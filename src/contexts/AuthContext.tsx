@@ -146,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(authInitTimeout);
       subscription.unsubscribe();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- isReady is read inside the timeout guard but must NOT re-trigger the subscription setup when it flips
   }, [applySession, markReady]);
 
 
