@@ -82,6 +82,10 @@ const RPC_ALLOWLIST = new Set<string>([
   "has_role", "is_admin", "get_user_roles", "get_user_empresas",
   "get_user_default_empresa", "get_user_scope_empresas", "user_belongs_to_empresa",
   "get_auth_empresa_id",
+  // gestão de papéis — único caminho de leitura/escrita para user_roles (a
+  // tabela está na TABLE_DENYLIST); as funções verificam is_admin(auth.uid())
+  // por dentro. Ver 20260718230000_admin_role_management_rpc.sql (achado R1).
+  "admin_set_user_role", "admin_list_user_roles",
   // negócio
   "get_personnel_cost_projection", "get_colaborador_banco_horas",
   "calcular_dias_ferias", "fn_calculate_periodo_aquisitivo",
