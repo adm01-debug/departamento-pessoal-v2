@@ -68,11 +68,11 @@ export const edgeFunctionsService = {
   calcularRescisao: async (params: {
     salario_base: number;
     data_admissao: string;
-    data_demissao: string;
+    data_desligamento: string;
     tipo_rescisao: string;
     aviso_previo: string;
     saldo_fgts: number;
-    ferias_vencidas: number;
+    ferias_vencidas: boolean;
     dependentes_irrf: number;
   }) => handleInvoke('calcular-rescisao', { body: params }),
 

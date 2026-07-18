@@ -18,9 +18,11 @@ import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 const CHUNK = 500;
 const MAX_COLABS = 10_000;
 
-// Encargos patronais consolidados
+// Encargos patronais consolidados. Achado K5 da auditoria: RAT estava em 2%
+// aqui, divergindo do valor canônico usado em src/calculators/tabelas.ts
+// (ENCARGOS_PADRAO.rat = 3%) — provisão de encargos subestimada.
 const INSS_PATRONAL_BPS = 200n;  // 20%
-const RAT_MEDIO_BPS = 20n;       // 2%
+const RAT_MEDIO_BPS = 30n;       // 3% (src/calculators/tabelas.ts::ENCARGOS_PADRAO.rat)
 const TERCEIROS_BPS = 58n;       // 5.8%
 const FGTS_BPS = 80n;            // 8%
 
@@ -164,9 +166,7 @@ serve(async (req: Request): Promise<Response> => {
         const salarioCents = reaisToCents(Number(c.salario_base) || 0);
         if (salarioCents <= 0n) continue;
 
-        // Provisão de Férias: (salário × 4/3) / 12
-        const feriasPrincipalCents = (salarioCents * 4n) / 12n / 3n * 3n; // = salarioCents * 4/36
-        // Fórmula mais precisa em BigInt:
+        // Provisão de Férias: (salário × 4/3) / 12 = salário × 4/36
         const feriasCents = (salarioCents * 4n) / 36n;
         const feriasINSSCents = (feriasCents * (INSS_PATRONAL_BPS + RAT_MEDIO_BPS + TERCEIROS_BPS)) / 1000n;
         const feriasFGTSCents = (feriasCents * FGTS_BPS) / 1000n;
@@ -195,9 +195,6 @@ serve(async (req: Request): Promise<Response> => {
         });
         totalPrincipalCents += decimoCents;
         totalEncargosCents += decimoINSSCents + decimoFGTSCents;
-
-        // silence unused
-        void feriasPrincipalCents;
       }
     }
 
