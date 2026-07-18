@@ -1,16 +1,16 @@
 # Matriz de Testes E2E e Cobertura Automatizada
 
-> **Data:** 2026-07-18. **Objetivo desta fase:** *documentar* o estado real da bateria de testes e os gaps por jornada crítica. A execução E2E completa exige backend real + browsers Playwright (não disponíveis neste sandbox — ver limitações).
+> **Data:** 2026-07-18. **Objetivo desta fase:** _documentar_ o estado real da bateria de testes e os gaps por jornada crítica. A execução E2E completa exige backend real + browsers Playwright (não disponíveis neste sandbox — ver limitações).
 
 ## 1. Inventário de testes
 
-| Tipo | Local | Quantidade |
-|---|---|---|
-| Unit/component (Vitest) | `src/**/__tests__`, `src/tests/`, `*.test.ts(x)` | 27 arquivos / 203 testes |
-| Edge functions (Deno) | `supabase/functions/**/*test*.ts` | 13 arquivos (8 de 54 funções) |
-| DB (Deno) | `supabase/tests/` | 2 arquivos |
-| E2E (Playwright) | `e2e/**/*.spec.ts` | 20 specs |
-| Setup de auth E2E | `e2e/*.setup.ts` | 2 (admin + não-admin) |
+| Tipo                    | Local                                            | Quantidade                    |
+| ----------------------- | ------------------------------------------------ | ----------------------------- |
+| Unit/component (Vitest) | `src/**/__tests__`, `src/tests/`, `*.test.ts(x)` | 27 arquivos / 203 testes      |
+| Edge functions (Deno)   | `supabase/functions/**/*test*.ts`                | 13 arquivos (8 de 54 funções) |
+| DB (Deno)               | `supabase/tests/`                                | 2 arquivos                    |
+| E2E (Playwright)        | `e2e/**/*.spec.ts`                               | 20 specs                      |
+| Setup de auth E2E       | `e2e/*.setup.ts`                                 | 2 (admin + não-admin)         |
 
 - **0/66 hooks** têm teste. **8/54 edge functions** têm algum teste (só Deno, **não** rodam no pipeline `ci:verify`).
 - `test` **não** faz parte de `ci:verify` (só typecheck+lint+format). Sem threshold de cobertura.
@@ -21,47 +21,47 @@
 
 ## 3. Matriz: jornada crítica × cobertura E2E
 
-| Jornada crítica | Coberta? | Realidade |
-|---|---|---|
-| Login (e-mail/senha) | ✅ | `public/login.spec.ts` + `auth.setup.ts` (login real, persiste `storageState`). |
-| **Login via gov.br** | ❌ | Só senha. Fluxo OAuth `auth-gov-br` sem teste unit nem E2E. |
-| **Rodar folha (calcular)** | ❌ | Nenhum spec dirige o cálculo. `modulos-criticos.spec.ts` só verifica se `/folha` renderiza. |
-| **Fechar folha** | ❌ | Sem E2E; só teste de service mockado. |
-| **Rescisão (com resultado)** | ⚠️ fraca | `calculadora-rescisao.spec.ts` = "renderiza e aceita inputs"; sem asserção de valor. |
-| **Batida com geolocalização/biometria** | ❌ | `mobile/ponto.spec.ts` só checa carregamento e botão visível; nenhuma batida submetida. |
-| RBAC / proteção de rota | ✅ (decente) | Redirect anônimo + não-admin, API 401/403, RLS-no-leak. |
-| Reset de senha | ✅ | Mailbox real (Mailosaur). |
-| Expiração de sessão / token corrompido | ✅ | `session-expiration.spec.ts`. |
-| AFDT/AEJ, dashboard, importação | ⚠️ smoke | Diálogos/KPIs visíveis; download de template `.xlsx`. |
+| Jornada crítica                         | Coberta?     | Realidade                                                                                   |
+| --------------------------------------- | ------------ | ------------------------------------------------------------------------------------------- |
+| Login (e-mail/senha)                    | ✅           | `public/login.spec.ts` + `auth.setup.ts` (login real, persiste `storageState`).             |
+| **Login via gov.br**                    | ❌           | Só senha. Fluxo OAuth `auth-gov-br` sem teste unit nem E2E.                                 |
+| **Rodar folha (calcular)**              | ❌           | Nenhum spec dirige o cálculo. `modulos-criticos.spec.ts` só verifica se `/folha` renderiza. |
+| **Fechar folha**                        | ❌           | Sem E2E; só teste de service mockado.                                                       |
+| **Rescisão (com resultado)**            | ⚠️ fraca     | `calculadora-rescisao.spec.ts` = "renderiza e aceita inputs"; sem asserção de valor.        |
+| **Batida com geolocalização/biometria** | ❌           | `mobile/ponto.spec.ts` só checa carregamento e botão visível; nenhuma batida submetida.     |
+| RBAC / proteção de rota                 | ✅ (decente) | Redirect anônimo + não-admin, API 401/403, RLS-no-leak.                                     |
+| Reset de senha                          | ✅           | Mailbox real (Mailosaur).                                                                   |
+| Expiração de sessão / token corrompido  | ✅           | `session-expiration.spec.ts`.                                                               |
+| AFDT/AEJ, dashboard, importação         | ⚠️ smoke     | Diálogos/KPIs visíveis; download de template `.xlsx`.                                       |
 
 **Dependência de backend:** E2E exige app rodando (`bun run dev` :8080) + Supabase real + credenciais semeadas. **Sem camada de mock.** Browsers Playwright não instalados aqui; egress ao Supabase bloqueado.
 
 ## 4. Matriz: módulo crítico × cobertura unitária
 
-| Módulo | Testado? | Gap principal |
-|---|---|---|
-| INSS/IRRF/FGTS | ✅ | melhor coberto (`scenarios` + `rescisaoCalc`). |
-| Folha (cálculo) | ⚠️ parcial | `calculoLoteService` (lote) e `folha/provisoesService` sem teste. |
-| Rescisão | ⚠️ parcial | edge `calcular-rescisao` sem teste (onde estão os bugs K2–K4). |
-| Férias / 13º / provisões | ⚠️ fraca | services e edges sem teste. |
-| Ponto / banco de horas | ⚠️ parcial | 8 services de ponto sem teste; `parse-afdt` sem teste. |
-| eSocial | ❌ | `esocialService`/`enviar-esocial` sem teste. |
-| CNAB / PIX | ❌ | `cnabService`, `cnab-remessa`, `pix-lote` sem teste (geração de arquivo financeiro). |
-| Benefícios | ⚠️ parcial | `beneficioService` sem teste. |
-| LGPD / anonimização | ❌ | `lgpdService` sem teste. |
-| external-db-bridge | ❌ | só script manual que bate em produção. |
-| Auth / RBAC | ⚠️ parcial | `authService`, gov.br, `controleAcessoService` sem teste. |
+| Módulo                   | Testado?   | Gap principal                                                                        |
+| ------------------------ | ---------- | ------------------------------------------------------------------------------------ |
+| INSS/IRRF/FGTS           | ✅         | melhor coberto (`scenarios` + `rescisaoCalc`).                                       |
+| Folha (cálculo)          | ⚠️ parcial | `calculoLoteService` (lote) e `folha/provisoesService` sem teste.                    |
+| Rescisão                 | ⚠️ parcial | edge `calcular-rescisao` sem teste (onde estão os bugs K2–K4).                       |
+| Férias / 13º / provisões | ⚠️ fraca   | services e edges sem teste.                                                          |
+| Ponto / banco de horas   | ⚠️ parcial | 8 services de ponto sem teste; `parse-afdt` sem teste.                               |
+| eSocial                  | ❌         | `esocialService`/`enviar-esocial` sem teste.                                         |
+| CNAB / PIX               | ❌         | `cnabService`, `cnab-remessa`, `pix-lote` sem teste (geração de arquivo financeiro). |
+| Benefícios               | ⚠️ parcial | `beneficioService` sem teste.                                                        |
+| LGPD / anonimização      | ❌         | `lgpdService` sem teste.                                                             |
+| external-db-bridge       | ❌         | só script manual que bate em produção.                                               |
+| Auth / RBAC              | ⚠️ parcial | `authService`, gov.br, `controleAcessoService` sem teste.                            |
 
 ## 5. Achados de qualidade de teste
 
-| Sev | Arquivo | Problema |
-|---|---|---|
-| 🟠 | `src/tests/rls-logic.test.ts` | Testa uma **reimplementação** inline das políticas, não o sistema. Sempre verde; falsa segurança sobre o controle mais crítico. |
-| 🟠 | `src/tests/rpc-permissions.test.ts` | "Unitário" que faz **rede real**; não-hermético, quebra em CI offline. |
-| 🟡 | `src/tests/validateBridgeContract.ts` | Script com **URL+JWT hardcoded** que bate em produção; fora do glob do Vitest. |
-| 🟡 | `ci:verify` | Não roda `test`; sem piso de cobertura → nada garante a suíte verde. |
-| 🟡 | vários services | Over-mock (cliente inteiro stubado) sem camada de integração → drift de schema não é pego. |
-| 🔵 | specs E2E de auth-error | `test.skip(!ANON_KEY)` → CI mal configurado reporta verde sem rodar. |
+| Sev | Arquivo                               | Problema                                                                                                                        |
+| --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 🟠  | `src/tests/rls-logic.test.ts`         | Testa uma **reimplementação** inline das políticas, não o sistema. Sempre verde; falsa segurança sobre o controle mais crítico. |
+| 🟠  | `src/tests/rpc-permissions.test.ts`   | "Unitário" que faz **rede real**; não-hermético, quebra em CI offline.                                                          |
+| 🟡  | `src/tests/validateBridgeContract.ts` | Script com **URL+JWT hardcoded** que bate em produção; fora do glob do Vitest.                                                  |
+| 🟡  | `ci:verify`                           | Não roda `test`; sem piso de cobertura → nada garante a suíte verde.                                                            |
+| 🟡  | vários services                       | Over-mock (cliente inteiro stubado) sem camada de integração → drift de schema não é pego.                                      |
+| 🔵  | specs E2E de auth-error               | `test.skip(!ANON_KEY)` → CI mal configurado reporta verde sem rodar.                                                            |
 
 ## 6. Top 15 comportamentos de maior risco NÃO testados (ranqueado)
 

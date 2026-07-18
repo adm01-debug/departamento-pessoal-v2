@@ -31,7 +31,7 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 
 - 🔴 **[VERIFICADO] B1 — UPDATE/DELETE em massa por descarte silencioso de filtros não-`eq`.** `supabase/functions/external-db-bridge/index.ts:492-497` (update) e `:507-512` (delete). A guarda exige apenas `filters.length > 0`, mas o laço aplica **somente** `f.op === 'eq'`. Um filtro `[{op:'neq', column:'id', value:'x'}]` passa a guarda e nenhum WHERE é aplicado → `UPDATE`/`DELETE` afeta a **tabela inteira**. **Cenário:** usuário autenticado envia delete em `notificacoes` (tabela não tenant-scoped) com filtro `gt` → apaga todos os registros de todos os tenants.
 - 🔴 **[VERIFICADO] B2 — DELETE ignora o tenant scope.** `:422-427` só chama `assertTenantScope` para writes; `:290` retorna `{ok:true}` quando `data` é indefinido. Em DELETE não há `data`, então o escopo de tenant **nunca** é verificado. **Cenário:** usuário do tenant A envia delete em `folhas_pagamento` com `eq empresa_id = <tenant B>` → destrói dados do tenant B.
-- 🔴 **B3 — Leitura anônima de qualquer tabela fora da denylist.** `:330-350, 435-467`. Reads não exigem JWT; a denylist tem ~16 tabelas. Todas as tabelas de negócio (colaboradores, holerites, salários, documentos) ficam acessíveis com colunas/filtros arbitrários, dependendo 100% de RLS externo. **Cenário:** `POST external-db-bridge {action:'select', table:'colaboradores', columns:'nome,cpf,salario'}` com a anon key pública. Se qualquer tabela não tiver RLS restritiva, é exfiltração total. *(Confirmar `EXTERNAL_DB_KEY` — passo 17 do plano.)*
+- 🔴 **B3 — Leitura anônima de qualquer tabela fora da denylist.** `:330-350, 435-467`. Reads não exigem JWT; a denylist tem ~16 tabelas. Todas as tabelas de negócio (colaboradores, holerites, salários, documentos) ficam acessíveis com colunas/filtros arbitrários, dependendo 100% de RLS externo. **Cenário:** `POST external-db-bridge {action:'select', table:'colaboradores', columns:'nome,cpf,salario'}` com a anon key pública. Se qualquer tabela não tiver RLS restritiva, é exfiltração total. _(Confirmar `EXTERNAL_DB_KEY` — passo 17 do plano.)_
 - 🟠 **B4 — Injeção de filtro PostgREST via `.or()`.** `client.ts:250` repassa o valor de `or` verbatim; o filtro `or` é isento da validação de coluna (`index.ts:405`). Services concatenam termos de busca do usuário crus em `.or()` (ver H1 no domínio 19). **Cenário:** termo de busca `x,is_admin.eq.true)` altera a semântica do predicado.
 - 🟡 **B5 — Fallback anônimo mascara sessão expirada.** `client.ts:96` usa `SUPABASE_PUBLISHABLE_KEY` quando não há sessão; `:112-119` esconde erros de "objeto ausente" retornando `{data:null}`, tornando indistinguíveis "sem permissão" e "sem dados".
 - 🟡 **B6 — Credenciais e URL hardcoded.** `client.ts:9-10` fixa a URL e um JWT anon com `exp` em 2094 (≈60 anos), impedindo rotação e configuração por ambiente.
@@ -88,7 +88,7 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 - 🟡 **M(K)1 — Pensão alimentícia não deduzida da base de IRRF.** `folhaCompleta.ts:46,51` (param `isPensaoAlimenticia` em `impostos.ts:33` nunca ligado).
 - 🟡 **M(K)2 — Dedução simplificada omitida em 13º e férias.** `calcular-13-salario:74,200`; `calcular-ferias:138`.
 - 🟡 **M(K)3 — Regra dos 15 dias na admissão com off-by-one.** `calcular-13-salario:169` — `diaAdm <= 15` ignora o tamanho do mês (admitido dia 16 de mês de 31 dias trabalha 16 dias e perde o avo).
-- 🔵 **L(K)1 — Tabelas "2026" são valores de 2025** (`tabelas.ts:3-23`: min. R$1.518,00, teto INSS R$8.157,41). *Não verificável sem as tabelas oficiais 2026.* Hardcoded em ~6 arquivos.
+- 🔵 **L(K)1 — Tabelas "2026" são valores de 2025** (`tabelas.ts:3-23`: min. R$1.518,00, teto INSS R$8.157,41). _Não verificável sem as tabelas oficiais 2026._ Hardcoded em ~6 arquivos.
 - 🔵 **L(K)2** — Faixas de seguro-desemprego 2024/2025 (`rescisao.ts:81-89`); **L(K)3** truncamento BigInt para baixo em provisões/13º; **L(K)4** ausência de clamp de líquido negativo.
 
 **Positivo verificado:** INSS progressivo + teto corretos em todas as engines; `impostos.ts:calcularIRRF` é a referência correta (min(legal, simplificado), clamp em 0); abono pecuniário de férias isento; frontend usa `decimal.js`/half-up consistentemente.
@@ -165,6 +165,7 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 > **Tema arquitetural central:** cada domínio financeiro/fiscal tem **dois níveis** — edge functions realmente endurecidas (idempotência, centavos BigInt, CSRF, tenant) e o **caminho que a UI de fato chama**, geralmente um service cliente não-endurecido ou um stub. Repetidamente, a função endurecida **não gera o artefato real** (arquivo bancário / XML gov / apagamento) e o artefato real é produzido pelo caminho bugado — ou por ninguém.
 
 ### Cálculo/dinheiro que escapa
+
 - 🔴 **[VERIFICADO] N1 — Adiantamento salarial e consignado NUNCA são descontados.** Nenhuma engine de folha consulta `adiantamentos_salariais`/`emprestimos_consignados` (`calcular-folha/index.ts:232` faz `descontos = inss+irrf`; `folhaCalc.ts:169`). **Cenário:** RH concede adiantamento/empréstimo → empregado fica com o adiantamento **e** o líquido cheio; parcela do consignado nunca retida. Perda de caixa recorrente e não recuperada.
 - 🔴 **N2 — Criação real de empréstimo/adiantamento burla o hardening.** `DescontosPage.tsx:61-91` faz `supabase.from(...).insert()` direto; as edge functions `emprestimo-consignado`/`adiantamento-salarial` (margem 35%, cap 40%, dedup) **nunca são invocadas**. Selos de "conformidade Lei 10.820" são cosméticos.
 - 🟠 **N3 — Margem consignável errada e inconsistente (3 implementações):** `emprestimo-consignado:137` limita 35% do **bruto** sem 5% cartão; `NewLoanDialog.tsx:41` limita **30%** e só compara a parcela nova (não soma empréstimos existentes); a forma correta (35% do líquido + 5% cartão) só existe em **código morto**. Empregado pode acumular vários empréstimos "cada um sob o teto".
@@ -173,6 +174,7 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 - 🟡 **N6 — Competência com data inválida** `calculoLoteService.ts:24` — `dataFim = ${ano}-${mes}-31` em `.lte('data',…)` quebra em fevereiro/meses de 30 dias, dropando registros de ponto que alimentam a folha.
 
 ### Ponto / jornada / banco de horas
+
 - 🔴 **[VERIFICADO] N7 — Toda batida offline falha ao persistir.** `processar-ponto-offline/index.ts:134` — o INSERT em `batidas_ponto` omite `ordem` (schema `ordem integer NOT NULL` sem default) e `empresa_id`; viola NOT-NULL, erro é engolido por registro e a batida fica na fila para sempre → perda silenciosa e permanente de jornada offline.
 - 🟠 **N8 — Engine de jornada erra o cálculo de tempo.** `processar-ponto/index.ts:96` — turnos que cruzam a meia-noite (22:00→06:00) contribuem **0 min** (`saida>entrada` falso) e são divididos em duas linhas `data` nunca reunidas → adicional noturno zerado. HE jogada em `banco_horas` como crédito único, sem classificar 50%/100% (domingo/feriado) nem reflexo de DSR; jornada-alvo é um `limit(1)` arbitrário, ignorando a jornada do colaborador.
 - 🟠 **N9 — HE não-idempotente + saldos divergentes.** `registros_ponto` é upsert, mas o crédito em `banco_horas` é `insert`; `edgeFunctionsService.ts:49` invoca sem Idempotency-Key → reprocessar um dia dobra a HE. Dois saldos coexistem (`bancoHorasService.getSaldo` × RPC `get_colaborador_banco_horas`) e discordam por construção.
@@ -182,6 +184,7 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 - 🟡 **N13 — Tolerância abatida de atraso e de HE** (`processar-ponto:106`), pareamento por índice assume alternância estrita (marcações ímpares dropam horas), intra/interjornada nunca validadas. `batidasPontoService.excluir` é código morto (trigger `proibir_delete_ponto` sempre lança antes do log).
 
 ### eSocial / fiscal / bancário
+
 - 🔴 **[VERIFICADO] N14 — Assinatura eSocial é mock.** `enviar-esocial/utils/signer.ts:20-41` — `base64("SIG-"+hash)` e `<X509Certificate>…Simulated…`; nenhuma chave A1/.pfx. Zero não-repúdio; Receita rejeitaria.
 - 🔴 **N15 — CNAB 240 header com CNPJ zerado.** `cnabService.ts:187` — `tpInsc=2` (CNPJ) mas `nrInsc` fica em branco→zeros; CNPJ do empregador nunca escrito; nome do banco literal `'BANCO'`. **Qualquer banco rejeita.** Este é o caminho ligado à UI, não a `cnab-remessa` endurecida.
 - 🟠 **N16 — eSocial é stub com bugs de dados.** `enviar-esocial/index.ts:163` — produção sempre fail-closed ("não configurado"); só S-1000/S-2200 emitem XML; demais eventos vão como `<dados><![CDATA[json]]>` (schema inválido); sem ordenação/dependência; `ideEstabLot.nrInsc = empresaId(UUID).slice(0,14)`; S-1210 sem idempotência (`esocialService.ts:254`) → reprocessar duplica eventos de pagamento.
@@ -192,6 +195,7 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 - 🟡 **N21 — PIX-lote TOCTOU na dupla aprovação.** `pix-lote/index.ts:261` — identidade/contagem de aprovadores reconstruída de `auditoria` e inserida; duas submissões concorrentes do mesmo usuário passam o `.has(userId)` e satisfazem o limiar de 2 com uma pessoa. Sem constraint única.
 
 ### LGPD / workflows
+
 - 🔴 **[VERIFICADO] N22 — Direito ao apagamento LGPD nunca é executado.** `anonimizar_dados_pessoais` não é invocado em `src/` nem em `functions/` (só aparece nos types gerados e na allowlist do bridge). `lgpdService.ts:50` só troca um campo de status; a fila `lgpd_fila_limpeza` nunca é drenada. PII é retida.
 - 🔴 **N23 — Mesmo se chamada, a anonimização quebra.** migration `20260513194604:23` grava `cpf='000.000.000-00'` (14 chars) em `colaboradores.cpf CHAR(11) UNIQUE` (overflow + colisão de unique no 2º registro); limpa só 5 colunas; PII sobrevive em `contas_bancarias`, `dependentes`, `documentos`, `esocial_eventos.dados`, `cnab_itens`, `pix_itens`, auditoria.
 - 🔴 **N24 — Rescisão paga e fecha sem homologação nem assinaturas.** `rescisaoService.ts:209` — `processarPagamento` seta `status:'pago'`/`etapa:'finalizado'` sem checar `homologado`/`checklist`/`assinado_*`. Uma rescisão `pendente` vira paga, pulando cálculo, homologação (art. 477) e ambas as assinaturas.
@@ -205,19 +209,18 @@ O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia 
 **Positivo (robusto/referência):** `pix-lote` (idempotência real, segregação de funções, mascaramento LGPD — exceto TOCTOU), `assinaturaDigital` do contrato de admissão (SHA-256 real, CSRF, rate-limit, guarda de corrida), `calcular-ferias`/`calcular-rescisao` edge (Zod/CSRF/tenant, impõem `gozo+abono≤30` que o cliente não impõe), `_shared/idempotency`, `utils/dateLocal` (embora o caminho offline que precisa dele o ignore).
 
 ### Features com UI mas que são stub/mock/não implementadas
+
 Biometria facial · transmissão + assinatura eSocial · anonimização/apagamento LGPD · "Hub sync" de férias · "assinatura digital" de rescisão · endpoints OCR (relay aberto) · geração real de artefato CNAB/DCTFWeb/FGTS-Digital (só metadados) · ciclo de vida de banco de horas. As edge functions endurecidas de adiantamento/consignado existem, mas são **código morto** em relação à UI.
 
 ---
 
 ## Anexo — Estado factual dos portões de qualidade (2026-07-18, neste sandbox)
 
-| Portão | Resultado | Observação |
-|---|---|---|
-| `vitest run` | 201 passam · 2 falham · 7 arquivos não carregam | Falhas por egress bloqueado (`Host not in allowlist`) e deps ausentes (`exceljs`, `sonner→react`) — artefatos de ambiente, não defeitos de lógica. `rescisaoCalc.test.ts` (50+ casos) **não executou**. |
-| `eslint src` | **15 erros · 71 warnings** | `lint:ci` (`--max-warnings=0`) **falharia**. 14 erros = guard de fuso horário (HK1); 1 = `no-useless-escape`. |
-| `tsc --noEmit` | inconclusivo | Erros são todos `Cannot find module 'exceljs'` (dep não instalada no sandbox), não erros de tipo reais. |
-| `npm audit` | 1 crítica · 7 altas | `vitest` (crítica), `react-router`, `undici`, `vite`, `rollup`, `lodash`, `xlsx` (sem fix). |
+| Portão         | Resultado                                       | Observação                                                                                                                                                                                              |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vitest run`   | 201 passam · 2 falham · 7 arquivos não carregam | Falhas por egress bloqueado (`Host not in allowlist`) e deps ausentes (`exceljs`, `sonner→react`) — artefatos de ambiente, não defeitos de lógica. `rescisaoCalc.test.ts` (50+ casos) **não executou**. |
+| `eslint src`   | **15 erros · 71 warnings**                      | `lint:ci` (`--max-warnings=0`) **falharia**. 14 erros = guard de fuso horário (HK1); 1 = `no-useless-escape`.                                                                                           |
+| `tsc --noEmit` | inconclusivo                                    | Erros são todos `Cannot find module 'exceljs'` (dep não instalada no sandbox), não erros de tipo reais.                                                                                                 |
+| `npm audit`    | 1 crítica · 7 altas                             | `vitest` (crítica), `react-router`, `undici`, `vite`, `rollup`, `lodash`, `xlsx` (sem fix).                                                                                                             |
 
 > **Nota metodológica:** dos ~90+ achados, os marcados **[VERIFICADO]** foram confirmados por leitura direta do código citado pelo auditor. Os demais vêm das frentes de auditoria especializadas com `arquivo:linha` — recomenda-se confirmação pontual antes da remediação, especialmente onde o comportamento depende do schema real do banco vivo (ver drift, L10).
-
-
