@@ -88,6 +88,9 @@ const RPC_ALLOWLIST = new Set<string>([
   "fn_link_gov_br_account", "processar_ajuste_aprovado",
   "gerar_alertas_preditivos_ia",
   "run_rls_tests",
+  // onboarding público (candidato) — lookup exato por token, ver
+  // 20260718220000_rls_remediacao_auditoria.sql (achado L3 da auditoria)
+  "get_admissao_por_token",
 ]);
 const LOGIN_PROTECTION_RPC_FALLBACKS: Record<string, unknown> = {
   check_login_lock: false,
