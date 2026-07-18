@@ -1,0 +1,223 @@
+# Auditoria Exaustiva — Falhas e Gaps
+
+> **Fase:** Descoberta e documentação (sem correções aplicadas).
+> **Data:** 2026-07-18 · **Sistema:** Departamento Pessoal v2.
+> **Método:** leitura estática linha a linha (8 frentes paralelas) + execução dos portões reais (`tsc`/`eslint`/`vitest`/`npm audit`) + verificação manual pontual dos achados críticos.
+> **Severidades:** 🔴 CRÍTICO · 🟠 ALTO · 🟡 MÉDIO · 🔵 BAIXO.
+
+Cada achado traz `arquivo:linha`, descrição e **cenário concreto de falha**. Itens marcados **[VERIFICADO]** foram confirmados manualmente pelo auditor lendo o código-fonte citado.
+
+---
+
+## Sumário Executivo
+
+A auditoria contradiz a conclusão de relatórios anteriores (`QA_SIMULATION_REPORT.md`) de que "o núcleo crítico está correto e o sistema saudável". Foram encontradas **falhas críticas de segurança e de cálculo em produção**:
+
+1. **Modelo de acesso a dados perigoso** — todo I/O passa por um gateway genérico (`external-db-bridge`) que permite **leitura anônima** de qualquer tabela fora de uma denylist curta, com filtros e colunas arbitrários. A confidencialidade depende inteiramente de RLS no banco externo (não verificável neste repo) e da chave `EXTERNAL_DB_KEY` **não** ser `service_role`.
+2. **Escalonamento de privilégio trivial** — um usuário comum pode se auto-promover a `admin` gravando em `user_roles` diretamente pelo bridge; todo o RBAC é apenas client-side.
+3. **Edge Functions legadas sem autenticação rodando com `service_role`** — `validar-biometria` (validação falsa com `Math.random()`), `alertas-dp` (exfiltração de PII cross-tenant + relay de e-mail), `OCR` (leitura de qualquer objeto de storage privado + SSRF), `backup`, `processar-ponto`, `metricas`. Exploráveis por qualquer um que possua a anon key pública (embutida no bundle).
+4. **Duas engines de folha divergentes** produzindo **valores legalmente errados** de IRRF, rescisão e provisões (13º com avos = número do mês; `pedido_demissao` zerando verbas devidas; IRRF sem dedução simplificada nem dependentes).
+5. **Biometria de ponto é teatro** — no frontend a barra de progresso sempre chega a 100% e a batida é registrada mesmo com falha; no backend a validação é `Math.random()`. Fotos faciais (dado sensível LGPD) vão para bucket **público**.
+
+O gate `lint:ci` (–max-warnings=0) **falha** (15 erros de ESLint reais, incluindo bug de fuso horário e `as never` que anula o type-check). O typecheck e 7 arquivos de teste não puderam ser executados de forma conclusiva no sandbox (dependências/egress), mas 201 testes passam.
+
+**Prioridade de remediação:** (1) segredos versionados + escalonamento `user_roles`; (2) autenticar/retirar as Edge Functions service-role; (3) confirmar `EXTERNAL_DB_KEY` e cobertura de RLS; (4) unificar e corrigir a engine de cálculo.
+
+---
+
+## Domínio 2/19 — Arquitetura de acesso a dados: `external-db-bridge` + `client.ts`
+
+O cliente (`src/integrations/supabase/client.ts`) é um query-builder que envia `{action, table, columns, filters, data}` para a Edge Function `external-db-bridge`, autenticando com o `access_token` do usuário **ou a anon key hardcoded como fallback**. O React é um cliente fino sobre um proxy genérico de tabelas.
+
+- 🔴 **[VERIFICADO] B1 — UPDATE/DELETE em massa por descarte silencioso de filtros não-`eq`.** `supabase/functions/external-db-bridge/index.ts:492-497` (update) e `:507-512` (delete). A guarda exige apenas `filters.length > 0`, mas o laço aplica **somente** `f.op === 'eq'`. Um filtro `[{op:'neq', column:'id', value:'x'}]` passa a guarda e nenhum WHERE é aplicado → `UPDATE`/`DELETE` afeta a **tabela inteira**. **Cenário:** usuário autenticado envia delete em `notificacoes` (tabela não tenant-scoped) com filtro `gt` → apaga todos os registros de todos os tenants.
+- 🔴 **[VERIFICADO] B2 — DELETE ignora o tenant scope.** `:422-427` só chama `assertTenantScope` para writes; `:290` retorna `{ok:true}` quando `data` é indefinido. Em DELETE não há `data`, então o escopo de tenant **nunca** é verificado. **Cenário:** usuário do tenant A envia delete em `folhas_pagamento` com `eq empresa_id = <tenant B>` → destrói dados do tenant B.
+- 🔴 **B3 — Leitura anônima de qualquer tabela fora da denylist.** `:330-350, 435-467`. Reads não exigem JWT; a denylist tem ~16 tabelas. Todas as tabelas de negócio (colaboradores, holerites, salários, documentos) ficam acessíveis com colunas/filtros arbitrários, dependendo 100% de RLS externo. **Cenário:** `POST external-db-bridge {action:'select', table:'colaboradores', columns:'nome,cpf,salario'}` com a anon key pública. Se qualquer tabela não tiver RLS restritiva, é exfiltração total. *(Confirmar `EXTERNAL_DB_KEY` — passo 17 do plano.)*
+- 🟠 **B4 — Injeção de filtro PostgREST via `.or()`.** `client.ts:250` repassa o valor de `or` verbatim; o filtro `or` é isento da validação de coluna (`index.ts:405`). Services concatenam termos de busca do usuário crus em `.or()` (ver H1 no domínio 19). **Cenário:** termo de busca `x,is_admin.eq.true)` altera a semântica do predicado.
+- 🟡 **B5 — Fallback anônimo mascara sessão expirada.** `client.ts:96` usa `SUPABASE_PUBLISHABLE_KEY` quando não há sessão; `:112-119` esconde erros de "objeto ausente" retornando `{data:null}`, tornando indistinguíveis "sem permissão" e "sem dados".
+- 🟡 **B6 — Credenciais e URL hardcoded.** `client.ts:9-10` fixa a URL e um JWT anon com `exp` em 2094 (≈60 anos), impedindo rotação e configuração por ambiente.
+
+---
+
+## Domínio 4/3 — Autenticação e Autorização / RBAC
+
+- 🔴 **[VERIFICADO] R1 — Auto-promoção a admin via `user_roles`.** `src/components/settings/UserRolesTab.tsx:27-39` faz `supabase.from('user_roles').upsert({user_id, role:'admin'})`; a única proteção é o filtro de aba client-side em `ConfiguracoesPage.tsx:63`. **Cenário:** usuário comum chama o upsert pelo console/serviço e vira admin, destravando todas as rotas `/admin/*`. Todo o RBAC (`isAdmin` derivado de `get_user_roles`) nasce dessa tabela.
+- 🔴 **R2 — Páginas sensíveis sem guarda de papel (apenas autenticação).** `src/App.tsx` — `/usuarios`, `/backup`, `/auditoria`, `/lgpd`, `/seguranca`, `/controle-acesso` usam **apenas** `ProtectedRoute`; grep confirma zero checagem de `isAdmin` no corpo dessas páginas. **Cenário:** qualquer autenticado navega para `/backup` ou `/lgpd` (PII) e lê/exporta dados.
+- 🟡 **R3 — RBAC 100% em memória no cliente.** `src/contexts/AuthContext.tsx:34-46,204` — `isAdmin`/`hasRole` derivam do RPC `get_user_roles` mantido em estado React; todas as guardas confiam nesse valor. Combinado com R1/R2, é o único portão de muitas ações.
+- 🟡 **R4 — Expiração de sessão não tratada reativamente.** `AuthContext.tsx:110-149` — sem tratamento de falha de refresh; sessão expirada degrada silenciosamente para chamadas anônimas do bridge (ver B5). Timeout de init (10s) marca o app "pronto" mesmo sem sessão.
+- 🟠 **R5 — Enforcement de escrita não checa papel no bridge.** O bridge exige apenas JWT + tenant (para tabelas listadas) em writes; **não** verifica `admin`/papel. Um papel `user` pode escrever em tabelas de negócio do próprio tenant contornando `AdminRoute`.
+
+---
+
+## Domínio 6/7 — Segurança das Edge Functions (53 auditadas + shared)
+
+> Nota de exposição: `supabase/config.toml` está vazio (sem `verify_jwt` por função). Mesmo que o gateway exija JWT, a **anon key é pública** (embutida no bundle), satisfaz o gateway, e as funções abaixo não fazem auth própria → **exploráveis por qualquer um**.
+
+- 🔴 **[VERIFICADO] E1 — `validar-biometria/index.ts:13-95`** — Sem JWT/CSRF, usa `service_role`. Validação facial é `Math.random() > 0.05` (l.60) e **fail-open**: sem foto de referência retorna `valid:true` (l.47-50). IDOR: aceita `batidaId`/`colaboradorId` arbitrários e carimba qualquer batida como `biometria_status:'valido'`. Vaza `error.message`.
+- 🔴 **E2 — `alertas-dp/index.ts`** — Sem JWT/CSRF, `service_role`. Agrega PII (nomes, ASOs, admissões, e-mails) de **todas** as empresas sem filtro `empresa_id`; usa `body.email` do atacante como destinatário (l.175) e envia via Resend (relay aberto). Interpola valores do colaborador sem escape no HTML (l.133 → HTML injection). Retorna `email_result` completo.
+- 🔴 **E3 — `OCR/index.ts:13-83`** — Sem JWT/CSRF, `service_role`. Usuário controla `bucket`+`filePath`; faz `createSignedUrl` em **qualquer** bucket e retorna o conteúdo OCR. **Cenário:** ler qualquer PDF de folha, RG/CPF, backup. `fileUrl` repassado ao gateway de IA = SSRF.
+- 🟠 **E4 — `backup/index.ts:15-65`** — Sem auth, `service_role`; `empresaId` opcional → itera todas as tabelas de todos os tenants; vaza contagens e `error.message`.
+- 🟠 **E5 — `processar-ponto/index.ts:16-181`** — Sem auth, `service_role`; aceita `colaboradorId`/`empresaId` arbitrários e insere créditos de `banco_horas` (l.135-143). **Cenário:** fabricar/inflar horas extras (impacto financeiro) de qualquer empregado.
+- 🟠 **E6 — `processar-ponto-offline/index.ts:40-187`** — Sem auth; HMAC só é exigido se `PONTO_HASH_SECRET` estiver setado (fail-open); insere `batidas_ponto` para `colaborador_id` arbitrário; sobe fotos e guarda **`getPublicUrl`** (PII biométrica pública).
+- 🟠 **E7 — `metricas/index.ts:6-51`** — Sem JWT/CSRF/tenant; `empresaId` do body → divulga headcount, `total_bruto` (folha) e status eSocial de qualquer empresa (IDOR).
+- 🟠 **E8 — Vazamento de `error.message` + ausência de CSRF em geradores SST** — `gerar-aej:219`, `gerar-ltcat-os:321`, `gerar-pgr:106,135` mutam estado sem `verifyCsrf` e retornam erros de banco crus.
+- 🟡 **E9 — `auth-gov-br/index.ts:18-102`** — Sem CSRF/auth; `redirectUri` do usuário injetado na URL OAuth sem allowlist (open-redirect/phishing); `state`/`nonce` sem binding ao usuário (replay).
+- 🟡 **E10 — `limpeza` e `processar-agendamentos`** — Crons `service_role` sem segredo compartilhado; qualquer um dispara limpeza de logs de segurança (`blocked_ips`, `login_attempts`) ou execução de relatórios.
+- 🟡 **E11 — `assistente-ia` / `process-document-ocr`** — Proxies não autenticados ao gateway de IA pago (abuso de custo, prompt-injection, SSRF em `fileUrl`).
+- 🟡 **E12 — `calcular-provisoes:205-218`** — `delete`+`insert` em lote rotulado "atômico" mas não-atômico; falha no meio deixa `provisoes_mensais` parcialmente apagada.
+- 🟡 **E13 — Assinatura eSocial simulada.** `enviar-esocial/utils/signer.ts:8-51` — "assinatura digital" é só SHA-256 + `base64("SIG-…")` e `<X509Certificate>` fake; sem RSA/ICP-Brasil (fail-closed em prod exceto `ESOCIAL_SIMULATE=true`, mas não é assinatura não-repudiável).
+- 🟡 **E14 — `_shared/csrf.ts:12,48-88`** — Allowlist aceita **qualquer** `*.lovable.app/.dev` + `localhost`; double-submit só é exigido se o cliente enviar `X-CSRF-Token` (atacante omite). CSRF fraco em todas as funções que dependem dele.
+- 🔵 **E15 — CORS `*` global** (`_shared/contract.ts:14`), rate limiter **fail-open** em erro de DB (`_shared/rateLimit.ts:44`), CSV/formula injection em `relatorio:117`, `healthcheck`/`warmup` vazam `error.message`, `assinaturaDigital` sem PKI real.
+
+**Positivo:** o núcleo fiscal/financeiro moderno (`calcular-*`, `fechar-folha`, `pix-lote`, `cnab-remessa`, `fgts-digital`, `dctfweb`, `enviar-esocial`, `criptografia`, `webhook`) tem JWT + CSRF + tenant + Zod + auditoria com hash de integridade. As vulnerabilidades concentram-se em funções **legadas nunca endurecidas**.
+
+---
+
+## Domínio 8–11/27 — Núcleo de Cálculo (folha, impostos, rescisão, férias, 13º, provisões)
+
+> **Problema estrutural:** existem **duas engines divergentes** — os calculators do frontend (`impostos.ts`/`folhaCalc.ts`, usados por `calculoLoteService`) e as Edge Functions (`calcular-*`) — que computam valores **materialmente diferentes** para as mesmas entradas.
+
+- 🔴 **[VERIFICADO] K1 — IRRF da folha ignora dedução simplificada e dependentes.** `calcular-folha/index.ts:57-64,233` usa `calcIRRF(bruto - inss)` (só tabela + dedução legal). Não aplica a dedução simplificada (R$564,80, Lei 14.663/2023) nem dependentes. O frontend `impostos.ts` aplica ambos. **Exemplo:** salário R$5.000, 2 dependentes → edge retém **R$347,57**; correto **R$262,26** (over-withholding de R$85,31/mês). Para R$2.500/0-dep o edge cobra R$2,89 onde o correto é R$0.
+- 🔴 **[VERIFICADO] K2 — 13º proporcional na rescisão usa o número do mês como avos.** `calcular-rescisao/index.ts:148` — `d13 = (salario/12) * mesAtual`, `mesAtual = desl.getMonth()+1`. **Exemplo:** admitido 01/02/2026, desligado 10/03/2026 → correto 1 avo; edge usa 3 avos (paga 200% a mais).
+- 🔴 **[VERIFICADO] K3 — `pedido_demissao` zera 13º e férias proporcionais indevidamente.** `calcular-rescisao/index.ts:147` — `podeReceber = tipo !== 'com_justa_causa' && tipo !== 'pedido_demissao'`. Pedido de demissão **tem** direito a 13º proporcional e férias proporcionais + 1/3. O frontend paga corretamente. Edge subpaga toda demissão voluntária.
+- 🔴 **[VERIFICADO] K4 — Tempo de serviço = `floor(totalDias/30)`, não meses de calendário.** `calcular-rescisao/index.ts:139-140` — infla o tempo (~+1 mês a cada ~6 anos e por blocos de 30 dias), afetando aviso prévio (+3 dias/ano) e avos de férias proporcionais (`mfp = totalMeses % 12`).
+- 🔴 **K5 — Três engines de provisão com encargos diferentes.** `rescisao.ts:104` (36,37%) vs `services/folha/provisoesService.ts:27` (**só 8% FGTS**) vs `calcular-provisoes/index.ts:28-31` (35,8%, RAT 2% vs `tabelas.ts` RAT 3%). Alimentam contabilidade; não podem estar todas certas. `provisoesService` subestima o passivo em ~28 p.p.
+- 🟠 **H(K)1 — Datas parseadas como UTC lidas com getters locais (day-shift).** `rescisao.ts:25-32` — `new Date("2026-07-31")` (UTC) + `.getDate()` (local) em UTC−3 retorna dia 30. Corrompe `saldoSalario`, `diasNoMes` e contagem de avos; o browser diverge do Deno (UTC) na virada do mês.
+- 🟠 **H(K)2 — 13º somado à base mensal de INSS/IRRF.** `folhaCalc.ts:118-158` — quando `parcela13` é setado, o 13º entra como provento comum e é tributado junto do salário (13º tem INSS separado e IRRF exclusivo na fonte). Caminho exportado e errado.
+- 🟠 **H(K)3 — Contrato de integridade quebrado por nomes de campo.** `calcular-folha:261-263` grava `total_bruto/descontos/liquido` e **não** grava `total_proventos`/`total_fgts`, que `fechar-folha:102` e `_shared/folhaIntegrity.ts:75,78` leem → `INTEGRITY_MISMATCH_HEADER` no fechamento.
+- 🟠 **H(K)4 — IRRF/INSS de rescisão diverge do frontend e do estatuto** (base combinada saldo+13º; sem dedução simplificada/dependentes). `calcular-rescisao:173-176`.
+- 🟡 **M(K)1 — Pensão alimentícia não deduzida da base de IRRF.** `folhaCompleta.ts:46,51` (param `isPensaoAlimenticia` em `impostos.ts:33` nunca ligado).
+- 🟡 **M(K)2 — Dedução simplificada omitida em 13º e férias.** `calcular-13-salario:74,200`; `calcular-ferias:138`.
+- 🟡 **M(K)3 — Regra dos 15 dias na admissão com off-by-one.** `calcular-13-salario:169` — `diaAdm <= 15` ignora o tamanho do mês (admitido dia 16 de mês de 31 dias trabalha 16 dias e perde o avo).
+- 🔵 **L(K)1 — Tabelas "2026" são valores de 2025** (`tabelas.ts:3-23`: min. R$1.518,00, teto INSS R$8.157,41). *Não verificável sem as tabelas oficiais 2026.* Hardcoded em ~6 arquivos.
+- 🔵 **L(K)2** — Faixas de seguro-desemprego 2024/2025 (`rescisao.ts:81-89`); **L(K)3** truncamento BigInt para baixo em provisões/13º; **L(K)4** ausência de clamp de líquido negativo.
+
+**Positivo verificado:** INSS progressivo + teto corretos em todas as engines; `impostos.ts:calcularIRRF` é a referência correta (min(legal, simplificado), clamp em 0); abono pecuniário de férias isento; frontend usa `decimal.js`/half-up consistentemente.
+
+---
+
+## Domínio 5 — RLS e isolamento multi-tenant (378 tabelas, 405 migrations)
+
+> **Pré-condição a confirmar (passo 17):** o bridge usa `EXTERNAL_DB_KEY` (`index.ts:412`), não presente no repo. Se for `service_role`, RLS é **totalmente ignorada** e tudo vira anon-read/write. As falhas abaixo **independem** disso: são políticas `USING(true)`/ausência de RLS, expostas mesmo com chave anon.
+>
+> Agregado: 378 tabelas criadas · 370 com RLS · **229 ocorrências de `USING(true)`** · 110 funções `SECURITY DEFINER` (**21 sem `SET search_path`**) · 0 `DISABLE RLS`. O cleanup tenant-scoped (`20260527130231`) só cobre **8 tabelas nomeadas**; o resto manteve políticas permissivas.
+
+- 🔴 **[VERIFICADO] L1 — `folhas` e `pontos` (legado) com `FOR ALL USING(true)` público.** `supabase/migrations/20250102000000_dp_production.sql:96-97`. O cleanup limpou `colaboradores`/`ferias` mas não as legadas `folhas`/`pontos` (ainda referenciadas em `src/`). `folhas` contém `salario_base, liquido, inss, irrf, fgts`. **Cenário:** `{action:'select', table:'folhas'}` anônimo retorna a folha de todas as empresas.
+- 🔴 **[VERIFICADO] L2 — `entity_versions` anon-readable com snapshots JSONB de tudo.** `20241231000001_entity_versions.sql:19` — `FOR SELECT USING(true)`. Guarda `data JSONB` com snapshot completo de todas as entidades (colaboradores, holerites, folha…). Backdoor que anula todas as políticas tenant-scoped corretas. Não está na denylist.
+- 🔴 **[VERIFICADO] L3 — `admissao_tokens` `FOR SELECT TO anon USING(true)`.** `20260509151903_*.sql:57`. Colunas: `token, email_candidato, telefone_candidato, assinatura_base64, ip_assinatura`. **Cenário:** anon enumera todos os tokens de admissão → sequestro de onboarding + coleta de PII e imagens de assinatura.
+- 🔴 **L4 — Seis tabelas de recrutamento/onboarding sem RLS alguma.** `curriculos_arquivos`, `triagem_notas`, `vaga_entrevistas`, `vaga_etapas`, `onboarding_kits`, `onboarding_documentos_obrigatorios` — criadas sem `ENABLE ROW LEVEL SECURITY` e sem política. Com os grants default do Supabase → anon read/write. Currículos e notas de triagem são PII.
+- 🟠 **L5 — Vazamento cross-tenant em tabelas fiscais/rescisórias** (`USING (auth.uid() IS NOT NULL)` sobrevive junto das políticas `tenant_*`; políticas permissivas são OR-combinadas): `darfs`, `recibos_rescisao`, `guias_inss`, `guias_fgts`, `pensoes`, `holerites`. Qualquer autenticado de qualquer empresa lê todas as linhas.
+- 🟠 **L6 — `admissoes` com CRUD total para qualquer autenticado** (`20260509151903:50` `FOR ALL TO authenticated USING(true)`), sem `empresa_id`.
+- 🟠 **L7 — Tabelas de log/config anon-readable com nomes enganosos** (`USING(true)` TO public, não denylisted): `cnab_configuracoes`, `integracao_logs` (pode conter tokens), `provisao_logs`, `sst_exposicao_riscos` (PII de saúde), `ia_provisoes_alertas`, `pendencias`. A denylist do bridge só cita `audit_log` (singular) — `audit_logs`/`auditoria_logs`/`integracao_logs` ficam expostas.
+- 🟡 **L8 — 21 funções `SECURITY DEFINER` sem `SET search_path`** (hijack de search_path), incluindo `anonimizar_dados_pessoais`, `processar_ajuste_aprovado`, `gerar_alertas_preditivos_ia`, `fn_link_gov_br_account` e ~14 triggers. Mitigado parcialmente por `REVOKE EXECUTE FROM PUBLIC` em algumas.
+- 🟡 **L9 — RLS habilitada sem política (default-deny) em `backup_logs`, `eventos_rh`, `rubricas`** — dados inacessíveis (bug funcional).
+- 🔵 **L10 — Higiene de migrations:** duplicatas divergentes (`..134212_create_holerites` vs `20251228131627_create_holerites`), `CREATE POLICY` sem `IF NOT EXISTS` (não idempotente), e **drift**: `missing_final.txt` lista 47 tabelas em migrations/código ausentes na instância consultada (278 no banco vs 324 nas migrations). **Confirmar qual banco o bridge realmente usa** e diferenciar o `pg_policies` real.
+
+---
+
+## Domínio 20/37 — Hooks e estado React (ESLint: 15 erros, 71 warnings)
+
+- 🟠 **HK1 — [VERIFICADO via ESLint] Guard de fuso horário violado 14× (erros de lint).** `no-restricted-syntax` proíbe `toISOString().split('T')[0]` (grava data em UTC → off-by-one em UTC−3). Persistem em **mutações que gravam no banco**: `AdminPontoDivergenciasPage.tsx:152,168,182,201` (RPC `resolver_divergencia_afdt`/`criar_batida_da_divergencia_afdt`), `ImportarAFDTDialog.tsx:41,58,59`, `AssinarEspelhoDialog.tsx:54`, `AdminRegimentoInternoPage.tsx:255`. **Sintoma:** batidas/competências gravadas um dia (ou mês) errado para usuários à noite no Brasil.
+- 🟠 **HK2 — `usePontoOffline.ts:64-72` efeito re-executa a cada render.** `sync` (função async recriada por render) está nas deps; o efeito remove/readiciona o listener `online` e re-dispara sync a cada render. **Sintoma:** round-trips redundantes e risco de tentativas duplicadas de sync de batidas offline.
+- 🟡 **HK3 — `command-palette.tsx:170-180` Cmd/Ctrl+K não fecha (stale closure).** Efeito com `[]` captura `open===false` para sempre; `setOpen(!open)` sempre abre. **Sintoma:** atalho não fecha a paleta.
+- 🟡 **HK4 — `ESocialAuditDialog.tsx:29` setInterval vaza + efeito colateral dentro de updater.** Sem cleanup no unmount; `finishScan()` (setState) chamado dentro de `setProgress(prev=>…)`. **Sintoma:** timer vazado e "finish" duplicado no StrictMode se o diálogo fecha durante o scan.
+- 🟡 **HK5 — `useRealtimeDashboard.ts:40-69` subscription realtime ampla demais** (sem `table`, escuta todo o schema `public`, filtra no cliente); `debounceInvalidate` fora das deps; label `registros_ponto` × `batidas_ponto` inconsistente.
+- 🟡 **HK6 — Efeitos de fetch async sem cancelamento (classe de páginas).** `AdminCatPage.tsx:103`, `ContabilidadePage`, `FinanceiroBancarioPage`, `DocumentosPage`, `PerfilPage`, `AdminExtintoresPage` etc.: `useEffect(()=>{carregar()},[empresaId])` sem `ignore`/`AbortController`. **Sintoma:** ao trocar de empresa, resposta antiga (lenta) sobrescreve a nova (dados da empresa errada).
+- 🟡 **HK7 — Canais realtime com nome estático** (`NotificacoesPage.tsx:56`, `ComunicacaoInternaPage.tsx:54`) → colisão em StrictMode/instâncias simultâneas.
+- 🟡 **HK8 — Dados do servidor copiados para estado de form via efeito** (`EstagiarioTab/EstrangeiroTab/PCDTab`) → fonte de verdade duplicada; refetch pode sobrescrever digitação.
+- 🔵 **HK9 — Ruído de lint** (`purity` 6, `preserve-manual-memoization` 6, `incompatible-library` 5, `only-export-components` 15) sem impacto de runtime; `SSTPage.tsx:86` useMemo com `new Date()` pode ficar stale na virada da meia-noite.
+
+**Positivo:** `useRealTimeSubscription.ts` é implementação de referência (queryKey estável, canal único com UUID, cleanup). Cleanups de interval/listener verificados presentes na maioria dos hooks.
+
+---
+
+## Domínio 25/26 — Cobertura e qualidade de testes
+
+- 🟠 **T1 — O único teste de RLS é uma reimplementação falsa.** `src/tests/rls-logic.test.ts` redefine `can_select_*` inline no próprio teste; valida um modelo copiado à mão, não as políticas reais. Sempre verde, prova nada sobre isolamento multi-tenant (o controle mais crítico).
+- 🟠 **T2 — Testes "unitários" fazem chamadas de rede reais.** `src/tests/rpc-permissions.test.ts` bate no host Supabase real (`VITE_SUPABASE_URL`); não-hermético, falha em CI offline (2 falhas observadas: "Host not in allowlist").
+- 🟡 **T3 — Script com credenciais hardcoded disfarçado de teste.** `src/tests/validateBridgeContract.ts` — URL + anon JWT hardcoded, `console.log`, fora do glob do Vitest, bate em produção.
+- 🟡 **T4 — `test` fora do gate `ci:verify`.** `ci:verify` roda só typecheck+lint+format; nada força a suíte passar nem piso de cobertura. `--coverage` existe sem threshold.
+- 🟡 **T5 — Over-mock sem camada de integração.** `folhaPagamentoService`/`rescisaoService`/`despesaService` stubam o cliente inteiro; nunca exercitam query real, RLS ou constraints → drift de schema/contrato não é pego.
+- 🟡 **T6 — Skips silenciosos.** `e2e/public/api-auth-errors.spec.ts` e `reset-password-callback.spec.ts` usam `test.skip(!ANON_KEY)` → CI mal configurado reporta verde sem rodar checagens de erro de auth.
+- **Gaps de cobertura (zero testes):** eSocial (`esocialService`, `enviar-esocial`), CNAB/PIX (`cnabService`, `cnab-remessa`, `pix-lote`), LGPD (`lgpdService`), `external-db-bridge`, FGTS-Digital/DCTFWeb/guias, 8 serviços de ponto, `feriasService`, `beneficioService`, `authService`, gov.br, **0/66 hooks**, **8/54 edge functions** com algum teste (só Deno, não rodam no pipeline).
+- **E2E:** apenas smoke (carregamento de página). **Não cobrem:** rodar folha, fechar folha, login gov.br, batida com geolocalização/biometria, cálculo de rescisão com asserção de resultado. Requer backend real + browsers Playwright (não instalados aqui).
+
+---
+
+## Domínio 28/29 — Infra, CI, dependências, segredos
+
+- 🔴 **[VERIFICADO] I1 — CI faz deploy de TODAS as edge functions com `--no-verify-jwt`.** `.github/workflows/ci.yml:158`. Combinado com o domínio 6, confirma que as funções service-role legadas (`validar-biometria`, `alertas-dp`, `OCR`, `backup`, `processar-ponto`, `metricas`) são invocáveis **sem token algum**.
+- 🔴 **I2 — `.env` versionado no git** com JWT anon de vida longa (exp 2036). `.gitignore` lista `.env` mas ele foi committado antes; presente no histórico. Impede rotação curta e convida a vazar um segredo real depois.
+- 🔴 **I3 — `vitest` com advisory CRÍTICO** (leitura/execução arbitrária de arquivo via UI server) no `npm audit`.
+- 🟠 **I4 — Credenciais/senhas de teste hardcoded no CI.** `ci.yml:18-21` e `e2e.yml:19-24` — anon key + `E2E_USER_PASSWORD='Admin@2026!'`, `E2E_NON_ADMIN_PASSWORD='User@2026!'`. Se essas contas existem no projeto vivo, são diretamente usáveis.
+- 🟠 **I5 — Dependências vulneráveis (1 crítica, 7 altas):** `react-router`/`-dom` (RCE não-auth via turbo-stream, XSS, open redirect), `undici` (7 CVEs), `vite`/`rollup` (path traversal/escrita arbitrária), `lodash` (prototype pollution), `xlsx` (**sem correção disponível** — trocar lib).
+- 🟠 **I6 — Actions do CI não fixadas por SHA;** `SonarSource/sonarcloud-github-action@master` (ref mutável), `bun-version: latest`. Sem bloco `permissions:` em nenhum workflow (GITHUB_TOKEN amplo).
+- 🟠 **I7 — `deploy.yml` faz deploy Netlify real em todo `pull_request`** (sem environment/approval); executa `bun run build` sobre código parcialmente confiável.
+- 🟡 **I8 — k8s `deployment.yaml`:** roda como **root** (sem `securityContext`/`runAsNonRoot`), `image:latest`, sem `readinessProbe`, sem resource `requests`. `secrets.yaml`/`service.yaml`/`ingress.yaml` são stubs TODO; duplicação `.yml` vs `.yaml` aplicaria manifests contraditórios.
+- 🟡 **I9 — PWA cacheia respostas Supabase autenticadas.** `vite.config.pwa.ts:44-52` (`NetworkFirst` em `*.supabase.co/rest/v1/*`). Se esse config for usado, respostas de folha/PII persistem no Cache Storage do dispositivo.
+- 🟡 **I10 — Headers de segurança ausentes.** `netlify.toml`/`vercel.json` sem headers; sem HSTS, sem `X-Frame-Options`/`frame-ancestors`; CSP com `unsafe-inline`. `nginx.conf` sem headers e com diretivas corrompidas (`proxy_set_header Host \;`).
+- 🟡 **I11 — Drift de gerenciador de pacotes:** `package-lock.json` **e** `bun.lock` versionados; CI usa Bun, Netlify/Vercel/Docker usam npm → árvores divergentes (o próprio `audit.json` vs `npm audit` diverge). Sem `packageManager`/`engines.node`.
+- 🔵 **I12 — IaC placebo:** `terraform/`, `ansible/`, `helm/`, `monitoring/`, `docker/` são stubs idênticos não-funcionais (falsa sensação de hardening). `.env.example` traz JWT anon real (não placeholder). `audit.json`/`AUDIT_REPORT.pdf` versionados (sprawl).
+
+---
+
+## Domínio 12–18 — Módulos de negócio (ponto, eSocial, CNAB, benefícios, workflows, LGPD)
+
+> **Tema arquitetural central:** cada domínio financeiro/fiscal tem **dois níveis** — edge functions realmente endurecidas (idempotência, centavos BigInt, CSRF, tenant) e o **caminho que a UI de fato chama**, geralmente um service cliente não-endurecido ou um stub. Repetidamente, a função endurecida **não gera o artefato real** (arquivo bancário / XML gov / apagamento) e o artefato real é produzido pelo caminho bugado — ou por ninguém.
+
+### Cálculo/dinheiro que escapa
+- 🔴 **[VERIFICADO] N1 — Adiantamento salarial e consignado NUNCA são descontados.** Nenhuma engine de folha consulta `adiantamentos_salariais`/`emprestimos_consignados` (`calcular-folha/index.ts:232` faz `descontos = inss+irrf`; `folhaCalc.ts:169`). **Cenário:** RH concede adiantamento/empréstimo → empregado fica com o adiantamento **e** o líquido cheio; parcela do consignado nunca retida. Perda de caixa recorrente e não recuperada.
+- 🔴 **N2 — Criação real de empréstimo/adiantamento burla o hardening.** `DescontosPage.tsx:61-91` faz `supabase.from(...).insert()` direto; as edge functions `emprestimo-consignado`/`adiantamento-salarial` (margem 35%, cap 40%, dedup) **nunca são invocadas**. Selos de "conformidade Lei 10.820" são cosméticos.
+- 🟠 **N3 — Margem consignável errada e inconsistente (3 implementações):** `emprestimo-consignado:137` limita 35% do **bruto** sem 5% cartão; `NewLoanDialog.tsx:41` limita **30%** e só compara a parcela nova (não soma empréstimos existentes); a forma correta (35% do líquido + 5% cartão) só existe em **código morto**. Empregado pode acumular vários empréstimos "cada um sob o teto".
+- 🟡 **N4 — Sem piso de líquido negativo** (`folhaCalc.ts:174`, `beneficios.ts:190`): faltas + coparticipação + descontos já produzem `total_liquido` negativo gravado no holerite; somar N1 piora.
+- 🟡 **N5 — Proração VA/VR por número mágico** (`calculoBeneficiosService.ts:66` — benefício é "diário" só se `valor<100`); coparticipação 20% hardcoded (`calculoLoteService.ts:177`).
+- 🟡 **N6 — Competência com data inválida** `calculoLoteService.ts:24` — `dataFim = ${ano}-${mes}-31` em `.lte('data',…)` quebra em fevereiro/meses de 30 dias, dropando registros de ponto que alimentam a folha.
+
+### Ponto / jornada / banco de horas
+- 🔴 **[VERIFICADO] N7 — Toda batida offline falha ao persistir.** `processar-ponto-offline/index.ts:134` — o INSERT em `batidas_ponto` omite `ordem` (schema `ordem integer NOT NULL` sem default) e `empresa_id`; viola NOT-NULL, erro é engolido por registro e a batida fica na fila para sempre → perda silenciosa e permanente de jornada offline.
+- 🟠 **N8 — Engine de jornada erra o cálculo de tempo.** `processar-ponto/index.ts:96` — turnos que cruzam a meia-noite (22:00→06:00) contribuem **0 min** (`saida>entrada` falso) e são divididos em duas linhas `data` nunca reunidas → adicional noturno zerado. HE jogada em `banco_horas` como crédito único, sem classificar 50%/100% (domingo/feriado) nem reflexo de DSR; jornada-alvo é um `limit(1)` arbitrário, ignorando a jornada do colaborador.
+- 🟠 **N9 — HE não-idempotente + saldos divergentes.** `registros_ponto` é upsert, mas o crédito em `banco_horas` é `insert`; `edgeFunctionsService.ts:49` invoca sem Idempotency-Key → reprocessar um dia dobra a HE. Dois saldos coexistem (`bancoHorasService.getSaldo` × RPC `get_colaborador_banco_horas`) e discordam por construção.
+- 🟠 **N10 — Saldo de banco de horas ilegível.** `bancoHorasService.ts:10` seleciona `quantidade_horas`, coluna inexistente (é `horas INTERVAL`) → erro PostgREST para todo chamador; e `parseFloat('01:30:00')=1` perde minutos.
+- 🟠 **N11 — Banco de horas sem ciclo de vida (CLT art. 59).** `prazo_meses/saldo_maximo_horas/acordo_tipo` não são lidos em lugar algum: sem janela de compensação, expiração, pagamento de saldo positivo como HE +50% no fechamento → passivo trabalhista.
+- 🟠 **N12 — Mismatch de fuso offline×online.** offline grava `new Date().toISOString()` (UTC) e fatia data/hora do string UTC; online usa `format(now,…)` local. Batida 22:15 BRT vira dia seguinte 01:15 → pareamento/DSR/competência corrompidos.
+- 🟡 **N13 — Tolerância abatida de atraso e de HE** (`processar-ponto:106`), pareamento por índice assume alternância estrita (marcações ímpares dropam horas), intra/interjornada nunca validadas. `batidasPontoService.excluir` é código morto (trigger `proibir_delete_ponto` sempre lança antes do log).
+
+### eSocial / fiscal / bancário
+- 🔴 **[VERIFICADO] N14 — Assinatura eSocial é mock.** `enviar-esocial/utils/signer.ts:20-41` — `base64("SIG-"+hash)` e `<X509Certificate>…Simulated…`; nenhuma chave A1/.pfx. Zero não-repúdio; Receita rejeitaria.
+- 🔴 **N15 — CNAB 240 header com CNPJ zerado.** `cnabService.ts:187` — `tpInsc=2` (CNPJ) mas `nrInsc` fica em branco→zeros; CNPJ do empregador nunca escrito; nome do banco literal `'BANCO'`. **Qualquer banco rejeita.** Este é o caminho ligado à UI, não a `cnab-remessa` endurecida.
+- 🟠 **N16 — eSocial é stub com bugs de dados.** `enviar-esocial/index.ts:163` — produção sempre fail-closed ("não configurado"); só S-1000/S-2200 emitem XML; demais eventos vão como `<dados><![CDATA[json]]>` (schema inválido); sem ordenação/dependência; `ideEstabLot.nrInsc = empresaId(UUID).slice(0,14)`; S-1210 sem idempotência (`esocialService.ts:254`) → reprocessar duplica eventos de pagamento.
+- 🟠 **N17 — Guias computadas da fonte errada e não persistidas.** `gerar-guias/index.ts:166` — totais re-derivados de `colaboradores.salario_base` de `ativo` **agora**, ignorando a folha fechada; retorna em memória mas **nunca insere** em `guias_inss`/`guias_fgts` → dedup inerte e `ObrigacoesFiscaisPage` não mostra. RAT 3%/terceiros 5.8% hardcoded.
+- 🟠 **N18 — Larguras de campo/dinheiro CNAB.** `cnabService.ts:238` trailer usa 15 dígitos onde FEBRABAN exige 18 (`padEnd` mascara); Segmento A com 229 chars antes do `padEnd(240)` (campos desalinhados); `formatAmount=Math.round(val*100)` sobre float (erro de centavos); sem strip de CPF no Segmento B.
+- 🟠 **N19 — CNAB sem idempotência + drop silencioso.** `generateCNAB240` sem guarda de regeneração por `folhaId` → remessa duplicada/pagamento dobrado; colaborador sem conta `principal` é `continue`-pulado sem aviso, mas `valor_total` soma todos → total do arquivo ≠ registrado.
+- 🟡 **N20 — DCTFWeb/FGTS-Digital/PIX/CNAB são gravadores, não integradores** — validam e persistem metadados (com bom hardening) mas não geram o XML/guia/arquivo real; confiam no `valor_centavos` do cliente.
+- 🟡 **N21 — PIX-lote TOCTOU na dupla aprovação.** `pix-lote/index.ts:261` — identidade/contagem de aprovadores reconstruída de `auditoria` e inserida; duas submissões concorrentes do mesmo usuário passam o `.has(userId)` e satisfazem o limiar de 2 com uma pessoa. Sem constraint única.
+
+### LGPD / workflows
+- 🔴 **[VERIFICADO] N22 — Direito ao apagamento LGPD nunca é executado.** `anonimizar_dados_pessoais` não é invocado em `src/` nem em `functions/` (só aparece nos types gerados e na allowlist do bridge). `lgpdService.ts:50` só troca um campo de status; a fila `lgpd_fila_limpeza` nunca é drenada. PII é retida.
+- 🔴 **N23 — Mesmo se chamada, a anonimização quebra.** migration `20260513194604:23` grava `cpf='000.000.000-00'` (14 chars) em `colaboradores.cpf CHAR(11) UNIQUE` (overflow + colisão de unique no 2º registro); limpa só 5 colunas; PII sobrevive em `contas_bancarias`, `dependentes`, `documentos`, `esocial_eventos.dados`, `cnab_itens`, `pix_itens`, auditoria.
+- 🔴 **N24 — Rescisão paga e fecha sem homologação nem assinaturas.** `rescisaoService.ts:209` — `processarPagamento` seta `status:'pago'`/`etapa:'finalizado'` sem checar `homologado`/`checklist`/`assinado_*`. Uma rescisão `pendente` vira paga, pulando cálculo, homologação (art. 477) e ambas as assinaturas.
+- 🟠 **N25 — Máquina de estados e "assinatura" de rescisão quebradas.** `rescisaoService.ts:8` — `validarTransicao` bloqueia só saltos para frente (permite voltar; rescisão paga pode reabrir/recalcular); `homologar` não checa etapa atual e insere homologações duplicadas; `assinarDigitalmente` = `btoa('rescisao-'+id+Date.now()).slice(0,32)` (base64 reversível, forjável, não atrelado ao valor, nunca verificado antes do pagamento).
+- 🟠 **N26 — Aprovação de férias sem guardas nem validação CLT.** `feriasService.ts:103` — `aprovar/aprovarGestor/aprovarRH` fazem `update({status:'aprovada'})` incondicional (férias `cancelada`/`rejeitada` reaprováveis; RH aprova sem gestor; duplo clique duplo-aprova). `feriasSchema` é importado por ninguém; nada valida período aquisitivo/concessivo, `gozo+abono≤30`, abono≤1/3, fracionamento (14+5+5), art. 134 §3.
+- 🟠 **N27 — Desligamento sem proteção de estado terminal/duplicidade.** `desligamentoService.ts:58` — `atualizar`/`excluir` aplicam a qualquer status (um `pago`/homologado pode ser editado/apagado); `criar` não checa desligamento aberto existente nem se o colaborador está `ativo`.
+- 🟠 **N28 — Afastamentos sem detecção de sobreposição/recidiva.** `afastamentoService` usa `BaseService.criar`; afastamentos sobrepostos salvam; split de 15 dias empresa/INSS é por-registro, nunca agregando mesmo CID em 60 dias → repasse INSS errado; sem reset de período aquisitivo (art. 133).
+- 🟡 **N29 — auth-gov-br OIDC fraco.** nonce nunca validado contra o id_token, sem expiração de state, sem PKCE, identidade gov.br atrelada ao bearer e não à sessão do browser; endpoints hardcoded para `sso.staging.acesso.gov.br` (staging).
+- 🔵 **N30 — Diversos:** `contratacaoService.ts:174` S-2200 é `setTimeout`+protocolo aleatório logado como sucesso; `NovaAdmissaoDialog` CPF sem checksum (validators existem, não usados); `feriasService.syncWithHub` é `Math.random()` auto-toastando a cada 60s; `admissaoService.concluir/cancelar` pulam a máquina de estados; `AdmissoesPage.tsx:88` "Enviar por WhatsApp" lê `.ok/.value` de service que retorna a linha → `TypeError` no caminho feliz (feature quebrada); `parse-afdt` usa offset fixo `-03:00` (ignora DST histórico).
+
+**Positivo (robusto/referência):** `pix-lote` (idempotência real, segregação de funções, mascaramento LGPD — exceto TOCTOU), `assinaturaDigital` do contrato de admissão (SHA-256 real, CSRF, rate-limit, guarda de corrida), `calcular-ferias`/`calcular-rescisao` edge (Zod/CSRF/tenant, impõem `gozo+abono≤30` que o cliente não impõe), `_shared/idempotency`, `utils/dateLocal` (embora o caminho offline que precisa dele o ignore).
+
+### Features com UI mas que são stub/mock/não implementadas
+Biometria facial · transmissão + assinatura eSocial · anonimização/apagamento LGPD · "Hub sync" de férias · "assinatura digital" de rescisão · endpoints OCR (relay aberto) · geração real de artefato CNAB/DCTFWeb/FGTS-Digital (só metadados) · ciclo de vida de banco de horas. As edge functions endurecidas de adiantamento/consignado existem, mas são **código morto** em relação à UI.
+
+---
+
+## Anexo — Estado factual dos portões de qualidade (2026-07-18, neste sandbox)
+
+| Portão | Resultado | Observação |
+|---|---|---|
+| `vitest run` | 201 passam · 2 falham · 7 arquivos não carregam | Falhas por egress bloqueado (`Host not in allowlist`) e deps ausentes (`exceljs`, `sonner→react`) — artefatos de ambiente, não defeitos de lógica. `rescisaoCalc.test.ts` (50+ casos) **não executou**. |
+| `eslint src` | **15 erros · 71 warnings** | `lint:ci` (`--max-warnings=0`) **falharia**. 14 erros = guard de fuso horário (HK1); 1 = `no-useless-escape`. |
+| `tsc --noEmit` | inconclusivo | Erros são todos `Cannot find module 'exceljs'` (dep não instalada no sandbox), não erros de tipo reais. |
+| `npm audit` | 1 crítica · 7 altas | `vitest` (crítica), `react-router`, `undici`, `vite`, `rollup`, `lodash`, `xlsx` (sem fix). |
+
+> **Nota metodológica:** dos ~90+ achados, os marcados **[VERIFICADO]** foram confirmados por leitura direta do código citado pelo auditor. Os demais vêm das frentes de auditoria especializadas com `arquivo:linha` — recomenda-se confirmação pontual antes da remediação, especialmente onde o comportamento depende do schema real do banco vivo (ver drift, L10).
+
+
