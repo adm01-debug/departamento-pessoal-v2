@@ -7,6 +7,7 @@ import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import { useSecureVisibility } from '@/hooks/useSecureVisibility';
+import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 
 // Core pages with optimized pre-loading
 import LoginPage from '@/pages/LoginPage';
@@ -161,6 +162,7 @@ function LazyPage({ Component }: { Component: React.LazyExoticComponent<() => Re
 export default function App() {
   useSessionTimeout();
   useSecureVisibility();
+  useSecurityMonitor();
 
   return (
     <Routes>
