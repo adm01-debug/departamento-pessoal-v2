@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Trash2, Users, FileText, CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { safeHref } from '@/utils/safeUrl';
 
 const tipoLabels: Record<string, string> = {
   advertencia_verbal: 'Adv. Verbal',
@@ -166,7 +167,7 @@ export function MedidasTable({ data, onMarcarCiencia, onExcluir }: MedidasTableP
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" asChild>
-                                <a href={m.documento_url} target="_blank" rel="noopener noreferrer">
+                                <a href={safeHref(m.documento_url)} target="_blank" rel="noopener noreferrer">
                                   <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
                                 </a>
                               </Button>

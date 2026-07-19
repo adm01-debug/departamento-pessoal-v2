@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Upload, Trash2, Eye, Loader2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { format } from 'date-fns';
+import { safeHref } from '@/utils/safeUrl';
 import { toast } from 'sonner';
 
 interface AfastamentoDocumentManagerProps {
@@ -211,7 +212,7 @@ export function AfastamentoDocumentManager({ afastamentoId }: AfastamentoDocumen
                 </div>
                 <div className="flex items-center gap-1">
                   <Button variant="ghost" size="icon" asChild>
-                    <a href={doc.url} target="_blank" rel="noopener noreferrer">
+                    <a href={safeHref(doc.url)} target="_blank" rel="noopener noreferrer">
                       <Eye className="h-4 w-4" />
                     </a>
                   </Button>

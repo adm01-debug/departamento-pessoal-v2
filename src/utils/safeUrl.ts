@@ -29,3 +29,18 @@ export function assertAllowedUrl(url: string): void {
     throw new Error(`URL bloqueada por política de segurança: ${new URL(url).hostname}`);
   }
 }
+
+const SAFE_PROTOCOLS = new Set(['https:', 'http:', 'mailto:', 'tel:']);
+
+export function safeHref(url: unknown): string {
+  if (typeof url !== 'string' || url.length === 0) return '#';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('/') || trimmed.startsWith('#')) return trimmed;
+  try {
+    const parsed = new URL(trimmed);
+    if (!SAFE_PROTOCOLS.has(parsed.protocol)) return '#';
+    return trimmed;
+  } catch {
+    return '#';
+  }
+}
