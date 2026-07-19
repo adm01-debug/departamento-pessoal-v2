@@ -132,7 +132,7 @@ serve(async (req: Request): Promise<Response> => {
             messages: [
               { role: 'user', content: [
                 { type: 'text', text: promptIA },
-                { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${fotoBase64}` } },
+                { type: 'image_url', image_url: { url: fotoBase64.startsWith('data:') ? fotoBase64 : `data:image/jpeg;base64,${fotoBase64}` } },
               ]},
             ],
             max_tokens: 256,

@@ -26,9 +26,15 @@ serve(async (req: Request): Promise<Response> => {
     let triggeredBy = 'cron';
 
     // Path 1: Cron secret (for pg_cron / external scheduler)
-    if (cronSecret && cronHeader === cronSecret) {
-      authorized = true;
-      triggeredBy = 'cron';
+    if (cronSecret && cronHeader && cronHeader.length === cronSecret.length) {
+      const enc = new TextEncoder();
+      const a = enc.encode(cronHeader);
+      const b = enc.encode(cronSecret);
+      const keyData = await crypto.subtle.importKey('raw', b, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+      const sig = await crypto.subtle.sign('HMAC', keyData, a);
+      const expected = await crypto.subtle.sign('HMAC', keyData, b);
+      const match = new Uint8Array(sig).every((v, i) => v === new Uint8Array(expected)[i]);
+      if (match) { authorized = true; triggeredBy = 'cron'; }
     }
 
     // Path 2: Admin JWT (for manual trigger via UI) — CSRF required
