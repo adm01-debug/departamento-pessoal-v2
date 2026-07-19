@@ -31,5 +31,5 @@ CREATE POLICY "Auth users read logs_integracoes" ON public.logs_integracoes FOR 
 
 -- contratacao storage bucket (contratacaoService.ts)
 INSERT INTO storage.buckets (id, name, public) VALUES ('contratacao', 'contratacao', false) ON CONFLICT (id) DO NOTHING;
-DROP POLICY IF EXISTS "Auth users upload contratacao" ON public.storage;
+DROP POLICY IF EXISTS "Auth users upload contratacao" ON storage.objects;
 CREATE POLICY "Auth users upload contratacao" ON storage.objects FOR ALL TO authenticated USING (bucket_id = 'contratacao') WITH CHECK (bucket_id = 'contratacao');

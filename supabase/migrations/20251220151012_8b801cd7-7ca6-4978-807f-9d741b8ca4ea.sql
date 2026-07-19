@@ -105,17 +105,17 @@ VALUES ('documentos-admissao', 'documentos-admissao', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Políticas de storage para uploads públicos
-DROP POLICY IF EXISTS "Anyone can upload admissao documents" ON public.storage;
+DROP POLICY IF EXISTS "Anyone can upload admissao documents" ON storage.objects;
 CREATE POLICY "Anyone can upload admissao documents"
 ON storage.objects FOR INSERT
 WITH CHECK (bucket_id = 'documentos-admissao');
 
-DROP POLICY IF EXISTS "Anyone can view admissao documents" ON public.storage;
+DROP POLICY IF EXISTS "Anyone can view admissao documents" ON storage.objects;
 CREATE POLICY "Anyone can view admissao documents"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'documentos-admissao');
 
-DROP POLICY IF EXISTS "Authenticated users can delete admissao documents" ON public.storage;
+DROP POLICY IF EXISTS "Authenticated users can delete admissao documents" ON storage.objects;
 CREATE POLICY "Authenticated users can delete admissao documents"
 ON storage.objects FOR DELETE
 USING (bucket_id = 'documentos-admissao' AND auth.role() = 'authenticated');

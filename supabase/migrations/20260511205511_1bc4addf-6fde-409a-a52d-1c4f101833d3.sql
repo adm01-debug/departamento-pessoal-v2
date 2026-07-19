@@ -107,7 +107,7 @@ ON CONFLICT (tipo) DO NOTHING;
 
 -- Storage Bucket para Afastamentos
 INSERT INTO storage.buckets (id, name, public) VALUES ('afastamentos', 'afastamentos', true) ON CONFLICT (id) DO NOTHING;
-DROP POLICY IF EXISTS "Acesso publico aos arquivos de afastamento" ON public.storage;
+DROP POLICY IF EXISTS "Acesso publico aos arquivos de afastamento" ON storage.objects;
 CREATE POLICY "Acesso publico aos arquivos de afastamento" ON storage.objects FOR SELECT USING (bucket_id = 'afastamentos');
-DROP POLICY IF EXISTS "Upload de arquivos de afastamento" ON public.storage;
+DROP POLICY IF EXISTS "Upload de arquivos de afastamento" ON storage.objects;
 CREATE POLICY "Upload de arquivos de afastamento" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'afastamentos');
