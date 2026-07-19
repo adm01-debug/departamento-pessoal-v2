@@ -18,11 +18,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useQuery } from '@tanstack/react-query';
+import { useDataAccessLog } from '@/hooks/useDataAccessLog';
 
 export default function CalculadoraRescisaoPage() {
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
   const [loadingColab, setLoadingColab] = useState(false);
+  const [selectedColabId, setSelectedColabId] = useState<string | undefined>(undefined);
+
+  useDataAccessLog('colaboradores', selectedColabId, empresaAtual?.id);
+
   const [form, setForm] = useState({
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
@@ -36,6 +41,7 @@ export default function CalculadoraRescisaoPage() {
   const handleSelectColaborador = async (id: string) => {
     if (!id) return;
     setLoadingColab(true);
+    setSelectedColabId(id);
     try {
       const { data, error } = await supabase.from('colaboradores').select('*').eq('id', id).single();
       if (error) throw error;

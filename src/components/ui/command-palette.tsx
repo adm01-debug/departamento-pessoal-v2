@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
 import { useDebounce } from '@/hooks/useDebounce';
+import { maskCpfDisplay } from '@/utils/piiMask';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { ColaboradorStatus } from '@/components/ui/status-badge';
 import {
@@ -188,7 +189,7 @@ export function CommandPalette({
       items.push({
         id: `colab-${c.id}`,
         label: c.nome_completo,
-        description: `${c.cpf || ''} · ${c.cargo || ''}`,
+        description: `${c.cpf ? maskCpfDisplay(c.cpf) : ''} · ${c.cargo || ''}`,
         status: c.status,
         icon: User,
         category: 'pessoa',
