@@ -34,8 +34,9 @@ export const beneficiariosSeguroService = {
 };
 
 export const colaboradorBeneficiosService = {
-  listar: async (colaboradorId: string) => {
-    const { data, error } = await supabase.from('colaborador_beneficios').select('*').eq('colaborador_id', colaboradorId);
+  listar: async (colaboradorId: string, empresaId: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('colaborador_beneficios').select('*').eq('colaborador_id', colaboradorId).eq('empresa_id', empresaId);
     if (error) throw error;
     return data || [];
   },

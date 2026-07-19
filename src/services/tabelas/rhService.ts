@@ -31,16 +31,22 @@ export const feriasSolicitacoesService = {
 };
 
 export const historicoCargoService = {
-  listar: async (colaboradorId: string) => {
-    const { data, error } = await supabase.from('historico_cargo').select('*').eq('colaborador_id', colaboradorId).order('data_inicio', { ascending: false });
+  listar: async (colaboradorId: string, empresaId: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('historico_cargo').select('*').eq('colaborador_id', colaboradorId).eq('empresa_id', empresaId).order('data_inicio', { ascending: false });
     if (error) throw error;
     return data || [];
   },
 };
 
 export const historicoFeriasService = {
-  listar: async (colaboradorId: string) => {
-    const { data, error } = await supabase.from('historico_ferias' as any).select('*').eq('colaborador_id', colaboradorId).order('data_inicio', { ascending: false });
+  listar: async (colaboradorId: string, empresaId: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await (supabase as any).from('historico_ferias')
+      .select('*, ferias!inner(colaborador_id, empresa_id)')
+      .eq('ferias.colaborador_id', colaboradorId)
+      .eq('ferias.empresa_id', empresaId)
+      .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },
