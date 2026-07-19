@@ -16,6 +16,7 @@ import { canalContabilidadeService, type ThreadCategoria, type ThreadPrioridade,
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
+import { safeHref } from '@/utils/safeUrl';
 import { MessageSquare, Plus, Send, Paperclip, CheckCircle2, Archive, UserPlus, ExternalLink, Inbox } from 'lucide-react';
 import { formatDateTime } from '@/utils/format';
 
@@ -111,7 +112,7 @@ export default function CanalContabilidadePage() {
 
   const abrirAnexo = async (path: string) => {
     const url = await canalContabilidadeService.getAnexoUrl(path);
-    if (url) window.open(url, '_blank', 'noopener');
+    if (url) window.open(safeHref(url), '_blank', 'noopener');
     else toast.error('Não foi possível abrir anexo');
   };
 

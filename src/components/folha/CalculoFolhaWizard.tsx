@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useFolhaAuditoria } from '@/hooks/useFolhaAuditoria';
 import { formatDateLocalISO } from '@/utils/dateLocal';
+import { safeHref } from '@/utils/safeUrl';
 
 import {
   Dialog,
@@ -358,7 +359,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                       if (currentFolhaId) {
                         try {
                           const result = await folhaPagamentoService.emitirPDF(currentFolhaId);
-                          window.open(result, '_blank', 'noopener');
+                          window.open(safeHref(result), '_blank', 'noopener');
                         } catch (e: any) {
                           toast.error(safeErrorMessage(e, 'Erro ao gerar PDF do holerite.'));
                         }

@@ -46,6 +46,20 @@ if (isInIframe && !isPreviewHost) {
   if (window.top) window.top.location = window.self.location;
 }
 
+// CSP violation monitoring — detect and report policy breaches client-side
+if (import.meta.env.PROD) {
+  document.addEventListener('securitypolicyviolation', (e) => {
+    const payload = {
+      directive: e.violatedDirective,
+      blocked: e.blockedURI,
+      source: e.sourceFile ? `${e.sourceFile}:${e.lineNumber}` : undefined,
+    };
+    if (typeof Sentry !== 'undefined' && Sentry.captureMessage) {
+      Sentry.captureMessage(`CSP violation: ${e.violatedDirective}`, { level: 'warning', extra: payload });
+    }
+  });
+}
+
 // PWA Service Worker Registration
 if (!isInIframe && !isPreviewHost && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

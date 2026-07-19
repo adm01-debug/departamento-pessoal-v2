@@ -17,6 +17,7 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
+import { safeHref } from '@/utils/safeUrl';
 import { Plus, Receipt, DollarSign, CheckCircle, Clock, XCircle, Trash2, Upload, Eye, DollarSign as DollarIcon } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
@@ -118,7 +119,7 @@ export default function DespesasPage() {
 
   const abrirComprovante = async (path: string) => {
     const url = await despesaService.getComprovanteUrl(path);
-    if (url) window.open(url, '_blank', 'noopener');
+    if (url) window.open(safeHref(url), '_blank', 'noopener');
     else toast.error('Não foi possível gerar link do comprovante');
   };
 
