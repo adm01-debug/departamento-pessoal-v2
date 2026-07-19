@@ -313,6 +313,7 @@ export function WhatsAppConfigPanel() {
           <Label>API Key</Label>
           <Input
             type="password"
+            autoComplete="off"
             value={config.api_key || ''}
             onChange={e => setConfig(p => ({ ...p, api_key: e.target.value }))}
             placeholder="Sua chave secreta"

@@ -210,6 +210,8 @@ export default function PontoKioskPage() {
               <form onSubmit={handlePinSubmit} className="space-y-4">
                 <Input
                   type="password"
+                  autoComplete="off"
+                  inputMode="numeric"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="0000"
