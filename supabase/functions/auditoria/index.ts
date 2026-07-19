@@ -100,6 +100,10 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `auditoria:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Tenant scope obrigatório
     const [{ data: belongs }, { data: isAdm }] = await Promise.all([
       supabase.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: body.empresaId }),
