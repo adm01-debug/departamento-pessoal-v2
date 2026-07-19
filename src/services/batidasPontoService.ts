@@ -1,15 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
 import { pontoAuditService } from './pontoAuditService';
 export const batidasPontoService = {
-  async listar(colaboradorId: string, dataInicio?: string, dataFim?: string): Promise<any[]> {
-    
+  async listar(colaboradorId: string, dataInicio?: string, dataFim?: string, empresaId?: string): Promise<any[]> {
+    if (empresaId !== undefined && !empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = (supabase as any).from('batidas_ponto').select('*').eq('colaborador_id', colaboradorId).order('data').order('ordem');
+    if (empresaId) q = q.eq('empresa_id', empresaId);
     if (dataInicio) q = q.gte('data', dataInicio);
     if (dataFim) q = q.lte('data', dataFim);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   async listarPorData(data: string, empresaId: string): Promise<any[]> {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');

@@ -65,10 +65,12 @@ export async function excluirCentroCusto(id: string): Promise<void> {
 // =============================================
 // Contas Bancárias
 // =============================================
-export async function listarContasBancarias(colaboradorId: string): Promise<unknown[]> {
+export async function listarContasBancarias(colaboradorId: string, empresaId: string): Promise<unknown[]> {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase.from('contas_bancarias')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('principal', { ascending: false });
   if (error) throw error;
   return data || [];

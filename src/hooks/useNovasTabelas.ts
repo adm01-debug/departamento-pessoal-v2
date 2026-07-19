@@ -13,10 +13,11 @@ type DataRecord = Record<string, unknown>;
 
 // === BATIDAS DE PONTO ===
 export function useBatidasPonto(colaboradorId: string, dataInicio?: string, dataFim?: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['batidas-ponto', colaboradorId, dataInicio, dataFim],
-    queryFn: () => batidasPontoService.listar(colaboradorId, dataInicio, dataFim),
-    enabled: !!colaboradorId,
+    queryKey: ['batidas-ponto', colaboradorId, dataInicio, dataFim, empresaAtual?.id],
+    queryFn: () => batidasPontoService.listar(colaboradorId, dataInicio, dataFim, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 

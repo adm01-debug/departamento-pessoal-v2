@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as service from '@/services/tabelasReferenciaService';
+import { useEmpresas } from './useEmpresas';
 
 type DataRecord = Record<string, unknown>;
 
@@ -76,7 +77,12 @@ export function useExcluirCentroCusto() {
 // Contas Bancárias (CRUD)
 // =============================================
 export function useContasBancarias(colaboradorId: string) {
-  return useResultQuery(['contas-bancarias', colaboradorId], () => service.listarContasBancarias(colaboradorId), !!colaboradorId);
+  const { empresaAtual } = useEmpresas();
+  return useResultQuery(
+    ['contas-bancarias', colaboradorId, empresaAtual?.id],
+    () => service.listarContasBancarias(colaboradorId, empresaAtual!.id),
+    !!colaboradorId && !!empresaAtual?.id
+  );
 }
 
 export function useCriarContaBancaria() {
