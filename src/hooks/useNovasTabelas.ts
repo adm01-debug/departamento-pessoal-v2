@@ -49,10 +49,11 @@ export function useFaltas() {
 }
 
 export function useFaltasColaborador(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['faltas-colaborador', colaboradorId],
-    queryFn: () => faltasService.buscarPorColaborador(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['faltas-colaborador', colaboradorId, empresaAtual?.id],
+    queryFn: () => faltasService.buscarPorColaborador(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 
@@ -94,10 +95,11 @@ export function useMedidasDisciplinares() {
 }
 
 export function useMedidasDisciplinaresColaborador(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['medidas-disciplinares-colaborador', colaboradorId],
-    queryFn: () => medidasDisciplinaresService.buscarPorColaborador(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['medidas-disciplinares-colaborador', colaboradorId, empresaAtual?.id],
+    queryFn: () => medidasDisciplinaresService.buscarPorColaborador(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 

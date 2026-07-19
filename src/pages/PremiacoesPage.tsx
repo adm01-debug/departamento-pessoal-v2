@@ -46,8 +46,8 @@ export default function PremiacoesPage() {
   });
 
   const { data: auditoria = [], isLoading: loadAuditoria } = useQuery({
-    queryKey: ['premiacoes_auditoria'],
-    queryFn: () => premiacoesService.listarAuditoria(),
+    queryKey: ['premiacoes_auditoria', empresaAtual?.id],
+    queryFn: () => premiacoesService.listarAuditoria(undefined, empresaAtual!.id),
     enabled: !!empresaAtual?.id
   });
 

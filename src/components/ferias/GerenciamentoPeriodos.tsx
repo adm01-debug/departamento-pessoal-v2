@@ -42,9 +42,9 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   });
 
   const { data: periodos, isLoading } = useQuery({
-    queryKey: ['periodos-aquisitivos', selectedColabId],
-    queryFn: () => feriasService.listPeriodosAquisitivos(selectedColabId),
-    enabled: !!selectedColabId,
+    queryKey: ['periodos-aquisitivos', selectedColabId, empresaAtual?.id],
+    queryFn: () => feriasService.listPeriodosAquisitivos(selectedColabId, empresaAtual!.id),
+    enabled: !!selectedColabId && !!empresaAtual?.id,
   });
 
   const createMutation = useMutation({

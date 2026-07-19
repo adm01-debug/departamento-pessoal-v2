@@ -47,7 +47,7 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
 
   const query = useQuery({
     queryKey: ['prorrogacoes-afastamento', empresaAtual?.id, afastamentoId],
-    queryFn: () => afastamentoService.listarProrrogacoes(afastamentoId),
+    queryFn: () => afastamentoService.listarProrrogacoes(afastamentoId, empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

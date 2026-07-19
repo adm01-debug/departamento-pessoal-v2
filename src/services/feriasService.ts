@@ -125,11 +125,13 @@ class FeriasService extends BaseService<Ferias> {
     if (error) throw error;
   }
 
-  async listPeriodosAquisitivos(colaboradorId: string): Promise<any[]> {
+  async listPeriodosAquisitivos(colaboradorId: string, empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { data, error } = await (supabase as any)
       .from('periodos_aquisitivos')
       .select('*')
       .eq('colaborador_id', colaboradorId)
+      .eq('empresa_id', empresaId)
       .order('data_inicio', { ascending: false });
     if (error) throw error;
     return data || [];

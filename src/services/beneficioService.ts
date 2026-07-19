@@ -92,11 +92,14 @@ class BeneficioService extends BaseService<any> {
     return data;
   }
 
-  async listarPorColaborador(colaboradorId: string): Promise<any[]> {
+  async listarPorColaborador(colaboradorId: string, empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    // !inner enables filtering on beneficio.empresa_id, excluding orphan/cross-tenant rows
     const { data, error } = await (supabase as any)
       .from('beneficios_colaborador')
-      .select('*, beneficio:beneficios(*)')
-      .eq('colaborador_id', colaboradorId);
+      .select('*, beneficio:beneficios!inner(*)')
+      .eq('colaborador_id', colaboradorId)
+      .eq('beneficio.empresa_id', empresaId);
     if (error) throw error;
     return data || [];
   }

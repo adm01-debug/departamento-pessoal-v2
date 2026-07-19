@@ -30,16 +30,18 @@ class AfastamentoService extends BaseService<any> {
     return { data: data || [], total: count || 0 };
   }
 
-  async listarHistoricoRecente(colaboradorId: string, dias: number = 60): Promise<any[]> {
+  async listarHistoricoRecente(colaboradorId: string, empresaId: string, dias: number = 60): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const dataLimite = new Date();
     dataLimite.setDate(dataLimite.getDate() - dias);
-    
+
     const { data, error } = await this.getQuery()
       .select('*')
       .eq('colaborador_id', colaboradorId)
+      .eq('empresa_id', empresaId)
       .gte('data_inicio', formatDateLocalISO(dataLimite))
       .order('data_inicio', { ascending: false });
-      
+
     if (error) throw error;
     return data || [];
   }
@@ -126,13 +128,16 @@ class AfastamentoService extends BaseService<any> {
     return data;
   }
 
-  async listarProrrogacoes(afastamentoId?: string): Promise<any[]> {
+  async listarProrrogacoes(afastamentoId?: string, empresaId?: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    // !inner forces an INNER JOIN enabling empresa_id filter on the joined afastamentos row
     let query = (supabase as any)
       .from('prorrogacoes_afastamento')
-      .select('*, afastamento:afastamentos!fk_afastamentos_colaborador(*, colaborador:colaboradores!fk_afastamentos_colaborador(nome_completo))');
-    
+      .select('*, afastamento:afastamentos!inner(*, colaborador:colaboradores(nome_completo))');
+
     if (afastamentoId) query = query.eq('afastamento_id', afastamentoId);
-    
+    query = query.eq('afastamento.empresa_id', empresaId);
+
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];

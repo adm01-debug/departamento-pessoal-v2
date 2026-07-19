@@ -10,25 +10,29 @@ export const premiacoesService = {
     return data || [];
   },
 
-  async listarRegras(campanhaId: string) {
-    const { data, error } = await supabase
+  async listarRegras(campanhaId: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    // !inner validates campanhaId belongs to this empresa (prevents IDOR across tenants)
+    const { data, error } = await (supabase as any)
       .from('premiacoes_regras')
-      .select('*, meta:metas_okrs(*)')
-      .eq('campanha_id', campanhaId);
+      .select('*, meta:metas_okrs(*), campanha:premiacoes_campanhas!inner(empresa_id)')
+      .eq('campanha_id', campanhaId)
+      .eq('campanha.empresa_id', empresaId);
     if (error) throw error;
     return data || [];
   },
 
   async listarPagamentos(campanhaId: string | undefined, empresaId: string) {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    let q = supabase.from('premiacoes_pagamentos').select(`
+    // !inner on campanha enables .eq() filtering on the embedded empresa_id column
+    let q = (supabase as any).from('premiacoes_pagamentos').select(`
       *,
       colaborador:colaboradores(nome_completo, salario_base),
-      campanha:premiacoes_campanhas(nome)
+      campanha:premiacoes_campanhas!inner(nome, empresa_id)
     `);
 
     if (campanhaId) q = q.eq('campanha_id', campanhaId);
-    q = q.filter('campanha.empresa_id', 'eq', empresaId);
+    q = q.eq('campanha.empresa_id', empresaId);
 
     const { data, error } = await q;
     if (error) throw error;
@@ -145,9 +149,16 @@ export const premiacoesService = {
     return this.reconciliarFolha(pagamentoId, valorEncontrado, "Conciliação automática via integração eSocial/Folha");
   },
 
-  async listarAuditoria(entidadeId?: string) {
-    let q = supabase.from('premiacoes_auditoria').select('*').order('created_at', { ascending: false });
+  async listarAuditoria(entidadeId?: string, empresaId?: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    // Scope via !inner join on pagamento → campanha → empresa_id
+    // (Requires entidade_tipo = 'pagamento' records; mixed types are excluded by !inner)
+    let q = (supabase as any)
+      .from('premiacoes_auditoria')
+      .select('*, pagamento:premiacoes_pagamentos!inner(campanha:premiacoes_campanhas!inner(empresa_id))')
+      .order('created_at', { ascending: false });
     if (entidadeId) q = q.eq('entidade_id', entidadeId);
+    q = q.eq('pagamento.campanha.empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];

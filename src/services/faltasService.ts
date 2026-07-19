@@ -11,12 +11,16 @@ export const faltasService = {
 
   },
   
-  async buscarPorColaborador(colaboradorId: string): Promise<any[]> {
-    
-    const { data, error } = await (supabase as any).from('faltas').select('*').eq('colaborador_id', colaboradorId).order('data', { ascending: false });
+  async buscarPorColaborador(colaboradorId: string, empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await (supabase as any)
+      .from('faltas')
+      .select('*')
+      .eq('colaborador_id', colaboradorId)
+      .eq('empresa_id', empresaId)
+      .order('data', { ascending: false });
     if (error) throw error;
     return data || [];
-  
   },
   
   async criar(d: any): Promise<any> {
