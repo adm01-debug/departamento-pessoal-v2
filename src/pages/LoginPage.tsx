@@ -96,7 +96,7 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (err: any) {
       await recordFailedAttempt(email);
-      setError(err.message || 'Erro ao fazer login');
+      setError('Email ou senha inválidos.');
     } finally {
       setLoading(false);
     }
@@ -108,10 +108,16 @@ export default function LoginPage() {
       setError('Informe seu email');
       return;
     }
+    const lastReset = Number(sessionStorage.getItem('__pwd_reset_ts') || '0');
+    if (Date.now() - lastReset < 60_000) {
+      setError('Aguarde 1 minuto antes de solicitar novamente.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
       await resetPassword(email);
+      sessionStorage.setItem('__pwd_reset_ts', String(Date.now()));
       setForgotSent(true);
     } catch (err: any) {
       setError(err.message || 'Erro ao enviar email de recuperação');

@@ -4,6 +4,7 @@ import type { Session, AuthError } from '@supabase/supabase-js';
 import DOMPurify from 'dompurify';
 import { loggerService } from '@/services/loggerService';
 import { queryClient } from '@/lib/queryClient';
+import { validatePassword } from '@/utils/passwordPolicy';
 
 export type AppRole = 'admin' | 'moderator' | 'user';
 
@@ -175,12 +176,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
+    const pwCheck = validatePassword(password);
+    if (!pwCheck.valid) {
+      throw new Error(`Senha fraca: ${pwCheck.errors.join('; ')}`);
+    }
     try {
       const sanitizedName = DOMPurify.sanitize(name.trim());
-      const { error } = await supabase.auth.signUp({ 
-        email, 
-        password, 
-        options: { data: { name: sanitizedName } } 
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name: sanitizedName } }
       });
       if (error) throw error;
       loggerService.info('User signed up', { email });

@@ -45,11 +45,13 @@ class AfastamentoService extends BaseService<any> {
 
   // CID-10 search
   async buscarCID(termo: string): Promise<any[]> {
+    const safe = termo.replace(/[%_.,()]/g, '');
+    if (!safe || safe.length < 2) return [];
     const { data, error } = await this.getQuery()
       .select('*')
-      .or(`codigo.ilike.%${termo}%,descricao.ilike.%${termo}%`)
+      .or(`codigo.ilike.%${safe}%,descricao.ilike.%${safe}%`)
       .limit(10);
-    
+
     if (error) throw error;
     return data || [];
   }

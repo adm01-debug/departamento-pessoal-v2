@@ -31,7 +31,8 @@ class ColaboradorService extends BaseService<Colaborador> {
     if (cargo && cargo !== 'all') query = query.eq('cargo', cargo);
 
     if (search) {
-      query = query.or(`nome_completo.ilike.%${search}%,cpf.ilike.%${search}%,email.ilike.%${search}%`);
+      const s = search.replace(/[%_.,()]/g, '');
+      if (s) query = query.or(`nome_completo.ilike.%${s}%,cpf.ilike.%${s}%,email.ilike.%${s}%`);
     }
 
     const from = (page - 1) * pageSize;

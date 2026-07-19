@@ -5,6 +5,7 @@ import { AdminRoute } from '@/components/AdminRoute';
 import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 
 // Core pages with optimized pre-loading
 import LoginPage from '@/pages/LoginPage';
@@ -157,6 +158,8 @@ function LazyPage({ Component }: { Component: React.LazyExoticComponent<() => Re
 }
 
 export default function App() {
+  useSessionTimeout();
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />

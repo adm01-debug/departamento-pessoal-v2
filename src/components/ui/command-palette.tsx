@@ -153,10 +153,11 @@ export function CommandPalette({
         .eq('ativa', true)
         .limit(5);
 
-      if (/^\d+$/.test(q)) {
-        queryBuilder = queryBuilder.ilike('cnpj', `%${q}%`);
-      } else {
-        queryBuilder = queryBuilder.or(`razao_social.ilike.%${q}%,nome_fantasia.ilike.%${q}%`);
+      const sq = q.replace(/[%_.,()]/g, '');
+      if (/^\d+$/.test(sq)) {
+        queryBuilder = queryBuilder.ilike('cnpj', `%${sq}%`);
+      } else if (sq) {
+        queryBuilder = queryBuilder.or(`razao_social.ilike.%${sq}%,nome_fantasia.ilike.%${sq}%`);
       }
 
       const { data } = await queryBuilder;
