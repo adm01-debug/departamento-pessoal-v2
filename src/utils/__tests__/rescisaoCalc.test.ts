@@ -129,7 +129,7 @@ describe('calcularRescisao — Sem Justa Causa', () => {
 
   it('saldo de salário = (salário / dias_no_mês) × dia_desligamento', async () => {
     const r = await calcularRescisao(base);
-    expect(r.saldoSalario).toBeCloseTo((5000 / 31) * 22, 2);
+    expect(r.saldoSalario).toBe(Math.trunc((5000 / 31) * 22 * 100) / 100);
     expect(r.diasTrabalhados).toBe(22);
   });
 
@@ -166,13 +166,13 @@ describe('calcularRescisao — Sem Justa Causa', () => {
 
   it('1/3 constitucional = (férias vencidas + proporcionais) / 3', async () => {
     const r = await calcularRescisao({ ...base, feriasVencidas: true });
-    expect(r.tercoFerias).toBeCloseTo((r.feriasVencidas + r.feriasProporcionais) / 3, 2);
+    expect(r.tercoFerias).toBe(Math.trunc((r.feriasVencidas + r.feriasProporcionais) / 3 * 100) / 100);
   });
 
   it('13º proporcional: decimoTerceiro = (salário/12) × meses13', async () => {
     const r = await calcularRescisao(base);
     expect(r.meses13).toBeGreaterThan(0);
-    expect(r.decimoTerceiro).toBeCloseTo((5000 / 12) * r.meses13, 2);
+    expect(r.decimoTerceiro).toBe(Math.trunc((5000 / 12) * r.meses13 * 100) / 100);
   });
 
   it('FGTS sobre rescisão = 8% do (saldo salário + aviso + 13º)', async () => {
@@ -490,7 +490,7 @@ describe('calcularRescisao — Edge Cases', () => {
     });
     expect(r.feriasVencidas).toBe(4000);
     expect(r.feriasProporcionais).toBeGreaterThan(0);
-    expect(r.tercoFerias).toBeCloseTo((r.feriasVencidas + r.feriasProporcionais) / 3, 2);
+    expect(r.tercoFerias).toBe(Math.trunc((r.feriasVencidas + r.feriasProporcionais) / 3 * 100) / 100);
   });
 });
 
