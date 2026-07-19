@@ -11,20 +11,20 @@ export const contratoService = {
 
   },
   
-  async buscarPorId(id: string): Promise<any | null> {
-    
-    const { data, error } = await supabase.from('contratos').select('*').eq('id', id).maybeSingle();
+  async buscarPorId(id: string, empresaId: string): Promise<any | null> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('contratos').select('*').eq('id', id).eq('empresa_id', empresaId).maybeSingle();
     if (error) throw error;
     return data;
-  
+
   },
-  
-  async buscarPorColaborador(colaboradorId: string): Promise<any[]> {
-    
-    const { data, error } = await supabase.from('contratos').select('*').eq('colaborador_id', colaboradorId).order('data_inicio', { ascending: false });
+
+  async buscarPorColaborador(colaboradorId: string, empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('contratos').select('*').eq('colaborador_id', colaboradorId).eq('empresa_id', empresaId).order('data_inicio', { ascending: false });
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criar(d: any): Promise<any> {

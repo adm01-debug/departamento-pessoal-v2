@@ -7,11 +7,13 @@ type DadosUpdate = any;
 // =============================================
 // Dependentes
 // =============================================
-export async function listarDependentes(colaboradorId: string) {
+export async function listarDependentes(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase
     .from('dependentes')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -62,11 +64,13 @@ export async function excluirContatoEmergencia(id: string) {
 // =============================================
 // Histórico Salarial
 // =============================================
-export async function listarHistoricoSalarial(colaboradorId: string) {
+export async function listarHistoricoSalarial(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase
     .from('historico_salarial')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('data_vigencia', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -85,11 +89,13 @@ export async function criarRegistroSalarial(registro: DadosInsert) {
 // =============================================
 // ASOs
 // =============================================
-export async function listarASOs(colaboradorId: string) {
+export async function listarASOs(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase
     .from('asos')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('data_exame', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -246,12 +252,14 @@ export async function excluirAnotacao(id: string) {
 // =============================================
 // Períodos Aquisitivos
 // =============================================
-export async function listarPeriodosAquisitivos(colaboradorId: string) {
+export async function listarPeriodosAquisitivos(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase
     .from('periodos_aquisitivos')
     .select('*')
     .eq('colaborador_id', colaboradorId)
-    .order('inicio_aquisitivo', { ascending: false });
+    .eq('empresa_id', empresaId)
+    .order('data_inicio', { ascending: false });
   if (error) throw error;
   return data || [];
 }

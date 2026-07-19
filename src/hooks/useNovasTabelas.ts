@@ -169,10 +169,11 @@ export function useEpisEntregas() {
 }
 
 export function useEpisEntregasColaborador(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['epis-entregas-colaborador', colaboradorId],
-    queryFn: () => episEntregasService.buscarPorColaborador(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['epis-entregas-colaborador', colaboradorId, empresaAtual?.id],
+    queryFn: () => episEntregasService.buscarPorColaborador(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 
