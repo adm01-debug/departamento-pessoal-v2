@@ -153,9 +153,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      // Check account lockout before attempting authentication
-      const { data: lockoutData } = await supabase.rpc('check_account_lockout', { p_email: email });
-      if (lockoutData && Array.isArray(lockoutData) && lockoutData[0]?.is_locked) {
+      // Check account lockout before attempting authentication.
+      // Fail-open intentionally: if the RPC is unavailable, Supabase Auth's own
+      // rate limiting still applies. We log the failure for monitoring.
+      const { data: lockoutData, error: lockoutError } = await supabase.rpc('check_account_lockout', { p_email: email });
+      if (lockoutError) {
+        loggerService.warn('Account lockout RPC failed — proceeding with auth', { email, message: lockoutError.message });
+      }
+      if (!lockoutError && lockoutData && Array.isArray(lockoutData) && lockoutData[0]?.is_locked) {
         const lockedUntil = lockoutData[0].locked_until;
         const msg = lockedUntil
           ? `Conta temporariamente bloqueada. Tente novamente após ${new Date(lockedUntil).toLocaleTimeString('pt-BR')}.`

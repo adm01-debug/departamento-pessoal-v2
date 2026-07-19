@@ -49,9 +49,9 @@ export const contratacaoService = {
         
         <div style="margin-bottom: 25px;">
           <h3 style="color: #2c5282; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">QUALIFICAÇÃO DAS PARTES</h3>
-          <p><strong>EMPREGADOR:</strong> ${empresa?.razao_social || '—'}<br>
-          <strong>CNPJ:</strong> ${empresa?.cnpj || '—'}<br>
-          <strong>ENDEREÇO:</strong> ${empresa?.logradouro || '—'}, ${empresa?.numero || '—'} - ${empresa?.cidade || '—'}/${empresa?.uf || '—'}</p>
+          <p><strong>EMPREGADOR:</strong> ${esc(empresa?.razao_social || '—')}<br>
+          <strong>CNPJ:</strong> ${esc(empresa?.cnpj || '—')}<br>
+          <strong>ENDEREÇO:</strong> ${esc(empresa?.logradouro || '—')}, ${esc(empresa?.numero || '—')} - ${esc(empresa?.cidade || '—')}/${esc(empresa?.uf || '—')}</p>
 
           <p><strong>EMPREGADO:</strong> ${esc(admissao.nome)}<br>
           <strong>CPF:</strong> ${esc(admissao.cpf || '—')}<br>
