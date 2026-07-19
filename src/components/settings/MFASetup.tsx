@@ -84,12 +84,11 @@ export function MFASetup() {
       });
       if (verify.error) throw verify.error;
 
-      // Update user_mfa record
       await supabase.from('user_mfa').upsert([{
         user_id: user!.id,
         mfa_enabled: true,
         mfa_type: 'totp',
-        mfa_secret: enrollData.secret,
+        mfa_secret: null,
       }], { onConflict: 'user_id' });
 
       toast.success('Autenticação de dois fatores ativada com sucesso!');

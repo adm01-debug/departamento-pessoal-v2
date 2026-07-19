@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
+import { validateUploadFile } from '@/utils/uploadValidation';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -44,7 +45,13 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
       toast.error('Selecione um arquivo e tipo');
       return;
     }
-    
+    try {
+      validateUploadFile(file, { maxSizeMB: 10 });
+    } catch (err: any) {
+      toast.error(err.message);
+      return;
+    }
+
     setUploading(true);
     try {
       const ext = file.name.split('.').pop();

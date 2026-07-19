@@ -13,6 +13,7 @@ import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, S
 import { pushNotificationService } from '@/services/pushNotificationService';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
+import { validateUploadFile } from '@/utils/uploadValidation';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -106,8 +107,15 @@ export default function PerfilPage() {
     const file = e.target.files?.[0];
     if (!file || !user || !profile) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Arquivo deve ter no máximo 2MB');
+    try {
+      validateUploadFile(file, { maxSizeMB: 2 });
+    } catch (err: any) {
+      toast.error(err.message);
+      return;
+    }
+    const allowedAvatarTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedAvatarTypes.includes(file.type)) {
+      toast.error('Avatar deve ser JPG, PNG ou WebP');
       return;
     }
 

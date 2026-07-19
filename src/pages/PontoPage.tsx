@@ -209,7 +209,7 @@ export default function PontoPage() {
             )}
             <ImportarAFDTDialog />
             <GerarAEJDialog />
-            <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={() => window.open('/ponto/kiosk', '_blank')}>
+            <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={() => window.open('/ponto/kiosk', '_blank', 'noopener')}>
               <Settings className="h-4 w-4" /> Kiosk Mode
             </Button>
             <Button size="sm" variant="outline" className="rounded-xl gap-1.5 font-body" onClick={processarPontoServidor} disabled={processando}>

@@ -18,6 +18,7 @@ import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Langu
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
+import { validateUploadFile } from '@/utils/uploadValidation';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { DocumentoTimeline } from '@/components/documents/DocumentoTimeline';
 import { DocumentoPreview } from '@/components/documents/DocumentoPreview';
@@ -84,8 +85,10 @@ export default function DocumentosPage() {
       toast.error('Selecione um arquivo e tipo');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Arquivo deve ter no máximo 10MB');
+    try {
+      validateUploadFile(file, { maxSizeMB: 10 });
+    } catch (e: any) {
+      toast.error(e.message);
       return;
     }
 
