@@ -120,7 +120,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       setStep(1);
       window.scrollTo(0, 0);
     },
-    onError: (err: any) => toast.error('Erro ao salvar dados: ' + err.message),
+    onError: (err: any) => toast.error(safeErrorMessage(err, 'Erro ao salvar dados.')),
   });
 
   const markDocsUploaded = useMutation({
@@ -222,7 +222,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
     } catch (error: any) {
       console.error(error);
       setUploadedDocs(prev => ({ ...prev, [docId]: { name: file.name, status: 'error' } }));
-      toast.error('Erro no upload do documento: ' + error.message);
+      toast.error(safeErrorMessage(error, 'Erro no upload do documento.'));
     }
   };
 

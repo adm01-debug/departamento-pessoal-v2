@@ -18,6 +18,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
 import { usePWA } from '@/hooks/usePWA';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { EmpresaSelector } from '@/components/empresa/EmpresaSelector';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
@@ -353,7 +354,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
       toast.success('Logout realizado com sucesso'); 
       navigate('/login'); 
     } catch (e: any) {
-      toast.error('Erro ao sair: ' + (e.message || 'Erro desconhecido'));
+      toast.error(safeErrorMessage(e, 'Erro ao encerrar sessão.'));
     }
   };
 

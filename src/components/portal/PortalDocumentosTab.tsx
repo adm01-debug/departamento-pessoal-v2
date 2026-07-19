@@ -48,7 +48,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
     try {
       validateUploadFile(file, { maxSizeMB: 10 });
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Arquivo inválido.'));
       return;
     }
 
@@ -143,7 +143,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
       toast.success('Documento assinado com sucesso!');
       setDocToSign(null);
     } catch (e: any) {
-      toast.error('Erro ao assinar documento: ' + e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao assinar documento.'));
     }
   };
 

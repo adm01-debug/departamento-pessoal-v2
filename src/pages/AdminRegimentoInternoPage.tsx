@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send, Bell, UserX, Download } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -147,7 +148,7 @@ const AdminRegimentoInternoPage = () => {
       }
     } catch (err: any) {
       console.error(err);
-      toast.error('Falha ao notificar pendentes', { description: err?.message });
+      toast.error(safeErrorMessage(err, 'Falha ao notificar pendentes.'));
     } finally {
       setNotificando(false);
     }

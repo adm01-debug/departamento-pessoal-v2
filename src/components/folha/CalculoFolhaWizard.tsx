@@ -360,7 +360,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                           const result = await folhaPagamentoService.emitirPDF(currentFolhaId);
                           window.open(result, '_blank', 'noopener');
                         } catch (e: any) {
-                          toast.error(e?.message || 'Erro ao gerar PDF do holerite.');
+                          toast.error(safeErrorMessage(e, 'Erro ao gerar PDF do holerite.'));
                         }
                       }
                     }}

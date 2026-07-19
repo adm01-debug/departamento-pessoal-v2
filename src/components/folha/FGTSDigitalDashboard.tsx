@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2, CloudSync, History } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
@@ -25,7 +26,7 @@ export function FGTSDigitalDashboard() {
       });
       toast.success('Sincronizado com FGTS Digital via API Caixa!');
     } catch (err: any) {
-      toast.error('Falha na sincronização: ' + err.message);
+      toast.error(safeErrorMessage(err, 'Falha na sincronização FGTS Digital.'));
     } finally {
       setLoading(false);
     }

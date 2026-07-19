@@ -16,6 +16,7 @@ import { FileText, Download, Eye, Printer, FileSignature, ScrollText, Shield, Us
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import jsPDF from 'jspdf';
 
 const TEMPLATES = [
@@ -201,7 +202,7 @@ export default function GeradorDocumentosPage() {
         window.open(url, '_blank', 'noopener');
       }
     } catch (err: any) {
-      toast.error(`Erro: ${err.message}`);
+      toast.error(safeErrorMessage(err, 'Erro ao gerar documento.'));
     } finally {
       setGenerating(false);
     }

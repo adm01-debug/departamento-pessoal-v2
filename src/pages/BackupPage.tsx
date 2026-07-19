@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Database, Download, Clock, Shield, HardDrive, CheckCircle, FileJson, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { cn } from '@/lib/utils';
 import { exportarBackupCSV, exportarBackupJSON, downloadBlob } from '@/services/backupService';
 import { useEmpresa } from '@/contexts/EmpresaContext';
@@ -52,7 +53,7 @@ export default function BackupPage() {
         `Backup ${formato.toUpperCase()} concluído! ${result.stats.registros} registros de ${result.stats.tabelas} tabelas (${result.stats.tamanho})`
       );
     } catch (err: any) {
-      toast.error(`Erro no backup: ${err.message}`);
+      toast.error(safeErrorMessage(err, 'Erro ao realizar backup.'));
     } finally {
       setBacking(null);
     }

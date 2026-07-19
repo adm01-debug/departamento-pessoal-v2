@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calculator, Download, Save, Shield, Loader2, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { calcularRescisao, fmt, type RescisaoResult } from '@/utils/rescisaoCalc';
 import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,7 +98,7 @@ export default function CalculadoraRescisaoPage() {
         toast.success('Rescisão calculada no servidor!');
       }
     } catch (err: any) {
-      toast.error(`Erro: ${err.message}`);
+      toast.error(safeErrorMessage(err, 'Erro ao calcular rescisão.'));
     } finally {
       setCalcServidor(false);
     }
@@ -168,7 +169,7 @@ export default function CalculadoraRescisaoPage() {
 
       toast.success('Cálculo salvo no histórico!');
     } catch (err: any) {
-      toast.error(`Erro ao salvar: ${err.message}`);
+      toast.error(safeErrorMessage(err, 'Erro ao salvar cálculo.'));
     } finally {
       setSaving(false);
     }

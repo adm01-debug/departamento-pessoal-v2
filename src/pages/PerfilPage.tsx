@@ -110,7 +110,7 @@ export default function PerfilPage() {
     try {
       validateUploadFile(file, { maxSizeMB: 2 });
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Arquivo inválido.'));
       return;
     }
     const allowedAvatarTypes = ['image/jpeg', 'image/png', 'image/webp'];

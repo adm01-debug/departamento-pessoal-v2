@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts';
 import { supabase } from '@/integrations/supabase/client';
@@ -170,7 +171,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
       });
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
     } catch (e: any) {
-      toast.error(`Erro no registro offline: ${e.message}`);
+      toast.error(safeErrorMessage(e, 'Erro no registro offline.'));
     }
   };
 

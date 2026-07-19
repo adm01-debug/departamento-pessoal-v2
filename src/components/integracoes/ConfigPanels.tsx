@@ -13,6 +13,7 @@ import { ExternalLink, RefreshCw, XCircle, Settings, History, Plus, Zap } from '
 import { bitrix24Service } from '@/services/tabelasComplementaresService';
 import { cnabService, webhookService } from '@/services/integracaoService';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { whatsappService, WhatsAppConfig } from '@/services/whatsappService';
 import { useEmpresas } from '@/hooks/useEmpresas';
 
@@ -70,7 +71,7 @@ export function Bitrix24ConfigPanel() {
       qc.invalidateQueries({ queryKey: ['bitrix24_sync_logs'] });
       toast.success(`Sincronização concluída: ${res.data.totals.success} sucessos.`);
     },
-    onError: (err: any) => toast.error(`Falha no Sync: ${err.message}`),
+    onError: (err: any) => toast.error(safeErrorMessage(err, 'Falha no Sync.')),
   });
 
   if (loadConfig) return <div className="flex justify-center py-8"><Spinner /></div>;

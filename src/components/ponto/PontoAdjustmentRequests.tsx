@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -81,7 +82,7 @@ export function PontoAdjustmentRequests() {
       toast.success('Solicitação processada com sucesso!');
     },
     onError: (e: any) => {
-      toast.error(`Erro ao processar: ${e.message}`);
+      toast.error(safeErrorMessage(e, 'Erro ao processar solicitação de ajuste.'));
     }
   });
 

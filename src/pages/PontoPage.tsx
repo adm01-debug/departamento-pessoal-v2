@@ -13,6 +13,7 @@ import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas, usePontoOffline } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -177,17 +178,17 @@ export default function PontoPage() {
         refetchRegistro(); 
         refetchBatidas(); 
       }
-    } catch (e: any) { 
-      toast.error(`Erro: ${e.message}`); 
-    } finally { 
-      setLoading(null); 
-      setTimeout(() => setGeoStatus('idle'), 3000); 
+    } catch (e: any) {
+      toast.error(safeErrorMessage(e, 'Erro ao registrar ponto.'));
+    } finally {
+      setLoading(null);
+      setTimeout(() => setGeoStatus('idle'), 3000);
     }
   };
 
   const processarPontoServidor = async () => {
     if (!empresaAtual?.id) return; setProcessando(true);
-    try { const w = new Date(); w.setDate(w.getDate() - 7); await edgeFunctionsService.processarPonto({ empresaId: empresaAtual.id, dataInicio: formatDateLocalISO(w), dataFim: todayLocalISO() }); toast.success('Ponto processado!'); refetchRegistro(); refetchBatidas(); } catch (e: any) { toast.error(`Erro: ${e.message}`); } finally { setProcessando(false); }
+    try { const w = new Date(); w.setDate(w.getDate() - 7); await edgeFunctionsService.processarPonto({ empresaId: empresaAtual.id, dataInicio: formatDateLocalISO(w), dataFim: todayLocalISO() }); toast.success('Ponto processado!'); refetchRegistro(); refetchBatidas(); } catch (e: any) { toast.error(safeErrorMessage(e, 'Erro ao processar ponto.')); } finally { setProcessando(false); }
   };
 
   return (

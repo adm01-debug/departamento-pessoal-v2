@@ -88,7 +88,7 @@ export default function DocumentosPage() {
     try {
       validateUploadFile(file, { maxSizeMB: 10 });
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Arquivo inválido.'));
       return;
     }
 
