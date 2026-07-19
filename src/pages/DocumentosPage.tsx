@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { documentoService, colaboradorService } from '@/services';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2, Search, Filter, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -43,6 +44,8 @@ export default function DocumentosPage() {
   const [isProcessingOcr, setIsProcessingOcr] = useState(false);
   const [selectedDocForTimeline, setSelectedDocForTimeline] = useState<any>(null);
   const [selectedDocForPreview, setSelectedDocForPreview] = useState<any>(null);
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id;
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -53,8 +56,12 @@ export default function DocumentosPage() {
   }, [urlColaboradorId]);
 
   const { data: documentos, isLoading } = useQuery<any[]>({
-    queryKey: ['documentos', colaboradorFilter],
-    queryFn: () => documentoService.listarDocumentos(colaboradorFilter === 'todos' ? undefined : colaboradorFilter),
+    queryKey: ['documentos', empresaId, colaboradorFilter],
+    queryFn: () => documentoService.listarDocumentos(
+      empresaId!,
+      colaboradorFilter === 'todos' ? undefined : colaboradorFilter
+    ),
+    enabled: !!empresaId,
   });
 
 

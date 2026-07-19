@@ -21,9 +21,10 @@ const TIPOS_DOCUMENTO = ['Atestado', 'Certificado', 'Comprovante', 'Contrato', '
 interface PortalDocumentosTabProps {
   navigate: (path: string) => void;
   colaboradorId?: string;
+  empresaId?: string;
 }
 
-export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumentosTabProps) {
+export function PortalDocumentosTab({ navigate, colaboradorId, empresaId }: PortalDocumentosTabProps) {
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipo, setTipo] = useState('');
@@ -33,9 +34,9 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
   const queryClient = useQueryClient();
 
   const { data: documentos, isLoading } = useQuery<any[]>({
-    queryKey: ['portal-documentos', colaboradorId],
-    queryFn: () => documentoService.listarDocumentos(colaboradorId),
-    enabled: !!colaboradorId
+    queryKey: ['portal-documentos', empresaId, colaboradorId],
+    queryFn: () => documentoService.listarDocumentos(empresaId!, colaboradorId),
+    enabled: !!colaboradorId && !!empresaId,
   });
 
 
