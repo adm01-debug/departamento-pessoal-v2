@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useDocumentos } from '@/hooks/useDocumentos';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { safeHref } from '@/utils/safeUrl';
 
 export function ColaboradorDocuments({ colaboradorId }: { colaboradorId: string }) {
   const { documentos, isLoading, criarDocumento, excluirDocumento } = useDocumentos(colaboradorId);
@@ -179,7 +180,7 @@ export function ColaboradorDocuments({ colaboradorId }: { colaboradorId: string 
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 rounded-lg hover:bg-info/10 text-info"
-                          onClick={() => window.open(doc.url, '_blank', 'noopener')}
+                          onClick={() => window.open(safeHref(doc.url), '_blank', 'noopener')}
                         >
                           <ExternalLink className="h-4 w-4" />
                         </Button>
