@@ -134,6 +134,10 @@ serve(async (req: Request): Promise<Response> => {
       return json({ success: false, error: 'Sem acesso a esta empresa', code: 'FORBIDDEN' }, 403);
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `calc-13:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Idempotência (janela 10min por competencia+colaborador+parcela)
     const idemKey = req.headers.get('idempotency-key') ?? '';
     const idemComposite = `13sal:${d.empresa_id}:${d.colaborador_id}:${d.competencia}:${d.parcela}:${idemKey}`;
