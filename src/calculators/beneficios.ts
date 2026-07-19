@@ -64,14 +64,14 @@ export function calcularFerias(salarioBase: number, diasFerias: number = 30, dia
   const inss = calcularINSS(valorFerias + tercoConstitucional);
   const irrf = calcularIRRF(valorFerias + tercoConstitucional, dependentes);
   
-  const liquido = Math.trunc((bruto - inss - irrf) * 100) / 100;
-  
+  const liquido = Math.round((bruto - inss - irrf) * 100) / 100;
+
   return {
-    valorFerias: Math.trunc(valorFerias * 100) / 100,
-    tercoConstitucional: Math.trunc(tercoConstitucional * 100) / 100,
-    valorAbono: Math.trunc(valorAbono * 100) / 100,
-    tercoAbono: Math.trunc(tercoAbono * 100) / 100,
-    bruto: Math.trunc(bruto * 100) / 100,
+    valorFerias: Math.round(valorFerias * 100) / 100,
+    tercoConstitucional: Math.round(tercoConstitucional * 100) / 100,
+    valorAbono: Math.round(valorAbono * 100) / 100,
+    tercoAbono: Math.round(tercoAbono * 100) / 100,
+    bruto: Math.round(bruto * 100) / 100,
     inss, irrf, liquido,
   };
 }

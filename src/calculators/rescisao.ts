@@ -30,49 +30,47 @@ export function calcularRescisao(params: {
   // Saldo de salário: dias trabalhados no mês sobre os dias reais do mês.
   const diasNoMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate() || 30;
   const diasTrabalhados = desligamento.getDate();
-  const saldoSalario = Math.trunc((salarioBase / diasNoMes) * diasTrabalhados * 100) / 100;
+  const saldoSalario = Math.round((salarioBase / diasNoMes) * diasTrabalhados * 100) / 100;
 
   // 13º proporcional: meses trabalhados no ano-calendário (a partir da admissão, se admitido no ano).
   const inicioAno = new Date(desligamento.getFullYear(), 0, 1);
   const baseInicio13 = admissao > inicioAno ? admissao : inicioAno;
   const meses13 = calcularAvos(baseInicio13, desligamento);
-  const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.trunc((salarioBase / 12) * meses13 * 100) / 100 : 0;
+  const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * meses13 * 100) / 100 : 0;
 
   // Férias proporcionais: avos do período aquisitivo corrente (com regra dos 15 dias).
   const mesesFeriasProp = avosTotal % 12 || (avosTotal > 0 ? 12 : 0);
-  const feriasProp = tipoRescisao !== 'com_justa_causa' ? Math.trunc((salarioBase / 12) * mesesFeriasProp * 100) / 100 : 0;
-  const tercoFeriasProp = Math.trunc(feriasProp / 3 * 100) / 100;
+  const feriasProp = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * mesesFeriasProp * 100) / 100 : 0;
+  const tercoFeriasProp = Math.round(feriasProp / 3 * 100) / 100;
   const feriasVencidasValor = feriasVencidas ? salarioBase : 0;
-  const tercoFeriasVencidas = Math.trunc(feriasVencidasValor / 3 * 100) / 100;
+  const tercoFeriasVencidas = Math.round(feriasVencidasValor / 3 * 100) / 100;
 
   const anosServico = Math.floor(avosTotal / 12);
   const diasAvisoPrevio = tipoRescisao === 'sem_justa_causa' ? Math.min(90, 30 + anosServico * 3) : 0;
   const avisoPrevio = tipoRescisao === 'sem_justa_causa'
-    ? Math.trunc((salarioBase / 30) * diasAvisoPrevio * 100) / 100
+    ? Math.round((salarioBase / 30) * diasAvisoPrevio * 100) / 100
     : tipoRescisao === 'acordo_mutuo'
-      ? Math.trunc((salarioBase / 30) * Math.min(90, 30 + anosServico * 3) * 0.5 * 100) / 100
+      ? Math.round((salarioBase / 30) * Math.min(90, 30 + anosServico * 3) * 0.5 * 100) / 100
       : 0;
 
-  // FGTS do período rescisório (Lei 8.036/90, Art. 18): base inclui saldo acumulado + FGTS do período final
-  const fgtsRescisao = Math.trunc((saldoSalario + avisoPrevio + decimo13Prop) * 0.08 * 100) / 100;
-  const baseMutaFGTS = saldoFGTS + fgtsRescisao;
+  // Multa FGTS (Lei 8.036/90, Art. 18): 40% (sem justa causa) ou 20% (acordo mútuo) sobre saldo acumulado.
   const multaFGTS = tipoRescisao === 'sem_justa_causa'
-    ? Math.trunc(baseMutaFGTS * 0.40 * 100) / 100
+    ? Math.round(saldoFGTS * 0.40 * 100) / 100
     : tipoRescisao === 'acordo_mutuo'
-      ? Math.trunc(baseMutaFGTS * 0.20 * 100) / 100
+      ? Math.round(saldoFGTS * 0.20 * 100) / 100
       : 0;
 
   const totalBruto = saldoSalario + decimo13Prop + feriasProp + tercoFeriasProp + feriasVencidasValor + tercoFeriasVencidas + avisoPrevio;
   // INSS/IRRF incidem sobre saldo de salário e 13º (em bases separadas); férias indenizadas são isentas.
-  const inss = Math.trunc((calcularINSS(saldoSalario) + calcularINSS(decimo13Prop)) * 100) / 100;
-  const irrf = Math.trunc((calcularIRRF(saldoSalario) + calcularIRRF(decimo13Prop)) * 100) / 100;
-  const totalLiquido = Math.trunc((totalBruto - inss - irrf) * 100) / 100;
+  const inss = Math.round((calcularINSS(saldoSalario) + calcularINSS(decimo13Prop)) * 100) / 100;
+  const irrf = Math.round((calcularIRRF(saldoSalario) + calcularIRRF(decimo13Prop)) * 100) / 100;
+  const totalLiquido = Math.round((totalBruto - inss - irrf) * 100) / 100;
 
   return {
     saldoSalario, decimo13Proporcional: decimo13Prop, feriasProporcional: feriasProp,
     tercoFeriasProporcional: tercoFeriasProp, feriasVencidas: feriasVencidasValor,
     tercoFeriasVencidas, avisoPrevio, diasAvisoPrevio, multaFGTS,
-    totalBruto: Math.trunc(totalBruto * 100) / 100, inss, irrf, totalLiquido,
+    totalBruto: Math.round(totalBruto * 100) / 100, inss, irrf, totalLiquido,
   };
 }
 

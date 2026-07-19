@@ -84,10 +84,10 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
       throw new Error('Data de desligamento não pode ser anterior à admissão');
     }
 
-    // 1. Saldo de Salário (Art. 4º CLT) — truncado conforme IN RFB 2110/2022
+    // 1. Saldo de Salário (Art. 4º CLT)
     const diasNoMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate();
     const diasTrabalhados = desligamento.getDate();
-    const saldoSalario = Math.trunc((salario / diasNoMes) * diasTrabalhados * 100) / 100;
+    const saldoSalario = Math.round((salario / diasNoMes) * diasTrabalhados * 100) / 100;
 
     // 2. Aviso Prévio (Lei 12.506/2011)
     const diffAnos = Math.floor((desligamento.getTime() - admissao.getTime()) / (1000 * 60 * 60 * 24 * 365.25));
@@ -101,20 +101,20 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
 
     let avisoIndenizado = 0;
     if (tipo === 'sem_justa_causa' && !avisoTrabalhado) {
-      avisoIndenizado = Math.trunc((salario / 30) * diasAviso * 100) / 100;
+      avisoIndenizado = Math.round((salario / 30) * diasAviso * 100) / 100;
     } else if (tipo === 'acordo_mutuo' && !avisoTrabalhado) {
-      avisoIndenizado = Math.trunc((salario / 30) * (diasAviso / 2) * 100) / 100;
+      avisoIndenizado = Math.round((salario / 30) * (diasAviso / 2) * 100) / 100;
     }
 
     // 3. Férias (Art. 146 CLT) - Com projeção do aviso
     const mesesFerias = calcularAvos(admissao, dataFimProjetada);
     let feriasProporcionaisVal = 0;
     if (tipo !== 'justa_causa') {
-      feriasProporcionaisVal = Math.trunc((salario / 12) * (mesesFerias % 12 || (mesesFerias > 0 ? 12 : 0)) * 100) / 100;
+      feriasProporcionaisVal = Math.round((salario / 12) * (mesesFerias % 12 || (mesesFerias > 0 ? 12 : 0)) * 100) / 100;
     }
 
     const feriasVencidasVal = feriasVencidas && tipo !== 'justa_causa' ? salario : 0;
-    const tercoFerias = Math.trunc((feriasProporcionaisVal + feriasVencidasVal) / 3 * 100) / 100;
+    const tercoFerias = Math.round((feriasProporcionaisVal + feriasVencidasVal) / 3 * 100) / 100;
 
     // 4. 13º Salário (Lei 4.090/62) - Com projeção do aviso
     // O ano-base do 13º é o ano do DESLIGAMENTO. Usar o ano da data projetada
@@ -126,33 +126,33 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
 
     let decimoTerceiro = 0;
     if (tipo !== 'justa_causa' && tipo !== 'culpa_reciproca') {
-      decimoTerceiro = Math.trunc((salario / 12) * meses13 * 100) / 100;
+      decimoTerceiro = Math.round((salario / 12) * meses13 * 100) / 100;
     } else if (tipo === 'culpa_reciproca') {
-      decimoTerceiro = Math.trunc((salario / 12) * meses13 / 2 * 100) / 100;
+      decimoTerceiro = Math.round((salario / 12) * meses13 / 2 * 100) / 100;
     }
 
     // 5. FGTS e Multa (Art. 18 Lei 8.036/90)
-    const fgtsRescisao = Math.trunc((saldoSalario + avisoIndenizado + decimoTerceiro) * 0.08 * 100) / 100;
+    const fgtsRescisao = Math.round((saldoSalario + avisoIndenizado + decimoTerceiro) * 0.08 * 100) / 100;
     let multaFGTS = 0;
     if (tipo === 'sem_justa_causa') {
-      multaFGTS = Math.trunc((saldoFGTS + fgtsRescisao) * 0.40 * 100) / 100;
+      multaFGTS = Math.round((saldoFGTS + fgtsRescisao) * 0.40 * 100) / 100;
     } else if (tipo === 'acordo_mutuo') {
-      multaFGTS = Math.trunc((saldoFGTS + fgtsRescisao) * 0.20 * 100) / 100;
+      multaFGTS = Math.round((saldoFGTS + fgtsRescisao) * 0.20 * 100) / 100;
     }
 
     // 6. Totais e Descontos
-    const totalProventos = Math.trunc((saldoSalario + avisoIndenizado + feriasVencidasVal + feriasProporcionaisVal + tercoFerias + decimoTerceiro) * 100) / 100;
+    const totalProventos = Math.round((saldoSalario + avisoIndenizado + feriasVencidasVal + feriasProporcionaisVal + tercoFerias + decimoTerceiro) * 100) / 100;
 
     const inssSaldo = calcularINSS(saldoSalario);
     const inss13 = calcularINSS(decimoTerceiro);
-    const inss = Math.trunc((inssSaldo + inss13) * 100) / 100;
+    const inss = Math.round((inssSaldo + inss13) * 100) / 100;
 
     const irrfSaldo = calcularIRRF(saldoSalario, dependentes, 0);
     const irrf13 = calcularIRRF(decimoTerceiro, 0, 0);
-    const irrf = Math.trunc((irrfSaldo + irrf13) * 100) / 100;
+    const irrf = Math.round((irrfSaldo + irrf13) * 100) / 100;
 
-    const totalDescontos = Math.trunc((inss + irrf) * 100) / 100;
-    const totalLiquido = Math.trunc((totalProventos - totalDescontos + multaFGTS) * 100) / 100;
+    const totalDescontos = Math.round((inss + irrf) * 100) / 100;
+    const totalLiquido = Math.round((totalProventos - totalDescontos + multaFGTS) * 100) / 100;
 
     const result: RescisaoResult = {
       saldoSalario, 
