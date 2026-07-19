@@ -70,6 +70,10 @@ serve(async (req: Request): Promise<Response> => {
       if (!belongs) return jsonResponse({ success: false, error: 'Sem acesso a esta empresa' }, 403);
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `bitrix:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // 5) Buscar config Bitrix
     let cfgQuery = admin.from('bitrix24_config').select('*').limit(1);
     if (empresaId) cfgQuery = cfgQuery.eq('empresa_id', empresaId);

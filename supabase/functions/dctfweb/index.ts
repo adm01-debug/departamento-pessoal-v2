@@ -92,6 +92,10 @@ Deno.serve(async (req) => {
       return createErrorResponse('Acesso negado', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(service, { key: `dctfweb:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     const compCheck = competenciaValida(p.competencia);
     if (!compCheck.ok) {
       return createErrorResponse(compCheck.msg!, 422, 'INVALID_COMPETENCIA');

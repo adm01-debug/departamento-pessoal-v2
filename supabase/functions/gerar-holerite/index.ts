@@ -83,6 +83,10 @@ serve(async (req: Request): Promise<Response> => {
       return createErrorResponse('Sem acesso a este holerite', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `gerar-holerite:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Audit log — leitura de PII sensível
     await supabase.from('audit_log').insert({
       tabela: 'holerite', registro_id: colaboradorId, acao: 'READ_HOLERITE',

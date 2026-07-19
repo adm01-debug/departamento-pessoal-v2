@@ -220,6 +220,10 @@ serve(async (req: Request): Promise<Response> => {
       if (!isAdm) return json({ error: "Sem acesso a esta empresa" }, 403);
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `enviar-relatorio:${userId}`, limit: 5, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // 4b. Anti-exfiltração: emailDestinatario deve pertencer a um usuário
     // vinculado à empresa (evita envio de dados internos para email externo).
     const { data: destinatarioUser } = await admin

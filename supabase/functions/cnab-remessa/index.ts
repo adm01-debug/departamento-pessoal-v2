@@ -93,6 +93,10 @@ Deno.serve(async (req) => {
       return createErrorResponse('Acesso negado', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(service, { key: `cnab-remessa:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Idempotência transacional (shared helper)
     const idemKey = extractIdempotencyKey(req, parsed.data);
     const idem = await beginIdempotency(service, {

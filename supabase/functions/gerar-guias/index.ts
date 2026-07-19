@@ -145,6 +145,10 @@ serve(async (req: Request): Promise<Response> => {
       return json({ success: false, error: 'Sem acesso a esta empresa', code: 'FORBIDDEN' }, 403);
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `gerar-guias:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Contagem prévia + cap
     const { count: totalColabs, error: countErr } = await supabase
       .from('colaboradores')

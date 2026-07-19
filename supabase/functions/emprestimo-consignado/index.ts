@@ -85,6 +85,10 @@ Deno.serve(async (req) => {
       return createErrorResponse('Acesso negado', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(service, { key: `emprestimo-consignado:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // Colaborador ativo com salário
     const { data: colab, error: colabErr } = await service
       .from('colaboradores')

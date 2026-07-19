@@ -90,6 +90,10 @@ serve(async (req: Request): Promise<Response> => {
       return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `reabrir-folha:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // 5) Carregar folha
     const { data: folha, error: folhaErr } = await admin
       .from('folhas_pagamento')

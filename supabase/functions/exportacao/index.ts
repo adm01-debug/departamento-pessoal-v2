@@ -103,6 +103,10 @@ serve(async (req) => {
       if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `exportacao:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     if (action === 'colaboradores') {
       let q = admin.from('colaboradores')
         .select('nome_completo, cpf, cargo, departamento, data_admissao, salario, status, email, telefone')

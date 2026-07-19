@@ -74,6 +74,10 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `backup:${user.id}`, limit: 3, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // 6) Whitelist de tabelas exportáveis (evita dump de auth/storage/vault)
     const ALLOWED_TABLES = new Set([
       'colaboradores', 'folhas_pagamento', 'holerites', 'ferias', 'afastamentos',

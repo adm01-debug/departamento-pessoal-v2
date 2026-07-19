@@ -112,6 +112,10 @@ serve(async (req: Request): Promise<Response> => {
       return json({ success: false, error: 'Sem acesso a esta empresa', code: 'FORBIDDEN' }, 403);
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `calc-provisoes:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     const dataLimite = ultimoDiaCompetencia(competencia);
     const startTime = Date.now();
 

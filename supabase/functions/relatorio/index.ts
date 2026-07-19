@@ -171,6 +171,10 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `relatorio:${userId}`, limit: 20, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // 5) Validação de janela temporal (quando aplicável)
     if ('dataInicio' in filtros && 'dataFim' in filtros) {
       const bad = validateWindow(filtros.dataInicio, filtros.dataFim);

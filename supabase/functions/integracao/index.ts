@@ -101,6 +101,10 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `integracao:${userId}`, limit: 20, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // 5. Dispatch de ação
     if (body.action === 'ping') {
       return json({

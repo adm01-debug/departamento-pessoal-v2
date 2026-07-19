@@ -86,6 +86,10 @@ Deno.serve(async (req) => {
       return createErrorResponse('Acesso negado', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(service, { key: `fgts-digital:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     const cc = competenciaValida(p.competencia);
     if (!cc.ok) return createErrorResponse(cc.msg!, 422, 'INVALID_COMPETENCIA');
 
