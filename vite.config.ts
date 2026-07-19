@@ -75,6 +75,9 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     force: true,
   },
+  esbuild: {
+    drop: mode === 'production' ? ['console', 'debugger'] : [],
+  },
   build: {
     rollupOptions: {
       output: {
