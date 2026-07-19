@@ -105,12 +105,12 @@ export default function EPIsPage() {
   });
 
   const excluirEpi = useMutation({
-    mutationFn: (id: string) => episService.excluir(id),
+    mutationFn: (id: string) => episService.excluir(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI excluído!'); },
   });
 
   const devolverEpi = useMutation({
-    mutationFn: (id: string) => episEntregasService.registrarDevolucao(id, todayLocalISO()),
+    mutationFn: (id: string) => episEntregasService.registrarDevolucao(id, todayLocalISO(), empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Devolução registrada!'); },
   });
 

@@ -97,7 +97,7 @@ export default function MedidasDisciplinaresPage() {
     mutationFn: (id: string) => medidasDisciplinaresService.atualizar(id, {
       colaborador_ciente: true,
       data_ciencia: new Date().toISOString(),
-    }),
+    }, empresaAtual!.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] });
       toast.success('Ciência registrada!');
@@ -105,7 +105,7 @@ export default function MedidasDisciplinaresPage() {
   });
 
   const excluir = useMutation({
-    mutationFn: (id: string) => medidasDisciplinaresService.excluir(id),
+    mutationFn: (id: string) => medidasDisciplinaresService.excluir(id, empresaAtual!.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] });
       toast.success('Registro excluído!');

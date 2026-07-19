@@ -27,7 +27,7 @@ export function useHorasExtras() {
   });
 
   const aprovarMutation = useMutation({
-    mutationFn: ({ id, obs }: { id: string; obs?: string }) => horaExtraService.aprovar(id, user?.id || '', obs),
+    mutationFn: ({ id, obs }: { id: string; obs?: string }) => horaExtraService.aprovar(id, user?.id || '', empresaId!, obs),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Hora extra aprovada');
@@ -36,7 +36,7 @@ export function useHorasExtras() {
   });
 
   const rejeitarMutation = useMutation({
-    mutationFn: ({ id, obs }: { id: string; obs?: string }) => horaExtraService.rejeitar(id, user?.id || '', obs),
+    mutationFn: ({ id, obs }: { id: string; obs?: string }) => horaExtraService.rejeitar(id, user?.id || '', empresaId!, obs),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Hora extra rejeitada');
@@ -45,7 +45,7 @@ export function useHorasExtras() {
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => horaExtraService.excluir(id),
+    mutationFn: (id: string) => horaExtraService.excluir(id, empresaId!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Solicitação excluída');
