@@ -13,7 +13,7 @@ export type StandardErrorResponse = {
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-hub-signature-256, idempotency-key',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-hub-signature-256, idempotency-key, x-csrf-token',
   'Access-Control-Expose-Headers': 'idempotent-replay',
 };
 
