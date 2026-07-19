@@ -9,29 +9,28 @@ SET search_path = public
 AS $$
 BEGIN
   INSERT INTO public.audit_log (
-    usuario_id,
+    user_id,
     acao,
     tabela,
     registro_id,
     empresa_id,
-    dados_anteriores,
-    ip
+    dados_anteriores
   ) VALUES (
     COALESCE(auth.uid(), '00000000-0000-0000-0000-000000000000'::uuid),
     'DELETE',
     TG_TABLE_NAME,
-    OLD.id::text,
-    CASE WHEN TG_TABLE_NAME IN ('empresas') THEN OLD.id::text
-         ELSE (OLD.empresa_id)::text
+    OLD.id,
+    CASE WHEN TG_TABLE_NAME IN ('empresas') THEN OLD.id
+         ELSE (OLD.empresa_id)
     END,
-    to_jsonb(OLD),
-    NULL
+    to_jsonb(OLD)
   );
   RETURN OLD;
 END;
 $$;
 
 -- Apply to critical tables that hold sensitive/business data
+-- Inner EXCEPTION block per iteration to survive missing tables on preview branches
 DO $$
 DECLARE
   tbl TEXT;
@@ -45,21 +44,27 @@ BEGIN
       'dependentes',
       'contas_bancarias',
       'ferias',
-      'rescisoes',
+      'historico_rescisoes',
       'documentos',
       'beneficios',
       'asos'
     ])
   LOOP
     trigger_name := 'trg_audit_delete_' || tbl;
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_trigger WHERE tgname = trigger_name
-    ) THEN
-      EXECUTE format(
-        'CREATE TRIGGER %I BEFORE DELETE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.audit_delete_operation()',
-        trigger_name, tbl
-      );
-    END IF;
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger t
+        JOIN pg_class c ON c.oid = t.tgrelid
+        WHERE t.tgname = trigger_name AND c.relname = tbl
+      ) THEN
+        EXECUTE format(
+          'CREATE TRIGGER %I BEFORE DELETE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.audit_delete_operation()',
+          trigger_name, tbl
+        );
+      END IF;
+    EXCEPTION WHEN others THEN
+      NULL;
+    END;
   END LOOP;
 END $$;
 
