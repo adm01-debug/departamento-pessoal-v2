@@ -4,7 +4,7 @@ import type { Session, AuthError } from '@supabase/supabase-js';
 import { sanitizePlainText } from '@/utils/sanitizeHtml';
 import { loggerService } from '@/services/loggerService';
 import { queryClient } from '@/lib/queryClient';
-import { validatePassword } from '@/utils/passwordPolicy';
+import { validatePasswordFull } from '@/utils/passwordPolicy';
 
 export type AppRole = 'admin' | 'moderator' | 'user';
 
@@ -200,9 +200,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
-    const pwCheck = validatePassword(password);
+    const pwCheck = await validatePasswordFull(password);
     if (!pwCheck.valid) {
       throw new Error(`Senha fraca: ${pwCheck.errors.join('; ')}`);
+    }
+    if (pwCheck.warnings?.length) {
+      loggerService.warn('Password breach warning on signup', { email, warnings: pwCheck.warnings });
     }
     try {
       const sanitizedName = sanitizePlainText(name.trim(), 100);
