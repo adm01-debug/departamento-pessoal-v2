@@ -1,14 +1,15 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { integrityHash, sha256Hex } from '../_shared/integrityHash.ts';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
+  'Cache-Control': 'no-store',
 };
 
-// HMAC-SHA256 usando segredo compartilhado com o cliente (opcional).
-// Se PONTO_HASH_SECRET não estiver definido, usa SHA-256 canônico (compat legado).
 async function computeExpectedHash(payload: {
   colaborador_id: string;
   timestamp: string;
@@ -29,7 +30,6 @@ async function computeExpectedHash(payload: {
   return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Comparação constant-time
 function safeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
@@ -39,19 +39,82 @@ function safeEqual(a: string, b: string): boolean {
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 405,
+    });
+  }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    );
+    // CSRF fail-closed
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
 
-    const { registros } = await req.json();
-    if (!registros || !Array.isArray(registros)) {
-      throw new Error('Nenhum registro fornecido');
+    // JWT auth obrigatória
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Autenticação obrigatória', code: 'UNAUTHORIZED' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401,
+      });
     }
 
-    // Enforcement de assinatura só é obrigatório quando o segredo está configurado
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Sessão inválida', code: 'UNAUTHORIZED' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401,
+      });
+    }
+    const userId = userData.user.id;
+
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    let rawBody: any;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: 'JSON inválido', code: 'BAD_REQUEST' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
+      });
+    }
+
+    const { registros } = rawBody ?? {};
+    if (!registros || !Array.isArray(registros) || registros.length === 0) {
+      return new Response(JSON.stringify({ error: 'Nenhum registro fornecido', code: 'VALIDATION_ERROR' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 422,
+      });
+    }
+
+    // Cap batch size to prevent abuse
+    if (registros.length > 100) {
+      return new Response(JSON.stringify({ error: 'Máximo 100 registros por lote', code: 'PAYLOAD_TOO_LARGE' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 413,
+      });
+    }
+
+    // Tenant scope: validate that user belongs to the empresas referenced
+    const empresaIds = [...new Set(registros.map((r: any) => r.empresa_id).filter(Boolean))];
+    for (const empId of empresaIds) {
+      const [{ data: belongs }, { data: isAdm }] = await Promise.all([
+        supabase.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: empId }),
+        supabase.rpc('is_admin', { _user_id: userId }),
+      ]);
+      if (!belongs && !isAdm) {
+        return new Response(JSON.stringify({ error: 'Sem acesso a esta empresa', code: 'FORBIDDEN' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403,
+        });
+      }
+    }
+
     const enforceHash = !!Deno.env.get('PONTO_HASH_SECRET');
 
     const results: {
@@ -70,7 +133,6 @@ serve(async (req: Request): Promise<Response> => {
           throw new Error('Campos obrigatórios ausentes (colaborador_id, timestamp, tipo, dispositivoId)');
         }
 
-        // 1. Validação de integridade real (HMAC quando segredo configurado)
         const expected = await computeExpectedHash({
           colaborador_id: reg.colaborador_id,
           timestamp: reg.timestamp,
@@ -95,7 +157,7 @@ serve(async (req: Request): Promise<Response> => {
         const timestampTime = reg.timestamp.split('T')[1].split('.')[0].substring(0, 5);
         const tipoMapped = reg.tipo === 'entrada' || reg.tipo === 'retorno_almoco' ? 'entrada' : 'saida';
 
-        // 2. Deduplicação (idempotência natural por (colaborador, data, hora, tipo))
+        // Deduplicação
         const { data: duplicate } = await supabase
           .from('batidas_ponto')
           .select('id')
@@ -111,7 +173,7 @@ serve(async (req: Request): Promise<Response> => {
           continue;
         }
 
-        // 3. Upload seguro de foto (opcional)
+        // Upload seguro de foto (opcional)
         let finalFotoUrl: string | null = null;
         if (reg.foto_base64 && reg.colaborador_id) {
           const fileName = `${reg.colaborador_id}/offline-${Date.now()}.jpg`;
@@ -144,13 +206,14 @@ serve(async (req: Request): Promise<Response> => {
             dispositivo_id: reg.dispositivoId,
             is_offline: true,
             sync_at: new Date().toISOString(),
-            hash_integridade: expected, // sempre grava o hash canônico calculado no servidor
+            hash_integridade: expected,
             foto_biometria_url: finalFotoUrl,
             metadata: {
               offline_original_type: reg.tipo,
               offline_timestamp: reg.timestamp,
               client_hash: reg.hash ?? null,
               hash_enforced: enforceHash,
+              synced_by: userId,
             },
           })
           .select('id')
@@ -173,16 +236,16 @@ serve(async (req: Request): Promise<Response> => {
       rejected_invalid_hash: results.rejected_invalid_hash,
       processed_ids: processedIds.sort(),
       enforce_hash: enforceHash,
+      user_id: userId,
     });
 
     return new Response(JSON.stringify({ success: true, ...results }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ success: false, error: msg }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+    try { captureException(error, { fn: 'processar-ponto-offline' }); } catch { /* noop */ }
+    return new Response(JSON.stringify({ success: false, error: 'Erro interno no processamento offline', code: 'INTERNAL_SERVER_ERROR' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
     });
   }
 });

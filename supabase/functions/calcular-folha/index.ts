@@ -55,10 +55,14 @@ function calcINSS(salario: number): number {
   return round2(desc);
 }
 
-function calcIRRF(base: number): number {
+const DEDUCAO_DEPENDENTE_IRRF = 189.59;
+
+function calcIRRF(base: number, dependentes: number = 0): number {
   if (!Number.isFinite(base) || base <= 0) return 0;
+  const baseComDeps = base - (dependentes * DEDUCAO_DEPENDENTE_IRRF);
+  if (baseComDeps <= 0) return 0;
   for (const f of FAIXAS_IRRF) {
-    if (base <= f.limite) return Math.max(0, round2(base * f.aliquota - f.deducao));
+    if (baseComDeps <= f.limite) return Math.max(0, round2(baseComDeps * f.aliquota - f.deducao));
   }
   return 0;
 }
@@ -220,7 +224,7 @@ Deno.serve(async (req) => {
     for (let offset = 0; offset < totalColabs; offset += CHUNK_SIZE) {
       const { data: colabs, error: e } = await admin
         .from('colaboradores')
-        .select('id, nome_completo, salario_base, cargo, departamento')
+        .select('id, nome_completo, salario_base, cargo, departamento, dependentes_irrf')
         .eq('empresa_id', empresa_id)
         .eq('status', 'ativo')
         .range(offset, offset + CHUNK_SIZE - 1);
@@ -229,8 +233,9 @@ Deno.serve(async (req) => {
 
       for (const c of colabs) {
         const bruto = Number(c.salario_base) || 0;
+        const deps = Number(c.dependentes_irrf) || 0;
         const inss = calcINSS(bruto);
-        const irrf = calcIRRF(bruto - inss);
+        const irrf = calcIRRF(bruto - inss, deps);
         const fgts = round2(bruto * 0.08);
         const descontos = round2(inss + irrf);
         const liquido = round2(bruto - descontos);

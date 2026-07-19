@@ -106,6 +106,30 @@ const FILTER_OPS = new Set([
 ]);
 const NOT_EXTRA_OPS = new Set(["eq", "neq", "gt", "gte", "lt", "lte", "in", "is"]);
 
+// Validação de expressões .or() — permite apenas operadores seguros sobre colunas válidas
+// Formato PostgREST: "col.op.val,col.op.val" — bloqueia subqueries, parênteses aninhados, SQL keywords
+const OR_SAFE_OPS = /^(eq|neq|gt|gte|lt|lte|like|ilike|is|in)\./;
+const OR_DANGEROUS = /(;|--|\/\*|\*\/|\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b|\bEXEC\b)/i;
+function isSafeOrExpression(expr: unknown): boolean {
+  if (typeof expr !== "string" || expr.length === 0 || expr.length > 500) return false;
+  if (OR_DANGEROUS.test(expr)) return false;
+  const parts = expr.split(",");
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) return false;
+    // Each part must be: column_name.operator.value (or nested and/or with parens)
+    // Allow parentheses for grouping but validate each leaf
+    const leaf = trimmed.replace(/^\(+/, "").replace(/\)+$/, "");
+    const dotIdx = leaf.indexOf(".");
+    if (dotIdx < 1) return false;
+    const colName = leaf.substring(0, dotIdx);
+    if (!IDENTIFIER_RE.test(colName)) return false;
+    const rest = leaf.substring(dotIdx + 1);
+    if (!OR_SAFE_OPS.test(rest)) return false;
+  }
+  return true;
+}
+
 // -------------------- Zod schemas --------------------
 const FilterSchema = z.object({
   column: z.string().max(120),
@@ -450,7 +474,10 @@ Deno.serve(async (req) => {
         else if (f.op === "ilike") query = query.ilike(f.column, f.value as string);
         else if (f.op === "in") query = query.in(f.column, f.value as unknown[]);
         else if (f.op === "is") query = query.is(f.column, f.value as null | boolean);
-        else if (f.op === "or") query = query.or(f.value as string);
+        else if (f.op === "or") {
+          if (!isSafeOrExpression(f.value)) return jsonError(400, "INVALID_OR_FILTER", "Expressão .or() contém operadores ou padrões não permitidos");
+          query = query.or(f.value as string);
+        }
         else if (f.op === "not") query = query.not(f.column, f.extraOp!, f.value);
         else if (f.op === "contains") query = query.contains(f.column, f.value);
       }
@@ -492,9 +519,22 @@ Deno.serve(async (req) => {
       if (filters.length === 0) {
         return jsonError(400, "UPDATE_REQUIRES_FILTER", "UPDATE requires at least one filter");
       }
+      // Require at least one eq filter to prevent overly-broad updates
+      if (!filters.some((f) => f.op === "eq")) {
+        return jsonError(400, "UPDATE_REQUIRES_EQ", "UPDATE requires at least one 'eq' filter for safety");
+      }
       const t0 = performance.now();
       let query = externalClient.from(table!).update(data as any);
-      for (const f of filters) if (f.op === "eq") query = query.eq(f.column, f.value);
+      for (const f of filters) {
+        if (f.op === "eq") query = query.eq(f.column, f.value);
+        else if (f.op === "neq") query = query.neq(f.column, f.value);
+        else if (f.op === "gt") query = query.gt(f.column, f.value);
+        else if (f.op === "gte") query = query.gte(f.column, f.value);
+        else if (f.op === "lt") query = query.lt(f.column, f.value);
+        else if (f.op === "lte") query = query.lte(f.column, f.value);
+        else if (f.op === "in") query = query.in(f.column, f.value as unknown[]);
+        else if (f.op === "is") query = query.is(f.column, f.value as null | boolean);
+      }
       const { data: r, error } = await query.select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "update", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
@@ -507,9 +547,21 @@ Deno.serve(async (req) => {
       if (filters.length === 0) {
         return jsonError(400, "DELETE_REQUIRES_FILTER", "DELETE requires at least one filter");
       }
+      if (!filters.some((f) => f.op === "eq")) {
+        return jsonError(400, "DELETE_REQUIRES_EQ", "DELETE requires at least one 'eq' filter for safety");
+      }
       const t0 = performance.now();
       let query = externalClient.from(table!).delete();
-      for (const f of filters) if (f.op === "eq") query = query.eq(f.column, f.value);
+      for (const f of filters) {
+        if (f.op === "eq") query = query.eq(f.column, f.value);
+        else if (f.op === "neq") query = query.neq(f.column, f.value);
+        else if (f.op === "gt") query = query.gt(f.column, f.value);
+        else if (f.op === "gte") query = query.gte(f.column, f.value);
+        else if (f.op === "lt") query = query.lt(f.column, f.value);
+        else if (f.op === "lte") query = query.lte(f.column, f.value);
+        else if (f.op === "in") query = query.in(f.column, f.value as unknown[]);
+        else if (f.op === "is") query = query.is(f.column, f.value as null | boolean);
+      }
       const { data: r, error } = await query.select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "delete", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });

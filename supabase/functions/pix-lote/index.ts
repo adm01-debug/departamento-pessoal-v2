@@ -205,7 +205,8 @@ Deno.serve(async (req) => {
       };
       const auditHash = await integrityHash(auditPayload);
 
-      await service.from('auditoria').insert({
+      // Auditoria bloqueante — operação financeira exige non-repudiation
+      const { error: auditErr } = await service.from('auditoria').insert({
         acao: 'PIX_LOTE_CRIADO',
         entidade: 'pix_lotes',
         entidade_id: lote.id,
@@ -221,6 +222,12 @@ Deno.serve(async (req) => {
           integrity_hash: auditHash,
         },
       });
+      if (auditErr) {
+        await service.from('pix_lotes').delete().eq('id', lote.id);
+        await service.from('pix_itens').delete().eq('lote_id', lote.id);
+        await failIdempotency(service, idem.id);
+        throw auditErr;
+      }
 
       const responseBody = {
         success: true,
@@ -283,7 +290,8 @@ Deno.serve(async (req) => {
     const totalAprovacoes = aprovadoresPrevios.size + 1;
     const suficiente = exigeDupla ? totalAprovacoes >= 2 : totalAprovacoes >= 1;
 
-    await service.from('auditoria').insert({
+    // Auditoria bloqueante — aprovação financeira exige non-repudiation
+    const { error: approvalAuditErr } = await service.from('auditoria').insert({
       acao: 'PIX_LOTE_APROVADO',
       entidade: 'pix_lotes',
       entidade_id: lote.id,
@@ -291,9 +299,11 @@ Deno.serve(async (req) => {
       usuario_id: userId,
       dados_novos: { aprovacao_num: totalAprovacoes, exige_dupla: exigeDupla },
     });
+    if (approvalAuditErr) throw approvalAuditErr;
 
     const novoStatus = suficiente ? 'aprovado' : 'aprovado_parcial';
-    await service.from('pix_lotes').update({ status: novoStatus }).eq('id', lote.id);
+    const { error: updateErr } = await service.from('pix_lotes').update({ status: novoStatus }).eq('id', lote.id);
+    if (updateErr) throw updateErr;
 
     return new Response(
       JSON.stringify({ success: true, status: novoStatus, aprovacoes: totalAprovacoes }),
