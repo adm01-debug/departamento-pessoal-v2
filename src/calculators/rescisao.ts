@@ -76,7 +76,7 @@ export function calcularRescisao(params: {
 
 export function calcularAvisoPrevioIndenizado(salarioBase: number, anosServico: number) {
   const dias = Math.min(90, 30 + anosServico * 3);
-  const valor = Math.trunc((salarioBase / 30) * dias * 100) / 100;
+  const valor = Math.round((salarioBase / 30) * dias * 100) / 100;
   return { dias, valor };
 }
 
@@ -88,14 +88,14 @@ export function calcularSeguroDesemprego(ultimosSalarios: number[], mesesVinculo
   if (media <= sd.faixa1Limite) valorParcela = media * sd.faixa1Mult;
   else if (media <= sd.faixa2Limite) valorParcela = sd.faixa2Base + (media - sd.faixa1Limite) * sd.faixa2Mult;
   else valorParcela = sd.teto;
-  valorParcela = Math.max(SALARIO_MINIMO_2026, Math.trunc(valorParcela * 100) / 100);
+  valorParcela = Math.max(SALARIO_MINIMO_2026, Math.round(valorParcela * 100) / 100);
   const ref = mesesVinculo > 0 ? mesesVinculo : ultimosSalarios.length;
   return { valorParcela, parcelas: ref >= 24 ? 5 : ref >= 12 ? 4 : 3 };
 }
 
 export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | 'acordo_mutuo', fgtsRescisao = 0): number {
   const percentual = tipo === 'sem_justa_causa' ? 0.40 : 0.20;
-  return Math.trunc((saldoFGTS + fgtsRescisao) * percentual * 100) / 100;
+  return Math.round((saldoFGTS + fgtsRescisao) * percentual * 100) / 100;
 }
 
 // CLT Art. 477 §8°: multa de um salário mensal quando o empregador não quita as verbas rescisórias
@@ -103,22 +103,22 @@ export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | '
 // Retorna 0 quando o empregador não é o culpado pelo atraso (e.g., força maior, culpa do empregado).
 export function calcularMulta477(salarioBase: number, empregadorCulpado: boolean = false): number {
   if (!empregadorCulpado) return 0;
-  return Math.trunc(salarioBase * 100) / 100;
+  return Math.round(salarioBase * 100) / 100;
 }
 
 export function calcularProvisaoFerias(salarioBase: number, mesesAquisitivo: number) {
   const proporcional = (salarioBase / 12) * mesesAquisitivo;
-  const provisaoFerias = Math.trunc(proporcional * 100) / 100;
-  const provisaoTerco = Math.trunc(provisaoFerias / 3 * 100) / 100;
-  const provisaoEncargos = Math.trunc((provisaoFerias + provisaoTerco) * 0.3637 * 100) / 100;
-  const total = Math.trunc((provisaoFerias + provisaoTerco + provisaoEncargos) * 100) / 100;
+  const provisaoFerias = Math.round(proporcional * 100) / 100;
+  const provisaoTerco = Math.round(provisaoFerias / 3 * 100) / 100;
+  const provisaoEncargos = Math.round((provisaoFerias + provisaoTerco) * 0.3637 * 100) / 100;
+  const total = Math.round((provisaoFerias + provisaoTerco + provisaoEncargos) * 100) / 100;
   return { provisaoFerias, provisaoTerco, provisaoEncargos, total };
 }
 
 export function calcularProvisao13(salarioBase: number, mesesTrabalhados: number) {
-  const provisao13 = Math.trunc((salarioBase / 12) * mesesTrabalhados * 100) / 100;
-  const provisaoEncargos = Math.trunc(provisao13 * 0.3637 * 100) / 100;
-  const total = Math.trunc((provisao13 + provisaoEncargos) * 100) / 100;
+  const provisao13 = Math.round((salarioBase / 12) * mesesTrabalhados * 100) / 100;
+  const provisaoEncargos = Math.round(provisao13 * 0.3637 * 100) / 100;
+  const total = Math.round((provisao13 + provisaoEncargos) * 100) / 100;
   return { provisao13, provisaoEncargos, total };
 }
 
@@ -127,12 +127,12 @@ export function calcularEncargos(salarioBase: number, percentualRAT: number = 0.
   const irrfEmpregado = calcularIRRF(salarioBase);
   const fgts = calcularFGTS(salarioBase);
 
-  const inssPatronal = Math.trunc(salarioBase * 0.20 * 100) / 100;
-  const rat = Math.trunc(salarioBase * percentualRAT * 100) / 100;
-  const terceiros = Math.trunc(salarioBase * percentualTerceiros * 100) / 100;
+  const inssPatronal = Math.round(salarioBase * 0.20 * 100) / 100;
+  const rat = Math.round(salarioBase * percentualRAT * 100) / 100;
+  const terceiros = Math.round(salarioBase * percentualTerceiros * 100) / 100;
 
-  const totalEncargosPatronais = Math.trunc((inssPatronal + rat + terceiros + fgts) * 100) / 100;
-  const custoMensalTotal = Math.trunc((salarioBase + totalEncargosPatronais) * 100) / 100;
+  const totalEncargosPatronais = Math.round((inssPatronal + rat + terceiros + fgts) * 100) / 100;
+  const custoMensalTotal = Math.round((salarioBase + totalEncargosPatronais) * 100) / 100;
 
   return {
     inssEmpregado,
@@ -147,13 +147,13 @@ export function calcularEncargos(salarioBase: number, percentualRAT: number = 0.
 }
 
 export function calcularProRata(salarioBase: number, diasTrabalhados: number): number {
-  return Math.trunc((salarioBase / 30) * diasTrabalhados * 100) / 100;
+  return Math.round((salarioBase / 30) * diasTrabalhados * 100) / 100;
 }
 
 export function calcularMargemConsignado(salarioLiquido: number) {
   return {
-    margemTotal: Math.trunc(salarioLiquido * 0.35 * 100) / 100,
-    margemCartao: Math.trunc(salarioLiquido * 0.05 * 100) / 100,
+    margemTotal: Math.round(salarioLiquido * 0.35 * 100) / 100,
+    margemCartao: Math.round(salarioLiquido * 0.05 * 100) / 100,
   };
 }
 
@@ -161,9 +161,9 @@ export function calcularPLR(valor: number) {
   let irrf = 0;
   for (const faixa of FAIXAS_PLR_2026) {
     if (valor <= faixa.limite) {
-      irrf = Math.max(0, Math.trunc((valor * faixa.aliquota - faixa.deducao) * 100) / 100);
+      irrf = Math.max(0, Math.round((valor * faixa.aliquota - faixa.deducao) * 100) / 100);
       break;
     }
   }
-  return { bruto: valor, irrf, liquido: Math.trunc((valor - irrf) * 100) / 100 };
+  return { bruto: valor, irrf, liquido: Math.round((valor - irrf) * 100) / 100 };
 }

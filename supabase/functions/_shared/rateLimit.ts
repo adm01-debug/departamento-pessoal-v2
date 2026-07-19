@@ -23,6 +23,12 @@ export interface RateLimitResult {
   windowSec: number;
 }
 
+// Fallback em memória (H21): ativado quando a tabela rate_limits está indisponível.
+// Não é compartilhado entre instâncias de edge function, mas impede que uma falha de
+// DB deixe todos os endpoints sem proteção (fail-closed com limite reduzido).
+const _memFallback = new Map<string, { count: number; windowStart: number }>();
+const MEM_LIMIT_FRACTION = 0.5; // usa 50% do limite normal em modo degradado
+
 export async function checkRateLimit(
   admin: SupabaseClient,
   opts: RateLimitOptions,
@@ -42,9 +48,34 @@ export async function checkRateLimit(
     .gte('timestamp', windowStart);
 
   if (error) {
-    // Fail-open — não bloqueia produção se a tabela estiver indisponível
-    console.error('[rateLimit] check falhou (fail-open):', error.message);
-    return { allowed: true, remaining: opts.limit, reset: windowStart + opts.windowSec, limit: opts.limit, windowSec: opts.windowSec };
+    // Fail-closed com fallback em memória (H21):
+    // Quando a tabela está indisponível, mantemos contadores locais com limite
+    // reduzido (50%). Isso evita tanto o fail-open irrestrito quanto uma negação
+    // total de serviço — em modo degradado a proteção permanece ativa.
+    console.error('[rateLimit] tabela inacessível — fallback em memória (fail-closed):', error.message);
+
+    const fallbackLimit = Math.max(1, Math.floor(opts.limit * MEM_LIMIT_FRACTION));
+    let slot = _memFallback.get(opts.key);
+    if (!slot || slot.windowStart < windowStart) {
+      slot = { count: 0, windowStart: now };
+      _memFallback.set(opts.key, slot);
+    }
+    const allowed = slot.count < fallbackLimit;
+    if (allowed) slot.count++;
+
+    // Evita vazamento de memória: descarta entradas mais antigas quando o mapa cresce
+    if (_memFallback.size > 1000) {
+      const oldest = _memFallback.keys().next().value;
+      if (oldest !== undefined) _memFallback.delete(oldest);
+    }
+
+    return {
+      allowed,
+      remaining: Math.max(0, fallbackLimit - slot.count),
+      reset: windowStart + opts.windowSec,
+      limit: fallbackLimit,
+      windowSec: opts.windowSec,
+    };
   }
 
   const current = count ?? 0;
