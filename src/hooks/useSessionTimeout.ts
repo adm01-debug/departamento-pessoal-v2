@@ -30,6 +30,7 @@ export function useSessionTimeout() {
           queryClient.clear();
           try { localStorage.clear(); } catch { /* private browsing */ }
           try { sessionStorage.clear(); } catch { /* private browsing */ }
+          try { indexedDB.deleteDatabase('ponto-offline-db'); } catch { /* ignore */ }
           await supabase.auth.signOut().catch(() => {});
           window.location.href = '/login?reason=idle_timeout';
         }
