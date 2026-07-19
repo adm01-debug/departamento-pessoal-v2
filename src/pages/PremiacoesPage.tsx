@@ -52,8 +52,8 @@ export default function PremiacoesPage() {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status, valor }: { id: string, status: string, valor?: number }) => 
-      premiacoesService.atualizarStatusPagamento(id, status, valor),
+    mutationFn: ({ id, status, valor }: { id: string, status: string, valor?: number }) =>
+      premiacoesService.atualizarStatusPagamento(id, status, empresaAtual!.id, valor),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
       queryClient.invalidateQueries({ queryKey: ['premiacoes_auditoria'] });

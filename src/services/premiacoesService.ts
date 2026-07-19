@@ -51,25 +51,26 @@ export const premiacoesService = {
     return data;
   },
 
-  async atualizarStatusPagamento(id: string, status: string, valorAprovado?: number, comentario?: string) {
-    const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*').eq('id', id).single();
+  async atualizarStatusPagamento(id: string, status: string, empresaId: string, valorAprovado?: number, comentario?: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*, campanha:premiacoes_campanhas!inner(empresa_id)').eq('id', id).eq('campanha.empresa_id', empresaId).single();
     if (fetchErr) throw fetchErr;
 
     const currentHistory = Array.isArray(original.historico_mudancas) ? original.historico_mudancas : [];
-    
+
     const { data, error } = await supabase
       .from('premiacoes_pagamentos')
-      .update({ 
-        status, 
+      .update({
+        status,
         valor_aprovado: valorAprovado,
         historico_mudancas: [...currentHistory, { status, data: new Date().toISOString(), comentario, user: 'current_user' }]
       })
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     if (status === 'rejeitado' || status === 'aprovado_financeiro') {
       await this.enviarNotificacaoCritica(`pagamento_${status}`, { id, status, valorAprovado });
     }
@@ -77,8 +78,9 @@ export const premiacoesService = {
     return data;
   },
 
-  async reconciliarFolha(id: string, valorFolha: number, justificativa?: string) {
-    const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*').eq('id', id).single();
+  async reconciliarFolha(id: string, valorFolha: number, empresaId: string, justificativa?: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data: original, error: fetchErr } = await supabase.from('premiacoes_pagamentos').select('*, campanha:premiacoes_campanhas!inner(empresa_id)').eq('id', id).eq('campanha.empresa_id', empresaId).single();
     if (fetchErr) throw fetchErr;
 
     const valorAprovado = Number(original.valor_aprovado || original.valor_calculado);

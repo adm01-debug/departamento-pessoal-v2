@@ -20,13 +20,13 @@ export const lgpdService = {
   
   },
   
-  async revogarConsentimento(id: string): Promise<any> {
-    
-    const { data, error } = await supabase.from('lgpd_consentimentos').update({ aceito: false, revogado_em: new Date().toISOString() }).eq('id', id).select().maybeSingle();
+  async revogarConsentimento(id: string, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('lgpd_consentimentos').update({ aceito: false, revogado_em: new Date().toISOString() }).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de consentimento foi retornado.');
     return data;
-  
+
   },
   
   async listarSolicitacoes(empresaId: string): Promise<any[]> {
@@ -49,13 +49,13 @@ export const lgpdService = {
   
   },
   
-  async atualizarSolicitacao(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('lgpd_solicitacoes').update(d).eq('id', id).select().maybeSingle();
+  async atualizarSolicitacao(id: string, d: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('lgpd_solicitacoes').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de solicitação LGPD foi retornado.');
     return data;
-  
+
   },
 };
 

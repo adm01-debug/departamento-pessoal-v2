@@ -20,20 +20,20 @@ export const turnoService = {
   
   },
   
-  async atualizarTurno(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('turnos').update(d).eq('id', id).select().maybeSingle();
+  async atualizarTurno(id: string, d: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('turnos').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de turno foi retornado.');
     return data;
-  
+
   },
-  
-  async excluirTurno(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('turnos').delete().eq('id', id);
+
+  async excluirTurno(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('turnos').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
-  
+
   },
   
   async listarEscalas(empresaId: string, data?: string): Promise<any[]> {
@@ -57,11 +57,11 @@ export const turnoService = {
   
   },
   
-  async excluirEscala(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('escalas_trabalho').delete().eq('id', id);
+  async excluirEscala(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('escalas_trabalho').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
-  
+
   },
 };
 

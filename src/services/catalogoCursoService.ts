@@ -19,13 +19,15 @@ export const catalogoCursoService = {
     if (error) throw error;
     return ensure(data, 'curso');
   },
-  async atualizarCurso(id: string, d: any) {
-    const { data, error } = await supabase.from('catalogo_cursos').update(d).eq('id', id).select().maybeSingle();
+  async atualizarCurso(id: string, d: any, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('catalogo_cursos').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'curso');
   },
-  async excluirCurso(id: string) {
-    const { error } = await supabase.from('catalogo_cursos').delete().eq('id', id);
+  async excluirCurso(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('catalogo_cursos').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
   async listarTrilhas(empresaId: string) {
@@ -44,8 +46,9 @@ export const catalogoCursoService = {
     if (error) throw error;
     return ensure(data, 'trilha');
   },
-  async excluirTrilha(id: string) {
-    const { error } = await supabase.from('trilhas_aprendizado').delete().eq('id', id);
+  async excluirTrilha(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('trilhas_aprendizado').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
   async listarInscricoes(empresaId: string, cursoId?: string) {
@@ -66,8 +69,9 @@ export const catalogoCursoService = {
     if (error) throw error;
     return ensure(data, 'inscrição');
   },
-  async atualizarInscricao(id: string, d: any) {
-    const { data, error } = await supabase.from('inscricoes_cursos').update(d).eq('id', id).select().maybeSingle();
+  async atualizarInscricao(id: string, d: any, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('inscricoes_cursos').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'inscrição');
   },
@@ -109,8 +113,9 @@ export const catalogoCursoService = {
     if (error) throw error;
     return data;
   },
-  async atualizarInstancia(id: string, d: any) {
-    const { data, error } = await supabase.from('treinamento_instancias').update(d).eq('id', id).select().maybeSingle();
+  async atualizarInstancia(id: string, d: any, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('treinamento_instancias').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     return data;
   },

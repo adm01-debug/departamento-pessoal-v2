@@ -108,12 +108,12 @@ export default function DespesasPage() {
   });
 
   const marcarPago = useMutation({
-    mutationFn: (id: string) => despesaService.marcarPago(id),
+    mutationFn: (id: string) => despesaService.marcarPago(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['despesas'] }); toast.success('Marcada como paga'); },
   });
 
   const excluir = useMutation({
-    mutationFn: (id: string) => despesaService.excluir(id),
+    mutationFn: (id: string) => despesaService.excluir(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['despesas'] }); toast.success('Excluída'); },
   });
 

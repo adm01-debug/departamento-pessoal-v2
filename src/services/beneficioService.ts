@@ -47,11 +47,11 @@ class BeneficioService extends BaseService<any> {
     }
   }
 
-  async atualizar(id: string, d: any): Promise<any> {
+  async atualizar(id: string, d: any, empresaId?: string): Promise<any> {
     try {
-      const anterior = await this.buscarPorId(id);
-      const data = await super.atualizar(id, d);
-      
+      const anterior = await this.buscarPorId(id, empresaId);
+      const data = await super.atualizar(id, d, empresaId);
+
       await auditLogger.log({
         tabela: 'beneficios',
         registro_id: id,
@@ -59,18 +59,18 @@ class BeneficioService extends BaseService<any> {
         dados_anteriores: anterior,
         dados_novos: data
       });
-      
+
       return data;
     } catch (e: any) {
       throw new Error(e.message || 'Falha ao atualizar benefício', { cause: e });
     }
   }
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: string, empresaId?: string): Promise<void> {
     try {
-      const anterior = await this.buscarPorId(id);
-      await super.excluir(id);
-      
+      const anterior = await this.buscarPorId(id, empresaId);
+      await super.excluir(id, empresaId);
+
       await auditLogger.log({
         tabela: 'beneficios',
         registro_id: id,
@@ -82,10 +82,12 @@ class BeneficioService extends BaseService<any> {
     }
   }
 
-  async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any): Promise<any> {
+  async vincularColaborador(beneficioId: string, colaboradorId: string, dados: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { data, error } = await (supabase as any).from('beneficios_colaborador').insert({
       beneficio_id: beneficioId,
       colaborador_id: colaboradorId,
+      empresa_id: empresaId,
       ...dados
     }).select().single();
     if (error) throw error;

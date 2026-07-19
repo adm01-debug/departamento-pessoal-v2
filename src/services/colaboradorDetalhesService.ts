@@ -29,13 +29,15 @@ export async function criarDependente(dependente: DadosInsert) {
   return data;
 }
 
-export async function atualizarDependente(id: string, dados: DadosUpdate) {
-  const { error } = await supabase.from('dependentes').update(dados).eq('id', id);
+export async function atualizarDependente(id: string, dados: DadosUpdate, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { error } = await supabase.from('dependentes').update(dados).eq('id', id).eq('empresa_id', empresaId);
   if (error) throw error;
 }
 
-export async function excluirDependente(id: string) {
-  const { error } = await supabase.from('dependentes').delete().eq('id', id);
+export async function excluirDependente(id: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { error } = await supabase.from('dependentes').delete().eq('id', id).eq('empresa_id', empresaId);
   if (error) throw error;
 }
 
@@ -337,9 +339,10 @@ export async function criarWebhook(webhook: DadosInsert) {
   return data;
 }
 
-export async function excluirWebhook(id: string) {
+export async function excluirWebhook(id: string, empresaId: string) {
   if (!id) throw new Error('id obrigatório');
-  const { error } = await supabase.from('webhooks_config').delete().eq('id', id);
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { error } = await supabase.from('webhooks_config').delete().eq('id', id).eq('empresa_id', empresaId);
   if (error) throw error;
 }
 

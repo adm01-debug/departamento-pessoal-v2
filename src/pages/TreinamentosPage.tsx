@@ -189,7 +189,7 @@ export default function TreinamentosPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['catalogo_cursos'] }); setOpenCurso(false); setCursoForm({ nome: '', descricao: '', categoria: '', modalidade: 'presencial', carga_horaria: '', obrigatorio: false, nr_relacionada: '' }); toast.success('Curso criado!'); },
     onError: () => toast.error('Erro ao criar curso'),
   });
-  const excluirCurso = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirCurso(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['catalogo_cursos'] }); toast.success('Curso excluído'); } });
+  const excluirCurso = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirCurso(id, empresaAtual!.id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['catalogo_cursos'] }); toast.success('Curso excluído'); } });
 
   // === Trilhas ===
   const [openTrilha, setOpenTrilha] = useState(false);
@@ -199,7 +199,7 @@ export default function TreinamentosPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); setOpenTrilha(false); setTrilhaForm({ titulo: '', descricao: '', nivel: 'basico' }); toast.success('Trilha criada!'); },
     onError: () => toast.error('Erro ao criar trilha'),
   });
-  const excluirTrilha = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirTrilha(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); toast.success('Trilha excluída'); } });
+  const excluirTrilha = useMutation({ mutationFn: (id: string) => catalogoCursoService.excluirTrilha(id, empresaAtual!.id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['trilhas'] }); toast.success('Trilha excluída'); } });
 
   // === Inscrições ===
   const [openInsc, setOpenInsc] = useState(false);

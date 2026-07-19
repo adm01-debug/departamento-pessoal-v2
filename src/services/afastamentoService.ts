@@ -116,14 +116,21 @@ class AfastamentoService extends BaseService<any> {
     }
   }
 
-  async validarDocumento(id: string, validado: boolean): Promise<any> {
+  async validarDocumento(id: string, validado: boolean, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    // documentos_afastamento does not carry empresa_id directly; scope through parent
+    const { data: doc } = await (supabase as any).from('documentos_afastamento').select('afastamento_id').eq('id', id).maybeSingle();
+    if (doc?.afastamento_id) {
+      const { data: af } = await this.getQuery().select('empresa_id').eq('id', doc.afastamento_id).maybeSingle();
+      if (af && af.empresa_id !== empresaId) throw new Error('Acesso negado: documento pertence a outro tenant');
+    }
     const { data, error } = await (supabase as any)
       .from('documentos_afastamento')
       .update({ validado } as any)
       .eq('id', id)
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     return data;
   }
@@ -143,20 +150,21 @@ class AfastamentoService extends BaseService<any> {
     return data || [];
   }
 
-  async criarProrrogacao(d: any): Promise<any> {
+  async criarProrrogacao(d: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     try {
       const { data, error } = await (supabase as any)
         .from('prorrogacoes_afastamento')
         .insert(d)
         .select()
         .maybeSingle();
-      
+
       if (error) throw error;
 
       await this.atualizar(d.afastamento_id, {
         data_fim_prevista: d.data_fim_nova,
         status: 'prorrogado'
-      });
+      }, empresaId);
 
       return data;
     } catch (e: any) {

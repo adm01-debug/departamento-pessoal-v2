@@ -57,7 +57,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => feriasService.atualizarPeriodoAquisitivo(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => feriasService.atualizarPeriodoAquisitivo(id, data, empresaAtual!.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
       toast.success('Período aquisitivo atualizado');
@@ -66,7 +66,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => feriasService.excluirPeriodoAquisitivo(id),
+    mutationFn: (id: string) => feriasService.excluirPeriodoAquisitivo(id, empresaAtual!.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['periodos-aquisitivos', selectedColabId] });
       toast.success('Período aquisitivo excluído');

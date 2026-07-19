@@ -13,10 +13,9 @@ export const configAfastamentosService = {
 };
 
 export const feriasSolicitacoesService = {
-  listar: async (empresaId?: string) => {
-    let q = supabase.from('ferias_solicitacoes').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
-    const { data, error } = await q;
+  listar: async (empresaId: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('ferias_solicitacoes').select('*, colaborador:colaboradores(nome_completo)').eq('empresa_id', empresaId).order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },
@@ -24,8 +23,9 @@ export const feriasSolicitacoesService = {
     const { error } = await supabase.from('ferias_solicitacoes').insert(d);
     if (error) throw error;
   },
-  atualizar: async (id: string, d: any) => {
-    const { error } = await supabase.from('ferias_solicitacoes').update(d).eq('id', id);
+  atualizar: async (id: string, d: any, empresaId: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('ferias_solicitacoes').update(d).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 };

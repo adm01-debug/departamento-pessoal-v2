@@ -75,14 +75,16 @@ class FeriasService extends BaseService<Ferias> {
     return data;
   }
 
-  async atualizarPeriodoAquisitivo(id: string, d: any): Promise<any> {
-    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d).eq('id', id).select().maybeSingle();
+  async atualizarPeriodoAquisitivo(id: string, d: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
-  async excluirPeriodoAquisitivo(id: string): Promise<void> {
-    const { error } = await (supabase as any).from('periodos_aquisitivos').delete().eq('id', id);
+  async excluirPeriodoAquisitivo(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await (supabase as any).from('periodos_aquisitivos').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 

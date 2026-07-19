@@ -41,7 +41,7 @@ export default function TurnosPage() {
   });
 
   const excluir = useMutation({
-    mutationFn: (id: string) => turnoService.excluirTurno(id),
+    mutationFn: (id: string) => turnoService.excluirTurno(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['turnos'] }); toast.success('Turno excluído'); },
   });
 

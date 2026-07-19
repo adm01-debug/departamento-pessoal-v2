@@ -43,17 +43,20 @@ export const despesaService = {
     return data;
   },
 
-  async marcarPago(id: string): Promise<any> {
-    const { data, error } = await supabase.from('despesas').update({ status: 'pago', updated_at: new Date().toISOString() }).eq('id', id).select().maybeSingle();
+  async marcarPago(id: string, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('despesas').update({ status: 'pago', updated_at: new Date().toISOString() }).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     return data;
   },
 
-  async integrarFolha(id: string, folhaId: string): Promise<any> {
+  async integrarFolha(id: string, folhaId: string, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { data, error } = await supabase
       .from('despesas')
       .update({ status: 'integrado_folha', folha_id: folhaId, integrado_folha_em: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', id)
+      .eq('empresa_id', empresaId)
       .eq('status', 'aprovado')
       .select()
       .maybeSingle();
@@ -61,18 +64,20 @@ export const despesaService = {
     return data;
   },
 
-  async excluir(id: string): Promise<void> {
-    const { error } = await supabase.from('despesas').delete().eq('id', id);
+  async excluir(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('despesas').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
   async uploadComprovante(empresaId: string, despesaId: string, file: File): Promise<string> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     validateUploadFile(file);
     const ext = file.name.split('.').pop() || 'bin';
     const path = `${empresaId}/${despesaId}/${crypto.randomUUID()}.${ext}`;
     const { error: upErr } = await supabase.storage.from('comprovantes-despesas').upload(path, file, { upsert: false });
     if (upErr) throw upErr;
-    const { error: updErr } = await supabase.from('despesas').update({ comprovante_url: path, updated_at: new Date().toISOString() }).eq('id', despesaId);
+    const { error: updErr } = await supabase.from('despesas').update({ comprovante_url: path, updated_at: new Date().toISOString() }).eq('id', despesaId).eq('empresa_id', empresaId);
     if (updErr) throw updErr;
     return path;
   },

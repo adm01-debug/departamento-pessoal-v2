@@ -22,17 +22,19 @@ export function useCriarDependente() {
 
 export function useAtualizarDependente() {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
     mutationFn: ({ id, dados }: { id: string; dados: Record<string, unknown> }) =>
-      service.atualizarDependente(id, dados),
+      service.atualizarDependente(id, dados, empresaAtual!.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes'] }),
   });
 }
 
 export function useExcluirDependente(colaboradorId: string) {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
-    mutationFn: service.excluirDependente,
+    mutationFn: (id: string) => service.excluirDependente(id, empresaAtual!.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes', colaboradorId] }),
   });
 }

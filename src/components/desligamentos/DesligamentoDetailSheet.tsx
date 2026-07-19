@@ -50,7 +50,7 @@ export function DesligamentoDetailSheet({ desligamento, open, onClose }: DetailS
         if (d.etapa === 'documentacao') updates.etapa = 'calculo';
       }
 
-      await desligamentoService.atualizar(d.id, updates);
+      await desligamentoService.atualizar(d.id, updates, d.empresa_id);
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Checklist atualizado');
     } catch (err: any) {

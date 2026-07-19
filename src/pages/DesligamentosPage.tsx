@@ -63,7 +63,7 @@ export default function DesligamentosPage() {
     e.stopPropagation();
     if (!confirm('Tem certeza que deseja excluir este desligamento?')) return;
     try {
-      await desligamentoService.excluir(id);
+      await desligamentoService.excluir(id, empresaAtual?.id);
       queryClient.invalidateQueries({ queryKey: ['desligamentos'] });
       toast.success('Desligamento excluído');
     } catch (err) {
