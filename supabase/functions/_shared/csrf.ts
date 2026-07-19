@@ -11,6 +11,11 @@ const ALLOWED_ORIGINS = [
 
 const LOVABLE_HOST_RE = /\.lovable\.(app|dev)$/;
 
+// Localhost only allowed when running Supabase locally (SUPABASE_URL points to localhost)
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const IS_LOCAL_DEV = supabaseUrl.includes('localhost') || supabaseUrl.includes('127.0.0.1') ||
+                     Deno.env.get('SUPABASE_ENV') === 'local';
+
 export interface CsrfResult {
   ok: boolean;
   response?: Response;
@@ -48,8 +53,7 @@ export async function verifyCsrf(req: Request): Promise<CsrfResult> {
     const isAllowed =
       ALLOWED_ORIGINS.some((o) => source.startsWith(o)) ||
       LOVABLE_HOST_RE.test(host) ||
-      host === 'localhost' ||
-      host === '127.0.0.1';
+      (IS_LOCAL_DEV && (host === 'localhost' || host === '127.0.0.1'));
 
     if (!isAllowed) {
       return {

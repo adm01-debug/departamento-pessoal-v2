@@ -26,15 +26,18 @@ serve(async (req: Request): Promise<Response> => {
     let triggeredBy = 'cron';
 
     // Path 1: Cron secret (for pg_cron / external scheduler)
-    if (cronSecret && cronHeader && cronHeader.length === cronSecret.length) {
+    // Constant-time comparison: HMAC both values with a fixed key, compare HMACs
+    if (cronSecret && cronHeader) {
       const enc = new TextEncoder();
-      const a = enc.encode(cronHeader);
-      const b = enc.encode(cronSecret);
-      const keyData = await crypto.subtle.importKey('raw', b, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
-      const sig = await crypto.subtle.sign('HMAC', keyData, a);
-      const expected = await crypto.subtle.sign('HMAC', keyData, b);
-      const match = new Uint8Array(sig).every((v, i) => v === new Uint8Array(expected)[i]);
-      if (match) { authorized = true; triggeredBy = 'cron'; }
+      const fixedKey = await crypto.subtle.importKey(
+        'raw', enc.encode('dp-cron-comparison-key'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+      );
+      const sigHeader = new Uint8Array(await crypto.subtle.sign('HMAC', fixedKey, enc.encode(cronHeader)));
+      const sigSecret = new Uint8Array(await crypto.subtle.sign('HMAC', fixedKey, enc.encode(cronSecret)));
+      // XOR accumulation — always runs all 32 iterations regardless of content
+      let diff = 0;
+      for (let i = 0; i < sigHeader.length; i++) diff |= sigHeader[i] ^ sigSecret[i];
+      if (diff === 0) { authorized = true; triggeredBy = 'cron'; }
     }
 
     // Path 2: Admin JWT (for manual trigger via UI) — CSRF required

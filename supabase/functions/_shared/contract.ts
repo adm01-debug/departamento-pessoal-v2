@@ -17,6 +17,11 @@ const ALLOWED_ORIGINS = [
 ];
 const LOVABLE_HOST_RE = /\.lovable\.(app|dev)$/;
 
+// Localhost only allowed when running Supabase locally
+const _supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const IS_LOCAL_DEV = _supabaseUrl.includes('localhost') || _supabaseUrl.includes('127.0.0.1') ||
+                     Deno.env.get('SUPABASE_ENV') === 'local';
+
 function isOriginAllowed(origin: string): boolean {
   if (!origin) return false;
   try {
@@ -24,8 +29,7 @@ function isOriginAllowed(origin: string): boolean {
     return (
       ALLOWED_ORIGINS.includes(origin) ||
       LOVABLE_HOST_RE.test(host) ||
-      host === 'localhost' ||
-      host === '127.0.0.1'
+      (IS_LOCAL_DEV && (host === 'localhost' || host === '127.0.0.1'))
     );
   } catch {
     return false;

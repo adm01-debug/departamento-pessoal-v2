@@ -5,6 +5,28 @@ import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
+const ALLOWED_BUCKETS = ['documentos', 'colaboradores', 'documents', 'arquivos', 'uploads'];
+
+function isAllowedFileUrl(urlStr: string): boolean {
+  try {
+    const url = new URL(urlStr);
+    // Block private/internal network ranges
+    const h = url.hostname;
+    if (h === 'localhost' || h === '127.0.0.1' || h.startsWith('192.168.') ||
+        h.startsWith('10.') || h.startsWith('172.16.') || h === '0.0.0.0' ||
+        h === '169.254.169.254' || h.endsWith('.internal') || h.endsWith('.local')) {
+      return false;
+    }
+    // Only allow Supabase storage URLs
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    if (!supabaseUrl) return false;
+    const supabaseHost = new URL(supabaseUrl).hostname;
+    return url.hostname === supabaseHost && url.pathname.includes('/storage/v1/');
+  } catch {
+    return false;
+  }
+}
+
 const BodySchema = z.object({
   fileUrl: z.string().url().max(2048).optional(),
   bucket: z.string().min(1).max(100).optional(),
@@ -12,6 +34,10 @@ const BodySchema = z.object({
   documentType: z.enum(['cpf', 'rg', 'ctps', 'comprovante_endereco', 'generic']).optional().default('generic'),
 }).refine((d) => d.fileUrl || (d.bucket && d.filePath), {
   message: 'Forneça fileUrl ou bucket+filePath',
+}).refine((d) => !d.bucket || ALLOWED_BUCKETS.includes(d.bucket), {
+  message: 'Bucket não permitido',
+}).refine((d) => !d.fileUrl || isAllowedFileUrl(d.fileUrl), {
+  message: 'URL de arquivo não permitida',
 });
 
 function json(body: unknown, status = 200): Response {
