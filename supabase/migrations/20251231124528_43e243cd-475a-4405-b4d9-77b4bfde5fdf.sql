@@ -56,7 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_webauthn_challenges_expires ON public.webauthn_ch
 -- RLS para challenges (sem restrição de user pois authentication pode ser anônimo)
 ALTER TABLE public.webauthn_challenges ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Allow all operations on challenges" ON public.challenges;
+DROP POLICY IF EXISTS "Allow all operations on challenges" ON public.webauthn_challenges;
 CREATE POLICY "Allow all operations on challenges"
 ON public.webauthn_challenges FOR ALL
 USING (true)
