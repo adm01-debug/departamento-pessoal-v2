@@ -82,7 +82,7 @@ export default function LoginPage() {
       if (error) throw error;
       if (data?.url) {
         const parsed = new URL(data.url);
-        if (!parsed.hostname.endsWith('.gov.br')) {
+        if (parsed.protocol !== 'https:' || !/\.gov\.br$/i.test(parsed.hostname)) {
           throw new Error('URL de redirecionamento inválida');
         }
         window.location.href = data.url;
