@@ -29,7 +29,7 @@ export const eventosVariaveisService = {
   },
   excluir: async (id: string, empresaId: string) => {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    const { error } = await supabase.from('eventos_variaveis').delete().eq('id', id).eq('empresa_id', empresaId);
+    const { error } = await (supabase as any).from('eventos_variaveis').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 };

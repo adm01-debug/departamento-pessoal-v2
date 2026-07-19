@@ -40,7 +40,7 @@ export const useMotivosAfastamento = () => useResultQuery(['motivos-afastamento'
 // Centros de Custo (CRUD)
 // =============================================
 export function useCentrosCusto(empresaId?: string) {
-  return useResultQuery(['centros-custo', empresaId], () => service.listarCentrosCusto(empresaId), !!empresaId);
+  return useResultQuery(['centros-custo', empresaId], () => service.listarCentrosCusto(empresaId!), !!empresaId);
 }
 
 export function useCriarCentroCusto() {
@@ -55,9 +55,10 @@ export function useCriarCentroCusto() {
 
 export function useAtualizarCentroCusto() {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
     mutationFn: async ({ id, dados }: { id: string; dados: DataRecord }) => {
-      return await service.atualizarCentroCusto(id, dados);
+      return await service.atualizarCentroCusto(id, dados, empresaAtual!.id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
@@ -65,9 +66,10 @@ export function useAtualizarCentroCusto() {
 
 export function useExcluirCentroCusto() {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
     mutationFn: async (id: string) => {
-      return await service.excluirCentroCusto(id);
+      return await service.excluirCentroCusto(id, empresaAtual!.id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['centros-custo'] }),
   });
@@ -97,9 +99,10 @@ export function useCriarContaBancaria() {
 
 export function useAtualizarContaBancaria() {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
     mutationFn: async ({ id, dados }: { id: string; dados: DataRecord }) => {
-      return await service.atualizarContaBancaria(id, dados);
+      return await service.atualizarContaBancaria(id, dados, empresaAtual!.id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias'] }),
   });
@@ -107,9 +110,10 @@ export function useAtualizarContaBancaria() {
 
 export function useExcluirContaBancaria(colaboradorId: string) {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
     mutationFn: async (id: string) => {
-      return await service.excluirContaBancaria(id);
+      return await service.excluirContaBancaria(id, empresaAtual!.id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contas-bancarias', colaboradorId] }),
   });

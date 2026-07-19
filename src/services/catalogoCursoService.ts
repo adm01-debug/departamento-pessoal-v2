@@ -115,7 +115,7 @@ export const catalogoCursoService = {
   },
   async atualizarInstancia(id: string, d: any, empresaId: string) {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    const { data, error } = await supabase.from('treinamento_instancias').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('treinamento_instancias').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     return data;
   },

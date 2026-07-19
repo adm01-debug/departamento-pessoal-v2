@@ -52,7 +52,7 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
   });
 
   const criarMutation = useMutation({
-    mutationFn: (data: any) => afastamentoService.criarProrrogacao(data),
+    mutationFn: (data: any) => afastamentoService.criarProrrogacao(data, empresaAtual!.id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['prorrogacoes-afastamento'] });
       queryClient.invalidateQueries({ queryKey: ['afastamentos'] });
