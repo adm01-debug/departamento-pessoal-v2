@@ -134,14 +134,31 @@ export const cnabService = {
     const config = await this.getConfig(empresaId);
     if (!config) throw new Error('Configuração CNAB não encontrada para esta empresa.');
 
+    // Idempotency guard (C46/C47): reject if a remessa already exists in 'enviado'
+    // status for this folha to prevent double-payment. Allow recovery if 'pendente'
+    // (previous attempt failed before sending).
+    const { data: existingRemessa } = await supabase
+      .from('cnab_remessas')
+      .select('id, status, arquivo_remessa')
+      .eq('empresa_id', empresaId)
+      .eq('folha_id', folhaId)
+      .maybeSingle();
+
+    if (existingRemessa) {
+      const rec = existingRemessa as unknown as CnabRemessaRecord & { folha_id?: string; arquivo_remessa?: string };
+      if (rec.status === 'enviado' && rec.arquivo_remessa) {
+        return rec.arquivo_remessa;
+      }
+    }
+
     const { data: itens, error: hError } = await supabase
       .from('folha_itens')
       .select(`
-        *, 
+        *,
         colaborador:colaboradores(id, nome_completo, cpf)
       `)
       .eq('folha_id', folhaId);
-    
+
     if (hError) throw hError;
     if (!itens?.length) throw new Error('Nenhum pagamento encontrado para gerar CNAB.');
 
@@ -155,20 +172,27 @@ export const cnabService = {
 
     if (cError) throw cError;
 
-    const { data: remessa, error: rError } = await supabase
-      .from('cnab_remessas')
-      .insert([{
-        empresa_id: empresaId,
-        banco_codigo: config.banco_codigo,
-        status: 'pendente',
-        valor_total: typedItens.reduce((acc, i) => acc + Number(i.total_liquido), 0),
-        total_pagamentos: typedItens.length
-      }] as any)
-      .select()
-      .single();
+    // Re-use pending remessa from a failed previous attempt; otherwise create new.
+    let remessaRecord: CnabRemessaRecord;
+    if (existingRemessa && (existingRemessa as unknown as CnabRemessaRecord).status === 'pendente') {
+      remessaRecord = existingRemessa as unknown as CnabRemessaRecord;
+    } else {
+      const { data: remessa, error: rError } = await supabase
+        .from('cnab_remessas')
+        .insert([{
+          empresa_id: empresaId,
+          folha_id: folhaId,
+          banco_codigo: config.banco_codigo,
+          status: 'pendente',
+          valor_total: typedItens.reduce((acc, i) => acc + Number(i.total_liquido), 0),
+          total_pagamentos: typedItens.length
+        }] as any)
+        .select()
+        .single();
 
-    if (rError || !remessa) throw rError || new Error('Falha ao criar remessa');
-    const remessaRecord = remessa as unknown as CnabRemessaRecord;
+      if (rError || !remessa) throw rError || new Error('Falha ao criar remessa');
+      remessaRecord = remessa as unknown as CnabRemessaRecord;
+    }
 
     const lines: string[] = [];
     // Fetch monotonically increasing sequence per (empresa, banco) — fixes C46 hardcoded=1
@@ -183,7 +207,7 @@ export const cnabService = {
       return side === 'right' ? s.padEnd(len, char) : s.padStart(len, char);
     };
 
-    const formatAmount = (val: number) => pad(Math.round(val * 100), 15, '0', 'left');
+    const formatAmount = (val: number) => pad(Math.trunc(val * 100), 15, '0', 'left');
 
     const today = new Date();
     const dateStr = formatDateLocalISO(today).replace(/-/g, '');

@@ -121,7 +121,8 @@ export const pontoService = {
       } as any);
 
       if (rpcError) {
-        if (rpcError.code === '23505') {
+        const pgCode = (rpcError as { code?: string }).code;
+        if (pgCode === '23505') {
           throw new Error('Já existe um registro idêntico para este horário. Aguarde um minuto.');
         }
         throw rpcError;
