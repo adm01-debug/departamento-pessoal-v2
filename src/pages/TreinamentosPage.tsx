@@ -166,9 +166,9 @@ export default function TreinamentosPage() {
   const { data: treinamentos = [], isLoading: loadTrein } = useQuery({ queryKey: ['treinamentos', empresaAtual?.id], queryFn: () => treinamentosService.listar(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: cursos = [], isLoading: loadCursos } = useQuery({ queryKey: ['catalogo_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarCursos(empresaAtual?.id), enabled: !!empresaAtual?.id });
   const { data: trilhas = [], isLoading: loadTrilhas } = useQuery({ queryKey: ['trilhas', empresaAtual?.id], queryFn: () => catalogoCursoService.listarTrilhas(empresaAtual?.id), enabled: !!empresaAtual?.id });
-  const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
-  const { data: instancias = [], isLoading: loadInst } = useQuery({ queryKey: ['treinamento_instancias', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInstancias(), enabled: !!empresaAtual?.id });
-  const { data: certificados = [], isLoading: loadCert } = useQuery({ queryKey: ['treinamento_certificados', empresaAtual?.id], queryFn: () => (catalogoCursoService as any).listarCertificados(undefined, empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: inscricoes = [], isLoading: loadInsc } = useQuery({ queryKey: ['inscricoes_cursos', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInscricoes(empresaAtual!.id), enabled: !!empresaAtual?.id });
+  const { data: instancias = [], isLoading: loadInst } = useQuery({ queryKey: ['treinamento_instancias', empresaAtual?.id], queryFn: () => catalogoCursoService.listarInstancias(empresaAtual!.id), enabled: !!empresaAtual?.id });
+  const { data: certificados = [], isLoading: loadCert } = useQuery({ queryKey: ['treinamento_certificados', empresaAtual?.id], queryFn: () => catalogoCursoService.listarCertificados(empresaAtual!.id), enabled: !!empresaAtual?.id });
   const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual!.id), enabled: !!empresaAtual?.id });
 
   // === Treinamentos ===

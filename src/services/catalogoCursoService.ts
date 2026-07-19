@@ -3,14 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 const ensure = <T>(d: T | null, e: string): T => { if (!d) throw new Error(`Nenhum registro de ${e} retornado.`); return d; };
 
 export const catalogoCursoService = {
-  async listarCursos(empresaId?: string) {
-    let q = supabase.from('catalogo_cursos').select('*').order('nome');
-    if (empresaId) q = q.eq('empresa_id', empresaId);
-    const { data, error } = await q;
+  async listarCursos(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase
+      .from('catalogo_cursos')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('nome');
     if (error) throw error;
     return data || [];
   },
   async criarCurso(d: any) {
+    if (!d.empresa_id) throw new Error('empresa_id obrigatório');
     const { data, error } = await supabase.from('catalogo_cursos').insert(d).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'curso');
@@ -24,14 +28,18 @@ export const catalogoCursoService = {
     const { error } = await supabase.from('catalogo_cursos').delete().eq('id', id);
     if (error) throw error;
   },
-  async listarTrilhas(empresaId?: string) {
-    let q = supabase.from('trilhas_aprendizado').select('*').order('titulo');
-    if (empresaId) q = q.eq('empresa_id', empresaId);
-    const { data, error } = await q;
+  async listarTrilhas(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase
+      .from('trilhas_aprendizado')
+      .select('*')
+      .eq('empresa_id', empresaId)
+      .order('titulo');
     if (error) throw error;
     return data || [];
   },
   async criarTrilha(d: any) {
+    if (!d.empresa_id) throw new Error('empresa_id obrigatório');
     const { data, error } = await supabase.from('trilhas_aprendizado').insert(d).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'trilha');
@@ -40,15 +48,20 @@ export const catalogoCursoService = {
     const { error } = await supabase.from('trilhas_aprendizado').delete().eq('id', id);
     if (error) throw error;
   },
-  async listarInscricoes(cursoId?: string, empresaId?: string) {
-    let q = supabase.from('inscricoes_cursos').select('*, colaborador:colaboradores(nome_completo), curso:catalogo_cursos(nome)').order('created_at', { ascending: false });
+  async listarInscricoes(empresaId: string, cursoId?: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    let q = supabase
+      .from('inscricoes_cursos')
+      .select('*, colaborador:colaboradores(nome_completo), curso:catalogo_cursos(nome)')
+      .eq('empresa_id', empresaId)
+      .order('created_at', { ascending: false });
     if (cursoId) q = q.eq('curso_id', cursoId);
-    if (empresaId) q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
   },
   async criarInscricao(d: any) {
+    if (!d.empresa_id) throw new Error('empresa_id obrigatório');
     const { data, error } = await supabase.from('inscricoes_cursos').insert(d).select().maybeSingle();
     if (error) throw error;
     return ensure(data, 'inscrição');
@@ -59,9 +72,12 @@ export const catalogoCursoService = {
     return ensure(data, 'inscrição');
   },
 
-  // === Trilhas ↔ Cursos ===
   async listarTrilhasCursos(trilhaId: string) {
-    const { data, error } = await supabase.from('trilhas_cursos').select('*, curso:catalogo_cursos(id, nome, carga_horaria)').eq('trilha_id', trilhaId).order('ordem');
+    const { data, error } = await supabase
+      .from('trilhas_cursos')
+      .select('*, curso:catalogo_cursos(id, nome, carga_horaria)')
+      .eq('trilha_id', trilhaId)
+      .order('ordem');
     if (error) throw error;
     return data || [];
   },
@@ -75,15 +91,20 @@ export const catalogoCursoService = {
     if (error) throw error;
   },
 
-  // === Instâncias / Turmas ===
-  async listarInstancias(cursoId?: string) {
-    let q = supabase.from('treinamento_instancias').select('*, curso:catalogo_cursos!treinamento_instancias_curso_id_fkey(nome), instrutor:colaboradores!treinamento_instancias_instrutor_id_fkey(nome_completo)').order('data_inicio', { ascending: true });
+  async listarInstancias(empresaId: string, cursoId?: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    let q = supabase
+      .from('treinamento_instancias')
+      .select('*, curso:catalogo_cursos!treinamento_instancias_curso_id_fkey(nome), instrutor:colaboradores!treinamento_instancias_instrutor_id_fkey(nome_completo)')
+      .eq('empresa_id', empresaId)
+      .order('data_inicio', { ascending: true });
     if (cursoId) q = q.eq('curso_id', cursoId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
   },
   async criarInstancia(d: any) {
+    if (!d.empresa_id) throw new Error('empresa_id obrigatório');
     const { data, error } = await supabase.from('treinamento_instancias').insert(d).select().maybeSingle();
     if (error) throw error;
     return data;
@@ -94,25 +115,30 @@ export const catalogoCursoService = {
     return data;
   },
 
-  // === Feedback ===
   async registrarFeedback(d: { inscricao_id: string; nota_satisfacao: number; comentario?: string; aplicabilidade_nota?: number }) {
     const { data, error } = await supabase.from('treinamento_feedback').insert(d).select().maybeSingle();
     if (error) throw error;
     return data;
   },
 
-  // === Certificados ===
-  async listarCertificados(colaboradorId?: string, empresaId?: string) {
-    let q = supabase.from('treinamento_certificados').select('*, curso:catalogo_cursos(nome, carga_horaria), colaborador:colaboradores(nome_completo)');
+  async listarCertificados(empresaId: string, colaboradorId?: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    let q = supabase
+      .from('treinamento_certificados')
+      .select('*, curso:catalogo_cursos(nome, carga_horaria), colaborador:colaboradores(nome_completo)')
+      .eq('empresa_id', empresaId);
     if (colaboradorId) q = q.eq('colaborador_id', colaboradorId);
-    if (empresaId) q = (q as any).eq('empresa_id', empresaId);
     const { data, error } = await q.order('data_emissao', { ascending: false });
     if (error) throw error;
     return data || [];
   },
-  
+
   async getCertificado(id: string) {
-    const { data, error } = await supabase.from('treinamento_certificados').select('*, curso:catalogo_cursos(*), colaborador:colaboradores(*)').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('treinamento_certificados')
+      .select('*, curso:catalogo_cursos(*), colaborador:colaboradores(*)')
+      .eq('id', id)
+      .single();
     if (error) throw error;
     return data;
   }

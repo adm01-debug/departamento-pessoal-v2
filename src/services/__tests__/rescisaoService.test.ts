@@ -28,10 +28,10 @@ describe('rescisaoService', () => {
         single: vi.fn().mockResolvedValue({ data: { etapa: 'comunicacao', status: 'pendente' }, error: null }),
       });
 
-      await expect(rescisaoService.validarTransicao('1', 'documentacao'))
+      await expect(rescisaoService.validarTransicao('1', 'documentacao', 'empresa-uuid-1'))
         .resolves.toBe(true);
-        
-      await expect(rescisaoService.validarTransicao('1', 'homologacao'))
+
+      await expect(rescisaoService.validarTransicao('1', 'homologacao', 'empresa-uuid-1'))
         .rejects.toThrow(/Transição bloqueada/);
     });
 
@@ -42,7 +42,7 @@ describe('rescisaoService', () => {
         single: vi.fn().mockResolvedValue({ data: { etapa: 'calculo', status: 'pendente' }, error: null }),
       });
 
-      await expect(rescisaoService.validarTransicao('1', 'homologacao'))
+      await expect(rescisaoService.validarTransicao('1', 'homologacao', 'empresa-uuid-1'))
         .rejects.toThrow(/A rescisão precisa estar com status "calculado"/);
     });
   });
@@ -61,7 +61,7 @@ describe('rescisaoService', () => {
         single: mockSingle,
       });
 
-      await rescisaoService.assinarDigitalmente('1', 'empresa');
+      await rescisaoService.assinarDigitalmente('1', 'empresa', 'empresa-uuid-1');
 
       expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
         assinado_empresa: true,
