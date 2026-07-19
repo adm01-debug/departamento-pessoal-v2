@@ -6,4 +6,5 @@
 
 ALTER TABLE public.colaboradores ADD COLUMN IF NOT EXISTS data_desligamento DATE;
 ALTER TABLE public.colaboradores ADD COLUMN IF NOT EXISTS email_corporativo TEXT;
-ALTER TABLE public.colaboradores ADD COLUMN IF NOT EXISTS jornada_id UUID REFERENCES public.jornadas(id);
+-- FK added later in 20260720040000_fix_jornada_fk_ordering.sql after jornadas table exists
+ALTER TABLE public.colaboradores ADD COLUMN IF NOT EXISTS jornada_id UUID;
