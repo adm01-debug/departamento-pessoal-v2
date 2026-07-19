@@ -206,11 +206,12 @@ serve(async (req: Request): Promise<Response> => {
       </div>
     `;
 
-    // Get admin emails from profiles
+    // Get admin emails from profiles (cap at 50 to avoid URL-length issues)
     const { data: admins } = await supabase
       .from('user_roles')
       .select('user_id')
-      .eq('role', 'admin');
+      .eq('role', 'admin')
+      .limit(50);
 
     let recipientEmails: string[] = [];
     if (admins?.length) {
@@ -221,12 +222,9 @@ serve(async (req: Request): Promise<Response> => {
       recipientEmails = (profiles || []).map((p: any) => p.email).filter(Boolean);
     }
 
-    // Fallback: get from request body
-    if (!recipientEmails.length) {
-      try {
-        const body = await req.json();
-        if (body.email) recipientEmails = [body.email];
-      } catch {}
+    // Fallback: get from already-parsed request body
+    if (!recipientEmails.length && body?.email && typeof body.email === 'string') {
+      recipientEmails = [body.email];
     }
 
     if (!recipientEmails.length) {

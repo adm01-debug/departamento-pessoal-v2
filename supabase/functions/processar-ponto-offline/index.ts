@@ -188,6 +188,17 @@ serve(async (req: Request): Promise<Response> => {
           }
         }
 
+        // Atomic ordem allocation: get max(ordem)+1 for this colaborador+date
+        const { data: maxOrdem } = await supabase
+          .from('batidas_ponto')
+          .select('ordem')
+          .eq('colaborador_id', reg.colaborador_id)
+          .eq('data', timestampDate)
+          .order('ordem', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const nextOrdem = ((maxOrdem?.ordem as number) ?? 0) + 1;
+
         const { data: inserted, error } = await supabase
           .from('batidas_ponto')
           .insert({
@@ -195,6 +206,7 @@ serve(async (req: Request): Promise<Response> => {
             tipo: tipoMapped,
             data: timestampDate,
             hora: timestampTime,
+            ordem: nextOrdem,
             latitude: reg.latitude,
             longitude: reg.longitude,
             precisao_metros: reg.precisao,
