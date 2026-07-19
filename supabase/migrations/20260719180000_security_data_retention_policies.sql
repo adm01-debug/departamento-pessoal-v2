@@ -16,7 +16,8 @@ END;
 $$;
 
 -- 2) Auto-expire old rate_limit_logs (already expired entries)
-CREATE OR REPLACE FUNCTION public.cleanup_expired_rate_limits()
+-- Named distinctly from cleanup_expired_rate_limits() in 20260719160000 which operates on rate_limits
+CREATE OR REPLACE FUNCTION public.cleanup_expired_rate_limit_logs()
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -57,7 +58,7 @@ EXCEPTION WHEN others THEN NULL; END $$;
 COMMENT ON FUNCTION public.cleanup_expired_login_attempts() IS
   'Removes login_attempts older than 30 days. Should be called via pg_cron or scheduled edge function.';
 
-COMMENT ON FUNCTION public.cleanup_expired_rate_limits() IS
+COMMENT ON FUNCTION public.cleanup_expired_rate_limit_logs() IS
   'Removes expired rate_limit_logs entries. Should be called via pg_cron or scheduled edge function.';
 
 -- 6) Ensure empresa_id is indexed on high-traffic tables for tenant isolation performance
