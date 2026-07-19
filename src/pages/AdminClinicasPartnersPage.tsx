@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Building2, MapPin, Plus, Search, Trash2, Pencil, Stethoscope } from 'lucide-react';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 type Clinica = {
   id: string;
@@ -150,7 +151,7 @@ export default function AdminClinicasPartnersPage() {
       setForm(EMPTY_FORM);
       setEditingId(null);
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Erro ao salvar'),
+    onError: (e: any) => toast.error(safeErrorMessage(e, 'Erro ao salvar clínica.')),
   });
 
   const deleteMutation = useMutation({
@@ -162,7 +163,7 @@ export default function AdminClinicasPartnersPage() {
       toast.success('Clínica removida');
       qc.invalidateQueries({ queryKey: ['clinicas-partners'] });
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Erro ao remover'),
+    onError: (e: any) => toast.error(safeErrorMessage(e, 'Erro ao remover clínica.')),
   });
 
   const openEdit = (c: Clinica) => {

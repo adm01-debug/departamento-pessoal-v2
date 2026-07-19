@@ -10,14 +10,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { verifyCsrf } from "../_shared/csrf.ts";
+import { corsHeaders } from "../_shared/contract.ts";
 
 // -------------------- Headers --------------------
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-csrf-token, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
 const NO_STORE = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" };
 
 // -------------------- Limites e thresholds --------------------
@@ -80,6 +75,7 @@ const TENANT_SCOPED_TABLES = new Set<string>([
 const RPC_ALLOWLIST = new Set<string>([
   // segurança / login
   "check_login_lock", "record_failed_login", "reset_login_attempts",
+  "check_account_lockout", "record_login_attempt", "reset_account_lockout",
   "check_brute_force", "check_rate_limit", "is_ip_blocked", "is_ip_whitelisted",
   "is_country_allowed",
   // roles / tenant
@@ -105,6 +101,30 @@ const FILTER_OPS = new Set([
   "like", "ilike", "in", "is", "or", "not", "contains", "match",
 ]);
 const NOT_EXTRA_OPS = new Set(["eq", "neq", "gt", "gte", "lt", "lte", "in", "is"]);
+
+// Validação de expressões .or() — permite apenas operadores seguros sobre colunas válidas
+// Formato PostgREST: "col.op.val,col.op.val" — bloqueia subqueries, parênteses aninhados, SQL keywords
+const OR_SAFE_OPS = /^(eq|neq|gt|gte|lt|lte|like|ilike|is|in)\./;
+const OR_DANGEROUS = /(;|--|\/\*|\*\/|\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b|\bEXEC\b)/i;
+function isSafeOrExpression(expr: unknown): boolean {
+  if (typeof expr !== "string" || expr.length === 0 || expr.length > 500) return false;
+  if (OR_DANGEROUS.test(expr)) return false;
+  const parts = expr.split(",");
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) return false;
+    // Each part must be: column_name.operator.value (or nested and/or with parens)
+    // Allow parentheses for grouping but validate each leaf
+    const leaf = trimmed.replace(/^\(+/, "").replace(/\)+$/, "");
+    const dotIdx = leaf.indexOf(".");
+    if (dotIdx < 1) return false;
+    const colName = leaf.substring(0, dotIdx);
+    if (!IDENTIFIER_RE.test(colName)) return false;
+    const rest = leaf.substring(dotIdx + 1);
+    if (!OR_SAFE_OPS.test(rest)) return false;
+  }
+  return true;
+}
 
 // -------------------- Zod schemas --------------------
 const FilterSchema = z.object({
@@ -286,14 +306,28 @@ async function assertTenantScope(
   localClient: ReturnType<typeof createClient>,
   userId: string,
   data: Record<string, unknown> | Record<string, unknown>[] | undefined,
+  filters?: Array<{ column: string; op: string; value: unknown }>,
 ): Promise<{ ok: true } | { ok: false; msg: string }> {
-  if (!data) return { ok: true };
-  const rows = Array.isArray(data) ? data : [data];
   const empresaIds = new Set<string>();
-  for (const r of rows) {
-    const eid = (r as Record<string, unknown>)?.empresa_id;
-    if (typeof eid === "string" && eid) empresaIds.add(eid);
+
+  // Extract empresa_id from data payload (INSERT/UPDATE/UPSERT)
+  if (data) {
+    const rows = Array.isArray(data) ? data : [data];
+    for (const r of rows) {
+      const eid = (r as Record<string, unknown>)?.empresa_id;
+      if (typeof eid === "string" && eid) empresaIds.add(eid);
+    }
   }
+
+  // Extract empresa_id from filters (critical for DELETE which has no data)
+  if (filters) {
+    for (const f of filters) {
+      if (f.column === "empresa_id" && f.op === "eq" && typeof f.value === "string" && f.value) {
+        empresaIds.add(f.value);
+      }
+    }
+  }
+
   if (empresaIds.size === 0) return { ok: true };
 
   // Verifica via RPC has_role(admin) primeiro
@@ -381,6 +415,17 @@ Deno.serve(async (req) => {
     return jsonError(401, "UNAUTHORIZED", "Authentication required for write operations");
   }
 
+  // Rate limit — bridge é o endpoint mais genérico: 100 req/min para reads, 30 req/min para writes
+  if (serviceKey) {
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rlClient = createClient(supabaseUrl, serviceKey);
+    const rlIdentity = user?.id ?? (req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || 'anon');
+    const rlKey = isWrite ? `bridge-write:${rlIdentity}` : `bridge-read:${rlIdentity}`;
+    const rlLimit = isWrite ? 30 : (user ? 100 : 20);
+    const rl = await checkRateLimit(rlClient, { key: rlKey, limit: rlLimit, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+  }
+
   // Validação: table obrigatório para non-rpc + regex + denylist
   if (action !== "rpc") {
     if (!isSafeTableName(table)) {
@@ -420,7 +465,7 @@ Deno.serve(async (req) => {
 
   // Tenant scope check para writes em tabelas de negócio
   if (isWrite && user && localClient && table && TENANT_SCOPED_TABLES.has(table)) {
-    const scope = await assertTenantScope(localClient, user.id, data);
+    const scope = await assertTenantScope(localClient, user.id, data, filters);
     if (!scope.ok) {
       return jsonError(403, "TENANT_SCOPE_DENIED", scope.msg);
     }
@@ -450,7 +495,10 @@ Deno.serve(async (req) => {
         else if (f.op === "ilike") query = query.ilike(f.column, f.value as string);
         else if (f.op === "in") query = query.in(f.column, f.value as unknown[]);
         else if (f.op === "is") query = query.is(f.column, f.value as null | boolean);
-        else if (f.op === "or") query = query.or(f.value as string);
+        else if (f.op === "or") {
+          if (!isSafeOrExpression(f.value)) return jsonError(400, "INVALID_OR_FILTER", "Expressão .or() contém operadores ou padrões não permitidos");
+          query = query.or(f.value as string);
+        }
         else if (f.op === "not") query = query.not(f.column, f.extraOp!, f.value);
         else if (f.op === "contains") query = query.contains(f.column, f.value);
       }
@@ -463,7 +511,7 @@ Deno.serve(async (req) => {
         durationMs, status: classifySeverity(durationMs, !!error),
         recordCount: (selectData as unknown[] | null)?.length ?? 0, error: error?.message, userId: user?.id,
       });
-      if (error) return jsonError(400, "QUERY_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] QUERY_ERROR:', error.message, error.hint); return jsonError(400, "QUERY_ERROR", "Falha na consulta"); }
       return jsonOk({ data: selectData, count, duration_ms: durationMs });
     }
 
@@ -473,7 +521,7 @@ Deno.serve(async (req) => {
       const { data: r, error } = await externalClient.from(table!).insert(data as any).select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "insert", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "INSERT_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] INSERT_ERROR:', error.message, error.hint); return jsonError(400, "INSERT_ERROR", "Falha na inserção"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -483,7 +531,7 @@ Deno.serve(async (req) => {
       const { data: r, error } = await externalClient.from(table!).upsert(data as any).select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "upsert", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "UPSERT_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] UPSERT_ERROR:', error.message, error.hint); return jsonError(400, "UPSERT_ERROR", "Falha no upsert"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -492,13 +540,26 @@ Deno.serve(async (req) => {
       if (filters.length === 0) {
         return jsonError(400, "UPDATE_REQUIRES_FILTER", "UPDATE requires at least one filter");
       }
+      // Require at least one eq filter to prevent overly-broad updates
+      if (!filters.some((f) => f.op === "eq")) {
+        return jsonError(400, "UPDATE_REQUIRES_EQ", "UPDATE requires at least one 'eq' filter for safety");
+      }
       const t0 = performance.now();
       let query = externalClient.from(table!).update(data as any);
-      for (const f of filters) if (f.op === "eq") query = query.eq(f.column, f.value);
+      for (const f of filters) {
+        if (f.op === "eq") query = query.eq(f.column, f.value);
+        else if (f.op === "neq") query = query.neq(f.column, f.value);
+        else if (f.op === "gt") query = query.gt(f.column, f.value);
+        else if (f.op === "gte") query = query.gte(f.column, f.value);
+        else if (f.op === "lt") query = query.lt(f.column, f.value);
+        else if (f.op === "lte") query = query.lte(f.column, f.value);
+        else if (f.op === "in") query = query.in(f.column, f.value as unknown[]);
+        else if (f.op === "is") query = query.is(f.column, f.value as null | boolean);
+      }
       const { data: r, error } = await query.select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "update", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "UPDATE_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] UPDATE_ERROR:', error.message, error.hint); return jsonError(400, "UPDATE_ERROR", "Falha na atualização"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -507,13 +568,25 @@ Deno.serve(async (req) => {
       if (filters.length === 0) {
         return jsonError(400, "DELETE_REQUIRES_FILTER", "DELETE requires at least one filter");
       }
+      if (!filters.some((f) => f.op === "eq")) {
+        return jsonError(400, "DELETE_REQUIRES_EQ", "DELETE requires at least one 'eq' filter for safety");
+      }
       const t0 = performance.now();
       let query = externalClient.from(table!).delete();
-      for (const f of filters) if (f.op === "eq") query = query.eq(f.column, f.value);
+      for (const f of filters) {
+        if (f.op === "eq") query = query.eq(f.column, f.value);
+        else if (f.op === "neq") query = query.neq(f.column, f.value);
+        else if (f.op === "gt") query = query.gt(f.column, f.value);
+        else if (f.op === "gte") query = query.gte(f.column, f.value);
+        else if (f.op === "lt") query = query.lt(f.column, f.value);
+        else if (f.op === "lte") query = query.lte(f.column, f.value);
+        else if (f.op === "in") query = query.in(f.column, f.value as unknown[]);
+        else if (f.op === "is") query = query.is(f.column, f.value as null | boolean);
+      }
       const { data: r, error } = await query.select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "delete", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "DELETE_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] DELETE_ERROR:', error.message, error.hint); return jsonError(400, "DELETE_ERROR", "Falha na exclusão"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -537,7 +610,7 @@ Deno.serve(async (req) => {
         recordCount: Array.isArray(rpcData) ? rpcData.length : rpcData ? 1 : 0,
         error: error?.message, userId: user?.id,
       });
-      if (error) return jsonError(400, "RPC_ERROR", error.message);
+      if (error) { console.error('[bridge] RPC_ERROR:', error.message); return jsonError(400, "RPC_ERROR", "Falha na chamada RPC"); }
       return jsonOk({ data: rpcData, duration_ms: durationMs });
     }
 

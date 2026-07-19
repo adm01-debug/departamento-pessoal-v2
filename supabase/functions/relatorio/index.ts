@@ -152,15 +152,20 @@ serve(async (req: Request): Promise<Response> => {
     }
     const userId = String(claimsData.claims.sub);
 
-    // 3) Validação Zod strict
+    // 3) Rate-limit
+    const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `relatorio:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
+    // 4) Validação Zod strict
     const { data: body, errorResponse } = await validateRequest(req, BodySchema);
     if (errorResponse) return errorResponse;
     const filtros = body as ReqBody;
 
-    // 4) Tenant scope obrigatório
-    const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    // 5) Tenant scope obrigatório
     const { data: belongs } = await admin.rpc('user_belongs_to_empresa', {
       _user_id: userId, _empresa_id: filtros.empresaId,
     });
@@ -171,13 +176,13 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    // 5) Validação de janela temporal (quando aplicável)
+    // 6) Validação de janela temporal (quando aplicável)
     if ('dataInicio' in filtros && 'dataFim' in filtros) {
       const bad = validateWindow(filtros.dataInicio, filtros.dataFim);
       if (bad) return bad;
     }
 
-    // 6) Execução do relatório (queries parametrizadas, sempre com empresa_id)
+    // 7) Execução do relatório (queries parametrizadas, sempre com empresa_id)
     const from = filtros.offset;
     const to = filtros.offset + filtros.limit - 1;
     let rows: Record<string, unknown>[] = [];
@@ -239,7 +244,7 @@ serve(async (req: Request): Promise<Response> => {
       rows = (data ?? []) as Record<string, unknown>[];
     }
 
-    // 7) Auditoria BLOQUEANTE não-repudiável
+    // 8) Auditoria BLOQUEANTE não-repudiável
     const timestamp = new Date().toISOString();
     const canonical = canonicalize({
       tipo: filtros.tipo,
@@ -273,7 +278,7 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // 8) Retorno (JSON ou CSV)
+    // 9) Retorno (JSON ou CSV)
     if (filtros.formato === 'csv') {
       return new Response(toCsv(rows), {
         status: 200,

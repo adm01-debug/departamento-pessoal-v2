@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, Users, Trash2, Edit2 } from 'lucide-react';
 import type { LooseRow } from '@/types/db';
 export default function TimesPage() {
@@ -52,7 +53,7 @@ export default function TimesPage() {
       setForm({ nome: '', descricao: '' });
       toast.success(editingItem ? 'Time atualizado!' : 'Time criado!'); 
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao salvar equipe.')),
   });
 
   const excluir = useMutation({

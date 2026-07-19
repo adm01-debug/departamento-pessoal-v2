@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, ArrowRightLeft, TrendingUp, MapPin, Trash2 } from 'lucide-react';
 
 export default function MovimentacoesPage() {
@@ -60,7 +61,7 @@ export default function MovimentacoesPage() {
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['transferencias'] }); setOpenTransf(false); toast.success('Transferência registrada!'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar movimentação.')),
   });
 
   const criarPromo = useMutation({
@@ -70,7 +71,7 @@ export default function MovimentacoesPage() {
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['promocoes'] }); setOpenPromo(false); toast.success('Promoção registrada!'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar movimentação.')),
   });
 
   const isLoading = loadTransf || loadPromo;

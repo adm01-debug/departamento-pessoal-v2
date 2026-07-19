@@ -743,7 +743,7 @@ export function AnalyticsSection({ stats, pendencias, isLoadingStats, isLoadingP
                               variant="ghost" 
                               size="icon" 
                               className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all"
-                              onClick={() => window.open(`/detalhes/${item.referencia_id || item.id}`, '_blank')}
+                              onClick={() => window.open(`/detalhes/${item.referencia_id || item.id}`, '_blank', 'noopener')}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>

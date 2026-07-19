@@ -10,12 +10,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-  'Cache-Control': 'no-store',
-};
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
 const TETO_INSS = 8157.41;
@@ -92,7 +87,9 @@ Deno.serve(async (req) => {
     const userId = userData.user.id;
 
     let raw: unknown;
-    try { raw = await req.json(); } catch { return json({ error: 'JSON inválido', code: 'INVALID_JSON' }, 400); }
+    const { body: parsedBody, errorResponse: payloadErr } = await parseJsonBody(req);
+    if (payloadErr) return payloadErr;
+    raw = parsedBody;
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
       return json({ error: 'Payload inválido', code: 'VALIDATION_ERROR', details: parsed.error.flatten() }, 422);
@@ -115,6 +112,10 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `calc-rescisao:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
 
     // Tenant scope opcional (apenas se veio empresa_id/colaborador_id)
     let empresaIdFinal = empresa_id;
@@ -144,16 +145,20 @@ Deno.serve(async (req) => {
 
     const saldoSalario = round2((salario_base / 30) * diasNoMes);
 
-    const podeReceber = tipo_rescisao !== 'com_justa_causa' && tipo_rescisao !== 'pedido_demissao';
-    const d13 = podeReceber ? round2((salario_base / 12) * mesAtual) : 0;
+    // CLT Art. 146/480: pedido_demissao TEM direito a 13o e ferias proporcionais
+    // Apenas com_justa_causa perde esses direitos (CLT Art. 482 + Sumula 171 TST)
+    const perde13eFerias = tipo_rescisao === 'com_justa_causa';
+    const d13 = perde13eFerias ? 0 : round2((salario_base / 12) * mesAtual);
 
     const mfp = totalMeses % 12;
-    const fp = podeReceber ? round2((salario_base / 12) * mfp) : 0;
+    const fp = perde13eFerias ? 0 : round2((salario_base / 12) * mfp);
     const tfp = round2(fp / 3);
 
+    // Ferias vencidas: devidas mesmo em justa causa (Sumula 171 TST)
     const fvv = ferias_vencidas ? salario_base : 0;
     const tfv = round2(fvv / 3);
 
+    // Aviso previo: sem_justa_causa = integral, acordo_mutuo = 50%, pedido_demissao = 0 (empregado cumpre ou desconta)
     const dap = tipo_rescisao === 'sem_justa_causa' ? Math.min(90, 30 + anos * 3) : 0;
     const ap = tipo_rescisao === 'sem_justa_causa'
       ? round2((salario_base / 30) * dap)
@@ -161,6 +166,7 @@ Deno.serve(async (req) => {
         ? round2((salario_base / 30) * Math.min(90, 30 + anos * 3) * 0.5)
         : 0;
 
+    // Multa FGTS: 40% sem_justa_causa, 20% acordo_mutuo, 0% demais
     const mf = tipo_rescisao === 'sem_justa_causa'
       ? round2(saldo_fgts * 0.40)
       : tipo_rescisao === 'acordo_mutuo'

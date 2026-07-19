@@ -1,6 +1,7 @@
 import { BaseService, ListOptions, ListResponse } from './baseService';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateLocalISO } from '@/utils/dateLocal';
+import { validateUploadFile } from '@/utils/uploadValidation';
 
 class AfastamentoService extends BaseService<any> {
   constructor() {
@@ -44,11 +45,13 @@ class AfastamentoService extends BaseService<any> {
 
   // CID-10 search
   async buscarCID(termo: string): Promise<any[]> {
+    const safe = termo.replace(/[%_.,()]/g, '');
+    if (!safe || safe.length < 2) return [];
     const { data, error } = await this.getQuery()
       .select('*')
-      .or(`codigo.ilike.%${termo}%,descricao.ilike.%${termo}%`)
+      .or(`codigo.ilike.%${safe}%,descricao.ilike.%${safe}%`)
       .limit(10);
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -76,15 +79,15 @@ class AfastamentoService extends BaseService<any> {
 
   async uploadDocumento(afastamentoId: string, file: File, tipo: string): Promise<any> {
     try {
+      validateUploadFile(file);
       const fileExt = file.name.split('.').pop();
       const fileName = `${afastamentoId}/${crypto.randomUUID()}.${fileExt}`;
-      
-      if (file.size > 10 * 1024 * 1024) throw new Error('Arquivo excede o limite de 10MB');
 
       const { error: uploadError } = await supabase.storage.from('afastamentos').upload(fileName, file);
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage.from('afastamentos').getPublicUrl(fileName);
+      const { data: signedUrlData } = await supabase.storage.from('afastamentos').createSignedUrl(fileName, 60 * 60 * 24 * 365);
+      const fileUrl = signedUrlData?.signedUrl || fileName;
 
       const { data, error } = await (supabase as any)
         .from('documentos_afastamento')
@@ -92,7 +95,7 @@ class AfastamentoService extends BaseService<any> {
           afastamento_id: afastamentoId,
           tipo,
           nome_arquivo: file.name,
-          url: publicUrl,
+          url: fileUrl,
           metadados: {
             size: file.size,
             type: file.type,

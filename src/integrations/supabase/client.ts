@@ -2,6 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import type { Database } from './types';
+import { secureJsonParse } from '@/utils/secureJson';
+
 
 // Configurações do Lovable Cloud (projeto ciziytrrjjotlsjzshnm).
 // O banco corporativo (hncgwjbzdajfdztqgefe) foi descontinuado por chave API
@@ -18,6 +20,8 @@ const supabaseBase = createClient<Database>(
       storage: localStorage,
       persistSession: true,
       autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
     }
   }
 );
@@ -97,12 +101,13 @@ const callBridge = async <T = any>(
       },
       body: JSON.stringify(body),
     });
+    const rawText = await res.text().catch(() => '{}');
     const json: {
       data?: unknown;
       count?: number;
       error?: string;
       duration_ms?: number;
-    } = await res.json().catch(() => ({}));
+    } = secureJsonParse(rawText);
     if (!res.ok || json.error) {
       const errorMsg = json.error || `Erro HTTP ${res.status}`;
       console.error('🔴 [BRIDGE_SCHEMA_ERROR]', action, target, errorMsg);
@@ -111,7 +116,7 @@ const callBridge = async <T = any>(
       // Apenas propagamos o erro para quem chamou tratar (ou ignorar).
       const isMissingObject = /Could not find the (function|table)|schema cache|does not exist|column .* does not exist/i.test(errorMsg);
       if (!isMissingObject) {
-        toast.error(`Erro de banco: ${errorMsg}`, {
+        toast.error('Erro ao processar operação no banco de dados.', {
           duration: 6000,
         });
       }

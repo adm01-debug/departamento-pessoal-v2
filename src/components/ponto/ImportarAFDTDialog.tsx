@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import { FileUp, Loader2, CheckCircle2, AlertTriangle, GitCompare } from 'lucide-react';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
 
@@ -66,7 +67,7 @@ export function ImportarAFDTDialog() {
         }
       }
     } catch (e: any) {
-      toast.error('Falha na reconciliação: ' + (e?.message ?? 'erro'));
+      toast.error(safeErrorMessage(e, 'Falha na reconciliação.'));
     } finally {
       setReconciliando(false);
     }
@@ -107,7 +108,7 @@ export function ImportarAFDTDialog() {
           : `Importação concluída: ${res.total_registros} registros.`
       );
     } catch (e: any) {
-      toast.error('Falha na importação: ' + (e?.message ?? 'erro'));
+      toast.error(safeErrorMessage(e, 'Falha na importação do arquivo.'));
     } finally {
       setLoading(false);
     }

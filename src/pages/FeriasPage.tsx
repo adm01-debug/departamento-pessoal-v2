@@ -12,6 +12,7 @@ import { useFerias } from '@/hooks/useFerias';
 import { feriasService, auditoriaService } from '@/services';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { useDataAccessLog } from '@/hooks/useDataAccessLog';
 import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -46,12 +47,14 @@ export default function FeriasPage() {
   const [calcResult, setCalcResult] = useState<Record<string, any> | null>(null);
   const queryClient = useQueryClient();
   
-  const { ferias, totalCount, isLoading, refetch } = useFerias({ 
-    page, 
-    limit, 
-    search: search.length >= 3 ? search : undefined, 
-    status: statusFilter 
+  const { ferias, totalCount, isLoading, refetch } = useFerias({
+    page,
+    limit,
+    search: search.length >= 3 ? search : undefined,
+    status: statusFilter
   });
+
+  useDataAccessLog('ferias', empresaAtual?.id, empresaAtual?.id);
 
   // Auto-sync effect
   useEffect(() => {

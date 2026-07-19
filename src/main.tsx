@@ -22,15 +22,45 @@ if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
   });
 }
 
-// PWA Service Worker Registration
+if (import.meta.env.PROD) {
+  const noop = () => {};
+  console.log = noop;
+  console.debug = noop;
+  console.info = noop;
+  console.warn = noop;
+  console.table = noop;
+  console.trace = noop;
+}
+
+// Clickjacking defense-in-depth: break out of foreign frames
 const isInIframe = (() => {
   try { return window.self !== window.top; } catch (e) { return true; }
 })();
 
-const isPreviewHost = 
-  window.location.hostname.includes("id-preview--") || 
+const isPreviewHost =
+  window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
 
+if (isInIframe && !isPreviewHost) {
+  document.body.innerHTML = '';
+  if (window.top) window.top.location = window.self.location;
+}
+
+// CSP violation monitoring — detect and report policy breaches client-side
+if (import.meta.env.PROD) {
+  document.addEventListener('securitypolicyviolation', (e) => {
+    const payload = {
+      directive: e.violatedDirective,
+      blocked: e.blockedURI,
+      source: e.sourceFile ? `${e.sourceFile}:${e.lineNumber}` : undefined,
+    };
+    if (typeof Sentry !== 'undefined' && Sentry.captureMessage) {
+      Sentry.captureMessage(`CSP violation: ${e.violatedDirective}`, { level: 'warning', extra: payload });
+    }
+  });
+}
+
+// PWA Service Worker Registration
 if (!isInIframe && !isPreviewHost && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw-custom.js')

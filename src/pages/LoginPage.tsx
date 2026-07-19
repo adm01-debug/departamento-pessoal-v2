@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageTitle } from '@/components/PageTitle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +14,7 @@ import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeO
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import govbrLogo from '@/assets/govbr-logo.svg';
 
 const features = [
@@ -22,6 +23,11 @@ const features = [
   { icon: BarChart3, label: 'Relatórios Inteligentes', desc: 'Dashboards com KPIs em tempo real' },
   { icon: FileText, label: 'Folha de Pagamento', desc: 'Cálculos trabalhistas atualizados 2026' },
 ];
+
+const SECURITY_REASONS: Record<string, string> = {
+  session_anomaly: 'Sessão encerrada por motivos de segurança. Faça login novamente.',
+  idle_timeout: 'Sessão expirada por inatividade. Faça login novamente.',
+};
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -33,9 +39,18 @@ export default function LoginPage() {
   const [forgotSent, setForgotSent] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [govBrLoading, setGovBrLoading] = useState(false);
+  const [securityNotice, setSecurityNotice] = useState('');
   const { signIn, resetPassword, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { lockState, checkLock, recordFailedAttempt, resetAttempts } = useBruteForceProtection();
+
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason && SECURITY_REASONS[reason]) {
+      setSecurityNotice(SECURITY_REASONS[reason]);
+    }
+  }, [searchParams]);
 
 
   const handleGoogleSignIn = async () => {
@@ -49,7 +64,7 @@ export default function LoginPage() {
         throw result.error;
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login com Google');
+      setError(safeErrorMessage(err, 'Erro ao fazer login com Google.'));
     } finally {
       setGoogleLoading(false);
     }
@@ -66,11 +81,15 @@ export default function LoginPage() {
       });
       if (error) throw error;
       if (data?.url) {
+        const parsed = new URL(data.url);
+        if (parsed.protocol !== 'https:' || !/\.gov\.br$/i.test(parsed.hostname)) {
+          throw new Error('URL de redirecionamento inválida');
+        }
         window.location.href = data.url;
       }
     } catch (err: any) {
       setError('Erro ao iniciar integração Gov.br');
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Erro ao iniciar integração Gov.br.'));
     } finally {
       setGovBrLoading(false);
     }
@@ -92,7 +111,12 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (err: any) {
       await recordFailedAttempt(email);
-      setError(err.message || 'Erro ao fazer login');
+      const msg = err?.message;
+      if (msg && msg.includes('bloqueada')) {
+        setError(msg);
+      } else {
+        setError('Email ou senha inválidos.');
+      }
     } finally {
       setLoading(false);
     }
@@ -104,13 +128,28 @@ export default function LoginPage() {
       setError('Informe seu email');
       return;
     }
+    const lastReset = Number(sessionStorage.getItem('__pwd_reset_ts') || '0');
+    if (Date.now() - lastReset < 60_000) {
+      setError('Aguarde 1 minuto antes de solicitar novamente.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
+      const { data: rl } = await supabase.rpc('check_rate_limit', {
+        check_endpoint: 'password_reset',
+        check_ip: 'client',
+        check_user_id: undefined,
+      });
+      if (rl && typeof rl === 'object' && (rl as any).blocked) {
+        setError('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.');
+        return;
+      }
       await resetPassword(email);
+      sessionStorage.setItem('__pwd_reset_ts', String(Date.now()));
       setForgotSent(true);
     } catch (err: any) {
-      setError(err.message || 'Erro ao enviar email de recuperação');
+      setError(safeErrorMessage(err, 'Erro ao enviar email de recuperação.'));
     } finally {
       setLoading(false);
     }
@@ -232,6 +271,13 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pb-8">
+              {securityNotice && (
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 flex items-center gap-2 rounded-lg bg-warning/10 border border-warning/30 px-3 py-2 text-sm text-warning-foreground">
+                  <Shield className="h-4 w-4 shrink-0 text-warning" />
+                  <span className="font-body">{securityNotice}</span>
+                </motion.div>
+              )}
               {forgotMode ? (
                 forgotSent ? (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center space-y-4 py-4">
@@ -297,6 +343,7 @@ export default function LoginPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="seu@email.com"
                         required
+                        autoComplete="username"
                         className="h-11 pl-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
                       />
                     </div>
@@ -320,6 +367,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        autoComplete="current-password"
                         className="h-11 pl-10 pr-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
                       />
                       <button

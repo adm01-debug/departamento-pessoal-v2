@@ -44,6 +44,10 @@ Deno.serve(async (req: Request) => {
     const allowed = Array.isArray(roles) && roles.some((r: string) => r === 'admin' || r === 'rh');
     if (!allowed) return createErrorResponse('Sem permissão', 403, 'FORBIDDEN');
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `folha-metrics:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     // Métricas de idempotência (últimas 24h)

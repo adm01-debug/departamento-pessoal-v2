@@ -16,6 +16,7 @@ import { medidasDisciplinaresService } from '@/services';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, AlertTriangle, Scale, Users } from 'lucide-react';
 
 const tipoLabels: Record<string, string> = {
@@ -89,7 +90,7 @@ export default function MedidasDisciplinaresPage() {
       setForm(initialForm);
       toast.success('Medida registrada com sucesso!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao registrar medida disciplinar.')),
   });
 
   const marcarCiencia = useMutation({

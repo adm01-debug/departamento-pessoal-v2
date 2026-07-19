@@ -157,11 +157,13 @@ export const premiacoesService = {
     return pagamentos;
   },
 
-  async salvarCenarioROI(cenario: any) {
-    const { data, error } = await supabase
-      .from('premiacoes_roi_cenarios')
+  async salvarCenarioROI(cenario: any, empresaId: string) {
+    if (!empresaId) throw new Error('empresaId é obrigatório');
+    const { data, error } = await (supabase
+      .from('premiacoes_roi_cenarios') as any)
       .insert({
         nome: cenario.name,
+        empresa_id: empresaId,
         configuracoes: {
           employees: cenario.employees,
           avgSalary: cenario.avgSalary,
@@ -186,10 +188,12 @@ export const premiacoesService = {
   },
 
   async listarCenariosROI(empresaId?: string) {
-    const { data, error } = await supabase
-      .from('premiacoes_roi_cenarios')
+    let query = (supabase
+      .from('premiacoes_roi_cenarios') as any)
       .select('*')
       .order('created_at', { ascending: false });
+    if (empresaId) query = query.eq('empresa_id', empresaId);
+    const { data, error } = await query;
     if (error) throw error;
     return data || [];
   },

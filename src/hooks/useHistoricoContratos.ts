@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { historicoContratoService } from '@/services/historicoContratoService';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useHistoricoContratos(colaboradorId: string) {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export function useHistoricoContratos(colaboradorId: string) {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });
       toast.success('Alteração contratual registrada');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação contratual.')),
   });
 
   const excluirMutation = useMutation({
@@ -32,7 +33,7 @@ export function useHistoricoContratos(colaboradorId: string) {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });
       toast.success('Registro excluído');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação contratual.')),
   });
 
   return {

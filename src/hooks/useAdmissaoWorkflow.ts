@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useAdmissaoWorkflow(admissaoId?: string) {
   const queryClient = useQueryClient();
@@ -90,7 +91,7 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
       queryClient.invalidateQueries({ queryKey: ['admissoes'] });
       toast.success('Workflow de admissão iniciado com sucesso');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro no workflow de admissão.')),
   });
 
   const avancarEtapa = useMutation({

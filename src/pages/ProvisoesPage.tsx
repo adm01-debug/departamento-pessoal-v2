@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { AnimatedNumber } from '@/components/dashboard/AnimatedNumber';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { exportPontoCSV, exportPontoPDF } from '@/services/exportService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -73,7 +74,7 @@ export default function ProvisoesPage() {
       queryClient.invalidateQueries({ queryKey: ['provisoes'] });
     },
     onError: (error: any) => {
-      toast.error('Erro ao calcular provisões: ' + error.message);
+      toast.error(safeErrorMessage(error, 'Erro ao calcular provisões.'));
     }
   });
 

@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, Building, Trash2 } from 'lucide-react';
 
 export default function CentrosCustoPage() {
@@ -41,7 +42,7 @@ export default function CentrosCustoPage() {
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['centros-custo'] }); setOpen(false); toast.success('Centro de custo criado!'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao salvar centro de custo.')),
   });
 
   const excluir = useMutation({

@@ -86,6 +86,10 @@ serve(async (req: Request): Promise<Response> => {
       return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `notificacao:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     switch (body.action) {
       case 'enviar': {
         const { empresaId, tipo, destinatarios, assunto, conteudo } = body;

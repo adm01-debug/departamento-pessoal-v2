@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
 import { Database } from '@/integrations/supabase/types';
-import DOMPurify from 'dompurify';
 
 // Escapa HTML para prevenir XSS em dados vindos do usuário/candidato.
 const esc = (v: unknown): string => {
@@ -84,12 +83,16 @@ export const contratacaoService = {
   },
 
   async validarDocumento(admissaoId: string, docType: string, status: 'validado' | 'rejeitado', observacao?: string): Promise<void> {
+    const ALLOWED_DOC_TYPES = ['rg', 'cpf', 'ctps', 'titulo', 'reservista', 'comprovante_residencia', 'foto', 'certidao', 'pis', 'cnh'];
+    if (!ALLOWED_DOC_TYPES.includes(docType)) {
+      throw new Error(`Tipo de documento inválido: ${docType}`);
+    }
     try {
       const { error } = await supabase
         .from('admissoes')
         .update({
           [`checklist_${docType}`]: status === 'validado',
-          metadata: { 
+          metadata: {
             obs: observacao,
             last_validation: new Date().toISOString()
           }
@@ -155,7 +158,7 @@ export const contratacaoService = {
           });
         }
       } catch (e) {
-        window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank');
+        window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank', 'noopener');
       }
       
       await supabase.from('notificacoes_admissao').insert({

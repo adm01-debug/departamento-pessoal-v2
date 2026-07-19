@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarClock, MapPin, Navigation, Plus, Stethoscope, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 type Agend = {
   id: string;
@@ -110,7 +111,7 @@ export default function AdminAgendamentoExamesPage() {
       setClinicasProximas((data ?? []) as ClinicaProxima[]);
       if (!data || data.length === 0) toast.info('Nenhuma clínica encontrada no raio informado');
     } catch (e: any) {
-      toast.error(e?.message ?? 'Falha na busca');
+      toast.error(safeErrorMessage(e, 'Falha na busca de clínicas.'));
     } finally {
       setBuscando(false);
     }
@@ -151,7 +152,7 @@ export default function AdminAgendamentoExamesPage() {
       setColaboradorId(''); setDataAgendada(''); setLat(''); setLng('');
       setClinicaEscolhida(null); setClinicasProximas([]); setObs('');
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Falha ao agendar'),
+    onError: (e: any) => toast.error(safeErrorMessage(e, 'Falha ao agendar exame.')),
   });
 
   const kpis = useMemo(() => {

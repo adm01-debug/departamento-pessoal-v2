@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Plus, Edit2, Trash2, Hash, TrendingUp, TrendingDown, Info, CheckCircle, XCircle } from 'lucide-react';
@@ -84,7 +85,7 @@ export default function RubricasPage() {
       setForm(emptyForm);
       toast.success(editId ? 'Rubrica atualizada!' : 'Rubrica criada!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao salvar rubrica.')),
   });
 
   const toggleAtivo = useMutation({

@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Stethoscope } from 'lucide-react';
 
 const tipoOptions = [
@@ -67,7 +68,7 @@ export default function ExamesPage() {
       qc.invalidateQueries({ queryKey: ['exames'] });
       toast.success('Exame registrado com sucesso!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao salvar exame.')),
   });
 
   const excluir = useMutation({

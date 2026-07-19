@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calculator, Download, Save, Shield, Loader2, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { calcularRescisao, fmt, type RescisaoResult } from '@/utils/rescisaoCalc';
 import { gerarPDFRescisao } from '@/utils/rescisaoPDF';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,11 +19,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useQuery } from '@tanstack/react-query';
+import { useDataAccessLog } from '@/hooks/useDataAccessLog';
 
 export default function CalculadoraRescisaoPage() {
   const { user } = useAuth();
   const { empresaAtual } = useEmpresas();
   const [loadingColab, setLoadingColab] = useState(false);
+  const [selectedColabId, setSelectedColabId] = useState<string | undefined>(undefined);
+
+  useDataAccessLog('colaboradores', selectedColabId, empresaAtual?.id);
+
   const [form, setForm] = useState({
     nomeColaborador: '', cpf: '', cargo: '', salario: '',
     dataAdmissao: '', dataDesligamento: '', tipo: 'sem_justa_causa',
@@ -36,6 +42,7 @@ export default function CalculadoraRescisaoPage() {
   const handleSelectColaborador = async (id: string) => {
     if (!id) return;
     setLoadingColab(true);
+    setSelectedColabId(id);
     try {
       const { data, error } = await supabase.from('colaboradores').select('*').eq('id', id).single();
       if (error) throw error;
@@ -91,7 +98,7 @@ export default function CalculadoraRescisaoPage() {
         toast.success('Rescisão calculada no servidor!');
       }
     } catch (err: any) {
-      toast.error(`Erro: ${err.message}`);
+      toast.error(safeErrorMessage(err, 'Erro ao calcular rescisão.'));
     } finally {
       setCalcServidor(false);
     }
@@ -162,7 +169,7 @@ export default function CalculadoraRescisaoPage() {
 
       toast.success('Cálculo salvo no histórico!');
     } catch (err: any) {
-      toast.error(`Erro ao salvar: ${err.message}`);
+      toast.error(safeErrorMessage(err, 'Erro ao salvar cálculo.'));
     } finally {
       setSaving(false);
     }

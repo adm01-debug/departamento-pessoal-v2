@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts';
 import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
 import { useNotificacoes } from './useNotificacoes';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useFeriasAprovacao() {
   const { user } = useAuth();
@@ -27,7 +28,7 @@ export function useFeriasAprovacao() {
       });
       toast.success('Aprovação do gestor registrada com sucesso');
     },
-    onError: (error: any) => toast.error(`Erro ao aprovar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao aprovar férias.')),
   });
 
   const aprovarRH = useMutation({
@@ -43,7 +44,7 @@ export function useFeriasAprovacao() {
       });
       toast.success('Aprovação do RH registrada. Férias confirmadas!');
     },
-    onError: (error: any) => toast.error(`Erro ao aprovar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao aprovar férias.')),
   });
 
   const enviarContabilidade = useMutation({
@@ -52,7 +53,7 @@ export function useFeriasAprovacao() {
       invalidate();
       toast.success('Solicitação enviada para a contabilidade');
     },
-    onError: (error: any) => toast.error(`Erro ao enviar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao enviar para contabilidade.')),
   });
 
   const rejeitar = useMutation({
@@ -68,7 +69,7 @@ export function useFeriasAprovacao() {
       });
       toast.warning('Solicitação de férias rejeitada');
     },
-    onError: (error: any) => toast.error(`Erro ao rejeitar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao rejeitar férias.')),
   });
 
   const cancelar = useMutation({
@@ -77,7 +78,7 @@ export function useFeriasAprovacao() {
       invalidate();
       toast.info('Solicitação de férias cancelada');
     },
-    onError: (error: any) => toast.error(`Erro ao cancelar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao cancelar férias.')),
   });
 
   return {

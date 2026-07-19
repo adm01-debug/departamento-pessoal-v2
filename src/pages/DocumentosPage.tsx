@@ -17,6 +17,8 @@ import { documentoService, colaboradorService } from '@/services';
 import { FileText, Upload, Download, Eye, Trash2, Loader2, File, Sparkles, Languages, CheckCircle2, Search, Filter, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
+import { validateUploadFile } from '@/utils/uploadValidation';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { DocumentoTimeline } from '@/components/documents/DocumentoTimeline';
 import { DocumentoPreview } from '@/components/documents/DocumentoPreview';
@@ -75,7 +77,7 @@ export default function DocumentosPage() {
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
       toast.success('Documento excluído');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar documento.')),
   });
 
   const handleUpload = async () => {
@@ -83,8 +85,10 @@ export default function DocumentosPage() {
       toast.error('Selecione um arquivo e tipo');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Arquivo deve ter no máximo 10MB');
+    try {
+      validateUploadFile(file, { maxSizeMB: 10 });
+    } catch (e: any) {
+      toast.error(safeErrorMessage(e, 'Arquivo inválido.'));
       return;
     }
 
@@ -115,7 +119,7 @@ export default function DocumentosPage() {
       setFile(null);
       setTipo('');
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao processar documento.'));
     } finally {
       setUploading(false);
     }
@@ -135,7 +139,7 @@ export default function DocumentosPage() {
       setOcrResult(result);
       toast.success('Processamento concluído!');
     } catch (e: any) {
-      toast.error(`Erro no OCR: ${e.message}`);
+      toast.error(safeErrorMessage(e, 'Erro ao processar documento.'));
     } finally {
       setIsProcessingOcr(false);
     }
@@ -156,7 +160,7 @@ export default function DocumentosPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao processar documento.'));
     }
   };
 

@@ -307,10 +307,13 @@ export async function listarTiposEstabilidade() {
 // =============================================
 // Webhooks
 // =============================================
-export async function listarWebhooks(empresaId?: string) {
-  let query = supabase.from('webhooks_config').select('*').order('created_at', { ascending: false });
-  if (empresaId) query = query.eq('empresa_id', empresaId);
-  const { data, error } = await query;
+export async function listarWebhooks(empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório');
+  const { data, error } = await supabase
+    .from('webhooks_config')
+    .select('id, empresa_id, nome, url, eventos, ativo, created_at')
+    .eq('empresa_id', empresaId)
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data || [];
 }
@@ -326,6 +329,7 @@ export async function criarWebhook(webhook: DadosInsert) {
 }
 
 export async function excluirWebhook(id: string) {
+  if (!id) throw new Error('id obrigatório');
   const { error } = await supabase.from('webhooks_config').delete().eq('id', id);
   if (error) throw error;
 }

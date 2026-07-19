@@ -8,7 +8,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
-import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
+import { corsHeaders, createErrorResponse, createValidationErrorResponse, parseJsonBody } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 
@@ -71,8 +71,9 @@ Deno.serve(async (req) => {
     const userId = claims.claims.sub as string;
 
     let raw: unknown;
-    try { raw = await req.json(); }
-    catch { return createErrorResponse('JSON inválido', 400, 'INVALID_JSON'); }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    raw = _pb;
 
     const parsed = bodySchema.safeParse(raw);
     if (!parsed.success) return createValidationErrorResponse(parsed.error);
@@ -85,6 +86,10 @@ Deno.serve(async (req) => {
     if (!pertence && !isAdmin) {
       return createErrorResponse('Acesso negado', 403, 'FORBIDDEN');
     }
+
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(service, { key: `fgts-digital:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
 
     const cc = competenciaValida(p.competencia);
     if (!cc.ok) return createErrorResponse(cc.msg!, 422, 'INVALID_COMPETENCIA');

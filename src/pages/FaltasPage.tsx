@@ -17,6 +17,7 @@ import { faltasService } from '@/services';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, UserX, Trash2, Check, X, FileText, Stethoscope } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -86,7 +87,7 @@ export default function FaltasPage() {
       setForm(initialForm);
       toast.success('Falta registrada!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao registrar falta.')),
   });
 
   const aprovar = useMutation({

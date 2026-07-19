@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ListOptions, ListResponse } from '@/services/baseService';
 import { loggerService } from '@/services/loggerService';
+import { auditLogger } from '@/utils/auditLogger';
+import { safeErrorMessage } from '@/utils/safeError';
 
 interface ServiceInterface<T> {
   listar(options: ListOptions): Promise<ListResponse<T>>;
@@ -65,7 +67,7 @@ export function useGenericCrud<T>({
     },
     onError: (err: Error) => {
       loggerService.error(`Failed to create ${queryKey}`, {}, err);
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Erro ao criar registro.'));
     },
   });
 
@@ -78,7 +80,7 @@ export function useGenericCrud<T>({
     },
     onError: (err: Error) => {
       loggerService.error(`Failed to update ${queryKey}`, {}, err);
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Erro ao atualizar registro.'));
     },
   });
 
@@ -88,10 +90,11 @@ export function useGenericCrud<T>({
       void queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success(successMessages.delete || 'Registro excluído com sucesso');
       loggerService.info(`${queryKey} deleted`, { id });
+      void auditLogger.log({ tabela: queryKey, registro_id: id, acao: 'DELETE' });
     },
     onError: (err: Error) => {
       loggerService.error(`Failed to delete ${queryKey}`, {}, err);
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Erro ao excluir registro.'));
     },
   });
 

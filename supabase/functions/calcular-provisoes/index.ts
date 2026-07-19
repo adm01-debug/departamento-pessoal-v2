@@ -13,13 +13,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Cache-Control': 'no-store',
-};
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const CHUNK = 500;
 const MAX_COLABS = 10_000;
@@ -97,7 +91,9 @@ serve(async (req: Request): Promise<Response> => {
     });
 
     let raw: unknown;
-    try { raw = await req.json(); } catch { return json({ success: false, error: 'JSON inválido', code: 'INVALID_JSON' }, 400); }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    raw = _pb;
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
       return json({ success: false, error: 'Payload inválido', code: 'VALIDATION_ERROR', details: parsed.error.flatten() }, 422);
@@ -111,6 +107,10 @@ serve(async (req: Request): Promise<Response> => {
     if (!belongs && !isAdm) {
       return json({ success: false, error: 'Sem acesso a esta empresa', code: 'FORBIDDEN' }, 403);
     }
+
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `calc-provisoes:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
 
     const dataLimite = ultimoDiaCompetencia(competencia);
     const startTime = Date.now();

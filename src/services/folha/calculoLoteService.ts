@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { folhaCalc } from '@/utils/folhaCalc';
 import { toast } from 'sonner';
 import { pontoIntegracaoUtils } from '@/utils/folha/pontoIntegracaoUtils';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export interface BatchProgress {
   total: number;
@@ -241,7 +242,7 @@ export const calculoLoteService = {
 
       return progress;
     } catch (error: any) {
-      toast.error(`Falha no processamento em lote: ${error.message}`);
+      toast.error(safeErrorMessage(error, 'Falha no processamento em lote.'));
       throw error;
     }
   }
