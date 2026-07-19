@@ -90,11 +90,11 @@ export default function PremiacoesPage() {
   };
 
   const stats = {
-    totalAprovado: pagamentos.reduce((acc, p) => acc + (Number(p.valor_aprovado) || 0), 0),
-    totalRealFolha: pagamentos.reduce((acc, p) => acc + (Number(p.valor_folha_real) || 0), 0),
-    totalPendente: pagamentos.filter(p => p.status === 'calculado').reduce((acc, p) => acc + Number(p.valor_calculado), 0),
+    totalAprovado: pagamentos.reduce((acc: number, p: any) => acc + (Number(p.valor_aprovado) || 0), 0),
+    totalRealFolha: pagamentos.reduce((acc: number, p: any) => acc + (Number(p.valor_folha_real) || 0), 0),
+    totalPendente: pagamentos.filter((p: any) => p.status === 'calculado').reduce((acc: number, p: any) => acc + Number(p.valor_calculado), 0),
     campanhasAtivas: campanhas.filter(c => c.status === 'ativo').length,
-    divergenciaCount: pagamentos.filter(p => p.status_conciliacao === 'divergente').length
+    divergenciaCount: pagamentos.filter((p: any) => p.status_conciliacao === 'divergente').length
   };
 
   if (loadCampanhas) return <div className="p-8"><Skeleton className="h-[400px] w-full" /></div>;
@@ -326,7 +326,7 @@ export default function PremiacoesPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/5">
-                      {pagamentos.map(p => (
+                      {pagamentos.map((p: any) => (
                         <tr key={p.id} className="hover:bg-accent/5 transition-colors group">
                           <td className="p-4">
                             <div className="flex items-center gap-2">
