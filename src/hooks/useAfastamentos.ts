@@ -5,6 +5,7 @@ import { useEmpresas } from './useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
 import { toast } from 'sonner';
 import { useGenericCrud } from './useGenericCrud';
+import { safeErrorMessage } from '@/utils/safeError';
 export function useAfastamentos() {
   const { empresaAtual } = useEmpresas();
   const empresaId = empresaAtual?.id;
@@ -63,7 +64,7 @@ export function useProrrogacoesAfastamento(afastamentoId?: string) {
       });
       toast.success('Prorrogação registrada com sucesso');
     },
-    onError: (err: Error) => toast.error(`Erro ao registrar prorrogação: ${err.message}`),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro ao registrar prorrogação.')),
   });
 
   return {
@@ -91,7 +92,7 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });
       toast.success('Documento enviado com sucesso');
     },
-    onError: (err: Error) => toast.error(`Erro ao enviar documento: ${err.message}`),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro ao enviar documento.')),
   });
 
   const excluirMutation = useMutation({
@@ -100,7 +101,7 @@ export function useDocumentosAfastamento(afastamentoId?: string) {
       queryClient.invalidateQueries({ queryKey: ['documentos-afastamento', afastamentoId] });
       toast.success('Documento excluído com sucesso');
     },
-    onError: (err: Error) => toast.error(`Erro ao excluir documento: ${err.message}`),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro ao excluir documento.')),
   });
 
   return {

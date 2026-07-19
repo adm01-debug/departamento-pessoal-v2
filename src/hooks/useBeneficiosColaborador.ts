@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useBeneficiosColaborador(colaboradorId?: string) {
   const queryClient = useQueryClient();
@@ -38,7 +39,7 @@ export function useBeneficiosColaborador(colaboradorId?: string) {
       toast.success('Benefício vinculado com sucesso!');
     },
     onError: (error: any) => {
-      toast.error('Erro ao vincular benefício: ' + error.message);
+      toast.error(safeErrorMessage(error, 'Erro ao vincular benefício.'));
     },
   });
 
@@ -56,7 +57,7 @@ export function useBeneficiosColaborador(colaboradorId?: string) {
       toast.success('Benefício removido!');
     },
     onError: (error: any) => {
-      toast.error('Erro ao remover benefício: ' + error.message);
+      toast.error(safeErrorMessage(error, 'Erro ao remover benefício.'));
     },
   });
 

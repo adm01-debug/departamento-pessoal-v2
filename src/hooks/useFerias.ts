@@ -3,6 +3,7 @@ import { feriasService } from '@/services';
 import { useEmpresas } from './useEmpresas';
 import { auditLogger } from '@/utils/auditLogger';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useFerias(params?: { page?: number; limit?: number; search?: string; status?: string }) {
   const { empresaAtual } = useEmpresas();
@@ -33,7 +34,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
       });
       toast.success('Solicitação de férias criada com sucesso');
     },
-    onError: (error: any) => toast.error(`Erro ao criar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao criar solicitação de férias.')),
   });
 
   const updateMutation = useMutation({
@@ -51,7 +52,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
       });
       toast.success('Solicitação de férias atualizada');
     },
-    onError: (error: any) => toast.error(`Erro ao atualizar: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao atualizar férias.')),
   });
 
   const deleteMutation = useMutation({
@@ -68,7 +69,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
       });
       toast.success('Solicitação de férias excluída');
     },
-    onError: (error: any) => toast.error(`Erro ao excluir: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao excluir férias.')),
   });
 
   const aprovarGestorMutation = useMutation({
@@ -79,7 +80,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
       toast.success('Férias aprovadas pelo gestor');
     },
-    onError: (error: any) => toast.error(`Erro ao aprovar gestor: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao aprovar férias.')),
   });
 
   const aprovarRHMutation = useMutation({
@@ -90,7 +91,7 @@ export function useFerias(params?: { page?: number; limit?: number; search?: str
       qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
       toast.success('Férias aprovadas pelo RH e finalizadas');
     },
-    onError: (error: any) => toast.error(`Erro ao aprovar RH: ${error.message}`),
+    onError: (error: any) => toast.error(safeErrorMessage(error, 'Erro ao aprovar férias.')),
   });
 
   return {

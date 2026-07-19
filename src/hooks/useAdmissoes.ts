@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { admissaoService } from '@/services';
 import { useEmpresas } from './useEmpresas';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useAdmissoes() {
   const { empresaAtual } = useEmpresas();
@@ -24,7 +25,7 @@ export function useAdmissoes() {
       void invalidate();
       toast.success('Admissão criada com sucesso');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação de admissão.')),
   });
 
   const atualizarMutation = useMutation({
@@ -33,7 +34,7 @@ export function useAdmissoes() {
       void invalidate();
       toast.success('Admissão atualizada');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação de admissão.')),
   });
 
   return {

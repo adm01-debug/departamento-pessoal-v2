@@ -3,6 +3,7 @@ import { horaExtraService } from '@/services/horaExtraService';
 import { useEmpresas } from './useEmpresas';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useHorasExtras() {
   const { empresaAtual } = useEmpresas();
@@ -22,7 +23,7 @@ export function useHorasExtras() {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Solicitação de hora extra criada');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação de hora extra.')),
   });
 
   const aprovarMutation = useMutation({
@@ -31,7 +32,7 @@ export function useHorasExtras() {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Hora extra aprovada');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação de hora extra.')),
   });
 
   const rejeitarMutation = useMutation({
@@ -40,7 +41,7 @@ export function useHorasExtras() {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Hora extra rejeitada');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação de hora extra.')),
   });
 
   const excluirMutation = useMutation({
@@ -49,7 +50,7 @@ export function useHorasExtras() {
       queryClient.invalidateQueries({ queryKey: ['solicitacoes_hora_extra'] });
       toast.success('Solicitação excluída');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na operação de hora extra.')),
   });
 
   return {

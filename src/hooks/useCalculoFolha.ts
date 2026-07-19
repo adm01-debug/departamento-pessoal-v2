@@ -4,6 +4,7 @@ import { folhaCalc, CalculoResultado } from '@/utils/folhaCalc';
 import { calculoLoteService, BatchProgress } from '@/services/folha/calculoLoteService';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useCalculoFolha() {
   const [resultado, setResultado] = useState<CalculoResultado | null>(null);
@@ -105,7 +106,7 @@ export function useCalculoFolha() {
       toast.success('Folha calculada e salva com sucesso.');
     },
     onError: (error: any) => {
-      toast.error(`Falha no processamento: ${error.message}`);
+      toast.error(safeErrorMessage(error, 'Falha no processamento da folha.'));
     },
     onSettled: () => setIsCalculando(false)
   });

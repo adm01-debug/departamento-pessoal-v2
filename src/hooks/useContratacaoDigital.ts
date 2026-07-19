@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { contratacaoService } from '@/services/contratacaoService';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function useContratacaoDigital() {
   const queryClient = useQueryClient();
@@ -24,7 +25,7 @@ export function useContratacaoDigital() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contratacao-token'] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na contratação digital.')),
   });
 
   const validarDocumento = useMutation({
@@ -41,7 +42,7 @@ export function useContratacaoDigital() {
       queryClient.invalidateQueries({ queryKey: ['contratacao-token'] });
       toast.success('Validação do documento atualizada');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(safeErrorMessage(err, 'Erro na contratação digital.')),
   });
 
   return { atualizarEtapa, validarDocumento };
