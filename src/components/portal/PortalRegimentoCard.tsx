@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeContractHtml } from '@/utils/sanitizeHtml';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmpresas } from '@/hooks/useEmpresas';
@@ -96,7 +96,7 @@ export function PortalRegimentoCard() {
   }, [empresaId, user?.id]);
 
   const conteudoSeguro = useMemo(
-    () => (documento ? DOMPurify.sanitize(documento.conteudo_html || '') : ''),
+    () => (documento ? sanitizeContractHtml(documento.conteudo_html || '') : ''),
     [documento],
   );
 

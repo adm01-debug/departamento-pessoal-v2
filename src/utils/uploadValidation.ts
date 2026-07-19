@@ -32,13 +32,22 @@ export function validateUploadFile(file: File, options?: { maxSizeMB?: number })
     throw new Error('Arquivo está vazio');
   }
 
-  const ext = (file.name.split('.').pop() || '').toLowerCase();
-  if (DANGEROUS_EXTENSIONS.has(ext)) {
-    throw new Error(`Tipo de arquivo não permitido: .${ext}`);
+  // Check ALL extensions in the filename (double-extension attack: file.pdf.exe)
+  const parts = file.name.split('.');
+  for (let i = 1; i < parts.length; i++) {
+    const ext = parts[i].toLowerCase();
+    if (DANGEROUS_EXTENSIONS.has(ext)) {
+      throw new Error(`Tipo de arquivo não permitido: .${ext}`);
+    }
   }
 
   if (file.type && !ALLOWED_DOCUMENT_TYPES.has(file.type)) {
     throw new Error(`Tipo MIME não permitido: ${file.type}`);
+  }
+
+  // Null byte injection in filename
+  if (file.name.includes('\x00')) {
+    throw new Error('Nome de arquivo inválido');
   }
 }
 
