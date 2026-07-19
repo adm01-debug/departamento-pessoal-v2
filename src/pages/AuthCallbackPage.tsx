@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function AuthCallbackPage() {
             navigate('/dashboard', { replace: true });
           }
         } catch (err: any) {
-          toast.error('Erro na autenticação Gov.br: ' + err.message);
+          toast.error(safeErrorMessage(err, 'Erro na autenticação Gov.br.'));
           navigate('/login', { replace: true });
         }
       } else {
