@@ -9,6 +9,7 @@ const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll'] as cons
 export function useSessionTimeout() {
   const lastActivityRef = useRef(Date.now());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const logoutInProgressRef = useRef(false);
 
   const resetActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
@@ -20,12 +21,17 @@ export function useSessionTimeout() {
     }
 
     intervalRef.current = setInterval(async () => {
+      if (logoutInProgressRef.current) return;
       const elapsed = Date.now() - lastActivityRef.current;
       if (elapsed >= INACTIVITY_LIMIT_MS) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          logoutInProgressRef.current = true;
           queryClient.clear();
-          await supabase.auth.signOut();
+          try { localStorage.clear(); } catch { /* private browsing */ }
+          try { sessionStorage.clear(); } catch { /* private browsing */ }
+          await supabase.auth.signOut().catch(() => {});
+          window.location.href = '/login?reason=idle_timeout';
         }
       }
     }, CHECK_INTERVAL_MS);

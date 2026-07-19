@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageTitle } from '@/components/PageTitle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,11 @@ const features = [
   { icon: FileText, label: 'Folha de Pagamento', desc: 'Cálculos trabalhistas atualizados 2026' },
 ];
 
+const SECURITY_REASONS: Record<string, string> = {
+  session_anomaly: 'Sessão encerrada por motivos de segurança. Faça login novamente.',
+  idle_timeout: 'Sessão expirada por inatividade. Faça login novamente.',
+};
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,9 +38,18 @@ export default function LoginPage() {
   const [forgotSent, setForgotSent] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [govBrLoading, setGovBrLoading] = useState(false);
+  const [securityNotice, setSecurityNotice] = useState('');
   const { signIn, resetPassword, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { lockState, checkLock, recordFailedAttempt, resetAttempts } = useBruteForceProtection();
+
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason && SECURITY_REASONS[reason]) {
+      setSecurityNotice(SECURITY_REASONS[reason]);
+    }
+  }, [searchParams]);
 
 
   const handleGoogleSignIn = async () => {
@@ -247,6 +261,13 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pb-8">
+              {securityNotice && (
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 flex items-center gap-2 rounded-lg bg-warning/10 border border-warning/30 px-3 py-2 text-sm text-warning-foreground">
+                  <Shield className="h-4 w-4 shrink-0 text-warning" />
+                  <span className="font-body">{securityNotice}</span>
+                </motion.div>
+              )}
               {forgotMode ? (
                 forgotSent ? (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center space-y-4 py-4">

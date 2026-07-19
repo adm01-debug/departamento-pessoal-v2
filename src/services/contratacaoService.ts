@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { auditLogger } from '@/utils/auditLogger';
 import { Database } from '@/integrations/supabase/types';
-import DOMPurify from 'dompurify';
 
 // Escapa HTML para prevenir XSS em dados vindos do usuário/candidato.
 const esc = (v: unknown): string => {
