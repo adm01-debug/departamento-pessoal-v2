@@ -91,6 +91,7 @@ ALTER TABLE public.ferias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pontos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.folhas ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Allow all" ON public.colaboradores;
 CREATE POLICY "Allow all" ON public.colaboradores FOR ALL USING (true);
 CREATE POLICY "Allow all" ON public.ferias FOR ALL USING (true);
 CREATE POLICY "Allow all" ON public.pontos FOR ALL USING (true);
@@ -105,6 +106,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS colaboradores_updated_at ON public.colaboradores;
 CREATE TRIGGER colaboradores_updated_at
   BEFORE UPDATE ON public.colaboradores
   FOR EACH ROW EXECUTE FUNCTION update_colaborador_updated_at();

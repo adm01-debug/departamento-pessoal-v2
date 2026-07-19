@@ -11,18 +11,22 @@ UPDATE storage.buckets SET public = false WHERE id = 'afastamentos';
 DROP POLICY IF EXISTS "Acesso publico aos arquivos de afastamento" ON storage.objects;
 DROP POLICY IF EXISTS "Upload de arquivos de afastamento" ON storage.objects;
 
+DROP POLICY IF EXISTS "afastamentos_select_authenticated" ON public.storage;
 CREATE POLICY "afastamentos_select_authenticated"
   ON storage.objects FOR SELECT TO authenticated
   USING (bucket_id = 'afastamentos');
 
+DROP POLICY IF EXISTS "afastamentos_insert_authenticated" ON public.storage;
 CREATE POLICY "afastamentos_insert_authenticated"
   ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'afastamentos');
 
+DROP POLICY IF EXISTS "afastamentos_update_authenticated" ON public.storage;
 CREATE POLICY "afastamentos_update_authenticated"
   ON storage.objects FOR UPDATE TO authenticated
   USING (bucket_id = 'afastamentos');
 
+DROP POLICY IF EXISTS "afastamentos_delete_rh_admin" ON public.storage;
 CREATE POLICY "afastamentos_delete_rh_admin"
   ON storage.objects FOR DELETE TO authenticated
   USING (
@@ -43,16 +47,19 @@ DROP POLICY IF EXISTS "Anyone can view admissao documents" ON storage.objects;
 DROP POLICY IF EXISTS "Authenticated users can delete admissao documents" ON storage.objects;
 
 -- Allow public INSERT (needed for token-based onboarding portal)
+DROP POLICY IF EXISTS "admissao_docs_insert_public" ON public.storage;
 CREATE POLICY "admissao_docs_insert_public"
   ON storage.objects FOR INSERT TO public
   WITH CHECK (bucket_id = 'documentos-admissao');
 
 -- Viewing requires authentication (HR team reviewing submitted docs)
+DROP POLICY IF EXISTS "admissao_docs_select_authenticated" ON public.storage;
 CREATE POLICY "admissao_docs_select_authenticated"
   ON storage.objects FOR SELECT TO authenticated
   USING (bucket_id = 'documentos-admissao');
 
 -- Delete restricted to admin/RH
+DROP POLICY IF EXISTS "admissao_docs_delete_rh_admin" ON public.storage;
 CREATE POLICY "admissao_docs_delete_rh_admin"
   ON storage.objects FOR DELETE TO authenticated
   USING (
@@ -69,18 +76,22 @@ CREATE POLICY "admissao_docs_delete_rh_admin"
 -- =============================================================================
 DROP POLICY IF EXISTS "Auth users upload documentos" ON storage.objects;
 
+DROP POLICY IF EXISTS "documentos_select_authenticated" ON public.storage;
 CREATE POLICY "documentos_select_authenticated"
   ON storage.objects FOR SELECT TO authenticated
   USING (bucket_id = 'documentos');
 
+DROP POLICY IF EXISTS "documentos_insert_authenticated" ON public.storage;
 CREATE POLICY "documentos_insert_authenticated"
   ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'documentos');
 
+DROP POLICY IF EXISTS "documentos_update_authenticated" ON public.storage;
 CREATE POLICY "documentos_update_authenticated"
   ON storage.objects FOR UPDATE TO authenticated
   USING (bucket_id = 'documentos');
 
+DROP POLICY IF EXISTS "documentos_delete_rh_admin" ON public.storage;
 CREATE POLICY "documentos_delete_rh_admin"
   ON storage.objects FOR DELETE TO authenticated
   USING (
@@ -98,14 +109,17 @@ DROP POLICY IF EXISTS "Users can view documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can upload documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete documents" ON storage.objects;
 
+DROP POLICY IF EXISTS "docs_colab_select_authenticated" ON public.storage;
 CREATE POLICY "docs_colab_select_authenticated"
   ON storage.objects FOR SELECT TO authenticated
   USING (bucket_id = 'documentos-colaboradores');
 
+DROP POLICY IF EXISTS "docs_colab_insert_authenticated" ON public.storage;
 CREATE POLICY "docs_colab_insert_authenticated"
   ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'documentos-colaboradores');
 
+DROP POLICY IF EXISTS "docs_colab_delete_rh_admin" ON public.storage;
 CREATE POLICY "docs_colab_delete_rh_admin"
   ON storage.objects FOR DELETE TO authenticated
   USING (
@@ -130,10 +144,12 @@ CREATE POLICY "comprovantes_despesas_select"
   ON storage.objects FOR SELECT TO authenticated
   USING (bucket_id = 'comprovantes-despesas');
 
+DROP POLICY IF EXISTS "comprovantes_despesas_insert" ON public.storage;
 CREATE POLICY "comprovantes_despesas_insert"
   ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'comprovantes-despesas');
 
+DROP POLICY IF EXISTS "comprovantes_despesas_delete" ON public.storage;
 CREATE POLICY "comprovantes_despesas_delete"
   ON storage.objects FOR DELETE TO authenticated
   USING (
