@@ -1,9 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const premiacoesService = {
-  async listarCampanhas(empresaId?: string) {
+  async listarCampanhas(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('premiacoes_campanhas').select('*').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
@@ -18,16 +19,17 @@ export const premiacoesService = {
     return data || [];
   },
 
-  async listarPagamentos(campanhaId?: string, empresaId?: string) {
+  async listarPagamentos(campanhaId: string | undefined, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('premiacoes_pagamentos').select(`
       *,
       colaborador:colaboradores(nome_completo, salario_base),
       campanha:premiacoes_campanhas(nome)
     `);
-    
+
     if (campanhaId) q = q.eq('campanha_id', campanhaId);
-    if (empresaId) q = q.filter('campanha.empresa_id', 'eq', empresaId);
-    
+    q = q.filter('campanha.empresa_id', 'eq', empresaId);
+
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
@@ -187,12 +189,13 @@ export const premiacoesService = {
     return data;
   },
 
-  async listarCenariosROI(empresaId?: string) {
+  async listarCenariosROI(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let query = (supabase
       .from('premiacoes_roi_cenarios') as any)
       .select('*')
       .order('created_at', { ascending: false });
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    query = query.eq('empresa_id', empresaId);
     const { data, error } = await query;
     if (error) throw error;
     return data || [];

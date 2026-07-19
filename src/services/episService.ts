@@ -1,13 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 export const episService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
+  async listar(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = (supabase as any).from('epis').select('*').order('nome');
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criar(d: any): Promise<any> {
@@ -37,14 +37,14 @@ export const episService = {
 };
 
 export const episEntregasService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
+  async listar(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = (supabase as any).from('epis_entregas').select('*, epi:epis(nome, ca), colaborador:colaboradores(nome_completo)').order('data_entrega', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async buscarPorColaborador(colaboradorId: string): Promise<any[]> {

@@ -13,17 +13,18 @@ class AfastamentoService extends BaseService<any> {
   async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
     const { filters, empresaId } = options as any;
     const empId = empresaId || (filters as any)?.empresa_id;
+    if (!empId) throw new Error('empresa_id obrigatório para isolamento de tenant');
 
     const selectStr = `
       *,
       colaborador:colaboradores!fk_afastamentos_colaborador(nome_completo, departamento)
     `;
-    
+
     let query = this.getQuery().select(selectStr, { count: 'exact' });
-    
-    if (empId) query = query.eq('empresa_id', empId);
+
+    query = query.eq('empresa_id', empId);
     if (filters?.status) query = query.eq('status', filters.status);
-    
+
     const { data, count, error } = await query.order('data_inicio', { ascending: false });
     if (error) throw error;
     return { data: data || [], total: count || 0 };

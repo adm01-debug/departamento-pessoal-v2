@@ -1,13 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 export const lgpdService = {
-  async listarConsentimentos(empresaId?: string): Promise<any[]> {
-    
+  async listarConsentimentos(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = supabase.from('lgpd_consentimentos').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criarConsentimento(d: any): Promise<any> {
@@ -28,14 +29,15 @@ export const lgpdService = {
   
   },
   
-  async listarSolicitacoes(empresaId?: string): Promise<any[]> {
-    
+  async listarSolicitacoes(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = supabase.from('lgpd_solicitacoes').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criarSolicitacao(d: any): Promise<any> {

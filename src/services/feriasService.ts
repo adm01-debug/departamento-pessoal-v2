@@ -18,7 +18,8 @@ class FeriasService extends BaseService<Ferias> {
     return { data: res.data, total: res.count };
   }
 
-  async listSolicitacoes(empresaId?: string, params?: { page?: number; limit?: number; search?: string; status?: string }): Promise<{ data: Ferias[]; count: number }> {
+  async listSolicitacoes(empresaId: string, params?: { page?: number; limit?: number; search?: string; status?: string }): Promise<{ data: Ferias[]; count: number }> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
 
     const { page = 1, limit = 10, search, status } = params || {};
     const from = (page - 1) * limit;
@@ -27,7 +28,7 @@ class FeriasService extends BaseService<Ferias> {
     let query = this.getQuery()
       .select('*, colaborador:colaboradores!fk_ferias_colaborador(nome_completo, foto_url)', { count: 'exact' });
 
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    query = query.eq('empresa_id', empresaId);
     if (status && status !== 'all') query = query.eq('status', status);
     
     if (search && search.length >= 3) {

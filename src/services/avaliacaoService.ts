@@ -2,9 +2,10 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const avaliacaoService = {
   // === Ciclos ===
-  async listarCiclos(empresaId?: string) {
+  async listarCiclos(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('ciclos_avaliacao').select('*').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
@@ -20,9 +21,10 @@ export const avaliacaoService = {
   },
 
   // === Metas ===
-  async listarMetas(empresaId?: string) {
+  async listarMetas(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('metas_okrs').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
@@ -38,9 +40,10 @@ export const avaliacaoService = {
   },
 
   // === PDIs ===
-  async listarPDIs(empresaId?: string) {
+  async listarPDIs(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('pdi_plano_desenvolvimento').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
@@ -56,13 +59,14 @@ export const avaliacaoService = {
   },
 
   // === Feedbacks ===
-  async listarFeedbacks(empresaId?: string) {
+  async listarFeedbacks(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('feedbacks_360').select(`
       *,
       avaliado:colaboradores!feedbacks_360_avaliado_id_fkey(nome_completo),
       avaliador:colaboradores!feedbacks_360_avaliador_id_fkey(nome_completo)
     `).order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
@@ -78,9 +82,10 @@ export const avaliacaoService = {
   },
 
   // === Competências ===
-  async listarCompetencias(empresaId?: string) {
+  async listarCompetencias(empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     let q = supabase.from('competencias_config').select('*').order('nome');
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
