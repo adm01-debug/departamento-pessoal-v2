@@ -39,13 +39,18 @@ export function calcularRescisao(params: {
   const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * meses13 * 100) / 100 : 0;
 
   // Férias proporcionais: avos do período aquisitivo corrente (com regra dos 15 dias).
-  const mesesFeriasProp = avosTotal % 12 || (avosTotal > 0 ? 12 : 0);
+  // C34: avosTotal múltiplo de 12 → período aquisitivo completo, proporcional = 0 (não 12).
+  const mesesFeriasProp = avosTotal % 12;
   const feriasProp = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * mesesFeriasProp * 100) / 100 : 0;
   const tercoFeriasProp = Math.round(feriasProp / 3 * 100) / 100;
   const feriasVencidasValor = feriasVencidas ? salarioBase : 0;
   const tercoFeriasVencidas = Math.round(feriasVencidasValor / 3 * 100) / 100;
 
-  const anosServico = Math.floor(avosTotal / 12);
+  // C35: aviso prévio proporcional usa anos completos de serviço calculados sem a regra de
+  // arredondamento dos 15 dias (que inflacionaria avosTotal e, por consequência, os dias extras).
+  const rawMeses = (desligamento.getFullYear() - admissao.getFullYear()) * 12
+    + (desligamento.getMonth() - admissao.getMonth());
+  const anosServico = Math.floor(rawMeses / 12);
   const diasAvisoPrevio = tipoRescisao === 'sem_justa_causa' ? Math.min(90, 30 + anosServico * 3) : 0;
   const avisoPrevio = tipoRescisao === 'sem_justa_causa'
     ? Math.round((salarioBase / 30) * diasAvisoPrevio * 100) / 100
