@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Shield, ShieldAlert, ShieldCheck, Users, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { auditLogger } from '@/utils/auditLogger';
 
 export function UserRolesTab() {
   const qc = useQueryClient();
@@ -26,15 +27,21 @@ export function UserRolesTab() {
 
   const upgradeToAdmin = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase.from('user_roles').upsert({ 
-        user_id: userId, 
-        role: 'admin' 
+      const { error } = await supabase.from('user_roles').upsert({
+        user_id: userId,
+        role: 'admin'
       }, { onConflict: 'user_id, role' });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, userId) => {
       qc.invalidateQueries({ queryKey: ['user-roles-list'] });
       toast.success('Perfil atualizado para Administrador');
+      void auditLogger.log({
+        tabela: 'user_roles',
+        registro_id: userId,
+        acao: 'UPDATE',
+        dados_novos: { role: 'admin', user_id: userId },
+      });
     },
   });
 
