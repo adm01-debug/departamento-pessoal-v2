@@ -25,8 +25,11 @@ function forceLogout(reason: string) {
   try { localStorage.clear(); } catch { /* private browsing */ }
   try { sessionStorage.clear(); } catch { /* private browsing */ }
   try { indexedDB.deleteDatabase('ponto-offline-db'); } catch { /* ignore */ }
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+  }
   (supabase as any).auth.signOut().catch(() => {});
-  window.location.href = `/login?reason=${reason}`;
+  window.location.href = `/login?reason=${encodeURIComponent(reason)}`;
 }
 
 export function useSecurityMonitor() {

@@ -31,6 +31,12 @@ export function useSessionTimeout() {
           try { localStorage.clear(); } catch { /* private browsing */ }
           try { sessionStorage.clear(); } catch { /* private browsing */ }
           try { indexedDB.deleteDatabase('ponto-offline-db'); } catch { /* ignore */ }
+          try {
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.map(k => caches.delete(k)));
+            }
+          } catch { /* caches API unavailable */ }
           await supabase.auth.signOut().catch(() => {});
           window.location.href = '/login?reason=idle_timeout';
         }
