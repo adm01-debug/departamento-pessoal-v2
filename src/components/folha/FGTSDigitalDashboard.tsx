@@ -45,7 +45,7 @@ export function FGTSDigitalDashboard() {
             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <CloudSync className="h-3.5 w-3.5" />}
             Sincronizar API
           </Button>
-          <Button size="sm" variant="ghost" className="text-xs gap-1.5 h-8 rounded-xl" onClick={() => window.open('https://fgtsdigital.sistema.gov.br/', '_blank')}>
+          <Button size="sm" variant="ghost" className="text-xs gap-1.5 h-8 rounded-xl" onClick={() => window.open('https://fgtsdigital.sistema.gov.br/', '_blank', 'noopener')}>
             <ExternalLink className="h-3.5 w-3.5" />
             Portal
           </Button>

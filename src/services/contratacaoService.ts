@@ -158,7 +158,7 @@ export const contratacaoService = {
           });
         }
       } catch (e) {
-        window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank');
+        window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank', 'noopener');
       }
       
       await supabase.from('notificacoes_admissao').insert({

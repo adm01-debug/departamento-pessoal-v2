@@ -29,7 +29,7 @@ export function DocumentoPreview({ documento, isOpen, onClose }: DocumentoPrevie
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="rounded-xl h-8 text-xs" onClick={() => window.open(documento.url, '_blank')}>
+            <Button variant="ghost" size="sm" className="rounded-xl h-8 text-xs" onClick={() => window.open(documento.url, '_blank', 'noopener')}>
               <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Abrir Original
             </Button>
             <Button variant="outline" size="icon" className="rounded-xl h-8 w-8" onClick={onClose}>
@@ -58,7 +58,7 @@ export function DocumentoPreview({ documento, isOpen, onClose }: DocumentoPrevie
                 <h3 className="font-display font-semibold">Visualização não disponível</h3>
                 <p className="text-sm text-muted-foreground mt-1">Este tipo de arquivo não pode ser visualizado diretamente no navegador.</p>
               </div>
-              <Button className="rounded-xl" onClick={() => window.open(documento.url, '_blank')}>
+              <Button className="rounded-xl" onClick={() => window.open(documento.url, '_blank', 'noopener')}>
                 <Download className="h-4 w-4 mr-2" /> Baixar para Ver
               </Button>
             </div>

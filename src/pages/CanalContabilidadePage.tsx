@@ -110,7 +110,7 @@ export default function CanalContabilidadePage() {
 
   const abrirAnexo = async (path: string) => {
     const url = await canalContabilidadeService.getAnexoUrl(path);
-    if (url) window.open(url, '_blank');
+    if (url) window.open(url, '_blank', 'noopener');
     else toast.error('Não foi possível abrir anexo');
   };
 

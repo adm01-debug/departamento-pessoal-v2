@@ -357,7 +357,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                       if (currentFolhaId) {
                         try {
                           const result = await folhaPagamentoService.emitirPDF(currentFolhaId);
-                          window.open(result, '_blank');
+                          window.open(result, '_blank', 'noopener');
                         } catch (e: any) {
                           toast.error(e?.message || 'Erro ao gerar PDF do holerite.');
                         }

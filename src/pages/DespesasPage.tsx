@@ -117,7 +117,7 @@ export default function DespesasPage() {
 
   const abrirComprovante = async (path: string) => {
     const url = await despesaService.getComprovanteUrl(path);
-    if (url) window.open(url, '_blank');
+    if (url) window.open(url, '_blank', 'noopener');
     else toast.error('Não foi possível gerar link do comprovante');
   };
 

@@ -179,7 +179,7 @@ export function ColaboradorDocuments({ colaboradorId }: { colaboradorId: string 
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 rounded-lg hover:bg-info/10 text-info"
-                          onClick={() => window.open(doc.url, '_blank')}
+                          onClick={() => window.open(doc.url, '_blank', 'noopener')}
                         >
                           <ExternalLink className="h-4 w-4" />
                         </Button>

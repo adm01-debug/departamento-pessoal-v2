@@ -64,7 +64,7 @@ export function GerarLtcatOsButton() {
       const { data, error } = await supabase.functions.invoke('gerar-ltcat-os', { body: payload });
       if (error) throw error;
       if (data?.signed_url) {
-        window.open(data.signed_url, '_blank');
+        window.open(data.signed_url, '_blank', 'noopener');
       }
       toast.success(`${tipo === 'os' ? 'Ordem de Serviço' : 'LTCAT'} gerado — v${data?.versao}`);
       setOpen(false);

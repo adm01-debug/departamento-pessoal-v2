@@ -198,7 +198,7 @@ export default function GeradorDocumentosPage() {
       } else {
         const blob = pdf.output('blob');
         const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        window.open(url, '_blank', 'noopener');
       }
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
