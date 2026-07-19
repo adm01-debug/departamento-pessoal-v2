@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import {
   FileText, Upload, CheckCircle2, User, PenTool,
   ArrowRight, ArrowLeft, Loader2, ShieldCheck,
@@ -137,7 +138,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       setStep(2);
       window.scrollTo(0, 0);
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(safeErrorMessage(err, 'Erro ao processar contratação.')),
   });
 
   const signContract = useMutation({
@@ -158,7 +159,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       setStep(3);
       window.scrollTo(0, 0);
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(safeErrorMessage(err, 'Erro ao processar contratação.')),
   });
 
   const handleAddressFound = (addr: Address) => {

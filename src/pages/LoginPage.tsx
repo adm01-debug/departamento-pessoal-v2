@@ -14,6 +14,7 @@ import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeO
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import govbrLogo from '@/assets/govbr-logo.svg';
 
 const features = [
@@ -63,7 +64,7 @@ export default function LoginPage() {
         throw result.error;
       }
     } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login com Google');
+      setError(safeErrorMessage(err, 'Erro ao fazer login com Google.'));
     } finally {
       setGoogleLoading(false);
     }
@@ -88,7 +89,7 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       setError('Erro ao iniciar integração Gov.br');
-      toast.error(err.message);
+      toast.error(safeErrorMessage(err, 'Erro ao iniciar integração Gov.br.'));
     } finally {
       setGovBrLoading(false);
     }
@@ -139,7 +140,7 @@ export default function LoginPage() {
       sessionStorage.setItem('__pwd_reset_ts', String(Date.now()));
       setForgotSent(true);
     } catch (err: any) {
-      setError(err.message || 'Erro ao enviar email de recuperação');
+      setError(safeErrorMessage(err, 'Erro ao enviar email de recuperação.'));
     } finally {
       setLoading(false);
     }

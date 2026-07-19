@@ -6,6 +6,7 @@ import { documentoService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -72,7 +73,7 @@ export function PortalDocumentosTab({ navigate, colaboradorId }: PortalDocumento
       setFile(null);
       setTipo('');
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao enviar documento.'));
     } finally {
       setUploading(false);
     }

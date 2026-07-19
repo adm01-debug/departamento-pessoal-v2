@@ -12,6 +12,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, ShieldCheck, History, Bell, Smartphone, Monitor } from 'lucide-react';
 import { pushNotificationService } from '@/services/pushNotificationService';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -67,7 +68,7 @@ export default function PerfilPage() {
         toast.success('Notificações push ativadas com sucesso!');
       }
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao atualizar perfil.'));
     }
   };
 
@@ -95,7 +96,7 @@ export default function PerfilPage() {
       queryClient.invalidateQueries({ queryKey: ['meu-perfil'] });
       toast.success('Perfil atualizado!');
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao atualizar perfil.'));
     } finally {
       setSaving(false);
     }
@@ -124,7 +125,7 @@ export default function PerfilPage() {
       queryClient.invalidateQueries({ queryKey: ['meu-perfil'] });
       toast.success('Avatar atualizado!');
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao atualizar perfil.'));
     } finally {
       setUploadingAvatar(false);
     }

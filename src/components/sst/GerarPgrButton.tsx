@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -63,7 +64,7 @@ export function GerarPgrButton() {
       qc.invalidateQueries({ queryKey: ['sst-programas-pgr'] });
       if (data.signed_url) window.open(data.signed_url, '_blank', 'noopener');
     },
-    onError: (e: Error) => toast.error(e.message || 'Falha ao gerar PGR'),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Falha ao gerar PGR.')),
   });
 
   const baixar = async (path: string) => {

@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Shield, ShieldCheck, ShieldAlert, Copy, Key, Smartphone, Loader2, Trash2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function MFASetup() {
   const { user } = useAuth();
@@ -63,7 +64,7 @@ export function MFASetup() {
       });
       setShowEnrollDialog(true);
     } catch (e: any) {
-      toast.error(e.message || 'Erro ao iniciar configuração MFA');
+      toast.error(safeErrorMessage(e, 'Erro ao iniciar configuração MFA.'));
     } finally {
       setEnrolling(false);
     }
@@ -98,7 +99,7 @@ export function MFASetup() {
       refetch();
       qc.invalidateQueries({ queryKey: ['user-mfa-record'] });
     } catch (e: any) {
-      toast.error(e.message || 'Código inválido');
+      toast.error(safeErrorMessage(e, 'Código inválido ou expirado.'));
     } finally {
       setEnrolling(false);
     }
@@ -123,7 +124,7 @@ export function MFASetup() {
       refetch();
       qc.invalidateQueries({ queryKey: ['user-mfa-record'] });
     } catch (e: any) {
-      toast.error(e.message || 'Erro ao desativar MFA');
+      toast.error(safeErrorMessage(e, 'Erro ao desativar MFA.'));
     } finally {
       setEnrolling(false);
     }

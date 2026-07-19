@@ -16,6 +16,7 @@ import { despesaService, type DespesaStatus, type DespesaTipo } from '@/services
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, Receipt, DollarSign, CheckCircle, Clock, XCircle, Trash2, Upload, Eye, DollarSign as DollarIcon } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
@@ -86,13 +87,13 @@ export default function DespesasPage() {
       setFile(null);
       toast.success('Despesa registrada com sucesso!');
     },
-    onError: (e: Error) => toast.error(e.message || 'Erro ao registrar despesa'),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar despesa.')),
   });
 
   const aprovar = useMutation({
     mutationFn: (id: string) => despesaService.aprovar(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['despesas'] }); toast.success('Despesa aprovada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar despesa.')),
   });
 
   const rejeitar = useMutation({
@@ -102,7 +103,7 @@ export default function DespesasPage() {
       toast.success('Despesa rejeitada');
       setRejectTarget(null); setRejectMotivo('');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar despesa.')),
   });
 
   const marcarPago = useMutation({

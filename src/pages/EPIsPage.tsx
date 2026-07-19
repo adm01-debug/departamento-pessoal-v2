@@ -16,6 +16,7 @@ import { episService, episEntregasService } from '@/services';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, HardHat, Package } from 'lucide-react';
 import { addMonths, parseISO, isBefore } from 'date-fns';
 
@@ -89,7 +90,7 @@ export default function EPIsPage() {
       });
       toast.success('EPI cadastrado!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao salvar EPI.')),
   });
 
   const criarEntrega = useMutation({
@@ -100,7 +101,7 @@ export default function EPIsPage() {
       setFormEntrega({ epi_id: '', colaborador_id: '', data_entrega: '', quantidade: '1' });
       toast.success('Entrega registrada!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao salvar EPI.')),
   });
 
   const excluirEpi = useMutation({

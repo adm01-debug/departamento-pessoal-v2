@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Clock, User, Fingerprint, MapPin, Camera, WifiOff, RefreshCw, Smartphone } from 'lucide-react';
 import { PageLayout } from '@/components/layout';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { pontoService } from '@/services/pontoService';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 import { supabase } from '@/integrations/supabase/client';
@@ -75,7 +76,7 @@ export default function PontoKioskPage() {
         speak(`Identidade confirmada. Selecione o tipo de registro.`);
       }, 3500);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao registrar ponto.'));
       setPin('');
     } finally {
       setLoading(false);
@@ -115,7 +116,7 @@ export default function PontoKioskPage() {
         setSelectedColab(null);
       }, 3000);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(safeErrorMessage(e, 'Erro ao registrar ponto.'));
     } finally {
       setLoading(false);
       setOfflineQueueSize(pontoOfflineService.getQueueSize());

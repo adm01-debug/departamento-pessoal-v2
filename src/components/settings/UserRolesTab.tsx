@@ -10,6 +10,7 @@ import { Shield, ShieldAlert, ShieldCheck, Users, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { auditLogger } from '@/utils/auditLogger';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export function UserRolesTab() {
   const qc = useQueryClient();
@@ -43,6 +44,7 @@ export function UserRolesTab() {
         dados_novos: { role: 'admin', user_id: userId },
       });
     },
+    onError: (err: any) => toast.error(safeErrorMessage(err, 'Erro ao atualizar perfil do usuário.')),
   });
 
   return (

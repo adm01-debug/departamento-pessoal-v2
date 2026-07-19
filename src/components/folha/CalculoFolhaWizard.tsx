@@ -21,6 +21,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useCalculoFolha } from '@/hooks/useCalculoFolha';
@@ -144,7 +145,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       setCurrentStep(4);
     } catch (err: any) {
-      toast.error(err.message || 'Erro no processamento');
+      toast.error(safeErrorMessage(err, 'Erro no processamento da folha.'));
     } finally {
       setIsProcessing(false);
     }
@@ -385,7 +386,7 @@ export function CalculoFolhaWizard({ competencia }: { competencia: string }) {
                           URL.revokeObjectURL(url);
                           toast.success('Arquivo CNAB gerado com sucesso!');
                         } catch (err: any) {
-                          toast.error(err.message || 'Erro ao gerar CNAB');
+                          toast.error(safeErrorMessage(err, 'Erro ao gerar CNAB.'));
                         }
                       }
                     }}

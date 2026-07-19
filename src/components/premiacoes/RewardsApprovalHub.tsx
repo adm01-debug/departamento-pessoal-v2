@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
@@ -140,7 +141,7 @@ export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
                                   queryClient.invalidateQueries({ queryKey: ['premiacoes_pagamentos'] });
                                   toast.success("Auto-conciliação concluída com sucesso!");
                                 } catch (e: any) {
-                                  toast.error(e.message || "Falha na conciliação automática.");
+                                  toast.error(safeErrorMessage(e, "Falha na conciliação automática."));
                                 }
                               }}
                             >
