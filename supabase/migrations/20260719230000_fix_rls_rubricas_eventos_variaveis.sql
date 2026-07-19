@@ -41,13 +41,13 @@ CREATE POLICY "eventos_variaveis_tenant" ON public.eventos_variaveis
   USING (
     colaborador_id IN (
       SELECT id FROM public.colaboradores
-      WHERE empresa_id = ANY(public.get_user_empresa_ids())
+      WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
     )
   )
   WITH CHECK (
     colaborador_id IN (
       SELECT id FROM public.colaboradores
-      WHERE empresa_id = ANY(public.get_user_empresa_ids())
+      WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
     )
   );
 

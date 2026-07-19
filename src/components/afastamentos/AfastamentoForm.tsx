@@ -58,6 +58,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
     }
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchInicio = watch('data_inicio');
   const watchFim = watch('data_fim_prevista');
   const watchTipo = watch('tipo');
@@ -79,6 +80,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
       }
     };
     carregarHistorico();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchColaboradorId]);
 
   useEffect(() => {

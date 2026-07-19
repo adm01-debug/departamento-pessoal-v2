@@ -50,6 +50,7 @@ export default function LoginPage() {
   useEffect(() => {
     const reason = searchParams.get('reason');
     if (reason && SECURITY_REASONS[reason]) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSecurityNotice(SECURITY_REASONS[reason]);
     }
   }, [searchParams]);

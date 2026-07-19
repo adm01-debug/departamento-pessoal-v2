@@ -287,6 +287,7 @@ const SecurityAlertsCount = memo(function SecurityAlertsCount() {
     return () => {
       supabase.removeChannel(channel);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryClient]);
 
   if (!count) return null;

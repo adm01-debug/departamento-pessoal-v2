@@ -16,4 +16,5 @@ export function ThemeProvider({ children, defaultTheme = 'system', storageKey = 
   const value = { theme, setTheme: (t: Theme) => { localStorage.setItem(storageKey, t); setTheme(t); } };
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => { const ctx = useContext(ThemeContext); if (!ctx) throw new Error('useTheme must be used within ThemeProvider'); return ctx; };

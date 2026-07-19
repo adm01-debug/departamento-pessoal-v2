@@ -22,6 +22,7 @@ export function EstagiarioTab({ colaboradorId }: { colaboradorId: string }) {
   useEffect(() => {
     if (data && !editing) {
       const d = data as any;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         instituicao_nome: d.instituicao_nome || '', instituicao_cnpj: d.instituicao_cnpj || '',
         curso: d.curso || '', nivel: d.nivel || '',

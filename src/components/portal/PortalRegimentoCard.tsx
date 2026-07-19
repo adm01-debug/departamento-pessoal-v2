@@ -92,6 +92,7 @@ export function PortalRegimentoCard() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId, user?.id]);

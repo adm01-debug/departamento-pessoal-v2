@@ -230,11 +230,11 @@ CREATE POLICY "contatos_emergencia_tenant" ON public.contatos_emergencia
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 26. periodos_experiencia
@@ -244,11 +244,11 @@ CREATE POLICY "periodos_experiencia_tenant" ON public.periodos_experiencia
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 27. formacoes_academicas
@@ -258,11 +258,11 @@ CREATE POLICY "formacoes_academicas_tenant" ON public.formacoes_academicas
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 28. dados_estrangeiro
@@ -272,11 +272,11 @@ CREATE POLICY "dados_estrangeiro_tenant" ON public.dados_estrangeiro
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 29. deficiencias
@@ -286,11 +286,11 @@ CREATE POLICY "deficiencias_tenant" ON public.deficiencias
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 30. anotacoes_colaborador
@@ -300,11 +300,11 @@ CREATE POLICY "anotacoes_colaborador_tenant" ON public.anotacoes_colaborador
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 31. exames
@@ -314,11 +314,11 @@ CREATE POLICY "exames_tenant" ON public.exames
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 32. vales_transporte
@@ -328,11 +328,11 @@ CREATE POLICY "vales_transporte_tenant" ON public.vales_transporte
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 33. promocoes (only colaborador_id)
@@ -342,11 +342,11 @@ CREATE POLICY "promocoes_tenant" ON public.promocoes
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 34. controle_acesso
@@ -356,11 +356,11 @@ CREATE POLICY "controle_acesso_tenant" ON public.controle_acesso
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 35. lgpd_consentimentos
@@ -370,11 +370,11 @@ CREATE POLICY "lgpd_consentimentos_tenant" ON public.lgpd_consentimentos
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 36. lgpd_solicitacoes
@@ -384,11 +384,11 @@ CREATE POLICY "lgpd_solicitacoes_tenant" ON public.lgpd_solicitacoes
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 37. despesas
@@ -398,11 +398,11 @@ CREATE POLICY "despesas_tenant" ON public.despesas
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 38. inscricoes_cursos
@@ -412,11 +412,11 @@ CREATE POLICY "inscricoes_cursos_tenant" ON public.inscricoes_cursos
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 39. pesquisas_respostas (via colaborador_id; anonymous entries have colaborador_id = NULL → visible to company admin only)
@@ -428,13 +428,13 @@ CREATE POLICY "pesquisas_respostas_tenant" ON public.pesquisas_respostas
     public.is_admin(auth.uid())
     OR pesquisa_id IN (
       SELECT id FROM public.pesquisas
-      WHERE empresa_id = ANY(public.get_user_empresa_ids())
+      WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
     )
   )
   WITH CHECK (
     pesquisa_id IN (
       SELECT id FROM public.pesquisas
-      WHERE empresa_id = ANY(public.get_user_empresa_ids())
+      WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
     )
   );
 
@@ -449,11 +449,11 @@ CREATE POLICY "valores_campos_customizados_tenant" ON public.valores_campos_cust
   FOR ALL TO authenticated
   USING (campo_customizado_id IN (
     SELECT id FROM public.campos_customizados
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (campo_customizado_id IN (
     SELECT id FROM public.campos_customizados
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 41. webhooks_logs → via webhooks_config.empresa_id
@@ -463,11 +463,11 @@ CREATE POLICY "webhooks_logs_tenant" ON public.webhooks_logs
   FOR ALL TO authenticated
   USING (webhook_id IN (
     SELECT id FROM public.webhooks_config
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (webhook_id IN (
     SELECT id FROM public.webhooks_config
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 42. beneficiarios_plano → via colaborador_id → colaboradores.empresa_id
@@ -477,11 +477,11 @@ CREATE POLICY "beneficiarios_plano_tenant" ON public.beneficiarios_plano
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 43. linhas_transporte → via vales_transporte.colaborador_id → colaboradores.empresa_id
@@ -492,12 +492,12 @@ CREATE POLICY "linhas_transporte_tenant" ON public.linhas_transporte
   USING (vale_transporte_id IN (
     SELECT vt.id FROM public.vales_transporte vt
     JOIN public.colaboradores c ON c.id = vt.colaborador_id
-    WHERE c.empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE c.empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (vale_transporte_id IN (
     SELECT vt.id FROM public.vales_transporte vt
     JOIN public.colaboradores c ON c.id = vt.colaborador_id
-    WHERE c.empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE c.empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 44. trilhas_cursos → via trilhas_aprendizado.empresa_id
@@ -507,11 +507,11 @@ CREATE POLICY "trilhas_cursos_tenant" ON public.trilhas_cursos
   FOR ALL TO authenticated
   USING (trilha_id IN (
     SELECT id FROM public.trilhas_aprendizado
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (trilha_id IN (
     SELECT id FROM public.trilhas_aprendizado
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 45. pesquisas_perguntas → via pesquisas.empresa_id
@@ -521,11 +521,11 @@ CREATE POLICY "pesquisas_perguntas_tenant" ON public.pesquisas_perguntas
   FOR ALL TO authenticated
   USING (pesquisa_id IN (
     SELECT id FROM public.pesquisas
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (pesquisa_id IN (
     SELECT id FROM public.pesquisas
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 46. comunicados_leituras → via comunicados.empresa_id
@@ -535,11 +535,11 @@ CREATE POLICY "comunicados_leituras_tenant" ON public.comunicados_leituras
   FOR ALL TO authenticated
   USING (comunicado_id IN (
     SELECT id FROM public.comunicados
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (comunicado_id IN (
     SELECT id FROM public.comunicados
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 47. holerites → via colaborador_id → colaboradores.empresa_id
@@ -549,11 +549,11 @@ CREATE POLICY "holerites_tenant" ON public.holerites
   FOR ALL TO authenticated
   USING (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (colaborador_id IN (
     SELECT id FROM public.colaboradores
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 48. lancamentos_folha → via holerite_id → holerites.colaborador_id → colaboradores.empresa_id
@@ -564,12 +564,12 @@ CREATE POLICY "lancamentos_folha_tenant" ON public.lancamentos_folha
   USING (holerite_id IN (
     SELECT h.id FROM public.holerites h
     JOIN public.colaboradores c ON c.id = h.colaborador_id
-    WHERE c.empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE c.empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (holerite_id IN (
     SELECT h.id FROM public.holerites h
     JOIN public.colaboradores c ON c.id = h.colaborador_id
-    WHERE c.empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE c.empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 49. workflows_etapas → via workflows_definicoes.empresa_id
@@ -579,11 +579,11 @@ CREATE POLICY "workflows_etapas_tenant" ON public.workflows_etapas
   FOR ALL TO authenticated
   USING (workflow_id IN (
     SELECT id FROM public.workflows_definicoes
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (workflow_id IN (
     SELECT id FROM public.workflows_definicoes
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 50. workflows_execucoes → via workflows_definicoes.empresa_id
@@ -593,11 +593,11 @@ CREATE POLICY "workflows_execucoes_tenant" ON public.workflows_execucoes
   FOR ALL TO authenticated
   USING (workflow_id IN (
     SELECT id FROM public.workflows_definicoes
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (workflow_id IN (
     SELECT id FROM public.workflows_definicoes
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 51. workflows_historico → via execucao_id → workflows_execucoes → workflows_definicoes.empresa_id
@@ -608,12 +608,12 @@ CREATE POLICY "workflows_historico_tenant" ON public.workflows_historico
   USING (execucao_id IN (
     SELECT we.id FROM public.workflows_execucoes we
     JOIN public.workflows_definicoes wd ON wd.id = we.workflow_id
-    WHERE wd.empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE wd.empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (execucao_id IN (
     SELECT we.id FROM public.workflows_execucoes we
     JOIN public.workflows_definicoes wd ON wd.id = we.workflow_id
-    WHERE wd.empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE wd.empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 52. premiacoes_regras → via campanha_id → premiacoes_campanhas.empresa_id
@@ -623,11 +623,11 @@ CREATE POLICY "premiacoes_regras_tenant" ON public.premiacoes_regras
   FOR ALL TO authenticated
   USING (campanha_id IN (
     SELECT id FROM public.premiacoes_campanhas
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (campanha_id IN (
     SELECT id FROM public.premiacoes_campanhas
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 53. premiacoes_pagamentos → via campanha_id → premiacoes_campanhas.empresa_id
@@ -637,11 +637,11 @@ CREATE POLICY "premiacoes_pagamentos_tenant" ON public.premiacoes_pagamentos
   FOR ALL TO authenticated
   USING (campanha_id IN (
     SELECT id FROM public.premiacoes_campanhas
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ))
   WITH CHECK (campanha_id IN (
     SELECT id FROM public.premiacoes_campanhas
-    WHERE empresa_id = ANY(public.get_user_empresa_ids())
+    WHERE empresa_id IN (SELECT public.get_user_empresa_ids())
   ));
 
 -- 54. premiacoes_auditoria → audit log tied to user_id; admins can see all

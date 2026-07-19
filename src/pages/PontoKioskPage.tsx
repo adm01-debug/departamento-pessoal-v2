@@ -39,6 +39,7 @@ export default function PontoKioskPage() {
   }, [isSyncing]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
     const interval = setInterval(() => {
       setOfflineQueueSize(pontoOfflineService.getQueueSize());

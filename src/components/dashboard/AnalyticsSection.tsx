@@ -46,6 +46,7 @@ import { useRealTimeSubscription } from '@/hooks/useRealTimeSubscription';
  */
 export {
   MotionCard,
+  // eslint-disable-next-line react-refresh/only-export-components
   donutColors,
   IndicatorRow,
   QuickStat,

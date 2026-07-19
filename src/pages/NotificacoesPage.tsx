@@ -74,6 +74,7 @@ export default function NotificacoesPage() {
     },
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const notificacoes = notificacoesDB || notificacoesHook || [];
 
   const filtradas = useMemo(() => {

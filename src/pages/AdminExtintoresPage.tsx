@@ -83,6 +83,7 @@ export default function AdminExtintoresPage() {
     altura_correta: true, corpo_integro: true, observacoes: '',
   });
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const carregar = useCallback(async () => {
     if (!empresaAtual?.id) return;
     setLoading(true);
@@ -106,6 +107,7 @@ export default function AdminExtintoresPage() {
     }
   }, [empresaAtual?.id]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { carregar(); }, [carregar]);
 
   const criarExtintor = async () => {

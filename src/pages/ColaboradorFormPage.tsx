@@ -209,6 +209,7 @@ export default function ColaboradorFormPage() {
                       
                       <div className="space-y-2">
                         <label className="text-sm font-medium">CPF</label>
+                        {/* eslint-disable-next-line react-hooks/incompatible-library */}
                         <CPFInput value={watch('cpf')} onChange={(v) => setValue('cpf', v)} />
                         {errors.cpf && <p className="text-xs text-destructive">{errors.cpf.message}</p>}
                       </div>

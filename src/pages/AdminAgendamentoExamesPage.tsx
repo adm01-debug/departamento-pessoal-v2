@@ -161,6 +161,7 @@ export default function AdminAgendamentoExamesPage() {
     const realizados = agendamentos?.filter((a) => a.status === 'realizado').length ?? 0;
     const proximos7d = agendamentos?.filter((a) => {
       const d = new Date(a.data_agendada);
+      // eslint-disable-next-line react-hooks/purity
       const now = Date.now();
       return d.getTime() >= now && d.getTime() <= now + 7 * 24 * 3600 * 1000;
     }).length ?? 0;

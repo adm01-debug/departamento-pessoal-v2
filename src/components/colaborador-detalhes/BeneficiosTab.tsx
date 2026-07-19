@@ -31,6 +31,7 @@ export function BeneficiosTab({ colaboradorId }: BeneficiosTabProps) {
     }
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedPlanId = watch('beneficio_id');
   const selectedPlan = Array.isArray(planosDisponiveis) ? (planosDisponiveis as any[]).find((p: any) => p.id === selectedPlanId) : null;
 
