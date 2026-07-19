@@ -14,6 +14,13 @@ const MAX_LOGS_BUFFER = 50;
 const logBuffer: LogEntry[] = [];
 let flushTimeout: ReturnType<typeof setTimeout> | null = null;
 
+// Levels that warrant remote persistence via SECURITY DEFINER RPC.
+// info is intentionally excluded to avoid flooding the audit table.
+const PERSIST_LEVELS = new Set<LogLevel>(['warn', 'error', 'fatal']);
+
+// Levels that must flush immediately (no buffering delay).
+const IMMEDIATE_LEVELS = new Set<LogLevel>(['error', 'fatal']);
+
 export const loggerService = {
   async log(nivel: LogLevel, mensagem: string, contexto: Record<string, unknown> = {}, stackTrace?: string) {
     const trace = stackTrace || (nivel === 'error' || nivel === 'fatal' ? new Error().stack : undefined);
@@ -32,10 +39,16 @@ export const loggerService = {
 
     logBuffer.push(logEntry);
 
-    if (nivel === 'error' || nivel === 'fatal') {
+    if (IMMEDIATE_LEVELS.has(nivel)) {
       if (import.meta.env.DEV) {
         console.error(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
       }
+      void this.flush();
+    } else if (nivel === 'warn') {
+      if (import.meta.env.DEV) {
+        console.warn(`[WARN] ${mensagem}`, contexto);
+      }
+      // Warn logs flush immediately to preserve security audit trail
       void this.flush();
     } else {
       if (import.meta.env.DEV) {
@@ -60,20 +73,24 @@ export const loggerService = {
 
     const logsToSend = logBuffer.splice(0, logBuffer.length);
 
-    // Persist error/fatal via SECURITY DEFINER RPC — bypasses RLS on audit_log_unified
-    const criticalLogs = logsToSend.filter(l => l.nivel === 'error' || l.nivel === 'fatal');
-    for (const entry of criticalLogs) {
+    // Persist warn/error/fatal via SECURITY DEFINER RPC — bypasses RLS on audit_log_unified
+    const persistableLogs = logsToSend.filter(l => PERSIST_LEVELS.has(l.nivel));
+    for (const entry of persistableLogs) {
       supabase.rpc('log_frontend_error', {
         p_nivel: entry.nivel,
         p_mensagem: entry.mensagem,
         p_contexto: entry.contexto as Record<string, unknown>,
-      }).catch(() => {});
+      }).catch((e: unknown) => {
+        if (import.meta.env.DEV) {
+          console.error('[logger] RPC flush failed:', e);
+        }
+      });
     }
 
     if (import.meta.env.DEV) {
-      const skipped = logsToSend.length - criticalLogs.length;
+      const skipped = logsToSend.length - persistableLogs.length;
       if (skipped > 0) {
-        console.debug(`[logger] ${skipped} info/warn entries not persisted remotely.`);
+        console.debug(`[logger] ${skipped} info entries not persisted remotely.`);
       }
     }
   },

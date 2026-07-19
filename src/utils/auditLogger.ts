@@ -59,8 +59,8 @@ export const auditLogger = {
         tabela: params.tabela,
         registro_id: params.registro_id,
         acao: params.acao,
-        dados_anteriores: params.dados_anteriores ? maskPii(params.dados_anteriores) : null,
-        dados_novos: params.dados_novos ? maskPii(params.dados_novos) : null,
+        dados_anteriores: params.dados_anteriores ? maskPii(params.dados_anteriores) as never : null,
+        dados_novos: params.dados_novos ? maskPii(params.dados_novos) as never : null,
         user_id: params.user_id || user?.id,
         user_email: params.user_email || user?.email,
       });
