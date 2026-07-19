@@ -37,41 +37,6 @@ BEGIN
   END LOOP;
 END $$;
 
--- Add CHECK constraint to prevent empty-string empresa_id
-DO $$
-DECLARE
-  tbl TEXT;
-  cname TEXT;
-BEGIN
-  FOR tbl IN
-    SELECT unnest(ARRAY[
-      'colaboradores',
-      'folhas_pagamento',
-      'despesas',
-      'dependentes',
-      'contas_bancarias',
-      'ferias',
-      'rescisoes',
-      'beneficios',
-      'asos',
-      'batidas_ponto',
-      'holerites'
-    ])
-  LOOP
-    cname := 'chk_' || tbl || '_empresa_id_not_empty';
-    IF EXISTS (
-      SELECT 1 FROM information_schema.columns
-      WHERE table_schema = 'public'
-        AND table_name = tbl
-        AND column_name = 'empresa_id'
-    ) AND NOT EXISTS (
-      SELECT 1 FROM pg_constraint
-      WHERE conname = cname
-    ) THEN
-      EXECUTE format(
-        'ALTER TABLE public.%I ADD CONSTRAINT %I CHECK (empresa_id <> '''')',
-        tbl, cname
-      );
-    END IF;
-  END LOOP;
-END $$;
+-- empresa_id is typed UUID — empty strings are rejected at the type level,
+-- so no CHECK constraint is needed. The NOT NULL above is sufficient.
+-- (UUID columns cannot store '' — PostgreSQL rejects the cast at constraint validation time.)
