@@ -10,9 +10,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { premiacoesService } from '@/services/premiacoesService';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDateTime } from '@/utils/format';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 export function RewardsSimulator() {
   const queryClient = useQueryClient();
+  const { empresaAtual } = useEmpresas();
+  const empresaId = empresaAtual?.id || '';
   const [employees, setEmployees] = React.useState(50);
   const [avgSalary, setAvgSalary] = React.useState(4500);
   const [bonusPercent, setBonusPercent] = React.useState(10);
@@ -21,14 +24,15 @@ export function RewardsSimulator() {
   const [compareMode, setCompareMode] = React.useState(false);
 
   const { data: scenarios = [] } = useQuery({
-    queryKey: ['premiacoes_cenarios_roi'],
-    queryFn: () => premiacoesService.listarCenariosROI()
+    queryKey: ['premiacoes_cenarios_roi', empresaId],
+    queryFn: () => premiacoesService.listarCenariosROI(empresaId),
+    enabled: !!empresaId
   });
 
   const saveMutation = useMutation({
-    mutationFn: (cenario: any) => premiacoesService.salvarCenarioROI(cenario),
+    mutationFn: (cenario: any) => premiacoesService.salvarCenarioROI(cenario, empresaId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['premiacoes_cenarios_roi'] });
+      queryClient.invalidateQueries({ queryKey: ['premiacoes_cenarios_roi', empresaId] });
       toast.success("Cenário salvo no banco de dados estrategicamente!");
     }
   });

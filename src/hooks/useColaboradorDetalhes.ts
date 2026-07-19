@@ -236,7 +236,8 @@ export function useTimes(empresaId?: string) {
 export function useWebhooks(empresaId?: string) {
   return useQuery({
     queryKey: ['webhooks', empresaId],
-    queryFn: () => service.listarWebhooks(empresaId),
+    queryFn: () => service.listarWebhooks(empresaId!),
+    enabled: !!empresaId,
   });
 }
 
