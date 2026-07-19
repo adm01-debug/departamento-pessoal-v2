@@ -24,6 +24,7 @@ function forceLogout(reason: string) {
   queryClient.clear();
   try { localStorage.clear(); } catch { /* private browsing */ }
   try { sessionStorage.clear(); } catch { /* private browsing */ }
+  try { indexedDB.deleteDatabase('ponto-offline-db'); } catch { /* ignore */ }
   (supabase as any).auth.signOut().catch(() => {});
   window.location.href = `/login?reason=${reason}`;
 }

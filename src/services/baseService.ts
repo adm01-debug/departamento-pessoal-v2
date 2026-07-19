@@ -31,15 +31,18 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async listar(options: ListOptions = {}): Promise<ListResponse<T>> {
-    const { 
-      search, 
-      page = 1, 
-      pageSize = 10, 
-      orderBy = this.options.defaultOrderBy || 'nome', 
+    const {
+      search: rawSearch,
+      page = 1,
+      pageSize: rawPageSize = 10,
+      orderBy = this.options.defaultOrderBy || 'nome',
       orderAscending = true,
       filters = {},
       searchColumn = this.options.searchColumn || 'nome'
     } = options;
+
+    const search = rawSearch?.slice(0, 200);
+    const pageSize = Math.min(Math.max(rawPageSize, 1), 100);
 
     try {
       let query = this.getQuery().select('*', { count: 'exact' });
@@ -51,7 +54,8 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
       });
 
       if (search && searchColumn) {
-        query = query.ilike(searchColumn, `%${search}%`);
+        const escapedSearch = search.replace(/[%_\\]/g, '\\$&');
+        query = query.ilike(searchColumn, `%${escapedSearch}%`);
       }
 
       const from = (page - 1) * pageSize;

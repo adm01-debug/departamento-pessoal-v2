@@ -189,10 +189,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       loggerService.error('Sign out error', {}, e as Error);
     } finally {
-      // Defense-in-depth: clear ALL client-side state regardless of signOut result
       queryClient.clear();
       try { localStorage.clear(); } catch { /* private browsing */ }
       try { sessionStorage.clear(); } catch { /* private browsing */ }
+      try { indexedDB.deleteDatabase('ponto-offline-db'); } catch { /* ignore */ }
       setUser(null);
       setSession(null);
       loggerService.info('User signed out - all local state cleared');
