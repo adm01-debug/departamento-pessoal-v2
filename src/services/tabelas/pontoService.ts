@@ -1,10 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const ajustesPontoService = {
-  listar: async (empresaId?: string) => {
-    let q = supabase.from('ajustes_ponto').select('*, colaborador:colaboradores(nome_completo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.in('colaborador_id', supabase.from('colaboradores').select('id').eq('empresa_id', empresaId) as any);
-    const { data, error } = await q;
+  listar: async (empresaId: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await (supabase as any)
+      .from('ajustes_ponto')
+      .select('*, colaborador:colaboradores!inner(nome_completo, empresa_id)')
+      .eq('colaborador.empresa_id', empresaId)
+      .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },
