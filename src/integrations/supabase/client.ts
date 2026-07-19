@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import type { Database } from './types';
 import { secureJsonParse } from '@/utils/secureJson';
 
+
 // Configurações do Lovable Cloud (projeto ciziytrrjjotlsjzshnm).
 // O banco corporativo (hncgwjbzdajfdztqgefe) foi descontinuado por chave API
 // inválida — migramos para o backend gerenciado pelo Lovable Cloud.
@@ -115,7 +116,7 @@ const callBridge = async <T = any>(
       // Apenas propagamos o erro para quem chamou tratar (ou ignorar).
       const isMissingObject = /Could not find the (function|table)|schema cache|does not exist|column .* does not exist/i.test(errorMsg);
       if (!isMissingObject) {
-        toast.error(`Erro de banco: ${errorMsg}`, {
+        toast.error('Erro ao processar operação no banco de dados.', {
           duration: 6000,
         });
       }

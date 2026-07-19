@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { useEmpresas } from '@/hooks/useEmpresas';
 
 export function useDocumentos(colaboradorId?: string) {
@@ -39,7 +40,7 @@ export function useDocumentos(colaboradorId?: string) {
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
       toast.success('Documento criado!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar documento.')),
   });
 
   const excluirDocumento = useMutation({
@@ -51,7 +52,7 @@ export function useDocumentos(colaboradorId?: string) {
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
       toast.success('Documento excluído');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar documento.')),
   });
 
   const atualizarDocumento = useMutation({
@@ -69,7 +70,7 @@ export function useDocumentos(colaboradorId?: string) {
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
       toast.success('Documento atualizado!');
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar documento.')),
   });
 
   return { documentos, isLoading, criarDocumento, excluirDocumento, atualizarDocumento };

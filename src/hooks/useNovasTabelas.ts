@@ -7,6 +7,7 @@ import { episService, episEntregasService } from '@/services/episService';
 import { jornadaHorariosService } from '@/services/jornadaHorariosService';
 import { bancoHorasConfigService } from '@/services/bancoHorasConfigService';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 
 type DataRecord = Record<string, unknown>;
 
@@ -33,7 +34,7 @@ export function useRegistrarBatida() {
   return useMutation({
     mutationFn: (d: DataRecord) => batidasPontoService.registrar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['batidas-ponto'] }); toast.success('Batida registrada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -60,7 +61,7 @@ export function useCriarFalta() {
   return useMutation({
     mutationFn: (d: DataRecord) => faltasService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['faltas'] }); toast.success('Falta registrada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -69,7 +70,7 @@ export function useAtualizarFalta() {
   return useMutation({
     mutationFn: ({ id, ...d }: { id: string } & DataRecord) => faltasService.atualizar(id, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['faltas'] }); toast.success('Falta atualizada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -78,7 +79,7 @@ export function useExcluirFalta() {
   return useMutation({
     mutationFn: (id: string) => faltasService.excluir(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['faltas'] }); toast.success('Falta excluída'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -105,7 +106,7 @@ export function useCriarMedidaDisciplinar() {
   return useMutation({
     mutationFn: (d: DataRecord) => medidasDisciplinaresService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] }); toast.success('Medida disciplinar registrada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -114,7 +115,7 @@ export function useAtualizarMedidaDisciplinar() {
   return useMutation({
     mutationFn: ({ id, ...d }: { id: string } & DataRecord) => medidasDisciplinaresService.atualizar(id, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] }); toast.success('Medida atualizada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -133,7 +134,7 @@ export function useCriarEpi() {
   return useMutation({
     mutationFn: (d: DataRecord) => episService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI cadastrado'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -142,7 +143,7 @@ export function useAtualizarEpi() {
   return useMutation({
     mutationFn: ({ id, ...d }: { id: string } & DataRecord) => episService.atualizar(id, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI atualizado'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -151,7 +152,7 @@ export function useExcluirEpi() {
   return useMutation({
     mutationFn: (id: string) => episService.excluir(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis'] }); toast.success('EPI excluído'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -178,7 +179,7 @@ export function useCriarEpiEntrega() {
   return useMutation({
     mutationFn: (d: DataRecord) => episEntregasService.criar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Entrega de EPI registrada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -187,7 +188,7 @@ export function useDevolverEpi() {
   return useMutation({
     mutationFn: ({ id, dataDevolucao }: { id: string; dataDevolucao: string }) => episEntregasService.registrarDevolucao(id, dataDevolucao),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['epis-entregas'] }); toast.success('Devolução registrada'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -205,7 +206,7 @@ export function useSalvarGradeHorarios() {
   return useMutation({
     mutationFn: ({ jornadaId, horarios }: { jornadaId: string; horarios: any[] }) => jornadaHorariosService.salvarGrade(jornadaId, horarios),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['jornada-horarios'] }); toast.success('Grade horária salva'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }
 
@@ -224,6 +225,6 @@ export function useSalvarBancoHorasConfig() {
   return useMutation({
     mutationFn: (d: DataRecord) => bancoHorasConfigService.salvar(d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['banco-horas-config'] }); toast.success('Configuração salva'); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar operação.')),
   });
 }

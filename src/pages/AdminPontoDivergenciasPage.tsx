@@ -21,6 +21,7 @@ import {
   AlertTriangle, CheckCircle2, UserPlus, Clock, Ban, Loader2, Search, RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { safeErrorMessage } from '@/utils/safeError';
 import { formatDateTime } from '@/utils/format';
 import { maskPisDisplay } from '@/utils/piiMask';
 
@@ -161,7 +162,7 @@ export default function AdminPontoDivergenciasPage() {
       setMotivoIgnorar('');
       qc.invalidateQueries({ queryKey: ['afdt-divergencias'] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar divergência.')),
   });
 
   const mCriarBatida = useMutation({
@@ -175,7 +176,7 @@ export default function AdminPontoDivergenciasPage() {
       toast.success('Batida criada e divergência resolvida');
       qc.invalidateQueries({ queryKey: ['afdt-divergencias'] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar divergência.')),
   });
 
   const mAssociar = useMutation({
@@ -191,7 +192,7 @@ export default function AdminPontoDivergenciasPage() {
       setColabParaAssociar('');
       qc.invalidateQueries({ queryKey: ['afdt-divergencias'] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar divergência.')),
   });
 
   const bulkIgnorar = async () => {
