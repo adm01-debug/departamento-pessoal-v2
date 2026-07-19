@@ -7,11 +7,13 @@ type DadosUpdate = any;
 // =============================================
 // Dependentes
 // =============================================
-export async function listarDependentes(colaboradorId: string) {
-  const { data, error } = await supabase
+export async function listarDependentes(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { data, error } = await (supabase as any)
     .from('dependentes')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -27,13 +29,15 @@ export async function criarDependente(dependente: DadosInsert) {
   return data;
 }
 
-export async function atualizarDependente(id: string, dados: DadosUpdate) {
-  const { error } = await supabase.from('dependentes').update(dados).eq('id', id);
+export async function atualizarDependente(id: string, dados: DadosUpdate, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { error } = await (supabase as any).from('dependentes').update(dados).eq('id', id).eq('empresa_id', empresaId);
   if (error) throw error;
 }
 
-export async function excluirDependente(id: string) {
-  const { error } = await supabase.from('dependentes').delete().eq('id', id);
+export async function excluirDependente(id: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { error } = await (supabase as any).from('dependentes').delete().eq('id', id).eq('empresa_id', empresaId);
   if (error) throw error;
 }
 
@@ -54,19 +58,21 @@ export async function criarContatoEmergencia(contato: DadosInsert) {
   return data;
 }
 
-export async function excluirContatoEmergencia(id: string) {
-  const { error } = await supabase.from('contatos_emergencia').delete().eq('id', id);
+export async function excluirContatoEmergencia(colaboradorId: string, id: string) {
+  const { error } = await supabase.from('contatos_emergencia').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 
 // =============================================
 // Histórico Salarial
 // =============================================
-export async function listarHistoricoSalarial(colaboradorId: string) {
+export async function listarHistoricoSalarial(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase
     .from('historico_salarial')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('data_vigencia', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -85,11 +91,13 @@ export async function criarRegistroSalarial(registro: DadosInsert) {
 // =============================================
 // ASOs
 // =============================================
-export async function listarASOs(colaboradorId: string) {
+export async function listarASOs(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   const { data, error } = await supabase
     .from('asos')
     .select('*')
     .eq('colaborador_id', colaboradorId)
+    .eq('empresa_id', empresaId)
     .order('data_exame', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -128,8 +136,8 @@ export async function criarFormacao(formacao: DadosInsert) {
   return data;
 }
 
-export async function excluirFormacao(id: string) {
-  const { error } = await supabase.from('formacoes_academicas').delete().eq('id', id);
+export async function excluirFormacao(colaboradorId: string, id: string) {
+  const { error } = await supabase.from('formacoes_academicas').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 
@@ -200,6 +208,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Dad
       .from('periodos_experiencia')
       .update(dados)
       .eq('id', String(existingRecord.id))
+      .eq('colaborador_id', colaboradorId)
       .select()
       .maybeSingle();
     if (error) throw error;
@@ -238,20 +247,22 @@ export async function criarAnotacao(anotacao: DadosInsert) {
   return data;
 }
 
-export async function excluirAnotacao(id: string) {
-  const { error } = await supabase.from('anotacoes_colaborador').delete().eq('id', id);
+export async function excluirAnotacao(colaboradorId: string, id: string) {
+  const { error } = await supabase.from('anotacoes_colaborador').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 
 // =============================================
 // Períodos Aquisitivos
 // =============================================
-export async function listarPeriodosAquisitivos(colaboradorId: string) {
-  const { data, error } = await supabase
+export async function listarPeriodosAquisitivos(colaboradorId: string, empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { data, error } = await (supabase as any)
     .from('periodos_aquisitivos')
     .select('*')
     .eq('colaborador_id', colaboradorId)
-    .order('inicio_aquisitivo', { ascending: false });
+    .eq('empresa_id', empresaId)
+    .order('data_inicio', { ascending: false });
   if (error) throw error;
   return data || [];
 }
@@ -329,9 +340,10 @@ export async function criarWebhook(webhook: DadosInsert) {
   return data;
 }
 
-export async function excluirWebhook(id: string) {
+export async function excluirWebhook(id: string, empresaId: string) {
   if (!id) throw new Error('id obrigatório');
-  const { error } = await supabase.from('webhooks_config').delete().eq('id', id);
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+  const { error } = await supabase.from('webhooks_config').delete().eq('id', id).eq('empresa_id', empresaId);
   if (error) throw error;
 }
 

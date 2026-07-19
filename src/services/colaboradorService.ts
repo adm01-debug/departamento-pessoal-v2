@@ -93,7 +93,10 @@ class ColaboradorService extends BaseService<Colaborador> {
 
   async getById(id: string) { return this.buscarPorId(id); }
   async create(d: any) { return this.criar(d); }
-  async update(id: string, d: any) { return this.atualizar(id, d); }
+  async update(id: string, d: any, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    return this.atualizar(id, d, empresaId);
+  }
 
 }
 

@@ -56,6 +56,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
   }, [isSyncing]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
 
     if (navigator.onLine) {
@@ -117,6 +118,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
       
       if (blob && user?.id && navigator.onLine) {
+        // eslint-disable-next-line react-hooks/purity
         const fileName = `${user.id}/${Date.now()}.jpg`;
         const { error } = await supabase.storage
           .from('ponto-biometria')

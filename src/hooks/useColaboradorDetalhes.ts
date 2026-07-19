@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEmpresas } from './useEmpresas';
 import * as service from '@/services/colaboradorDetalhesService';
 
 // Dependentes
 export function useDependentes(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['dependentes', colaboradorId],
-    queryFn: () => service.listarDependentes(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['dependentes', colaboradorId, empresaAtual?.id],
+    queryFn: () => service.listarDependentes(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 
@@ -20,17 +22,19 @@ export function useCriarDependente() {
 
 export function useAtualizarDependente() {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
     mutationFn: ({ id, dados }: { id: string; dados: Record<string, unknown> }) =>
-      service.atualizarDependente(id, dados),
+      service.atualizarDependente(id, dados, empresaAtual!.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes'] }),
   });
 }
 
 export function useExcluirDependente(colaboradorId: string) {
   const qc = useQueryClient();
+  const { empresaAtual } = useEmpresas();
   return useMutation({
-    mutationFn: service.excluirDependente,
+    mutationFn: (id: string) => service.excluirDependente(id, empresaAtual!.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['dependentes', colaboradorId] }),
   });
 }
@@ -55,17 +59,18 @@ export function useCriarContatoEmergencia() {
 export function useExcluirContatoEmergencia(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirContatoEmergencia,
+    mutationFn: (id: string) => service.excluirContatoEmergencia(colaboradorId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contatos-emergencia', colaboradorId] }),
   });
 }
 
 // Histórico Salarial
 export function useHistoricoSalarial(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['historico-salarial', colaboradorId],
-    queryFn: () => service.listarHistoricoSalarial(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['historico-salarial', colaboradorId, empresaAtual?.id],
+    queryFn: () => service.listarHistoricoSalarial(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 
@@ -79,10 +84,11 @@ export function useCriarRegistroSalarial() {
 
 // ASOs
 export function useASOs(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['asos', colaboradorId],
-    queryFn: () => service.listarASOs(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['asos', colaboradorId, empresaAtual?.id],
+    queryFn: () => service.listarASOs(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 
@@ -114,7 +120,7 @@ export function useCriarFormacao() {
 export function useExcluirFormacao(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirFormacao,
+    mutationFn: (id: string) => service.excluirFormacao(colaboradorId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['formacoes', colaboradorId] }),
   });
 }
@@ -193,17 +199,18 @@ export function useCriarAnotacao() {
 export function useExcluirAnotacao(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirAnotacao,
+    mutationFn: (id: string) => service.excluirAnotacao(colaboradorId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['anotacoes', colaboradorId] }),
   });
 }
 
 // Períodos Aquisitivos
 export function usePeriodosAquisitivos(colaboradorId: string) {
+  const { empresaAtual } = useEmpresas();
   return useQuery({
-    queryKey: ['periodos-aquisitivos', colaboradorId],
-    queryFn: () => service.listarPeriodosAquisitivos(colaboradorId),
-    enabled: !!colaboradorId,
+    queryKey: ['periodos-aquisitivos', colaboradorId, empresaAtual?.id],
+    queryFn: () => service.listarPeriodosAquisitivos(colaboradorId, empresaAtual!.id),
+    enabled: !!colaboradorId && !!empresaAtual?.id,
   });
 }
 

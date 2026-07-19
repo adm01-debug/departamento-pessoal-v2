@@ -59,12 +59,12 @@ export default function LGPDPage() {
   });
 
   const concluirSol = useMutation({
-    mutationFn: (id: string) => lgpdService.atualizarSolicitacao(id, { status: 'concluida', concluida_em: new Date().toISOString() }),
+    mutationFn: (id: string) => lgpdService.atualizarSolicitacao(id, { status: 'concluida', concluida_em: new Date().toISOString() }, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['lgpd_solicitacoes'] }); toast.success('Solicitação concluída!'); },
   });
 
   const revogar = useMutation({
-    mutationFn: (id: string) => lgpdService.revogarConsentimento(id),
+    mutationFn: (id: string) => lgpdService.revogarConsentimento(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['lgpd_consentimentos'] }); toast.success('Consentimento revogado'); },
   });
 

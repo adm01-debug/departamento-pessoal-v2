@@ -153,27 +153,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      // Check account lockout before attempting authentication
-      const { data: lockoutData } = await supabase.rpc('check_account_lockout', { p_email: email });
-      if (lockoutData && Array.isArray(lockoutData) && lockoutData[0]?.is_locked) {
-        const lockedUntil = lockoutData[0].locked_until;
-        const msg = lockedUntil
-          ? `Conta temporariamente bloqueada. Tente novamente após ${new Date(lockedUntil).toLocaleTimeString('pt-BR')}.`
-          : 'Conta temporariamente bloqueada por excesso de tentativas.';
-        loggerService.warn('Login blocked - account locked', { email });
-        throw new Error(msg);
+      // H20: Route all logins through the auth-login edge function so that
+      // IP-level + per-email rate limits and account lockout are enforced
+      // server-side — unreachable by attackers calling the Supabase Auth REST
+      // API directly (which would bypass the React UI checks entirely).
+      const SUPABASE_URL = (supabase as unknown as { supabaseUrl?: string }).supabaseUrl
+        ?? import.meta.env.VITE_SUPABASE_URL
+        ?? 'https://ciziytrrjjotlsjzshnm.supabase.co';
+      const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+        ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpeml5dHJyampvdGxzanpzaG5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NzU5NjQsImV4cCI6MjA5NDA1MTk2NH0.Ld9R1Rf5CH06IMUxDYvOXZoIqNmrGlwrpdO-eBrVMRQ';
+
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/auth-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const body = await res.json().catch(() => ({})) as {
+        success?: boolean;
+        code?: string;
+        error?: string;
+        locked_until?: string;
+        session?: { access_token: string; refresh_token: string };
+      };
+
+      if (!res.ok || !body.success) {
+        const code = body.code ?? '';
+        if (code === 'ACCOUNT_LOCKED' || res.status === 429) {
+          const msg = body.error ?? 'Conta temporariamente bloqueada por excesso de tentativas.';
+          loggerService.warn('Login blocked - account locked or rate limited', { email, code });
+          throw new Error(msg);
+        }
+        throw new Error(body.error ?? 'Credenciais inválidas.');
       }
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // Hydrate the Supabase client session from the token returned by the edge function.
+      const session = body.session!;
+      const { error: sessionErr } = await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+      });
+      if (sessionErr) throw sessionErr;
 
-      if (error) {
-        // Record failed attempt (fire-and-forget)
-        supabase.rpc('record_login_attempt', { p_email: email, p_success: false }).catch(() => {});
-        throw error;
+      // Check if MFA challenge is required (user enrolled TOTP → nextLevel = aal2)
+      const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aalData?.nextLevel === 'aal2' && aalData.currentLevel !== 'aal2') {
+        const { data: factorsData } = await supabase.auth.mfa.listFactors();
+        const totpFactor = factorsData?.totp?.[0];
+        const mfaErr = new Error('Autenticação de dois fatores necessária.');
+        (mfaErr as Error & { code: string; factorId: string }).code = 'mfa_required';
+        (mfaErr as Error & { code: string; factorId: string }).factorId = totpFactor?.id || '';
+        throw mfaErr;
       }
 
-      // Record successful attempt (fire-and-forget)
-      supabase.rpc('record_login_attempt', { p_email: email, p_success: true }).catch(() => {});
       loggerService.info('User signed in', { email });
     } catch (e) {
       const err = e as AuthError | Error;
@@ -256,6 +288,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');

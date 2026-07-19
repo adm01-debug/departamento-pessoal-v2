@@ -98,6 +98,7 @@ export function usePontoMelhorado(empresaId?: string, colaboradorId?: string) {
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
+        .eq('empresa_id', empresaId!)
         .select()
         .single();
 

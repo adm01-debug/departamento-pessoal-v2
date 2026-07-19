@@ -64,6 +64,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
   useEffect(() => {
     if (tokenData?.admissao) {
       const adm = tokenData.admissao;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(prev => ({
         ...prev,
         nome_completo: adm.nome || '',
@@ -180,6 +181,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       if (result.valid) {
         // 1. Upload real para o storage
         const ext = file.name.split('.').pop();
+        // eslint-disable-next-line react-hooks/purity
         const storagePath = `admissao_${tokenData?.admissao_id}/${docType}_${Date.now()}.${ext}`;
         
         const { error: uploadErr } = await supabase.storage

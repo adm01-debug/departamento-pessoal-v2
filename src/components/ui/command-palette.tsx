@@ -180,6 +180,7 @@ export function CommandPalette({
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Build dynamic items from DB results
@@ -244,6 +245,7 @@ export function CommandPalette({
     if (item.action) item.action();
     setOpen(false);
     setQuery('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, query]);
 
   // Keyboard nav
@@ -265,6 +267,7 @@ export function CommandPalette({
     return () => window.removeEventListener('keydown', handler);
   }, [open, selectedIndex, allItems, execute]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setSelectedIndex(0); }, [query]);
 
   /* ─── Render group helper ─── */

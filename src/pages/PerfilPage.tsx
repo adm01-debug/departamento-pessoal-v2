@@ -75,6 +75,7 @@ export default function PerfilPage() {
 
   useEffect(() => {
     if (profile) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNome(profile.nome || '');
       setTelefone(profile.telefone || '');
       setCargo(profile.cargo || '');

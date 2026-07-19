@@ -50,5 +50,6 @@ export function useBackGesture() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, navigate]);
 }

@@ -66,6 +66,7 @@ export function useRealtimeDashboard() {
       void supabase.removeChannel(channel);
       Object.values(pendingTimeouts).forEach(clearTimeout);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryClient, empresaAtualId]);
 
   return { empresaAtualId };

@@ -29,7 +29,7 @@ export function useAdmissoes() {
   });
 
   const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => admissaoService.atualizar(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => admissaoService.atualizar(id, data, empresaId!),
     onSuccess: () => {
       void invalidate();
       toast.success('Admissão atualizada');

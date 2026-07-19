@@ -15,8 +15,9 @@ export const avaliacaoService = {
     if (error) throw error;
     return data;
   },
-  async excluirCiclo(id: string) {
-    const { error } = await supabase.from('ciclos_avaliacao').delete().eq('id', id);
+  async excluirCiclo(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('ciclos_avaliacao').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
@@ -34,8 +35,9 @@ export const avaliacaoService = {
     if (error) throw error;
     return data;
   },
-  async excluirMeta(id: string) {
-    const { error } = await supabase.from('metas_okrs').delete().eq('id', id);
+  async excluirMeta(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('metas_okrs').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
@@ -53,8 +55,9 @@ export const avaliacaoService = {
     if (error) throw error;
     return data;
   },
-  async excluirPDI(id: string) {
-    const { error } = await supabase.from('pdi_plano_desenvolvimento').delete().eq('id', id);
+  async excluirPDI(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('pdi_plano_desenvolvimento').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
@@ -76,8 +79,9 @@ export const avaliacaoService = {
     if (error) throw error;
     return data;
   },
-  async excluirFeedback(id: string) {
-    const { error } = await supabase.from('feedbacks_360').delete().eq('id', id);
+  async excluirFeedback(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('feedbacks_360').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
@@ -95,8 +99,9 @@ export const avaliacaoService = {
     if (error) throw error;
     return data;
   },
-  async excluirCompetencia(id: string) {
-    const { error } = await supabase.from('competencias_config').delete().eq('id', id);
+  async excluirCompetencia(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('competencias_config').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 };

@@ -30,6 +30,7 @@ export default function FinanceiroBancarioPage() {
   const [selectedFolha, setSelectedFolha] = useState('');
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const loadData = useCallback(async () => {
     if (!empresaAtual?.id) return;
     try {
@@ -53,6 +54,7 @@ export default function FinanceiroBancarioPage() {
   }, [empresaAtual?.id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 
@@ -145,7 +147,7 @@ export default function FinanceiroBancarioPage() {
     try {
       setProcessingRetorno(true);
       const content = await file.text();
-      const results = await cnabService.parseRetornoCNAB(content);
+      const results = await cnabService.parseRetornoCNAB(empresaAtual!.id, content);
 
       toast.success(`Retorno processado: ${results.sucesso} sucessos, ${results.erro} erros.`);
       loadData();

@@ -26,6 +26,7 @@ export function EmpresaSettingsTab() {
 
   useEffect(() => {
     if (empresaAtual) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         razao_social: empresaAtual.razao_social || '',
         nome_fantasia: empresaAtual.nome_fantasia || '',

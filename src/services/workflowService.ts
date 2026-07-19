@@ -20,20 +20,20 @@ export const workflowService = {
   
   },
   
-  async atualizarDefinicao(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('workflows_definicoes').update(d).eq('id', id).select().maybeSingle();
+  async atualizarDefinicao(id: string, d: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('workflows_definicoes').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de workflow foi retornado.');
     return data;
-  
+
   },
-  
-  async excluirDefinicao(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('workflows_definicoes').delete().eq('id', id);
+
+  async excluirDefinicao(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('workflows_definicoes').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
-  
+
   },
   
   async listarEtapas(workflowId: string): Promise<any[]> {
@@ -53,11 +53,11 @@ export const workflowService = {
   
   },
   
-  async excluirEtapa(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('workflows_etapas').delete().eq('id', id);
+  async excluirEtapa(workflowId: string, id: string): Promise<void> {
+    if (!workflowId) throw new Error('workflow_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('workflows_etapas').delete().eq('id', id).eq('workflow_id', workflowId);
     if (error) throw error;
-  
+
   },
   
   async listarExecucoes(empresaId: string): Promise<any[]> {
@@ -80,13 +80,13 @@ export const workflowService = {
   
   },
   
-  async atualizarExecucao(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('workflows_execucoes').update(d).eq('id', id).select().maybeSingle();
+  async atualizarExecucao(id: string, d: any, empresaId: string): Promise<any> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { data, error } = await supabase.from('workflows_execucoes').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de execução foi retornado.');
     return data;
-  
+
   },
   
   async registrarHistorico(d: any): Promise<any> {

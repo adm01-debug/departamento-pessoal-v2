@@ -30,8 +30,8 @@ export const canalContabilidadeService = {
     return data;
   },
 
-  async toggleContato(id: string, ativo: boolean) {
-    const { error } = await supabase.from('contabilidade_contatos' as any).update({ ativo }).eq('id', id);
+  async toggleContato(empresaId: string, id: string, ativo: boolean) {
+    const { error } = await supabase.from('contabilidade_contatos' as any).update({ ativo }).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
@@ -75,10 +75,10 @@ export const canalContabilidadeService = {
     return thread;
   },
 
-  async atualizarStatus(threadId: string, status: ThreadStatus) {
+  async atualizarStatus(empresaId: string, threadId: string, status: ThreadStatus) {
     const patch: any = { status };
     if (status === 'resolvido') patch.resolvido_em = new Date().toISOString();
-    const { error } = await supabase.from('contabilidade_threads' as any).update(patch).eq('id', threadId);
+    const { error } = await supabase.from('contabilidade_threads' as any).update(patch).eq('id', threadId).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 
@@ -116,7 +116,7 @@ export const canalContabilidadeService = {
   // ---------- anexos ----------
   async uploadAnexo(empresaId: string, threadId: string, file: File) {
     validateUploadFile(file);
-    const safe = file.name.replace(/[^\w.\-]/g, '_');
+    const safe = file.name.replace(/[^\w.-]/g, '_');
     const path = `${empresaId}/${threadId}/${Date.now()}_${safe}`;
     const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: false });
     if (error) throw error;

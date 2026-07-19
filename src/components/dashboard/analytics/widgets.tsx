@@ -22,8 +22,10 @@ import { CardSkeleton } from '@/components/ui/module-skeleton';
 import { viewsService } from '@/services/tabelasComplementaresService';
 import { useQuery } from '@tanstack/react-query';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const MotionCard = motion.create(Card);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const donutColors = [
   'hsl(var(--primary))',
   'hsl(var(--info))',

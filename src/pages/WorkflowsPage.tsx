@@ -71,18 +71,18 @@ export default function WorkflowsPage() {
   });
 
   const excluir = useMutation({
-    mutationFn: (id: string) => workflowService.excluirDefinicao(id),
+    mutationFn: (id: string) => workflowService.excluirDefinicao(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_def'] }); toast.success('Workflow excluído'); },
   });
 
   const aprovar = useMutation({
-    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'aprovado', concluida_em: new Date().toISOString() }),
+    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'aprovado', concluida_em: new Date().toISOString() }, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_exec'] }); toast.success('Workflow aprovado!'); },
     onError: () => toast.error('Erro ao aprovar'),
   });
 
   const rejeitar = useMutation({
-    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'rejeitado', concluida_em: new Date().toISOString() }),
+    mutationFn: (id: string) => workflowService.atualizarExecucao(id, { status: 'rejeitado', concluida_em: new Date().toISOString() }, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['workflows_exec'] }); toast.success('Workflow rejeitado'); },
     onError: () => toast.error('Erro ao rejeitar'),
   });
@@ -381,7 +381,7 @@ export default function WorkflowsPage() {
                     <p className="text-[10px] text-muted-foreground font-body mt-1">
                       A engine de workflows iniciou o processamento via `trigger_workflow_automation`.
                     </p>
-                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{formatDateTime(selectedExec?.created_at ?? Date.now())}</span>
+                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{formatDateTime(selectedExec?.created_at ?? '')}</span>
                   </div>
                 </div>
 
@@ -395,7 +395,7 @@ export default function WorkflowsPage() {
                     <p className="text-[10px] text-muted-foreground font-body mt-1">
                       E-mail disparado para o aprovador Nível 1 (Gestor Direto).
                     </p>
-                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{formatDateTime(selectedExec?.created_at ?? Date.now())}</span>
+                    <span className="text-[9px] text-muted-foreground font-mono mt-2 block">{formatDateTime(selectedExec?.created_at ?? '')}</span>
                   </div>
                 </div>
 

@@ -56,12 +56,12 @@ class DesligamentoService extends BaseService<any> {
     }
   }
 
-  async atualizar(id: string, d: any): Promise<any> {
+  async atualizar(id: string, d: any, empresaId?: string): Promise<any> {
     if (!id) throw new Error('ID é obrigatório');
 
     try {
-      const anterior = await this.buscarPorId(id);
-      const data = await super.atualizar(id, d);
+      const anterior = await this.buscarPorId(id, empresaId);
+      const data = await super.atualizar(id, d, empresaId);
 
       if (data) {
         await auditLogger.log({
@@ -79,12 +79,12 @@ class DesligamentoService extends BaseService<any> {
     }
   }
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: string, empresaId?: string): Promise<void> {
     if (!id) throw new Error('ID é obrigatório');
-    
+
     try {
-      const anterior = await this.buscarPorId(id);
-      await super.excluir(id);
+      const anterior = await this.buscarPorId(id, empresaId);
+      await super.excluir(id, empresaId);
 
       await auditLogger.log({
         tabela: 'desligamentos',

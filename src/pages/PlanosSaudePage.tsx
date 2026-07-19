@@ -40,7 +40,7 @@ function BeneficiariosPlanoSection({ planoId }: { planoId: string }) {
   });
 
   const excluir = useMutation({
-    mutationFn: (id: string) => beneficiariosPlanoService.excluir(id),
+    mutationFn: (id: string) => beneficiariosPlanoService.excluir(planoId, id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['beneficiarios-plano', planoId] }); toast.success('Beneficiário excluído do plano'); },
   });
 

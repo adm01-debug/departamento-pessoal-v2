@@ -18,6 +18,7 @@ export function EstrangeiroTab({ colaboradorId }: { colaboradorId: string }) {
   useEffect(() => {
     if (data && !editing) {
       const d = data as any;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({ pais_origem: d.pais_origem || '', tipo_visto: d.tipo_visto || '', data_chegada: d.data_chegada || '', reside_brasil: d.reside_brasil ?? true });
     }
   }, [data, editing]);

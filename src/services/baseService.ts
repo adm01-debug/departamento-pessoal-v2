@@ -87,14 +87,12 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
     }
   }
 
-  async buscarPorId(id: string): Promise<T | null> {
+  async buscarPorId(id: string, empresaId?: string): Promise<T | null> {
     if (!id) throw new Error('ID é obrigatório');
     try {
-      const { data, error } = await this.getQuery()
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-      
+      let query = this.getQuery().select('*').eq('id', id);
+      if (empresaId) query = query.eq('empresa_id', empresaId);
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       return data as T;
     } catch (e) {
@@ -119,22 +117,26 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
     }
   }
 
-  async atualizar(id: string, payload: UpdateDTO): Promise<T> {
+  async atualizar(id: string, payload: UpdateDTO, empresaId?: string): Promise<T> {
     try {
+      if (this.options.requireEmpresaId && !empresaId) {
+        throw new Error(`empresa_id obrigatório para atualizar ${this.table} (isolamento de tenant)`);
+      }
       let query = this.getQuery().update(payload as Record<string, unknown>).eq('id', id);
+      if (empresaId) query = query.eq('empresa_id', empresaId);
 
       if (this.options.useVersioning) {
         const { data: current, error: currentError } = await this.getQuery()
           .select('version')
           .eq('id', id)
           .single();
-        
+
         if (currentError) throw currentError;
         query = query.eq('version', (current as any)?.version || 1);
       }
 
       const { data, error } = await query.select().maybeSingle();
-      
+
       if (error) throw error;
       if (!data) throw new Error(`Falha ao atualizar ${this.table} ou conflito de versão.`);
       return data as T;
@@ -147,6 +149,9 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   async excluir(id: string, empresaId?: string): Promise<void> {
     if (!id) throw new Error('ID é obrigatório para exclusão');
     try {
+      if (this.options.requireEmpresaId && !empresaId) {
+        throw new Error(`empresa_id obrigatório para excluir ${this.table} (isolamento de tenant)`);
+      }
       let query = this.getQuery().delete().eq('id', id);
       if (empresaId) {
         query = query.eq('empresa_id', empresaId);

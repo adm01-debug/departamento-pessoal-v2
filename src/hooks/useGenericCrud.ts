@@ -9,8 +9,8 @@ import { safeErrorMessage } from '@/utils/safeError';
 interface ServiceInterface<T> {
   listar(options: ListOptions): Promise<ListResponse<T>>;
   criar(data: any): Promise<T>;
-  atualizar(id: string, data: any): Promise<T>;
-  excluir(id: string): Promise<void>;
+  atualizar(id: string, data: any, empresaId?: string): Promise<T>;
+  excluir(id: string, empresaId?: string): Promise<void>;
 }
 
 interface UseGenericCrudOptions<T> {
@@ -24,6 +24,7 @@ interface UseGenericCrudOptions<T> {
   };
   filters?: Record<string, any>;
   searchColumn?: string;
+  empresaId?: string;
 }
 
 export function useGenericCrud<T>({
@@ -32,7 +33,8 @@ export function useGenericCrud<T>({
   initialPageSize = 10,
   successMessages = {},
   filters = {},
-  searchColumn
+  searchColumn,
+  empresaId
 }: UseGenericCrudOptions<T>) {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -42,7 +44,9 @@ export function useGenericCrud<T>({
 
   // Reset page on search or filter change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, JSON.stringify(filters)]);
 
   const query = useQuery({
@@ -72,7 +76,7 @@ export function useGenericCrud<T>({
   });
 
   const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => service.atualizar(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => service.atualizar(id, data, empresaId),
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success(successMessages.update || 'Registro atualizado com sucesso');
@@ -85,7 +89,7 @@ export function useGenericCrud<T>({
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => service.excluir(id),
+    mutationFn: (id: string) => service.excluir(id, empresaId),
     onSuccess: (_, id) => {
       void queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success(successMessages.delete || 'Registro excluído com sucesso');

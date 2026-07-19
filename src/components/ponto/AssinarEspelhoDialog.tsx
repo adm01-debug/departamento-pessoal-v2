@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { currentCompetenciaLocal } from "@/utils/dateLocal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,7 +52,7 @@ export function AssinarEspelhoDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [competencia, setCompetencia] = useState(
-    competenciaPadrao ?? new Date().toISOString().slice(0, 7),
+    competenciaPadrao ?? currentCompetenciaLocal(),
   );
   const [loading, setLoading] = useState(false);
   const [verificando, setVerificando] = useState(false);

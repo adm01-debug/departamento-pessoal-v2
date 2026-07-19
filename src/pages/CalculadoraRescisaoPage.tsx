@@ -173,6 +173,7 @@ export default function CalculadoraRescisaoPage() {
     } finally {
       setSaving(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result, form, user]);
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 

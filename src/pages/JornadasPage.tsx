@@ -51,7 +51,7 @@ export default function JornadasPage() {
 
   const excluir = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('jornadas').delete().eq('id', id);
+      const { error } = await supabase.from('jornadas').delete().eq('id', id).eq('empresa_id', empresaAtual!.id);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['jornadas'] }); toast.success('Jornada excluída!'); },

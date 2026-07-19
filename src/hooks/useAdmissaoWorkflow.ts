@@ -46,10 +46,11 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
       if (admissaoId) {
         await supabase
           .from('admissoes')
-          .update({ 
+          .update({
             etapa: 'documentos' as any
           })
-          .eq('id', admissaoId);
+          .eq('id', admissaoId)
+          .eq('empresa_id', empresaAtualId!);
       }
 
       // Automatically send link to candidate if email is present
@@ -98,11 +99,12 @@ export function useAdmissaoWorkflow(admissaoId?: string) {
     mutationFn: async ({ execucaoId, proximaEtapa, observacao }: { execucaoId: string, proximaEtapa: number, observacao?: string }) => {
       const { data: execucao, error: execError } = await supabase
         .from('workflows_execucoes')
-        .update({ 
+        .update({
           etapa_atual: proximaEtapa,
           updated_at: new Date().toISOString()
         } as any)
         .eq('id', execucaoId)
+        .eq('empresa_id', empresaAtualId!)
         .select()
         .single();
 

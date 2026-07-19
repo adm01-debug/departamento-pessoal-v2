@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAfastamentos } from '@/hooks/useAfastamentos';
 import { afastamentoService } from '@/services/afastamentoService';
 import { useColaboradores } from '@/hooks/useColaboradores';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { Info, Calendar, Search, Stethoscope, AlertTriangle, Calendar as CalendarIcon, Zap, History as HistoryIcon } from 'lucide-react';
 import { formatDate } from '@/utils/format';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -40,6 +41,7 @@ interface AfastamentoFormProps {
 export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps) {
   const { criar, atualizar, configs, isCriando, isAtualizando } = useAfastamentos();
   const { colaboradores } = useColaboradores();
+  const { empresaAtual } = useEmpresas();
   const [diasInfo, setDiasInfo] = useState({ total: 0, empresa: 0, inss: 0 });
   const [cidSearch, setCidSearch] = useState('');
   const [cidResults, setCidResults] = useState<any[]>([]);
@@ -56,6 +58,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
     }
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchInicio = watch('data_inicio');
   const watchFim = watch('data_fim_prevista');
   const watchTipo = watch('tipo');
@@ -63,10 +66,10 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
 
   useEffect(() => {
     const carregarHistorico = async () => {
-      if (watchColaboradorId) {
+      if (watchColaboradorId && empresaAtual?.id) {
         setIsVerificandoHistorico(true);
         try {
-          const res = await afastamentoService.listarHistoricoRecente(watchColaboradorId);
+          const res = await afastamentoService.listarHistoricoRecente(watchColaboradorId, empresaAtual.id);
           setHistoricoRecente(res);
         } catch (e) {
 
@@ -77,6 +80,7 @@ export function AfastamentoForm({ onSuccess, initialData }: AfastamentoFormProps
       }
     };
     carregarHistorico();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchColaboradorId]);
 
   useEffect(() => {

@@ -20,20 +20,20 @@ export const intervaloService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await supabase.from('configuracoes_intervalo').update(d).eq('id', id).select().maybeSingle();
+  async atualizar(empresaId: string, id: string, d: any): Promise<any> {
+
+    const { data, error } = await supabase.from('configuracoes_intervalo').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de configuração de intervalo foi retornado.');
     return data;
-  
+
   },
-  
-  async excluir(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('configuracoes_intervalo').delete().eq('id', id);
+
+  async excluir(empresaId: string, id: string): Promise<void> {
+
+    const { error } = await supabase.from('configuracoes_intervalo').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
-  
+
   },
 };
 

@@ -92,13 +92,13 @@ export default function DespesasPage() {
   });
 
   const aprovar = useMutation({
-    mutationFn: (id: string) => despesaService.aprovar(id),
+    mutationFn: (id: string) => despesaService.aprovar(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['despesas'] }); toast.success('Despesa aprovada'); },
     onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao processar despesa.')),
   });
 
   const rejeitar = useMutation({
-    mutationFn: () => despesaService.rejeitar(rejectTarget!, rejectMotivo),
+    mutationFn: () => despesaService.rejeitar(rejectTarget!, empresaAtual!.id, rejectMotivo),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['despesas'] });
       toast.success('Despesa rejeitada');
@@ -108,12 +108,12 @@ export default function DespesasPage() {
   });
 
   const marcarPago = useMutation({
-    mutationFn: (id: string) => despesaService.marcarPago(id),
+    mutationFn: (id: string) => despesaService.marcarPago(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['despesas'] }); toast.success('Marcada como paga'); },
   });
 
   const excluir = useMutation({
-    mutationFn: (id: string) => despesaService.excluir(id),
+    mutationFn: (id: string) => despesaService.excluir(id, empresaAtual!.id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['despesas'] }); toast.success('Excluída'); },
   });
 

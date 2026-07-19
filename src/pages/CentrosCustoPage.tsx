@@ -47,7 +47,7 @@ export default function CentrosCustoPage() {
 
   const excluir = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('centros_custo').delete().eq('id', id);
+      const { error } = await supabase.from('centros_custo').delete().eq('id', id).eq('empresa_id', empresaAtual!.id);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['centros-custo'] }); toast.success('Centro excluído!'); },

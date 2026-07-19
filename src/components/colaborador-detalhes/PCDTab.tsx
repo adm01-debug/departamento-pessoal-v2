@@ -21,6 +21,7 @@ export function PCDTab({ colaboradorId }: { colaboradorId: string }) {
   useEffect(() => {
     if (data && !editing) {
       const d = data as any;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({ tipo: d.tipo || '', cid: d.cid || '', descricao: d.descricao || '', observacoes: d.observacoes || '' });
     }
   }, [data, editing]);

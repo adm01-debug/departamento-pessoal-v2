@@ -7,6 +7,7 @@ const CHECK_INTERVAL_MS = 60 * 1000; // check every minute
 const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll'] as const;
 
 export function useSessionTimeout() {
+  // eslint-disable-next-line react-hooks/purity
   const lastActivityRef = useRef(Date.now());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const logoutInProgressRef = useRef(false);

@@ -130,7 +130,7 @@ export const calculoLoteService = {
                       codigo: '5010',
                       descricao: 'Desconto Vale Transporte (Portaria 671)',
                       tipo: 'desconto',
-                      valor: Math.round(valorDescontoVT * 100) / 100
+                      valor: Math.trunc(valorDescontoVT * 100) / 100
                     });
                   }
                 }
@@ -162,7 +162,7 @@ export const calculoLoteService = {
                   codigo: '5010',
                   descricao: 'Desconto Vale Transporte (Legacy)',
                   tipo: 'desconto',
-                  valor: Math.round(valorDescontoVT * 100) / 100
+                  valor: Math.trunc(valorDescontoVT * 100) / 100
                 });
               }
             }
@@ -181,7 +181,7 @@ export const calculoLoteService = {
                     codigo: '5020',
                     descricao: `Coparticipação ${v.tipo || 'Ticket'} (Legacy)`,
                     tipo: 'desconto',
-                    valor: Math.round(desc * 100) / 100
+                    valor: Math.trunc(desc * 100) / 100
                   });
                 }
               });
@@ -232,7 +232,7 @@ export const calculoLoteService = {
           progress.success++;
           onProgress?.({ ...progress });
         } catch (err: any) {
-          console.error(`Erro no colaborador ${colab.nome_completo}:`, err);
+          console.error(`Erro no processamento de colaborador id=${colab.id}:`, safeErrorMessage(err, 'erro desconhecido'));
           progress.errors++;
           onProgress?.({ ...progress });
         }

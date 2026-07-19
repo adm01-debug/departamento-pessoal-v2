@@ -3,9 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { contratacaoService } from '@/services/contratacaoService';
 import { safeErrorMessage } from '@/utils/safeError';
+import { useEmpresas } from '@/hooks/useEmpresas';
 
 export function useContratacaoDigital() {
   const queryClient = useQueryClient();
+  const { empresaAtual } = useEmpresas();
 
   const atualizarEtapa = useMutation({
     mutationFn: async ({ tokenId, campos }: { tokenId: string, campos: any }) => {
@@ -29,13 +31,13 @@ export function useContratacaoDigital() {
   });
 
   const validarDocumento = useMutation({
-    mutationFn: async ({ admissaoId, docType, status, observacao }: { 
-      admissaoId: string, 
-      docType: string, 
-      status: 'validado' | 'rejeitado', 
-      observacao?: string 
+    mutationFn: async ({ admissaoId, docType, status, observacao }: {
+      admissaoId: string,
+      docType: string,
+      status: 'validado' | 'rejeitado',
+      observacao?: string
     }) => {
-      return await contratacaoService.validarDocumento(admissaoId, docType, status, observacao);
+      return await contratacaoService.validarDocumento(admissaoId, docType, status, observacao, empresaAtual?.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admissoes'] });

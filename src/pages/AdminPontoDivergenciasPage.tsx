@@ -151,9 +151,9 @@ export default function AdminPontoDivergenciasPage() {
 
   const mIgnorar = useMutation({
     mutationFn: async ({ id, obs }: { id: string; obs: string }) => {
-      const { error } = await supabase.rpc('resolver_divergencia_afdt' as never, {
+      const { error } = await (supabase as any).rpc('resolver_divergencia_afdt', {
         _divergencia_id: id, _observacao: obs || null,
-      } as never);
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -167,9 +167,9 @@ export default function AdminPontoDivergenciasPage() {
 
   const mCriarBatida = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc('criar_batida_da_divergencia_afdt' as never, {
+      const { error } = await (supabase as any).rpc('criar_batida_da_divergencia_afdt', {
         _divergencia_id: id, _tipo: 'entrada',
-      } as never);
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -181,9 +181,9 @@ export default function AdminPontoDivergenciasPage() {
 
   const mAssociar = useMutation({
     mutationFn: async ({ id, colaboradorId }: { id: string; colaboradorId: string }) => {
-      const { error } = await supabase.rpc('associar_pis_colaborador_afdt' as never, {
+      const { error } = await (supabase as any).rpc('associar_pis_colaborador_afdt', {
         _divergencia_id: id, _colaborador_id: colaboradorId,
-      } as never);
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -200,9 +200,9 @@ export default function AdminPontoDivergenciasPage() {
     if (!ids.length) return;
     toast.info(`Resolvendo ${ids.length} divergências...`);
     const results = await Promise.allSettled(
-      ids.map(id => supabase.rpc('resolver_divergencia_afdt' as never, {
+      ids.map(id => (supabase as any).rpc('resolver_divergencia_afdt', {
         _divergencia_id: id, _observacao: 'Ignorada em massa',
-      } as never))
+      }))
     );
     const ok = results.filter(r => r.status === 'fulfilled').length;
     toast.success(`${ok}/${ids.length} divergências resolvidas`);

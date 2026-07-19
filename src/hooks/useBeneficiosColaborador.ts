@@ -48,7 +48,8 @@ export function useBeneficiosColaborador(colaboradorId?: string) {
       const { error } = await supabase
         .from('beneficios_colaborador')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('colaborador_id', colaboradorId!);
 
       if (error) throw error;
     },

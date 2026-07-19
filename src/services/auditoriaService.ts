@@ -67,9 +67,10 @@ export const notificacaoService = {
     if (error) throw error;
     return data || [];
   },
-  async marcarComoLida(id: string) {
+  async marcarComoLida(userId: string, id: string) {
     if (!id) throw new Error('id obrigatório');
-    const { error } = await supabase.from('notificacoes').update({ lida: true }).eq('id', id);
+    if (!userId) throw new Error('user_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('notificacoes').update({ lida: true }).eq('id', id).eq('user_id', userId);
     if (error) throw error;
   },
   async marcarTodasComoLidas(userId: string) {
