@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { exportarBackupCSV, exportarBackupJSON, downloadBlob } from '@/services/backupService';
+import { useEmpresa } from '@/contexts/EmpresaContext';
 
 interface BackupHistoryItem {
   id: string;
@@ -20,15 +21,20 @@ interface BackupHistoryItem {
 }
 
 export default function BackupPage() {
+  const { empresaAtual } = useEmpresa();
   const [backing, setBacking] = useState<'csv' | 'json' | null>(null);
   const [historico, setHistorico] = useState<BackupHistoryItem[]>([]);
 
   const handleBackup = async (formato: 'csv' | 'json') => {
+    if (!empresaAtual?.id) {
+      toast.error('Selecione uma empresa antes de realizar o backup');
+      return;
+    }
     setBacking(formato);
     try {
       const result = formato === 'csv'
-        ? await exportarBackupCSV()
-        : await exportarBackupJSON();
+        ? await exportarBackupCSV(empresaAtual.id)
+        : await exportarBackupJSON(empresaAtual.id);
 
       downloadBlob(result.blob, result.fileName);
 

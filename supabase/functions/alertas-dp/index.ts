@@ -58,6 +58,28 @@ serve(async (req: Request): Promise<Response> => {
     const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
     const rl = await checkRateLimit(supabase, { key: `alertas-dp:${userData.user.id}`, limit: 5, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
+
+    // Tenant scope obrigatório
+    let body: any = {};
+    try { body = await req.json(); } catch {}
+    const empresaId = body?.empresaId;
+    if (!empresaId || typeof empresaId !== 'string') {
+      return new Response(JSON.stringify({ error: 'empresaId é obrigatório' }), {
+        status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: belongs } = await supabase.rpc('user_belongs_to_empresa', {
+      _user_id: userData.user.id, _empresa_id: empresaId,
+    });
+    if (belongs !== true) {
+      const { data: isAdm } = await supabase.rpc('is_admin', { _user_id: userData.user.id });
+      if (isAdm !== true) {
+        return new Response(JSON.stringify({ error: 'Sem acesso a esta empresa' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     const hoje = new Date();
     const em7dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -69,6 +91,7 @@ serve(async (req: Request): Promise<Response> => {
     const { data: asosVencendo } = await supabase
       .from('asos')
       .select('*, colaborador:colaboradores(nome_completo, email)')
+      .eq('empresa_id', empresaId)
       .lte('data_validade', em7dias)
       .gte('data_validade', hojeStr);
 
@@ -89,6 +112,7 @@ serve(async (req: Request): Promise<Response> => {
     const { data: asosVencidos } = await supabase
       .from('asos')
       .select('*, colaborador:colaboradores(nome_completo)')
+      .eq('empresa_id', empresaId)
       .lt('data_validade', hojeStr);
 
     if (asosVencidos?.length) {
@@ -108,6 +132,7 @@ serve(async (req: Request): Promise<Response> => {
     const { data: colabAtivos } = await supabase
       .from('colaboradores')
       .select('id, nome_completo, data_admissao, email')
+      .eq('empresa_id', empresaId)
       .eq('status', 'ativo');
 
     const feriasVencendo = (colabAtivos || []).filter((c: any) => {

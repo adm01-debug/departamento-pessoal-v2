@@ -226,8 +226,8 @@ Deno.serve(async (req) => {
       conteudo, // TXT completo (base64 opcional em versões futuras)
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return new Response(JSON.stringify({ error: msg }), {
+    captureException(e, { fn: 'gerar-aej' });
+    return new Response(JSON.stringify({ error: 'Erro interno' }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

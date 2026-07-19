@@ -127,6 +127,7 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   }
 
   async excluir(id: string): Promise<void> {
+    if (!id) throw new Error('ID é obrigatório para exclusão');
     try {
       const { error } = await this.getQuery().delete().eq('id', id);
       if (error) throw error;

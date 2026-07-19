@@ -406,11 +406,12 @@ Deno.serve(async (req) => {
   }
 
   // Rate limit — bridge é o endpoint mais genérico: 100 req/min para reads, 30 req/min para writes
-  if (user && serviceKey) {
+  if (serviceKey) {
     const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
     const rlClient = createClient(supabaseUrl, serviceKey);
-    const rlKey = isWrite ? `bridge-write:${user.id}` : `bridge-read:${user.id}`;
-    const rlLimit = isWrite ? 30 : 100;
+    const rlIdentity = user?.id ?? (req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || 'anon');
+    const rlKey = isWrite ? `bridge-write:${rlIdentity}` : `bridge-read:${rlIdentity}`;
+    const rlLimit = isWrite ? 30 : (user ? 100 : 20);
     const rl = await checkRateLimit(rlClient, { key: rlKey, limit: rlLimit, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
   }
@@ -500,7 +501,7 @@ Deno.serve(async (req) => {
         durationMs, status: classifySeverity(durationMs, !!error),
         recordCount: (selectData as unknown[] | null)?.length ?? 0, error: error?.message, userId: user?.id,
       });
-      if (error) return jsonError(400, "QUERY_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] QUERY_ERROR:', error.message, error.hint); return jsonError(400, "QUERY_ERROR", "Falha na consulta"); }
       return jsonOk({ data: selectData, count, duration_ms: durationMs });
     }
 
@@ -510,7 +511,7 @@ Deno.serve(async (req) => {
       const { data: r, error } = await externalClient.from(table!).insert(data as any).select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "insert", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "INSERT_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] INSERT_ERROR:', error.message, error.hint); return jsonError(400, "INSERT_ERROR", "Falha na inserção"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -520,7 +521,7 @@ Deno.serve(async (req) => {
       const { data: r, error } = await externalClient.from(table!).upsert(data as any).select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "upsert", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "UPSERT_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] UPSERT_ERROR:', error.message, error.hint); return jsonError(400, "UPSERT_ERROR", "Falha no upsert"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -548,7 +549,7 @@ Deno.serve(async (req) => {
       const { data: r, error } = await query.select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "update", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "UPDATE_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] UPDATE_ERROR:', error.message, error.hint); return jsonError(400, "UPDATE_ERROR", "Falha na atualização"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -575,7 +576,7 @@ Deno.serve(async (req) => {
       const { data: r, error } = await query.select();
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({ operation: "delete", table, durationMs, status: classifySeverity(durationMs, !!error), recordCount: r?.length ?? 0, error: error?.message, userId: user?.id });
-      if (error) return jsonError(400, "DELETE_ERROR", error.message, { hint: error.hint, code: error.code });
+      if (error) { console.error('[bridge] DELETE_ERROR:', error.message, error.hint); return jsonError(400, "DELETE_ERROR", "Falha na exclusão"); }
       return jsonOk({ data: r, duration_ms: durationMs });
     }
 
@@ -599,7 +600,7 @@ Deno.serve(async (req) => {
         recordCount: Array.isArray(rpcData) ? rpcData.length : rpcData ? 1 : 0,
         error: error?.message, userId: user?.id,
       });
-      if (error) return jsonError(400, "RPC_ERROR", error.message);
+      if (error) { console.error('[bridge] RPC_ERROR:', error.message); return jsonError(400, "RPC_ERROR", "Falha na chamada RPC"); }
       return jsonOk({ data: rpcData, duration_ms: durationMs });
     }
 

@@ -126,8 +126,8 @@ serve(async (req: Request): Promise<Response> => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ success: false, error: message }), {
+    captureException(error, { fn: 'limpeza' });
+    return new Response(JSON.stringify({ success: false, error: 'Erro interno na limpeza' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
     });
   }

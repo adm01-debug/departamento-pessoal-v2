@@ -227,9 +227,9 @@ serve(async (req: Request): Promise<Response> => {
         if (inserted?.id) processedIds.push(String(inserted.id));
         results.success++;
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[processar-ponto-offline] item error:', err instanceof Error ? err.message : err);
         results.errors++;
-        results.details.push({ id: reg?.id, error: msg });
+        results.details.push({ id: reg?.id, error: 'Falha ao processar registro' });
       }
     }
 

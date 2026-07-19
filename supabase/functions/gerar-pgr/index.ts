@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
     const { error: upErr } = await admin.storage
       .from('sst-programas')
       .upload(path, pdfBytes, { contentType: 'application/pdf', upsert: false });
-    if (upErr) return json({ error: `Falha no upload: ${upErr.message}` }, 500);
+    if (upErr) { console.error('[gerar-pgr] upload error:', upErr.message); return json({ error: 'Falha no upload do documento' }, 500); }
 
     // Arquivar versão anterior e inserir a nova como ativa (transação lógica)
     await admin
@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
       })
       .select()
       .single();
-    if (insErr) return json({ error: `Falha ao registrar programa: ${insErr.message}` }, 500);
+    if (insErr) { console.error('[gerar-pgr] insert error:', insErr.message); return json({ error: 'Falha ao registrar programa' }, 500); }
 
     // URL assinada 5 min
     const { data: signed } = await admin.storage
@@ -157,8 +157,8 @@ Deno.serve(async (req) => {
       signed_url: signed?.signedUrl,
     });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return json({ error: msg }, 500);
+    captureException(e, { fn: 'gerar-pgr' });
+    return json({ error: 'Erro interno' }, 500);
   }
 });
 

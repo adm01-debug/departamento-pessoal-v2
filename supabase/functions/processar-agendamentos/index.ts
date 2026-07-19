@@ -1,11 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token, x-cron-secret',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Cache-Control': 'no-store',
 };
 
 serve(async (req: Request): Promise<Response> => {
@@ -27,14 +29,19 @@ serve(async (req: Request): Promise<Response> => {
     const cronHeader = req.headers.get('X-Cron-Secret') ?? '';
 
     let authorized = false;
+    let triggeredBy = 'cron';
 
     // Path 1: Cron secret (for pg_cron / external scheduler)
     if (cronSecret && cronHeader === cronSecret) {
       authorized = true;
+      triggeredBy = 'cron';
     }
 
-    // Path 2: Admin JWT (for manual trigger via UI)
+    // Path 2: Admin JWT (for manual trigger via UI) — CSRF required
     if (!authorized && authHeader.startsWith('Bearer ')) {
+      const csrf = await verifyCsrf(req.clone());
+      if (!csrf.ok) return csrf.response!;
+
       const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
       const userClient = createClient(supabaseUrl, anonKey, {
         global: { headers: { Authorization: `Bearer ${jwt}` } },
@@ -45,8 +52,16 @@ serve(async (req: Request): Promise<Response> => {
         const admin = createClient(supabaseUrl, serviceKey, {
           auth: { persistSession: false, autoRefreshToken: false },
         });
+
+        const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+        const rl = await checkRateLimit(admin, { key: `agendamentos:${userData.user.id}`, limit: 5, windowSec: 60 });
+        if (!rl.allowed) return rateLimitResponse(rl);
+
         const { data: isAdmin } = await admin.rpc('is_admin', { _user_id: userData.user.id });
-        if (isAdmin) authorized = true;
+        if (isAdmin) {
+          authorized = true;
+          triggeredBy = userData.user.id;
+        }
       }
     }
 

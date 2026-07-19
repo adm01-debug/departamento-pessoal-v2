@@ -76,7 +76,8 @@ serve(async (req: Request): Promise<Response> => {
         if (empresaId) query = query.eq('empresa_id', empresaId);
         const { data, error } = await query.limit(1000);
         if (error) {
-          results[table] = { error: error.message, count: 0 };
+          console.error(`[backup] table ${table} error:`, error.message);
+          results[table] = { error: 'Falha ao exportar tabela', count: 0 };
         } else {
           results[table] = { count: data?.length || 0 };
           totalRecords += data?.length || 0;
@@ -104,8 +105,8 @@ serve(async (req: Request): Promise<Response> => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ success: false, error: message }), {
+    captureException(error, { fn: 'backup' });
+    return new Response(JSON.stringify({ success: false, error: 'Erro interno no backup' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500,
     });
   }

@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
+import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
@@ -39,6 +40,9 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') return json({ success: false, error: 'Method not allowed' }, 405);
 
   try {
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
