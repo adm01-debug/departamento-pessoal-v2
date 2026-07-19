@@ -43,23 +43,18 @@ class FeriasService extends BaseService<Ferias> {
     return { data: (data as any[]) || [], count: count || 0 };
   }
 
-  async syncWithHub(empresaId: string): Promise<any> {
-    const { data, error } = await (supabase as any)
+  async syncWithHub(empresaId: string): Promise<{ success: boolean; lastSync: string; recordsUpdated: number }> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await (supabase as any)
       .from('ferias')
-      .select('id, updated_at')
+      .select('id')
       .eq('empresa_id', empresaId)
-      .order('updated_at', { ascending: false })
       .limit(1);
-    
     if (error) throw error;
-    
-    const hasChanges = Math.random() > 0.7; 
-    await new Promise(resolve => setTimeout(resolve, 800)); 
-    
-    return { 
-      success: true, 
+    return {
+      success: true,
       lastSync: new Date().toISOString(),
-      recordsUpdated: hasChanges ? Math.floor(Math.random() * 3) + 1 : 0 
+      recordsUpdated: 0,
     };
   }
 

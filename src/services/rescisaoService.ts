@@ -2,6 +2,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { calcularRescisao } from '@/utils/rescisaoCalc';
 import { auditLogger } from '@/utils/auditLogger';
 
+async function sha256Hex(data: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // Ordem lógica das etapas para validação
 const ORDEM_ETAPAS = ['comunicacao', 'documentacao', 'calculo', 'homologacao', 'pagamento', 'finalizado'];
 
@@ -98,7 +103,7 @@ export const rescisaoService = {
           etapa: novo.etapa,
           status: novo.status,
           valor_liquido: novo.valor_liquido,
-          hash_integridade: btoa(JSON.stringify(resultado)).slice(0, 32)
+          hash_integridade: await sha256Hex(JSON.stringify(resultado))
         },
       });
 
@@ -174,7 +179,7 @@ export const rescisaoService = {
   async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador', empresaId: string): Promise<any> {
     if (!empresaId) throw new Error('empresa_id é obrigatório');
     try {
-      const hash = btoa(`rescisao-${id}-${tipo}-${new Date().getTime()}`).slice(0, 32);
+      const hash = await sha256Hex(`rescisao-${id}-${tipo}-${new Date().toISOString()}`);
       const updateData: any = {};
 
       if (tipo === 'empresa') {
