@@ -157,7 +157,7 @@ serve(async (req: Request): Promise<Response> => {
     // 5) Handlers
     if (action === 'template') {
       const templates: Record<string, string> = {
-        colaboradores: 'nome,cpf,email,telefone,data_nascimento,data_admissao,cargo,departamento,salario',
+        colaboradores: 'nome_completo,cpf,email,telefone,data_nascimento,data_admissao,cargo,departamento,salario',
         departamentos: 'nome,descricao',
         cargos: 'nome,cbo,salario_base',
         beneficios: 'nome,tipo,valor,valor_empresa,valor_colaborador',
@@ -204,6 +204,18 @@ serve(async (req: Request): Promise<Response> => {
     if (rows.length === 0) return createErrorResponse('Nenhum dado para importar', 400, 'EMPTY_PAYLOAD');
     if (rows.length > MAX_ROWS) {
       return createErrorResponse(`Máximo ${MAX_ROWS} linhas por importação`, 413, 'TOO_MANY_ROWS');
+    }
+
+    // Normaliza campo 'nome' → 'nome_completo' em colaboradores (backward-compat com CSVs antigos)
+    if (tabela === 'colaboradores') {
+      rows = rows.map((r) => {
+        const mapped = { ...r };
+        if ('nome' in mapped && !('nome_completo' in mapped)) {
+          (mapped as Record<string, unknown>).nome_completo = mapped.nome;
+          delete (mapped as Record<string, unknown>).nome;
+        }
+        return mapped;
+      });
     }
 
     // Injeta empresa_id server-side — cliente NUNCA sobrescreve

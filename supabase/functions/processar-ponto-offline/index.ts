@@ -115,6 +115,10 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `ponto-offline:${userId}`, limit: 30, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     const enforceHash = !!Deno.env.get('PONTO_HASH_SECRET');
 
     const results: {

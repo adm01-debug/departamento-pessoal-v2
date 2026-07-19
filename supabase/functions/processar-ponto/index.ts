@@ -84,6 +84,10 @@ serve(async (req) => {
       });
     }
 
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `proc-ponto:${userId}`, limit: 120, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     const dataRef = dataRegistro || new Date().toISOString().split('T')[0];
 
     // Idempotência transacional

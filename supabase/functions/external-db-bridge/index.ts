@@ -405,6 +405,16 @@ Deno.serve(async (req) => {
     return jsonError(401, "UNAUTHORIZED", "Authentication required for write operations");
   }
 
+  // Rate limit — bridge é o endpoint mais genérico: 100 req/min para reads, 30 req/min para writes
+  if (user && serviceKey) {
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rlClient = createClient(supabaseUrl, serviceKey);
+    const rlKey = isWrite ? `bridge-write:${user.id}` : `bridge-read:${user.id}`;
+    const rlLimit = isWrite ? 30 : 100;
+    const rl = await checkRateLimit(rlClient, { key: rlKey, limit: rlLimit, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+  }
+
   // Validação: table obrigatório para non-rpc + regex + denylist
   if (action !== "rpc") {
     if (!isSafeTableName(table)) {

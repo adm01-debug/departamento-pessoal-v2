@@ -125,6 +125,11 @@ Deno.serve(async (req) => {
     if (!parsed.success) return createValidationErrorResponse(parsed.error);
     const payload = parsed.data;
 
+    // Rate limit — PIX lote é operação financeira pesada: 10 req / min / usuário
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(service, { key: `pix-lote:${userId}`, limit: 10, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
     // ---------- CRIAR ----------
     if (payload.action === 'criar') {
       // Tenant scope
