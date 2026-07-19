@@ -305,14 +305,28 @@ async function assertTenantScope(
   localClient: ReturnType<typeof createClient>,
   userId: string,
   data: Record<string, unknown> | Record<string, unknown>[] | undefined,
+  filters?: Array<{ column: string; op: string; value: unknown }>,
 ): Promise<{ ok: true } | { ok: false; msg: string }> {
-  if (!data) return { ok: true };
-  const rows = Array.isArray(data) ? data : [data];
   const empresaIds = new Set<string>();
-  for (const r of rows) {
-    const eid = (r as Record<string, unknown>)?.empresa_id;
-    if (typeof eid === "string" && eid) empresaIds.add(eid);
+
+  // Extract empresa_id from data payload (INSERT/UPDATE/UPSERT)
+  if (data) {
+    const rows = Array.isArray(data) ? data : [data];
+    for (const r of rows) {
+      const eid = (r as Record<string, unknown>)?.empresa_id;
+      if (typeof eid === "string" && eid) empresaIds.add(eid);
+    }
   }
+
+  // Extract empresa_id from filters (critical for DELETE which has no data)
+  if (filters) {
+    for (const f of filters) {
+      if (f.column === "empresa_id" && f.op === "eq" && typeof f.value === "string" && f.value) {
+        empresaIds.add(f.value);
+      }
+    }
+  }
+
   if (empresaIds.size === 0) return { ok: true };
 
   // Verifica via RPC has_role(admin) primeiro
@@ -450,7 +464,7 @@ Deno.serve(async (req) => {
 
   // Tenant scope check para writes em tabelas de negócio
   if (isWrite && user && localClient && table && TENANT_SCOPED_TABLES.has(table)) {
-    const scope = await assertTenantScope(localClient, user.id, data);
+    const scope = await assertTenantScope(localClient, user.id, data, filters);
     if (!scope.ok) {
       return jsonError(403, "TENANT_SCOPE_DENIED", scope.msg);
     }

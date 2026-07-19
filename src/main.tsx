@@ -32,15 +32,21 @@ if (import.meta.env.PROD) {
   console.trace = noop;
 }
 
-// PWA Service Worker Registration
+// Clickjacking defense-in-depth: break out of foreign frames
 const isInIframe = (() => {
   try { return window.self !== window.top; } catch (e) { return true; }
 })();
 
-const isPreviewHost = 
-  window.location.hostname.includes("id-preview--") || 
+const isPreviewHost =
+  window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
 
+if (isInIframe && !isPreviewHost) {
+  document.body.innerHTML = '';
+  if (window.top) window.top.location = window.self.location;
+}
+
+// PWA Service Worker Registration
 if (!isInIframe && !isPreviewHost && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw-custom.js')
