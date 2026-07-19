@@ -16,7 +16,7 @@ export function useFeriasAprovacao() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ['ferias', empresaId] });
 
   const aprovarGestor = useMutation({
-    mutationFn: (id: string) => feriasService.aprovarGestor(id, user?.id),
+    mutationFn: (id: string) => feriasService.aprovarGestor(id, empresaId!, user?.id),
     onSuccess: (_, id) => {
       invalidate();
       criarNotificacao({
@@ -32,7 +32,7 @@ export function useFeriasAprovacao() {
   });
 
   const aprovarRH = useMutation({
-    mutationFn: (id: string) => feriasService.aprovarRH(id, user?.id),
+    mutationFn: (id: string) => feriasService.aprovarRH(id, empresaId!, user?.id),
     onSuccess: (_, id) => {
       invalidate();
       criarNotificacao({
@@ -48,7 +48,7 @@ export function useFeriasAprovacao() {
   });
 
   const enviarContabilidade = useMutation({
-    mutationFn: (id: string) => feriasService.enviarContabilidade(id, user?.id),
+    mutationFn: (id: string) => feriasService.enviarContabilidade(id, empresaId!, user?.id),
     onSuccess: () => {
       invalidate();
       toast.success('Solicitação enviada para a contabilidade');
@@ -57,7 +57,7 @@ export function useFeriasAprovacao() {
   });
 
   const rejeitar = useMutation({
-    mutationFn: (id: string) => feriasService.rejeitar(id),
+    mutationFn: (id: string) => feriasService.rejeitar(id, empresaId!),
     onSuccess: (_, id) => {
       invalidate();
       criarNotificacao({
@@ -73,7 +73,7 @@ export function useFeriasAprovacao() {
   });
 
   const cancelar = useMutation({
-    mutationFn: (id: string) => feriasService.cancelar(id, user?.id),
+    mutationFn: (id: string) => feriasService.cancelar(id, empresaId!, user?.id),
     onSuccess: () => {
       invalidate();
       toast.info('Solicitação de férias cancelada');

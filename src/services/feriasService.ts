@@ -91,39 +91,42 @@ class FeriasService extends BaseService<Ferias> {
     if (error) throw error;
   }
 
-  async enviarContabilidade(id: string, userId?: string): Promise<void> {
+  async enviarContabilidade(id: string, empresaId: string, userId?: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { error } = await this.getQuery().update({
       enviado_contabilidade: true,
       enviado_contabilidade_em: new Date().toISOString(),
       enviado_contabilidade_por: userId || null,
-    } as any).eq('id', id);
+    } as any).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
-
-  async aprovar(id: string): Promise<void> {
-    const { error } = await this.getQuery().update({ status: 'aprovada' } as Record<string, unknown>).eq('id', id);
+  async aprovar(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await this.getQuery().update({ status: 'aprovada' } as Record<string, unknown>).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
-  async aprovarGestor(id: string, userId?: string): Promise<void> {
+  async aprovarGestor(id: string, empresaId: string, userId?: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { error } = await this.getQuery().update({
       status_aprovacao_gestor: 'aprovado',
       aprovado_gestor: true,
       aprovado_gestor_em: new Date().toISOString(),
       aprovado_gestor_por: userId || null,
-    } as any).eq('id', id);
+    } as any).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
-  async aprovarRH(id: string, userId?: string): Promise<void> {
+  async aprovarRH(id: string, empresaId: string, userId?: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { error } = await this.getQuery().update({
       status_aprovacao_rh: 'aprovado',
       aprovado_rh: true,
       aprovado_rh_em: new Date().toISOString(),
       aprovado_rh_por: userId || null,
       status: 'aprovada',
-    } as any).eq('id', id);
+    } as any).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
@@ -137,18 +140,20 @@ class FeriasService extends BaseService<Ferias> {
     return data || [];
   }
 
-  async rejeitar(id: string): Promise<void> {
-    const { error } = await this.getQuery().update({ status: 'rejeitada' } as Record<string, unknown>).eq('id', id);
+  async rejeitar(id: string, empresaId: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await this.getQuery().update({ status: 'rejeitada' } as Record<string, unknown>).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
-  async cancelar(id: string, userId?: string): Promise<void> {
+  async cancelar(id: string, empresaId: string, userId?: string): Promise<void> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { error } = await this.getQuery().update({
       cancelado: true,
       cancelado_em: new Date().toISOString(),
       cancelado_por: userId || null,
       status: 'cancelada',
-    } as any).eq('id', id);
+    } as any).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 }
