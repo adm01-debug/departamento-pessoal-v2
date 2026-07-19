@@ -45,7 +45,7 @@ export function useDocumentos(colaboradorId?: string) {
 
   const excluirDocumento = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('documentos').delete().eq('id', id);
+      const { error } = await (supabase as any).from('documentos').delete().eq('id', id).eq('empresa_id', empresaAtualId!);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -57,10 +57,11 @@ export function useDocumentos(colaboradorId?: string) {
 
   const atualizarDocumento = useMutation({
     mutationFn: async ({ id, ...updates }: { id: string; [key: string]: any }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('documentos')
         .update(updates as any)
         .eq('id', id)
+        .eq('empresa_id', empresaAtualId!)
         .select()
         .single();
       if (error) throw error;

@@ -44,7 +44,7 @@ export default function SindicatosPage() {
   });
 
   const excluir = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('sindicatos').delete().eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await (supabase as any).from('sindicatos').delete().eq('id', id).eq('empresa_id', empresaAtual!.id); if (error) throw error; },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['sindicatos'] }); toast.success('Sindicato excluído!'); },
   });
 

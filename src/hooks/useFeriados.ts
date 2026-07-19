@@ -39,7 +39,7 @@ export function useFeriados() {
 
   const excluirFeriado = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('feriados').delete().eq('id', id);
+      const { error } = await supabase.from('feriados').delete().eq('id', id).eq('empresa_id', empresaAtual!.id);
       if (error) throw error;
     },
     onSuccess: () => {

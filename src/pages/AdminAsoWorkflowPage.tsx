@@ -123,7 +123,7 @@ export default function AdminAsoWorkflowPage() {
         if (restricoesEdit.trim().length >= 5) patch.restricoes_descricao = restricoesEdit;
         if (restricaoDataFim) patch.restricao_data_fim = restricaoDataFim;
       }
-      const { error } = await supabase.from('asos').update(patch).eq('id', aso.id);
+      const { error } = await supabase.from('asos').update(patch).eq('id', aso.id).eq('empresa_id', empresaAtual!.id);
       if (error) throw error;
     },
     onSuccess: () => {

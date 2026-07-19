@@ -137,7 +137,7 @@ export default function AdminClinicasPartnersPage() {
         observacoes: payload.observacoes || null,
       };
       if (editingId) {
-        const { error } = await (supabase as any).from('clinicas_partners').update(row).eq('id', editingId);
+        const { error } = await (supabase as any).from('clinicas_partners').update(row).eq('id', editingId).eq('empresa_id', empresaId);
         if (error) throw error;
       } else {
         const { error } = await (supabase as any).from('clinicas_partners').insert(row);
@@ -156,7 +156,7 @@ export default function AdminClinicasPartnersPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any).from('clinicas_partners').delete().eq('id', id);
+      const { error } = await (supabase as any).from('clinicas_partners').delete().eq('id', id).eq('empresa_id', empresaId);
       if (error) throw error;
     },
     onSuccess: () => {

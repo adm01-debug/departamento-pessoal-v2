@@ -119,6 +119,9 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
 
   async atualizar(id: string, payload: UpdateDTO, empresaId?: string): Promise<T> {
     try {
+      if (this.options.requireEmpresaId && !empresaId) {
+        throw new Error(`empresa_id obrigatório para atualizar ${this.table} (isolamento de tenant)`);
+      }
       let query = this.getQuery().update(payload as Record<string, unknown>).eq('id', id);
       if (empresaId) query = query.eq('empresa_id', empresaId);
 
@@ -146,6 +149,9 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
   async excluir(id: string, empresaId?: string): Promise<void> {
     if (!id) throw new Error('ID é obrigatório para exclusão');
     try {
+      if (this.options.requireEmpresaId && !empresaId) {
+        throw new Error(`empresa_id obrigatório para excluir ${this.table} (isolamento de tenant)`);
+      }
       let query = this.getQuery().delete().eq('id', id);
       if (empresaId) {
         query = query.eq('empresa_id', empresaId);

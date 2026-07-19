@@ -213,6 +213,10 @@ export function useEmpresas(): UseEmpresasReturn {
   // Atualizar empresa
   const atualizarEmpresa = useMutation({
     mutationFn: async ({ id, ...dados }: Partial<Empresa> & { id: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Sessão expirada. Faça login novamente.');
+      const { data: membership } = await supabase.from("user_empresas").select("id").eq("user_id", user.id).eq("empresa_id", id).maybeSingle();
+      if (!membership) throw new Error('Sem permissão para atualizar esta empresa.');
       const { data, error } = await supabase.from("empresas").update(dados).eq("id", id).select().maybeSingle();
 
       if (error) throw error;

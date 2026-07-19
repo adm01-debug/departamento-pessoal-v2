@@ -98,7 +98,8 @@ export const cnabService = {
       const { error } = await supabase
         .from('cnab_configuracoes')
         .update(config as DataRecord)
-        .eq('id', String(existingRecord.id));
+        .eq('id', String(existingRecord.id))
+        .eq('empresa_id', empresaId);
       if (error) throw error;
     } else {
       const { error } = await supabase
@@ -280,7 +281,7 @@ export const cnabService = {
       arquivo_remessa: fullFile,
       status: 'enviado',
       sequencial_arquivo: sequence,
-    } as any).eq('id', remessaRecord.id);
+    } as any).eq('id', remessaRecord.id).eq('empresa_id', empresaId);
 
     return fullFile;
   },

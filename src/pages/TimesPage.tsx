@@ -39,7 +39,7 @@ export default function TimesPage() {
   const handleSubmit = useMutation({
     mutationFn: async (d: any) => {
       if (editingItem) {
-        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id!);
+        const { error } = await supabase.from('times').update(d).eq('id', editingItem.id!).eq('empresa_id', empresaAtual!.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('times').insert({ ...d, empresa_id: empresaAtual?.id });
@@ -57,7 +57,7 @@ export default function TimesPage() {
   });
 
   const excluir = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('times').delete().eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await supabase.from('times').delete().eq('id', id).eq('empresa_id', empresaAtual!.id); if (error) throw error; },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['times'] }); toast.success('Time excluído!'); },
   });
 

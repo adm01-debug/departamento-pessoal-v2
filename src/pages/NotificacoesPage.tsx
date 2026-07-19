@@ -88,7 +88,7 @@ export default function NotificacoesPage() {
   }, [notificacoes, filtroTipo, filtroStatus, busca]);
 
   const marcarLida = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('notificacoes').update({ lida: true }).eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await supabase.from('notificacoes').update({ lida: true }).eq('id', id).eq('user_id', user!.id); if (error) throw error; },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notificacoes-db'] }); queryClient.invalidateQueries({ queryKey: ['notificacoes'] }); },
   });
 
@@ -98,7 +98,7 @@ export default function NotificacoesPage() {
   });
 
   const excluirNotificacao = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('notificacoes').delete().eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await supabase.from('notificacoes').delete().eq('id', id).eq('user_id', user!.id); if (error) throw error; },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notificacoes-db'] }); queryClient.invalidateQueries({ queryKey: ['notificacoes'] }); toast.success('Notificação removida'); },
   });
 

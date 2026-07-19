@@ -35,8 +35,10 @@ const treinamentosService = {
     const { error } = await supabase.from('treinamentos').insert(d);
     if (error) throw error;
   },
-  excluir: async (id: string) => {
-    const { error } = await supabase.from('treinamentos').delete().eq('id', id);
+  excluir: async (id: string, empresaId?: string) => {
+    let q = supabase.from('treinamentos').delete().eq('id', id);
+    if (empresaId) q = q.eq('empresa_id', empresaId);
+    const { error } = await q;
     if (error) throw error;
   },
 };
@@ -179,7 +181,7 @@ export default function TreinamentosPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['treinamentos'] }); setOpenTrein(false); setTreinForm({ nome: '', descricao: '', data: '', carga_horaria: '' }); toast.success('Treinamento criado!'); },
     onError: () => toast.error('Erro ao criar treinamento'),
   });
-  const excluirTrein = useMutation({ mutationFn: (id: string) => treinamentosService.excluir(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['treinamentos'] }); toast.success('Treinamento excluído'); } });
+  const excluirTrein = useMutation({ mutationFn: (id: string) => treinamentosService.excluir(id, empresaAtual?.id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['treinamentos'] }); toast.success('Treinamento excluído'); } });
 
   // === Cursos ===
   const [openCurso, setOpenCurso] = useState(false);

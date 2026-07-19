@@ -148,6 +148,10 @@ export async function enviarEvento(eventoId: string, empresaId: string): Promise
 
     const { data: evento } = await supabase.from('esocial_eventos').select('*').eq('id', eventoId).eq('empresa_id', empresaId).maybeSingle();
 
+    if (!evento) {
+      throw new Error('Evento eSocial não encontrado ou acesso não autorizado para esta empresa.');
+    }
+
     if (evento?.dados && evento?.tipo_evento) {
       const validacao = validarEvento(evento.tipo_evento, evento.dados as Record<string, any>);
       if (!validacao.valid) {

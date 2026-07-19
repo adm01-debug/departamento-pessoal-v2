@@ -147,22 +147,24 @@ export const contratacaoService = {
       const baseUrl = window.location.origin;
       const link = `${baseUrl}/contratacao?token=${token}`;
       const mensagem = encodeURIComponent(`Olá! 👋 Boas-vindas à nossa equipe!\n\nSeu processo de admissão digital está pronto. Acesse pelo link seguro: ${link}\n\nCódigo de Acesso: *${token}*`);
-      
+
+      const { data: admissao, error: admErr } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).maybeSingle();
+      if (admErr) throw admErr;
+      if (!admissao) throw new Error('Admissão não encontrada — não é possível enviar notificação.');
+
       try {
-        const { data: admissao, error: admErr } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).maybeSingle();
-        if (admErr) throw admErr;
-        if (admissao?.empresa_id) {
+        if (admissao.empresa_id) {
           const { whatsappService } = await import('./whatsappService');
-          await whatsappService.sendMessage({ 
-            empresaId: admissao.empresa_id, 
-            phone: telefone, 
-            message: `Olá! 👋 Boas-vindas!\n\nSeu processo de admissão digital está pronto: ${link}\n\nCódigo: *${token}*` 
+          await whatsappService.sendMessage({
+            empresaId: admissao.empresa_id,
+            phone: telefone,
+            message: `Olá! 👋 Boas-vindas!\n\nSeu processo de admissão digital está pronto: ${link}\n\nCódigo: *${token}*`
           });
         }
       } catch (e) {
         window.open(`https://wa.me/55${telefone.replace(/\D/g, '')}?text=${mensagem}`, '_blank', 'noopener');
       }
-      
+
       await supabase.from('notificacoes_admissao').insert({
         admissao_id: admissaoId,
         tipo: 'whatsapp',

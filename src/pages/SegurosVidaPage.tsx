@@ -117,7 +117,7 @@ export default function SegurosVidaPage() {
   });
 
   const excluir = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from('seguros_vida').delete().eq('id', id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await supabase.from('seguros_vida').delete().eq('id', id).eq('empresa_id', empresaAtual!.id); if (error) throw error; },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['seguros-vida'] }); toast.success('Excluído'); },
   });
 
