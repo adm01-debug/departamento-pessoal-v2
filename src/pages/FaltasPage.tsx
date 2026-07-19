@@ -52,12 +52,12 @@ export default function FaltasPage() {
 
   const { data: faltas = [], isLoading } = useQuery({
     queryKey: ['faltas', empresaAtual?.id],
-    queryFn: () => faltasService.listar(empresaAtual?.id),
+    queryFn: () => faltasService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    queryFn: () => colaboradorService.list(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

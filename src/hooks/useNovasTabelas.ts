@@ -24,7 +24,7 @@ export function useBatidasPontoDia(data: string) {
   const { empresaAtual } = useEmpresas();
   return useQuery({
     queryKey: ['batidas-ponto-dia', data, empresaAtual?.id],
-    queryFn: () => batidasPontoService.listarPorData(data, empresaAtual?.id),
+    queryFn: () => batidasPontoService.listarPorData(data, empresaAtual!.id),
     enabled: !!data && !!empresaAtual?.id,
   });
 }
@@ -43,7 +43,7 @@ export function useFaltas() {
   const { empresaAtual } = useEmpresas();
   return useQuery({
     queryKey: ['faltas', empresaAtual?.id],
-    queryFn: () => faltasService.listar(empresaAtual?.id),
+    queryFn: () => faltasService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 }
@@ -88,7 +88,7 @@ export function useMedidasDisciplinares() {
   const { empresaAtual } = useEmpresas();
   return useQuery({
     queryKey: ['medidas-disciplinares', empresaAtual?.id],
-    queryFn: () => medidasDisciplinaresService.listar(empresaAtual?.id),
+    queryFn: () => medidasDisciplinaresService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 }
@@ -124,7 +124,7 @@ export function useEpis() {
   const { empresaAtual } = useEmpresas();
   return useQuery({
     queryKey: ['epis', empresaAtual?.id],
-    queryFn: () => episService.listar(empresaAtual?.id),
+    queryFn: () => episService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 }
@@ -161,7 +161,7 @@ export function useEpisEntregas() {
   const { empresaAtual } = useEmpresas();
   return useQuery({
     queryKey: ['epis-entregas', empresaAtual?.id],
-    queryFn: () => episEntregasService.listar(empresaAtual?.id),
+    queryFn: () => episEntregasService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 }

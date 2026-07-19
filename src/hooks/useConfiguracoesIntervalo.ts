@@ -11,7 +11,7 @@ export function useConfiguracoesIntervalo() {
 
   const query = useQuery({
     queryKey: ['configuracoes_intervalo', empresaId],
-    queryFn: () => intervaloService.listar(empresaId),
+    queryFn: () => intervaloService.listar(empresaId!),
     enabled: !!empresaId,
   });
 

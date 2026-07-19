@@ -28,7 +28,7 @@ export default function MovimentacoesPage() {
   const [formTransf, setFormTransf] = useState({ colaborador_id: '', tipo: 'transferencia', origem: '', destino: '', data_efetivacao: '', motivo: '' });
   const [formPromo, setFormPromo] = useState({ colaborador_id: '', cargo_anterior: '', cargo_novo: '', data_promocao: '', novo_salario: '', motivo: '' });
 
-  const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual?.id), enabled: !!empresaAtual?.id });
+  const { data: colaboradores = [] } = useQuery({ queryKey: ['colaboradores', empresaAtual?.id], queryFn: () => colaboradorService.list(empresaAtual!.id), enabled: !!empresaAtual?.id });
 
   const { data: transferencias = [], isLoading: loadTransf } = useQuery({
     queryKey: ['transferencias', empresaAtual?.id],

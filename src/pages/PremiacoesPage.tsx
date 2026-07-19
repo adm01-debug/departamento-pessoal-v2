@@ -35,13 +35,13 @@ export default function PremiacoesPage() {
   
   const { data: campanhas = [], isLoading: loadCampanhas } = useQuery({
     queryKey: ['premiacoes_campanhas', empresaAtual?.id],
-    queryFn: () => premiacoesService.listarCampanhas(empresaAtual?.id),
+    queryFn: () => premiacoesService.listarCampanhas(empresaAtual!.id),
     enabled: !!empresaAtual?.id
   });
 
   const { data: pagamentos = [], isLoading: loadPagamentos } = useQuery({
     queryKey: ['premiacoes_pagamentos', empresaAtual?.id],
-    queryFn: () => premiacoesService.listarPagamentos(undefined, empresaAtual?.id),
+    queryFn: () => premiacoesService.listarPagamentos(undefined, empresaAtual!.id),
     enabled: !!empresaAtual?.id
   });
 

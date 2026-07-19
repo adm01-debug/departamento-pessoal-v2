@@ -68,7 +68,7 @@ export default function PontoPage() {
     enabled: !!user?.id, refetchInterval: 30000,
   });
 
-  const { data: batidasHoje = [], refetch: refetchBatidas } = useQuery({ queryKey: ['batidas-hoje', empresaAtual?.id, today], queryFn: () => batidasPontoService.listarPorData(today, empresaAtual?.id), enabled: !!empresaAtual?.id, refetchInterval: 30000 });
+  const { data: batidasHoje = [], refetch: refetchBatidas } = useQuery({ queryKey: ['batidas-hoje', empresaAtual?.id, today], queryFn: () => batidasPontoService.listarPorData(today, empresaAtual!.id), enabled: !!empresaAtual?.id, refetchInterval: 30000 });
 
   const { data: registrosSemana = [] } = useQuery({
     queryKey: ['registros-semana', user?.id],

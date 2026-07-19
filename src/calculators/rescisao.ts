@@ -1,5 +1,5 @@
 // Cálculos de rescisão, provisões e encargos
-import { SALARIO_MINIMO_2026, FAIXAS_SEGURO_DESEMPREGO_2026 } from './tabelas';
+import { SALARIO_MINIMO_2026, FAIXAS_SEGURO_DESEMPREGO_2026, FAIXAS_PLR_2026 } from './tabelas';
 import { calcularINSS, calcularIRRF, calcularFGTS } from './impostos';
 
 export type TipoRescisao = 'sem_justa_causa' | 'com_justa_causa' | 'pedido_demissao' | 'acordo_mutuo';
@@ -79,7 +79,7 @@ export function calcularAvisoPrevioIndenizado(salarioBase: number, anosServico: 
   return { dias, valor };
 }
 
-export function calcularSeguroDesemprego(ultimosSalarios: number[]) {
+export function calcularSeguroDesemprego(ultimosSalarios: number[], mesesVinculo: number = 0) {
   if (!ultimosSalarios.length) return { valorParcela: SALARIO_MINIMO_2026, parcelas: 3 };
   const media = ultimosSalarios.reduce((a, b) => a + b, 0) / ultimosSalarios.length;
   const sd = FAIXAS_SEGURO_DESEMPREGO_2026;
@@ -87,8 +87,9 @@ export function calcularSeguroDesemprego(ultimosSalarios: number[]) {
   if (media <= sd.faixa1Limite) valorParcela = media * sd.faixa1Mult;
   else if (media <= sd.faixa2Limite) valorParcela = sd.faixa2Base + (media - sd.faixa1Limite) * sd.faixa2Mult;
   else valorParcela = sd.teto;
-  valorParcela = Math.max(SALARIO_MINIMO_2026, Math.round(valorParcela * 100) / 100);
-  return { valorParcela, parcelas: ultimosSalarios.length >= 24 ? 5 : ultimosSalarios.length >= 12 ? 4 : 3 };
+  valorParcela = Math.max(SALARIO_MINIMO_2026, Math.trunc(valorParcela * 100) / 100);
+  const ref = mesesVinculo > 0 ? mesesVinculo : ultimosSalarios.length;
+  return { valorParcela, parcelas: ref >= 24 ? 5 : ref >= 12 ? 4 : 3 };
 }
 
 export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | 'acordo_mutuo'): number {
@@ -152,19 +153,12 @@ export function calcularMargemConsignado(salarioLiquido: number) {
 }
 
 export function calcularPLR(valor: number) {
-  const faixas = [
-    { limite: 7640.80, aliquota: 0, deducao: 0 },
-    { limite: 9922.28, aliquota: 0.075, deducao: 573.06 },
-    { limite: 13167.00, aliquota: 0.15, deducao: 1316.36 },
-    { limite: 16380.38, aliquota: 0.225, deducao: 2303.89 },
-    { limite: Infinity, aliquota: 0.275, deducao: 3123.78 },
-  ];
   let irrf = 0;
-  for (const faixa of faixas) {
+  for (const faixa of FAIXAS_PLR_2026) {
     if (valor <= faixa.limite) {
-      irrf = Math.max(0, Math.round((valor * faixa.aliquota - faixa.deducao) * 100) / 100);
+      irrf = Math.max(0, Math.trunc((valor * faixa.aliquota - faixa.deducao) * 100) / 100);
       break;
     }
   }
-  return { bruto: valor, irrf, liquido: Math.round((valor - irrf) * 100) / 100 };
+  return { bruto: valor, irrf, liquido: Math.trunc((valor - irrf) * 100) / 100 };
 }

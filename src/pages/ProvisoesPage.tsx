@@ -46,7 +46,7 @@ export default function ProvisoesPage() {
 
   const { data: provisoes, isLoading } = useQuery({
     queryKey: ['provisoes', empresaAtual?.id, competencia],
-    queryFn: () => provisaoService.list(empresaAtual?.id, `${competencia}-01`),
+    queryFn: () => provisaoService.list(empresaAtual!.id, `${competencia}-01`),
     enabled: !!empresaAtual?.id,
   });
 

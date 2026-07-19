@@ -13,8 +13,8 @@ export function useHorasExtras() {
 
   const query = useQuery({
     queryKey: ['solicitacoes_hora_extra', empresaId],
-    queryFn: () => horaExtraService.listar(empresaId),
-    enabled: true,
+    queryFn: () => horaExtraService.listar(empresaId!),
+    enabled: !!empresaId,
   });
 
   const criarMutation = useMutation({

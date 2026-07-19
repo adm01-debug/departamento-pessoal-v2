@@ -47,7 +47,7 @@ export default function ExamesPage() {
 
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    queryFn: () => colaboradorService.list(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

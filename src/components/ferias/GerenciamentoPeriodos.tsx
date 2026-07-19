@@ -37,7 +37,7 @@ export function GerenciamentoPeriodos({ colaboradorId: initialColaboradorId }: G
 
   const { data: colaboradores } = useQuery({
     queryKey: ['colaboradores-ferias', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    queryFn: () => colaboradorService.list(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

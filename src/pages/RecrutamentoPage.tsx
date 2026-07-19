@@ -35,7 +35,7 @@ export default function RecrutamentoPage() {
 
   const { data: vagas = [], isLoading: loadVagas } = useQuery({
     queryKey: ['vagas', empresaAtual?.id],
-    queryFn: () => recrutamentoService.listarVagas(empresaAtual?.id),
+    queryFn: () => recrutamentoService.listarVagas(empresaAtual!.id),
     enabled: !!empresaAtual?.id
   });
 
@@ -47,7 +47,7 @@ export default function RecrutamentoPage() {
 
   const { data: candidatos = [], isLoading: loadCandidatos } = useQuery({
     queryKey: ['candidatos', empresaAtual?.id],
-    queryFn: () => recrutamentoService.listarCandidatos(empresaAtual?.id),
+    queryFn: () => recrutamentoService.listarCandidatos(empresaAtual!.id),
     enabled: !!empresaAtual?.id
   });
 
