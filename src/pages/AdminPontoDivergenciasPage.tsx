@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDateTime } from '@/utils/format';
+import { maskPisDisplay } from '@/utils/piiMask';
 
 type TipoDiv = 'ok' | 'sem_colaborador' | 'sem_batida' | 'duplicado';
 
@@ -330,7 +331,7 @@ export default function AdminPontoDivergenciasPage() {
                     <TableCell>
                       <Badge variant={TIPO_LABEL[d.tipo].variant}>{TIPO_LABEL[d.tipo].label}</Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">{d.pis || '—'}</TableCell>
+                    <TableCell className="font-mono text-xs">{d.pis ? maskPisDisplay(d.pis) : '—'}</TableCell>
                     <TableCell className="tabular-nums text-xs">
                       {d.data_hora_afdt ? formatDateTime(d.data_hora_afdt) : '—'}
                     </TableCell>
@@ -416,7 +417,7 @@ export default function AdminPontoDivergenciasPage() {
           <DialogHeader>
             <DialogTitle>Associar PIS ao colaborador</DialogTitle>
             <DialogDescription>
-              PIS: <span className="font-mono">{dialogAssociar?.pis}</span>
+              PIS: <span className="font-mono">{maskPisDisplay(dialogAssociar?.pis)}</span>
             </DialogDescription>
           </DialogHeader>
           <Select value={colabParaAssociar} onValueChange={setColabParaAssociar}>
