@@ -193,6 +193,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try { localStorage.clear(); } catch { /* private browsing */ }
       try { sessionStorage.clear(); } catch { /* private browsing */ }
       try { indexedDB.deleteDatabase('ponto-offline-db'); } catch { /* ignore */ }
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch { /* caches API unavailable */ }
       setUser(null);
       setSession(null);
       loggerService.info('User signed out - all local state cleared');
