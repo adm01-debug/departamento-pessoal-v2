@@ -2,10 +2,12 @@
 // Gera PGR (NR-01) em PDF, armazena em bucket privado, versionamento + hash SHA-256 legal
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { PDFDocument, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
@@ -30,6 +32,9 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) return json({ error: 'Não autenticado' }, 401);
 
@@ -41,10 +46,15 @@ Deno.serve(async (req) => {
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      { auth: { persistSession: false, autoRefreshToken: false } },
     );
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return json({ error: 'Não autenticado' }, 401);
+
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(admin, { key: `gerar-pgr:${user.id}`, limit: 5, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
 
     const { empresa_id, responsavel_tecnico, registro_profissional } = await req.json();
     if (!empresa_id) return json({ error: 'empresa_id é obrigatório' }, 400);

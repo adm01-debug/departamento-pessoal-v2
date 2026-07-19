@@ -2,6 +2,8 @@
 // Layout MVP: Registro 1 (cabeçalho), 5 (colaboradores/vínculos), 3 (marcações), 9 (trailer).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const TZ = "America/Sao_Paulo";
 const CRLF = "\r\n";
@@ -47,6 +49,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
@@ -67,6 +72,11 @@ Deno.serve(async (req) => {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const rlAdmin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(rlAdmin, { key: `gerar-aej:${userId}`, limit: 5, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
 
     const body = await req.json().catch(() => ({}));
     const empresa_id: string | undefined = body.empresa_id;
