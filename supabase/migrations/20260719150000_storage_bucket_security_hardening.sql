@@ -156,6 +156,6 @@ CREATE POLICY "comprovantes_despesas_delete"
     bucket_id = 'comprovantes-despesas'
     AND auth.uid() IN (
       SELECT user_id FROM public.user_roles
-      WHERE role IN ('admin', 'rh', 'financeiro')
+      WHERE role IN ('admin', 'rh', 'gestor')
     )
   );
