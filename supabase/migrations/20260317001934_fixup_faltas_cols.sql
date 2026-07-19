@@ -1,4 +1,4 @@
--- Fixup: add missing columns to faltas table
+-- Fixup: add missing columns to faltas table (runs just before vw_kpi_absenteismo)
 -- 2025122813133705_create_faltas.sql creates faltas with data_inicio/data_fim but
 -- NOT data or dias_total. 20260317001900 tries CREATE TABLE IF NOT EXISTS with
 -- those columns but is skipped. vw_kpi_absenteismo in 20260317001935 uses both.
