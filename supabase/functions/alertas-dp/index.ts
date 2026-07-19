@@ -1,23 +1,38 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Cache-Control': 'no-store',
 };
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+serve(async (req: Request): Promise<Response> => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
-    if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY não configurada');
+    if (!RESEND_API_KEY) {
+      return new Response(JSON.stringify({ error: 'Serviço de email não configurado' }), {
+        status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    // JWT Authentication
     const authHeader = req.headers.get('Authorization') ?? '';
     if (!authHeader.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Autenticação obrigatória' }), {
@@ -36,7 +51,13 @@ serve(async (req) => {
       });
     }
 
-    const supabase = createClient(supabaseUrl, serviceKey);
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `alertas-dp:${userData.user.id}`, limit: 5, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
     const hoje = new Date();
     const em7dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -229,8 +250,9 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error: unknown) {
+    try { captureException(error, { fn: 'alertas-dp' }); } catch { /* noop */ }
+    return new Response(JSON.stringify({ error: 'Erro interno' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

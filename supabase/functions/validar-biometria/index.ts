@@ -1,20 +1,31 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { verifyCsrf } from '../_shared/csrf.ts';
+import { captureException } from '../_shared/sentry.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Cache-Control': 'no-store',
 };
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? Deno.env.get('VITE_SUPABASE_URL') ?? '';
+    const csrf = await verifyCsrf(req.clone());
+    if (!csrf.ok) return csrf.response!;
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
-    // JWT Authentication
     const authHeader = req.headers.get('Authorization') ?? '';
     if (!authHeader.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Autenticacao obrigatoria' }), {
@@ -32,17 +43,38 @@ serve(async (req: Request): Promise<Response> => {
         status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    const userId = userData.user.id;
 
-    const supabase = createClient(supabaseUrl, serviceKey);
-    const { batidaId, fotoBase64, colaboradorId } = await req.json();
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-    if (!batidaId || !fotoBase64 || !colaboradorId) {
+    const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
+    const rl = await checkRateLimit(supabase, { key: `biometria:${userId}`, limit: 20, windowSec: 60 });
+    if (!rl.allowed) return rateLimitResponse(rl);
+
+    let raw: unknown;
+    try { raw = await req.json(); } catch {
+      return new Response(JSON.stringify({ error: 'JSON inválido' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { batidaId, fotoBase64, colaboradorId } = raw as Record<string, unknown>;
+
+    if (!batidaId || !fotoBase64 || !colaboradorId ||
+        typeof batidaId !== 'string' || typeof fotoBase64 !== 'string' || typeof colaboradorId !== 'string') {
       return new Response(JSON.stringify({ error: 'Parametros batidaId, fotoBase64 e colaboradorId sao obrigatorios' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Tenant isolation: verify the colaborador belongs to same empresa as user
+    // Cap base64 payload at 2MB
+    if (fotoBase64.length > 2 * 1024 * 1024) {
+      return new Response(JSON.stringify({ error: 'Foto excede limite de 2MB' }), {
+        status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { data: colaborador, error: cError } = await supabase
       .from('colaboradores')
       .select('foto_referencia_url, nome_completo, empresa_id')
@@ -52,6 +84,17 @@ serve(async (req: Request): Promise<Response> => {
     if (cError || !colaborador) {
       return new Response(JSON.stringify({ error: 'Colaborador nao encontrado' }), {
         status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Tenant scope: verify user has access to the colaborador's empresa
+    const { data: belongs } = await supabase.rpc('user_belongs_to_empresa', {
+      _user_id: userId,
+      _empresa_id: colaborador.empresa_id,
+    });
+    if (!belongs) {
+      return new Response(JSON.stringify({ error: 'Sem acesso a este colaborador' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -147,9 +190,8 @@ serve(async (req: Request): Promise<Response> => {
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`Erro na validacao biometrica: ${message}`);
-    return new Response(JSON.stringify({ success: false, error: message }), {
+    try { captureException(error, { fn: 'validar-biometria' }); } catch { /* noop */ }
+    return new Response(JSON.stringify({ success: false, error: 'Erro interno na validacao' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
