@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Zap, Shield, Users, BarChart3, FileText, Lock, Mail, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -40,6 +40,8 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [govBrLoading, setGovBrLoading] = useState(false);
   const [securityNotice, setSecurityNotice] = useState('');
+  const [mfaPending, setMfaPending] = useState<{ factorId: string } | null>(null);
+  const [totpCode, setTotpCode] = useState('');
   const { signIn, resetPassword, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -110,6 +112,11 @@ export default function LoginPage() {
       await resetAttempts(email);
       navigate('/dashboard');
     } catch (err: any) {
+      if (err?.code === 'mfa_required') {
+        // MFA enrolled — show TOTP challenge without recording a failed attempt
+        setMfaPending({ factorId: err.factorId || '' });
+        return;
+      }
       await recordFailedAttempt(email);
       const msg = err?.message;
       if (msg && msg.includes('bloqueada')) {
@@ -117,6 +124,26 @@ export default function LoginPage() {
       } else {
         setError('Email ou senha inválidos.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMfaSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mfaPending || !totpCode) return;
+    setLoading(true);
+    setError('');
+    try {
+      const { error: challengeError } = await supabase.auth.mfa.challengeAndVerify({
+        factorId: mfaPending.factorId,
+        code: totpCode.replace(/\s/g, ''),
+      });
+      if (challengeError) throw challengeError;
+      await resetAttempts(email);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError('Código inválido. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -261,16 +288,58 @@ export default function LoginPage() {
             <div className="h-[2px] bg-gradient-to-r from-primary to-primary-glow" />
             <CardHeader className="text-center pb-2 pt-8">
               <CardTitle className="text-2xl font-display">
-                {forgotMode ? 'Recuperar senha' : 'Bem-vindo de volta'}
+                {mfaPending ? 'Verificação em duas etapas' : forgotMode ? 'Recuperar senha' : 'Bem-vindo de volta'}
               </CardTitle>
               <CardDescription className="font-body">
-                {forgotMode
+                {mfaPending
+                  ? 'Digite o código do seu aplicativo autenticador'
+                  : forgotMode
                   ? 'Informe seu email para receber o link de recuperação'
                   : 'Faça login para acessar o sistema'
                 }
               </CardDescription>
             </CardHeader>
             <CardContent className="px-8 pb-8">
+              {mfaPending ? (
+                <form onSubmit={handleMfaSubmit} className="space-y-5">
+                  <div className="flex justify-center mb-2">
+                    <div className="h-14 w-14 rounded-full bg-primary/15 flex items-center justify-center">
+                      <ShieldCheck className="h-7 w-7 text-primary" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="totp" className="font-body text-sm font-medium">Código TOTP (6 dígitos)</Label>
+                    <Input
+                      id="totp"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9 ]*"
+                      maxLength={7}
+                      autoComplete="one-time-code"
+                      value={totpCode}
+                      onChange={(e) => setTotpCode(e.target.value)}
+                      placeholder="000 000"
+                      required
+                      autoFocus
+                      className="h-11 text-center text-lg tracking-widest rounded-lg border-border/50 focus:border-primary/50 font-mono"
+                    />
+                  </div>
+                  {error && (
+                    <motion.p role="alert" aria-live="assertive" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="text-sm text-destructive font-body bg-destructive/10 px-3 py-2 rounded-lg">
+                      {error}
+                    </motion.p>
+                  )}
+                  <Button type="submit" className="w-full h-11 rounded-lg font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-glow" disabled={loading || totpCode.replace(/\s/g,'').length !== 6}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Verificar
+                  </Button>
+                  <Button type="button" variant="ghost" className="w-full font-body text-sm" onClick={() => { setMfaPending(null); setTotpCode(''); setError(''); }}>
+                    Voltar ao login
+                  </Button>
+                </form>
+              ) : (
+              <>
               {securityNotice && (
                 <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
                   className="mb-4 flex items-center gap-2 rounded-lg bg-warning/10 border border-warning/30 px-3 py-2 text-sm text-warning-foreground">
@@ -449,6 +518,8 @@ export default function LoginPage() {
                     </Button>
                   </div>
                 </form>
+              )}
+              </>
               )}
             </CardContent>
           </Card>

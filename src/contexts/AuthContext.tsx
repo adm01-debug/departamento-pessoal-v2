@@ -172,6 +172,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
 
+      // Check if MFA challenge is required (user enrolled TOTP → nextLevel = aal2)
+      const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aalData?.nextLevel === 'aal2' && aalData.currentLevel !== 'aal2') {
+        const { data: factorsData } = await supabase.auth.mfa.listFactors();
+        const totpFactor = factorsData?.totp?.[0];
+        const mfaErr = new Error('Autenticação de dois fatores necessária.');
+        (mfaErr as Error & { code: string; factorId: string }).code = 'mfa_required';
+        (mfaErr as Error & { code: string; factorId: string }).factorId = totpFactor?.id || '';
+        throw mfaErr;
+      }
+
       // Record successful attempt (fire-and-forget)
       supabase.rpc('record_login_attempt', { p_email: email, p_success: true }).catch(() => {});
       loggerService.info('User signed in', { email });

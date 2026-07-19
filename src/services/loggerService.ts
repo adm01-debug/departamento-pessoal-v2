@@ -36,7 +36,7 @@ export const loggerService = {
       if (import.meta.env.DEV) {
         console.error(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
       }
-      void this.flush(); // Errors are sent immediately
+      void this.flush();
     } else {
       if (import.meta.env.DEV) {
         console.debug(`[${nivel.toUpperCase()}] ${mensagem}`, contexto);
@@ -46,7 +46,7 @@ export const loggerService = {
       } else if (!flushTimeout) {
         flushTimeout = setTimeout(() => {
           void this.flush();
-        }, 10000); // Flush every 10s if limit not reached
+        }, 10000);
       }
     }
   },
@@ -58,12 +58,23 @@ export const loggerService = {
       flushTimeout = null;
     }
 
-    // O banco corporativo externo bloqueia inserts em `logs_sistema` via RLS
-    // para clientes autenticados. Como logs do front não devem quebrar a UI,
-    // descartamos o buffer silenciosamente. Mantemos console em DEV.
     const logsToSend = logBuffer.splice(0, logBuffer.length);
+
+    // Persist error/fatal via SECURITY DEFINER RPC — bypasses RLS on audit_log_unified
+    const criticalLogs = logsToSend.filter(l => l.nivel === 'error' || l.nivel === 'fatal');
+    for (const entry of criticalLogs) {
+      supabase.rpc('log_frontend_error', {
+        p_nivel: entry.nivel,
+        p_mensagem: entry.mensagem,
+        p_contexto: entry.contexto as Record<string, unknown>,
+      }).catch(() => {});
+    }
+
     if (import.meta.env.DEV) {
-      console.debug(`[logger] Descartando ${logsToSend.length} log(s) — persistência remota desabilitada.`);
+      const skipped = logsToSend.length - criticalLogs.length;
+      if (skipped > 0) {
+        console.debug(`[logger] ${skipped} info/warn entries not persisted remotely.`);
+      }
     }
   },
 
