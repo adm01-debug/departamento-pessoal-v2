@@ -220,20 +220,20 @@ export default function App() {
         <Route path="esocial" element={<LazyPage Component={ESocialPage} />} />
         <Route path="obrigacoes-fiscais" element={<LazyPage Component={ObrigacoesFiscaisPage} />} />
         <Route path="sst" element={<LazyPage Component={SSTPage} />} />
-        <Route path="auditoria" element={<LazyPage Component={AuditoriaPage} />} />
+        <Route path="auditoria" element={<AdminRoute><LazyPage Component={AuditoriaPage} /></AdminRoute>} />
         <Route path="canal-etica" element={<LazyPage Component={CanalEticaPage} />} />
-        <Route path="lgpd" element={<LazyPage Component={LGPDPage} />} />
-        <Route path="seguranca" element={<LazyPage Component={SegurancaPage} />} />
+        <Route path="lgpd" element={<AdminRoute><LazyPage Component={LGPDPage} /></AdminRoute>} />
+        <Route path="seguranca" element={<AdminRoute><LazyPage Component={SegurancaPage} /></AdminRoute>} />
         
         {/* Utilitários */}
         <Route path="assistente-ia" element={<LazyPage Component={AssistenteIAPage} />} />
         <Route path="calculadora-rescisao" element={<LazyPage Component={CalculadoraRescisaoPage} />} />
         <Route path="importacao" element={<LazyPage Component={ImportacaoPage} />} />
-        <Route path="backup" element={<LazyPage Component={BackupPage} />} />
+        <Route path="backup" element={<AdminRoute><LazyPage Component={BackupPage} /></AdminRoute>} />
         <Route path="notificacoes" element={<LazyPage Component={NotificacoesPage} />} />
-        <Route path="usuarios" element={<LazyPage Component={UsuariosPage} />} />
+        <Route path="usuarios" element={<AdminRoute><LazyPage Component={UsuariosPage} /></AdminRoute>} />
         <Route path="perfil" element={<LazyPage Component={PerfilPage} />} />
-        <Route path="configuracoes" element={<LazyPage Component={ConfiguracoesPage} />} />
+        <Route path="configuracoes" element={<AdminRoute><LazyPage Component={ConfiguracoesPage} /></AdminRoute>} />
         
         {/* Admin */}
         <Route path="admin/telemetria" element={<AdminRoute><LazyPage Component={AdminTelemetriaPage} /></AdminRoute>} />

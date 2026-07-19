@@ -10,13 +10,33 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY não configurada');
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // JWT Authentication
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Autenticação obrigatória' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Sessão inválida' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, serviceKey);
     const hoje = new Date();
     const em7dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -33,8 +53,8 @@ serve(async (req) => {
 
     if (asosVencendo?.length) {
       alertas.push({
-        tipo: '🏥 ASOs Vencendo',
-        mensagem: `${asosVencendo.length} ASO(s) vencem nos próximos 7 dias`,
+        tipo: 'ASOs Vencendo',
+        mensagem: `${asosVencendo.length} ASO(s) vencem nos proximos 7 dias`,
         urgencia: 'alta',
         detalhes: asosVencendo.map((a: any) => ({
           colaborador: a.colaborador?.nome_completo,
@@ -52,8 +72,8 @@ serve(async (req) => {
 
     if (asosVencidos?.length) {
       alertas.push({
-        tipo: '⚠️ ASOs Vencidos',
-        mensagem: `${asosVencidos.length} ASO(s) estão vencidos!`,
+        tipo: 'ASOs Vencidos',
+        mensagem: `${asosVencidos.length} ASO(s) estao vencidos!`,
         urgencia: 'critica',
         detalhes: asosVencidos.map((a: any) => ({
           colaborador: a.colaborador?.nome_completo,
@@ -63,7 +83,7 @@ serve(async (req) => {
       });
     }
 
-    // 3. Férias vencendo em 30 dias (colaboradores com mais de 12 meses sem férias)
+    // 3. Ferias vencendo em 30 dias
     const { data: colabAtivos } = await supabase
       .from('colaboradores')
       .select('id, nome_completo, data_admissao, email')
@@ -78,8 +98,8 @@ serve(async (req) => {
 
     if (feriasVencendo.length) {
       alertas.push({
-        tipo: '🏖️ Férias Próximas',
-        mensagem: `${feriasVencendo.length} colaborador(es) completam período aquisitivo em breve`,
+        tipo: 'Ferias Proximas',
+        mensagem: `${feriasVencendo.length} colaborador(es) completam periodo aquisitivo em breve`,
         urgencia: 'media',
         detalhes: feriasVencendo.map((c: any) => ({
           colaborador: c.nome_completo,
@@ -88,14 +108,7 @@ serve(async (req) => {
       });
     }
 
-    // 4. Aniversariantes da semana
-    const aniversariantes = (colabAtivos || []).filter((c: any) => {
-      if (!c.data_admissao) return false;
-      // Check birth date would require data_nascimento
-      return false;
-    });
-
-    // 5. Contratos de experiência vencendo
+    // 4. Contratos de experiencia vencendo
     const em90dias = new Date(hoje.getTime() - 90 * 24 * 60 * 60 * 1000);
     const em83dias = new Date(hoje.getTime() - 83 * 24 * 60 * 60 * 1000);
     const contratosVencendo = (colabAtivos || []).filter((c: any) => {
@@ -106,8 +119,8 @@ serve(async (req) => {
 
     if (contratosVencendo.length) {
       alertas.push({
-        tipo: '📋 Contratos de Experiência',
-        mensagem: `${contratosVencendo.length} contrato(s) de experiência vencem em breve`,
+        tipo: 'Contratos de Experiencia',
+        mensagem: `${contratosVencendo.length} contrato(s) de experiencia vencem em breve`,
         urgencia: 'alta',
         detalhes: contratosVencendo.map((c: any) => ({
           colaborador: c.nome_completo,
@@ -130,7 +143,7 @@ serve(async (req) => {
         <table style="width:100%;border-collapse:collapse;font-size:13px">
           ${a.detalhes.slice(0, 10).map(d => `
             <tr style="border-bottom:1px solid #e5e7eb">
-              ${Object.values(d).map(v => `<td style="padding:6px 8px;color:#374151">${v || '—'}</td>`).join('')}
+              ${Object.values(d).map(v => `<td style="padding:6px 8px;color:#374151">${v || '-'}</td>`).join('')}
             </tr>
           `).join('')}
         </table>
@@ -141,13 +154,13 @@ serve(async (req) => {
     const html = `
       <div style="max-width:600px;margin:0 auto;font-family:system-ui,-apple-system,sans-serif">
         <div style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);padding:24px;border-radius:16px 16px 0 0">
-          <h1 style="color:white;margin:0;font-size:22px">📊 Alertas do Departamento Pessoal</h1>
-          <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:14px">${hoje.toLocaleDateString('pt-BR')} · ${alertas.length} alerta(s) ativo(s)</p>
+          <h1 style="color:white;margin:0;font-size:22px">Alertas do Departamento Pessoal</h1>
+          <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:14px">${hoje.toLocaleDateString('pt-BR')} - ${alertas.length} alerta(s) ativo(s)</p>
         </div>
         <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 16px 16px">
           ${alertasHTML}
           <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center">
-            <p style="color:#9ca3af;font-size:12px">Sistema de Departamento Pessoal · Alertas automáticos</p>
+            <p style="color:#9ca3af;font-size:12px">Sistema de Departamento Pessoal - Alertas automaticos</p>
           </div>
         </div>
       </div>
@@ -177,7 +190,7 @@ serve(async (req) => {
     }
 
     if (!recipientEmails.length) {
-      return new Response(JSON.stringify({ message: 'Alertas gerados mas sem destinatários configurados', alertas }), {
+      return new Response(JSON.stringify({ message: 'Alertas gerados mas sem destinatarios configurados', alertas }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -189,19 +202,20 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'DP Alertas <onboarding@resend.dev>',
         to: recipientEmails,
-        subject: `⚡ ${alertas.length} Alerta(s) DP - ${hoje.toLocaleDateString('pt-BR')}`,
+        subject: `${alertas.length} Alerta(s) DP - ${hoje.toLocaleDateString('pt-BR')}`,
         html,
       }),
     });
 
     const emailResult = await emailRes.json();
 
-    // Log alertas as notificações
+    // Log alertas as notificacoes
     for (const alerta of alertas) {
       await supabase.from('notificacoes').insert({
         titulo: alerta.tipo,
         mensagem: alerta.mensagem,
         tipo: alerta.urgencia === 'critica' ? 'erro' : alerta.urgencia === 'alta' ? 'aviso' : 'info',
+        user_id: userData.user.id,
       }).catch(() => {});
     }
 

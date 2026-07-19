@@ -28,7 +28,8 @@ const BodySchema = z.object({
   idempotencyKey: z.string().optional(),
 });
 
-const SIMULATE = (Deno.env.get('ESOCIAL_SIMULATE') ?? 'true').toLowerCase() === 'true';
+// Fail-closed: simulation must be explicitly enabled. In production, missing env = real mode (which fails safely if SOAP not configured)
+const SIMULATE = Deno.env.get('ESOCIAL_SIMULATE')?.toLowerCase() === 'true';
 
 const NO_STORE = { 'Cache-Control': 'no-store' };
 

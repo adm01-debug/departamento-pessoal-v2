@@ -252,6 +252,28 @@ serve(async (req: Request): Promise<Response> => {
       guias.push({ ...payload, hash_sha256: hash, status: 'pendente' });
     }
 
+    // Persist guias to database
+    if (guias.length > 0) {
+      for (const guia of guias) {
+        const t = guia.tipo as string;
+        const tabela = (t === 'FGTS' || t === 'FGTS_DIGITAL' || t === 'GFD') ? 'guias_fgts' : 'guias_inss';
+        const { error: insertErr } = await supabase.from(tabela).insert({
+          empresa_id: guia.empresa_id,
+          competencia: guia.competencia,
+          tipo: guia.tipo,
+          codigo_receita: guia.codigo_receita,
+          valor_total: guia.valor_total,
+          valores: guia.valores,
+          vencimento: guia.vencimento,
+          protocolo: guia.protocolo,
+          hash_sha256: guia.hash_sha256,
+          status: 'pendente',
+          gerado_por: userId,
+        });
+        if (insertErr) throw insertErr;
+      }
+    }
+
     // Auditoria bloqueante
     const { error: auditErr } = await supabase.from('audit_log').insert({
       tabela: 'guias_fiscais',

@@ -144,16 +144,20 @@ Deno.serve(async (req) => {
 
     const saldoSalario = round2((salario_base / 30) * diasNoMes);
 
-    const podeReceber = tipo_rescisao !== 'com_justa_causa' && tipo_rescisao !== 'pedido_demissao';
-    const d13 = podeReceber ? round2((salario_base / 12) * mesAtual) : 0;
+    // CLT Art. 146/480: pedido_demissao TEM direito a 13o e ferias proporcionais
+    // Apenas com_justa_causa perde esses direitos (CLT Art. 482 + Sumula 171 TST)
+    const perde13eFerias = tipo_rescisao === 'com_justa_causa';
+    const d13 = perde13eFerias ? 0 : round2((salario_base / 12) * mesAtual);
 
     const mfp = totalMeses % 12;
-    const fp = podeReceber ? round2((salario_base / 12) * mfp) : 0;
+    const fp = perde13eFerias ? 0 : round2((salario_base / 12) * mfp);
     const tfp = round2(fp / 3);
 
+    // Ferias vencidas: devidas mesmo em justa causa (Sumula 171 TST)
     const fvv = ferias_vencidas ? salario_base : 0;
     const tfv = round2(fvv / 3);
 
+    // Aviso previo: sem_justa_causa = integral, acordo_mutuo = 50%, pedido_demissao = 0 (empregado cumpre ou desconta)
     const dap = tipo_rescisao === 'sem_justa_causa' ? Math.min(90, 30 + anos * 3) : 0;
     const ap = tipo_rescisao === 'sem_justa_causa'
       ? round2((salario_base / 30) * dap)
@@ -161,6 +165,7 @@ Deno.serve(async (req) => {
         ? round2((salario_base / 30) * Math.min(90, 30 + anos * 3) * 0.5)
         : 0;
 
+    // Multa FGTS: 40% sem_justa_causa, 20% acordo_mutuo, 0% demais
     const mf = tipo_rescisao === 'sem_justa_causa'
       ? round2(saldo_fgts * 0.40)
       : tipo_rescisao === 'acordo_mutuo'
