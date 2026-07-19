@@ -86,7 +86,7 @@ const RPC_ALLOWLIST = new Set<string>([
   "get_personnel_cost_projection", "get_colaborador_banco_horas",
   "calcular_dias_ferias", "fn_calculate_periodo_aquisitivo",
   "fn_link_gov_br_account", "processar_ajuste_aprovado",
-  "gerar_alertas_preditivos_ia", "anonimizar_dados_pessoais",
+  "gerar_alertas_preditivos_ia",
   "run_rls_tests",
 ]);
 const LOGIN_PROTECTION_RPC_FALLBACKS: Record<string, unknown> = {
@@ -459,6 +459,10 @@ Deno.serve(async (req) => {
     return jsonError(500, "NOT_CONFIGURED", "External database not configured");
   }
   const externalClient = createClient(externalUrl, externalKey);
+  // User-scoped client for RPCs that rely on auth.uid() inside the external DB
+  const externalUserClient = authHeader
+    ? createClient(externalUrl, externalKey, { global: { headers: { Authorization: authHeader } } })
+    : externalClient;
 
   // Cliente local (para verificação de tenant scope via RPC has_role/user_belongs_to_empresa)
   const localClient = serviceKey ? createClient(supabaseUrl, serviceKey) : null;
@@ -603,7 +607,7 @@ Deno.serve(async (req) => {
         const durationMs = Math.round(performance.now() - t0);
         return jsonOk({ data: LOGIN_PROTECTION_RPC_FALLBACKS[rpcName], duration_ms: durationMs });
       }
-      const { data: rpcData, error } = await externalClient.rpc(rpcName, (rpcArgs || {}) as Record<string, unknown>);
+      const { data: rpcData, error } = await externalUserClient.rpc(rpcName, (rpcArgs || {}) as Record<string, unknown>);
       const durationMs = Math.round(performance.now() - t0);
       emitTelemetry({
         operation: "rpc", rpcName, durationMs, status: classifySeverity(durationMs, !!error),

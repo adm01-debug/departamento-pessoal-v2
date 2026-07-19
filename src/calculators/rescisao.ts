@@ -1,5 +1,5 @@
 // Cálculos de rescisão, provisões e encargos
-import { SALARIO_MINIMO_2026 } from './tabelas';
+import { SALARIO_MINIMO_2026, FAIXAS_SEGURO_DESEMPREGO_2026 } from './tabelas';
 import { calcularINSS, calcularIRRF, calcularFGTS } from './impostos';
 
 export type TipoRescisao = 'sem_justa_causa' | 'com_justa_causa' | 'pedido_demissao' | 'acordo_mutuo';
@@ -22,12 +22,13 @@ export function calcularRescisao(params: {
   feriasVencidas?: boolean;
 }) {
   const { salarioBase, dataAdmissao, dataDesligamento, tipoRescisao, saldoFGTS = 0, feriasVencidas = false } = params;
-  const admissao = new Date(dataAdmissao);
-  const desligamento = new Date(dataDesligamento);
+  // Parse as local date (YYYY-MM-DD) to avoid timezone shift
+  const admissao = new Date(dataAdmissao + 'T00:00:00');
+  const desligamento = new Date(dataDesligamento + 'T00:00:00');
   const avosTotal = calcularAvos(admissao, desligamento);
 
   // Saldo de salário: dias trabalhados no mês sobre os dias reais do mês.
-  const diasNoMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate();
+  const diasNoMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate() || 30;
   const diasTrabalhados = desligamento.getDate();
   const saldoSalario = Math.round((salarioBase / diasNoMes) * diasTrabalhados * 100) / 100;
 
@@ -79,11 +80,13 @@ export function calcularAvisoPrevioIndenizado(salarioBase: number, anosServico: 
 }
 
 export function calcularSeguroDesemprego(ultimosSalarios: number[]) {
+  if (!ultimosSalarios.length) return { valorParcela: SALARIO_MINIMO_2026, parcelas: 3 };
   const media = ultimosSalarios.reduce((a, b) => a + b, 0) / ultimosSalarios.length;
+  const sd = FAIXAS_SEGURO_DESEMPREGO_2026;
   let valorParcela: number;
-  if (media <= 2041.39) valorParcela = media * 0.8;
-  else if (media <= 3402.65) valorParcela = 1633.10 + (media - 2041.39) * 0.5;
-  else valorParcela = 2313.74;
+  if (media <= sd.faixa1Limite) valorParcela = media * sd.faixa1Mult;
+  else if (media <= sd.faixa2Limite) valorParcela = sd.faixa2Base + (media - sd.faixa1Limite) * sd.faixa2Mult;
+  else valorParcela = sd.teto;
   valorParcela = Math.max(SALARIO_MINIMO_2026, Math.round(valorParcela * 100) / 100);
   return { valorParcela, parcelas: ultimosSalarios.length >= 24 ? 5 : ultimosSalarios.length >= 12 ? 4 : 3 };
 }
