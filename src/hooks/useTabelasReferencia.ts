@@ -157,7 +157,7 @@ export function useExcluirDocumentoPessoal(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      return await service.excluirDocumentoPessoal(id);
+      return await service.excluirDocumentoPessoal(colaboradorId, id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['documentos-pessoais', colaboradorId] }),
   });
@@ -183,8 +183,8 @@ export function useCriarFeriasAprovacao() {
 export function useAtualizarFeriasAprovacao() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, dados }: { id: string; dados: DataRecord }) => {
-      return await service.atualizarFeriasAprovacao(id, dados);
+    mutationFn: async ({ id, feriasId, dados }: { id: string; feriasId: string; dados: DataRecord }) => {
+      return await service.atualizarFeriasAprovacao(feriasId, id, dados);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ferias-aprovacoes'] }),
   });

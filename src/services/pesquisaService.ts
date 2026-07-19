@@ -55,13 +55,12 @@ export const pesquisaService = {
   
   async excluirPergunta(id: string, empresaId: string): Promise<void> {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    // Cross-tenant ownership check via parent pesquisa
+    // Cross-tenant ownership check via parent pesquisa — fail closed if record not found
     const { data: perg } = await supabase.from('pesquisas_perguntas').select('pesquisa_id').eq('id', id).maybeSingle();
-    if (perg?.pesquisa_id) {
-      const { data: pesq } = await supabase.from('pesquisas').select('empresa_id').eq('id', perg.pesquisa_id).maybeSingle();
-      if (pesq && pesq.empresa_id !== empresaId) throw new Error('Acesso negado: pergunta pertence a outro tenant');
-    }
-    const { error } = await supabase.from('pesquisas_perguntas').delete().eq('id', id);
+    if (!perg?.pesquisa_id) throw new Error('Pergunta não encontrada');
+    const { data: pesq } = await supabase.from('pesquisas').select('empresa_id').eq('id', perg.pesquisa_id).maybeSingle();
+    if (!pesq || pesq.empresa_id !== empresaId) throw new Error('Acesso negado: pergunta pertence a outro tenant');
+    const { error } = await supabase.from('pesquisas_perguntas').delete().eq('id', id).eq('pesquisa_id', perg.pesquisa_id);
     if (error) throw error;
 
   },

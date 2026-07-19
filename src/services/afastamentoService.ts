@@ -118,16 +118,16 @@ class AfastamentoService extends BaseService<any> {
 
   async validarDocumento(id: string, validado: boolean, empresaId: string): Promise<any> {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    // documentos_afastamento does not carry empresa_id directly; scope through parent
+    // documentos_afastamento does not carry empresa_id directly; scope through parent — fail closed
     const { data: doc } = await (supabase as any).from('documentos_afastamento').select('afastamento_id').eq('id', id).maybeSingle();
-    if (doc?.afastamento_id) {
-      const { data: af } = await this.getQuery().select('empresa_id').eq('id', doc.afastamento_id).maybeSingle();
-      if (af && af.empresa_id !== empresaId) throw new Error('Acesso negado: documento pertence a outro tenant');
-    }
+    if (!doc?.afastamento_id) throw new Error('Documento não encontrado');
+    const { data: af } = await this.getQuery().select('empresa_id').eq('id', doc.afastamento_id).maybeSingle();
+    if (!af || af.empresa_id !== empresaId) throw new Error('Acesso negado: documento pertence a outro tenant');
     const { data, error } = await (supabase as any)
       .from('documentos_afastamento')
       .update({ validado } as any)
       .eq('id', id)
+      .eq('afastamento_id', doc.afastamento_id)
       .select()
       .maybeSingle();
 

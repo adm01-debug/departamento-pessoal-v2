@@ -326,10 +326,11 @@ export const cnabService = {
             .eq('empresa_id', empresaId);
 
           if (isSuccess && itemRecord.folha_item_id) {
-            await supabase
+            await (supabase as any)
               .from('folha_itens')
               .update({ status_pagamento: 'pago' })
-              .eq('id', itemRecord.folha_item_id);
+              .eq('id', itemRecord.folha_item_id)
+              .eq('empresa_id', empresaId);
             results.sucesso++;
           } else {
             results.erro++;

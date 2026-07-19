@@ -30,9 +30,15 @@ class AdmissaoService extends BaseService<any> {
 
   async getById(id: string) { return this.buscarPorId(id); }
   async create(d: any) { return this.criar(d); }
-  async update(id: string, d: any) { return this.atualizar(id, d); }
-  async concluir(id: string) { return this.update(id, { etapa: 'concluida' }); }
-  async cancelar(id: string) { return this.update(id, { etapa: 'cancelada' }); }
+  async update(id: string, d: any, empresaId: string) { return this.atualizar(id, d, empresaId); }
+  async concluir(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    return this.atualizar(id, { etapa: 'concluida' }, empresaId);
+  }
+  async cancelar(id: string, empresaId: string) {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    return this.atualizar(id, { etapa: 'cancelada' }, empresaId);
+  }
 }
 
 export const admissaoService = new AdmissaoService();

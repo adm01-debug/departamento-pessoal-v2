@@ -160,8 +160,9 @@ export async function criarDocumentoPessoal(doc: DataRecord): Promise<any> {
   return data;
 }
 
-export async function excluirDocumentoPessoal(id: string): Promise<void> {
-  const { error } = await supabase.from('documentos_pessoais').delete().eq('id', id);
+export async function excluirDocumentoPessoal(colaboradorId: string, id: string): Promise<void> {
+  if (!colaboradorId) throw new Error('colaborador_id obrigatório para isolamento de tenant');
+  const { error } = await supabase.from('documentos_pessoais').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 
@@ -187,8 +188,9 @@ export async function criarFeriasAprovacao(aprovacao: DataRecord): Promise<any> 
   return data;
 }
 
-export async function atualizarFeriasAprovacao(id: string, dados: DataRecord): Promise<void> {
-  const { error } = await supabase.from('ferias_aprovacoes').update(dados).eq('id', id);
+export async function atualizarFeriasAprovacao(feriasId: string, id: string, dados: DataRecord): Promise<void> {
+  if (!feriasId) throw new Error('ferias_id obrigatório para isolamento de tenant');
+  const { error } = await supabase.from('ferias_aprovacoes').update(dados).eq('id', id).eq('ferias_id', feriasId);
   if (error) throw error;
 }
 

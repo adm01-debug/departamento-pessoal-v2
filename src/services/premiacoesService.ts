@@ -66,6 +66,7 @@ export const premiacoesService = {
         historico_mudancas: [...currentHistory, { status, data: new Date().toISOString(), comentario, user: 'current_user' }]
       })
       .eq('id', id)
+      .eq('campanha_id', original.campanha_id)
       .select()
       .single();
 
@@ -104,6 +105,7 @@ export const premiacoesService = {
         }]
       })
       .eq('id', id)
+      .eq('campanha_id', original.campanha_id)
       .select()
       .single();
     
