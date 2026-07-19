@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useIdempotencyKey } from '@/hooks/useIdempotencyKey';
 import { auditLogger } from '@/utils/auditLogger';
+import { useDataAccessLog } from '@/hooks/useDataAccessLog';
 import { Card, CardContent } from '@/components/ui/card';
 import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard, FolhaESocialSync } from '@/components/folha';
 import { folhaCalc } from '@/utils/folhaCalc';
@@ -107,6 +108,8 @@ export default function FolhaPagamentoPage() {
   const { data: resumo, isLoading, refetch } = useFolhaResumo(competencia, empresaAtual?.id);
   const queryClient = useQueryClient();
   const [calcServidor, setCalcServidor] = useState(false);
+
+  useDataAccessLog('folhas_pagamento', resumo?.id, empresaAtual?.id);
 
   const calcularFolha = useMutation({
     mutationFn: async (comp: string) => {
