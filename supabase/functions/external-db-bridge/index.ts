@@ -75,6 +75,7 @@ const TENANT_SCOPED_TABLES = new Set<string>([
 const RPC_ALLOWLIST = new Set<string>([
   // segurança / login
   "check_login_lock", "record_failed_login", "reset_login_attempts",
+  "check_account_lockout", "record_login_attempt", "reset_account_lockout",
   "check_brute_force", "check_rate_limit", "is_ip_blocked", "is_ip_whitelisted",
   "is_country_allowed",
   // roles / tenant
