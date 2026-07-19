@@ -26,7 +26,9 @@ export const rescisaoService = {
       const indexNova = ORDEM_ETAPAS.indexOf(novaEtapa);
 
       if (indexNova > indexAtual + 1) {
-        throw new Error(`Transição bloqueada: Você deve concluir a etapa '${ORDEM_ETAPAS[indexAtual]}' e passar por '${ORDEM_ETAPAS[indexAtual + 1]}' antes de chegar em '${novaEtapa}'.`);
+        throw new Error(
+          `Transição bloqueada: Você deve concluir a etapa '${ORDEM_ETAPAS[indexAtual]}' e passar por '${ORDEM_ETAPAS[indexAtual + 1]}' antes de chegar em '${novaEtapa}'.`
+        );
       }
 
       if (novaEtapa === 'homologacao' && atual.status !== 'calculado') {
@@ -46,7 +48,7 @@ export const rescisaoService = {
     try {
       const { data: anterior, error: fetchError } = await supabase
         .from('desligamentos')
-        .select('*, colaborador:colaboradores!desligamentos_colaborador_id_fkey(nome_completo, data_admissao, dependentes_irrf)')
+        .select('*, colaborador:colaboradores!desligamentos_colaborador_id_fkey(nome, data_admissao, dependentes_irrf)')
         .eq('id', id)
         .eq('empresa_id', empresaId)
         .single();
@@ -60,9 +62,16 @@ export const rescisaoService = {
         dataAdmissao: (anterior.colaborador as any)?.data_admissao || params.data_admissao,
         dataDesligamento: params.data_desligamento || (anterior as Record<string, unknown>).data_desligamento,
         tipo: params.tipo || (anterior as Record<string, unknown>).tipo,
-        avisoTrabalhado: params.aviso_trabalhado !== undefined ? params.aviso_trabalhado : (anterior as Record<string, unknown>).aviso_trabalhado,
-        feriasVencidas: params.ferias_vencidas !== undefined ? params.ferias_vencidas : (anterior as Record<string, unknown>).ferias_vencidas_check,
-        saldoFGTS: params.saldo_fgts !== undefined ? params.saldo_fgts : ((anterior as Record<string, unknown>).saldo_fgts || 0),
+        avisoTrabalhado:
+          params.aviso_trabalhado !== undefined
+            ? params.aviso_trabalhado
+            : (anterior as Record<string, unknown>).aviso_trabalhado,
+        feriasVencidas:
+          params.ferias_vencidas !== undefined
+            ? params.ferias_vencidas
+            : (anterior as Record<string, unknown>).ferias_vencidas_check,
+        saldoFGTS:
+          params.saldo_fgts !== undefined ? params.saldo_fgts : (anterior as Record<string, unknown>).saldo_fgts || 0,
         dependentes: (anterior.colaborador as any)?.dependentes_irrf || 0,
       });
       const resultado = result;
@@ -81,7 +90,7 @@ export const rescisaoService = {
         detalhes_calculo: resultado,
         status: 'calculado',
         etapa: 'homologacao',
-        checklist_calculo_rescisao: true
+        checklist_calculo_rescisao: true,
       };
 
       const { data: novo, error: updateError } = await supabase
@@ -135,12 +144,22 @@ export const rescisaoService = {
           etapa,
           status: 'aprovado',
           parecer,
-          data_decisao: new Date().toISOString()
-        });
+          usuario_id: userData?.user?.id,
+          data_decisao: new Date().toISOString(),
+        },
+        { onConflict: 'desligamento_id,etapa' }
+      );
 
       if (homError) throw homError;
 
-      const proximaEtapa = etapa === 'rh' ? 'financeiro' : etapa === 'financeiro' ? 'juridico' : etapa === 'juridico' ? 'colaborador' : 'finalizado';
+      const proximaEtapa =
+        etapa === 'rh'
+          ? 'financeiro'
+          : etapa === 'financeiro'
+            ? 'juridico'
+            : etapa === 'juridico'
+              ? 'colaborador'
+              : 'finalizado';
       const novoStatus = proximaEtapa === 'finalizado' ? 'homologado' : 'em_homologacao';
 
       const { data, error } = await supabase
@@ -166,7 +185,7 @@ export const rescisaoService = {
           etapa: proximaEtapa,
           evento: 'HOMOLOGACAO_PARCIAL',
           etapa_concluida: etapa,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
       });
 
@@ -202,16 +221,19 @@ export const rescisaoService = {
 
       if (error) throw error;
 
+      const { data, error: fetchError } = await supabase.from('desligamentos').select().eq('id', id).single();
+      if (fetchError) throw fetchError;
+
       await auditLogger.log({
         tabela: 'desligamentos',
         registro_id: id,
         acao: 'SIGN',
-        dados_novos: { tipo_assinatura: tipo, hash }
+        dados_novos: { tipo_assinatura: tipo },
       });
 
       return data;
     } catch (e: any) {
-      throw new Error('Falha ao realizar assinatura digital', { cause: e });
+      throw new Error(e.message || 'Falha ao realizar assinatura digital', { cause: e });
     }
   },
 
@@ -252,7 +274,7 @@ export const rescisaoService = {
         .from('colaboradores')
         .update({
           status: 'desligado',
-          data_desligamento: d.data_desligamento
+          data_desligamento: d.data_desligamento,
         })
         .eq('id', d.colaborador_id)
         .eq('empresa_id', empresaId);
@@ -263,12 +285,12 @@ export const rescisaoService = {
         tabela: 'desligamentos',
         registro_id: id,
         acao: 'UPDATE',
-        dados_novos: { status: 'pago', etapa: 'finalizado', colaborador_desativado: true },
+        dados_novos: { status: 'pago', etapa: 'concluido', colaborador_desativado: true },
       });
 
       return data;
     } catch (e: any) {
       throw new Error('Erro ao processar pagamento de rescisão', { cause: e });
     }
-  }
+  },
 };

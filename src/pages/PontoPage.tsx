@@ -281,7 +281,7 @@ export default function PontoPage() {
       }
       return {};
     } catch (e: any) {
-      toast.error(`Erro: ${e.message}`);
+      toast.error(safeErrorMessage(e, 'Erro ao registrar ponto.'));
       return undefined;
     } finally {
       setLoading(null);

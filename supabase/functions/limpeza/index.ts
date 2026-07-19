@@ -101,6 +101,19 @@ serve(async (req: Request): Promise<Response> => {
       .select('id');
     results.expired_sessions_cleaned = sessions?.length || 0;
 
+    // Achado N22 da auditoria: lgpd_fila_limpeza nunca era drenada — itens
+    // se acumulavam para sempre com executado=false. drenar_fila_limpeza_lgpd
+    // (SECURITY DEFINER, service_role) processa os itens vencidos e chama
+    // anonimizar_dados_pessoais para cada um.
+    const { data: lgpdResults, error: lgpdError } = await supabase.rpc('drenar_fila_limpeza_lgpd');
+    if (lgpdError) {
+      results.lgpd_fila_limpeza_erro = 1;
+    } else {
+      const processados = (lgpdResults ?? []) as Array<{ sucesso: boolean }>;
+      results.lgpd_fila_limpeza_processados = processados.filter((r) => r.sucesso).length;
+      results.lgpd_fila_limpeza_falhas = processados.filter((r) => !r.sucesso).length;
+    }
+
     const totalCleaned = Object.values(results).reduce((a, b) => a + b, 0);
 
     await adminClient.from('auditoria').insert({
