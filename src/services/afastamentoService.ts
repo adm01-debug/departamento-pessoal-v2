@@ -84,7 +84,8 @@ class AfastamentoService extends BaseService<any> {
       const { error: uploadError } = await supabase.storage.from('afastamentos').upload(fileName, file);
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage.from('afastamentos').getPublicUrl(fileName);
+      const { data: signedUrlData } = await supabase.storage.from('afastamentos').createSignedUrl(fileName, 60 * 60 * 24 * 365);
+      const fileUrl = signedUrlData?.signedUrl || fileName;
 
       const { data, error } = await (supabase as any)
         .from('documentos_afastamento')
@@ -92,7 +93,7 @@ class AfastamentoService extends BaseService<any> {
           afastamento_id: afastamentoId,
           tipo,
           nome_arquivo: file.name,
-          url: publicUrl,
+          url: fileUrl,
           metadados: {
             size: file.size,
             type: file.type,
