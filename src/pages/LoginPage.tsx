@@ -333,6 +333,7 @@ export default function LoginPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="seu@email.com"
                         required
+                        autoComplete="username"
                         className="h-11 pl-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
                       />
                     </div>
@@ -356,6 +357,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        autoComplete="current-password"
                         className="h-11 pl-10 pr-10 rounded-lg border-border/50 focus:border-primary/50 font-body"
                       />
                       <button

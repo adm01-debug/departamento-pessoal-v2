@@ -13,8 +13,9 @@ export default function AuthCallbackPage() {
       const code = searchParams.get('code');
       const state = searchParams.get('state');
 
+      window.history.replaceState(null, '', window.location.pathname);
+
       if (code && state) {
-        // Fluxo Gov.br
         try {
           const { data, error } = await supabase.functions.invoke('auth-gov-br', {
             body: { action: 'callback', code, state },
@@ -24,15 +25,14 @@ export default function AuthCallbackPage() {
 
           if (data?.success) {
             toast.success(`Autenticado com Gov.br! Nível: ${data.profile.nivel}`);
-            navigate('/dashboard');
+            navigate('/dashboard', { replace: true });
           }
         } catch (err: any) {
           toast.error('Erro na autenticação Gov.br: ' + err.message);
-          navigate('/login');
+          navigate('/login', { replace: true });
         }
       } else {
-        // Callback padrão Supabase (se necessário)
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     };
 

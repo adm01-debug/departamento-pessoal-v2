@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
 import { useDebounce } from '@/hooks/useDebounce';
 import { maskCpfDisplay } from '@/utils/piiMask';
+import { secureJsonParse } from '@/utils/secureJson';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { ColaboradorStatus } from '@/components/ui/status-badge';
 import {
@@ -87,7 +88,7 @@ function fuzzyMatch(text: string, query: string): boolean {
 /* ─── Recent searches ─── */
 function getRecentSearches(): string[] {
   try {
-    return JSON.parse(localStorage.getItem('cmd-recent') || '[]').slice(0, 5);
+    return secureJsonParse<string[]>(localStorage.getItem('cmd-recent') || '[]').slice(0, 5);
   } catch { return []; }
 }
 
