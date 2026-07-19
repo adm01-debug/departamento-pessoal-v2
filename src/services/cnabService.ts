@@ -171,7 +171,12 @@ export const cnabService = {
     const remessaRecord = remessa as unknown as CnabRemessaRecord;
 
     const lines: string[] = [];
-    const sequence = 1;
+    // Fetch monotonically increasing sequence per (empresa, banco) — fixes C46 hardcoded=1
+    const { data: seqData } = await supabase.rpc('next_cnab_sequencial', {
+      p_empresa_id: empresaId,
+      p_banco_codigo: config.banco_codigo,
+    } as any);
+    const sequence = (seqData as number) || 1;
 
     const pad = (val: unknown, len: number, char = ' ', side: 'left' | 'right' = 'right') => {
       const s = String(val || '').substring(0, len);
@@ -186,12 +191,6 @@ export const cnabService = {
 
     const header = pad(config.banco_codigo, 3, '0', 'left') + '00000' + pad('', 9) + '2' + pad('', 14, '0') + pad(config.convenio, 20) + pad(config.agencia, 5, '0', 'left') + pad(config.agencia_digito || '', 1) + pad(config.conta, 12, '0', 'left') + pad(config.conta_digito, 1) + ' ' + pad(config.nome_empresa || 'EMPRESA', 30) + pad('BANCO', 30) + pad('', 10) + '1' + dateStr + timeStr + pad(sequence, 6, '0', 'left') + '081' + '00000' + pad('', 69);
     lines.push(header.padEnd(240, ' '));
-
-    // Registrar o arquivo de remessa no banco para auditoria real
-    await supabase.from('cnab_remessas').update({
-      arquivo_remessa: lines[0],
-      status: 'enviado'
-    } as any).eq('id', remessaRecord.id);
 
     let detailSequence = 1;
     let totalValue = 0;
@@ -238,17 +237,25 @@ export const cnabService = {
     const lotTrailer = pad(config.banco_codigo, 3, '0', 'left') + '00015' + pad('', 9) + pad(detailSequence + 1, 6, '0', 'left') + formatAmount(totalValue) + pad('', 18, '0') + pad('', 183);
     lines.push(lotTrailer.padEnd(240, ' '));
 
-    await supabase.from('cnab_itens').insert(cnabItensToInsert);
-
     // Trailer de Arquivo (Tipo 9)
     const trailer = pad(config.banco_codigo, 3, '0', 'left') + '99999' + pad('', 9) + '000001' + pad(lines.length + 1, 6, '0', 'left') + pad('', 6, '0') + pad('', 205);
     lines.push(trailer.padEnd(240, ' '));
 
     const fullFile = lines.join('\r\n');
-    
-    // Atualiza com o arquivo completo
+
+    // Insert cnab_itens BEFORE marking remessa as 'enviado' (fixes C47):
+    // if we crash after updating status but before inserting items, the remessa
+    // would appear sent but have no payment records. Insert items first so the
+    // DB is always consistent — a pending remessa with items is recoverable.
+    if (cnabItensToInsert.length > 0) {
+      await supabase.from('cnab_itens').insert(cnabItensToInsert);
+    }
+
+    // Only after items are persisted, mark remessa as sent with the full file
     await supabase.from('cnab_remessas').update({
-      arquivo_remessa: fullFile
+      arquivo_remessa: fullFile,
+      status: 'enviado',
+      sequencial_arquivo: sequence,
     } as any).eq('id', remessaRecord.id);
 
     return fullFile;
