@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { todayLocalISO } from '@/utils/dateLocal';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -253,7 +254,7 @@ const AdminRegimentoInternoPage = () => {
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = `regimento-pendentes-${new Date().toISOString().slice(0,10)}.csv`;
+              a.download = `regimento-pendentes-${todayLocalISO()}.csv`;
               a.click();
               URL.revokeObjectURL(url);
             }}

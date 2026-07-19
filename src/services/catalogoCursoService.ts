@@ -93,7 +93,7 @@ export const catalogoCursoService = {
 
   async listarInstancias(empresaId: string, cursoId?: string) {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    let q = supabase
+    let q = (supabase as any)
       .from('treinamento_instancias')
       .select('*, curso:catalogo_cursos!treinamento_instancias_curso_id_fkey(nome), instrutor:colaboradores!treinamento_instancias_instrutor_id_fkey(nome_completo)')
       .eq('empresa_id', empresaId)
@@ -123,7 +123,7 @@ export const catalogoCursoService = {
 
   async listarCertificados(empresaId: string, colaboradorId?: string) {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    let q = supabase
+    let q = (supabase as any)
       .from('treinamento_certificados')
       .select('*, curso:catalogo_cursos(nome, carga_horaria), colaborador:colaboradores(nome_completo)')
       .eq('empresa_id', empresaId);

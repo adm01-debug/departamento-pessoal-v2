@@ -22,8 +22,8 @@ DROP POLICY IF EXISTS "Authenticated users can manage historico_cargo" ON public
 DROP POLICY IF EXISTS "Tenant isolation historico_cargo" ON public.historico_cargo;
 CREATE POLICY "Tenant isolation historico_cargo"
   ON public.historico_cargo FOR ALL TO authenticated
-  USING (empresa_id IN (SELECT empresa_id FROM public.user_empresa_roles WHERE user_id = auth.uid()))
-  WITH CHECK (empresa_id IN (SELECT empresa_id FROM public.user_empresa_roles WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid()))
+  WITH CHECK (empresa_id IN (SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid()));
 
 -- ============================================================
 -- colaborador_beneficios — backfill from beneficios.empresa_id
@@ -46,8 +46,8 @@ DROP POLICY IF EXISTS "Auth users manage colaborador_beneficios" ON public.colab
 DROP POLICY IF EXISTS "Tenant isolation colaborador_beneficios" ON public.colaborador_beneficios;
 CREATE POLICY "Tenant isolation colaborador_beneficios"
   ON public.colaborador_beneficios FOR ALL TO authenticated
-  USING (empresa_id IN (SELECT empresa_id FROM public.user_empresa_roles WHERE user_id = auth.uid()))
-  WITH CHECK (empresa_id IN (SELECT empresa_id FROM public.user_empresa_roles WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid()))
+  WITH CHECK (empresa_id IN (SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid()));
 
 -- ============================================================
 -- documentos_colaborador
@@ -70,5 +70,5 @@ DROP POLICY IF EXISTS "Authenticated users can manage documentos" ON public.docu
 DROP POLICY IF EXISTS "Tenant isolation documentos_colaborador" ON public.documentos_colaborador;
 CREATE POLICY "Tenant isolation documentos_colaborador"
   ON public.documentos_colaborador FOR ALL TO authenticated
-  USING (empresa_id IN (SELECT empresa_id FROM public.user_empresa_roles WHERE user_id = auth.uid()))
-  WITH CHECK (empresa_id IN (SELECT empresa_id FROM public.user_empresa_roles WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid()))
+  WITH CHECK (empresa_id IN (SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid()));

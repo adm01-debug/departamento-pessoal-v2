@@ -55,7 +55,7 @@ export const documentosAssinaturaService = {
 export const documentosColaboradorService = {
   listar: async (colaboradorId: string, empresaId: string) => {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    const { data, error } = await supabase.from('documentos_colaborador').select('*').eq('colaborador_id', colaboradorId).eq('empresa_id', empresaId).order('created_at', { ascending: false });
+    const { data, error } = await (supabase as any).from('documentos_colaborador').select('*').eq('colaborador_id', colaboradorId).eq('empresa_id', empresaId).order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },

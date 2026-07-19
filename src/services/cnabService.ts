@@ -137,7 +137,7 @@ export const cnabService = {
     // Idempotency guard (C46/C47): reject if a remessa already exists in 'enviado'
     // status for this folha to prevent double-payment. Allow recovery if 'pendente'
     // (previous attempt failed before sending).
-    const { data: existingRemessa } = await supabase
+    const { data: existingRemessa } = await (supabase as any)
       .from('cnab_remessas')
       .select('id, status, arquivo_remessa')
       .eq('empresa_id', empresaId)

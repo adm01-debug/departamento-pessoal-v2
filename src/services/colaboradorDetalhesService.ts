@@ -9,7 +9,7 @@ type DadosUpdate = any;
 // =============================================
 export async function listarDependentes(colaboradorId: string, empresaId: string) {
   if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('dependentes')
     .select('*')
     .eq('colaborador_id', colaboradorId)
@@ -254,7 +254,7 @@ export async function excluirAnotacao(id: string) {
 // =============================================
 export async function listarPeriodosAquisitivos(colaboradorId: string, empresaId: string) {
   if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('periodos_aquisitivos')
     .select('*')
     .eq('colaborador_id', colaboradorId)

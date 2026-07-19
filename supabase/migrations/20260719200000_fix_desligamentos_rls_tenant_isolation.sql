@@ -3,7 +3,7 @@
 -- user_roles maps users to their empresa(s); we scope SELECT/UPDATE/DELETE to that set.
 
 -- Helper function: returns set of empresa_ids the current user belongs to.
--- Defined safely so it can be called in RLS without privilege escalation.
+-- Wrapper around get_user_empresas for zero-arg convenience in RLS policies.
 CREATE OR REPLACE FUNCTION public.get_user_empresa_ids()
 RETURNS SETOF UUID
 LANGUAGE sql
@@ -11,7 +11,7 @@ STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT empresa_id FROM public.user_roles WHERE user_id = auth.uid();
+  SELECT empresa_id FROM public.user_empresas WHERE user_id = auth.uid();
 $$;
 
 -- Replace all four desligamentos policies with empresa-scoped equivalents.

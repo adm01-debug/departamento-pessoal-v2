@@ -24,10 +24,10 @@ DROP POLICY IF EXISTS "Tenant isolation periodos_aquisitivos" ON public.periodos
 CREATE POLICY "Tenant isolation periodos_aquisitivos"
   ON public.periodos_aquisitivos FOR ALL TO authenticated
   USING (empresa_id IN (
-    SELECT empresa_id FROM public.user_empresa_roles
+    SELECT empresa_id FROM public.user_empresas
     WHERE user_id = auth.uid()
   ))
   WITH CHECK (empresa_id IN (
-    SELECT empresa_id FROM public.user_empresa_roles
+    SELECT empresa_id FROM public.user_empresas
     WHERE user_id = auth.uid()
   ));
