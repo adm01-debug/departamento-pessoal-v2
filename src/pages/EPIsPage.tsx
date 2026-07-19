@@ -50,19 +50,19 @@ export default function EPIsPage() {
 
   const { data: epis = [], isLoading } = useQuery({
     queryKey: ['epis', empresaAtual?.id],
-    queryFn: () => episService.listar(empresaAtual?.id),
+    queryFn: () => episService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 
   const { data: entregas = [] } = useQuery({
     queryKey: ['epis-entregas', empresaAtual?.id],
-    queryFn: () => episEntregasService.listar(empresaAtual?.id),
+    queryFn: () => episEntregasService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    queryFn: () => colaboradorService.list(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

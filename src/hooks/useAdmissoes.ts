@@ -11,7 +11,7 @@ export function useAdmissoes() {
 
   const query = useQuery<any[]>({
     queryKey: ['admissoes', empresaId],
-    queryFn: () => admissaoService.listarAdmissoes(empresaId),
+    queryFn: () => admissaoService.listarAdmissoes(empresaId!),
     // Guard: evita fetch sem tenant (possível vazamento cross-empresa via RLS frouxa).
     enabled: !!empresaId,
   });

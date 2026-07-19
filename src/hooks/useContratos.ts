@@ -11,7 +11,7 @@ export function useContratos() {
 
   const query = useQuery({
     queryKey: ['contratos', empresaId],
-    queryFn: () => contratoService.listar(empresaId),
+    queryFn: () => contratoService.listar(empresaId!),
     enabled: !!empresaId,
   });
 

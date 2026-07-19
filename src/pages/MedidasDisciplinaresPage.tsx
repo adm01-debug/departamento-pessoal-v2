@@ -60,13 +60,13 @@ export default function MedidasDisciplinaresPage() {
 
   const { data: medidas = [], isLoading } = useQuery({
     queryKey: ['medidas-disciplinares', empresaAtual?.id],
-    queryFn: () => medidasDisciplinaresService.listar(empresaAtual?.id),
+    queryFn: () => medidasDisciplinaresService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    queryFn: () => colaboradorService.list(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

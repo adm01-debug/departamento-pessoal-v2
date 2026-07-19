@@ -11,14 +11,15 @@ export const batidasPontoService = {
     return data || [];
   
   },
-  async listarPorData(data: string, empresaId?: string): Promise<any[]> {
-    
+  async listarPorData(data: string, empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = (supabase as any).from('batidas_ponto').select('*, colaborador:colaboradores!fk_batidas_ponto_colaborador(nome_completo, foto_url)').eq('data', data).order('ordem');
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data: result, error } = await q;
     if (error) throw error;
     return result || [];
-  
+
   },
   async registrar(d: any): Promise<any> {
     

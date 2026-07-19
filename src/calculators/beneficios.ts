@@ -140,12 +140,14 @@ export function calcularAuxilioDoenca(mediaSalarial: number): number {
 }
 
 export function calcularSobreaviso(salarioBase: number, horas: number, jornadaMensal: number = 220): number {
-  const valorHora = jornadaMensal > 0 ? salarioBase / jornadaMensal : 0;
+  if (jornadaMensal <= 0 || horas <= 0) return 0;
+  const valorHora = salarioBase / jornadaMensal;
   return Math.round(valorHora * (1 / 3) * horas * 100) / 100;
 }
 
 export function calcularProntidao(salarioBase: number, horas: number, jornadaMensal: number = 220): number {
-  const valorHora = jornadaMensal > 0 ? salarioBase / jornadaMensal : 0;
+  if (jornadaMensal <= 0 || horas <= 0) return 0;
+  const valorHora = salarioBase / jornadaMensal;
   return Math.round(valorHora * (2 / 3) * horas * 100) / 100;
 }
 

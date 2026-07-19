@@ -27,7 +27,7 @@ export function calcularINSS(salarioBruto: number): number {
     // Removido o bloco duplicado que adicionava a última alíquota novamente
   }
   
-  return Math.round(descontoTotal * 100) / 100;
+  return Math.trunc(descontoTotal * 100) / 100;
 }
 
 export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outrasDeducoes: number = 0, isPensaoAlimenticia: boolean = false): number {
@@ -56,10 +56,10 @@ export function calcularIRRF(salarioBruto: number, dependentes: number = 0, outr
     impostoTotal += baseNaFaixa * faixa.aliquota;
   }
   
-  return Math.max(0, Math.round(impostoTotal * 100) / 100);
+  return Math.max(0, Math.trunc(impostoTotal * 100) / 100);
 }
 
 export function calcularFGTS(salarioBruto: number): number {
   if (!(salarioBruto > 0)) return 0; // captura também NaN/negativos
-  return Math.round(salarioBruto * ALIQUOTA_FGTS * 100) / 100;
+  return Math.trunc(salarioBruto * ALIQUOTA_FGTS * 100) / 100;
 }

@@ -12,9 +12,10 @@ class BeneficioService extends BaseService<any> {
   async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
     const { filters, search } = options;
     const empresaId = (filters as any)?.empresa_id;
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
 
     let query = this.getQuery().select('*', { count: 'exact' });
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    query = query.eq('empresa_id', empresaId);
     if (search) query = query.ilike('nome', `%${search}%`);
 
     const { data, count, error } = await query.order('nome');
@@ -22,10 +23,11 @@ class BeneficioService extends BaseService<any> {
     return { data: data || [], total: count || 0 };
   }
 
-  async listComAdesao(empresaId?: string): Promise<any[]> {
+  async listComAdesao(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { data, error } = await this.getQuery()
       .select('*, beneficios_colaborador(count)')
-      .eq('empresa_id', empresaId || '');
+      .eq('empresa_id', empresaId);
     if (error) throw error;
     return data || [];
   }

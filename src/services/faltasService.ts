@@ -1,13 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 export const faltasService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
+  async listar(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = (supabase as any).from('faltas').select('*, colaborador:colaboradores(nome_completo)').order('data', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async buscarPorColaborador(colaboradorId: string): Promise<any[]> {

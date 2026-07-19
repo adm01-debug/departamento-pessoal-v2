@@ -43,7 +43,7 @@ const isPreviewHost =
 
 if (isInIframe && !isPreviewHost) {
   document.body.innerHTML = '';
-  if (window.top) window.top.location = window.self.location;
+  if (window.top) window.top.location.href = window.self.location.href;
 }
 
 // CSP violation monitoring — detect and report policy breaches client-side

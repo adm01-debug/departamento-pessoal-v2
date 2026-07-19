@@ -14,6 +14,7 @@ import { captureException } from '../_shared/sentry.ts';
 
 const noStore = { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
+const trunc2 = (n: number): number => Math.trunc(n * 100) / 100;
 const TETO_INSS = 8157.41;
 
 const FAIXAS_INSS = [
@@ -41,13 +42,13 @@ function calcINSS(sal: number): number {
     desc += f * FAIXAS_INSS[i].a;
     rest -= f;
   }
-  return round2(desc);
+  return trunc2(desc);
 }
 
 function calcIRRF(b: number): number {
   if (!Number.isFinite(b) || b <= 0) return 0;
   for (const f of FAIXAS_IRRF) {
-    if (b <= f.l) return Math.max(0, round2(b * f.a - f.d));
+    if (b <= f.l) return Math.max(0, trunc2(b * f.a - f.d));
   }
   return 0;
 }

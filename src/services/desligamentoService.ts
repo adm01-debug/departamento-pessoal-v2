@@ -11,14 +11,15 @@ class DesligamentoService extends BaseService<any> {
   async listar(options: ListOptions = {}): Promise<ListResponse<any>> {
     const { filters } = options;
     const empresaId = (filters as any)?.empresa_id;
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
 
     let query = this.getQuery()
       .select('*, colaborador:colaboradores(nome_completo)', { count: 'exact' })
       .order('data_desligamento', { ascending: false })
       .limit(500);
 
-    if (empresaId) query = query.eq('empresa_id', empresaId);
-    
+    query = query.eq('empresa_id', empresaId);
+
     const { data, count, error } = await query;
     if (error) throw error;
     return { data: data || [], total: count || 0 };

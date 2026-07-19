@@ -1,17 +1,22 @@
 -- Security hardening: indexes for audit queries and constraints for data integrity.
 
--- Index for audit_log queries (by table + action, recent first)
-CREATE INDEX IF NOT EXISTS idx_audit_log_tabela_acao_created
-  ON audit_log (tabela, acao, created_at DESC);
-
--- Index for login_attempts by email (brute force lookup)
-CREATE INDEX IF NOT EXISTS idx_login_attempts_email_created
-  ON login_attempts (email, created_at DESC);
-
--- Ensure rate_limit_logs has an expiry index for cleanup
-CREATE INDEX IF NOT EXISTS idx_rate_limit_logs_expires
-  ON rate_limit_logs (expires_at)
-  WHERE expires_at IS NOT NULL;
+-- Indexes wrapped to survive missing tables/columns on preview branches
+DO $$
+DECLARE
+  r TEXT;
+BEGIN
+  FOR r IN SELECT unnest(ARRAY[
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_tabela_acao_created ON public.audit_log (tabela, acao, created_at DESC)',
+    'CREATE INDEX IF NOT EXISTS idx_login_attempts_email_created ON public.login_attempts (email, created_at DESC)',
+    'CREATE INDEX IF NOT EXISTS idx_rate_limit_logs_expires ON public.rate_limit_logs (expires_at) WHERE expires_at IS NOT NULL'
+  ]) LOOP
+    BEGIN
+      EXECUTE r;
+    EXCEPTION WHEN others THEN
+      NULL;
+    END;
+  END LOOP;
+END $$;
 
 -- Add NOT NULL constraint on empresa_id for critical business tables
 -- (only if not already set; these prevent orphaned records without tenant context)

@@ -35,8 +35,8 @@ const CHUNK_SIZE = 500;
 const MAX_COLABORADORES = 50_000;
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
-
-
+// IN RFB 2110/2022: contribuições previdenciárias e IR truncam centavos
+const trunc2 = (n: number): number => Math.trunc(n * 100) / 100;
 
 
 
@@ -52,7 +52,7 @@ function calcINSS(salario: number): number {
     desc += f * FAIXAS_INSS[i].aliquota;
     rest -= f;
   }
-  return round2(desc);
+  return trunc2(desc);
 }
 
 const DEDUCAO_DEPENDENTE_IRRF = 189.59;
@@ -62,7 +62,7 @@ function calcIRRF(base: number, dependentes: number = 0): number {
   const baseComDeps = base - (dependentes * DEDUCAO_DEPENDENTE_IRRF);
   if (baseComDeps <= 0) return 0;
   for (const f of FAIXAS_IRRF) {
-    if (baseComDeps <= f.limite) return Math.max(0, round2(baseComDeps * f.aliquota - f.deducao));
+    if (baseComDeps <= f.limite) return Math.max(0, trunc2(baseComDeps * f.aliquota - f.deducao));
   }
   return 0;
 }
@@ -236,7 +236,7 @@ Deno.serve(async (req) => {
         const deps = Number(c.dependentes_irrf) || 0;
         const inss = calcINSS(bruto);
         const irrf = calcIRRF(bruto - inss, deps);
-        const fgts = round2(bruto * 0.08);
+        const fgts = trunc2(bruto * 0.08);
         const descontos = round2(inss + irrf);
         const liquido = round2(bruto - descontos);
 

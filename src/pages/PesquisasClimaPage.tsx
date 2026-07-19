@@ -29,7 +29,7 @@ export default function PesquisasClimaPage() {
 
   const { data: pesquisas = [], isLoading } = useQuery({
     queryKey: ['pesquisas', empresaAtual?.id],
-    queryFn: () => pesquisaService.listar(empresaAtual?.id),
+    queryFn: () => pesquisaService.listar(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

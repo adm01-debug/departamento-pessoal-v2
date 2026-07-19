@@ -13,6 +13,7 @@ import { captureException } from '../_shared/sentry.ts';
 import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
+const trunc2 = (n: number): number => Math.trunc(n * 100) / 100;
 const TETO_INSS = 8157.41;
 
 const FAIXAS_INSS = [
@@ -40,13 +41,13 @@ function calcINSS(sal: number): number {
     desc += f * FAIXAS_INSS[i].a;
     rest -= f;
   }
-  return round2(desc);
+  return trunc2(desc);
 }
 
 function calcIRRF(b: number): number {
   if (!Number.isFinite(b) || b <= 0) return 0;
   for (const f of FAIXAS_IRRF) {
-    if (b <= f.l) return Math.max(0, round2(b * f.a - f.d));
+    if (b <= f.l) return Math.max(0, trunc2(b * f.a - f.d));
   }
   return 0;
 }
@@ -55,7 +56,7 @@ const BodySchema = z.object({
   salario_base: z.number().positive().max(1_000_000),
   data_admissao: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   data_desligamento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  tipo_rescisao: z.enum(['sem_justa_causa', 'com_justa_causa', 'acordo_mutuo', 'pedido_demissao', 'termino_contrato']).default('sem_justa_causa'),
+  tipo_rescisao: z.enum(['sem_justa_causa', 'com_justa_causa', 'justa_causa', 'acordo_mutuo', 'pedido_demissao', 'termino_contrato']).default('sem_justa_causa'),
   saldo_fgts: z.number().nonnegative().max(10_000_000).default(0),
   ferias_vencidas: z.boolean().default(false),
   colaborador_id: z.string().uuid().optional(),
@@ -95,9 +96,11 @@ Deno.serve(async (req) => {
       return json({ error: 'Payload inválido', code: 'VALIDATION_ERROR', details: parsed.error.flatten() }, 422);
     }
     const {
-      salario_base, data_admissao, data_desligamento, tipo_rescisao,
+      salario_base, data_admissao, data_desligamento, tipo_rescisao: rawTipo,
       saldo_fgts, ferias_vencidas, colaborador_id, empresa_id,
     } = parsed.data;
+    // Normaliza: frontend envia 'justa_causa', edge usa 'com_justa_causa'
+    const tipo_rescisao = rawTipo === 'justa_causa' ? 'com_justa_causa' : rawTipo;
 
     // Sanity de datas
     const adm = new Date(data_admissao);

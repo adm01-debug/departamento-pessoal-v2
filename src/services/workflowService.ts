@@ -1,13 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 export const workflowService = {
-  async listarDefinicoes(empresaId?: string): Promise<any[]> {
-    
+  async listarDefinicoes(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = supabase.from('workflows_definicoes').select('*').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criarDefinicao(d: any): Promise<any> {
@@ -59,14 +60,15 @@ export const workflowService = {
   
   },
   
-  async listarExecucoes(empresaId?: string): Promise<any[]> {
-    
+  async listarExecucoes(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = supabase.from('workflows_execucoes').select('*, workflow:workflows_definicoes(nome, tipo)').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criarExecucao(d: any): Promise<any> {

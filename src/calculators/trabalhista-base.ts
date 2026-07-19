@@ -14,7 +14,7 @@ export function calcularHorasExtras(
   horasExtras: number,
   percentual: number = 0.5
 ): number {
-  if (horasExtras <= 0) return 0;
+  if (horasExtras <= 0 || jornadaMensal <= 0) return 0;
   const valorHora = salarioBase / jornadaMensal;
   const valorComAdicional = valorHora * (1 + percentual);
   return Math.round(valorComAdicional * horasExtras * 100) / 100;
@@ -29,7 +29,7 @@ export function calcularDSR(
   diasUteis: number = 26,
   domingosFeriados: number = 4
 ): number {
-  if (totalVariavel <= 0) return 0;
+  if (totalVariavel <= 0 || diasUteis <= 0) return 0;
   return Math.round((totalVariavel / diasUteis) * domingosFeriados * 100) / 100;
 }
 

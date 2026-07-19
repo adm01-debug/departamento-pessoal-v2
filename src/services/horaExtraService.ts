@@ -1,16 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 export const horaExtraService = {
-  async listar(empresaId?: string): Promise<any[]> {
-    
+  async listar(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let query = supabase
       .from('solicitacoes_hora_extra')
       .select('*, colaborador:colaboradores(nome_completo)')
       .order('created_at', { ascending: false });
-    if (empresaId) query = query.eq('empresa_id', empresaId);
+    query = query.eq('empresa_id', empresaId);
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
-  
+
   },
   
   async criar(d: any): Promise<any> {

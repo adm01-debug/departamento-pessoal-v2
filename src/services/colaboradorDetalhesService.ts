@@ -259,9 +259,10 @@ export async function listarPeriodosAquisitivos(colaboradorId: string) {
 // =============================================
 // Times
 // =============================================
-export async function listarTimes(empresaId?: string) {
+export async function listarTimes(empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   let query = supabase.from('times').select('*').order('nome');
-  if (empresaId) query = query.eq('empresa_id', empresaId);
+  query = query.eq('empresa_id', empresaId);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];
@@ -360,9 +361,10 @@ export async function criarFeriasColetivas(ferias: DadosInsert) {
 // =============================================
 // Campos Customizados
 // =============================================
-export async function listarCamposCustomizados(empresaId?: string) {
+export async function listarCamposCustomizados(empresaId: string) {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
   let query = supabase.from('campos_customizados').select('*').eq('ativo', true).order('ordem');
-  if (empresaId) query = query.eq('empresa_id', empresaId);
+  query = query.eq('empresa_id', empresaId);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];

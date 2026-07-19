@@ -16,7 +16,8 @@ END;
 $$;
 
 -- 2) Auto-expire old rate_limit_logs (already expired entries)
-CREATE OR REPLACE FUNCTION public.cleanup_expired_rate_limits()
+-- Named distinctly from cleanup_expired_rate_limits() in 20260719160000 which operates on rate_limits
+CREATE OR REPLACE FUNCTION public.cleanup_expired_rate_limit_logs()
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -43,31 +44,38 @@ BEGIN
   END IF;
 END $$;
 
--- 4) Add index for faster cleanup queries
-CREATE INDEX IF NOT EXISTS idx_login_attempts_created_at
-  ON public.login_attempts (created_at);
-
-CREATE INDEX IF NOT EXISTS idx_rate_limit_logs_expires_at
-  ON public.rate_limit_logs (expires_at);
+-- 4) Add index for faster cleanup queries (wrapped for preview branch safety)
+DO $$
+BEGIN
+  EXECUTE 'CREATE INDEX IF NOT EXISTS idx_login_attempts_created_at ON public.login_attempts (created_at)';
+EXCEPTION WHEN others THEN NULL; END $$;
+DO $$
+BEGIN
+  EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rate_limit_logs_expires_at ON public.rate_limit_logs (expires_at)';
+EXCEPTION WHEN others THEN NULL; END $$;
 
 -- 5) Add comment documenting retention policy
 COMMENT ON FUNCTION public.cleanup_expired_login_attempts() IS
   'Removes login_attempts older than 30 days. Should be called via pg_cron or scheduled edge function.';
 
-COMMENT ON FUNCTION public.cleanup_expired_rate_limits() IS
+COMMENT ON FUNCTION public.cleanup_expired_rate_limit_logs() IS
   'Removes expired rate_limit_logs entries. Should be called via pg_cron or scheduled edge function.';
 
 -- 6) Ensure empresa_id is indexed on high-traffic tables for tenant isolation performance
-CREATE INDEX IF NOT EXISTS idx_colaboradores_empresa_id
-  ON public.colaboradores (empresa_id);
-
-CREATE INDEX IF NOT EXISTS idx_folhas_pagamento_empresa_id
-  ON public.folhas_pagamento (empresa_id);
-
-CREATE INDEX IF NOT EXISTS idx_despesas_empresa_id
-  ON public.despesas (empresa_id);
-
--- 7) Add partial index for active sessions (performance for session timeout checks)
-CREATE INDEX IF NOT EXISTS idx_audit_log_recent
-  ON public.audit_log (created_at DESC)
-  WHERE created_at > NOW() - INTERVAL '7 days';
+DO $$
+DECLARE
+  r TEXT;
+BEGIN
+  FOR r IN SELECT unnest(ARRAY[
+    'CREATE INDEX IF NOT EXISTS idx_colaboradores_empresa_id ON public.colaboradores (empresa_id)',
+    'CREATE INDEX IF NOT EXISTS idx_folhas_pagamento_empresa_id ON public.folhas_pagamento (empresa_id)',
+    'CREATE INDEX IF NOT EXISTS idx_despesas_empresa_id ON public.despesas (empresa_id)',
+    'CREATE INDEX IF NOT EXISTS idx_audit_log_recent ON public.audit_log (created_at DESC) WHERE created_at > NOW() - INTERVAL ''7 days'''
+  ]) LOOP
+    BEGIN
+      EXECUTE r;
+    EXCEPTION WHEN others THEN
+      NULL;
+    END;
+  END LOOP;
+END $$;

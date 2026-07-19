@@ -5,8 +5,26 @@ import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
+function isAllowedFileUrl(urlStr: string): boolean {
+  try {
+    const url = new URL(urlStr);
+    const h = url.hostname;
+    if (h === 'localhost' || h === '127.0.0.1' || h.startsWith('192.168.') ||
+        h.startsWith('10.') || h.startsWith('172.16.') || h === '0.0.0.0' ||
+        h === '169.254.169.254' || h.endsWith('.internal') || h.endsWith('.local')) {
+      return false;
+    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    if (!supabaseUrl) return false;
+    const supabaseHost = new URL(supabaseUrl).hostname;
+    return url.hostname === supabaseHost && url.pathname.includes('/storage/v1/');
+  } catch {
+    return false;
+  }
+}
+
 const BodySchema = z.object({
-  fileUrl: z.string().url().max(2048),
+  fileUrl: z.string().url().max(2048).refine(isAllowedFileUrl, { message: 'URL de arquivo não permitida' }),
   docType: z.enum(['cpf', 'rg', 'cnh', 'comprovante_residencia', 'generic']).optional().default('generic'),
 });
 

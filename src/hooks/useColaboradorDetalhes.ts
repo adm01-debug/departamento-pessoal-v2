@@ -228,7 +228,8 @@ export function useTiposEstabilidade() {
 export function useTimes(empresaId?: string) {
   return useQuery({
     queryKey: ['times', empresaId],
-    queryFn: () => service.listarTimes(empresaId),
+    queryFn: () => service.listarTimes(empresaId!),
+    enabled: !!empresaId,
   });
 }
 
@@ -270,6 +271,7 @@ export function useCriarFeriasColetivas() {
 export function useCamposCustomizados(empresaId?: string) {
   return useQuery({
     queryKey: ['campos-customizados', empresaId],
-    queryFn: () => service.listarCamposCustomizados(empresaId),
+    queryFn: () => service.listarCamposCustomizados(empresaId!),
+    enabled: !!empresaId,
   });
 }

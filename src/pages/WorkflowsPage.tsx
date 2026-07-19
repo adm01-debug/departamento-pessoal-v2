@@ -54,13 +54,13 @@ export default function WorkflowsPage() {
 
   const { data: definicoes = [], isLoading: loadDef } = useQuery({
     queryKey: ['workflows_def', empresaAtual?.id],
-    queryFn: () => workflowService.listarDefinicoes(empresaAtual?.id),
+    queryFn: () => workflowService.listarDefinicoes(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 
   const { data: execucoes = [], isLoading: loadExec } = useQuery({
     queryKey: ['workflows_exec', empresaAtual?.id],
-    queryFn: () => workflowService.listarExecucoes(empresaAtual?.id),
+    queryFn: () => workflowService.listarExecucoes(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 

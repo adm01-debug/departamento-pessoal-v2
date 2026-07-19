@@ -69,13 +69,13 @@ export default function DespesasPage() {
   });
   const { data: colaboradores = [] } = useQuery({
     queryKey: ['colaboradores', empresaAtual?.id],
-    queryFn: () => colaboradorService.list(empresaAtual?.id),
+    queryFn: () => colaboradorService.list(empresaAtual!.id),
     enabled: !!empresaAtual?.id,
   });
 
   const criar = useMutation({
     mutationFn: async () => {
-      const created = await despesaService.criar({ ...form, valor: Number(form.valor), empresa_id: empresaAtual?.id });
+      const created = await despesaService.criar({ ...form, valor: Number(form.valor), empresa_id: empresaAtual!.id });
       if (file && created?.id && empresaAtual?.id) {
         await despesaService.uploadComprovante(empresaAtual.id, created.id, file);
       }

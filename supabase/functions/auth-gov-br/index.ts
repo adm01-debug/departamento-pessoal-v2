@@ -9,6 +9,32 @@ const GOVBR_AUTH_URL = 'https://sso.staging.acesso.gov.br/authorize';
 const GOVBR_TOKEN_URL = 'https://sso.staging.acesso.gov.br/token';
 const GOVBR_USERINFO_URL = 'https://sso.staging.acesso.gov.br/userinfo';
 
+const DEFAULT_ALLOWED_REDIRECT_ORIGINS = [
+  'https://sistema-dp.lovable.app',
+  'https://unified-harmony-hub.lovable.app',
+];
+
+function isAllowedRedirectUri(uri: string): boolean {
+  try {
+    const url = new URL(uri);
+    const allowed = (Deno.env.get('ALLOWED_REDIRECT_ORIGINS') ?? '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .concat(DEFAULT_ALLOWED_REDIRECT_ORIGINS);
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    // Also allow same Supabase project origin
+    if (supabaseUrl) {
+      try { allowed.push(new URL(supabaseUrl).origin); } catch { /* noop */ }
+    }
+    return allowed.some(origin => {
+      try { return url.origin === new URL(origin).origin; } catch { return false; }
+    });
+  } catch {
+    return false;
+  }
+}
+
 const BodySchema = z.discriminatedUnion('action', [
   z.object({
     action: z.literal('get_auth_url'),
@@ -77,6 +103,10 @@ serve(async (req: Request): Promise<Response> => {
     const body = parsed.data;
 
     if (body.action === 'get_auth_url') {
+      if (!isAllowedRedirectUri(body.redirectUri)) {
+        return json({ success: false, error: 'URI de redirecionamento não permitida' }, 400);
+      }
+
       const clientId = Deno.env.get('GOVBR_CLIENT_ID');
       if (!clientId) {
         return json({ success: false, error: 'Gov.br não configurado' }, 503);

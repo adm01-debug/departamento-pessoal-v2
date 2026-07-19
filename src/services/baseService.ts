@@ -9,6 +9,7 @@ export interface ListOptions {
   orderAscending?: boolean;
   filters?: Record<string, any>;
   searchColumn?: string;
+  empresaId?: string;
 }
 
 export interface ListResponse<T> {
@@ -23,8 +24,13 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
       searchColumn?: string;
       defaultOrderBy?: string;
       useVersioning?: boolean;
+      requireEmpresaId?: boolean;
     } = {}
-  ) {}
+  ) {
+    if (this.options.requireEmpresaId === undefined) {
+      this.options.requireEmpresaId = true;
+    }
+  }
 
   protected getQuery() {
     return (supabase as any).from(this.table);
@@ -45,7 +51,15 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
     const pageSize = Math.min(Math.max(rawPageSize, 1), 100);
 
     try {
+      if (this.options.requireEmpresaId && !filters?.empresa_id && !options.empresaId) {
+        throw new Error(`empresa_id obrigatório para listar ${this.table} (isolamento de tenant)`);
+      }
+
       let query = this.getQuery().select('*', { count: 'exact' });
+
+      if (options.empresaId) {
+        query = query.eq('empresa_id', options.empresaId);
+      }
 
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -130,10 +144,14 @@ export class BaseService<T, CreateDTO = any, UpdateDTO = any> {
     }
   }
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: string, empresaId?: string): Promise<void> {
     if (!id) throw new Error('ID é obrigatório para exclusão');
     try {
-      const { error } = await this.getQuery().delete().eq('id', id);
+      let query = this.getQuery().delete().eq('id', id);
+      if (empresaId) {
+        query = query.eq('empresa_id', empresaId);
+      }
+      const { error } = await query;
       if (error) throw error;
     } catch (e) {
       loggerService.error(`Error in excluir for ${this.table}`, { id }, e as Error);

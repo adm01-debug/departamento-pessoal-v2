@@ -32,7 +32,7 @@ export function FolhaESocialSync({ competencia }: { competencia: string }) {
 
   const { data: eventosRaw, isLoading, refetch } = useQuery({
     queryKey: ['esocial-events-sync', compFormatada, empresaAtual?.id],
-    queryFn: () => listarEventosPorCompetencia(empresaAtual?.id || null, compFormatada),
+    queryFn: () => listarEventosPorCompetencia(empresaAtual!.id, compFormatada),
     enabled: !!empresaAtual?.id
   });
 

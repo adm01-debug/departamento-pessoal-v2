@@ -14,7 +14,7 @@ export function useDataAccessLog(
         const { data: { session } } = await (supabase as any).auth.getSession();
         if (!session?.user?.id) return;
 
-        await supabase.from('audit_log').insert({
+        await (supabase as any).from('audit_log').insert({
           usuario_id: session.user.id,
           acao: 'VISUALIZACAO',
           tabela: recurso,

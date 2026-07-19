@@ -1,14 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
 export const recrutamentoService = {
   // ===== VAGAS =====
-  async listarVagas(empresaId?: string): Promise<any[]> {
-    
+  async listarVagas(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = supabase.from('vagas').select('*').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
 
   async criarVaga(d: Record<string, unknown>): Promise<any> {
@@ -37,14 +38,15 @@ export const recrutamentoService = {
   },
 
   // ===== CANDIDATOS =====
-  async listarCandidatos(empresaId?: string): Promise<any[]> {
-    
+  async listarCandidatos(empresaId: string): Promise<any[]> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
     let q = supabase.from('candidatos').select('*').order('created_at', { ascending: false });
-    if (empresaId) q = q.eq('empresa_id', empresaId);
+    q = q.eq('empresa_id', empresaId);
     const { data, error } = await q;
     if (error) throw error;
     return data || [];
-  
+
   },
 
   async criarCandidato(d: Record<string, unknown>): Promise<any> {

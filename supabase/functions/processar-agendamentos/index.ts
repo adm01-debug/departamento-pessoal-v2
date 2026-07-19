@@ -26,9 +26,18 @@ serve(async (req: Request): Promise<Response> => {
     let triggeredBy = 'cron';
 
     // Path 1: Cron secret (for pg_cron / external scheduler)
-    if (cronSecret && cronHeader === cronSecret) {
-      authorized = true;
-      triggeredBy = 'cron';
+    // Constant-time comparison: HMAC both values with a fixed key, compare HMACs
+    if (cronSecret && cronHeader) {
+      const enc = new TextEncoder();
+      const fixedKey = await crypto.subtle.importKey(
+        'raw', enc.encode('dp-cron-comparison-key'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+      );
+      const sigHeader = new Uint8Array(await crypto.subtle.sign('HMAC', fixedKey, enc.encode(cronHeader)));
+      const sigSecret = new Uint8Array(await crypto.subtle.sign('HMAC', fixedKey, enc.encode(cronSecret)));
+      // XOR accumulation — always runs all 32 iterations regardless of content
+      let diff = 0;
+      for (let i = 0; i < sigHeader.length; i++) diff |= sigHeader[i] ^ sigSecret[i];
+      if (diff === 0) { authorized = true; triggeredBy = 'cron'; }
     }
 
     // Path 2: Admin JWT (for manual trigger via UI) — CSRF required

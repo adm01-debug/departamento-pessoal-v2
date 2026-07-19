@@ -43,42 +43,40 @@ export function getEventoDescricao(tipo: string): string {
   return eventoDescricao[tipo] || tipo;
 }
 
-export async function listarEventos(empresaId: string | null): Promise<ESocialEvento[]> {
-  
+export async function listarEventos(empresaId: string): Promise<ESocialEvento[]> {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
   let query = supabase
     .from('esocial_eventos')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
-  if (empresaId) {
-    query = query.eq('empresa_id', empresaId);
-  }
+  query = query.eq('empresa_id', empresaId);
 
   const { data, error } = await query;
   if (error) throw error;
   return (data || []) as ESocialEvento[];
-  
+
 }
 
-export async function listarEventosPorCompetencia(empresaId: string | null, competencia: string): Promise<ESocialEvento[]> {
-  
+export async function listarEventosPorCompetencia(empresaId: string, competencia: string): Promise<ESocialEvento[]> {
+  if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+
   let query = supabase
     .from('esocial_eventos')
     .select('*')
     .eq('competencia', competencia);
 
-  if (empresaId) {
-    query = query.eq('empresa_id', empresaId);
-  }
+  query = query.eq('empresa_id', empresaId);
 
   const { data, error } = await query;
   if (error) throw error;
   return (data || []) as ESocialEvento[];
-  
+
 }
 
-export async function obterEstatisticas(empresaId: string | null): Promise<any> {
+export async function obterEstatisticas(empresaId: string): Promise<any> {
   try {
     const res = await listarEventos(empresaId);
     const eventos = res;
