@@ -75,12 +75,14 @@ export const webhookService = {
     if (error) throw error;
   },
 
-  async excluir(id: string): Promise<void> {
+  async excluir(empresaId: string, id: string): Promise<void> {
     if (!id) throw new Error('id obrigatório');
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { error } = await supabase
       .from('webhooks_config')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('empresa_id', empresaId);
     if (error) throw error;
   },
 

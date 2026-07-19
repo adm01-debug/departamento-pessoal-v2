@@ -103,7 +103,7 @@ export default function CanalContabilidadePage() {
   });
 
   const mudarStatus = useMutation({
-    mutationFn: (s: ThreadStatus) => canalContabilidadeService.atualizarStatus(activeThread!, s),
+    mutationFn: (s: ThreadStatus) => canalContabilidadeService.atualizarStatus(empresaAtual!.id, activeThread!, s),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['contab-threads'] });
       toast.success('Status atualizado');

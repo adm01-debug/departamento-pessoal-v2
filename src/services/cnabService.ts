@@ -285,7 +285,7 @@ export const cnabService = {
     return fullFile;
   },
 
-  async parseRetornoCNAB(fileContent: string) {
+  async parseRetornoCNAB(empresaId: string, fileContent: string) {
     const lines = fileContent.split(/\r?\n/);
     const results = {
       sucesso: 0,
@@ -303,25 +303,27 @@ export const cnabService = {
         const seuNumero = line.substring(73, 93).trim();
         const codigoOcorrencia = line.substring(230, 232);
         
-        const { data: item } = await supabase
+        const { data: item } = await (supabase as any)
           .from('cnab_itens')
           .select('id, folha_item_id, nome_favorecido')
           .eq('seu_numero', seuNumero)
+          .eq('empresa_id', empresaId)
           .maybeSingle();
 
         if (item) {
           const itemRecord = item as unknown as CnabItemRecord;
           const isSuccess = ['00', '02'].includes(codigoOcorrencia);
           const status = isSuccess ? 'pago' : 'erro';
-          
-          await supabase
+
+          await (supabase as any)
             .from('cnab_itens')
-            .update({ 
-              status, 
+            .update({
+              status,
               codigo_ocorrencia: codigoOcorrencia,
               mensagem_ocorrencia: isSuccess ? 'Confirmado' : 'Rejeitado pelo banco'
             })
-            .eq('id', itemRecord.id);
+            .eq('id', itemRecord.id)
+            .eq('empresa_id', empresaId);
 
           if (isSuccess && itemRecord.folha_item_id) {
             await supabase

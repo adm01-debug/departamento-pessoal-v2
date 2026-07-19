@@ -232,7 +232,7 @@ export const calculoLoteService = {
           progress.success++;
           onProgress?.({ ...progress });
         } catch (err: any) {
-          console.error(`Erro no colaborador ${colab.nome_completo}:`, err);
+          console.error(`Erro no processamento de colaborador id=${colab.id}:`, safeErrorMessage(err, 'erro desconhecido'));
           progress.errors++;
           onProgress?.({ ...progress });
         }

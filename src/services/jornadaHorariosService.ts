@@ -17,20 +17,20 @@ export const jornadaHorariosService = {
   
   },
   
-  async atualizar(id: string, d: any): Promise<any> {
-    
-    const { data, error } = await (supabase as any).from('jornadas_horarios').update(d).eq('id', id).select().maybeSingle();
+  async atualizar(jornadaId: string, id: string, d: any): Promise<any> {
+
+    const { data, error } = await (supabase as any).from('jornadas_horarios').update(d).eq('id', id).eq('jornada_id', jornadaId).select().maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Nenhum registro de horário de jornada foi retornado.');
     return data;
-  
+
   },
-  
-  async excluir(id: string): Promise<void> {
-    
-    const { error } = await (supabase as any).from('jornadas_horarios').delete().eq('id', id);
+
+  async excluir(jornadaId: string, id: string): Promise<void> {
+
+    const { error } = await (supabase as any).from('jornadas_horarios').delete().eq('id', id).eq('jornada_id', jornadaId);
     if (error) throw error;
-  
+
   },
   
   async salvarGrade(jornadaId: string, horarios: any[]): Promise<any[]> {

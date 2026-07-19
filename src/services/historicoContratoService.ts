@@ -22,11 +22,11 @@ export const historicoContratoService = {
   
   },
   
-  async excluir(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('historico_contratos').delete().eq('id', id);
+  async excluir(empresaId: string, id: string): Promise<void> {
+
+    const { error } = await supabase.from('historico_contratos').delete().eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
-  
+
   },
 };
 

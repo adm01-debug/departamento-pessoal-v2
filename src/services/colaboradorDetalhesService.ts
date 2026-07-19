@@ -58,8 +58,8 @@ export async function criarContatoEmergencia(contato: DadosInsert) {
   return data;
 }
 
-export async function excluirContatoEmergencia(id: string) {
-  const { error } = await supabase.from('contatos_emergencia').delete().eq('id', id);
+export async function excluirContatoEmergencia(colaboradorId: string, id: string) {
+  const { error } = await supabase.from('contatos_emergencia').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 
@@ -136,8 +136,8 @@ export async function criarFormacao(formacao: DadosInsert) {
   return data;
 }
 
-export async function excluirFormacao(id: string) {
-  const { error } = await supabase.from('formacoes_academicas').delete().eq('id', id);
+export async function excluirFormacao(colaboradorId: string, id: string) {
+  const { error } = await supabase.from('formacoes_academicas').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 
@@ -246,8 +246,8 @@ export async function criarAnotacao(anotacao: DadosInsert) {
   return data;
 }
 
-export async function excluirAnotacao(id: string) {
-  const { error } = await supabase.from('anotacoes_colaborador').delete().eq('id', id);
+export async function excluirAnotacao(colaboradorId: string, id: string) {
+  const { error } = await supabase.from('anotacoes_colaborador').delete().eq('id', id).eq('colaborador_id', colaboradorId);
   if (error) throw error;
 }
 

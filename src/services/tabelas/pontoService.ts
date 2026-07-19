@@ -15,8 +15,9 @@ export const ajustesPontoService = {
     const { error } = await supabase.from('ajustes_ponto').insert(d);
     if (error) throw error;
   },
-  aprovar: async (id: string, userId: string) => {
-    const { error } = await supabase.from('ajustes_ponto').update({ status: 'aprovado', aprovado_por: userId, aprovado_em: new Date().toISOString() }).eq('id', id);
+  aprovar: async (colaboradorId: string, id: string, userId: string) => {
+    if (!colaboradorId) throw new Error('colaborador_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('ajustes_ponto').update({ status: 'aprovado', aprovado_por: userId, aprovado_em: new Date().toISOString() }).eq('id', id).eq('colaborador_id', colaboradorId);
     if (error) throw error;
   },
 };
@@ -33,8 +34,9 @@ export const periodosPontoService = {
     const { error } = await supabase.from('periodos_ponto').insert(d);
     if (error) throw error;
   },
-  fechar: async (id: string) => {
-    const { error } = await supabase.from('periodos_ponto').update({ status: 'fechado', fechado_em: new Date().toISOString() }).eq('id', id);
+  fechar: async (empresaId: string, id: string) => {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
+    const { error } = await (supabase as any).from('periodos_ponto').update({ status: 'fechado', fechado_em: new Date().toISOString() }).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   },
 };

@@ -25,7 +25,7 @@ export function useConfiguracoesIntervalo() {
   });
 
   const atualizarMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => intervaloService.atualizar(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => intervaloService.atualizar(empresaId!, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['configuracoes_intervalo'] });
       toast.success('Configuração atualizada');
@@ -34,7 +34,7 @@ export function useConfiguracoesIntervalo() {
   });
 
   const excluirMutation = useMutation({
-    mutationFn: (id: string) => intervaloService.excluir(id),
+    mutationFn: (id: string) => intervaloService.excluir(empresaId!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['configuracoes_intervalo'] });
       toast.success('Configuração excluída');

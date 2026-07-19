@@ -144,9 +144,9 @@ export function listarEventosValidaveis(): string[] {
 
 export async function enviarEvento(eventoId: string, empresaId: string): Promise<any> {
   try {
-    await supabase.from('esocial_eventos').update({ status: 'processando' }).eq('id', eventoId);
+    await supabase.from('esocial_eventos').update({ status: 'processando' }).eq('id', eventoId).eq('empresa_id', empresaId);
 
-    const { data: evento } = await supabase.from('esocial_eventos').select('*').eq('id', eventoId).maybeSingle();
+    const { data: evento } = await supabase.from('esocial_eventos').select('*').eq('id', eventoId).eq('empresa_id', empresaId).maybeSingle();
 
     if (evento?.dados && evento?.tipo_evento) {
       const validacao = validarEvento(evento.tipo_evento, evento.dados as Record<string, any>);
@@ -154,7 +154,7 @@ export async function enviarEvento(eventoId: string, empresaId: string): Promise
         await supabase.from('esocial_eventos').update({
           status: 'erro',
           erros: { validacao: validacao.errors } as any,
-        }).eq('id', eventoId);
+        }).eq('id', eventoId).eq('empresa_id', empresaId);
         throw new Error('Falha na validação do evento');
       }
     }
@@ -162,12 +162,12 @@ export async function enviarEvento(eventoId: string, empresaId: string): Promise
     const { data, error } = await supabase.functions.invoke('enviar-esocial', {
       body: { empresaId, eventoId },
     });
-    
+
     if (error) {
       await supabase.from('esocial_eventos').update({
         status: 'erro',
         erros: { mensagem: error.message },
-      }).eq('id', eventoId);
+      }).eq('id', eventoId).eq('empresa_id', empresaId);
       throw error;
     }
 

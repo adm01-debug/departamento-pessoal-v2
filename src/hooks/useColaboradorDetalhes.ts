@@ -59,7 +59,7 @@ export function useCriarContatoEmergencia() {
 export function useExcluirContatoEmergencia(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirContatoEmergencia,
+    mutationFn: (id: string) => service.excluirContatoEmergencia(colaboradorId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contatos-emergencia', colaboradorId] }),
   });
 }
@@ -120,7 +120,7 @@ export function useCriarFormacao() {
 export function useExcluirFormacao(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirFormacao,
+    mutationFn: (id: string) => service.excluirFormacao(colaboradorId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['formacoes', colaboradorId] }),
   });
 }
@@ -199,7 +199,7 @@ export function useCriarAnotacao() {
 export function useExcluirAnotacao(colaboradorId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: service.excluirAnotacao,
+    mutationFn: (id: string) => service.excluirAnotacao(colaboradorId, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['anotacoes', colaboradorId] }),
   });
 }

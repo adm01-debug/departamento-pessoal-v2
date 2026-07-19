@@ -24,7 +24,11 @@ function calcularAvos(inicio: Date, fim: Date): number {
     meses--;
   }
   
-  const dataReferencia = new Date(inicio.getFullYear(), inicio.getMonth() + meses, inicio.getDate());
+  const anoRef = inicio.getFullYear();
+  const mesRef = inicio.getMonth() + meses;
+  // Clamp diaInicio to the last valid day of mesRef (avoids Jan 31 + 1 month = Mar 3 overflow).
+  const ultimoDiaMesRef = new Date(anoRef, mesRef + 1, 0).getDate();
+  const dataReferencia = new Date(anoRef, mesRef, Math.min(inicio.getDate(), ultimoDiaMesRef));
   const diffTime = fim.getTime() - dataReferencia.getTime();
   const diasRestantes = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
@@ -73,8 +77,8 @@ export async function calcularRescisao(params: RescisaoParams): Promise<Rescisao
     
     if (salario <= 0) throw new Error('Salário deve ser maior que zero');
     
-    const admissao = new Date(dataAdmissao);
-    const desligamento = new Date(dataDesligamento);
+    const admissao = new Date(dataAdmissao + 'T00:00:00');
+    const desligamento = new Date(dataDesligamento + 'T00:00:00');
     
     if (isNaN(admissao.getTime()) || isNaN(desligamento.getTime())) {
       throw new Error('Datas inválidas');

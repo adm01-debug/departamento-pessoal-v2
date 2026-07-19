@@ -147,7 +147,7 @@ export default function FinanceiroBancarioPage() {
     try {
       setProcessingRetorno(true);
       const content = await file.text();
-      const results = await cnabService.parseRetornoCNAB(content);
+      const results = await cnabService.parseRetornoCNAB(empresaAtual!.id, content);
 
       toast.success(`Retorno processado: ${results.sucesso} sucessos, ${results.erro} erros.`);
       loadData();

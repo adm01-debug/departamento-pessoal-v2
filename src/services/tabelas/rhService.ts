@@ -113,8 +113,9 @@ export const onboardingService = {
     if (error) throw error;
     return data || [];
   },
-  concluirTarefa: async (id: string) => {
-    const { error } = await supabase.from('onboarding_tarefas').update({ concluida: true, concluida_em: new Date().toISOString() } as any).eq('id', id);
+  concluirTarefa: async (onboardingId: string, id: string) => {
+    if (!onboardingId) throw new Error('onboarding_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('onboarding_tarefas').update({ concluida: true, concluida_em: new Date().toISOString() } as any).eq('id', id).eq('onboarding_id', onboardingId);
     if (error) throw error;
   },
 };
@@ -127,8 +128,9 @@ export const treinamentoParticipantesService = {
     if (error) throw error;
     return data || [];
   },
-  registrarPresenca: async (id: string) => {
-    const { error } = await supabase.from('treinamento_participantes').update({ presente: true }).eq('id', id);
+  registrarPresenca: async (inscricaoId: string, id: string) => {
+    if (!inscricaoId) throw new Error('inscricao_id obrigatório para isolamento de tenant');
+    const { error } = await (supabase as any).from('treinamento_participantes').update({ presente: true }).eq('id', id).eq('inscricao_id', inscricaoId);
     if (error) throw error;
   },
 };

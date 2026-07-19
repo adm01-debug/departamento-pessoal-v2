@@ -32,7 +32,8 @@ class FeriasService extends BaseService<Ferias> {
     if (status && status !== 'all') query = query.eq('status', status);
     
     if (search && search.length >= 3) {
-      query = query.ilike('colaborador_nome', `%${search}%`);
+      const escapedSearch = search.replace(/[%_\\]/g, '\\$&');
+      query = query.ilike('colaborador_nome', `%${escapedSearch}%`);
     }
 
     const { data, error, count } = await query

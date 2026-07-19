@@ -53,11 +53,11 @@ export const workflowService = {
   
   },
   
-  async excluirEtapa(id: string): Promise<void> {
-    
-    const { error } = await supabase.from('workflows_etapas').delete().eq('id', id);
+  async excluirEtapa(workflowId: string, id: string): Promise<void> {
+    if (!workflowId) throw new Error('workflow_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('workflows_etapas').delete().eq('id', id).eq('workflow_id', workflowId);
     if (error) throw error;
-  
+
   },
   
   async listarExecucoes(empresaId: string): Promise<any[]> {

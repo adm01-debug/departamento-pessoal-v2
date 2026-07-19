@@ -29,7 +29,7 @@ export function useHistoricoContratos(colaboradorId: string) {
 
   const excluirMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await historicoContratoService.excluir(id);
+      return await historicoContratoService.excluir(empresaAtual!.id, id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['historico_contratos', colaboradorId] });
