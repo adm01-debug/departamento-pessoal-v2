@@ -53,10 +53,13 @@ export function calcularRescisao(params: {
       ? Math.trunc((salarioBase / 30) * Math.min(90, 30 + anosServico * 3) * 0.5 * 100) / 100
       : 0;
 
+  // FGTS do período rescisório (Lei 8.036/90, Art. 18): base inclui saldo acumulado + FGTS do período final
+  const fgtsRescisao = Math.trunc((saldoSalario + avisoPrevio + decimo13Prop) * 0.08 * 100) / 100;
+  const baseMutaFGTS = saldoFGTS + fgtsRescisao;
   const multaFGTS = tipoRescisao === 'sem_justa_causa'
-    ? Math.trunc(saldoFGTS * 0.40 * 100) / 100
+    ? Math.trunc(baseMutaFGTS * 0.40 * 100) / 100
     : tipoRescisao === 'acordo_mutuo'
-      ? Math.trunc(saldoFGTS * 0.20 * 100) / 100
+      ? Math.trunc(baseMutaFGTS * 0.20 * 100) / 100
       : 0;
 
   const totalBruto = saldoSalario + decimo13Prop + feriasProp + tercoFeriasProp + feriasVencidasValor + tercoFeriasVencidas + avisoPrevio;
@@ -92,9 +95,9 @@ export function calcularSeguroDesemprego(ultimosSalarios: number[], mesesVinculo
   return { valorParcela, parcelas: ref >= 24 ? 5 : ref >= 12 ? 4 : 3 };
 }
 
-export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | 'acordo_mutuo'): number {
+export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | 'acordo_mutuo', fgtsRescisao = 0): number {
   const percentual = tipo === 'sem_justa_causa' ? 0.40 : 0.20;
-  return Math.trunc(saldoFGTS * percentual * 100) / 100;
+  return Math.trunc((saldoFGTS + fgtsRescisao) * percentual * 100) / 100;
 }
 
 // CLT Art. 477 §8°: multa de um salário mensal quando o empregador não quita as verbas rescisórias
