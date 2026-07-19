@@ -9,7 +9,7 @@ import {
 import { integrityHash } from '../_shared/integrityHash.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -53,13 +53,9 @@ serve(async (req) => {
     });
 
     let body: any;
-    try {
-      body = await req.json();
-    } catch {
-      return new Response(JSON.stringify({ error: 'JSON inválido' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-      });
-    }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    body = _pb;
 
     const { colaboradorId, empresaId, data: dataRegistro } = body ?? {};
     if (!colaboradorId || !empresaId) {

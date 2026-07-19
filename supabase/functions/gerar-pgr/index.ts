@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import { PDFDocument, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 interface Risco {
   categoria: string;
@@ -51,7 +51,9 @@ Deno.serve(async (req) => {
     const rl = await checkRateLimit(admin, { key: `gerar-pgr:${user.id}`, limit: 5, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
 
-    const { empresa_id, responsavel_tecnico, registro_profissional } = await req.json();
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    const { empresa_id, responsavel_tecnico, registro_profissional } = _pb as Record<string, unknown>;
     if (!empresa_id) return json({ error: 'empresa_id é obrigatório' }, 400);
 
     // Autorização via vínculo empresa + role

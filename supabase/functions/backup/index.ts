@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const TABLES = [
   'colaboradores', 'folhas_pagamento', 'itens_folha', 'ferias',
@@ -60,7 +60,8 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    const { empresaId } = await req.json().catch(() => ({ empresaId: null }));
+    const { body: _pb } = await parseJsonBody(req);
+    const { empresaId } = (_pb as Record<string, unknown>) ?? { empresaId: null };
     const results: Record<string, any> = {};
     let totalRecords = 0;
 

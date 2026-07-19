@@ -93,12 +93,13 @@ self.addEventListener('notificationclick', (event) => {
 
   if (event.action === 'close') return;
 
-  const urlToOpen = event.notification.data.url;
+  const rawUrl = event.notification.data.url || '/notificacoes';
+  const urlToOpen = rawUrl.startsWith('/') ? rawUrl : '/notificacoes';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
-        if (client.url === urlToOpen && 'focus' in client) {
+        if (client.url.endsWith(urlToOpen) && 'focus' in client) {
           return client.focus();
         }
       }

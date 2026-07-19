@@ -8,7 +8,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
-import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
+import { corsHeaders, createErrorResponse, createValidationErrorResponse, parseJsonBody } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import {
@@ -77,8 +77,9 @@ Deno.serve(async (req) => {
     const userId = claims.claims.sub as string;
 
     let raw: unknown;
-    try { raw = await req.json(); }
-    catch { return createErrorResponse('JSON inválido', 400, 'INVALID_JSON'); }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req, 512 * 1024);
+    if (_pe) return _pe;
+    raw = _pb;
 
     const parsed = bodySchema.safeParse(raw);
     if (!parsed.success) return createValidationErrorResponse(parsed.error);

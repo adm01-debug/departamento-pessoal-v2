@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { integrityHash, sha256Hex } from '../_shared/integrityHash.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 async function computeExpectedHash(payload: {
   colaborador_id: string;
@@ -74,13 +74,9 @@ serve(async (req: Request): Promise<Response> => {
     });
 
     let rawBody: any;
-    try {
-      rawBody = await req.json();
-    } catch {
-      return new Response(JSON.stringify({ error: 'JSON inválido', code: 'BAD_REQUEST' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
-      });
-    }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    rawBody = _pb;
 
     const { registros } = rawBody ?? {};
     if (!registros || !Array.isArray(registros) || registros.length === 0) {

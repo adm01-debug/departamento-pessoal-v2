@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const SYSTEM_PROMPT = `Voce e um assistente especialista em Departamento Pessoal brasileiro. Seu nome e "Assistente DP".
 
@@ -79,11 +79,9 @@ serve(async (req: Request): Promise<Response> => {
     if (!rl.allowed) return rateLimitResponse(rl);
 
     let raw: unknown;
-    try { raw = await req.json(); } catch {
-      return new Response(JSON.stringify({ error: 'JSON inválido' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    raw = _pb;
     const { message, history = [] } = raw as { message?: string; history?: unknown[] };
 
     if (!message || typeof message !== 'string' || message.length > 4000) {

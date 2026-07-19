@@ -3,7 +3,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
-import { corsHeaders, createErrorResponse, createValidationErrorResponse } from '../_shared/contract.ts';
+import { corsHeaders, createErrorResponse, createValidationErrorResponse, parseJsonBody } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 
@@ -123,9 +123,11 @@ serve(async (req: Request): Promise<Response> => {
     if (userErr || !userData?.user) return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     const userId = userData.user.id;
 
-    // 3) Validação de input via Zod
+    // 3) Validação de input via Zod (com limite de payload 512 KB para importações CSV)
     let raw: unknown;
-    try { raw = await req.json(); } catch { return createErrorResponse('JSON inválido', 400, 'INVALID_JSON'); }
+    const { body: _body, errorResponse: _plErr } = await parseJsonBody(req, 512 * 1024);
+    if (_plErr) return _plErr;
+    raw = _body;
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) return createValidationErrorResponse(parsed.error);
     const { action, tabela, dados, formato, csvContent, empresaId } = parsed.data;

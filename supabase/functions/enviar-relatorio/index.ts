@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://esm.sh/zod@3.23.8";
 import { verifyCsrf } from "../_shared/csrf.ts";
 import { captureException } from "../_shared/sentry.ts";
-import { corsHeaders } from "../_shared/contract.ts";
+import { corsHeaders, parseJsonBody } from "../_shared/contract.ts";
 
 /**
  * enviar-relatorio — Onda 20 hardening
@@ -188,11 +188,9 @@ serve(async (req: Request): Promise<Response> => {
 
     // 3. Validação do payload
     let raw: unknown;
-    try {
-      raw = await req.json();
-    } catch {
-      return json({ error: "JSON inválido" }, 400);
-    }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    raw = _pb;
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
       return json(

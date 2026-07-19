@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
@@ -54,8 +54,8 @@ serve(async (req: Request): Promise<Response> => {
     if (!rl.allowed) return rateLimitResponse(rl);
 
     // Tenant scope obrigatório
-    let body: any = {};
-    try { body = await req.json(); } catch {}
+    const { body: _pb } = await parseJsonBody(req);
+    const body: any = _pb ?? {};
     const empresaId = body?.empresaId;
     if (!empresaId || typeof empresaId !== 'string') {
       return new Response(JSON.stringify({ error: 'empresaId é obrigatório' }), {

@@ -10,7 +10,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
 import { assinarXMLEsocial } from './utils/signer.ts';
-import { corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { corsHeaders, createErrorResponse, parseJsonBody } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import {
@@ -76,7 +76,9 @@ serve(async (req: Request): Promise<Response> => {
 
     // Payload
     let raw: unknown;
-    try { raw = await req.json(); } catch { return createErrorResponse('JSON inválido', 400, 'BAD_REQUEST'); }
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    raw = _pb;
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) return createErrorResponse('Payload inválido', 422, 'VALIDATION_ERROR');
     const { empresaId, eventoId } = parsed.data;

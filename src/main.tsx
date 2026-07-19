@@ -22,6 +22,16 @@ if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
   });
 }
 
+if (import.meta.env.PROD) {
+  const noop = () => {};
+  console.log = noop;
+  console.debug = noop;
+  console.info = noop;
+  console.warn = noop;
+  console.table = noop;
+  console.trace = noop;
+}
+
 // PWA Service Worker Registration
 const isInIframe = (() => {
   try { return window.self !== window.top; } catch (e) { return true; }

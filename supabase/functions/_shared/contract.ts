@@ -90,26 +90,58 @@ export function createValidationErrorResponse(zodError: z.ZodError): Response {
   );
 }
 
-export async function validateRequest<T>(
+const DEFAULT_MAX_PAYLOAD_BYTES = 256 * 1024; // 256 KB
+
+export async function parseJsonBody(
   req: Request,
-  schema: z.Schema<T>
-): Promise<{ data?: T; errorResponse?: Response }> {
+  maxBytes: number = DEFAULT_MAX_PAYLOAD_BYTES
+): Promise<{ body?: unknown; errorResponse?: Response }> {
+  const contentLength = req.headers.get('content-length');
+  if (contentLength && parseInt(contentLength, 10) > maxBytes) {
+    return {
+      errorResponse: createErrorResponse(
+        `Payload excede o limite de ${Math.round(maxBytes / 1024)} KB`,
+        413,
+        'PAYLOAD_TOO_LARGE'
+      ),
+    };
+  }
+
   try {
-    const body = await req.json();
-    const result = schema.safeParse(body);
-    
-    if (!result.success) {
-      return { errorResponse: createValidationErrorResponse(result.error) };
+    const raw = await req.text();
+    if (raw.length > maxBytes) {
+      return {
+        errorResponse: createErrorResponse(
+          `Payload excede o limite de ${Math.round(maxBytes / 1024)} KB`,
+          413,
+          'PAYLOAD_TOO_LARGE'
+        ),
+      };
     }
-    
-    return { data: result.data };
-  } catch (err) {
-    return { 
+    const parsed = JSON.parse(raw);
+    return { body: parsed };
+  } catch {
+    return {
       errorResponse: createErrorResponse(
         'JSON inválido ou corpo da requisição ausente',
         400,
         'INVALID_JSON'
-      ) 
+      ),
     };
   }
+}
+
+export async function validateRequest<T>(
+  req: Request,
+  schema: z.Schema<T>,
+  maxBytes: number = DEFAULT_MAX_PAYLOAD_BYTES
+): Promise<{ data?: T; errorResponse?: Response }> {
+  const { body, errorResponse } = await parseJsonBody(req, maxBytes);
+  if (errorResponse) return { errorResponse };
+
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    return { errorResponse: createValidationErrorResponse(result.error) };
+  }
+  return { data: result.data };
 }

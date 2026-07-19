@@ -5,7 +5,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 function err(msg: string, status = 400, code = 'BAD_REQUEST') {
   return new Response(JSON.stringify({ error: msg, code }), {
@@ -134,7 +134,9 @@ serve(async (req: Request): Promise<Response> => {
   if (!rl.allowed) return rateLimitResponse(rl);
 
   let body: { conteudo?: string; nome_arquivo?: string; tipo?: string; empresa_id?: string };
-  try { body = await req.json(); } catch { return err('JSON inválido'); }
+  const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+  if (_pe) return _pe;
+  body = _pb as typeof body;
 
   const conteudo = String(body.conteudo ?? '');
   const nomeArquivo = String(body.nome_arquivo ?? 'arquivo.txt').slice(0, 255);

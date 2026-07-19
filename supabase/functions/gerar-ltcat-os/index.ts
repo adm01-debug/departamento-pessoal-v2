@@ -3,7 +3,7 @@ import { PDFDocument, StandardFonts, rgb } from "https://esm.sh/pdf-lib@1.17.1";
 import { z } from "https://esm.sh/zod@3.23.8";
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const OSSchema = z.object({
   tipo: z.literal("os"),
@@ -227,7 +227,9 @@ Deno.serve(async (req) => {
     const rl = await checkRateLimit(adminRL, { key: `gerar-ltcat-os:${user.id}`, limit: 5, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
 
-    const body = await req.json();
+    const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
+    if (_pe) return _pe;
+    const body = _pb;
     const parsed = Schema.safeParse(body);
     if (!parsed.success) {
       return new Response(JSON.stringify({ error: "validation", detail: parsed.error.flatten() }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });

@@ -10,7 +10,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
 const TETO_INSS = 8157.41;
@@ -87,7 +87,9 @@ Deno.serve(async (req) => {
     const userId = userData.user.id;
 
     let raw: unknown;
-    try { raw = await req.json(); } catch { return json({ error: 'JSON inválido', code: 'INVALID_JSON' }, 400); }
+    const { body: parsedBody, errorResponse: payloadErr } = await parseJsonBody(req);
+    if (payloadErr) return payloadErr;
+    raw = parsedBody;
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
       return json({ error: 'Payload inválido', code: 'VALIDATION_ERROR', details: parsed.error.flatten() }, 422);
