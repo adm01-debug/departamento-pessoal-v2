@@ -23,6 +23,21 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
+const selfRateBuckets = new Map<string, { count: number; resetAt: number }>();
+const SELF_LIMIT = 30;
+const SELF_WINDOW = 60_000;
+
+function selfRateCheck(userId: string): boolean {
+  const now = Date.now();
+  const b = selfRateBuckets.get(userId);
+  if (!b || b.resetAt <= now) {
+    selfRateBuckets.set(userId, { count: 1, resetAt: now + SELF_WINDOW });
+    return true;
+  }
+  b.count++;
+  return b.count <= SELF_LIMIT;
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
@@ -45,6 +60,15 @@ serve(async (req: Request): Promise<Response> => {
       return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     }
     const userId = userData.user.id;
+
+    if (!selfRateCheck(userId)) {
+      return new Response(JSON.stringify({
+        success: false, error: 'Rate limit endpoint abuse detected',
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '60' },
+      });
+    }
 
     const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return createValidationErrorResponse(parsed.error);
