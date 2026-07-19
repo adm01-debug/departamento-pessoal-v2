@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://esm.sh/zod@3.23.8";
 import { verifyCsrf } from "../_shared/csrf.ts";
 import { captureException } from "../_shared/sentry.ts";
+import { corsHeaders } from "../_shared/contract.ts";
 
 /**
  * enviar-relatorio — Onda 20 hardening
@@ -20,13 +21,6 @@ import { captureException } from "../_shared/sentry.ts";
  * 10. Todas as queries de coleta são escopadas por empresa_id (evita
  *     vazamento cross-tenant que existia antes com service key crua).
  */
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-csrf-token",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
 
 const RELATORIOS_PERMITIDOS = [
   "lista_colaboradores",

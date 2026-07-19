@@ -5,11 +5,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-};
+import { corsHeaders } from '../_shared/contract.ts';
 
 function err(msg: string, status = 400, code = 'BAD_REQUEST') {
   return new Response(JSON.stringify({ error: msg, code }), {

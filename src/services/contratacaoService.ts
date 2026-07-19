@@ -84,12 +84,16 @@ export const contratacaoService = {
   },
 
   async validarDocumento(admissaoId: string, docType: string, status: 'validado' | 'rejeitado', observacao?: string): Promise<void> {
+    const ALLOWED_DOC_TYPES = ['rg', 'cpf', 'ctps', 'titulo', 'reservista', 'comprovante_residencia', 'foto', 'certidao', 'pis', 'cnh'];
+    if (!ALLOWED_DOC_TYPES.includes(docType)) {
+      throw new Error(`Tipo de documento inválido: ${docType}`);
+    }
     try {
       const { error } = await supabase
         .from('admissoes')
         .update({
           [`checklist_${docType}`]: status === 'validado',
-          metadata: { 
+          metadata: {
             obs: observacao,
             last_validation: new Date().toISOString()
           }

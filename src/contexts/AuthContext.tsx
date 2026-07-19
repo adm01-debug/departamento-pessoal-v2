@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Session, AuthError } from '@supabase/supabase-js';
 import DOMPurify from 'dompurify';
 import { loggerService } from '@/services/loggerService';
+import { queryClient } from '@/lib/queryClient';
 
 export type AppRole = 'admin' | 'moderator' | 'user';
 
@@ -165,6 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      queryClient.clear();
       loggerService.info('User signed out');
     } catch (e) {
       loggerService.error('Sign out error', {}, e as Error);

@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { validateUploadFile } from '@/utils/uploadValidation';
 
 export type ThreadStatus = 'aberto' | 'respondido' | 'resolvido' | 'arquivado';
 export type ThreadCategoria = 'folha' | 'esocial' | 'admissao' | 'rescisao' | 'tributos' | 'ferias' | 'outro';
@@ -114,6 +115,7 @@ export const canalContabilidadeService = {
 
   // ---------- anexos ----------
   async uploadAnexo(empresaId: string, threadId: string, file: File) {
+    validateUploadFile(file);
     const safe = file.name.replace(/[^\w.\-]/g, '_');
     const path = `${empresaId}/${threadId}/${Date.now()}_${safe}`;
     const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: false });

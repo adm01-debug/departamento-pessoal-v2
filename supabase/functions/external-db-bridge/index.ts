@@ -10,14 +10,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { verifyCsrf } from "../_shared/csrf.ts";
+import { corsHeaders } from "../_shared/contract.ts";
 
 // -------------------- Headers --------------------
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-csrf-token, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
 const NO_STORE = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" };
 
 // -------------------- Limites e thresholds --------------------

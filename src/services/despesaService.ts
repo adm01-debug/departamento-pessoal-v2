@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { validateUploadFile } from '@/utils/uploadValidation';
 
 export type DespesaStatus = 'rascunho' | 'pendente' | 'aprovado' | 'rejeitado' | 'integrado_folha' | 'pago' | 'cancelado';
 export type DespesaTipo = 'reembolso' | 'adiantamento' | 'despesa_viagem' | 'material' | 'alimentacao' | 'transporte' | 'outro';
@@ -66,6 +67,7 @@ export const despesaService = {
   },
 
   async uploadComprovante(empresaId: string, despesaId: string, file: File): Promise<string> {
+    validateUploadFile(file);
     const ext = file.name.split('.').pop() || 'bin';
     const path = `${empresaId}/${despesaId}/${crypto.randomUUID()}.${ext}`;
     const { error: upErr } = await supabase.storage.from('comprovantes-despesas').upload(path, file, { upsert: false });

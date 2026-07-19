@@ -11,11 +11,48 @@ export type StandardErrorResponse = {
   };
 };
 
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-hub-signature-256, idempotency-key, x-csrf-token',
-  'Access-Control-Expose-Headers': 'idempotent-replay',
+const ALLOWED_ORIGINS = [
+  'https://sistema-dp.lovable.app',
+  'https://unified-harmony-hub.lovable.app',
+];
+const LOVABLE_HOST_RE = /\.lovable\.(app|dev)$/;
+
+function isOriginAllowed(origin: string): boolean {
+  if (!origin) return false;
+  try {
+    const host = new URL(origin).hostname;
+    return (
+      ALLOWED_ORIGINS.includes(origin) ||
+      LOVABLE_HOST_RE.test(host) ||
+      host === 'localhost' ||
+      host === '127.0.0.1'
+    );
+  } catch {
+    return false;
+  }
+}
+
+export const securityHeaders: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '0',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
+
+export function getCorsHeaders(req?: Request): Record<string, string> {
+  const origin = req?.headers.get('origin') || '';
+  const allowedOrigin = isOriginAllowed(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-hub-signature-256, idempotency-key, x-csrf-token',
+    'Access-Control-Expose-Headers': 'idempotent-replay',
+    'Vary': 'Origin',
+    ...securityHeaders,
+  };
+}
+
+export const corsHeaders = getCorsHeaders();
 
 export function createErrorResponse(
   message: string,

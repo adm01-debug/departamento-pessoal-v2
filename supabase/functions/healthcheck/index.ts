@@ -38,25 +38,20 @@ serve(async (req: Request): Promise<Response> => {
 
     const start = Date.now();
 
-    const { count: colabCount, error: dbError } = await supabase
+    const { error: dbError } = await supabase
       .from('colaboradores')
       .select('id', { count: 'exact', head: true });
 
     const dbLatency = Date.now() - start;
 
-    const storageStart = Date.now();
-    const { error: storageError } = await supabase.storage.listBuckets();
-    const storageLatency = Date.now() - storageStart;
-
     const totalLatency = Date.now() - start;
-    const allOk = !dbError && !storageError;
+    const allOk = !dbError;
 
     return new Response(JSON.stringify({
       status: allOk ? 'healthy' : 'degraded',
       timestamp: new Date().toISOString(),
       services: {
         database: { status: !dbError ? 'ok' : 'error', latency_ms: dbLatency },
-        storage: { status: !storageError ? 'ok' : 'error', latency_ms: storageLatency },
       },
       total_latency_ms: totalLatency,
     }), {

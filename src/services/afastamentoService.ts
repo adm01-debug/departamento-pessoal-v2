@@ -1,6 +1,7 @@
 import { BaseService, ListOptions, ListResponse } from './baseService';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateLocalISO } from '@/utils/dateLocal';
+import { validateUploadFile } from '@/utils/uploadValidation';
 
 class AfastamentoService extends BaseService<any> {
   constructor() {
@@ -76,10 +77,9 @@ class AfastamentoService extends BaseService<any> {
 
   async uploadDocumento(afastamentoId: string, file: File, tipo: string): Promise<any> {
     try {
+      validateUploadFile(file);
       const fileExt = file.name.split('.').pop();
       const fileName = `${afastamentoId}/${crypto.randomUUID()}.${fileExt}`;
-      
-      if (file.size > 10 * 1024 * 1024) throw new Error('Arquivo excede o limite de 10MB');
 
       const { error: uploadError } = await supabase.storage.from('afastamentos').upload(fileName, file);
       if (uploadError) throw uploadError;

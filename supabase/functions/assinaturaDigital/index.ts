@@ -2,14 +2,8 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
 import { verifyCsrf } from '../_shared/csrf.ts';
+import { getCorsHeaders } from '../_shared/contract.ts';
 import { captureException } from '../_shared/sentry.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Cache-Control': 'no-store',
-};
 
 const BodySchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('verificar'), tokenId: z.string().uuid() }),
@@ -22,15 +16,18 @@ const BodySchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('listar') }),
 ]);
 
+let _corsHeaders: Record<string, string> = {};
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    headers: { ..._corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
 }
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  _corsHeaders = { ...getCorsHeaders(req), 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: _corsHeaders });
   if (req.method !== 'POST') return json({ success: false, error: 'Method not allowed' }, 405);
 
   try {
