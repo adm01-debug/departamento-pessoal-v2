@@ -96,7 +96,12 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (err: any) {
       await recordFailedAttempt(email);
-      setError('Email ou senha inválidos.');
+      const msg = err?.message;
+      if (msg && msg.includes('bloqueada')) {
+        setError(msg);
+      } else {
+        setError('Email ou senha inválidos.');
+      }
     } finally {
       setLoading(false);
     }

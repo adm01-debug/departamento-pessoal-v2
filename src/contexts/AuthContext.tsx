@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, AuthError } from '@supabase/supabase-js';
-import DOMPurify from 'dompurify';
+import { sanitizePlainText } from '@/utils/sanitizeHtml';
 import { loggerService } from '@/services/loggerService';
 import { queryClient } from '@/lib/queryClient';
 import { validatePassword } from '@/utils/passwordPolicy';
@@ -153,11 +153,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
+      // Check account lockout before attempting authentication
+      const { data: lockoutData } = await supabase.rpc('check_account_lockout', { p_email: email });
+      if (lockoutData && Array.isArray(lockoutData) && lockoutData[0]?.is_locked) {
+        const lockedUntil = lockoutData[0].locked_until;
+        const msg = lockedUntil
+          ? `Conta temporariamente bloqueada. Tente novamente após ${new Date(lockedUntil).toLocaleTimeString('pt-BR')}.`
+          : 'Conta temporariamente bloqueada por excesso de tentativas.';
+        loggerService.warn('Login blocked - account locked', { email });
+        throw new Error(msg);
+      }
+
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+
+      if (error) {
+        // Record failed attempt (fire-and-forget)
+        supabase.rpc('record_login_attempt', { p_email: email, p_success: false }).catch(() => {});
+        throw error;
+      }
+
+      // Record successful attempt (fire-and-forget)
+      supabase.rpc('record_login_attempt', { p_email: email, p_success: true }).catch(() => {});
       loggerService.info('User signed in', { email });
     } catch (e) {
-      const err = e as AuthError;
+      const err = e as AuthError | Error;
       loggerService.warn('Sign in failed', { email, message: err.message });
       throw err;
     }
@@ -167,11 +186,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      queryClient.clear();
-      loggerService.info('User signed out');
     } catch (e) {
       loggerService.error('Sign out error', {}, e as Error);
-      throw e;
+    } finally {
+      // Defense-in-depth: clear ALL client-side state regardless of signOut result
+      queryClient.clear();
+      try { localStorage.clear(); } catch { /* private browsing */ }
+      try { sessionStorage.clear(); } catch { /* private browsing */ }
+      setUser(null);
+      setSession(null);
+      loggerService.info('User signed out - all local state cleared');
     }
   }, []);
 
@@ -181,7 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(`Senha fraca: ${pwCheck.errors.join('; ')}`);
     }
     try {
-      const sanitizedName = DOMPurify.sanitize(name.trim());
+      const sanitizedName = sanitizePlainText(name.trim(), 100);
       const { error } = await supabase.auth.signUp({
         email,
         password,
