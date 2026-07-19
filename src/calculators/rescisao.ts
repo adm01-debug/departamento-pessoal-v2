@@ -30,52 +30,52 @@ export function calcularRescisao(params: {
   // Saldo de salário: dias trabalhados no mês sobre os dias reais do mês.
   const diasNoMes = new Date(desligamento.getFullYear(), desligamento.getMonth() + 1, 0).getDate() || 30;
   const diasTrabalhados = desligamento.getDate();
-  const saldoSalario = Math.round((salarioBase / diasNoMes) * diasTrabalhados * 100) / 100;
+  const saldoSalario = Math.trunc((salarioBase / diasNoMes) * diasTrabalhados * 100) / 100;
 
   // 13º proporcional: meses trabalhados no ano-calendário (a partir da admissão, se admitido no ano).
   const inicioAno = new Date(desligamento.getFullYear(), 0, 1);
   const baseInicio13 = admissao > inicioAno ? admissao : inicioAno;
   const meses13 = calcularAvos(baseInicio13, desligamento);
-  const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * meses13 * 100) / 100 : 0;
+  const decimo13Prop = tipoRescisao !== 'com_justa_causa' ? Math.trunc((salarioBase / 12) * meses13 * 100) / 100 : 0;
 
   // Férias proporcionais: avos do período aquisitivo corrente (com regra dos 15 dias).
   const mesesFeriasProp = avosTotal % 12 || (avosTotal > 0 ? 12 : 0);
-  const feriasProp = tipoRescisao !== 'com_justa_causa' ? Math.round((salarioBase / 12) * mesesFeriasProp * 100) / 100 : 0;
-  const tercoFeriasProp = Math.round(feriasProp / 3 * 100) / 100;
+  const feriasProp = tipoRescisao !== 'com_justa_causa' ? Math.trunc((salarioBase / 12) * mesesFeriasProp * 100) / 100 : 0;
+  const tercoFeriasProp = Math.trunc(feriasProp / 3 * 100) / 100;
   const feriasVencidasValor = feriasVencidas ? salarioBase : 0;
-  const tercoFeriasVencidas = Math.round(feriasVencidasValor / 3 * 100) / 100;
+  const tercoFeriasVencidas = Math.trunc(feriasVencidasValor / 3 * 100) / 100;
 
   const anosServico = Math.floor(avosTotal / 12);
   const diasAvisoPrevio = tipoRescisao === 'sem_justa_causa' ? Math.min(90, 30 + anosServico * 3) : 0;
   const avisoPrevio = tipoRescisao === 'sem_justa_causa'
-    ? Math.round((salarioBase / 30) * diasAvisoPrevio * 100) / 100
+    ? Math.trunc((salarioBase / 30) * diasAvisoPrevio * 100) / 100
     : tipoRescisao === 'acordo_mutuo'
-      ? Math.round((salarioBase / 30) * Math.min(90, 30 + anosServico * 3) * 0.5 * 100) / 100
+      ? Math.trunc((salarioBase / 30) * Math.min(90, 30 + anosServico * 3) * 0.5 * 100) / 100
       : 0;
 
   const multaFGTS = tipoRescisao === 'sem_justa_causa'
-    ? Math.round(saldoFGTS * 0.40 * 100) / 100
+    ? Math.trunc(saldoFGTS * 0.40 * 100) / 100
     : tipoRescisao === 'acordo_mutuo'
-      ? Math.round(saldoFGTS * 0.20 * 100) / 100
+      ? Math.trunc(saldoFGTS * 0.20 * 100) / 100
       : 0;
 
   const totalBruto = saldoSalario + decimo13Prop + feriasProp + tercoFeriasProp + feriasVencidasValor + tercoFeriasVencidas + avisoPrevio;
   // INSS/IRRF incidem sobre saldo de salário e 13º (em bases separadas); férias indenizadas são isentas.
-  const inss = Math.round((calcularINSS(saldoSalario) + calcularINSS(decimo13Prop)) * 100) / 100;
-  const irrf = Math.round((calcularIRRF(saldoSalario) + calcularIRRF(decimo13Prop)) * 100) / 100;
-  const totalLiquido = Math.round((totalBruto - inss - irrf) * 100) / 100;
+  const inss = Math.trunc((calcularINSS(saldoSalario) + calcularINSS(decimo13Prop)) * 100) / 100;
+  const irrf = Math.trunc((calcularIRRF(saldoSalario) + calcularIRRF(decimo13Prop)) * 100) / 100;
+  const totalLiquido = Math.trunc((totalBruto - inss - irrf) * 100) / 100;
 
   return {
     saldoSalario, decimo13Proporcional: decimo13Prop, feriasProporcional: feriasProp,
     tercoFeriasProporcional: tercoFeriasProp, feriasVencidas: feriasVencidasValor,
     tercoFeriasVencidas, avisoPrevio, diasAvisoPrevio, multaFGTS,
-    totalBruto: Math.round(totalBruto * 100) / 100, inss, irrf, totalLiquido,
+    totalBruto: Math.trunc(totalBruto * 100) / 100, inss, irrf, totalLiquido,
   };
 }
 
 export function calcularAvisoPrevioIndenizado(salarioBase: number, anosServico: number) {
   const dias = Math.min(90, 30 + anosServico * 3);
-  const valor = Math.round((salarioBase / 30) * dias * 100) / 100;
+  const valor = Math.trunc((salarioBase / 30) * dias * 100) / 100;
   return { dias, valor };
 }
 
@@ -94,26 +94,30 @@ export function calcularSeguroDesemprego(ultimosSalarios: number[], mesesVinculo
 
 export function calcularMultaFGTS(saldoFGTS: number, tipo: 'sem_justa_causa' | 'acordo_mutuo'): number {
   const percentual = tipo === 'sem_justa_causa' ? 0.40 : 0.20;
-  return Math.round(saldoFGTS * percentual * 100) / 100;
+  return Math.trunc(saldoFGTS * percentual * 100) / 100;
 }
 
-export function calcularMulta477(salarioBase: number): number {
-  return salarioBase;
+// CLT Art. 477 §8°: multa de um salário mensal quando o empregador não quita as verbas rescisórias
+// no prazo legal (10 dias corridos para aviso prévio trabalhado; 1° dia útil para demissão imediata).
+// Retorna 0 quando o empregador não é o culpado pelo atraso (e.g., força maior, culpa do empregado).
+export function calcularMulta477(salarioBase: number, empregadorCulpado: boolean = false): number {
+  if (!empregadorCulpado) return 0;
+  return Math.trunc(salarioBase * 100) / 100;
 }
 
 export function calcularProvisaoFerias(salarioBase: number, mesesAquisitivo: number) {
   const proporcional = (salarioBase / 12) * mesesAquisitivo;
-  const provisaoFerias = Math.round(proporcional * 100) / 100;
-  const provisaoTerco = Math.round(provisaoFerias / 3 * 100) / 100;
-  const provisaoEncargos = Math.round((provisaoFerias + provisaoTerco) * 0.3637 * 100) / 100;
-  const total = Math.round((provisaoFerias + provisaoTerco + provisaoEncargos) * 100) / 100;
+  const provisaoFerias = Math.trunc(proporcional * 100) / 100;
+  const provisaoTerco = Math.trunc(provisaoFerias / 3 * 100) / 100;
+  const provisaoEncargos = Math.trunc((provisaoFerias + provisaoTerco) * 0.3637 * 100) / 100;
+  const total = Math.trunc((provisaoFerias + provisaoTerco + provisaoEncargos) * 100) / 100;
   return { provisaoFerias, provisaoTerco, provisaoEncargos, total };
 }
 
 export function calcularProvisao13(salarioBase: number, mesesTrabalhados: number) {
-  const provisao13 = Math.round((salarioBase / 12) * mesesTrabalhados * 100) / 100;
-  const provisaoEncargos = Math.round(provisao13 * 0.3637 * 100) / 100;
-  const total = Math.round((provisao13 + provisaoEncargos) * 100) / 100;
+  const provisao13 = Math.trunc((salarioBase / 12) * mesesTrabalhados * 100) / 100;
+  const provisaoEncargos = Math.trunc(provisao13 * 0.3637 * 100) / 100;
+  const total = Math.trunc((provisao13 + provisaoEncargos) * 100) / 100;
   return { provisao13, provisaoEncargos, total };
 }
 
@@ -121,14 +125,14 @@ export function calcularEncargos(salarioBase: number, percentualRAT: number = 0.
   const inssEmpregado = calcularINSS(salarioBase);
   const irrfEmpregado = calcularIRRF(salarioBase);
   const fgts = calcularFGTS(salarioBase);
-  
-  const inssPatronal = Math.round(salarioBase * 0.20 * 100) / 100;
-  const rat = Math.round(salarioBase * percentualRAT * 100) / 100;
-  const terceiros = Math.round(salarioBase * percentualTerceiros * 100) / 100;
-  
-  const totalEncargosPatronais = Math.round((inssPatronal + rat + terceiros + fgts) * 100) / 100;
-  const custoMensalTotal = Math.round((salarioBase + totalEncargosPatronais) * 100) / 100;
-  
+
+  const inssPatronal = Math.trunc(salarioBase * 0.20 * 100) / 100;
+  const rat = Math.trunc(salarioBase * percentualRAT * 100) / 100;
+  const terceiros = Math.trunc(salarioBase * percentualTerceiros * 100) / 100;
+
+  const totalEncargosPatronais = Math.trunc((inssPatronal + rat + terceiros + fgts) * 100) / 100;
+  const custoMensalTotal = Math.trunc((salarioBase + totalEncargosPatronais) * 100) / 100;
+
   return {
     inssEmpregado,
     irrfEmpregado,
@@ -142,13 +146,13 @@ export function calcularEncargos(salarioBase: number, percentualRAT: number = 0.
 }
 
 export function calcularProRata(salarioBase: number, diasTrabalhados: number): number {
-  return Math.round((salarioBase / 30) * diasTrabalhados * 100) / 100;
+  return Math.trunc((salarioBase / 30) * diasTrabalhados * 100) / 100;
 }
 
 export function calcularMargemConsignado(salarioLiquido: number) {
   return {
-    margemTotal: Math.round(salarioLiquido * 0.35 * 100) / 100,
-    margemCartao: Math.round(salarioLiquido * 0.05 * 100) / 100,
+    margemTotal: Math.trunc(salarioLiquido * 0.35 * 100) / 100,
+    margemCartao: Math.trunc(salarioLiquido * 0.05 * 100) / 100,
   };
 }
 
