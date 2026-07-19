@@ -90,8 +90,9 @@ export const catalogoCursoService = {
     if (error) throw error;
     return data;
   },
-  async desvincularCursoTrilha(id: string) {
-    const { error } = await supabase.from('trilhas_cursos').delete().eq('id', id);
+  async desvincularCursoTrilha(id: string, trilhaId: string) {
+    if (!trilhaId) throw new Error('trilha_id obrigatório para isolamento de tenant');
+    const { error } = await supabase.from('trilhas_cursos').delete().eq('id', id).eq('trilha_id', trilhaId);
     if (error) throw error;
   },
 

@@ -208,6 +208,7 @@ export async function salvarPeriodoExperiencia(colaboradorId: string, dados: Dad
       .from('periodos_experiencia')
       .update(dados)
       .eq('id', String(existingRecord.id))
+      .eq('colaborador_id', colaboradorId)
       .select()
       .maybeSingle();
     if (error) throw error;

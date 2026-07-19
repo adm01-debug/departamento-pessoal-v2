@@ -65,7 +65,7 @@ function TrilhaCursosSection({ trilhaId, cursos }: { trilhaId: string; cursos: a
   });
 
   const desvincular = useMutation({
-    mutationFn: (id: string) => catalogoCursoService.desvincularCursoTrilha(id),
+    mutationFn: (id: string) => catalogoCursoService.desvincularCursoTrilha(id, trilhaId),
     onSuccess: () => { 
       qc.invalidateQueries({ queryKey: ['trilhas_cursos', trilhaId] }); 
       toast.success('Curso desvinculado'); 

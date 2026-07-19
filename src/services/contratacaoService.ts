@@ -82,11 +82,12 @@ export const contratacaoService = {
   
   },
 
-  async validarDocumento(admissaoId: string, docType: string, status: 'validado' | 'rejeitado', observacao?: string): Promise<void> {
+  async validarDocumento(admissaoId: string, docType: string, status: 'validado' | 'rejeitado', observacao?: string, empresaId?: string): Promise<void> {
     const ALLOWED_DOC_TYPES = ['rg', 'cpf', 'ctps', 'titulo', 'reservista', 'comprovante_residencia', 'foto', 'certidao', 'pis', 'cnh'];
     if (!ALLOWED_DOC_TYPES.includes(docType)) {
       throw new Error(`Tipo de documento inválido: ${docType}`);
     }
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     try {
       const { error } = await supabase
         .from('admissoes')
@@ -97,7 +98,8 @@ export const contratacaoService = {
             last_validation: new Date().toISOString()
           }
         } as any)
-        .eq('id', admissaoId);
+        .eq('id', admissaoId)
+        .eq('empresa_id', empresaId);
 
       if (error) throw error;
 
@@ -174,19 +176,22 @@ export const contratacaoService = {
     }
   },
 
-  async transmitirESocial(admissaoId: string): Promise<boolean> {
+  async transmitirESocial(admissaoId: string, empresaId: string): Promise<boolean> {
+    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     try {
-      const { data: admissao } = await supabase.from('admissoes').select('*').eq('id', admissaoId).single();
-      
+      const { data: admissao } = await supabase.from('admissoes').select('empresa_id').eq('id', admissaoId).eq('empresa_id', empresaId).single();
+      if (!admissao) throw new Error('Admissão não encontrada ou sem permissão');
+
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       const { error } = await supabase
         .from('admissoes')
-        .update({ 
-          etapa: 'esocial', 
-          metadata: { esocial_protocol: `PROTO-${Math.random().toString(36).toUpperCase().slice(0, 10)}` } as any 
+        .update({
+          etapa: 'esocial',
+          metadata: { esocial_protocol: `PROTO-${Math.random().toString(36).toUpperCase().slice(0, 10)}` } as any
         })
-        .eq('id', admissaoId);
+        .eq('id', admissaoId)
+        .eq('empresa_id', empresaId);
         
       if (error) throw error;
       
