@@ -304,7 +304,7 @@ export default function PontoPage() {
       refetchRegistro();
       refetchBatidas();
     } catch (e: any) {
-      toast.error(`Erro: ${e.message}`);
+      toast.error(safeErrorMessage(e, 'Erro ao processar ponto.'));
     } finally {
       setProcessando(false);
     }
@@ -338,7 +338,7 @@ export default function PontoPage() {
               size="sm"
               variant="outline"
               className="rounded-xl gap-1.5 font-body"
-              onClick={() => window.open('/ponto/kiosk', '_blank')}
+              onClick={() => window.open('/ponto/kiosk', '_blank', 'noopener')}
             >
               <Settings className="h-4 w-4" /> Kiosk Mode
             </Button>
