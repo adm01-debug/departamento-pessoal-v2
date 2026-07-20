@@ -110,6 +110,47 @@ serve(async (req: Request): Promise<Response> => {
     const rl = await checkRateLimit(supabase, { key: `ponto-offline:${userId}`, limit: 30, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
 
+    // Achado N7 da auditoria: o INSERT abaixo omitia `ordem` (NOT NULL, sem
+    // default, parte de UNIQUE(colaborador_id, data, ordem)) — toda batida
+    // offline falhava a constraint e ficava presa na fila para sempre.
+    // `empresa_id` também nunca era gravado; embora a coluna seja nullable,
+    // uma linha com empresa_id NULL fica invisível às policies de RLS.
+    const colaboradorIds: string[] = [...new Set(
+      registros.map((r: any) => r?.colaborador_id).filter((v: unknown): v is string => typeof v === 'string' && v.length > 0),
+    )];
+    const datasEnvolvidas: string[] = [...new Set(
+      registros
+        .map((r: any) => (typeof r?.timestamp === 'string' ? r.timestamp.split('T')[0] : null))
+        .filter((v: unknown): v is string => typeof v === 'string' && v.length > 0),
+    )];
+
+    const empresaPorColaborador = new Map<string, string | null>();
+    if (colaboradorIds.length > 0) {
+      const { data: colabs } = await supabase
+        .from('colaboradores')
+        .select('id, empresa_id')
+        .in('id', colaboradorIds);
+      for (const c of colabs ?? []) {
+        empresaPorColaborador.set(c.id as string, (c as any).empresa_id ?? null);
+      }
+    }
+
+    // Semente do contador de ordem = MAX(ordem) já existente por (colaborador_id, data)
+    const ordemAtual = new Map<string, number>();
+    if (colaboradorIds.length > 0 && datasEnvolvidas.length > 0) {
+      const { data: existentes } = await supabase
+        .from('batidas_ponto')
+        .select('colaborador_id, data, ordem')
+        .in('colaborador_id', colaboradorIds)
+        .in('data', datasEnvolvidas);
+      for (const b of existentes ?? []) {
+        const key = `${b.colaborador_id}|${b.data}`;
+        const atual = ordemAtual.get(key) ?? 0;
+        if ((b.ordem as number) > atual) ordemAtual.set(key, b.ordem as number);
+      }
+    }
+
+    // Enforcement de assinatura só é obrigatório quando o segredo está configurado
     const enforceHash = !!Deno.env.get('PONTO_HASH_SECRET');
 
     const results: {
@@ -168,6 +209,15 @@ serve(async (req: Request): Promise<Response> => {
           continue;
         }
 
+        // Tenant (empresa_id) + próxima ordem sequencial (N7 fix)
+        const empresaId = empresaPorColaborador.get(reg.colaborador_id);
+        if (!empresaId) {
+          throw new Error('Colaborador sem empresa associada — batida rejeitada');
+        }
+        const ordemKey = `${reg.colaborador_id}|${timestampDate}`;
+        const proximaOrdem = (ordemAtual.get(ordemKey) ?? 0) + 1;
+        ordemAtual.set(ordemKey, proximaOrdem);
+
         // Upload seguro de foto (opcional)
         let finalFotoUrl: string | null = null;
         if (reg.foto_base64 && reg.colaborador_id) {
@@ -188,27 +238,15 @@ serve(async (req: Request): Promise<Response> => {
           }
         }
 
-        // Atomic ordem allocation: get max(ordem)+1 for this colaborador+date
-        const { data: maxOrdem } = await supabase
-          .from('batidas_ponto')
-          .select('ordem')
-          .eq('colaborador_id', reg.colaborador_id)
-          .eq('data', timestampDate)
-          .order('ordem', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        const nextOrdem = ((maxOrdem?.ordem as number) ?? 0) + 1;
-
         const { data: inserted, error } = await supabase
           .from('batidas_ponto')
           .insert({
             colaborador_id: reg.colaborador_id,
             empresa_id: empresaId,
-            ordem: proximaOrdem,
             tipo: tipoMapped,
             data: timestampDate,
             hora: timestampTime,
-            ordem: nextOrdem,
+            ordem: proximaOrdem,
             latitude: reg.latitude,
             longitude: reg.longitude,
             precisao_metros: reg.precisao,
