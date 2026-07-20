@@ -1,12 +1,15 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter,
-  DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileUp, Loader2, CheckCircle2, AlertTriangle, GitCompare } from 'lucide-react';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
@@ -31,7 +34,12 @@ export function ImportarAFDTDialog() {
   const [tipo, setTipo] = useState<Tipo>('AFDT');
   const [loading, setLoading] = useState(false);
   const [reconciliando, setReconciliando] = useState(false);
-  const [reconc, setReconc] = useState<{ total: number; ok: number; sem_colaborador: number; sem_batida: number } | null>(null);
+  const [reconc, setReconc] = useState<{
+    total: number;
+    ok: number;
+    sem_colaborador: number;
+    sem_batida: number;
+  } | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -51,7 +59,9 @@ export function ImportarAFDTDialog() {
         sem_colaborador: row?.sem_colaborador ?? 0,
         sem_batida: row?.sem_batida ?? 0,
       });
-      toast.success(`Reconciliação concluída: ${row?.ok ?? 0} OK, ${(row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0)} divergências.`);
+      toast.success(
+        `Reconciliação concluída: ${row?.ok ?? 0} OK, ${(row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0)} divergências.`
+      );
       // Dispara notificações agregadas aos membros da empresa (idempotente).
       const divergenciasTotais = (row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0);
       if (divergenciasTotais > 0) {
@@ -115,7 +125,13 @@ export function ImportarAFDTDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setResultado(null); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) setResultado(null);
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <FileUp className="h-4 w-4" />
@@ -134,7 +150,9 @@ export function ImportarAFDTDialog() {
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-muted-foreground">Tipo de arquivo</label>
             <Select value={tipo} onValueChange={(v) => setTipo(v as Tipo)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="AFDT">AFDT — Detalhado de Marcações</SelectItem>
                 <SelectItem value="ACJEF">ACJEF — Controle de Jornada e Eventos</SelectItem>
@@ -166,23 +184,48 @@ export function ImportarAFDTDialog() {
                 </span>
               </div>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                <dt className="text-muted-foreground">Linhas</dt><dd className="tabular-nums">{resultado.total_linhas}</dd>
-                <dt className="text-muted-foreground">Registros</dt><dd className="tabular-nums">{resultado.total_registros}</dd>
+                <dt className="text-muted-foreground">Linhas</dt>
+                <dd className="tabular-nums">{resultado.total_linhas}</dd>
+                <dt className="text-muted-foreground">Registros</dt>
+                <dd className="tabular-nums">{resultado.total_registros}</dd>
                 <dt className="text-muted-foreground">Erros</dt>
-                <dd className={resultado.total_erros ? 'text-warning tabular-nums' : 'tabular-nums'}>{resultado.total_erros}</dd>
-                {resultado.cnpj_empregador && (<><dt className="text-muted-foreground">CNPJ</dt><dd className="tabular-nums">{resultado.cnpj_empregador}</dd></>)}
+                <dd className={resultado.total_erros ? 'text-warning tabular-nums' : 'tabular-nums'}>
+                  {resultado.total_erros}
+                </dd>
+                {resultado.cnpj_empregador && (
+                  <>
+                    <dt className="text-muted-foreground">CNPJ</dt>
+                    <dd className="tabular-nums">{resultado.cnpj_empregador}</dd>
+                  </>
+                )}
                 {resultado.periodo?.inicio && (
-                  <><dt className="text-muted-foreground">Período</dt>
-                  <dd className="tabular-nums">{resultado.periodo.inicio} → {resultado.periodo.fim}</dd></>
+                  <>
+                    <dt className="text-muted-foreground">Período</dt>
+                    <dd className="tabular-nums">
+                      {resultado.periodo.inicio} → {resultado.periodo.fim}
+                    </dd>
+                  </>
                 )}
               </dl>
 
               {reconc && (
                 <div className="mt-3 pt-3 border-t border-border/40 grid grid-cols-4 gap-2 text-center text-xs">
-                  <div><p className="text-muted-foreground">Total</p><p className="font-bold tabular-nums">{reconc.total}</p></div>
-                  <div><p className="text-success">OK</p><p className="font-bold tabular-nums text-success">{reconc.ok}</p></div>
-                  <div><p className="text-warning">S/ colab.</p><p className="font-bold tabular-nums text-warning">{reconc.sem_colaborador}</p></div>
-                  <div><p className="text-destructive">S/ batida</p><p className="font-bold tabular-nums text-destructive">{reconc.sem_batida}</p></div>
+                  <div>
+                    <p className="text-muted-foreground">Total</p>
+                    <p className="font-bold tabular-nums">{reconc.total}</p>
+                  </div>
+                  <div>
+                    <p className="text-success">OK</p>
+                    <p className="font-bold tabular-nums text-success">{reconc.ok}</p>
+                  </div>
+                  <div>
+                    <p className="text-warning">S/ colab.</p>
+                    <p className="font-bold tabular-nums text-warning">{reconc.sem_colaborador}</p>
+                  </div>
+                  <div>
+                    <p className="text-destructive">S/ batida</p>
+                    <p className="font-bold tabular-nums text-destructive">{reconc.sem_batida}</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -190,7 +233,9 @@ export function ImportarAFDTDialog() {
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading || reconciliando}>Fechar</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading || reconciliando}>
+            Fechar
+          </Button>
           {resultado?.importacao_id && (
             <Button variant="secondary" onClick={handleReconciliar} disabled={reconciliando} className="gap-2">
               {reconciliando ? <Loader2 className="h-4 w-4 animate-spin" /> : <GitCompare className="h-4 w-4" />}

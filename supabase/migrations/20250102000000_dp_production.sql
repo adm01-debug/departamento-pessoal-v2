@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS public.folhas (
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_colaboradores_status ON public.colaboradores(status);
-CREATE INDEX IF NOT EXISTS idx_colaboradores_depto ON public.colaboradores(departamento_id);
+-- idx_colaboradores_depto removido: referenciava coluna inexistente; 002_colaboradores.sql já cria o índice correto.
 CREATE INDEX IF NOT EXISTS idx_ferias_status ON public.ferias(status);
 CREATE INDEX IF NOT EXISTS idx_pontos_data ON public.pontos(data);
 CREATE INDEX IF NOT EXISTS idx_folhas_mes ON public.folhas(mes_referencia);

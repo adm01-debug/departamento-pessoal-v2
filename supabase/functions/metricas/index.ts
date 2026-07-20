@@ -1,3 +1,7 @@
+// Remediação de auditoria (achado E7 / ALTO):
+// • JWT + tenant scope obrigatórios (antes: sem autenticação alguma;
+//   qualquer um lia headcount, total_bruto de folha e status eSocial de
+//   QUALQUER empresa informando o empresaId de outro tenant — IDOR)
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
@@ -34,6 +38,14 @@ serve(async (req) => {
     const { data, errorResponse } = await validateRequest(req, metricasSchema);
     if (errorResponse) return errorResponse;
     const { empresaId } = data!;
+    if (!empresaId) return createErrorResponse('empresaId é obrigatório', 422, 'VALIDATION_ERROR');
+
+    const admin = createClient(supabaseUrl, serviceKey);
+    const [{ data: belongs }, { data: isAdm }] = await Promise.all([
+      admin.rpc('user_belongs_to_empresa', { _user_id: userId, _empresa_id: empresaId }),
+      admin.rpc('is_admin', { _user_id: userId }),
+    ]);
+    if (!belongs && !isAdm) return createErrorResponse('Sem acesso a esta empresa', 403, 'FORBIDDEN');
 
     const supabase = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },

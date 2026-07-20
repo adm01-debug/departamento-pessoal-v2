@@ -14,7 +14,7 @@ const handleInvoke = async <T>(name: string, options: any, breaker = genericBrea
       if (error) {
         throw new Error(error.message || `Erro ao chamar função ${name}`);
       }
-      return (data as T);
+      return data as T;
     });
   } catch (e: any) {
     throw new Error(e.message || `Falha crítica na comunicação com ${name}`, { cause: e });
@@ -23,8 +23,7 @@ const handleInvoke = async <T>(name: string, options: any, breaker = genericBrea
 
 export const edgeFunctionsService = {
   /** Dispara alertas automáticos de DP via email */
-  dispararAlertasDP: async () => 
-    handleInvoke('alertas-dp', { body: { trigger: 'manual' } }),
+  dispararAlertasDP: async () => handleInvoke('alertas-dp', { body: { trigger: 'manual' } }),
 
   /** Envia relatório por email via Resend */
   enviarRelatorioEmail: async (params: {
@@ -42,11 +41,8 @@ export const edgeFunctionsService = {
   }) => handleInvoke('gerar-guias', { body: params }),
 
   /** Processa ponto do período via edge function */
-  processarPonto: async (params: {
-    empresaId: string;
-    dataInicio: string;
-    dataFim: string;
-  }) => handleInvoke('processar-ponto', { body: params }),
+  processarPonto: async (params: { empresaId: string; dataInicio: string; dataFim: string }) =>
+    handleInvoke('processar-ponto', { body: params }),
 
   /** Calcula férias via edge function */
   calcularFerias: async (params: {
@@ -59,36 +55,30 @@ export const edgeFunctionsService = {
   /** Calcula folha via edge function server-side com resiliência + idempotência.
    *  A `idempotencyKey` viaja no body (o CORS já aceita header, mas body é mais robusto
    *  contra proxies que removem headers custom em preflights antigos). */
-  calcularFolha: async (params: {
-    empresaId: string;
-    competencia: string;
-    idempotencyKey?: string;
-  }) => handleInvoke('calcular-folha', {
-    body: {
-      empresa_id: params.empresaId,
-      competencia: params.competencia,
-      ...(params.idempotencyKey ? { idempotency_key: params.idempotencyKey } : {}),
-    },
-  }),
+  calcularFolha: async (params: { empresaId: string; competencia: string; idempotencyKey?: string }) =>
+    handleInvoke('calcular-folha', {
+      body: {
+        empresa_id: params.empresaId,
+        competencia: params.competencia,
+        ...(params.idempotencyKey ? { idempotency_key: params.idempotencyKey } : {}),
+      },
+    }),
 
   /** Calcula rescisão via edge function */
   calcularRescisao: async (params: {
     salario_base: number;
     data_admissao: string;
-    data_demissao: string;
+    data_desligamento: string;
     tipo_rescisao: string;
     aviso_previo: string;
     saldo_fgts: number;
-    ferias_vencidas: number;
+    ferias_vencidas: boolean;
     dependentes_irrf: number;
   }) => handleInvoke('calcular-rescisao', { body: params }),
 
   /** Exportação server-side */
-  exportarDados: async (params: {
-    tabela: string;
-    formato: 'csv' | 'json';
-    filtros?: Record<string, any>;
-  }) => handleInvoke('exportacao', { body: params }),
+  exportarDados: async (params: { tabela: string; formato: 'csv' | 'json'; filtros?: Record<string, any> }) =>
+    handleInvoke('exportacao', { body: params }),
 
   /** Health check do sistema */
   healthcheck: async () => handleInvoke('healthcheck', { body: {} }),
@@ -97,20 +87,17 @@ export const edgeFunctionsService = {
   limpezaDados: async () => handleInvoke('limpeza', { body: {} }),
 
   /** Backup server-side */
-  backupServidor: async (empresaId?: string) => 
-    handleInvoke('backup', { body: { empresaId } }),
+  backupServidor: async (empresaId?: string) => handleInvoke('backup', { body: { empresaId } }),
 
-  /** OCR de documentos via AI */
+  /** OCR de documentos via AI (bucket restrito a documentos/documentos-admissao) */
   ocrDocumento: async (params: {
-    fileUrl?: string;
-    bucket?: string;
-    filePath?: string;
+    bucket: 'documentos' | 'documentos-admissao';
+    filePath: string;
     documentType?: 'cpf' | 'rg' | 'ctps' | 'comprovante_endereco';
   }) => handleInvoke('OCR', { body: params }),
 
   /** Métricas do sistema */
-  metricas: async (empresaId: string) => 
-    handleInvoke('metricas', { body: { empresaId } }),
+  metricas: async (empresaId: string) => handleInvoke('metricas', { body: { empresaId } }),
 
   /** Notificações */
   enviarNotificacao: async (params: {
@@ -123,14 +110,11 @@ export const edgeFunctionsService = {
   }) => handleInvoke('notificacao', { body: params }),
 
   /** Processar agendamentos de relatórios */
-  processarAgendamentos: async () => 
-    handleInvoke('processar-agendamentos', { body: {} }),
+  processarAgendamentos: async () => handleInvoke('processar-agendamentos', { body: {} }),
 
   /** Gerar holerite server-side */
-  gerarHolerite: async (params: {
-    colaboradorId: string;
-    competencia: string;
-  }) => handleInvoke('gerar-holerite', { body: params }),
+  gerarHolerite: async (params: { colaboradorId: string; competencia: string }) =>
+    handleInvoke('gerar-holerite', { body: params }),
 
   /** Assinatura digital */
   assinaturaDigital: async (params: {
@@ -173,10 +157,10 @@ export const edgeFunctionsService = {
   }) => handleInvoke('sincronizar-bitrix', { body: params }, bitrixBreaker),
 
   /** Verifica rate limit */
-  checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) => 
+  checkRateLimit: async (key: string, limit: number = 100, windowSeconds: number = 60) =>
     handleInvoke('rateLimit', { body: { key, limit, window_seconds: windowSeconds } }),
 
   /** Verifica conexão com banco externo */
-  checkExternalDb: async () => 
+  checkExternalDb: async () =>
     handleInvoke('external-db-bridge', { body: { action: 'select', table: 'empresas', limit: 1 } }),
 };

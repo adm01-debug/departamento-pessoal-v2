@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: vi.fn(),
+    rpc: vi.fn(),
   },
 }));
 
@@ -36,7 +37,7 @@ describe('rescisaoService', () => {
     });
 
     it('should block homologation if status is not calculado', async () => {
-       (supabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: { etapa: 'calculo', status: 'pendente' }, error: null }),
@@ -48,26 +49,39 @@ describe('rescisaoService', () => {
   });
 
   describe('assinarDigitalmente', () => {
-    it('should update correct fields for employer signature', async () => {
-      const mockUpdate = vi.fn().mockReturnThis();
-      const mockEq = vi.fn().mockReturnThis();
+    // Achado N25: assinatura deixou de ser um hash client-side (btoa
+    // reversível, forjável) gravado via UPDATE direto — agora é delegada à
+    // RPC assinar_desligamento (SECURITY DEFINER), que calcula o hash
+    // server-side e é a única via permitida para gravar essas colunas
+    // (escrita direta é bloqueada por trigger).
+    it('should call assinar_desligamento RPC with the correct part', async () => {
+      const mockRpc = vi.fn().mockResolvedValue({ data: true, error: null });
       const mockSelect = vi.fn().mockReturnThis();
-      const mockSingle = vi.fn().mockResolvedValue({ data: { id: '1' }, error: null });
+      const mockEq = vi.fn().mockReturnThis();
+      const mockSingle = vi.fn().mockResolvedValue({ data: { id: '1', assinado_empresa: true }, error: null });
 
+      (supabase.rpc as unknown as ReturnType<typeof vi.fn>) = mockRpc;
       (supabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-        update: mockUpdate,
-        eq: mockEq,
         select: mockSelect,
+        eq: mockEq,
         single: mockSingle,
       });
 
       await rescisaoService.assinarDigitalmente('1', 'empresa', 'empresa-uuid-1');
 
-      expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
-        assinado_empresa: true,
-        hash_assinatura_empresa: expect.any(String),
-        data_assinatura_empresa: expect.any(String),
-      }));
+      expect(mockRpc).toHaveBeenCalledWith('assinar_desligamento', {
+        _desligamento_id: '1',
+        _parte: 'empresa',
+      });
+    });
+
+    it('should surface the RPC error (e.g. blocked by server-side rules)', async () => {
+      const mockRpc = vi
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: 'Esta parte ja assinou esta rescisao' } });
+      (supabase.rpc as unknown as ReturnType<typeof vi.fn>) = mockRpc;
+
+      await expect(rescisaoService.assinarDigitalmente('1', 'empresa')).rejects.toThrow(/ja assinou/);
     });
   });
 });

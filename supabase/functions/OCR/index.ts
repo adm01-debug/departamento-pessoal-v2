@@ -1,3 +1,9 @@
+// Remediação de auditoria (achado E3 / CRÍTICO):
+// • JWT obrigatório (antes: sem autenticação alguma, service_role exposto)
+// • Bucket restrito a uma allowlist de documentos (antes: qualquer bucket)
+// • Remove o parâmetro `fileUrl` livre (antes: SSRF — URL arbitrária
+//   repassada como image_url para o gateway de IA)
+// • Erros genéricos ao cliente (antes: error.message podia vazar detalhes)
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
@@ -44,6 +50,16 @@ function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+// Só buckets de documentos de identidade/admissão fazem sentido para OCR;
+// nunca aceitar um bucket arbitrário informado pelo cliente.
+const ALLOWED_BUCKETS = new Set(['documentos', 'documentos-admissao']);
+
+function jsonError(status: number, code: string, message: string) {
+  return new Response(JSON.stringify({ success: false, error: message, code }), {
+    status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 }
 
@@ -118,7 +134,7 @@ serve(async (req: Request): Promise<Response> => {
 
     const aiResponse = await fetch('https://api.lovable.dev/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${lovableApiKey}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${lovableApiKey}` },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: imageUrl } }] }],

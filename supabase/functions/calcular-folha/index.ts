@@ -31,6 +31,8 @@ const FAIXAS_IRRF = [
 ];
 
 const TETO_INSS = 8157.41;
+const DEDUCAO_SIMPLIFICADA_IRRF = 564.80; // Lei 14.663/2023
+const DEDUCAO_DEPENDENTE_IRRF = 189.59;
 const CHUNK_SIZE = 500;
 const MAX_COLABORADORES = 50_000;
 
@@ -55,14 +57,15 @@ function calcINSS(salario: number): number {
   return trunc2(desc);
 }
 
-const DEDUCAO_DEPENDENTE_IRRF = 189.59;
-
-function calcIRRF(base: number, dependentes: number = 0): number {
-  if (!Number.isFinite(base) || base <= 0) return 0;
-  const baseComDeps = base - (dependentes * DEDUCAO_DEPENDENTE_IRRF);
-  if (baseComDeps <= 0) return 0;
+function calcIRRF(bruto: number, dependentes = 0): number {
+  if (!Number.isFinite(bruto) || bruto <= 0) return 0;
+  const inss = calcINSS(bruto);
+  const baseLegal = bruto - inss - dependentes * DEDUCAO_DEPENDENTE_IRRF;
+  const baseSimplificada = bruto - DEDUCAO_SIMPLIFICADA_IRRF;
+  const base = Math.max(0, Math.min(baseLegal, baseSimplificada));
+  if (base <= 0) return 0;
   for (const f of FAIXAS_IRRF) {
-    if (baseComDeps <= f.limite) return Math.max(0, trunc2(baseComDeps * f.aliquota - f.deducao));
+    if (base <= f.limite) return Math.max(0, trunc2(base * f.aliquota - f.deducao));
   }
   return 0;
 }
@@ -231,12 +234,27 @@ Deno.serve(async (req) => {
       if (e) throw e;
       if (!colabs?.length) break;
 
+      // Dependentes para fins de IRRF (public.dependentes.ir_dependente) — uma
+      // única query em lote por chunk, evita N+1 por colaborador.
+      const colabIds = colabs.map((c) => c.id);
+      const { data: depsRows } = await admin
+        .from('dependentes')
+        .select('colaborador_id')
+        .in('colaborador_id', colabIds)
+        .eq('ir_dependente', true);
+      const dependentesPorColaborador = new Map<string, number>();
+      for (const d of depsRows ?? []) {
+        const key = d.colaborador_id as string;
+        dependentesPorColaborador.set(key, (dependentesPorColaborador.get(key) ?? 0) + 1);
+      }
+
       for (const c of colabs) {
         const bruto = Number(c.salario_base) || 0;
         const deps = Number(c.dependentes_irrf) || 0;
         const inss = calcINSS(bruto);
-        const irrf = calcIRRF(bruto - inss, deps);
-        const fgts = trunc2(bruto * 0.08);
+        const dependentes = dependentesPorColaborador.get(c.id as string) ?? 0;
+        const irrf = calcIRRF(bruto, dependentes);
+        const fgts = round2(bruto * 0.08);
         const descontos = round2(inss + irrf);
         const liquido = round2(bruto - descontos);
 

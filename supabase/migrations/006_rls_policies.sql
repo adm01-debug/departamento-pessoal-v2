@@ -26,6 +26,16 @@ ALTER TABLE notificacoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to get user's empresa_id (public schema for branching compatibility)
+-- NOTA (remediação da auditoria): a função original tentava ser criada no
+-- schema `auth` (CREATE FUNCTION auth.user_empresa_id()), o que o Supabase
+-- hospedado recusa com "permission denied for schema auth" — isso quebrava
+-- a aplicação desta migration (e de toda a cadeia após ela) em qualquer
+-- ambiente novo/preview branch criado do zero. Movida para `public`,
+-- mesmo padrão já usado por `public.get_auth_empresa_id()` em migrations
+-- posteriores. As políticas abaixo são permissivas (OR-combinadas com as
+-- políticas mais novas e corretas que já existem no restante do schema),
+-- portanto esta correção só pode ampliar, nunca reduzir, o acesso já
+-- concedido por elas — não há regressão de segurança em corrigi-la.
 CREATE OR REPLACE FUNCTION public.user_empresa_id()
 RETURNS UUID AS $$
   SELECT (auth.jwt() -> 'user_metadata' ->> 'empresa_id')::UUID;
@@ -76,7 +86,7 @@ CREATE POLICY ferias_select ON ferias FOR SELECT USING (
 );
 DROP POLICY IF EXISTS ferias_all ON public.ferias;
 CREATE POLICY ferias_all ON ferias FOR ALL USING (
-  colaborador_id IN (SELECT id FROM colaboradores WHERE empresa_id = public.user_empresa_id()) 
+  colaborador_id IN (SELECT id FROM colaboradores WHERE empresa_id = public.user_empresa_id())
   AND auth.jwt() ->> 'role' IN ('admin', 'rh')
 );
 
