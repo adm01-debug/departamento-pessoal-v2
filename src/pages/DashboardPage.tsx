@@ -19,6 +19,7 @@ import { AnalyticsSection } from "@/components/dashboard/AnalyticsSection";
 import { KPICardSkeleton } from "@/components/ui/module-skeleton";
 import { useRealtimeDashboard } from "@/hooks/useRealtimeDashboard";
 import { formatCompetenciaLocal } from '@/utils/dateLocal';
+import { HealthTrendCard } from "@/components/admin/HealthTrendCard";
 
 /* ─── Data Hooks ─── */
 interface DashboardStats {
