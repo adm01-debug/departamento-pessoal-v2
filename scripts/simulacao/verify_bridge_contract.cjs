@@ -50,7 +50,8 @@ console.log(`🚀 Contract test contra: ${BRIDGE}\n`);
 // --- Runner ------------------------------------------------------------------
 async function callBridge(body, { authOverride } = {}) {
   const start = Date.now();
-  const origin = new URL(SUPABASE_URL).origin;
+  // Bridge exige origem *.lovable.app/dev (CSRF guard) — usamos o host publicado.
+  const origin = 'https://unified-harmony-hub.lovable.app';
   const res = await fetch(BRIDGE, {
     method: 'POST',
     headers: {
