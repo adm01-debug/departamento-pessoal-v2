@@ -69,6 +69,32 @@ if (!isInIframe && !isPreviewHost && 'serviceWorker' in navigator) {
   });
 }
 
+// Env-var guard fail-fast: se VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY
+// não vieram no build, o client.ts cai em fallback embutido — nesse caso
+// mostramos um banner bloqueante ao invés de deixar o app rodar contra config
+// silenciosamente incorreta.
+(() => {
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (url && key) return;
+  const banner = document.createElement('div');
+  banner.setAttribute('role', 'alert');
+  banner.style.cssText =
+    'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;' +
+    'justify-content:center;background:rgba(220,38,38,0.95);color:#fff;' +
+    'font-family:system-ui,sans-serif;padding:2rem;text-align:center;';
+  banner.innerHTML =
+    '<div style="max-width:640px;">' +
+    '<h1 style="font-size:1.5rem;font-weight:800;margin-bottom:.5rem;">Configuração inválida</h1>' +
+    '<p style="margin-bottom:1rem;">As variáveis <code>VITE_SUPABASE_URL</code> e/ou ' +
+    '<code>VITE_SUPABASE_PUBLISHABLE_KEY</code> não foram encontradas no build. ' +
+    'O app não pode iniciar em segurança. Restaure o <code>.env</code> e recompile.</p>' +
+    '<small>ref: <code>src/integrations/supabase/client.ts</code></small></div>';
+  document.body.appendChild(banner);
+  throw new Error('[BOOT] Variáveis Supabase ausentes — inicialização abortada.');
+})();
+
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
