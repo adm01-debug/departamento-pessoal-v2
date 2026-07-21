@@ -6579,6 +6579,7 @@ export type Database = {
           checklist_pagamento: boolean | null
           checklist_revogacao_acessos: boolean | null
           colaborador_id: string
+          comprovante_pagamento_url: string | null
           created_at: string
           created_by: string | null
           data_assinatura_colaborador: string | null
@@ -6587,6 +6588,7 @@ export type Database = {
           data_aviso_previo: string | null
           data_contabilidade: string | null
           data_desligamento: string
+          data_pagamento: string | null
           data_remocao_acesso: string | null
           decimo_terceiro: number | null
           empresa_id: string | null
@@ -6627,6 +6629,7 @@ export type Database = {
           checklist_pagamento?: boolean | null
           checklist_revogacao_acessos?: boolean | null
           colaborador_id: string
+          comprovante_pagamento_url?: string | null
           created_at?: string
           created_by?: string | null
           data_assinatura_colaborador?: string | null
@@ -6635,6 +6638,7 @@ export type Database = {
           data_aviso_previo?: string | null
           data_contabilidade?: string | null
           data_desligamento: string
+          data_pagamento?: string | null
           data_remocao_acesso?: string | null
           decimo_terceiro?: number | null
           empresa_id?: string | null
@@ -6675,6 +6679,7 @@ export type Database = {
           checklist_pagamento?: boolean | null
           checklist_revogacao_acessos?: boolean | null
           colaborador_id?: string
+          comprovante_pagamento_url?: string | null
           created_at?: string
           created_by?: string | null
           data_assinatura_colaborador?: string | null
@@ -6683,6 +6688,7 @@ export type Database = {
           data_aviso_previo?: string | null
           data_contabilidade?: string | null
           data_desligamento?: string
+          data_pagamento?: string | null
           data_remocao_acesso?: string | null
           decimo_terceiro?: number | null
           empresa_id?: string | null
@@ -22965,6 +22971,22 @@ export type Database = {
       _is_admin_bypass: { Args: never; Returns: boolean }
       _purge_audit_log_internal: { Args: { _dias?: number }; Returns: number }
       _scan_status_anomalies_global: { Args: never; Returns: number }
+      admin_list_user_roles: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }[]
+      }
+      admin_set_user_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _target_user_id: string
+        }
+        Returns: boolean
+      }
       anonimizar_dados_pessoais: {
         Args: { target_id: string }
         Returns: undefined
@@ -22998,6 +23020,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      assinar_desligamento: {
+        Args: { _desligamento_id: string; _parte: string }
+        Returns: boolean
       }
       assinar_espelho_ponto: {
         Args: {
@@ -23109,6 +23135,13 @@ export type Database = {
       gerar_canonical_espelho_ponto: {
         Args: { _colaborador_id: string; _competencia: string }
         Returns: Json
+      }
+      get_admissao_por_token: {
+        Args: { _token: string }
+        Returns: {
+          admissao: Json
+          token_row: Database["public"]["Tables"]["admissao_tokens"]["Row"]
+        }[]
       }
       get_audit_trail_by_entity: {
         Args: { _entidade: string; _entidade_id: string; _limit?: number }
@@ -23227,6 +23260,10 @@ export type Database = {
       is_ip_blocked: { Args: { check_ip: string }; Returns: boolean }
       is_ip_whitelisted: { Args: { check_ip: string }; Returns: boolean }
       limpar_govbr_states_expirados: { Args: never; Returns: undefined }
+      log_frontend_error: {
+        Args: { p_contexto?: Json; p_mensagem: string; p_nivel: string }
+        Returns: undefined
+      }
       maintenance_archive_old_audit: {
         Args: { _batch?: number; _days?: number }
         Returns: {
@@ -23235,6 +23272,10 @@ export type Database = {
         }[]
       }
       maintenance_weekly_analyze: { Args: never; Returns: undefined }
+      next_cnab_sequencial: {
+        Args: { p_banco_codigo: string; p_empresa_id: string }
+        Returns: number
+      }
       notificar_divergencias_afdt: {
         Args: { _importacao_id: string }
         Returns: {
@@ -23242,6 +23283,65 @@ export type Database = {
           criticas: number
           notificacoes_criadas: number
         }[]
+      }
+      pagar_desligamento: {
+        Args: { _comprovante_url?: string; _desligamento_id: string }
+        Returns: {
+          assinado_colaborador: boolean | null
+          assinado_empresa: boolean | null
+          aviso_previo: number | null
+          checklist_calculo_rescisao: boolean | null
+          checklist_comunicacao: boolean | null
+          checklist_devolucao_equipamentos: boolean | null
+          checklist_documentacao: boolean | null
+          checklist_esocial: boolean | null
+          checklist_homologacao: boolean | null
+          checklist_pagamento: boolean | null
+          checklist_revogacao_acessos: boolean | null
+          colaborador_id: string
+          comprovante_pagamento_url: string | null
+          created_at: string
+          created_by: string | null
+          data_assinatura_colaborador: string | null
+          data_assinatura_empresa: string | null
+          data_aviso: string | null
+          data_aviso_previo: string | null
+          data_contabilidade: string | null
+          data_desligamento: string
+          data_pagamento: string | null
+          data_remocao_acesso: string | null
+          decimo_terceiro: number | null
+          empresa_id: string | null
+          etapa: string | null
+          ferias_proporcionais: number | null
+          ferias_vencidas: number | null
+          hash_assinatura_colaborador: string | null
+          hash_assinatura_empresa: string | null
+          hash_integridade: string | null
+          id: string
+          motivo: string | null
+          multa_fgts: number | null
+          novo_supervisor_id: string | null
+          quebra_contrato: boolean | null
+          remover_beneficios: boolean | null
+          salario_base: number
+          saldo_salario: number | null
+          status: string
+          terco_constitucional: number | null
+          tipo: Database["public"]["Enums"]["tipo_desligamento"]
+          tipo_aviso_previo_id: number | null
+          tipo_desligamento_id: number | null
+          total_descontos: number | null
+          total_proventos: number | null
+          updated_at: string
+          valor_liquido: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "desligamentos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       process_lgpd_cleanup_queue: { Args: never; Returns: number }
       processar_ajuste_aprovado: {
@@ -23270,6 +23370,71 @@ export type Database = {
         }[]
       }
       refresh_dashboard_mvs: { Args: never; Returns: Json }
+      registrar_batida_ponto: {
+        Args: {
+          p_colaborador_id: string
+          p_data: string
+          p_dentro_raio?: boolean
+          p_dispositivo_id?: string
+          p_empresa_id: string
+          p_foto_biometria_url?: string
+          p_hash_integridade?: string
+          p_hora: string
+          p_latitude?: number
+          p_longitude?: number
+          p_metadata?: Json
+          p_origem?: string
+          p_precisao_metros?: number
+          p_timezone?: string
+          p_tipo: string
+        }
+        Returns: {
+          ajustado: boolean | null
+          ajustado_por: string | null
+          anomalia_detectada: boolean | null
+          biometria_score: number | null
+          biometria_status: string | null
+          colaborador_id: string
+          created_at: string | null
+          data: string
+          dentro_raio: boolean | null
+          device_metadata: Json | null
+          dispositivo_id: string | null
+          distancia_local_metros: number | null
+          empresa_id: string | null
+          foto_biometria_url: string | null
+          hash_biometrico: string | null
+          hash_comprovante: string | null
+          hash_digital: string | null
+          hash_integridade: string | null
+          hora: string
+          id: string
+          id_fiscal_ponto: string | null
+          ip_address: string | null
+          is_offline: boolean | null
+          justificativa_anomalia: string | null
+          latitude: number | null
+          longitude: number | null
+          motivo_ajuste: string | null
+          offline: boolean | null
+          offset_timezone: number | null
+          ordem: number
+          origem: string | null
+          precisao_metros: number | null
+          sync_at: string | null
+          timestamp_dispositivo: string | null
+          timezone: string | null
+          tipo: string
+          updated_at: string | null
+          versao_app: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "batidas_ponto"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rejeitar_despesa: {
         Args: { _despesa_id: string; _motivo: string }
         Returns: {
