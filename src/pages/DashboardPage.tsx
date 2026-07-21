@@ -241,7 +241,7 @@ function OnboardingWizard() {
 
 /* ─── Main Dashboard ─── */
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { empresaAtualId } = useRealtimeDashboard();
   const isAuthenticated = !!user;
   const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useDashboardStats(isAuthenticated);
