@@ -137,6 +137,7 @@ export const rescisaoService = {
         throw new Error('A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.');
       }
 
+      const { data: userData } = await supabase.auth.getUser();
       const { error: homError } = await supabase
         .from('homologacoes_rescisao')
         .upsert({
