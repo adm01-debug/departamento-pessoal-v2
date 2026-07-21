@@ -50,6 +50,24 @@ export class CircuitBreaker {
   getState(): CircuitState {
     return this.state;
   }
+
+  /** Snapshot completo do breaker para dashboards operacionais. */
+  snapshot() {
+    return {
+      state: this.state,
+      failureCount: this.failureCount,
+      lastFailureTime: this.lastFailureTime ?? null,
+      threshold: this.options.failureThreshold,
+      resetTimeoutMs: this.options.resetTimeout,
+    };
+  }
+
+  /** Reset manual — usado pela página de diagnóstico para reabrir o circuito. */
+  reset() {
+    this.state = 'CLOSED';
+    this.failureCount = 0;
+    this.lastFailureTime = undefined;
+  }
 }
 
 // Singleton instances for specific services
