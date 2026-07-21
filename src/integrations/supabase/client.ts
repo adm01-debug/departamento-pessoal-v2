@@ -8,8 +8,8 @@ import { secureJsonParse } from '@/utils/secureJson';
 // Configurações do Lovable Cloud (projeto ciziytrrjjotlsjzshnm).
 // O banco corporativo (hncgwjbzdajfdztqgefe) foi descontinuado por chave API
 // inválida — migramos para o backend gerenciado pelo Lovable Cloud.
-const SUPABASE_URL = 'https://ciziytrrjjotlsjzshnm.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpeml5dHJyampvdGxzanpzaG5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NzU5NjQsImV4cCI6MjA5NDA1MTk2NH0.Ld9R1Rf5CH06IMUxDYvOXZoIqNmrGlwrpdO-eBrVMRQ';
+const SUPABASE_URL = 'https://frjbfeamybqsejlvmqbl.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjEwMDIxNjc1Nn0.yrnnKshNB_89tmJtHbyaZGnsOHuAEV6x5OFrcepBYIU';
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
