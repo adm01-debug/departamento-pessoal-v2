@@ -100,8 +100,8 @@ async function run(name, expect, body, opts) {
   await run('filter neq', 'ok', { action: 'select', table: 'empresas', filters: [{ column: 'id', op: 'neq', value: '00000000-0000-0000-0000-000000000000' }], limit: 1 });
   await run('filter in (array)', 'ok', { action: 'select', table: 'empresas', filters: [{ column: 'id', op: 'in', value: ['00000000-0000-0000-0000-000000000000'] }] });
   await run('filter is null', 'ok', { action: 'select', table: 'empresas', filters: [{ column: 'deleted_at', op: 'is', value: null }], limit: 1 });
-  await run('filter ilike', 'ok', { action: 'select', table: 'empresas', filters: [{ column: 'nome', op: 'ilike', value: '%test%' }], limit: 1 });
-  await run('filter or expr', 'ok', { action: 'select', table: 'empresas', filters: [{ column: '', op: 'or', value: 'nome.ilike.%a%,nome.ilike.%b%' }], limit: 1 });
+  await run('filter ilike', 'ok', { action: 'select', table: 'empresas', filters: [{ column: 'razao_social', op: 'ilike', value: '%test%' }], limit: 1 });
+  await run('filter or expr', 'ok', { action: 'select', table: 'empresas', filters: [{ column: '', op: 'or', value: 'razao_social.ilike.%a%,razao_social.ilike.%b%' }], limit: 1 });
   await run('filter not eq', 'ok', { action: 'select', table: 'empresas', filters: [{ column: 'id', op: 'not', extraOp: 'eq', value: '00000000-0000-0000-0000-000000000000' }], limit: 1 });
 
   // 3. Ordenação + range
