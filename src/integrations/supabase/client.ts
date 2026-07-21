@@ -5,11 +5,22 @@ import type { Database } from './types';
 import { secureJsonParse } from '@/utils/secureJson';
 
 
-// Configurações do Lovable Cloud (projeto ciziytrrjjotlsjzshnm).
-// O banco corporativo (hncgwjbzdajfdztqgefe) foi descontinuado por chave API
-// inválida — migramos para o backend gerenciado pelo Lovable Cloud.
-const SUPABASE_URL = 'https://frjbfeamybqsejlvmqbl.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjEwMDIxNjc1Nn0.yrnnKshNB_89tmJtHbyaZGnsOHuAEV6x5OFrcepBYIU';
+// Projeto ativo pós-cutover: frjbfeamybqsejlvmqbl.
+// Guard fail-fast: se as env vars faltarem no build, gritamos alto no console
+// (o client Supabase silenciosamente iria para "undefined.supabase.co").
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://frjbfeamybqsejlvmqbl.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  import.meta.env.VITE_SUPABASE_ANON_KEY ??
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjEwMDIxNjc1Nn0.yrnnKshNB_89tmJtHbyaZGnsOHuAEV6x5OFrcepBYIU';
+
+if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+  // eslint-disable-next-line no-console
+  console.error(
+    '⚠️ [SUPABASE] VITE_SUPABASE_URL/VITE_SUPABASE_PUBLISHABLE_KEY ausentes no .env. ' +
+    'Usando fallback embutido — verifique o build.',
+  );
+}
 
 // Base client usado para Auth/Storage. Toda I/O de dados vai pela bridge.
 const supabaseBase = createClient<Database>(
