@@ -38,8 +38,25 @@ Acesse `/admin/diagnostico-migracao` (admin only). A página roda:
 
 ## Rollback
 
-Reverter `.env`, `src/integrations/supabase/client.ts` e `supabase/config.toml` para o `project_id` antigo (`ciziytrrjjotlsjzshnm`). Nenhuma mudança destrutiva foi feita no antigo.
+Procedimento detalhado (≤ 5 min): [`docs/ROLLBACK_DRILL.md`](./ROLLBACK_DRILL.md).
+
+Resumo: reverter `.env`, `src/integrations/supabase/client.ts` e `supabase/config.toml` para o `project_id` antigo (`ciziytrrjjotlsjzshnm`). Nenhuma mudança destrutiva foi feita no antigo.
+
+## Ferramentas de suporte
+
+- Página de diagnóstico: `/admin/diagnostico-migracao` — health monitor com sparkline (últimas 20 amostras), validação de 13 buckets, 15 cron jobs, circuit breakers com reset manual.
+- Contract test da bridge: `node scripts/simulacao/verify_bridge_contract.cjs` — 18 cenários cobrindo filtros, verbos e CSRF.
+- Smoke E2E pós-cutover: `bunx playwright test e2e/authenticated/post-cutover-smoke.spec.ts`.
 
 ## Observação importante
 
-Enquanto o Lovable Cloud continuar apontado para `ciziytrrjjotlsjzshnm`, novas migrations e deploys automáticos feitos pelo Lovable irão para o projeto antigo. Para trabalho novo no `frjbfeamybqsejlvmqbl`, use SQL Editor + CLI diretamente.
+Enquanto o Lovable Cloud continuar apontado para `ciziytrrjjotlsjzshnm`, novas migrations e deploys automáticos feitos pelo Lovable irão para o projeto antigo. Para trabalho novo no `frjbfeamybqsejlvmqbl`, use SQL Editor + CLI diretamente (`scripts/deploy-functions-novo-projeto.sh`).
+
+## Postmortem (preencher em caso de rollback)
+
+- **Data/hora do gatilho:**
+- **Sintoma observado:**
+- **Duração da indisponibilidade:**
+- **Root cause:**
+- **Ação corretiva antes da re-tentativa:**
+
