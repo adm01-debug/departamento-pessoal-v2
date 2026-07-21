@@ -103,6 +103,7 @@ const AdminEpisFichasPage = lazy(() => import('@/pages/AdminEpisFichasPage'));
 const AdminExtintoresPage = lazy(() => import('@/pages/AdminExtintoresPage'));
 const AdminCatPage = lazy(() => import('@/pages/AdminCatPage'));
 const AdminRegimentoInternoPage = lazy(() => import('@/pages/AdminRegimentoInternoPage'));
+const AdminDiagnosticoMigracaoPage = lazy(() => import('@/pages/AdminDiagnosticoMigracaoPage'));
 const RubricasPage = lazy(() => import('@/pages/RubricasPage'));
 const ProvisoesPage = lazy(() => import('@/pages/ProvisoesPage'));
 const PassivoTrabalhistaPage = lazy(() => import('@/pages/PassivoTrabalhistaPage'));
@@ -351,6 +352,14 @@ export default function App() {
           element={
             <AdminRoute>
               <LazyPage Component={AdminRegimentoInternoPage} />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/diagnostico-migracao"
+          element={
+            <AdminRoute>
+              <LazyPage Component={AdminDiagnosticoMigracaoPage} />
             </AdminRoute>
           }
         />
