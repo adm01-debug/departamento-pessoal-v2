@@ -137,9 +137,10 @@ export const rescisaoService = {
         throw new Error('A homologação exige que o cálculo da rescisão tenha sido realizado e salvo primeiro.');
       }
 
+      const { data: userData } = await supabase.auth.getUser();
       const { error: homError } = await supabase
         .from('homologacoes_rescisao')
-        .insert({
+        .upsert({
           desligamento_id: id,
           etapa,
           status: 'aprovado',
@@ -221,7 +222,7 @@ export const rescisaoService = {
 
       if (error) throw error;
 
-      const { data, error: fetchError } = await supabase.from('desligamentos').select().eq('id', id).single();
+      const { data: refreshed, error: fetchError } = await supabase.from('desligamentos').select().eq('id', id).single();
       if (fetchError) throw fetchError;
 
       await auditLogger.log({

@@ -106,7 +106,7 @@ export default function PontoPage() {
 
   const { data: batidasHoje = [], refetch: refetchBatidas } = useQuery({
     queryKey: ['batidas-hoje', empresaAtual?.id, today],
-    queryFn: () => batidasPontoService.listarPorData(today, empresaAtual?.id),
+    queryFn: () => batidasPontoService.listarPorData(today, empresaAtual?.id ?? ''),
     enabled: !!empresaAtual?.id,
     refetchInterval: 30000,
   });

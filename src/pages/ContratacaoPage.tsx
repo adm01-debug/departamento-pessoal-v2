@@ -86,7 +86,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
 
   useEffect(() => {
     if (tokenData?.admissao) {
-      const adm = tokenData.admissao;
+      const adm = tokenData.admissao as any;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(prev => ({
         ...prev,
