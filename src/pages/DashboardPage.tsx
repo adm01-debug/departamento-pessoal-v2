@@ -312,6 +312,9 @@ export default function DashboardPage() {
         isEmptySystem={isEmptySystem}
         empresaId={empresaAtualId || undefined}
       />
+
+      {/* 7. Observabilidade pós-cutover — admin only */}
+      {isAdmin && <HealthTrendCard />}
     </div>
   );
 }
