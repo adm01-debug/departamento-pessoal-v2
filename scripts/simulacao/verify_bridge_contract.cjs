@@ -50,12 +50,16 @@ console.log(`🚀 Contract test contra: ${BRIDGE}\n`);
 // --- Runner ------------------------------------------------------------------
 async function callBridge(body, { authOverride } = {}) {
   const start = Date.now();
+  const origin = new URL(SUPABASE_URL).origin;
   const res = await fetch(BRIDGE, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       apikey: ANON,
       Authorization: `Bearer ${authOverride ?? ANON}`,
+      // Bridge exige Origin/Referer (CSRF guard). Espelhamos o próprio host.
+      Origin: origin,
+      Referer: `${origin}/`,
     },
     body: JSON.stringify(body),
   });
