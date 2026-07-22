@@ -8510,8 +8510,10 @@ export type Database = {
           competencia: string
           created_at: string
           created_by: string | null
+          empresa_id: string | null
           id: string
           observacao: string | null
+          origem_ferias_id: string | null
           referencia: number | null
           rubrica_id: string
           valor: number
@@ -8521,8 +8523,10 @@ export type Database = {
           competencia: string
           created_at?: string
           created_by?: string | null
+          empresa_id?: string | null
           id?: string
           observacao?: string | null
+          origem_ferias_id?: string | null
           referencia?: number | null
           rubrica_id: string
           valor: number
@@ -8532,8 +8536,10 @@ export type Database = {
           competencia?: string
           created_at?: string
           created_by?: string | null
+          empresa_id?: string | null
           id?: string
           observacao?: string | null
+          origem_ferias_id?: string | null
           referencia?: number | null
           rubrica_id?: string
           valor?: number
@@ -8566,6 +8572,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "eventos_variaveis_rubrica_id_fkey"
@@ -23246,6 +23266,7 @@ export type Database = {
         Args: { _colaborador_id: string; _competencia: string }
         Returns: Json
       }
+      gerar_rubricas_ferias: { Args: { p_ferias_id: string }; Returns: number }
       get_admissao_por_token: {
         Args: { _token: string }
         Returns: {
