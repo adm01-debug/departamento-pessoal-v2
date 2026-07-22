@@ -21775,6 +21775,54 @@ export type Database = {
         }
         Relationships: []
       }
+      v_audit_legacy: {
+        Row: {
+          action: string | null
+          empresa_id: string | null
+          entity: string | null
+          entity_id: string | null
+          id: string | null
+          ingested_at: string | null
+          ip_address: unknown
+          occurred_at: string | null
+          payload: Json | null
+          source_id: string | null
+          source_table: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          empresa_id?: string | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: string | null
+          ingested_at?: string | null
+          ip_address?: unknown
+          occurred_at?: string | null
+          payload?: Json | null
+          source_id?: string | null
+          source_table?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          empresa_id?: string | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: string | null
+          ingested_at?: string | null
+          ip_address?: unknown
+          occurred_at?: string | null
+          payload?: Json | null
+          source_id?: string | null
+          source_table?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       v_audit_trail: {
         Row: {
           acao: string | null
@@ -21817,6 +21865,18 @@ export type Database = {
           rows: number | null
           stddev_ms: number | null
           total_ms: number | null
+        }
+        Relationships: []
+      }
+      v_system_health: {
+        Row: {
+          audit_events_total: number | null
+          audit_last_event_at: string | null
+          fks_without_index: number | null
+          security_alerts_open: number | null
+          snapshot_at: string | null
+          tables_total: number | null
+          tables_with_rls: number | null
         }
         Relationships: []
       }

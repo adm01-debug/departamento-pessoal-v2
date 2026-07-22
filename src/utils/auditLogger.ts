@@ -55,14 +55,21 @@ export const auditLogger = {
   }) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase.from('audit_log').insert({
-        tabela: params.tabela,
-        registro_id: params.registro_id,
-        acao: params.acao,
-        dados_anteriores: params.dados_anteriores ? maskPii(params.dados_anteriores) as never : null,
-        dados_novos: params.dados_novos ? maskPii(params.dados_novos) as never : null,
+      // Escrita canônica em audit_log_unified (Etapa 8 — Fase 2). A tabela legada
+      // `audit_log` está DEPRECATED e mantida somente para observação histórica.
+      const { error } = await supabase.from('audit_log_unified').insert({
+        source_table: params.tabela,
+        source_id: null,
+        action: params.acao,
+        entity: params.tabela,
+        entity_id: params.registro_id,
         user_id: params.user_id || user?.id,
-        user_email: params.user_email || user?.email,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+        payload: {
+          user_email: params.user_email || user?.email || null,
+          dados_anteriores: params.dados_anteriores ? maskPii(params.dados_anteriores) : null,
+          dados_novos: params.dados_novos ? maskPii(params.dados_novos) : null,
+        } as never,
       });
       if (error) console.error('Audit log error:', error);
     } catch (e) {
