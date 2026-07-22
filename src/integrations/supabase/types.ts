@@ -22971,6 +22971,16 @@ export type Database = {
       _is_admin_bypass: { Args: never; Returns: boolean }
       _purge_audit_log_internal: { Args: { _dias?: number }; Returns: number }
       _scan_status_anomalies_global: { Args: never; Returns: number }
+      admin_list_security_definer_rpcs: {
+        Args: never
+        Returns: {
+          arguments: string
+          executable_by_anon: boolean
+          executable_by_authenticated: boolean
+          function_name: string
+          return_type: string
+        }[]
+      }
       admin_list_user_roles: {
         Args: never
         Returns: {
