@@ -11,9 +11,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
-import {
-  corsHeaders, createErrorResponse, validateRequest,
-} from '../_shared/contract.ts';
+import { corsHeaders, createErrorResponse, validateRequest, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
 import { integrityHash } from '../_shared/integrityHash.ts';
@@ -45,8 +43,8 @@ const BodySchema = z.object({
 
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
-  if (req.method !== 'POST') {
+  const __pf = handlePreflight(req); if (__pf) return __pf;
+  const __og = enforceOrigin(req); if (__og) return __og;if (req.method !== 'POST') {
     return createErrorResponse('Method not allowed', 405, 'METHOD_NOT_ALLOWED');
   }
 
@@ -248,5 +246,4 @@ serve(async (req: Request): Promise<Response> => {
     return createErrorResponse('Erro interno', 500, 'INTERNAL_ERROR');
   }
 });
-  }
-});
+

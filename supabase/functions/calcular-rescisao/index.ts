@@ -10,7 +10,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://esm.sh/zod@3.23.8';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
-import { corsHeaders, parseJsonBody } from '../_shared/contract.ts';
+import { corsHeaders, parseJsonBody, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
 
 const round2 = (n: number): number => Math.round((n + Number.EPSILON) * 100) / 100;
 const trunc2 = (n: number): number => Math.trunc(n * 100) / 100;
@@ -99,9 +99,8 @@ const BodySchema = z.object({
 });
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
-
-  try {
+  const __pf = handlePreflight(req); if (__pf) return __pf;
+  const __og = enforceOrigin(req); if (__og) return __og;try {
     const csrf = await verifyCsrf(req.clone());
     if (!csrf.ok) return csrf.response!;
 

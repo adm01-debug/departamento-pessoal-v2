@@ -13,6 +13,13 @@ export interface RateLimitOptions {
   key: string;           // Deve incluir namespacing (ex: `esocial:<userId>`)
   limit: number;         // Máx requisições permitidas na janela
   windowSec: number;     // Janela em segundos
+  /**
+   * Burst opcional (janela curta anti-rajada). Se informado, a chamada é
+   * bloqueada quando EITHER o bucket principal OR o bucket de burst estourar.
+   * Ex.: { burstLimit: 20, burstWindowSec: 10 } além de 60/min.
+   */
+  burstLimit?: number;
+  burstWindowSec?: number;
 }
 
 export interface RateLimitResult {
@@ -21,6 +28,8 @@ export interface RateLimitResult {
   reset: number;         // epoch seconds
   limit: number;
   windowSec: number;
+  /** Motivo do bloqueio quando allowed=false (main|burst) */
+  reason?: 'main' | 'burst';
 }
 
 // Fallback em memória (H21): ativado quando a tabela rate_limits está indisponível.
@@ -79,7 +88,23 @@ export async function checkRateLimit(
   }
 
   const current = count ?? 0;
-  const allowed = current < opts.limit;
+  const allowedMain = current < opts.limit;
+
+  // Bucket de burst opcional (janela curta anti-rajada, in-memory)
+  let allowedBurst = true;
+  if (opts.burstLimit && opts.burstWindowSec) {
+    const bKey = `__burst:${opts.key}`;
+    const bWinStart = now - opts.burstWindowSec;
+    let slot = _memFallback.get(bKey);
+    if (!slot || slot.windowStart < bWinStart) {
+      slot = { count: 0, windowStart: now };
+      _memFallback.set(bKey, slot);
+    }
+    allowedBurst = slot.count < opts.burstLimit;
+    if (allowedBurst && allowedMain) slot.count++;
+  }
+
+  const allowed = allowedMain && allowedBurst;
 
   if (allowed) {
     const { error: insErr } = await admin.from('rate_limits').insert({ key: opts.key, timestamp: now });
@@ -92,6 +117,7 @@ export async function checkRateLimit(
     reset: windowStart + opts.windowSec,
     limit: opts.limit,
     windowSec: opts.windowSec,
+    reason: allowed ? undefined : (!allowedBurst ? 'burst' : 'main'),
   };
 }
 

@@ -10,7 +10,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { verifyCsrf } from "../_shared/csrf.ts";
-import { corsHeaders } from "../_shared/contract.ts";
+import { corsHeaders, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
 
 // -------------------- Headers --------------------
 const NO_STORE = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" };
@@ -377,8 +377,8 @@ async function assertTenantScope(
 // Handler principal
 // ============================================================
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  if (req.method !== "POST") return jsonError(405, "METHOD_NOT_ALLOWED", "Only POST is allowed");
+  const __pf = handlePreflight(req); if (__pf) return __pf;
+  const __og = enforceOrigin(req); if (__og) return __og;if (req.method !== "POST") return jsonError(405, "METHOD_NOT_ALLOWED", "Only POST is allowed");
 
   // CSRF fail-closed em toda operação de escrita/rpc.
   const csrf = await verifyCsrf(req);

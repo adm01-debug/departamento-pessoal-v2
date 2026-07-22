@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders, createErrorResponse, parseJsonBody } from '../_shared/contract.ts';
+import { corsHeaders, createErrorResponse, parseJsonBody, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
 import {
@@ -19,9 +19,8 @@ import {
  * - Idempotente: reprocessa apenas canais/holerites ainda não distribuídos.
  */
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-
-  try {
+  const __pf = handlePreflight(req); if (__pf) return __pf;
+  const __og = enforceOrigin(req); if (__og) return __og;try {
   const csrf = await verifyCsrf(req.clone());
   if (!csrf.ok) return csrf.response!;
 

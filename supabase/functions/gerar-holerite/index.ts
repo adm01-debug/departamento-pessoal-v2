@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { validateRequest, corsHeaders, createErrorResponse } from '../_shared/contract.ts';
+import { validateRequest, corsHeaders, createErrorResponse, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
 import { holeriteSchema } from '../_shared/schemas/common.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
@@ -25,9 +25,8 @@ const calcularIRRF = (base: number, dependentes: number = 0): number => {
 };
 
 serve(async (req: Request): Promise<Response> => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const __pf = handlePreflight(req); if (__pf) return __pf;
+  const __og = enforceOrigin(req); if (__og) return __og;
 
   const csrf = await verifyCsrf(req.clone());
   if (!csrf.ok) return csrf.response!;
