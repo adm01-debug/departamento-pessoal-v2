@@ -14250,7 +14250,9 @@ export type Database = {
           dias_direito: number
           faltas_periodo: number | null
           id: string
+          motivo_perda: string | null
           numero_periodo: number
+          perdeu_direito: boolean
           status: string | null
         }
         Insert: {
@@ -14262,7 +14264,9 @@ export type Database = {
           dias_direito?: number
           faltas_periodo?: number | null
           id?: string
+          motivo_perda?: string | null
           numero_periodo?: number
+          perdeu_direito?: boolean
           status?: string | null
         }
         Update: {
@@ -14274,7 +14278,9 @@ export type Database = {
           dias_direito?: number
           faltas_periodo?: number | null
           id?: string
+          motivo_perda?: string | null
           numero_periodo?: number
+          perdeu_direito?: boolean
           status?: string | null
         }
         Relationships: [
