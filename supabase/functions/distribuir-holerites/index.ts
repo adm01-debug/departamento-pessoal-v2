@@ -3,6 +3,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, createErrorResponse, parseJsonBody } from '../_shared/contract.ts';
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { captureException } from '../_shared/sentry.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+
 
 /**
  * distribuir-holerites
@@ -77,6 +84,19 @@ serve(async (req: Request): Promise<Response> => {
     .maybeSingle();
   if (!vinc) return createErrorResponse('Sem permissão nesta empresa', 403, 'FORBIDDEN');
 
+  // Idempotência transacional — evita distribuições duplicadas em rajada
+  const idemKey = extractIdempotencyKey(req, body);
+  const idem = await beginIdempotency(admin, {
+    endpoint: 'distribuir-holerites',
+    key: idemKey,
+    requestBody: { folha_id: folhaId, canais: [...canais].sort() },
+    empresaId: folha.empresa_id,
+    userId,
+  });
+  if (idem.replay) return idem.replay;
+  if (idem.conflict) return idem.conflict;
+
+
   // Busca holerites da folha
   const { data: holerites, error: hErr } = await admin
     .from('holerites')
@@ -130,8 +150,10 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   if (inserts.length === 0) {
+    const replayBody = { ok: true, novos: 0, ja_distribuidos: existentes.size, total: holerites.length };
+    await completeIdempotency(admin, idem.id, 200, replayBody);
     return new Response(
-      JSON.stringify({ ok: true, novos: 0, ja_distribuidos: existentes.size, total: holerites.length }),
+      JSON.stringify(replayBody),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -140,7 +162,10 @@ serve(async (req: Request): Promise<Response> => {
     .from('holerite_distribuicoes')
     .insert(inserts)
     .select('id, canal');
-  if (distErr) return createErrorResponse(distErr.message, 500, 'DB_ERROR');
+  if (distErr) {
+    await failIdempotency(admin, idem.id);
+    return createErrorResponse(distErr.message, 500, 'DB_ERROR');
+  }
 
   // Marca portal como enviado imediatamente (canal síncrono)
   const idsPortal = (distIns ?? []).filter((d) => d.canal === 'portal').map((d) => d.id);
@@ -155,15 +180,17 @@ serve(async (req: Request): Promise<Response> => {
     await admin.from('notificacoes').insert(notifs);
   }
 
+  const successBody = {
+    ok: true,
+    total: holerites.length,
+    novos: inserts.length,
+    ja_distribuidos: existentes.size,
+    canais,
+    folha_id: folhaId,
+  };
+  await completeIdempotency(admin, idem.id, 200, successBody);
   return new Response(
-    JSON.stringify({
-      ok: true,
-      total: holerites.length,
-      novos: inserts.length,
-      ja_distribuidos: existentes.size,
-      canais,
-      folha_id: folhaId,
-    }),
+    JSON.stringify(successBody),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
   } catch (e) {
@@ -171,3 +198,4 @@ serve(async (req: Request): Promise<Response> => {
     return createErrorResponse('Erro interno', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
+

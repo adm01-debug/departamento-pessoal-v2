@@ -18,6 +18,13 @@ import {
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
 import { integrityHash } from '../_shared/integrityHash.ts';
+import {
+  beginIdempotency,
+  completeIdempotency,
+  extractIdempotencyKey,
+  failIdempotency,
+} from '../_shared/idempotency.ts';
+
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -93,6 +100,19 @@ serve(async (req: Request): Promise<Response> => {
     const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
     const rl = await checkRateLimit(admin, { key: `reabrir-folha:${userId}`, limit: 10, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
+
+    // 4.5) Idempotência transacional — evita reaberturas duplicadas
+    const idemKey = extractIdempotencyKey(req, body);
+    const idem = await beginIdempotency(admin, {
+      endpoint: 'reabrir-folha',
+      key: idemKey,
+      requestBody: { empresaId, folhaId, version, motivo, override_esocial },
+      empresaId,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+
 
     // 5) Carregar folha
     const { data: folha, error: folhaErr } = await admin
@@ -234,17 +254,21 @@ serve(async (req: Request): Promise<Response> => {
         version: folha.version,
         updated_at: new Date().toISOString(),
       }).eq('id', folhaId).eq('version', updated.version);
+      await failIdempotency(admin, idem.id);
       return createErrorResponse('Auditoria falhou — reabertura revertida', 500, 'AUDIT_FAILED');
     }
 
-    return jsonOk({
+    const successBody = {
       ok: true,
       folha_id: folhaId,
       version: updated.version,
       audit_hash: auditHash,
       warnings: integrityWarnings,
       integrity_precheck: integritySnapshot,
-    }, 200, { 'X-Audit-Hash': auditHash });
+    };
+    await completeIdempotency(admin, idem.id, 200, successBody);
+    return jsonOk(successBody, 200, { 'X-Audit-Hash': auditHash });
+
   } catch (e) {
     console.error('[reabrir-folha] erro inesperado:', (e as Error)?.message);
     return createErrorResponse('Erro interno', 500, 'INTERNAL_ERROR');
