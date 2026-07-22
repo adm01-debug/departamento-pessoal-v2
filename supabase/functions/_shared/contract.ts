@@ -24,8 +24,14 @@ const IS_LOCAL_DEV = _supabaseUrl.includes('localhost') || _supabaseUrl.includes
 
 function isOriginAllowed(origin: string): boolean {
   if (!origin) return false;
+  // Strict: rejeitar espaços, controle, null-byte ou unicode não-ASCII no header Origin.
+  // (WHATWG URL faz trim silencioso; queremos falhar fechado.)
+  if (origin !== origin.trim()) return false;
+  if (/[\u0000-\u001F\u007F-\uFFFF]/.test(origin)) return false;
   try {
-    const host = new URL(origin).hostname;
+    const url = new URL(origin);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return false;
+    const host = url.hostname;
     return (
       ALLOWED_ORIGINS.includes(origin) ||
       LOVABLE_HOST_RE.test(host) ||
