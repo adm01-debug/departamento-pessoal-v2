@@ -138,12 +138,19 @@ function isSafeOrExpression(expr: unknown): boolean {
 }
 
 // -------------------- Zod schemas --------------------
+const MAX_FILTER_VALUE_BYTES = 8 * 1024; // 8 KB por valor escalar de filtro
+const boundedFilterValue = z.unknown().refine((v) => {
+  if (typeof v === "string") return v.length <= MAX_FILTER_VALUE_BYTES;
+  if (Array.isArray(v)) return v.every((x) => typeof x !== "string" || x.length <= MAX_FILTER_VALUE_BYTES);
+  return true;
+}, { message: `Filter value exceeds ${MAX_FILTER_VALUE_BYTES} bytes` });
 const FilterSchema = z.object({
   column: z.string().max(120),
   op: z.string().max(20),
-  value: z.unknown(),
+  value: boundedFilterValue,
   extraOp: z.string().max(20).optional(),
 });
+
 const BodySchema = z.object({
   action: z.enum(["select", "insert", "update", "delete", "upsert", "rpc"]),
   table: z.string().max(63).optional(),
@@ -412,17 +419,35 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Body + validação estrutural
+  // Body + validação estrutural (leitura streaming com corte precoce em MAX_PAYLOAD_BYTES)
   let rawBody: unknown;
   try {
-    const text = await req.text();
-    if (text.length > MAX_PAYLOAD_BYTES) {
-      return jsonError(413, "PAYLOAD_TOO_LARGE", "Body too large");
+    const reader = req.body?.getReader();
+    if (!reader) {
+      rawBody = {};
+    } else {
+      const chunks: Uint8Array[] = [];
+      let total = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        total += value.byteLength;
+        if (total > MAX_PAYLOAD_BYTES) {
+          try { await reader.cancel(); } catch { /* ignore */ }
+          return jsonError(413, "PAYLOAD_TOO_LARGE", `Payload exceeds ${MAX_PAYLOAD_BYTES} bytes`);
+        }
+        chunks.push(value);
+      }
+      const buf = new Uint8Array(total);
+      let off = 0;
+      for (const c of chunks) { buf.set(c, off); off += c.byteLength; }
+      const text = new TextDecoder().decode(buf);
+      rawBody = text.length ? JSON.parse(text) : {};
     }
-    rawBody = JSON.parse(text);
   } catch {
     return jsonError(400, "INVALID_JSON", "Invalid JSON body");
   }
+
   const parsed = BodySchema.safeParse(rawBody);
   if (!parsed.success) {
     return jsonError(400, "SCHEMA_VALIDATION", "Invalid request shape", {
