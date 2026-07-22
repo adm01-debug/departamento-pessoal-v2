@@ -1,0 +1,41 @@
+name: 🔒 Branch Protection Enforcer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      administration: write
+
+    steps:
+      - name: Apply Branch Protection to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/branches/main/protection \
+            --method PUT \
+            --silent \
+            --input - << 'JSON'
+          {
+            "required_status_checks": {
+              "strict": true,
+              "contexts": []
+            },
+            "enforce_admins": true,
+            "required_pull_request_reviews": {
+              "required_approving_review_count": 1,
+              "dismiss_stale_reviews": true,
+              "require_code_owner_reviews": false
+            },
+            "required_linear_history": true,
+            "allow_force_pushes": false,
+            "allow_deletions": false,
+            "required_conversation_resolution": true
+          }
+JSON
