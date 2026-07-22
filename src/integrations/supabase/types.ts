@@ -14246,8 +14246,10 @@ export type Database = {
           created_at: string
           data_fim: string
           data_inicio: string
+          data_limite_concessao: string | null
           dias_descontados: number | null
           dias_direito: number
+          em_dobra: boolean
           faltas_periodo: number | null
           id: string
           motivo_perda: string | null
@@ -14260,8 +14262,10 @@ export type Database = {
           created_at?: string
           data_fim: string
           data_inicio: string
+          data_limite_concessao?: string | null
           dias_descontados?: number | null
           dias_direito?: number
+          em_dobra?: boolean
           faltas_periodo?: number | null
           id?: string
           motivo_perda?: string | null
@@ -14274,8 +14278,10 @@ export type Database = {
           created_at?: string
           data_fim?: string
           data_inicio?: string
+          data_limite_concessao?: string | null
           dias_descontados?: number | null
           dias_direito?: number
+          em_dobra?: boolean
           faltas_periodo?: number | null
           id?: string
           motivo_perda?: string | null
@@ -21844,6 +21850,23 @@ export type Database = {
           user_email: string | null
           user_id: string | null
           user_nome: string | null
+        }
+        Relationships: []
+      }
+      v_ferias_alertas_criticos: {
+        Row: {
+          aquisitivo_fim: string | null
+          aquisitivo_inicio: string | null
+          colaborador: string | null
+          colaborador_id: string | null
+          data_limite_concessao: string | null
+          dias_direito: number | null
+          dias_para_limite: number | null
+          em_dobra: boolean | null
+          empresa_id: string | null
+          perdeu_direito: boolean | null
+          periodo_aquisitivo_id: string | null
+          severidade: string | null
         }
         Relationships: []
       }
