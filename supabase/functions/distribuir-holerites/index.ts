@@ -150,8 +150,10 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   if (inserts.length === 0) {
+    const replayBody = { ok: true, novos: 0, ja_distribuidos: existentes.size, total: holerites.length };
+    await completeIdempotency(admin, idem.id, 200, replayBody);
     return new Response(
-      JSON.stringify({ ok: true, novos: 0, ja_distribuidos: existentes.size, total: holerites.length }),
+      JSON.stringify(replayBody),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -160,7 +162,10 @@ serve(async (req: Request): Promise<Response> => {
     .from('holerite_distribuicoes')
     .insert(inserts)
     .select('id, canal');
-  if (distErr) return createErrorResponse(distErr.message, 500, 'DB_ERROR');
+  if (distErr) {
+    await failIdempotency(admin, idem.id);
+    return createErrorResponse(distErr.message, 500, 'DB_ERROR');
+  }
 
   // Marca portal como enviado imediatamente (canal síncrono)
   const idsPortal = (distIns ?? []).filter((d) => d.canal === 'portal').map((d) => d.id);
@@ -175,15 +180,17 @@ serve(async (req: Request): Promise<Response> => {
     await admin.from('notificacoes').insert(notifs);
   }
 
+  const successBody = {
+    ok: true,
+    total: holerites.length,
+    novos: inserts.length,
+    ja_distribuidos: existentes.size,
+    canais,
+    folha_id: folhaId,
+  };
+  await completeIdempotency(admin, idem.id, 200, successBody);
   return new Response(
-    JSON.stringify({
-      ok: true,
-      total: holerites.length,
-      novos: inserts.length,
-      ja_distribuidos: existentes.size,
-      canais,
-      folha_id: folhaId,
-    }),
+    JSON.stringify(successBody),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
   } catch (e) {
@@ -191,3 +198,4 @@ serve(async (req: Request): Promise<Response> => {
     return createErrorResponse('Erro interno', 500, 'INTERNAL_SERVER_ERROR');
   }
 });
+
