@@ -85,6 +85,20 @@ serve(async (req: Request): Promise<Response> => {
     const rl = await checkRateLimit(admin, { key: `fechar-folha:${userId}`, limit: 5, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
 
+    // 3.5) Idempotência — evita duplo-fechamento por double-click / retry de rede
+    const idemKey = extractIdempotencyKey(req, body);
+    const idem = await beginIdempotency(admin, {
+      endpoint: 'fechar-folha',
+      key: idemKey,
+      requestBody: body,
+      empresaId,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+
+
+
 
     // 4) Tenant scope
     const { data: belongs } = await admin.rpc('user_belongs_to_empresa', {
