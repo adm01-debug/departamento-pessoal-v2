@@ -196,34 +196,16 @@ export const rescisaoService = {
     }
   },
 
-  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador', empresaId: string): Promise<any> {
-    if (!empresaId) throw new Error('empresa_id é obrigatório');
+  async assinarDigitalmente(id: string, tipo: 'empresa' | 'colaborador', _empresaId?: string): Promise<any> {
     try {
-      const hash = await sha256Hex(`rescisao-${id}-${tipo}-${new Date().toISOString()}`);
-      const updateData: any = {};
-
-      if (tipo === 'empresa') {
-        updateData.assinado_empresa = true;
-        updateData.hash_assinatura_empresa = hash;
-        updateData.data_assinatura_empresa = new Date().toISOString();
-      } else {
-        updateData.assinado_colaborador = true;
-        updateData.hash_assinatura_colaborador = hash;
-        updateData.data_assinatura_colaborador = new Date().toISOString();
-      }
-
-      const { data, error } = await supabase
-        .from('desligamentos')
-        .update(updateData)
-        .eq('id', id)
-        .eq('empresa_id', empresaId)
-        .select()
-        .single();
-
+      // Delegado à RPC assinar_desligamento (SECURITY DEFINER):
+      // - hash SHA-256 é calculado server-side (trigger bloqueia escrita direta);
+      // - a RPC valida is_admin, status válido e dupla-assinatura.
+      const { data, error } = await supabase.rpc('assinar_desligamento', {
+        _desligamento_id: id,
+        _parte: tipo,
+      });
       if (error) throw error;
-
-      const { data: refreshed, error: fetchError } = await supabase.from('desligamentos').select().eq('id', id).single();
-      if (fetchError) throw fetchError;
 
       await auditLogger.log({
         tabela: 'desligamentos',
@@ -237,6 +219,8 @@ export const rescisaoService = {
       throw new Error(e.message || 'Falha ao realizar assinatura digital', { cause: e });
     }
   },
+
+
 
   async processarPagamento(id: string, empresaId: string, comprovanteUrl?: string): Promise<any> {
     if (!empresaId) throw new Error('empresa_id é obrigatório');
