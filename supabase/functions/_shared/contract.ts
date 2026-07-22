@@ -59,6 +59,35 @@ export function getCorsHeaders(req?: Request): Record<string, string> {
 
 export const corsHeaders = getCorsHeaders();
 
+/**
+ * Strict origin gate. Retorna Response 403 quando o Origin é enviado
+ * mas não está na allowlist. Use no início de toda edge function
+ * (após handlePreflight). Requests sem header Origin (server-to-server,
+ * curl, cron) passam livremente.
+ */
+export function enforceOrigin(req: Request): Response | null {
+  const origin = req.headers.get('origin');
+  if (!origin) return null;
+  if (isOriginAllowed(origin)) return null;
+  return new Response(
+    JSON.stringify({ error: { code: 'FORBIDDEN_ORIGIN', message: 'Origin não autorizado' } }),
+    { status: 403, headers: { 'Content-Type': 'application/json', ...securityHeaders } }
+  );
+}
+
+/**
+ * Handler padrão de preflight CORS. Retorna 204 com headers ecoados
+ * apenas se o Origin for permitido; caso contrário 403.
+ */
+export function handlePreflight(req: Request): Response | null {
+  if (req.method !== 'OPTIONS') return null;
+  const origin = req.headers.get('origin') || '';
+  if (origin && !isOriginAllowed(origin)) {
+    return new Response(null, { status: 403, headers: securityHeaders });
+  }
+  return new Response(null, { status: 204, headers: getCorsHeaders(req) });
+}
+
 export function createErrorResponse(
   message: string,
   status: number = 400,
