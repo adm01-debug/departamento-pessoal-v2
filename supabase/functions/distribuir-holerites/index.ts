@@ -84,6 +84,19 @@ serve(async (req: Request): Promise<Response> => {
     .maybeSingle();
   if (!vinc) return createErrorResponse('Sem permissão nesta empresa', 403, 'FORBIDDEN');
 
+  // Idempotência transacional — evita distribuições duplicadas em rajada
+  const idemKey = extractIdempotencyKey(req, body);
+  const idem = await beginIdempotency(admin, {
+    endpoint: 'distribuir-holerites',
+    key: idemKey,
+    requestBody: { folha_id: folhaId, canais: [...canais].sort() },
+    empresaId: folha.empresa_id,
+    userId,
+  });
+  if (idem.replay) return idem.replay;
+  if (idem.conflict) return idem.conflict;
+
+
   // Busca holerites da folha
   const { data: holerites, error: hErr } = await admin
     .from('holerites')
