@@ -254,17 +254,21 @@ serve(async (req: Request): Promise<Response> => {
         version: folha.version,
         updated_at: new Date().toISOString(),
       }).eq('id', folhaId).eq('version', updated.version);
+      await failIdempotency(admin, idem.id);
       return createErrorResponse('Auditoria falhou — reabertura revertida', 500, 'AUDIT_FAILED');
     }
 
-    return jsonOk({
+    const successBody = {
       ok: true,
       folha_id: folhaId,
       version: updated.version,
       audit_hash: auditHash,
       warnings: integrityWarnings,
       integrity_precheck: integritySnapshot,
-    }, 200, { 'X-Audit-Hash': auditHash });
+    };
+    await completeIdempotency(admin, idem.id, 200, successBody);
+    return jsonOk(successBody, 200, { 'X-Audit-Hash': auditHash });
+
   } catch (e) {
     console.error('[reabrir-folha] erro inesperado:', (e as Error)?.message);
     return createErrorResponse('Erro interno', 500, 'INTERNAL_ERROR');
