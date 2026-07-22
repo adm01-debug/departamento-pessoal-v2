@@ -1,6 +1,9 @@
 name: Protect Main Branch
 on:
   workflow_dispatch:
+permissions:
+  contents: read
+  administration: write
 
 jobs:
   protect:
