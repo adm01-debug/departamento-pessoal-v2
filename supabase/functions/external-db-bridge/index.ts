@@ -159,7 +159,7 @@ const BodySchema = z.object({
   data: z.union([z.record(z.unknown()), z.array(z.record(z.unknown()))]).optional(),
   params: z.record(z.unknown()).optional(),
   userId: z.string().max(64).optional(),
-});
+}).strict();
 
 // -------------------- Telemetria --------------------
 interface TelemetryMeta {
