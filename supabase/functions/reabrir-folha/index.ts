@@ -101,6 +101,19 @@ serve(async (req: Request): Promise<Response> => {
     const rl = await checkRateLimit(admin, { key: `reabrir-folha:${userId}`, limit: 10, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
 
+    // 4.5) Idempotência transacional — evita reaberturas duplicadas
+    const idemKey = extractIdempotencyKey(req, body);
+    const idem = await beginIdempotency(admin, {
+      endpoint: 'reabrir-folha',
+      key: idemKey,
+      requestBody: { empresaId, folhaId, version, motivo, override_esocial },
+      empresaId,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+
+
     // 5) Carregar folha
     const { data: folha, error: folhaErr } = await admin
       .from('folhas_pagamento')
