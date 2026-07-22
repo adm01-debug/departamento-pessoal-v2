@@ -23653,6 +23653,18 @@ export type Database = {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
       }
+      validar_split_ferias: {
+        Args: {
+          p_colaborador_id: string
+          p_dias_novo: number
+          p_ferias_id?: string
+          p_periodo_aquisitivo_id: string
+        }
+        Returns: {
+          motivo: string
+          ok: boolean
+        }[]
+      }
       validate_status_transition: {
         Args: { _allowed: Json; _new: string; _old: string; _table: string }
         Returns: undefined
