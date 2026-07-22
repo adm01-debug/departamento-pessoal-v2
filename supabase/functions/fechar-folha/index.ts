@@ -17,6 +17,7 @@ import {
 import { verifyCsrf } from '../_shared/csrf.ts';
 import { verifyFolhaIntegrity } from '../_shared/folhaIntegrity.ts';
 import { integrityHash } from '../_shared/integrityHash.ts';
+import { beginIdempotency, completeIdempotency, failIdempotency, extractIdempotencyKey } from '../_shared/idempotency.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -83,6 +84,20 @@ serve(async (req: Request): Promise<Response> => {
     const { checkRateLimit, rateLimitResponse } = await import('../_shared/rateLimit.ts');
     const rl = await checkRateLimit(admin, { key: `fechar-folha:${userId}`, limit: 5, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
+
+    // 3.5) Idempotência — evita duplo-fechamento por double-click / retry de rede
+    const idemKey = extractIdempotencyKey(req, body);
+    const idem = await beginIdempotency(admin, {
+      endpoint: 'fechar-folha',
+      key: idemKey,
+      requestBody: body,
+      empresaId,
+      userId,
+    });
+    if (idem.replay) return idem.replay;
+    if (idem.conflict) return idem.conflict;
+
+
 
 
     // 4) Tenant scope
@@ -215,18 +230,23 @@ serve(async (req: Request): Promise<Response> => {
         version: folha.version,
         updated_at: new Date().toISOString(),
       }).eq('id', folhaId).eq('version', updated.version);
+      await failIdempotency(admin, idem.id);
       return createErrorResponse('Auditoria falhou — fechamento revertido', 500, 'AUDIT_FAILED');
     }
 
-    return jsonOk({
+    const okBody = {
       ok: true,
       folha_id: folhaId,
       version: updated.version,
       audit_hash: auditHash,
       warnings,
-    }, 200, { 'X-Audit-Hash': auditHash });
+    };
+    await completeIdempotency(admin, idem.id, 200, okBody);
+    return jsonOk(okBody, 200, { 'X-Audit-Hash': auditHash });
   } catch (e) {
     console.error('[fechar-folha] erro inesperado:', (e as Error)?.message);
     return createErrorResponse('Erro interno', 500, 'INTERNAL_ERROR');
+  }
+});
   }
 });
