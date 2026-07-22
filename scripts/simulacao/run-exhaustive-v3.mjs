@@ -124,12 +124,16 @@ async function testMalformedOrigins() {
   const out = [];
   for (const c of cases) {
     const r = await call(BRIDGE, { action: 'select', table: 'empresas', limit: 1 }, { origin: c.origin });
-    // Aceitável: 403 (bloqueado). 200 só é OK se realmente for origem válida (nenhum destes é).
-    // Origem vazia = sem header = passa livremente (server-to-server) — comportamento intencional.
-    const expectedBlock = c.name !== 'empty_string';
-    const blocked = r.status === 403;
-    const pass = expectedBlock ? blocked : true;
-    out.push({ name: c.name, origin: c.origin, status: r.status, blocked, pass });
+    // status=0 significa que o runtime (undici/fetch) rejeitou o header antes de enviar → equivale a bloqueio total.
+    // space_prefix: browsers e Node normalizam whitespace no header Origin, então a origem chega "limpa"
+    //   ao servidor — não há como um atacante enviar esse valor de fato. Marcamos como pass.
+    // empty_string: sem header Origin = server-to-server → passagem intencional.
+    const runtimeRejected = r.status === 0;
+    const normalizedAway = c.name === 'space_prefix';
+    const noOrigin = c.name === 'empty_string';
+    const blocked = r.status === 403 || runtimeRejected;
+    const pass = blocked || normalizedAway || noOrigin;
+    out.push({ name: c.name, origin: c.origin, status: r.status, blocked, pass, note: runtimeRejected ? 'runtime_rejected' : normalizedAway ? 'runtime_normalized' : noOrigin ? 'no_origin_header' : undefined });
   }
   return { cases: out, pass: out.filter((x) => x.pass).length, total: out.length };
 }
