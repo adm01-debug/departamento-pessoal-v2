@@ -23108,6 +23108,10 @@ export type Database = {
         Args: { _colaborador_id: string; _divergencia_id: string }
         Returns: undefined
       }
+      calcular_dias_direito_ferias: {
+        Args: { p_faltas: number }
+        Returns: number
+      }
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
       calculate_lockout_duration: {
         Args: { attempts: number }
