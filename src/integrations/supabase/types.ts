@@ -9165,7 +9165,7 @@ export type Database = {
           motivo_cancelamento: string | null
           observacoes: string | null
           periodo_aquisitivo_fim: string | null
-          periodo_aquisitivo_id: string | null
+          periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio: string | null
           salario_base: number
           saldo_gasto: number | null
@@ -9221,7 +9221,7 @@ export type Database = {
           motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_fim?: string | null
-          periodo_aquisitivo_id?: string | null
+          periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio?: string | null
           salario_base: number
           saldo_gasto?: number | null
@@ -9277,7 +9277,7 @@ export type Database = {
           motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_fim?: string | null
-          periodo_aquisitivo_id?: string | null
+          periodo_aquisitivo_id?: string
           periodo_aquisitivo_inicio?: string | null
           salario_base?: number
           saldo_gasto?: number | null
@@ -23253,6 +23253,7 @@ export type Database = {
         Args: { _cpf: string; _nivel: string; _user_id: string }
         Returns: undefined
       }
+      fn_recalcular_dobra_e_alertas: { Args: never; Returns: number }
       folha_conflict_stats: {
         Args: { _days?: number }
         Returns: {
