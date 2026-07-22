@@ -1,39 +1,26 @@
 name: Branch Protection Enforcer
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [main]
-
+on: workflow_dispatch
 jobs:
   enforce:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       administration: write
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Apply Branch Protection to main
+      - name: Protect main branch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api repos/${{ github.repository }}/branches/main/protection \
-            --method PUT \
-            --silent \
-            --input - << 'ENDJSON'
-            {
-              "required_status_checks": { "strict": true, "contexts": [] },
-              "enforce_admins": true,
-              "required_pull_request_reviews": {
-                "required_approving_review_count": 1,
-                "dismiss_stale_reviews": true,
-                "require_code_owner_reviews": false
-              },
-              "required_linear_history": true,
-              "allow_force_pushes": false,
-              "allow_deletions": false,
-              "required_conversation_resolution": true
-            }
-ENDJSON
+          gh api repos/${{ github.repository }}/branches/main/protection --method PUT --silent --input - <<< '{
+            "required_status_checks": {"strict": true, "contexts": []},
+            "enforce_admins": true,
+            "required_pull_request_reviews": {
+              "required_approving_review_count": 1,
+              "dismiss_stale_reviews": true,
+              "require_code_owner_reviews": false
+            },
+            "required_linear_history": true,
+            "allow_force_pushes": false,
+            "allow_deletions": false,
+            "required_conversation_resolution": true
+          }'
