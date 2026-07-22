@@ -23190,6 +23190,13 @@ export type Database = {
         Args: { lat1: number; lat2: number; lng1: number; lng2: number }
         Returns: number
       }
+      eh_dia_valido_inicio_ferias: {
+        Args: { p_data: string; p_empresa_id: string }
+        Returns: {
+          motivo: string
+          ok: boolean
+        }[]
+      }
       enforce_log_retention: { Args: never; Returns: Json }
       fn_calculate_periodo_aquisitivo: {
         Args: { _colaborador_id: string }
