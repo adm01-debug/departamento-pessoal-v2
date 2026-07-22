@@ -8510,8 +8510,10 @@ export type Database = {
           competencia: string
           created_at: string
           created_by: string | null
+          empresa_id: string | null
           id: string
           observacao: string | null
+          origem_ferias_id: string | null
           referencia: number | null
           rubrica_id: string
           valor: number
@@ -8521,8 +8523,10 @@ export type Database = {
           competencia: string
           created_at?: string
           created_by?: string | null
+          empresa_id?: string | null
           id?: string
           observacao?: string | null
+          origem_ferias_id?: string | null
           referencia?: number | null
           rubrica_id: string
           valor: number
@@ -8532,8 +8536,10 @@ export type Database = {
           competencia?: string
           created_at?: string
           created_by?: string | null
+          empresa_id?: string | null
           id?: string
           observacao?: string | null
+          origem_ferias_id?: string | null
           referencia?: number | null
           rubrica_id?: string
           valor?: number
@@ -8566,6 +8572,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "eventos_variaveis_rubrica_id_fkey"
@@ -9145,7 +9165,7 @@ export type Database = {
           motivo_cancelamento: string | null
           observacoes: string | null
           periodo_aquisitivo_fim: string | null
-          periodo_aquisitivo_id: string | null
+          periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio: string | null
           salario_base: number
           saldo_gasto: number | null
@@ -9201,7 +9221,7 @@ export type Database = {
           motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_fim?: string | null
-          periodo_aquisitivo_id?: string | null
+          periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio?: string | null
           salario_base: number
           saldo_gasto?: number | null
@@ -9257,7 +9277,7 @@ export type Database = {
           motivo_cancelamento?: string | null
           observacoes?: string | null
           periodo_aquisitivo_fim?: string | null
-          periodo_aquisitivo_id?: string | null
+          periodo_aquisitivo_id?: string
           periodo_aquisitivo_inicio?: string | null
           salario_base?: number
           saldo_gasto?: number | null
@@ -14246,11 +14266,15 @@ export type Database = {
           created_at: string
           data_fim: string
           data_inicio: string
+          data_limite_concessao: string | null
           dias_descontados: number | null
           dias_direito: number
+          em_dobra: boolean
           faltas_periodo: number | null
           id: string
+          motivo_perda: string | null
           numero_periodo: number
+          perdeu_direito: boolean
           status: string | null
         }
         Insert: {
@@ -14258,11 +14282,15 @@ export type Database = {
           created_at?: string
           data_fim: string
           data_inicio: string
+          data_limite_concessao?: string | null
           dias_descontados?: number | null
           dias_direito?: number
+          em_dobra?: boolean
           faltas_periodo?: number | null
           id?: string
+          motivo_perda?: string | null
           numero_periodo?: number
+          perdeu_direito?: boolean
           status?: string | null
         }
         Update: {
@@ -14270,11 +14298,15 @@ export type Database = {
           created_at?: string
           data_fim?: string
           data_inicio?: string
+          data_limite_concessao?: string | null
           dias_descontados?: number | null
           dias_direito?: number
+          em_dobra?: boolean
           faltas_periodo?: number | null
           id?: string
+          motivo_perda?: string | null
           numero_periodo?: number
+          perdeu_direito?: boolean
           status?: string | null
         }
         Relationships: [
@@ -21841,6 +21873,23 @@ export type Database = {
         }
         Relationships: []
       }
+      v_ferias_alertas_criticos: {
+        Row: {
+          aquisitivo_fim: string | null
+          aquisitivo_inicio: string | null
+          colaborador: string | null
+          colaborador_id: string | null
+          data_limite_concessao: string | null
+          dias_direito: number | null
+          dias_para_limite: number | null
+          em_dobra: boolean | null
+          empresa_id: string | null
+          perdeu_direito: boolean | null
+          periodo_aquisitivo_id: string | null
+          severidade: string | null
+        }
+        Relationships: []
+      }
       v_idempotency_metrics: {
         Row: {
           completed_24h: number | null
@@ -23108,6 +23157,10 @@ export type Database = {
         Args: { _colaborador_id: string; _divergencia_id: string }
         Returns: undefined
       }
+      calcular_dias_direito_ferias: {
+        Args: { p_faltas: number }
+        Returns: number
+      }
       calcular_dias_ferias: { Args: { faltas: number }; Returns: number }
       calculate_lockout_duration: {
         Args: { attempts: number }
@@ -23180,6 +23233,13 @@ export type Database = {
         Args: { lat1: number; lat2: number; lng1: number; lng2: number }
         Returns: number
       }
+      eh_dia_valido_inicio_ferias: {
+        Args: { p_data: string; p_empresa_id: string }
+        Returns: {
+          motivo: string
+          ok: boolean
+        }[]
+      }
       enforce_log_retention: { Args: never; Returns: Json }
       fn_calculate_periodo_aquisitivo: {
         Args: { _colaborador_id: string }
@@ -23193,6 +23253,7 @@ export type Database = {
         Args: { _cpf: string; _nivel: string; _user_id: string }
         Returns: undefined
       }
+      fn_recalcular_dobra_e_alertas: { Args: never; Returns: number }
       folha_conflict_stats: {
         Args: { _days?: number }
         Returns: {
@@ -23206,6 +23267,7 @@ export type Database = {
         Args: { _colaborador_id: string; _competencia: string }
         Returns: Json
       }
+      gerar_rubricas_ferias: { Args: { p_ferias_id: string }; Returns: number }
       get_admissao_por_token: {
         Args: { _token: string }
         Returns: {
@@ -23642,6 +23704,18 @@ export type Database = {
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
         Returns: boolean
+      }
+      validar_split_ferias: {
+        Args: {
+          p_colaborador_id: string
+          p_dias_novo: number
+          p_ferias_id?: string
+          p_periodo_aquisitivo_id: string
+        }
+        Returns: {
+          motivo: string
+          ok: boolean
+        }[]
       }
       validate_status_transition: {
         Args: { _allowed: Json; _new: string; _old: string; _table: string }
