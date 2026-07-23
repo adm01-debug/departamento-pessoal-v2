@@ -152,7 +152,7 @@ POST-only gateway (32KB file, 729 lines)
 │   ├── FinancialSummaryCards.tsx: 7 any
 │   └── PontoAdjustmentRequests.tsx: 12 any
 ├── tsconfig.app.json: strict false→true ✅
-├── 675 arquivos compilam com 0 erros ✅
+├── 675 arquivos — claim NÃO validado (era sob tsconfig.app.json ÓRFÃO; ver aviso no topo)
 
 📚 DOCUMENTAÇÃO
 ├── CHANGELOG.md: v18.0.1
@@ -208,7 +208,7 @@ O `oven-sh/setup-bun@v2` action não funciona em repositórios privados do GitHu
 O projeto usa `bun.lock` como lockfile, não `package-lock.json`. `npm ci` requer lockfile. `npm install` funciona sem.
 
 ### Por que strict:false foi alterado para true?
-`strict` foi ligado em `tsconfig.app.json` — porém esse config é ÓRFÃO (nada no CI/build o invoca), então o efeito prático foi ZERO. O typecheck real do CI é `tsgo --noEmit` sobre `tsconfig.json` (raiz). Sob `tsconfig.app.json` o `tsc` acusa erros de dead-code (`noUnusedLocals`); a afirmação anterior de "675 arquivos, 0 erros" NÃO se sustentava. Verificar sempre o config que o CI de fato roda antes de declarar verde.
+`strict` foi ligado em `tsconfig.app.json` — porém esse config é ÓRFÃO (nada no CI/build o invoca), então o efeito prático foi ZERO. O typecheck real do CI é `tsgo --noEmit` sobre `tsconfig.json` (raiz). Sob `tsconfig.app.json` o `tsc` acusa erros de dead-code (`noUnusedLocals`); a afirmação anterior de "claim não validado (tsconfig.app.json órfão)" NÃO se sustentava. Verificar sempre o config que o CI de fato roda antes de declarar verde.
 
 ### Bridge external-db-bridge
 Gateway hardening com JWT validation, CSRF fail-closed, rate limiting, tenant isolation, denylist de tabelas, allowlist de RPCs, regex de SQL injection, validação de ORDER BY, e telemetria com batch. Código em `supabase/functions/external-db-bridge/index.ts` (729 linhas).
