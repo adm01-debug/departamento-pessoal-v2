@@ -81,6 +81,24 @@ export default function ContratosGeradosPage() {
   const [status, setStatus] = useState<StatusFilter>('todos');
   const [busca, setBusca] = useState('');
   const [periodo, setPeriodo] = useState<'todos' | '30' | '90' | '365'>('todos');
+  const [drawerContrato, setDrawerContrato] = useState<ContratoGerado | null>(null);
+  const [eventos, setEventos] = useState<EventoContrato[]>([]);
+  const [loadingEventos, setLoadingEventos] = useState(false);
+
+  const abrirTimeline = async (c: ContratoGerado) => {
+    setDrawerContrato(c);
+    setLoadingEventos(true);
+    setEventos([]);
+    try {
+      const data = await contratoTemplateService.listarEventos(c.id);
+      setEventos(data);
+    } catch (e) {
+      console.error('[eventos-contrato]', e);
+      toast.error('Falha ao carregar histórico');
+    } finally {
+      setLoadingEventos(false);
+    }
+  };
 
   const carregar = async () => {
     if (!empresaAtual) return;
