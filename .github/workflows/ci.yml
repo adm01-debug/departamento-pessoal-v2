@@ -1,6 +1,7 @@
 name: Continuous Integration & Delivery
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main, master ]
   pull_request:
@@ -15,15 +16,14 @@ jobs:
     name: Lint, Type Check & Test
     runs-on: ubuntu-latest
     env:
-      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://hncgwjbzdajfdztqgefe.supabase.co' }}
-      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuY2d3amJ6ZGFqZmR6dHFnZWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjQ4ODIsImV4cCI6MjA4OTI0MDg4Mn0.B9ml1sHPkPHoTEWBapO3z1y1RNVpMQfT9Ws0srULlzE' }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || '' }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || '' }}
       E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
       E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
         with:
-          # Necessário para `format:check:changed` conseguir fazer diff vs base ref
           fetch-depth: 0
 
       - name: Setup Bun
@@ -32,9 +32,8 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
 
-      # === Quality gate (fail-fast antes de testes pesados) ===
       - name: Type Check (tsgo, strict)
         run: bunx tsgo --noEmit
 
@@ -61,7 +60,6 @@ jobs:
 
       - name: Supabase Edge Functions Test
         run: |
-          # Verifica se os arquivos de teste existem (smoke test de configuração)
           test -f supabase/functions/calcular-folha/index.test.ts || echo "Warning: calcular-folha test missing"
           test -f supabase/functions/webhook/index.test.ts || echo "Warning: webhook test missing"
           echo "Edge Functions tests structure verified."
@@ -76,14 +74,12 @@ jobs:
             test-results/
           retention-days: 30
 
-
       - name: Upload Coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/
 
-  # MP-044: SonarCloud static analysis (requires SONAR_TOKEN secret)
   sonar:
     name: SonarCloud Scan
     needs: quality
@@ -106,7 +102,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-
   build-and-deploy:
     name: Build & Deploy Production
     needs: quality
@@ -114,14 +109,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Build Application
         run: bun run build
@@ -161,5 +156,3 @@ jobs:
           done
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-
