@@ -30,9 +30,29 @@ import {
   RefreshCw,
   FileSpreadsheet,
   Send,
+  History,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+type EventoContrato = {
+  id: string;
+  evento: string;
+  detalhes: Record<string, unknown> | null;
+  ip: string | null;
+  user_agent: string | null;
+  created_at: string;
+};
+
+const EVENTO_LABELS: Record<string, string> = {
+  token_gerado: 'Token de assinatura gerado',
+  token_revogado: 'Token revogado',
+  token_expiracao_estendida: 'Prazo estendido',
+  assinatura_visualizada: 'Página de assinatura acessada',
+  assinatura_concluida: 'Contrato assinado',
+  cpf_invalido: 'Tentativa com CPF inválido',
+  lembrete_enviado: 'Lembrete enviado ao gestor',
+};
 
 type StatusFilter = 'todos' | ContratoGerado['status'];
 
