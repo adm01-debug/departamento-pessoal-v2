@@ -3215,6 +3215,56 @@ export type Database = {
           },
         ]
       }
+      catalogo_infracoes: {
+        Row: {
+          artigo_clt_sugerido: string | null
+          ativo: boolean
+          codigo: string
+          created_at: string
+          descricao: string
+          dias_suspensao_sugerido: number | null
+          empresa_id: string
+          gravidade: string
+          id: string
+          tipo_sugerido: string
+          updated_at: string
+        }
+        Insert: {
+          artigo_clt_sugerido?: string | null
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          descricao: string
+          dias_suspensao_sugerido?: number | null
+          empresa_id: string
+          gravidade: string
+          id?: string
+          tipo_sugerido: string
+          updated_at?: string
+        }
+        Update: {
+          artigo_clt_sugerido?: string | null
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          descricao?: string
+          dias_suspensao_sugerido?: number | null
+          empresa_id?: string
+          gravidade?: string
+          id?: string
+          tipo_sugerido?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogo_infracoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categorias_trabalhador: {
         Row: {
           codigo_esocial: string | null
@@ -13177,26 +13227,38 @@ export type Database = {
       medidas_disciplinares: {
         Row: {
           aplicado_por: string | null
+          aprovador_id: string | null
           artigo_clt: string | null
           assinado_em: string | null
           colaborador_ciente: boolean | null
           colaborador_id: string
+          contestacao_data: string | null
+          contestacao_resposta: string | null
+          contestacao_texto: string | null
           created_at: string | null
+          data_aprovacao: string | null
           data_ciencia: string | null
+          data_conhecimento_fato: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
           documento_url: string | null
           empresa_id: string | null
           evidenciado_por: Json | null
+          gravidade: string | null
           hash_integridade: string | null
           id: string
           id_registro_anterior: string | null
           motivo_recusa: string | null
           numero_sequencial: number | null
+          pdf_gerado_em: string | null
+          pdf_hash_sha256: string | null
+          pdf_url: string | null
+          prazo_ciencia_dias: number | null
           recorrencia_infrafacao: boolean | null
           recusa_assinatura: boolean | null
           status: string | null
+          status_workflow: string | null
           testemunha_1: string | null
           testemunha_1_cpf: string | null
           testemunha_1_nome: string | null
@@ -13208,26 +13270,38 @@ export type Database = {
         }
         Insert: {
           aplicado_por?: string | null
+          aprovador_id?: string | null
           artigo_clt?: string | null
           assinado_em?: string | null
           colaborador_ciente?: boolean | null
           colaborador_id: string
+          contestacao_data?: string | null
+          contestacao_resposta?: string | null
+          contestacao_texto?: string | null
           created_at?: string | null
+          data_aprovacao?: string | null
           data_ciencia?: string | null
+          data_conhecimento_fato?: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
           evidenciado_por?: Json | null
+          gravidade?: string | null
           hash_integridade?: string | null
           id?: string
           id_registro_anterior?: string | null
           motivo_recusa?: string | null
           numero_sequencial?: number | null
+          pdf_gerado_em?: string | null
+          pdf_hash_sha256?: string | null
+          pdf_url?: string | null
+          prazo_ciencia_dias?: number | null
           recorrencia_infrafacao?: boolean | null
           recusa_assinatura?: boolean | null
           status?: string | null
+          status_workflow?: string | null
           testemunha_1?: string | null
           testemunha_1_cpf?: string | null
           testemunha_1_nome?: string | null
@@ -13239,26 +13313,38 @@ export type Database = {
         }
         Update: {
           aplicado_por?: string | null
+          aprovador_id?: string | null
           artigo_clt?: string | null
           assinado_em?: string | null
           colaborador_ciente?: boolean | null
           colaborador_id?: string
+          contestacao_data?: string | null
+          contestacao_resposta?: string | null
+          contestacao_texto?: string | null
           created_at?: string | null
+          data_aprovacao?: string | null
           data_ciencia?: string | null
+          data_conhecimento_fato?: string | null
           data_ocorrencia?: string
           descricao?: string
           dias_suspensao?: number | null
           documento_url?: string | null
           empresa_id?: string | null
           evidenciado_por?: Json | null
+          gravidade?: string | null
           hash_integridade?: string | null
           id?: string
           id_registro_anterior?: string | null
           motivo_recusa?: string | null
           numero_sequencial?: number | null
+          pdf_gerado_em?: string | null
+          pdf_hash_sha256?: string | null
+          pdf_url?: string | null
+          prazo_ciencia_dias?: number | null
           recorrencia_infrafacao?: boolean | null
           recusa_assinatura?: boolean | null
           status?: string | null
+          status_workflow?: string | null
           testemunha_1?: string | null
           testemunha_1_cpf?: string | null
           testemunha_1_nome?: string | null
@@ -13346,8 +13432,11 @@ export type Database = {
           created_at: string | null
           id: string
           medida_id: string | null
+          mime_type: string | null
           nome_arquivo: string
           storage_path: string
+          tamanho_bytes: number | null
+          tipo: string | null
           tipo_arquivo: string | null
           uploaded_by: string | null
         }
@@ -13355,8 +13444,11 @@ export type Database = {
           created_at?: string | null
           id?: string
           medida_id?: string | null
+          mime_type?: string | null
           nome_arquivo: string
           storage_path: string
+          tamanho_bytes?: number | null
+          tipo?: string | null
           tipo_arquivo?: string | null
           uploaded_by?: string | null
         }
@@ -13364,8 +13456,11 @@ export type Database = {
           created_at?: string | null
           id?: string
           medida_id?: string | null
+          mime_type?: string | null
           nome_arquivo?: string
           storage_path?: string
+          tamanho_bytes?: number | null
+          tipo?: string | null
           tipo_arquivo?: string | null
           uploaded_by?: string | null
         }
@@ -24702,6 +24797,14 @@ export type Database = {
       sst_regimento_publicar: {
         Args: { p_documento_id: string }
         Returns: Json
+      }
+      sugerir_proxima_medida: {
+        Args: { p_colaborador_id: string; p_empresa_id: string }
+        Returns: {
+          historico_12m: Json
+          justificativa: string
+          tipo_sugerido: string
+        }[]
       }
       user_belongs_to_empresa: {
         Args: { _empresa_id: string; _user_id: string }
