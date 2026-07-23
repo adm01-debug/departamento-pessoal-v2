@@ -18,7 +18,10 @@ const SUPABASE_ANON = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
 
 // Smoke test de integração: exige backend real (URL + anon key). Sem essas
 // variáveis (ex.: CI sem secrets), o suite é pulado em vez de quebrar no import.
-const hasBackend = Boolean(SUPABASE_URL && SUPABASE_ANON);
+// Integração real: só roda com backend configurado E fora de CI (runners não têm
+// egress garantido ao banco; rode local/staging). Em CI o suite é pulado.
+const isCI = typeof process !== 'undefined' && !!(process.env.CI || process.env.GITHUB_ACTIONS);
+const hasBackend = Boolean(SUPABASE_URL && SUPABASE_ANON) && !isCI;
 const anon = hasBackend
   ? createClient(SUPABASE_URL, SUPABASE_ANON, {
       auth: { persistSession: false, autoRefreshToken: false },

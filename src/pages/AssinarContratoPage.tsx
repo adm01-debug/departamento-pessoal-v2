@@ -51,9 +51,9 @@ export default function AssinarContratoPage() {
     if (!token) return;
     setPreviewLoading(true);
     try {
-      const { data, error } = await supabase.rpc('contrato_preview_url_por_token' as never, {
+      const { data, error } = await supabase.rpc('contrato_preview_url_por_token' as any, {
         p_token: token,
-      } as never);
+      } as any);
       if (error) throw error;
       const res = data as unknown as { signed_url: string };
       if (!res?.signed_url) throw new Error('URL não disponível.');
@@ -77,9 +77,9 @@ export default function AssinarContratoPage() {
         return;
       }
       try {
-        const { data, error } = await supabase.rpc('contrato_consultar_por_token' as never, {
+        const { data, error } = await supabase.rpc('contrato_consultar_por_token' as any, {
           p_token: token,
-        } as never);
+        } as any);
         if (cancel) return;
         if (error) throw error;
         setInfo(data as unknown as ContratoInfo);
@@ -120,13 +120,13 @@ export default function AssinarContratoPage() {
       } catch {
         /* silencioso */
       }
-      const { data, error } = await supabase.rpc('contrato_assinar_por_token' as never, {
+      const { data, error } = await supabase.rpc('contrato_assinar_por_token' as any, {
         p_token: token,
         p_cpf: cpf.replace(/\D/g, ''),
         p_nome_completo: nome.trim(),
         p_ip: ip,
         p_user_agent: navigator.userAgent,
-      } as never);
+      } as any);
       if (error) throw error;
       const res = data as unknown as { assinatura_hash: string; assinado_em: string };
       setAssinado({ hash: res.assinatura_hash, em: res.assinado_em });

@@ -8,10 +8,10 @@ import { secureJsonParse } from '@/utils/secureJson';
 // Projeto ativo pós-cutover: frjbfeamybqsejlvmqbl.
 // Guard fail-fast: se as env vars faltarem no build, gritamos alto no console
 // (o client Supabase silenciosamente iria para "undefined.supabase.co").
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://frjbfeamybqsejlvmqbl.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://frjbfeamybqsejlvmqbl.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  import.meta.env.VITE_SUPABASE_ANON_KEY ??
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjEwMDIxNjc1Nn0.yrnnKshNB_89tmJtHbyaZGnsOHuAEV6x5OFrcepBYIU';
 
 if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {

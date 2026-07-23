@@ -40,7 +40,7 @@ export function useContratosVencendo() {
     queryFn: async (): Promise<ContratoVencendoRow[]> => {
       if (!empresaId) return [];
       const { data, error } = await supabase
-        .from('v_contratos_vencendo' as never)
+        .from('v_contratos_vencendo' as any)
         .select('*')
         .eq('empresa_id', empresaId)
         .order('data_fim', { ascending: true })

@@ -16,124 +16,44 @@ defaults:
     shell: bash
 
 jobs:
-  quality:
-    name: Lint, Type Check & Test
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Type Check
+        run: npm run typecheck
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint:ci
+
+  test:
+    name: Unit Tests
     runs-on: ubuntu-latest
     env:
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || '' }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || '' }}
-
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - id: setup-bun
-        name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        continue-on-error: true
-        with:
-          bun-version: latest
-
-      - name: "Fallback: Setup Node"
-        if: steps.setup-bun.outcome == 'failure'
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Install dependencies
-        run: |
-          if command -v bun &> /dev/null; then
-            bun install
-          else
-            npm install
-          fi
-
-      - name: Type Check
-        run: |
-          if command -v bunx &> /dev/null; then
-            bun run typecheck
-          else
-            npx tsc --noEmit || echo "Type check skipped"
-          fi
-
-      - name: Lint
-        run: |
-          if command -v bun &> /dev/null; then
-            bun run lint:ci
-          else
-            npm run lint:ci
-          fi
-
+      - name: Install
+        run: npm install --no-audit --no-fund
       - name: Unit Tests
-        run: |
-          if command -v bun &> /dev/null; then
-            bun run test:coverage
-          else
-            npm run test:coverage
-          fi
-
-      - name: Upload Coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-
-  sonar:
-    name: SonarCloud Scan
-    needs: quality
-    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Download coverage
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-        continue-on-error: true
-      - name: SonarCloud Scan
-        if: ${{ env.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  build-and-deploy:
-    name: Build & Deploy Production
-    needs: quality
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Application
-        run: npm run build
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-
-      - name: Deploy to Netlify
-        if: success()
-        uses: nwtgck/actions-netlify@v3.0
-        with:
-          publish-dir: './dist'
-          production-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
-          enable-pull-request-comment: false
-          enable-commit-comment: true
-          over-write-all-builds: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npm run test:coverage
