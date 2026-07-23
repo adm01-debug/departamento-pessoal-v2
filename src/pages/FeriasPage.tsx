@@ -147,6 +147,16 @@ export default function FeriasPage() {
       gradient="from-primary-glow to-primary"
       actions={
         <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-xl gap-1.5 font-body"
+            asChild
+          >
+            <a href="/ferias/programacao">
+              <CalendarDays className="h-4 w-4" /> Programação Anual
+            </a>
+          </Button>
           <Button 
             size="sm" 
             variant="outline" 

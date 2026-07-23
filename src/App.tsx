@@ -24,6 +24,7 @@ const FolhaPage = lazy(() => import('@/pages/FolhaPage'));
 const FolhaPagamentoPage = lazy(() => import('@/pages/FolhaPagamentoPage'));
 const FolhaCompliancePage = lazy(() => import('@/pages/FolhaCompliancePage'));
 const FeriasPage = lazy(() => import('@/pages/FeriasPage'));
+const FeriasProgramacaoPage = lazy(() => import('@/pages/FeriasProgramacaoPage'));
 const PontoPage = lazy(() => import('@/pages/PontoPage'));
 const BeneficiosPage = lazy(() => import('@/pages/BeneficiosPage'));
 const BeneficioFormPage = lazy(() => import('@/pages/BeneficioFormPage'));
@@ -193,6 +194,7 @@ export default function App() {
         <Route path="afastamentos" element={<LazyPage Component={AfastamentosPage} />} />
         <Route path="desligamentos" element={<LazyPage Component={DesligamentosPage} />} />
         <Route path="ferias" element={<LazyPage Component={FeriasPage} />} />
+        <Route path="ferias/programacao" element={<LazyPage Component={FeriasProgramacaoPage} />} />
         <Route path="ponto" element={<LazyPage Component={PontoPage} />} />
         <Route path="beneficios" element={<LazyPage Component={BeneficiosPage} />} />
         <Route path="beneficios/novo" element={<LazyPage Component={BeneficioFormPage} />} />

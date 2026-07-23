@@ -9645,6 +9645,138 @@ export type Database = {
           },
         ]
       }
+      ferias_programacao: {
+        Row: {
+          ano: number
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          colaborador_id: string
+          created_at: string
+          criado_por: string | null
+          data_fim_prevista: string | null
+          data_inicio_prevista: string | null
+          dias_previstos: number
+          empresa_id: string
+          ferias_id: string | null
+          id: string
+          mes_previsto: number
+          observacoes: string | null
+          periodo_aquisitivo_id: string | null
+          rejeitado_em: string | null
+          rejeitado_motivo: string | null
+          rejeitado_por: string | null
+          status: Database["public"]["Enums"]["programacao_ferias_status"]
+          updated_at: string
+        }
+        Insert: {
+          ano: number
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
+          colaborador_id: string
+          created_at?: string
+          criado_por?: string | null
+          data_fim_prevista?: string | null
+          data_inicio_prevista?: string | null
+          dias_previstos?: number
+          empresa_id: string
+          ferias_id?: string | null
+          id?: string
+          mes_previsto: number
+          observacoes?: string | null
+          periodo_aquisitivo_id?: string | null
+          rejeitado_em?: string | null
+          rejeitado_motivo?: string | null
+          rejeitado_por?: string | null
+          status?: Database["public"]["Enums"]["programacao_ferias_status"]
+          updated_at?: string
+        }
+        Update: {
+          ano?: number
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
+          colaborador_id?: string
+          created_at?: string
+          criado_por?: string | null
+          data_fim_prevista?: string | null
+          data_inicio_prevista?: string | null
+          dias_previstos?: number
+          empresa_id?: string
+          ferias_id?: string | null
+          id?: string
+          mes_previsto?: number
+          observacoes?: string | null
+          periodo_aquisitivo_id?: string | null
+          rejeitado_em?: string | null
+          rejeitado_motivo?: string | null
+          rejeitado_por?: string | null
+          status?: Database["public"]["Enums"]["programacao_ferias_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_programacao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "vw_ferias_resumo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_periodo_aquisitivo_id_fkey"
+            columns: ["periodo_aquisitivo_id"]
+            isOneToOne: false
+            referencedRelation: "periodos_aquisitivos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ferias_solicitacoes: {
         Row: {
           abono_pecuniario: boolean | null
@@ -23511,6 +23643,184 @@ export type Database = {
         Args: { p_solicitacao_id: string }
         Returns: undefined
       }
+      programacao_ferias_aprovar_gestor: {
+        Args: { _id: string }
+        Returns: {
+          ano: number
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          colaborador_id: string
+          created_at: string
+          criado_por: string | null
+          data_fim_prevista: string | null
+          data_inicio_prevista: string | null
+          dias_previstos: number
+          empresa_id: string
+          ferias_id: string | null
+          id: string
+          mes_previsto: number
+          observacoes: string | null
+          periodo_aquisitivo_id: string | null
+          rejeitado_em: string | null
+          rejeitado_motivo: string | null
+          rejeitado_por: string | null
+          status: Database["public"]["Enums"]["programacao_ferias_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias_programacao"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      programacao_ferias_aprovar_rh: {
+        Args: { _id: string }
+        Returns: {
+          ano: number
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          colaborador_id: string
+          created_at: string
+          criado_por: string | null
+          data_fim_prevista: string | null
+          data_inicio_prevista: string | null
+          dias_previstos: number
+          empresa_id: string
+          ferias_id: string | null
+          id: string
+          mes_previsto: number
+          observacoes: string | null
+          periodo_aquisitivo_id: string | null
+          rejeitado_em: string | null
+          rejeitado_motivo: string | null
+          rejeitado_por: string | null
+          status: Database["public"]["Enums"]["programacao_ferias_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias_programacao"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      programacao_ferias_converter: {
+        Args: { _id: string }
+        Returns: {
+          abono_pecuniario: boolean | null
+          adiantamento_13: boolean | null
+          adiantamento_13o: boolean | null
+          aprovado_em: string | null
+          aprovado_gestor: boolean | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_por: string | null
+          aprovado_rh: boolean | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          aviso_assinatura_em: string | null
+          aviso_assinatura_hash: string | null
+          aviso_assinatura_ip: unknown
+          aviso_assinatura_por: string | null
+          aviso_assinatura_user_agent: string | null
+          aviso_gerado_em: string | null
+          aviso_pdf_url: string | null
+          cancelado: boolean | null
+          cancelado_em: string | null
+          cancelado_por: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_fim: string
+          data_inicio: string
+          data_pagamento: string | null
+          descontos_inss: number | null
+          descontos_irrf: number | null
+          dias_abono: number | null
+          dias_gozo: number
+          documento_url: string | null
+          empresa_id: string | null
+          enviado_contabilidade: boolean | null
+          enviado_contabilidade_em: string | null
+          enviado_contabilidade_por: string | null
+          ferias_coletiva_id: string | null
+          hash_integridade: string | null
+          id: string
+          justificativa: string | null
+          motivo_cancelamento: string | null
+          observacoes: string | null
+          periodo_aquisitivo_fim: string | null
+          periodo_aquisitivo_id: string
+          periodo_aquisitivo_inicio: string | null
+          salario_base: number
+          saldo_gasto: number | null
+          status: string | null
+          status_aprovacao_contabilidade: string | null
+          status_aprovacao_gestor: string | null
+          status_aprovacao_rh: string | null
+          updated_at: string
+          valor_abono: number | null
+          valor_abono_pecuniario: number | null
+          valor_adiantamento_13: number | null
+          valor_ferias: number
+          valor_liquido: number
+          valor_terco: number
+          valor_terco_abono: number | null
+          valor_total: number
+          vender_abono: boolean | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      programacao_ferias_mover: {
+        Args: { _id: string; _nova_data_inicio?: string; _novo_mes: number }
+        Returns: {
+          aviso: string
+          programacao: Database["public"]["Tables"]["ferias_programacao"]["Row"]
+        }[]
+      }
+      programacao_ferias_rejeitar: {
+        Args: { _id: string; _motivo: string }
+        Returns: {
+          ano: number
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          colaborador_id: string
+          created_at: string
+          criado_por: string | null
+          data_fim_prevista: string | null
+          data_inicio_prevista: string | null
+          dias_previstos: number
+          empresa_id: string
+          ferias_id: string | null
+          id: string
+          mes_previsto: number
+          observacoes: string | null
+          periodo_aquisitivo_id: string | null
+          rejeitado_em: string | null
+          rejeitado_motivo: string | null
+          rejeitado_por: string | null
+          status: Database["public"]["Enums"]["programacao_ferias_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias_programacao"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       purge_audit_log_old: { Args: { _dias?: number }; Returns: number }
       purge_expired_idempotency_keys: { Args: never; Returns: number }
       purge_expired_security_data: { Args: never; Returns: Json }
@@ -23782,6 +24092,14 @@ export type Database = {
         | "contrato"
         | "assinatura"
         | "esocial"
+      programacao_ferias_status:
+        | "rascunho"
+        | "sugerido_gestor"
+        | "aprovado_gestor"
+        | "aprovado_rh"
+        | "convertido"
+        | "rejeitado"
+        | "cancelado"
       regime_tributario:
         | "simples_nacional"
         | "lucro_presumido"
@@ -23981,6 +24299,15 @@ export const Constants = {
         "contrato",
         "assinatura",
         "esocial",
+      ],
+      programacao_ferias_status: [
+        "rascunho",
+        "sugerido_gestor",
+        "aprovado_gestor",
+        "aprovado_rh",
+        "convertido",
+        "rejeitado",
+        "cancelado",
       ],
       regime_tributario: [
         "simples_nacional",
