@@ -175,6 +175,8 @@ export default function App() {
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
       <Route path="/assinar-contrato/:token" element={<LazyPage Component={AssinarContratoPage} />} />
+      <Route path="/verificar-contrato" element={<LazyPage Component={VerificarContratoPage} />} />
+      <Route path="/verificar-contrato/:hash" element={<LazyPage Component={VerificarContratoPage} />} />
 
       <Route
         path="/"
