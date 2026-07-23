@@ -28,8 +28,8 @@ const STATUS_OPTIONS: Array<{ value: ProgramacaoStatus | 'all'; label: string }>
 
 export default function FeriasProgramacaoPage() {
   const { hasRole } = useAuth();
-  const isRH = hasRole('rh') || hasRole('admin');
-  const canManage = isRH || hasRole('gestor');
+  const isRH = hasRole('rh' as any) || hasRole('admin');
+  const canManage = isRH || hasRole('gestor' as any);
 
   const [ano, setAno] = useState<number>(new Date().getFullYear());
   const [status, setStatus] = useState<ProgramacaoStatus | 'all'>('all');
