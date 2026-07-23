@@ -148,4 +148,12 @@ export const contratoTemplateService = {
     const url = `${window.location.origin}/assinar-contrato/${row.token}`;
     return { token: row.token, url, expira_em: row.expira_em };
   },
+
+  async revogarToken(tokenId: string, motivo?: string): Promise<void> {
+    const { error } = await supabase.rpc('contrato_revogar_token' as never, {
+      p_token_id: tokenId,
+      p_motivo: motivo ?? null,
+    } as never);
+    if (error) throw error;
+  },
 };

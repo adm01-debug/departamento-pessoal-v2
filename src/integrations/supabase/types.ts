@@ -5460,6 +5460,9 @@ export type Database = {
           expira_em: string
           id: string
           reminders_enviados: number
+          revogacao_motivo: string | null
+          revogado_em: string | null
+          revogado_por: string | null
           tentativas: number
           token_hash: string
           ultimo_reminder_at: string | null
@@ -5478,6 +5481,9 @@ export type Database = {
           expira_em: string
           id?: string
           reminders_enviados?: number
+          revogacao_motivo?: string | null
+          revogado_em?: string | null
+          revogado_por?: string | null
           tentativas?: number
           token_hash: string
           ultimo_reminder_at?: string | null
@@ -5496,6 +5502,9 @@ export type Database = {
           expira_em?: string
           id?: string
           reminders_enviados?: number
+          revogacao_motivo?: string | null
+          revogado_em?: string | null
+          revogado_por?: string | null
           tentativas?: number
           token_hash?: string
           ultimo_reminder_at?: string | null
@@ -24797,6 +24806,10 @@ export type Database = {
       contrato_resolver_template: {
         Args: { p_admissao_id: string }
         Returns: string
+      }
+      contrato_revogar_token: {
+        Args: { p_motivo?: string; p_token_id: string }
+        Returns: undefined
       }
       contratos_alertar_vencimentos: { Args: never; Returns: number }
       contratos_enviar_lembretes_assinatura: { Args: never; Returns: number }

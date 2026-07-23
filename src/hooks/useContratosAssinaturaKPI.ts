@@ -1,6 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
+import { contratoTemplateService } from '@/services/contratoTemplateService';
+import { safeErrorMessage } from '@/utils/safeError';
 
 export interface ContratoAssinaturaKPI {
   empresa_id: string;
@@ -33,6 +36,7 @@ export interface ContratoTokenPendente {
 
 export function useContratosAssinaturaKPI() {
   const { empresaAtual } = useEmpresas();
+  const queryClient = useQueryClient();
   const empresaId = empresaAtual?.id;
 
   const kpi = useQuery({
@@ -68,5 +72,44 @@ export function useContratosAssinaturaKPI() {
     staleTime: 60_000,
   });
 
-  return { kpi, pendentes };
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['contratos-assinatura-kpi'] });
+    queryClient.invalidateQueries({ queryKey: ['contratos-tokens-pendentes'] });
+  };
+
+  const revogar = useMutation({
+    mutationFn: ({ tokenId, motivo }: { tokenId: string; motivo?: string }) =>
+      contratoTemplateService.revogarToken(tokenId, motivo),
+    onSuccess: () => {
+      toast.success('Token revogado.');
+      invalidateAll();
+    },
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao revogar token.')),
+  });
+
+  const reenviar = useMutation({
+    mutationFn: async ({ contratoId, tokenIdAntigo }: { contratoId: string; tokenIdAntigo: string }) => {
+      // revoga antigo (idempotente) e gera novo
+      try {
+        await contratoTemplateService.revogarToken(tokenIdAntigo, 'Reenvio manual');
+      } catch {
+        /* segue mesmo se falhar (pode já estar revogado) */
+      }
+      return contratoTemplateService.gerarTokenAssinatura(contratoId);
+    },
+    onSuccess: async (res) => {
+      try {
+        await navigator.clipboard.writeText(res.url);
+        toast.success('Novo link gerado e copiado', {
+          description: `Válido até ${new Date(res.expira_em).toLocaleString('pt-BR')}`,
+        });
+      } catch {
+        toast.success('Novo link gerado', { description: res.url });
+      }
+      invalidateAll();
+    },
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao reenviar link.')),
+  });
+
+  return { kpi, pendentes, revogar, reenviar };
 }
