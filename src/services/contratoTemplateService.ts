@@ -171,4 +171,22 @@ export const contratoTemplateService = {
       : (data as { id: string; expira_em: string });
     return row;
   },
+
+  async listarEventos(contratoId: string): Promise<Array<{
+    id: string;
+    evento: string;
+    detalhes: Record<string, unknown> | null;
+    ip: string | null;
+    user_agent: string | null;
+    created_at: string;
+  }>> {
+    const { data, error } = await supabase
+      .from('contrato_token_eventos' as never)
+      .select('id, evento, detalhes, ip, user_agent, created_at')
+      .eq('contrato_id', contratoId)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    return (data ?? []) as never;
+  },
 };
