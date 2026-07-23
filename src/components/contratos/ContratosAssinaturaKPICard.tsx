@@ -133,6 +133,15 @@ export function ContratosAssinaturaKPICard() {
                     </Badge>
                     <Button
                       size="sm"
+                      variant="ghost"
+                      className="h-7 gap-1 px-2 text-xs"
+                      onClick={() => setTimelineTokenId(t.id)}
+                      title="Ver trilha de auditoria"
+                    >
+                      <History className="h-3 w-3" /> Histórico
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="outline"
                       className="h-7 gap-1 px-2 text-xs"
                       disabled={reenviar.isPending}
