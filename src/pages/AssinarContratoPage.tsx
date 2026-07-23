@@ -269,6 +269,18 @@ export default function AssinarContratoPage() {
             </p>
           </div>
 
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={previewLoading}
+            onClick={handlePreview}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            {previewLoading ? 'Gerando prévia…' : 'Ler contrato completo (PDF)'}
+          </Button>
+
+
           <div>
             <Label htmlFor="nome">Nome completo</Label>
             <Input
