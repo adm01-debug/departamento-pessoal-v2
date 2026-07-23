@@ -181,7 +181,7 @@ export default function DashboardExecutivoPage() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <RechartsPie>
-                    <Pie data={data?.departamentos || []} dataKey="value" nameKey="nome" cx="50%" cy="50%" outerRadius={100} label={({ nome, value }) => `${nome} (${value})`}>
+                    <Pie data={data?.departamentos || []} dataKey="value" nameKey="nome" cx="50%" cy="50%" outerRadius={100} label={(p: any) => `${p.nome} (${p.value})`}>
                       {data?.departamentos?.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
                     <Tooltip />
