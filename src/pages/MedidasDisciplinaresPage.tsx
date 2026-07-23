@@ -17,7 +17,9 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
-import { Plus, AlertTriangle, Scale, Users } from 'lucide-react';
+import { Plus, AlertTriangle, Scale, Users, Sparkles } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 const tipoLabels: Record<string, string> = {
   advertencia_verbal: 'Advertência Verbal',
@@ -44,7 +46,8 @@ const artigosCLT = [
 ];
 
 const initialForm = {
-  colaborador_id: '', tipo: 'advertencia_verbal', data_ocorrencia: '', descricao: '',
+  colaborador_id: '', tipo: 'advertencia_verbal', data_ocorrencia: '', data_conhecimento_fato: '',
+  gravidade: '', descricao: '',
   dias_suspensao: '', artigo_clt: '', testemunha_1_nome: '', testemunha_1_cpf: '',
   testemunha_2_nome: '', testemunha_2_cpf: '', documento_url: '', recusa_assinatura: false,
   motivo_recusa: '',
@@ -70,12 +73,21 @@ export default function MedidasDisciplinaresPage() {
     enabled: !!empresaAtual?.id,
   });
 
+  const { data: sugestao } = useQuery({
+    queryKey: ['medida-sugestao', form.colaborador_id, empresaAtual?.id],
+    queryFn: () => medidasDisciplinaresService.sugerirProxima(form.colaborador_id, empresaAtual!.id),
+    enabled: !!form.colaborador_id && !!empresaAtual?.id && open,
+    staleTime: 60_000,
+  });
+
   const criar = useMutation({
     mutationFn: (d: Record<string, unknown>) => medidasDisciplinaresService.criar({
       ...d,
       empresa_id: empresaAtual?.id,
       dias_suspensao: d.dias_suspensao ? Number(d.dias_suspensao) : null,
       artigo_clt: d.artigo_clt || null,
+      gravidade: d.gravidade || null,
+      data_conhecimento_fato: d.data_conhecimento_fato || null,
       testemunha_1_nome: d.testemunha_1_nome || null,
       testemunha_1_cpf: d.testemunha_1_cpf || null,
       testemunha_2_nome: d.testemunha_2_nome || null,
@@ -91,6 +103,16 @@ export default function MedidasDisciplinaresPage() {
       toast.success('Medida registrada com sucesso!');
     },
     onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao registrar medida disciplinar.')),
+  });
+
+  const gerarPDF = useMutation({
+    mutationFn: (id: string) => medidasDisciplinaresService.gerarPDF(id),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] });
+      toast.success('Documento gerado com sucesso!');
+      if (data.signed_url) window.open(data.signed_url, '_blank', 'noopener,noreferrer');
+    },
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Falha ao gerar documento.')),
   });
 
   const marcarCiencia = useMutation({
@@ -186,6 +208,28 @@ export default function MedidasDisciplinaresPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {sugestao && form.colaborador_id && (
+                <Alert className="border-primary/40 bg-primary/5">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <AlertDescription className="text-xs">
+                    <div className="font-medium mb-1">
+                      Sugestão CLT: <Badge variant="outline" className="ml-1">{tipoLabels[sugestao.tipo_sugerido] ?? sugestao.tipo_sugerido}</Badge>
+                    </div>
+                    <div className="text-muted-foreground">{sugestao.justificativa}</div>
+                    {form.tipo !== sugestao.tipo_sugerido && (
+                      <button
+                        type="button"
+                        className="mt-2 text-primary underline text-xs"
+                        onClick={() => setForm(p => ({ ...p, tipo: sugestao.tipo_sugerido }))}
+                      >
+                        Aplicar sugestão
+                      </button>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div>
                 <Label>Tipo *</Label>
                 <Select value={form.tipo} onValueChange={v => setForm(p => ({ ...p, tipo: v }))}>
@@ -197,10 +241,33 @@ export default function MedidasDisciplinaresPage() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
-                <Label>Data Ocorrência *</Label>
-                <Input type="date" value={form.data_ocorrencia} onChange={e => setForm(p => ({ ...p, data_ocorrencia: e.target.value }))} />
+                <Label>Gravidade</Label>
+                <Select value={form.gravidade} onValueChange={v => setForm(p => ({ ...p, gravidade: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a gravidade" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="leve">Leve</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="grave">Grave</SelectItem>
+                    <SelectItem value="gravissima">Gravíssima</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Data Ocorrência *</Label>
+                  <Input type="date" value={form.data_ocorrencia} onChange={e => setForm(p => ({ ...p, data_ocorrencia: e.target.value }))} />
+                </div>
+                <div>
+                  <Label>Data Conhecimento</Label>
+                  <Input type="date" value={form.data_conhecimento_fato} onChange={e => setForm(p => ({ ...p, data_conhecimento_fato: e.target.value }))} />
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground -mt-2">
+                CLT: prescrição em 60 dias após ocorrência • imediatidade em 30 dias após conhecimento.
+              </p>
 
               {form.tipo === 'suspensao' && (
                 <div>
@@ -208,6 +275,7 @@ export default function MedidasDisciplinaresPage() {
                   <Input type="number" min={1} max={30} value={form.dias_suspensao} onChange={e => setForm(p => ({ ...p, dias_suspensao: e.target.value }))} />
                 </div>
               )}
+
 
               <div className="space-y-3 p-3 rounded-xl bg-muted/50 border border-border/30">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -281,6 +349,8 @@ export default function MedidasDisciplinaresPage() {
           data={filtered}
           onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
           onExcluir={(id) => excluir.mutate(id)}
+          onGerarPDF={(id) => gerarPDF.mutate(id)}
+          gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
         />
       )}
     </PageLayout>
