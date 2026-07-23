@@ -37,6 +37,12 @@ function isSafeColumnsExpr(c: unknown): c is string {
   if (DANGEROUS_TOKENS.test(c)) return false;
   return COLUMNS_RE.test(c);
 }
+function isSafeOrderColumn(c: unknown): c is string {
+  if (typeof c !== "string") return false;
+  if (c.length === 0 || c.length > 120) return false;
+  if (DANGEROUS_TOKENS.test(c)) return false;
+  return /^[a-zA-Z_][a-zA-Z0-9_.]*$/.test(c);
+}
 
 // -------------------- Denylist de tabelas --------------------
 // Estas tabelas nunca podem ser acessadas via bridge (nem leitura). Contêm
@@ -598,7 +604,11 @@ Deno.serve(async (req) => {
         else if (f.op === "not") query = query.not(f.column, f.extraOp!, f.value);
         else if (f.op === "contains") query = query.contains(f.column, f.value);
       }
+      if (body.order && !isSafeOrderColumn(body.order.column)) {
+        return jsonError(400, "INVALID_ORDER_COLUMN", "ORDER BY column contains invalid characters");
+      }
       if (body.order) query = query.order(body.order.column, { ascending: body.order.ascending !== false });
+      if (body.single) query = query.single();
 
       const { data: selectData, error, count } = await query;
       const durationMs = Math.round(performance.now() - t0);
