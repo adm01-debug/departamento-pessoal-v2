@@ -21,26 +21,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: 1.3.14
+          node-version: '22'
       - name: Install
-        run: bun install
+        run: npm install --no-audit --no-fund
       - name: Type Check
-        run: bun run typecheck
+        run: npm run typecheck
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: 1.3.14
+          node-version: '22'
       - name: Install
-        run: bun install
+        run: npm install --no-audit --no-fund
       - name: Lint
-        run: bun run lint:ci
+        run: npm run lint:ci
 
   test:
     name: Unit Tests
@@ -50,10 +50,10 @@ jobs:
       VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || '' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: 1.3.14
+          node-version: '22'
       - name: Install
-        run: bun install
+        run: npm install --no-audit --no-fund
       - name: Unit Tests
-        run: bun run test:coverage
+        run: npm run test:coverage
