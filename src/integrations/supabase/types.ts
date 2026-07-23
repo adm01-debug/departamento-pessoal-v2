@@ -13252,6 +13252,7 @@ export type Database = {
           data_aprovacao: string | null
           data_ciencia: string | null
           data_conhecimento_fato: string | null
+          data_inicio_efeito: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
@@ -13311,6 +13312,7 @@ export type Database = {
           data_aprovacao?: string | null
           data_ciencia?: string | null
           data_conhecimento_fato?: string | null
+          data_inicio_efeito?: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao?: number | null
@@ -13370,6 +13372,7 @@ export type Database = {
           data_aprovacao?: string | null
           data_ciencia?: string | null
           data_conhecimento_fato?: string | null
+          data_inicio_efeito?: string | null
           data_ocorrencia?: string
           descricao?: string
           dias_suspensao?: number | null
@@ -13562,6 +13565,97 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medidas_disciplinares_contestacao_anexos_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medidas_disciplinares_integracao: {
+        Row: {
+          colaborador_id: string
+          competencia: string | null
+          created_at: string
+          detalhes: Json | null
+          dias: number | null
+          empresa_id: string
+          id: string
+          medida_id: string
+          ref_id: string | null
+          status: string
+          tipo_integracao: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          colaborador_id: string
+          competencia?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          dias?: number | null
+          empresa_id: string
+          id?: string
+          medida_id: string
+          ref_id?: string | null
+          status?: string
+          tipo_integracao: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          dias?: number | null
+          empresa_id?: string
+          id?: string
+          medida_id?: string
+          ref_id?: string | null
+          status?: string
+          tipo_integracao?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_medida_id_fkey"
             columns: ["medida_id"]
             isOneToOne: false
             referencedRelation: "medidas_disciplinares"
@@ -24005,6 +24099,10 @@ export type Database = {
         Args: { target_id: string }
         Returns: undefined
       }
+      aplicar_medida_folha_ponto: {
+        Args: { p_medida_id: string }
+        Returns: Json
+      }
       aprovar_despesa: {
         Args: { _despesa_id: string; _observacoes?: string }
         Returns: {
@@ -24120,6 +24218,14 @@ export type Database = {
           uf: string
         }[]
       }
+      consumir_pendencias_medida_no_holerite: {
+        Args: {
+          p_colaborador_id: string
+          p_competencia: string
+          p_holerite_id: string
+        }
+        Returns: number
+      }
       criar_batida_da_divergencia_afdt: {
         Args: { _divergencia_id: string; _tipo?: string }
         Returns: string
@@ -24166,6 +24272,10 @@ export type Database = {
           conflitos: number
           ultimo_em: string
         }[]
+      }
+      garantir_rubrica_suspensao: {
+        Args: { p_empresa_id: string }
+        Returns: string
       }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
       gerar_canonical_espelho_ponto: {
@@ -24346,6 +24456,7 @@ export type Database = {
           data_aprovacao: string | null
           data_ciencia: string | null
           data_conhecimento_fato: string | null
+          data_inicio_efeito: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
@@ -24419,6 +24530,7 @@ export type Database = {
           data_aprovacao: string | null
           data_ciencia: string | null
           data_conhecimento_fato: string | null
+          data_inicio_efeito: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
