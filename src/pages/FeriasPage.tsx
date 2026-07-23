@@ -362,6 +362,10 @@ export default function FeriasPage() {
           </div>
         </TabsContent>
 
+        <TabsContent value="coletivas">
+          <FeriasColetivasTab />
+        </TabsContent>
+
       </Tabs>
     </PageLayout>
 
