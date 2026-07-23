@@ -118,6 +118,7 @@ const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PremiacoesPage = lazy(() => import('@/pages/PremiacoesPage'));
 const ContratoTemplatesPage = lazy(() => import('@/pages/ContratoTemplatesPage'));
+const ContratosGeradosPage = lazy(() => import('@/pages/ContratosGeradosPage'));
 
 function PageLoader() {
   return (
@@ -409,6 +410,7 @@ export default function App() {
 
         <Route path="premiacoes" element={<LazyPage Component={PremiacoesPage} />} />
         <Route path="configuracoes/contratos-templates" element={<AdminRoute><LazyPage Component={ContratoTemplatesPage} /></AdminRoute>} />
+        <Route path="contratos-gerados" element={<AdminRoute><LazyPage Component={ContratosGeradosPage} /></AdminRoute>} />
         <Route path="*" element={<LazyPage Component={NotFoundPage} />} />
       </Route>
 
