@@ -97,8 +97,10 @@ export default function ContratosGeradosPage() {
 
   const filtrados = useMemo(() => {
     const term = busca.trim().toLowerCase();
+    const cutoff = periodo === 'todos' ? null : Date.now() - Number(periodo) * 86400_000;
     return contratos.filter((c) => {
       if (status !== 'todos' && c.status !== status) return false;
+      if (cutoff && new Date(c.created_at).getTime() < cutoff) return false;
       if (term) {
         const col = c.colaborador_id ? colaboradores[c.colaborador_id] : undefined;
         const alvo = `${col?.nome_completo ?? ''} ${col?.cpf ?? ''} ${c.sha256 ?? ''}`.toLowerCase();
@@ -106,7 +108,7 @@ export default function ContratosGeradosPage() {
       }
       return true;
     });
-  }, [contratos, status, busca, colaboradores]);
+  }, [contratos, status, busca, colaboradores, periodo]);
 
   const kpis = useMemo(() => {
     const total = contratos.length;
