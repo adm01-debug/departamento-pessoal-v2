@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban,
+  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban, CalendarPlus,
 } from 'lucide-react';
 import { useContratosAssinaturaKPI } from '@/hooks/useContratosAssinaturaKPI';
 
