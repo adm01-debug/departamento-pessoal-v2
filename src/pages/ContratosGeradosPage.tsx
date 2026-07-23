@@ -129,6 +129,47 @@ export default function ContratosGeradosPage() {
     }
   };
 
+  const exportarCsv = () => {
+    if (!filtrados.length) {
+      toast.error('Nenhum contrato para exportar');
+      return;
+    }
+    const headers = [
+      'Colaborador',
+      'CPF',
+      'Status',
+      'Gerado em',
+      'Assinado em',
+      'Hash SHA-256',
+      'Link Público',
+    ];
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+    const linhas = filtrados.map((c) => {
+      const col = c.colaborador_id ? colaboradores[c.colaborador_id] : undefined;
+      const linkPublico = c.sha256 && c.status === 'assinado'
+        ? `${window.location.origin}/verificar-contrato/${c.sha256}`
+        : '';
+      return [
+        col?.nome_completo ?? '',
+        col?.cpf ?? '',
+        STATUS_META[c.status].label,
+        format(new Date(c.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }),
+        c.assinado_em ? format(new Date(c.assinado_em), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : '',
+        c.sha256 ?? '',
+        linkPublico,
+      ].map(escape).join(';');
+    });
+    const csv = '\uFEFF' + [headers.map(escape).join(';'), ...linhas].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `contratos-${format(new Date(), 'yyyy-MM-dd-HHmm')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${filtrados.length} contrato(s) exportado(s)`);
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -140,9 +181,14 @@ export default function ContratosGeradosPage() {
             Auditoria e acompanhamento de contratos emitidos, assinados e verificáveis publicamente.
           </p>
         </div>
-        <Button variant="outline" onClick={() => void carregar()} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Atualizar
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportarCsv} disabled={loading || !filtrados.length}>
+            <FileSpreadsheet className="h-4 w-4 mr-2" /> Exportar CSV
+          </Button>
+          <Button variant="outline" onClick={() => void carregar()} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Atualizar
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
