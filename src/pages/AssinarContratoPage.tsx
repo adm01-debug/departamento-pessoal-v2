@@ -280,6 +280,27 @@ export default function AssinarContratoPage() {
                 </div>
               </div>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={async () => {
+                try {
+                  const { gerarReciboAssinaturaPDF } = await import('@/lib/reciboAssinaturaPdf');
+                  await gerarReciboAssinaturaPDF({
+                    hash: assinado.hash,
+                    assinadoEm: assinado.em,
+                    origin: window.location.origin,
+                  });
+                  toast.success('Recibo baixado');
+                } catch (e) {
+                  console.error('[recibo-pdf]', e);
+                  toast.error('Falha ao gerar recibo');
+                }
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" /> Baixar recibo de assinatura (PDF)
+            </Button>
             <p className="text-xs text-muted-foreground">
               Guarde este comprovante. Uma cópia foi arquivada na empresa contratante e pode ser
               auditada externamente a qualquer momento pelo link acima.
