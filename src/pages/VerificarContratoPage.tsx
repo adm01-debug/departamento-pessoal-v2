@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle2, XCircle, ShieldCheck, Search, Loader2, FileSignature } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface VerificacaoResult {
   valido: boolean;
@@ -156,6 +157,19 @@ export default function VerificarContratoPage() {
                       <p className="font-mono text-[10px] break-all">{result.assinatura_hash}</p>
                     </div>
                   )}
+                  <div className="pt-3 border-t flex flex-col items-center gap-2">
+                    <div className="bg-white p-2 rounded-md border">
+                      <QRCodeSVG
+                        value={`${window.location.origin}/verificar-contrato/${result.assinatura_hash ?? result.documento_hash ?? hash}`}
+                        size={112}
+                        level="M"
+                        marginSize={0}
+                      />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground text-center">
+                      QR Code compartilhável · reimpressão de comprovante
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <p className="mt-2">{result.motivo ?? 'Hash não corresponde a nenhum contrato assinado.'}</p>
