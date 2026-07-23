@@ -410,6 +410,7 @@ export default function App() {
 
         <Route path="premiacoes" element={<LazyPage Component={PremiacoesPage} />} />
         <Route path="configuracoes/contratos-templates" element={<AdminRoute><LazyPage Component={ContratoTemplatesPage} /></AdminRoute>} />
+        <Route path="contratos-gerados" element={<AdminRoute><LazyPage Component={ContratosGeradosPage} /></AdminRoute>} />
         <Route path="*" element={<LazyPage Component={NotFoundPage} />} />
       </Route>
 
