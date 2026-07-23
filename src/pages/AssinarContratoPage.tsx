@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle2, ShieldCheck, FileSignature, AlertTriangle, Ban, Clock, RotateCcw } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, FileSignature, AlertTriangle, Ban, Clock, RotateCcw, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ContratoInfo {
@@ -43,7 +43,28 @@ export default function AssinarContratoPage() {
   const [nome, setNome] = useState('');
   const [aceite, setAceite] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [assinado, setAssinado] = useState<{ hash: string; em: string } | null>(null);
+
+  async function handlePreview() {
+    if (!token) return;
+    setPreviewLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('contrato_preview_url_por_token' as never, {
+        p_token: token,
+      } as never);
+      if (error) throw error;
+      const res = data as unknown as { signed_url: string };
+      if (!res?.signed_url) throw new Error('URL não disponível.');
+      window.open(res.signed_url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Falha ao gerar prévia.';
+      toast.error(msg);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
 
   useEffect(() => {
     let cancel = false;
@@ -268,6 +289,18 @@ export default function AssinarContratoPage() {
               {new Date(info.expira_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
             </p>
           </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={previewLoading}
+            onClick={handlePreview}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            {previewLoading ? 'Gerando prévia…' : 'Ler contrato completo (PDF)'}
+          </Button>
+
 
           <div>
             <Label htmlFor="nome">Nome completo</Label>

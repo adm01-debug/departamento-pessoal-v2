@@ -24937,6 +24937,10 @@ export type Database = {
         Args: { p_admissao_id: string }
         Returns: Json
       }
+      contrato_preview_url_por_token: {
+        Args: { p_token: string }
+        Returns: Json
+      }
       contrato_resolver_template: {
         Args: { p_admissao_id: string }
         Returns: string
