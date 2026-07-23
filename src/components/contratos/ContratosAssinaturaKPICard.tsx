@@ -18,6 +18,8 @@ function fmtHoras(h: number | null): string {
 
 export function ContratosAssinaturaKPICard() {
   const { kpi, pendentes, revogar, reenviar, estender } = useContratosAssinaturaKPI();
+  const [timelineTokenId, setTimelineTokenId] = useState<string | null>(null);
+
 
   if (kpi.isLoading) {
     return (
