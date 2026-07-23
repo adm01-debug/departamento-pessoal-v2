@@ -347,7 +347,7 @@ export default function ContratosGeradosPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtrados.map((c) => {
+                  {paginados.map((c) => {
                     const col = c.colaborador_id ? colaboradores[c.colaborador_id] : undefined;
                     return (
                       <TableRow key={c.id}>
