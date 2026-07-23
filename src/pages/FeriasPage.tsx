@@ -233,7 +233,10 @@ export default function FeriasPage() {
         </TabsList>
 
         <TabsContent value="dashboard" className="space-y-6">
-          <FeriasAlertasPagamentoCard />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <FeriasAlertasPagamentoCard />
+            <FeriasReconciliacaoCard />
+          </div>
           <FeriasDashboard data={ferias} />
         </TabsContent>
 
