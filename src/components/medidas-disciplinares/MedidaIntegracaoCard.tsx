@@ -43,7 +43,6 @@ export function MedidaIntegracaoCard({ medidaId, tipo, statusWorkflow }: Props) 
     onSuccess: (res) => {
       toast.success('Integração aplicada com Folha/Ponto');
       qc.invalidateQueries({ queryKey: ['medida-integracao', medidaId] });
-      // eslint-disable-next-line no-console
       console.info('[medida-integracao]', res);
     },
     onError: (e: any) => toast.error(e?.message ?? 'Falha ao integrar'),
