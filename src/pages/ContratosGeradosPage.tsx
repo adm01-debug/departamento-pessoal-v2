@@ -149,6 +149,15 @@ export default function ContratosGeradosPage() {
     });
   }, [contratos, status, busca, colaboradores, periodo]);
 
+  const [pagina, setPagina] = useState(1);
+  const PAGE_SIZE = 25;
+  useEffect(() => setPagina(1), [status, busca, periodo]);
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / PAGE_SIZE));
+  const paginados = useMemo(
+    () => filtrados.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE),
+    [filtrados, pagina],
+  );
+
   const kpis = useMemo(() => {
     const total = contratos.length;
     const assinados = contratos.filter((c) => c.status === 'assinado').length;
@@ -338,7 +347,7 @@ export default function ContratosGeradosPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtrados.map((c) => {
+                  {paginados.map((c) => {
                     const col = c.colaborador_id ? colaboradores[c.colaborador_id] : undefined;
                     return (
                       <TableRow key={c.id}>
@@ -425,6 +434,35 @@ export default function ContratosGeradosPage() {
                   })}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          {!loading && filtrados.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between mt-4 text-xs">
+              <span className="text-muted-foreground">
+                Mostrando {(pagina - 1) * PAGE_SIZE + 1}–
+                {Math.min(pagina * PAGE_SIZE, filtrados.length)} de {filtrados.length}
+              </span>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={pagina === 1}
+                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                >
+                  Anterior
+                </Button>
+                <span className="px-3 py-1 rounded-md border bg-muted/30">
+                  {pagina} / {totalPaginas}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={pagina >= totalPaginas}
+                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                >
+                  Próxima
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
