@@ -9924,6 +9924,36 @@ export type Database = {
           },
         ]
       }
+      ferias_reconciliacao_logs: {
+        Row: {
+          corrigidas: number
+          detalhes: Json
+          duracao_ms: number
+          executado_em: string
+          id: string
+          restantes: number
+          verificadas: number
+        }
+        Insert: {
+          corrigidas?: number
+          detalhes?: Json
+          duracao_ms?: number
+          executado_em?: string
+          id?: string
+          restantes?: number
+          verificadas?: number
+        }
+        Update: {
+          corrigidas?: number
+          detalhes?: Json
+          duracao_ms?: number
+          executado_em?: string
+          id?: string
+          restantes?: number
+          verificadas?: number
+        }
+        Relationships: []
+      }
       ferias_solicitacoes: {
         Row: {
           abono_pecuniario: boolean | null
@@ -24308,6 +24338,24 @@ export type Database = {
           sem_colaborador: number
           total: number
         }[]
+      }
+      reconciliar_ferias_folha_batch: {
+        Args: never
+        Returns: {
+          corrigidas: number
+          detalhes: Json
+          duracao_ms: number
+          executado_em: string
+          id: string
+          restantes: number
+          verificadas: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias_reconciliacao_logs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       record_failed_login: {
         Args: { p_identifier: string; p_identifier_type?: string }
