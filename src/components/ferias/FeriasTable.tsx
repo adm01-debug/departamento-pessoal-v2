@@ -1,8 +1,21 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, User, History } from 'lucide-react';
-import { format } from 'date-fns';
+import { DollarSign, User, History, AlertTriangle } from 'lucide-react';
+import { format, differenceInCalendarDays } from 'date-fns';
+
+type SeveridadePgto = { label: string; className: string } | null;
+function calcularSeveridadePagamento(s: Record<string, any>): SeveridadePgto {
+  if (s?.cancelado || s?.pagamento_confirmado) return null;
+  const inicio = s?.data_inicio ? new Date(s.data_inicio) : null;
+  if (!inicio || Number.isNaN(inicio.getTime())) return null;
+  const dias = differenceInCalendarDays(inicio, new Date());
+  if (dias < 0) return null;
+  if (dias <= 2) return { label: `Pgto D-${dias} (crítico)`, className: 'bg-destructive text-destructive-foreground border-destructive' };
+  if (dias <= 5) return { label: `Pgto D-${dias}`, className: 'bg-orange-500/15 text-orange-600 border-orange-500/40 dark:text-orange-400' };
+  if (dias <= 10) return { label: `Pgto D-${dias}`, className: 'bg-yellow-500/15 text-yellow-700 border-yellow-500/40 dark:text-yellow-400' };
+  return null;
+}
 import { motion } from 'framer-motion';
 import { FeriasWorkflowStepper } from './FeriasWorkflowStepper';
 import { FeriasActions } from './FeriasActions';
