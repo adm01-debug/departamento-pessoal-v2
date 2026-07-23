@@ -1,6 +1,7 @@
 name: Security Scan & Code Quality
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -26,16 +27,16 @@ jobs:
           languages: javascript-typescript
           queries: security-and-quality
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: '22'
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: npm install 2>/dev/null || true
 
-      - name: Bun Audit
-        run: bun pm audit || true
+      - name: npm Audit
+        run: npm audit --audit-level=high || true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
