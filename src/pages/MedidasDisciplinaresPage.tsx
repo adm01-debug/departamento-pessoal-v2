@@ -17,7 +17,9 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
-import { Plus, AlertTriangle, Scale, Users } from 'lucide-react';
+import { Plus, AlertTriangle, Scale, Users, Sparkles, FileDown, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 const tipoLabels: Record<string, string> = {
   advertencia_verbal: 'Advertência Verbal',
