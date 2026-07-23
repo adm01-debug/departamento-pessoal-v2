@@ -5446,6 +5446,79 @@ export type Database = {
           },
         ]
       }
+      contrato_assinatura_tokens: {
+        Row: {
+          assinado_ip: unknown
+          assinado_ua: string | null
+          assinatura_hash: string | null
+          contrato_id: string
+          cpf_esperado: string | null
+          created_at: string
+          created_by: string | null
+          email_destinatario: string | null
+          empresa_id: string
+          expira_em: string
+          id: string
+          tentativas: number
+          token_hash: string
+          usado_em: string | null
+        }
+        Insert: {
+          assinado_ip?: unknown
+          assinado_ua?: string | null
+          assinatura_hash?: string | null
+          contrato_id: string
+          cpf_esperado?: string | null
+          created_at?: string
+          created_by?: string | null
+          email_destinatario?: string | null
+          empresa_id: string
+          expira_em: string
+          id?: string
+          tentativas?: number
+          token_hash: string
+          usado_em?: string | null
+        }
+        Update: {
+          assinado_ip?: unknown
+          assinado_ua?: string | null
+          assinatura_hash?: string | null
+          contrato_id?: string
+          cpf_esperado?: string | null
+          created_at?: string
+          created_by?: string | null
+          email_destinatario?: string | null
+          empresa_id?: string
+          expira_em?: string
+          id?: string
+          tentativas?: number
+          token_hash?: string
+          usado_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contrato_assinatura_tokens_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_gerados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_assinatura_tokens_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_vencendo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_assinatura_tokens_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contrato_templates: {
         Row: {
           ativo: boolean
@@ -5635,14 +5708,19 @@ export type Database = {
       contratos_gerados: {
         Row: {
           admissao_id: string | null
+          alerta_vencimento_enviado_em: string | null
           assinado_em: string | null
           assinatura_metadata: Json | null
           colaborador_id: string | null
+          contrato_anterior_id: string | null
           created_at: string
+          data_fim: string | null
+          data_inicio: string | null
           empresa_id: string
           gerado_por: string | null
           html_final: string | null
           id: string
+          prorrogado: boolean
           sha256: string | null
           status: string
           storage_path: string | null
@@ -5653,14 +5731,19 @@ export type Database = {
         }
         Insert: {
           admissao_id?: string | null
+          alerta_vencimento_enviado_em?: string | null
           assinado_em?: string | null
           assinatura_metadata?: Json | null
           colaborador_id?: string | null
+          contrato_anterior_id?: string | null
           created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
           empresa_id: string
           gerado_por?: string | null
           html_final?: string | null
           id?: string
+          prorrogado?: boolean
           sha256?: string | null
           status?: string
           storage_path?: string | null
@@ -5671,14 +5754,19 @@ export type Database = {
         }
         Update: {
           admissao_id?: string | null
+          alerta_vencimento_enviado_em?: string | null
           assinado_em?: string | null
           assinatura_metadata?: Json | null
           colaborador_id?: string | null
+          contrato_anterior_id?: string | null
           created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
           empresa_id?: string
           gerado_por?: string | null
           html_final?: string | null
           id?: string
+          prorrogado?: boolean
           sha256?: string | null
           status?: string
           storage_path?: string | null
@@ -5722,6 +5810,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_passivo_trabalhista_consolidado"
             referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_contrato_anterior_id_fkey"
+            columns: ["contrato_anterior_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_gerados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_contrato_anterior_id_fkey"
+            columns: ["contrato_anterior_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_vencendo"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "contratos_gerados_empresa_id_fkey"
@@ -22835,6 +22937,66 @@ export type Database = {
         }
         Relationships: []
       }
+      v_contratos_vencendo: {
+        Row: {
+          admissao_id: string | null
+          colaborador_id: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          dias_para_vencer: number | null
+          empresa_id: string | null
+          id: string | null
+          prorrogado: boolean | null
+          severidade: string | null
+          status: string | null
+          template_nome: string | null
+          tipo_contrato: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_gerados_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_ferias_adiant13_elegibilidade: {
         Row: {
           ano_exercicio: number | null
@@ -24508,6 +24670,29 @@ export type Database = {
         }
         Returns: number
       }
+      contrato_assinar_por_token: {
+        Args: {
+          p_cpf: string
+          p_ip?: unknown
+          p_nome_completo: string
+          p_token: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
+      contrato_consultar_por_token: { Args: { p_token: string }; Returns: Json }
+      contrato_gerar_token_assinatura: {
+        Args: {
+          p_contrato_id: string
+          p_cpf?: string
+          p_email?: string
+          p_validade_dias?: number
+        }
+        Returns: {
+          expira_em: string
+          token: string
+        }[]
+      }
       contrato_montar_variaveis: {
         Args: { p_admissao_id: string }
         Returns: Json
@@ -24516,6 +24701,7 @@ export type Database = {
         Args: { p_admissao_id: string }
         Returns: string
       }
+      contratos_alertar_vencimentos: { Args: never; Returns: number }
       criar_batida_da_divergencia_afdt: {
         Args: { _divergencia_id: string; _tipo?: string }
         Returns: string
