@@ -6,4 +6,5 @@ export { MedidasKanban } from './MedidasKanban';
 export { MedidaWorkflowTimeline } from './MedidaWorkflowTimeline';
 export { MedidaContestacaoDialog } from './MedidaContestacaoDialog';
 export { MedidaIntegracaoCard } from './MedidaIntegracaoCard';
+export { MedidaEsocialCard } from './MedidaEsocialCard';
 export { MedidasAnalytics } from './MedidasAnalytics';
