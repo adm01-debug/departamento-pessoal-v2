@@ -8598,6 +8598,13 @@ export type Database = {
             foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
             columns: ["origem_ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_folha_reconciliacao"
+            referencedColumns: ["ferias_id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
@@ -9492,6 +9499,13 @@ export type Database = {
             foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_folha_reconciliacao"
+            referencedColumns: ["ferias_id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
@@ -9551,6 +9565,13 @@ export type Database = {
             foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_folha_reconciliacao"
+            referencedColumns: ["ferias_id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
@@ -9605,6 +9626,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_arquivos_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_folha_reconciliacao"
+            referencedColumns: ["ferias_id"]
           },
           {
             foreignKeyName: "ferias_arquivos_ferias_id_fkey"
@@ -9872,6 +9900,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_folha_reconciliacao"
+            referencedColumns: ["ferias_id"]
           },
           {
             foreignKeyName: "ferias_programacao_ferias_id_fkey"
@@ -11247,6 +11282,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_ferias_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_folha_reconciliacao"
+            referencedColumns: ["ferias_id"]
           },
           {
             foreignKeyName: "historico_ferias_ferias_id_fkey"
@@ -22379,6 +22421,94 @@ export type Database = {
           severidade: string | null
         }
         Relationships: []
+      }
+      v_ferias_folha_reconciliacao: {
+        Row: {
+          colaborador_id: string | null
+          colaborador_nome: string | null
+          competencia: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          empresa_id: string | null
+          enviado_contabilidade: boolean | null
+          ferias_id: string | null
+          rubricas_esperadas: number | null
+          rubricas_geradas: number | null
+          situacao: string | null
+          status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "ferias_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       v_idempotency_metrics: {
         Row: {
