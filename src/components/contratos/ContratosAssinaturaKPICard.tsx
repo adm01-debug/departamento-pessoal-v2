@@ -139,6 +139,24 @@ export function ContratosAssinaturaKPICard() {
                     </Button>
                     <Button
                       size="sm"
+                      variant="outline"
+                      className="h-7 gap-1 px-2 text-xs"
+                      disabled={estender.isPending}
+                      onClick={() => {
+                        const raw = window.prompt('Estender prazo em quantos dias? (1 a 30)', '7');
+                        if (raw === null) return;
+                        const dias = Number.parseInt(raw, 10);
+                        if (!Number.isFinite(dias) || dias < 1 || dias > 30) {
+                          return;
+                        }
+                        estender.mutate({ tokenId: t.id, dias });
+                      }}
+                      title="Estende a validade do link atual"
+                    >
+                      <CalendarPlus className="h-3 w-3" /> Estender
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="ghost"
                       className="h-7 gap-1 px-2 text-xs text-destructive hover:text-destructive"
                       disabled={revogar.isPending}
