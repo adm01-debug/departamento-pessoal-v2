@@ -13224,6 +13224,68 @@ export type Database = {
           },
         ]
       }
+      medidas_ciencia_tokens: {
+        Row: {
+          acao: string | null
+          assinatura_hash: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          expires_at: string
+          geolocation: Json | null
+          id: string
+          ip_address: string | null
+          medida_id: string
+          motivo_recusa: string | null
+          token: string
+          used_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          acao?: string | null
+          assinatura_hash?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          expires_at?: string
+          geolocation?: Json | null
+          id?: string
+          ip_address?: string | null
+          medida_id: string
+          motivo_recusa?: string | null
+          token: string
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          acao?: string | null
+          assinatura_hash?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          expires_at?: string
+          geolocation?: Json | null
+          id?: string
+          ip_address?: string | null
+          medida_id?: string
+          motivo_recusa?: string | null
+          token?: string
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_ciencia_tokens_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medidas_disciplinares: {
         Row: {
           aplicado_por: string | null
@@ -24431,6 +24493,7 @@ export type Database = {
         Args: { _medida_id: string; _observacao?: string }
         Returns: Json
       }
+      medida_consultar_por_token: { Args: { p_token: string }; Returns: Json }
       medida_contestar: {
         Args: { _medida_id: string; _texto: string }
         Returns: {
@@ -24501,6 +24564,21 @@ export type Database = {
         }
       }
       medida_enviar_aprovacao: { Args: { _medida_id: string }; Returns: Json }
+      medida_gerar_link_ciencia: {
+        Args: { p_medida_id: string }
+        Returns: Json
+      }
+      medida_registrar_ciencia_publica: {
+        Args: {
+          p_acao: string
+          p_geo?: Json
+          p_ip?: string
+          p_motivo_recusa?: string
+          p_token: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
       medida_rejeitar: {
         Args: { _medida_id: string; _motivo: string }
         Returns: Json
