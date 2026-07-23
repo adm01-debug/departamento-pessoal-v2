@@ -7,10 +7,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { useMemo } from 'react';
 import { useReconciliacaoLogs } from '@/hooks/ferias/useReconciliacaoLogs';
 
 export function FeriasReconciliacaoHistoricoCard() {
-  const { data, isLoading } = useReconciliacaoLogs(5);
+  const { data, isLoading } = useReconciliacaoLogs(10);
+
+  const resumo = useMemo(() => {
+    if (!data || data.length === 0) return null;
+    const total = data.length;
+    const consistentes = data.filter((l) => l.restantes === 0).length;
+    const corrigidas = data.reduce((s, l) => s + (l.corrigidas ?? 0), 0);
+    const duracaoMedia = Math.round(
+      data.reduce((s, l) => s + (l.duracao_ms ?? 0), 0) / total,
+    );
+    const sla = Math.round((consistentes / total) * 100);
+    return { total, consistentes, corrigidas, duracaoMedia, sla };
+  }, [data]);
 
   return (
     <Card>
