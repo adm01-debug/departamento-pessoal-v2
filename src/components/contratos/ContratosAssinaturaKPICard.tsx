@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban, CalendarPlus,
+  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban, CalendarPlus, History,
 } from 'lucide-react';
 import { useContratosAssinaturaKPI } from '@/hooks/useContratosAssinaturaKPI';
+import { ContratoTokenTimelineDialog } from './ContratoTokenTimelineDialog';
 
 function fmtHoras(h: number | null): string {
   if (h == null) return '—';
@@ -16,6 +18,8 @@ function fmtHoras(h: number | null): string {
 
 export function ContratosAssinaturaKPICard() {
   const { kpi, pendentes, revogar, reenviar, estender } = useContratosAssinaturaKPI();
+  const [timelineTokenId, setTimelineTokenId] = useState<string | null>(null);
+
 
   if (kpi.isLoading) {
     return (
@@ -129,6 +133,15 @@ export function ContratosAssinaturaKPICard() {
                     </Badge>
                     <Button
                       size="sm"
+                      variant="ghost"
+                      className="h-7 gap-1 px-2 text-xs"
+                      onClick={() => setTimelineTokenId(t.id)}
+                      title="Ver trilha de auditoria"
+                    >
+                      <History className="h-3 w-3" /> Histórico
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="outline"
                       className="h-7 gap-1 px-2 text-xs"
                       disabled={reenviar.isPending}
@@ -175,6 +188,12 @@ export function ContratosAssinaturaKPICard() {
           </div>
         )}
       </CardContent>
+      <ContratoTokenTimelineDialog
+        tokenId={timelineTokenId}
+        open={!!timelineTokenId}
+        onOpenChange={(o) => !o && setTimelineTokenId(null)}
+      />
     </Card>
   );
 }
+
