@@ -63,6 +63,18 @@ export default function MedidasDisciplinaresPage() {
   const [form, setForm] = useState(initialForm);
   const [search, setSearch] = useState('');
   const [tipoFilter, setTipoFilter] = useState('');
+  const [contestMedida, setContestMedida] = useState<any | null>(null);
+  const { user } = useAuth();
+
+  const { data: userRoles = [] } = useQuery({
+    queryKey: ['user-roles-current', user?.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any).from('user_roles').select('role').eq('user_id', user!.id);
+      return (data ?? []).map((r: any) => r.role as string);
+    },
+    enabled: !!user?.id,
+  });
+  const isRHOrAdmin = userRoles.some((r) => r === 'admin' || r === 'rh');
 
   const { data: medidas = [], isLoading } = useQuery({
     queryKey: ['medidas-disciplinares', empresaAtual?.id],
