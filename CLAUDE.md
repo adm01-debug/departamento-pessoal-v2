@@ -4,6 +4,13 @@
 > Última atualização: 23/07/2026
 > Mantenedor: Hermes Agent (AtomicaBR Ops/Dev)
 
+> ⚠️ **Correções de auditoria (23/07/2026)** — revisão do batch anterior:
+> - `typescript` **re-pinado 7.0.2 → 6.0.3**. TS 7 quebrava o `typescript-eslint` (peer `>=4.8.4 <6.1.0`) → `lint:ci` abortava (CI vermelho). **NÃO re-bumpar `typescript` para ≥6.1.0** até o typescript-eslint suportar. O `tsgo` (typecheck) vem do pacote separado `@typescript/native-preview`, não afetado.
+> - Bucket de storage **`ferias-avisos` criado** (migração `20260723113000`). O batch da feature de assinatura criou as policies RLS mas nunca o bucket → upload do PDF falhava em runtime ("Bucket not found").
+> - Corrigidos 3 erros de tipo de mock em `loggerService.test.ts` (vitest 4).
+> - ⚠️ **`tsconfig.app.json` é ÓRFÃO** — nada no CI/build o roda. O typecheck real do CI é `tsgo --noEmit` → `tsconfig.json` (raiz), que já dá 0 erros. Ligar `strict` só no app config teve efeito prático ZERO no CI.
+> - Regressão pendente: **Vite 8 ignora `esbuild.drop`** → ~20 `console.*` vazam no bundle de prod (exige terser ou oxc-minify).
+
 ## 📋 Sumário
 1. [Stack & Arquitetura](#-stack--arquitetura)
 2. [Histórico de Sessões](#-histórico-de-sessões)
@@ -21,7 +28,7 @@
 | Camada | Tecnologia | Versão |
 |--------|-----------|--------|
 | **Runtime** | Node.js (Docker) | 22 LTS |
-| **Linguagem** | TypeScript (strict) | 7.0.2 |
+| **Linguagem** | TypeScript (strict) | 6.0.3 |
 | **Framework** | React | 19.2.8 |
 | **Build** | Vite | 8.1.4 |
 | **Bundler** | Bun | 1.3.14 |
@@ -201,7 +208,7 @@ O `oven-sh/setup-bun@v2` action não funciona em repositórios privados do GitHu
 O projeto usa `bun.lock` como lockfile, não `package-lock.json`. `npm ci` requer lockfile. `npm install` funciona sem.
 
 ### Por que strict:false foi alterado para true?
-O projeto já compilava sem erros com strict mode. A configuração `strict:false` era desnecessária e permitia `any` implícitos. A ativação foi validada com `tsc -p tsconfig.app.json` (675 arquivos, 0 erros).
+`strict` foi ligado em `tsconfig.app.json` — porém esse config é ÓRFÃO (nada no CI/build o invoca), então o efeito prático foi ZERO. O typecheck real do CI é `tsgo --noEmit` sobre `tsconfig.json` (raiz). Sob `tsconfig.app.json` o `tsc` acusa erros de dead-code (`noUnusedLocals`); a afirmação anterior de "675 arquivos, 0 erros" NÃO se sustentava. Verificar sempre o config que o CI de fato roda antes de declarar verde.
 
 ### Bridge external-db-bridge
 Gateway hardening com JWT validation, CSRF fail-closed, rate limiting, tenant isolation, denylist de tabelas, allowlist de RPCs, regex de SQL injection, validação de ORDER BY, e telemetria com batch. Código em `supabase/functions/external-db-bridge/index.ts` (729 linhas).
