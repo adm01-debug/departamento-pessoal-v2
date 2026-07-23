@@ -9588,6 +9588,13 @@ export type Database = {
       ferias_coletivas: {
         Row: {
           aprovado_por: string | null
+          comunicado_gerado_em: string | null
+          comunicado_gerado_por: string | null
+          comunicado_mte_hash: string | null
+          comunicado_mte_path: string | null
+          comunicado_sindicato_hash: string | null
+          comunicado_sindicato_nome: string | null
+          comunicado_sindicato_path: string | null
           created_at: string
           created_by: string | null
           data_fim: string
@@ -9602,6 +9609,13 @@ export type Database = {
         }
         Insert: {
           aprovado_por?: string | null
+          comunicado_gerado_em?: string | null
+          comunicado_gerado_por?: string | null
+          comunicado_mte_hash?: string | null
+          comunicado_mte_path?: string | null
+          comunicado_sindicato_hash?: string | null
+          comunicado_sindicato_nome?: string | null
+          comunicado_sindicato_path?: string | null
           created_at?: string
           created_by?: string | null
           data_fim: string
@@ -9616,6 +9630,13 @@ export type Database = {
         }
         Update: {
           aprovado_por?: string | null
+          comunicado_gerado_em?: string | null
+          comunicado_gerado_por?: string | null
+          comunicado_mte_hash?: string | null
+          comunicado_mte_path?: string | null
+          comunicado_sindicato_hash?: string | null
+          comunicado_sindicato_nome?: string | null
+          comunicado_sindicato_path?: string | null
           created_at?: string
           created_by?: string | null
           data_fim?: string
@@ -23904,6 +23925,43 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "batidas_ponto"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      registrar_comunicado_ferias_coletivas: {
+        Args: {
+          _coletiva_id: string
+          _mte_hash: string
+          _mte_path: string
+          _sindicato_hash: string
+          _sindicato_nome: string
+          _sindicato_path: string
+        }
+        Returns: {
+          aprovado_por: string | null
+          comunicado_gerado_em: string | null
+          comunicado_gerado_por: string | null
+          comunicado_mte_hash: string | null
+          comunicado_mte_path: string | null
+          comunicado_sindicato_hash: string | null
+          comunicado_sindicato_nome: string | null
+          comunicado_sindicato_path: string | null
+          created_at: string
+          created_by: string | null
+          data_fim: string
+          data_inicio: string
+          departamentos: string[] | null
+          dias: number
+          empresa_id: string
+          id: string
+          justificativa: string | null
+          status: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias_coletivas"
           isOneToOne: true
           isSetofReturn: false
         }
