@@ -204,6 +204,7 @@ export function MedidaContestacaoDialog({ medida, open, onOpenChange, isRHOrAdmi
 
         <Separator />
         <MedidaWorkflowTimeline medidaId={medida.id} />
+        <MedidaIntegracaoCard medidaId={medida.id} tipo={medida.tipo} statusWorkflow={medida.status_workflow} />
 
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Fechar</Button>
