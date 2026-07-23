@@ -42,9 +42,11 @@ interface MedidasTableProps {
   data: any[];
   onMarcarCiencia: (id: string) => void;
   onExcluir: (id: string) => void;
+  onGerarPDF?: (id: string) => void;
+  gerandoPDFId?: string | null;
 }
 
-export function MedidasTable({ data, onMarcarCiencia, onExcluir }: MedidasTableProps) {
+export function MedidasTable({ data, onMarcarCiencia, onExcluir, onGerarPDF, gerandoPDFId }: MedidasTableProps) {
   const formatDate = (d: string) => {
     try { return format(parseISO(d), 'dd/MM/yyyy', { locale: ptBR }); } catch { return d; }
   };
