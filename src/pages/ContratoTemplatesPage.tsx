@@ -11,6 +11,7 @@ import { FileText, Plus, Copy, Trash2, Eye, Pencil } from 'lucide-react';
 import { useContratoTemplates } from '@/hooks/useContratoTemplates';
 import { TIPO_CONTRATO_LABELS, type ContratoTemplate, type TipoContrato } from '@/services/contratoTemplateService';
 import { sanitizeContractHtml } from '@/utils/sanitizeHtml';
+import { ContratosVencendoPanel } from '@/components/contratos/ContratosVencendoPanel';
 
 const PLACEHOLDERS = [
   { key: 'empresa.razao_social', label: 'Razão social' },
@@ -69,6 +70,8 @@ export default function ContratoTemplatesPage() {
         </div>
         <Button onClick={onNew}><Plus className="h-4 w-4 mr-2" /> Novo modelo</Button>
       </div>
+
+      <ContratosVencendoPanel />
 
       <Card>
         <CardHeader><CardTitle>Biblioteca ({templates.length})</CardTitle></CardHeader>
