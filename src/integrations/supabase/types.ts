@@ -24787,6 +24787,13 @@ export type Database = {
         Returns: Json
       }
       contrato_consultar_por_token: { Args: { p_token: string }; Returns: Json }
+      contrato_estender_expiracao: {
+        Args: { p_dias?: number; p_token_id: string }
+        Returns: {
+          expira_em: string
+          id: string
+        }[]
+      }
       contrato_gerar_token_assinatura: {
         Args: {
           p_contrato_id: string

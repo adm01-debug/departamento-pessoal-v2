@@ -111,5 +111,17 @@ export function useContratosAssinaturaKPI() {
     onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao reenviar link.')),
   });
 
-  return { kpi, pendentes, revogar, reenviar };
+  const estender = useMutation({
+    mutationFn: ({ tokenId, dias }: { tokenId: string; dias: number }) =>
+      contratoTemplateService.estenderExpiracaoToken(tokenId, dias),
+    onSuccess: (res) => {
+      toast.success('Prazo estendido', {
+        description: `Nova expiração: ${new Date(res.expira_em).toLocaleString('pt-BR')}`,
+      });
+      invalidateAll();
+    },
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao estender prazo.')),
+  });
+
+  return { kpi, pendentes, revogar, reenviar, estender };
 }

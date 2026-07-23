@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban,
+  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban, CalendarPlus,
 } from 'lucide-react';
 import { useContratosAssinaturaKPI } from '@/hooks/useContratosAssinaturaKPI';
 
@@ -15,7 +15,7 @@ function fmtHoras(h: number | null): string {
 }
 
 export function ContratosAssinaturaKPICard() {
-  const { kpi, pendentes, revogar, reenviar } = useContratosAssinaturaKPI();
+  const { kpi, pendentes, revogar, reenviar, estender } = useContratosAssinaturaKPI();
 
   if (kpi.isLoading) {
     return (
@@ -136,6 +136,24 @@ export function ContratosAssinaturaKPICard() {
                       title="Revoga o link atual e gera um novo"
                     >
                       <RefreshCw className="h-3 w-3" /> Reenviar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 gap-1 px-2 text-xs"
+                      disabled={estender.isPending}
+                      onClick={() => {
+                        const raw = window.prompt('Estender prazo em quantos dias? (1 a 30)', '7');
+                        if (raw === null) return;
+                        const dias = Number.parseInt(raw, 10);
+                        if (!Number.isFinite(dias) || dias < 1 || dias > 30) {
+                          return;
+                        }
+                        estender.mutate({ tokenId: t.id, dias });
+                      }}
+                      title="Estende a validade do link atual"
+                    >
+                      <CalendarPlus className="h-3 w-3" /> Estender
                     </Button>
                     <Button
                       size="sm"
