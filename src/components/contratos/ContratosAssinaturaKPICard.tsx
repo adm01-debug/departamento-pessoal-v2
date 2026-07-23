@@ -121,11 +121,36 @@ export function ContratosAssinaturaKPICard() {
                       )}
                     </div>
                   </div>
-                  <Badge
-                    variant={t.dias_para_expirar <= 1 ? 'destructive' : t.dias_para_expirar <= 3 ? 'secondary' : 'outline'}
-                  >
-                    {t.dias_para_expirar <= 1 ? 'Urgente' : t.dias_para_expirar <= 3 ? 'Crítico' : 'Ativo'}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={t.dias_para_expirar <= 1 ? 'destructive' : t.dias_para_expirar <= 3 ? 'secondary' : 'outline'}
+                    >
+                      {t.dias_para_expirar <= 1 ? 'Urgente' : t.dias_para_expirar <= 3 ? 'Crítico' : 'Ativo'}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 gap-1 px-2 text-xs"
+                      disabled={reenviar.isPending}
+                      onClick={() => reenviar.mutate({ contratoId: t.contrato_id, tokenIdAntigo: t.id })}
+                      title="Revoga o link atual e gera um novo"
+                    >
+                      <RefreshCw className="h-3 w-3" /> Reenviar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 gap-1 px-2 text-xs text-destructive hover:text-destructive"
+                      disabled={revogar.isPending}
+                      onClick={() => {
+                        const motivo = window.prompt('Motivo da revogação (opcional):') ?? undefined;
+                        if (motivo === null) return;
+                        revogar.mutate({ tokenId: t.id, motivo });
+                      }}
+                    >
+                      <Ban className="h-3 w-3" /> Revogar
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>
