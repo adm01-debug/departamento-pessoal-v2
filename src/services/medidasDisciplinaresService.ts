@@ -53,4 +53,35 @@ export const medidasDisciplinaresService = {
       .eq('empresa_id', empresaId);
     if (error) throw error;
   },
+
+  async sugerirProxima(colaboradorId: string, empresaId: string): Promise<{
+    tipo_sugerido: string;
+    justificativa: string;
+    historico_12m: Record<string, number>;
+  } | null> {
+    if (!colaboradorId || !empresaId) return null;
+    const { data, error } = await (supabase as any).rpc('sugerir_proxima_medida', {
+      p_colaborador_id: colaboradorId,
+      p_empresa_id: empresaId,
+    });
+    if (error) throw error;
+    return Array.isArray(data) && data[0] ? data[0] : null;
+  },
+
+  async gerarPDF(medidaId: string): Promise<{ path: string; hash: string; signed_url: string }> {
+    const { data, error } = await supabase.functions.invoke('gerar-medida-disciplinar-pdf', {
+      body: { medida_id: medidaId },
+    });
+    if (error) throw error;
+    if (!data?.success) throw new Error(data?.error ?? 'Falha ao gerar documento');
+    return { path: data.path, hash: data.hash, signed_url: data.signed_url };
+  },
+
+  async obterSignedUrl(path: string, expiresIn = 3600): Promise<string> {
+    const { data, error } = await supabase.storage
+      .from('medidas-disciplinares')
+      .createSignedUrl(path, expiresIn);
+    if (error) throw error;
+    return data.signedUrl;
+  },
 };
