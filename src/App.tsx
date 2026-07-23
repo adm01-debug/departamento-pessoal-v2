@@ -402,6 +402,7 @@ export default function App() {
         <Route path="relatorios" element={<LazyPage Component={RelatoriosPage} />} />
 
         <Route path="premiacoes" element={<LazyPage Component={PremiacoesPage} />} />
+        <Route path="configuracoes/contratos-templates" element={<AdminRoute><LazyPage Component={ContratoTemplatesPage} /></AdminRoute>} />
         <Route path="*" element={<LazyPage Component={NotFoundPage} />} />
       </Route>
 
