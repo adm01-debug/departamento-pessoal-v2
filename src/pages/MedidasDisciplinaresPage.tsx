@@ -349,6 +349,8 @@ export default function MedidasDisciplinaresPage() {
           data={filtered}
           onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
           onExcluir={(id) => excluir.mutate(id)}
+          onGerarPDF={(id) => gerarPDF.mutate(id)}
+          gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
         />
       )}
     </PageLayout>
