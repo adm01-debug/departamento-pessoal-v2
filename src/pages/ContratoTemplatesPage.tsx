@@ -73,6 +73,7 @@ export default function ContratoTemplatesPage() {
       </div>
 
       <ContratosVencendoPanel />
+      <ContratosAssinaturaKPICard />
 
       <Card>
         <CardHeader><CardTitle>Biblioteca ({templates.length})</CardTitle></CardHeader>
