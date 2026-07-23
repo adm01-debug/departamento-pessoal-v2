@@ -130,6 +130,18 @@ export default function ContratosGeradosPage() {
     }
   };
 
+  const reenviarLink = async (contratoId: string) => {
+    try {
+      const { url } = await contratoTemplateService.gerarTokenAssinatura(contratoId, { validadeDias: 7 });
+      await navigator.clipboard.writeText(url);
+      toast.success('Novo link gerado e copiado (válido por 7 dias)');
+      void carregar();
+    } catch (e) {
+      console.error('[reenviar-link]', e);
+      toast.error('Falha ao gerar link de assinatura');
+    }
+  };
+
   const exportarCsv = () => {
     if (!filtrados.length) {
       toast.error('Nenhum contrato para exportar');
