@@ -41,33 +41,55 @@ export function FeriasReconciliacaoHistoricoCard() {
             Aguardando a primeira execução do cron diário (03:15 BRT).
           </p>
         ) : (
-          <ul className="divide-y">
-            {data.map((log) => {
-              const ok = log.restantes === 0;
-              const Icon = ok ? CheckCircle2 : AlertTriangle;
-              return (
-                <li key={log.id} className="py-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Icon
-                        className={`w-4 h-4 ${ok ? 'text-emerald-500' : 'text-amber-500'}`}
-                        aria-hidden
-                      />
-                      <Badge variant={ok ? 'secondary' : 'destructive'}>
-                        {ok ? 'Consistente' : `${log.restantes} pendente(s)`}
-                      </Badge>
-                      <span className="text-sm font-medium">
-                        {new Date(log.executado_em).toLocaleString('pt-BR')}
-                      </span>
+          <>
+            <ul className="divide-y">
+              {data.slice(0, 5).map((log) => {
+                const ok = log.restantes === 0;
+                const Icon = ok ? CheckCircle2 : AlertTriangle;
+                return (
+                  <li key={log.id} className="py-3 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Icon
+                          className={`w-4 h-4 ${ok ? 'text-emerald-500' : 'text-amber-500'}`}
+                          aria-hidden
+                        />
+                        <Badge variant={ok ? 'secondary' : 'destructive'}>
+                          {ok ? 'Consistente' : `${log.restantes} pendente(s)`}
+                        </Badge>
+                        <span className="text-sm font-medium">
+                          {new Date(log.executado_em).toLocaleString('pt-BR')}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Verificadas {log.verificadas} · Corrigidas {log.corrigidas} · Duração {log.duracao_ms} ms
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Verificadas {log.verificadas} · Corrigidas {log.corrigidas} · Duração {log.duracao_ms} ms
-                    </p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+            {resumo && (
+              <div className="mt-3 pt-3 border-t grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div>
+                  <p className="text-muted-foreground">SLA (últ. {resumo.total})</p>
+                  <p className="font-semibold text-sm">{resumo.sla}%</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Consistentes</p>
+                  <p className="font-semibold text-sm">{resumo.consistentes}/{resumo.total}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Auto-corrigidas</p>
+                  <p className="font-semibold text-sm">{resumo.corrigidas}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Duração média</p>
+                  <p className="font-semibold text-sm">{resumo.duracaoMedia} ms</p>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
