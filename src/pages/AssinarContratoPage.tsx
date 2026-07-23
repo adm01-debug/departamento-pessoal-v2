@@ -50,6 +50,7 @@ export default function AssinarContratoPage() {
     (async () => {
       if (!token || token.length < 16) {
         setErro('Token de assinatura inválido.');
+        setErroTipo('invalido');
         setLoading(false);
         return;
       }
@@ -62,10 +63,17 @@ export default function AssinarContratoPage() {
         setInfo(data as unknown as ContratoInfo);
       } catch (e) {
         const msg = e instanceof Error ? e.message : 'Não foi possível carregar o contrato.';
+        const low = msg.toLowerCase();
+        if (low.includes('revog')) setErroTipo('revogado');
+        else if (low.includes('expir') || low.includes('venc')) setErroTipo('expirado');
+        else if (low.includes('usad') || low.includes('assinad') || low.includes('já')) setErroTipo('usado');
+        else if (low.includes('inválid') || low.includes('não encontr')) setErroTipo('invalido');
+        else setErroTipo('generico');
         setErro(msg);
       } finally {
         if (!cancel) setLoading(false);
       }
+
     })();
     return () => {
       cancel = true;
