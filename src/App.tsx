@@ -118,6 +118,7 @@ const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PremiacoesPage = lazy(() => import('@/pages/PremiacoesPage'));
 const ContratoTemplatesPage = lazy(() => import('@/pages/ContratoTemplatesPage'));
+const ContratosGeradosPage = lazy(() => import('@/pages/ContratosGeradosPage'));
 
 function PageLoader() {
   return (
