@@ -5610,6 +5610,81 @@ export type Database = {
           },
         ]
       }
+      contrato_token_eventos: {
+        Row: {
+          ator_id: string | null
+          contrato_id: string
+          created_at: string
+          detalhes: Json
+          empresa_id: string
+          evento: string
+          id: string
+          ip: unknown
+          token_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          ator_id?: string | null
+          contrato_id: string
+          created_at?: string
+          detalhes?: Json
+          empresa_id: string
+          evento: string
+          id?: string
+          ip?: unknown
+          token_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          ator_id?: string | null
+          contrato_id?: string
+          created_at?: string
+          detalhes?: Json
+          empresa_id?: string
+          evento?: string
+          id?: string
+          ip?: unknown
+          token_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contrato_token_eventos_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_gerados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_vencendo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "contrato_assinatura_tokens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_tokens_pendentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contratos: {
         Row: {
           colaborador_id: string | null
@@ -22952,6 +23027,58 @@ export type Database = {
         }
         Relationships: []
       }
+      v_contrato_token_timeline: {
+        Row: {
+          ator_id: string | null
+          ator_nome: string | null
+          contrato_id: string | null
+          created_at: string | null
+          detalhes: Json | null
+          empresa_id: string | null
+          evento: string | null
+          id: string | null
+          ip: unknown
+          token_id: string | null
+          user_agent: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contrato_token_eventos_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_gerados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_vencendo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "contrato_assinatura_tokens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_token_eventos_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_tokens_pendentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_contratos_assinatura_kpi: {
         Row: {
           empresa_id: string | null
@@ -24817,6 +24944,16 @@ export type Database = {
       contrato_revogar_token: {
         Args: { p_motivo?: string; p_token_id: string }
         Returns: undefined
+      }
+      contrato_token_evento_registrar: {
+        Args: {
+          p_detalhes?: Json
+          p_evento: string
+          p_ip?: unknown
+          p_token_id: string
+          p_ua?: string
+        }
+        Returns: string
       }
       contratos_alertar_vencimentos: { Args: never; Returns: number }
       contratos_enviar_lembretes_assinatura: { Args: never; Returns: number }
