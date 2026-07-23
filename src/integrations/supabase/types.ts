@@ -5459,8 +5459,10 @@ export type Database = {
           empresa_id: string
           expira_em: string
           id: string
+          reminders_enviados: number
           tentativas: number
           token_hash: string
+          ultimo_reminder_at: string | null
           usado_em: string | null
         }
         Insert: {
@@ -5475,8 +5477,10 @@ export type Database = {
           empresa_id: string
           expira_em: string
           id?: string
+          reminders_enviados?: number
           tentativas?: number
           token_hash: string
+          ultimo_reminder_at?: string | null
           usado_em?: string | null
         }
         Update: {
@@ -5491,8 +5495,10 @@ export type Database = {
           empresa_id?: string
           expira_em?: string
           id?: string
+          reminders_enviados?: number
           tentativas?: number
           token_hash?: string
+          ultimo_reminder_at?: string | null
           usado_em?: string | null
         }
         Relationships: [
@@ -22937,6 +22943,97 @@ export type Database = {
         }
         Relationships: []
       }
+      v_contratos_assinatura_kpi: {
+        Row: {
+          empresa_id: string | null
+          taxa_conversao_pct: number | null
+          tempo_medio_assinatura_h: number | null
+          tokens_assinados: number | null
+          tokens_expirados: number | null
+          tokens_gerados: number | null
+          tokens_pendentes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contrato_assinatura_tokens_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_contratos_tokens_pendentes: {
+        Row: {
+          colaborador_id: string | null
+          colaborador_nome: string | null
+          contrato_id: string | null
+          contrato_status: string | null
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          dias_desde_geracao: number | null
+          dias_para_expirar: number | null
+          email_destinatario: string | null
+          empresa_id: string | null
+          expira_em: string | null
+          id: string | null
+          reminders_enviados: number | null
+          tipo_contrato: string | null
+          ultimo_reminder_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contrato_assinatura_tokens_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_gerados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_assinatura_tokens_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "v_contratos_vencendo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_assinatura_tokens_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+        ]
+      }
       v_contratos_vencendo: {
         Row: {
           admissao_id: string | null
@@ -24702,6 +24799,7 @@ export type Database = {
         Returns: string
       }
       contratos_alertar_vencimentos: { Args: never; Returns: number }
+      contratos_enviar_lembretes_assinatura: { Args: never; Returns: number }
       criar_batida_da_divergencia_afdt: {
         Args: { _divergencia_id: string; _tipo?: string }
         Returns: string
