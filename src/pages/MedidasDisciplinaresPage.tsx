@@ -343,17 +343,28 @@ export default function MedidasDisciplinaresPage() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <TableSkeleton rows={6} columns={9} />
-      ) : (
-        <MedidasTable
-          data={filtered}
-          onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
-          onExcluir={(id) => excluir.mutate(id)}
-          onGerarPDF={(id) => gerarPDF.mutate(id)}
-          gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
-        />
-      )}
+      <Tabs defaultValue="lista" className="mt-4">
+        <TabsList>
+          <TabsTrigger value="lista">Lista</TabsTrigger>
+          <TabsTrigger value="kanban">Workflow (Kanban)</TabsTrigger>
+        </TabsList>
+        <TabsContent value="lista" className="mt-4">
+          {isLoading ? (
+            <TableSkeleton rows={6} columns={9} />
+          ) : (
+            <MedidasTable
+              data={filtered}
+              onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
+              onExcluir={(id) => excluir.mutate(id)}
+              onGerarPDF={(id) => gerarPDF.mutate(id)}
+              gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
+            />
+          )}
+        </TabsContent>
+        <TabsContent value="kanban" className="mt-4">
+          <MedidasKanban />
+        </TabsContent>
+      </Tabs>
     </PageLayout>
     </>
   );
