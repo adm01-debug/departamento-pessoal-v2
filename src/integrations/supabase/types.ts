@@ -24652,6 +24652,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      medida_verificar_ciencia_hash: { Args: { p_hash: string }; Returns: Json }
       medidas_analytics_reincidencia: {
         Args: {
           p_data_fim: string
