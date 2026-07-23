@@ -436,6 +436,35 @@ export default function ContratosGeradosPage() {
               </Table>
             </div>
           )}
+          {!loading && filtrados.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between mt-4 text-xs">
+              <span className="text-muted-foreground">
+                Mostrando {(pagina - 1) * PAGE_SIZE + 1}–
+                {Math.min(pagina * PAGE_SIZE, filtrados.length)} de {filtrados.length}
+              </span>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={pagina === 1}
+                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                >
+                  Anterior
+                </Button>
+                <span className="px-3 py-1 rounded-md border bg-muted/30">
+                  {pagina} / {totalPaginas}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={pagina >= totalPaginas}
+                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                >
+                  Próxima
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
