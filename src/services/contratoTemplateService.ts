@@ -156,4 +156,19 @@ export const contratoTemplateService = {
     } as never);
     if (error) throw error;
   },
+
+  async estenderExpiracaoToken(
+    tokenId: string,
+    dias = 7
+  ): Promise<{ id: string; expira_em: string }> {
+    const { data, error } = await supabase.rpc('contrato_estender_expiracao' as never, {
+      p_token_id: tokenId,
+      p_dias: dias,
+    } as never);
+    if (error) throw error;
+    const row = Array.isArray(data)
+      ? (data[0] as { id: string; expira_em: string })
+      : (data as { id: string; expira_em: string });
+    return row;
+  },
 };
