@@ -24933,6 +24933,13 @@ export type Database = {
           token: string
         }[]
       }
+      contrato_lembretes_pendentes: {
+        Args: never
+        Returns: {
+          notificados: number
+          processados: number
+        }[]
+      }
       contrato_montar_variaveis: {
         Args: { p_admissao_id: string }
         Returns: Json
