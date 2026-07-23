@@ -46,7 +46,8 @@ const artigosCLT = [
 ];
 
 const initialForm = {
-  colaborador_id: '', tipo: 'advertencia_verbal', data_ocorrencia: '', descricao: '',
+  colaborador_id: '', tipo: 'advertencia_verbal', data_ocorrencia: '', data_conhecimento_fato: '',
+  gravidade: '', descricao: '',
   dias_suspensao: '', artigo_clt: '', testemunha_1_nome: '', testemunha_1_cpf: '',
   testemunha_2_nome: '', testemunha_2_cpf: '', documento_url: '', recusa_assinatura: false,
   motivo_recusa: '',
