@@ -4,7 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale, MedidasKanban } from '@/components/medidas-disciplinares';
+import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale, MedidasKanban, MedidaContestacaoDialog } from '@/components/medidas-disciplinares';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -61,6 +63,18 @@ export default function MedidasDisciplinaresPage() {
   const [form, setForm] = useState(initialForm);
   const [search, setSearch] = useState('');
   const [tipoFilter, setTipoFilter] = useState('');
+  const [contestMedida, setContestMedida] = useState<any | null>(null);
+  const { user } = useAuth();
+
+  const { data: userRoles = [] } = useQuery({
+    queryKey: ['user-roles-current', user?.id],
+    queryFn: async () => {
+      const { data } = await (supabase as any).from('user_roles').select('role').eq('user_id', user!.id);
+      return (data ?? []).map((r: any) => r.role as string);
+    },
+    enabled: !!user?.id,
+  });
+  const isRHOrAdmin = (userRoles as string[]).some((r: string) => r === 'admin' || r === 'rh');
 
   const { data: medidas = [], isLoading } = useQuery({
     queryKey: ['medidas-disciplinares', empresaAtual?.id],
@@ -357,6 +371,7 @@ export default function MedidasDisciplinaresPage() {
               onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
               onExcluir={(id) => excluir.mutate(id)}
               onGerarPDF={(id) => gerarPDF.mutate(id)}
+              onAbrirContestacao={(m) => setContestMedida(m)}
               gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
             />
           )}
@@ -365,6 +380,18 @@ export default function MedidasDisciplinaresPage() {
           <MedidasKanban />
         </TabsContent>
       </Tabs>
+
+      <MedidaContestacaoDialog
+        medida={contestMedida}
+        open={!!contestMedida}
+        onOpenChange={(v) => !v && setContestMedida(null)}
+        isRHOrAdmin={isRHOrAdmin}
+        colaboradorUserId={
+          contestMedida
+            ? ((colaboradores as any[]).find((c: any) => c.id === contestMedida.colaborador_id)?.user_id ?? null)
+            : null
+        }
+      />
     </PageLayout>
     </>
   );
