@@ -66,6 +66,7 @@ export default function MedidasDisciplinaresPage() {
   const [tipoFilter, setTipoFilter] = useState('');
   const [contestMedida, setContestMedida] = useState<any | null>(null);
   const { user } = useAuth();
+  useMedidasDisciplinaresRealtime(empresaAtual?.id);
 
   const { data: userRoles = [] } = useQuery({
     queryKey: ['user-roles-current', user?.id],
