@@ -8584,6 +8584,13 @@ export type Database = {
             foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
             columns: ["origem_ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_alerta_pagamento_d2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
@@ -9171,6 +9178,10 @@ export type Database = {
           justificativa: string | null
           motivo_cancelamento: string | null
           observacoes: string | null
+          pagamento_comprovante_path: string | null
+          pagamento_confirmado_em: string | null
+          pagamento_confirmado_por: string | null
+          pagamento_valor: number | null
           periodo_aquisitivo_fim: string | null
           periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio: string | null
@@ -9234,6 +9245,10 @@ export type Database = {
           justificativa?: string | null
           motivo_cancelamento?: string | null
           observacoes?: string | null
+          pagamento_comprovante_path?: string | null
+          pagamento_confirmado_em?: string | null
+          pagamento_confirmado_por?: string | null
+          pagamento_valor?: number | null
           periodo_aquisitivo_fim?: string | null
           periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio?: string | null
@@ -9297,6 +9312,10 @@ export type Database = {
           justificativa?: string | null
           motivo_cancelamento?: string | null
           observacoes?: string | null
+          pagamento_comprovante_path?: string | null
+          pagamento_confirmado_em?: string | null
+          pagamento_confirmado_por?: string | null
+          pagamento_valor?: number | null
           periodo_aquisitivo_fim?: string | null
           periodo_aquisitivo_id?: string
           periodo_aquisitivo_inicio?: string | null
@@ -9443,6 +9462,13 @@ export type Database = {
             foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_alerta_pagamento_d2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
@@ -9488,6 +9514,13 @@ export type Database = {
             foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_alerta_pagamento_d2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
             referencedRelation: "vw_ferias_resumo"
             referencedColumns: ["id"]
           },
@@ -9527,6 +9560,13 @@ export type Database = {
             columns: ["ferias_id"]
             isOneToOne: false
             referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_arquivos_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
           },
           {
@@ -9780,6 +9820,13 @@ export type Database = {
             columns: ["ferias_id"]
             isOneToOne: false
             referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
           },
           {
@@ -11141,6 +11188,13 @@ export type Database = {
             columns: ["ferias_id"]
             isOneToOne: false
             referencedRelation: "ferias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_ferias_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
           },
           {
@@ -22047,6 +22101,113 @@ export type Database = {
         }
         Relationships: []
       }
+      v_ferias_alerta_pagamento_d2: {
+        Row: {
+          colaborador_id: string | null
+          data_inicio: string | null
+          data_pagamento: string | null
+          dias_ate_inicio: number | null
+          empresa_id: string | null
+          id: string | null
+          pagamento_confirmado_em: string | null
+          severidade: string | null
+          status: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          data_inicio?: string | null
+          data_pagamento?: string | null
+          dias_ate_inicio?: never
+          empresa_id?: string | null
+          id?: string | null
+          pagamento_confirmado_em?: string | null
+          severidade?: never
+          status?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          data_inicio?: string | null
+          data_pagamento?: string | null
+          dias_ate_inicio?: never
+          empresa_id?: string | null
+          id?: string | null
+          pagamento_confirmado_em?: string | null
+          severidade?: never
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "ferias_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_ferias_alertas_criticos: {
         Row: {
           aquisitivo_fim: string | null
@@ -23775,6 +23936,10 @@ export type Database = {
           justificativa: string | null
           motivo_cancelamento: string | null
           observacoes: string | null
+          pagamento_comprovante_path: string | null
+          pagamento_confirmado_em: string | null
+          pagamento_confirmado_por: string | null
+          pagamento_valor: number | null
           periodo_aquisitivo_fim: string | null
           periodo_aquisitivo_id: string
           periodo_aquisitivo_inicio: string | null
@@ -23962,6 +24127,86 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "ferias_coletivas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      registrar_pagamento_ferias: {
+        Args: {
+          p_comprovante_path?: string
+          p_ferias_id: string
+          p_valor: number
+        }
+        Returns: {
+          abono_pecuniario: boolean | null
+          adiantamento_13: boolean | null
+          adiantamento_13o: boolean | null
+          aprovado_em: string | null
+          aprovado_gestor: boolean | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_por: string | null
+          aprovado_rh: boolean | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          aviso_assinatura_em: string | null
+          aviso_assinatura_hash: string | null
+          aviso_assinatura_ip: unknown
+          aviso_assinatura_por: string | null
+          aviso_assinatura_user_agent: string | null
+          aviso_gerado_em: string | null
+          aviso_pdf_url: string | null
+          cancelado: boolean | null
+          cancelado_em: string | null
+          cancelado_por: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          data_fim: string
+          data_inicio: string
+          data_pagamento: string | null
+          descontos_inss: number | null
+          descontos_irrf: number | null
+          dias_abono: number | null
+          dias_gozo: number
+          documento_url: string | null
+          empresa_id: string | null
+          enviado_contabilidade: boolean | null
+          enviado_contabilidade_em: string | null
+          enviado_contabilidade_por: string | null
+          ferias_coletiva_id: string | null
+          hash_integridade: string | null
+          id: string
+          justificativa: string | null
+          motivo_cancelamento: string | null
+          observacoes: string | null
+          pagamento_comprovante_path: string | null
+          pagamento_confirmado_em: string | null
+          pagamento_confirmado_por: string | null
+          pagamento_valor: number | null
+          periodo_aquisitivo_fim: string | null
+          periodo_aquisitivo_id: string
+          periodo_aquisitivo_inicio: string | null
+          salario_base: number
+          saldo_gasto: number | null
+          status: string | null
+          status_aprovacao_contabilidade: string | null
+          status_aprovacao_gestor: string | null
+          status_aprovacao_rh: string | null
+          updated_at: string
+          valor_abono: number | null
+          valor_abono_pecuniario: number | null
+          valor_adiantamento_13: number | null
+          valor_ferias: number
+          valor_liquido: number
+          valor_terco: number
+          valor_terco_abono: number | null
+          valor_total: number
+          vender_abono: boolean | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ferias"
           isOneToOne: true
           isSetofReturn: false
         }
