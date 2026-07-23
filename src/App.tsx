@@ -113,6 +113,7 @@ const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
 const CanalContabilidadePage = lazy(() => import('@/pages/CanalContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
 const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
+const CienciaMedidaPage = lazy(() => import('@/pages/CienciaMedidaPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PremiacoesPage = lazy(() => import('@/pages/PremiacoesPage'));
 
@@ -171,6 +172,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
+      <Route path="/ciencia-medida/:token" element={<LazyPage Component={CienciaMedidaPage} />} />
       <Route
         path="/"
         element={
