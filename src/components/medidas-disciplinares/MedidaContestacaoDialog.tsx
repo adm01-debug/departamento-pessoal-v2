@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { MedidaWorkflowTimeline } from './MedidaWorkflowTimeline';
 import { MedidaIntegracaoCard } from './MedidaIntegracaoCard';
+import { MedidaEsocialCard } from './MedidaEsocialCard';
 import { AlertTriangle, Clock, Paperclip, Upload, Download, FileText, Check, X } from 'lucide-react';
 import { format, parseISO, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
