@@ -177,37 +177,4 @@ export const medidasDisciplinaresService = {
     if (error) throw error;
     return data.signedUrl;
   },
-
-  // ===== Integração Folha/Ponto =====
-  async aplicarIntegracao(medidaId: string) {
-    const { data, error } = await (supabase as any).rpc('aplicar_medida_folha_ponto', { p_medida_id: medidaId });
-    if (error) throw error;
-    return data;
-  },
-  async listarIntegracao(medidaId: string) {
-    const { data, error } = await (supabase as any)
-      .from('medidas_disciplinares_integracao')
-      .select('*').eq('medida_id', medidaId).order('created_at', { ascending: false });
-    if (error) throw error;
-    return data ?? [];
-  },
-
-  // ===== Integração eSocial (S-2299 / S-2206) =====
-  async enfileirarEsocial(medidaId: string) {
-    const { data, error } = await (supabase as any).rpc('enfileirar_esocial_medida_disciplinar', { p_medida_id: medidaId });
-    if (error) throw error;
-    return data;
-  },
-  async listarEventosEsocial(medidaId: string, empresaId: string) {
-    if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    const { data, error } = await (supabase as any)
-      .from('esocial_eventos')
-      .select('id, tipo_evento, status, competencia, protocolo, recibo, data_envio, created_at, dados')
-      .eq('empresa_id', empresaId)
-      .in('tipo_evento', ['S-2299', 'S-2206'])
-      .filter('dados->>medida_id', 'eq', medidaId)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data ?? [];
-  },
 };

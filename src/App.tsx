@@ -113,10 +113,9 @@ const ContabilidadePage = lazy(() => import('@/pages/ContabilidadePage'));
 const CanalContabilidadePage = lazy(() => import('@/pages/CanalContabilidadePage'));
 const SegurancaPage = lazy(() => import('@/pages/SegurancaPage'));
 const PontoKioskPage = lazy(() => import('@/pages/PontoKioskPage'));
-const CienciaMedidaPage = lazy(() => import('@/pages/CienciaMedidaPage'));
-const VerificarCienciaPage = lazy(() => import('@/pages/VerificarCienciaPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const PremiacoesPage = lazy(() => import('@/pages/PremiacoesPage'));
+const ContratoTemplatesPage = lazy(() => import('@/pages/ContratoTemplatesPage'));
 
 function PageLoader() {
   return (
@@ -173,8 +172,6 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/ponto/kiosk" element={<LazyPage Component={PontoKioskPage} />} />
-      <Route path="/ciencia-medida/:token" element={<LazyPage Component={CienciaMedidaPage} />} />
-      <Route path="/verificar-ciencia/:hash" element={<LazyPage Component={VerificarCienciaPage} />} />
       <Route
         path="/"
         element={
@@ -405,6 +402,7 @@ export default function App() {
         <Route path="relatorios" element={<LazyPage Component={RelatoriosPage} />} />
 
         <Route path="premiacoes" element={<LazyPage Component={PremiacoesPage} />} />
+        <Route path="configuracoes/contratos-templates" element={<AdminRoute><LazyPage Component={ContratoTemplatesPage} /></AdminRoute>} />
         <Route path="*" element={<LazyPage Component={NotFoundPage} />} />
       </Route>
 
