@@ -5,7 +5,7 @@ import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights, FeriasAlertasPagamentoCard, FeriasReconciliacaoCard } from '@/components/ferias';
+import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights, FeriasAlertasPagamentoCard, FeriasReconciliacaoCard, FeriasReconciliacaoHistoricoCard } from '@/components/ferias';
 import { FeriasColetivasTab } from '@/components/ferias/FeriasColetivasTab';
 import { FeriasRelatorioDialog } from '@/components/ferias/FeriasRelatorioDialog';
 import { feriasPDF } from '@/utils/feriasPDF';
@@ -237,6 +237,7 @@ export default function FeriasPage() {
             <FeriasAlertasPagamentoCard />
             <FeriasReconciliacaoCard />
           </div>
+          <FeriasReconciliacaoHistoricoCard />
           <FeriasDashboard data={ferias} />
         </TabsContent>
 
