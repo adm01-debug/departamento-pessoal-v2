@@ -12,7 +12,6 @@ import { useAuth } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { MedidaWorkflowTimeline } from './MedidaWorkflowTimeline';
-import { MedidaIntegracaoCard } from './MedidaIntegracaoCard';
 import { AlertTriangle, Clock, Paperclip, Upload, Download, FileText, Check, X } from 'lucide-react';
 import { format, parseISO, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -34,7 +33,7 @@ export function MedidaContestacaoDialog({ medida, open, onOpenChange, isRHOrAdmi
 
   const isOwner = colaboradorUserId && user?.id === colaboradorUserId;
   const prazoDate = medida?.contestacao_prazo_ate ? parseISO(medida.contestacao_prazo_ate) : null;
-  // eslint-disable-next-line react-hooks/purity -- comparação de prazo em tempo de render (aceitável para UI de contestação)
+  // eslint-disable-next-line react-hooks/purity -- comparação de prazo em tempo de render (UI de contestação)
   const prazoExpirado = prazoDate ? Date.now() > prazoDate.getTime() : false;
   const podeContestar = !!medida && isOwner && medida.status_workflow === 'aplicada' && !prazoExpirado && !medida.contestacao_texto;
   const podeResponder = !!medida && isRHOrAdmin && medida.status_workflow === 'contestada';
@@ -205,7 +204,6 @@ export function MedidaContestacaoDialog({ medida, open, onOpenChange, isRHOrAdmi
 
         <Separator />
         <MedidaWorkflowTimeline medidaId={medida.id} />
-        <MedidaIntegracaoCard medidaId={medida.id} tipo={medida.tipo} statusWorkflow={medida.status_workflow} />
 
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Fechar</Button>
