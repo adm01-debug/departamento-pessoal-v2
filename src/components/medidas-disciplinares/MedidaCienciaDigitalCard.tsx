@@ -157,9 +157,19 @@ export function MedidaCienciaDigitalCard({ medidaId, statusWorkflow }: Props) {
                       <p className="text-xs text-destructive">Motivo: {t.motivo_recusa}</p>
                     )}
                     {t.assinatura_hash && (
-                      <p className="truncate font-mono text-[10px] text-muted-foreground">
-                        SHA-256: {t.assinatura_hash}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="truncate font-mono text-[10px] text-muted-foreground">
+                          SHA-256: {t.assinatura_hash}
+                        </p>
+                        <a
+                          href={`/verificar-ciencia/${t.assinatura_hash}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[10px] font-medium text-primary underline"
+                        >
+                          verificar
+                        </a>
+                      </div>
                     )}
                   </div>
                   {!t.used_at && !expirado && (
