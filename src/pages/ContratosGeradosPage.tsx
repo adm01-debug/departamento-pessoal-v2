@@ -260,6 +260,18 @@ export default function ContratosGeradosPage() {
                 ),
               )}
             </div>
+            <div className="flex gap-1 flex-wrap ml-auto">
+              {(['todos', '30', '90', '365'] as const).map((p) => (
+                <Button
+                  key={p}
+                  size="sm"
+                  variant={periodo === p ? 'default' : 'outline'}
+                  onClick={() => setPeriodo(p)}
+                >
+                  {p === 'todos' ? 'Todo período' : `${p} dias`}
+                </Button>
+              ))}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
