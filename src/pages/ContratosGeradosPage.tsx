@@ -149,6 +149,15 @@ export default function ContratosGeradosPage() {
     });
   }, [contratos, status, busca, colaboradores, periodo]);
 
+  const [pagina, setPagina] = useState(1);
+  const PAGE_SIZE = 25;
+  useEffect(() => setPagina(1), [status, busca, periodo]);
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / PAGE_SIZE));
+  const paginados = useMemo(
+    () => filtrados.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE),
+    [filtrados, pagina],
+  );
+
   const kpis = useMemo(() => {
     const total = contratos.length;
     const assinados = contratos.filter((c) => c.status === 'assinado').length;
