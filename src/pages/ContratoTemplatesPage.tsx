@@ -12,6 +12,7 @@ import { useContratoTemplates } from '@/hooks/useContratoTemplates';
 import { TIPO_CONTRATO_LABELS, type ContratoTemplate, type TipoContrato } from '@/services/contratoTemplateService';
 import { sanitizeContractHtml } from '@/utils/sanitizeHtml';
 import { ContratosVencendoPanel } from '@/components/contratos/ContratosVencendoPanel';
+import { ContratosAssinaturaKPICard } from '@/components/contratos/ContratosAssinaturaKPICard';
 
 const PLACEHOLDERS = [
   { key: 'empresa.razao_social', label: 'Razão social' },
