@@ -241,29 +241,44 @@ export default function AssinarContratoPage() {
               <p>{new Date(assinado.em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
             </div>
             <div className="rounded-md border border-primary/30 p-3 bg-primary/5">
-              <p className="text-muted-foreground text-xs mb-1 flex items-center gap-1">
+              <p className="text-muted-foreground text-xs mb-2 flex items-center gap-1">
                 <ShieldCheck className="h-3 w-3" /> Link público de verificação
               </p>
-              <a
-                href={`${window.location.origin}/verificar-contrato/${assinado.hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline break-all text-xs font-mono"
-              >
-                {window.location.origin}/verificar-contrato/{assinado.hash.substring(0, 16)}…
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  void navigator.clipboard.writeText(
-                    `${window.location.origin}/verificar-contrato/${assinado.hash}`,
-                  );
-                  toast.success('Link de verificação copiado');
-                }}
-                className="ml-2 text-[11px] underline text-primary"
-              >
-                copiar
-              </button>
+              <div className="flex gap-3 items-start">
+                <div className="bg-white p-2 rounded-md border shrink-0">
+                  <QRCodeSVG
+                    value={`${window.location.origin}/verificar-contrato/${assinado.hash}`}
+                    size={96}
+                    level="M"
+                    marginSize={0}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <a
+                    href={`${window.location.origin}/verificar-contrato/${assinado.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline break-all text-xs font-mono"
+                  >
+                    {window.location.origin}/verificar-contrato/{assinado.hash.substring(0, 16)}…
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(
+                        `${window.location.origin}/verificar-contrato/${assinado.hash}`,
+                      );
+                      toast.success('Link de verificação copiado');
+                    }}
+                    className="ml-2 text-[11px] underline text-primary"
+                  >
+                    copiar
+                  </button>
+                  <p className="text-[11px] text-muted-foreground mt-2">
+                    Aponte a câmera para o QR Code para validar em qualquer dispositivo.
+                  </p>
+                </div>
+              </div>
             </div>
             <p className="text-xs text-muted-foreground">
               Guarde este comprovante. Uma cópia foi arquivada na empresa contratante e pode ser
