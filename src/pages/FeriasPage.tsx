@@ -232,7 +232,8 @@ export default function FeriasPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="dashboard">
+        <TabsContent value="dashboard" className="space-y-6">
+          <FeriasAlertasPagamentoCard />
           <FeriasDashboard data={ferias} />
         </TabsContent>
 
