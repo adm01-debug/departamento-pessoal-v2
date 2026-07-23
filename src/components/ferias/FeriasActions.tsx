@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { UserCheck, Shield, Building2, X, Ban, FileDown, FileSignature } from 'lucide-react';
+import { UserCheck, Shield, Building2, X, Ban, FileDown, FileSignature, Gift } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { AssinarAvisoDialog } from './AssinarAvisoDialog';
 import { useAssinarAvisoFerias } from '@/hooks/useAssinarAvisoFerias';
+import { useSolicitarAdiantamento13 } from '@/hooks/ferias/useAdiantamento13';
 
 interface FeriasActionsProps {
   solicitacao: Record<string, any>;
@@ -19,6 +20,7 @@ export function FeriasActions(props: FeriasActionsProps) {
   const { solicitacao } = props;
   const [assinarOpen, setAssinarOpen] = useState(false);
   const { baixarAvisoAssinado } = useAssinarAvisoFerias();
+  const solicitarAdiant13 = useSolicitarAdiantamento13();
 
   if (solicitacao.cancelado || solicitacao.status === 'rejeitada') return null;
 
@@ -27,6 +29,7 @@ export function FeriasActions(props: FeriasActionsProps) {
   const podeEnviarContab = solicitacao.aprovado_rh && !solicitacao.enviado_contabilidade;
   const podeRejeitar = !solicitacao.aprovado_gestor;
   const temAvisoAssinado = !!solicitacao.aviso_pdf_url;
+  const podeSolicitar13 = !solicitacao.adiantamento_13o && !solicitacao.enviado_contabilidade;
 
   return (
     <TooltipProvider>
@@ -98,6 +101,19 @@ export function FeriasActions(props: FeriasActionsProps) {
               </Button>
             </TooltipTrigger>
             <TooltipContent><p className="text-xs">Baixar Aviso Assinado</p></TooltipContent>
+          </Tooltip>
+        )}
+
+        {podeSolicitar13 && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-warning/10 text-warning"
+                disabled={solicitarAdiant13.isPending}
+                onClick={() => solicitarAdiant13.mutate({ feriasId: solicitacao.id })}>
+                <Gift className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent><p className="text-xs">Solicitar adiantamento 13º (Lei 4.749/65)</p></TooltipContent>
           </Tooltip>
         )}
 
