@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale, MedidasKanban, MedidaContestacaoDialog } from '@/components/medidas-disciplinares';
+import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale, MedidasKanban, MedidaContestacaoDialog, MedidasAnalytics } from '@/components/medidas-disciplinares';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
