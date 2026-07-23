@@ -136,16 +136,65 @@ export default function AssinarContratoPage() {
   }
 
   if (erro) {
+    const cfg = {
+      revogado: {
+        icon: Ban,
+        title: 'Link revogado',
+        desc: 'Este link de assinatura foi cancelado pela empresa. Solicite ao RH o envio de um novo link.',
+        tone: 'text-destructive',
+      },
+      expirado: {
+        icon: Clock,
+        title: 'Link expirado',
+        desc: 'O prazo de validade deste link terminou. Peça ao RH que estenda o prazo ou gere um novo link.',
+        tone: 'text-amber-600 dark:text-amber-400',
+      },
+      usado: {
+        icon: CheckCircle2,
+        title: 'Contrato já assinado',
+        desc: 'Este contrato já foi assinado anteriormente. Não é necessário assiná-lo novamente.',
+        tone: 'text-emerald-600 dark:text-emerald-400',
+      },
+      invalido: {
+        icon: AlertTriangle,
+        title: 'Link inválido',
+        desc: 'Verifique se o endereço copiado está completo. Se o problema persistir, solicite um novo link ao RH.',
+        tone: 'text-destructive',
+      },
+      generico: {
+        icon: AlertTriangle,
+        title: 'Não foi possível abrir o contrato',
+        desc: erro,
+        tone: 'text-destructive',
+      },
+    }[erroTipo ?? 'generico'];
+    const Icon = cfg.icon;
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-xl">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Não foi possível abrir o contrato</AlertTitle>
-          <AlertDescription>{erro}</AlertDescription>
-        </Alert>
+        <Card className="w-full max-w-xl">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+              <Icon className={`h-7 w-7 ${cfg.tone}`} />
+            </div>
+            <CardTitle>{cfg.title}</CardTitle>
+            <CardDescription>{cfg.desc}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-center text-xs text-muted-foreground">
+            {erroTipo !== 'generico' && (
+              <p className="font-mono break-all opacity-70">{erro}</p>
+            )}
+            {(erroTipo === 'expirado' || erroTipo === 'revogado') && (
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="mt-2">
+                <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> Recarregar
+              </Button>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   }
+
+
 
   if (assinado) {
     return (
