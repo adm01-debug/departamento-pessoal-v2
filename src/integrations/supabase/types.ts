@@ -3462,6 +3462,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ciencia_rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          identifier: string | null
+          ip_address: unknown
+          rpc_name: string
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier?: string | null
+          ip_address: unknown
+          rpc_name: string
+          success?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier?: string | null
+          ip_address?: unknown
+          rpc_name?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       clinicas_partners: {
         Row: {
           aceita_convenio: boolean
@@ -13224,6 +13251,68 @@ export type Database = {
           },
         ]
       }
+      medidas_ciencia_tokens: {
+        Row: {
+          acao: string | null
+          assinatura_hash: string | null
+          colaborador_id: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          expires_at: string
+          geolocation: Json | null
+          id: string
+          ip_address: string | null
+          medida_id: string
+          motivo_recusa: string | null
+          token: string
+          used_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          acao?: string | null
+          assinatura_hash?: string | null
+          colaborador_id: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          expires_at?: string
+          geolocation?: Json | null
+          id?: string
+          ip_address?: string | null
+          medida_id: string
+          motivo_recusa?: string | null
+          token: string
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          acao?: string | null
+          assinatura_hash?: string | null
+          colaborador_id?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          expires_at?: string
+          geolocation?: Json | null
+          id?: string
+          ip_address?: string | null
+          medida_id?: string
+          motivo_recusa?: string | null
+          token?: string
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_ciencia_tokens_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medidas_disciplinares: {
         Row: {
           aplicado_por: string | null
@@ -13252,6 +13341,7 @@ export type Database = {
           data_aprovacao: string | null
           data_ciencia: string | null
           data_conhecimento_fato: string | null
+          data_inicio_efeito: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
@@ -13311,6 +13401,7 @@ export type Database = {
           data_aprovacao?: string | null
           data_ciencia?: string | null
           data_conhecimento_fato?: string | null
+          data_inicio_efeito?: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao?: number | null
@@ -13370,6 +13461,7 @@ export type Database = {
           data_aprovacao?: string | null
           data_ciencia?: string | null
           data_conhecimento_fato?: string | null
+          data_inicio_efeito?: string | null
           data_ocorrencia?: string
           descricao?: string
           dias_suspensao?: number | null
@@ -13562,6 +13654,97 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medidas_disciplinares_contestacao_anexos_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medidas_disciplinares_integracao: {
+        Row: {
+          colaborador_id: string
+          competencia: string | null
+          created_at: string
+          detalhes: Json | null
+          dias: number | null
+          empresa_id: string
+          id: string
+          medida_id: string
+          ref_id: string | null
+          status: string
+          tipo_integracao: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          colaborador_id: string
+          competencia?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          dias?: number | null
+          empresa_id: string
+          id?: string
+          medida_id: string
+          ref_id?: string | null
+          status?: string
+          tipo_integracao: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          colaborador_id?: string
+          competencia?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          dias?: number | null
+          empresa_id?: string
+          id?: string
+          medida_id?: string
+          ref_id?: string | null
+          status?: string
+          tipo_integracao?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medidas_disciplinares_integracao_medida_id_fkey"
             columns: ["medida_id"]
             isOneToOne: false
             referencedRelation: "medidas_disciplinares"
@@ -24005,6 +24188,10 @@ export type Database = {
         Args: { target_id: string }
         Returns: undefined
       }
+      aplicar_medida_folha_ponto: {
+        Args: { p_medida_id: string }
+        Returns: Json
+      }
       aprovar_despesa: {
         Args: { _despesa_id: string; _observacoes?: string }
         Returns: {
@@ -24075,6 +24262,15 @@ export type Database = {
         Args: { check_email: string; check_ip: string }
         Returns: Json
       }
+      check_ciencia_rate_limit: {
+        Args: {
+          p_identifier?: string
+          p_max_requests?: number
+          p_rpc_name: string
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_idempotency_anomalies: {
         Args: never
         Returns: {
@@ -24098,6 +24294,7 @@ export type Database = {
         }
         Returns: Json
       }
+      cleanup_ciencia_rate_limits: { Args: never; Returns: undefined }
       cleanup_security_logs: { Args: never; Returns: undefined }
       clinicas_proximas: {
         Args: {
@@ -24119,6 +24316,14 @@ export type Database = {
           tipos_exame: string[]
           uf: string
         }[]
+      }
+      consumir_pendencias_medida_no_holerite: {
+        Args: {
+          p_colaborador_id: string
+          p_competencia: string
+          p_holerite_id: string
+        }
+        Returns: number
       }
       criar_batida_da_divergencia_afdt: {
         Args: { _divergencia_id: string; _tipo?: string }
@@ -24145,6 +24350,10 @@ export type Database = {
           ok: boolean
         }[]
       }
+      enfileirar_esocial_medida_disciplinar: {
+        Args: { p_medida_id: string }
+        Returns: Json
+      }
       enforce_log_retention: { Args: never; Returns: Json }
       fn_calculate_periodo_aquisitivo: {
         Args: { _colaborador_id: string }
@@ -24166,6 +24375,10 @@ export type Database = {
           conflitos: number
           ultimo_em: string
         }[]
+      }
+      garantir_rubrica_suspensao: {
+        Args: { p_empresa_id: string }
+        Returns: string
       }
       gerar_alertas_preditivos_ia: { Args: never; Returns: undefined }
       gerar_canonical_espelho_ponto: {
@@ -24317,6 +24530,7 @@ export type Database = {
         Args: { _medida_id: string; _observacao?: string }
         Returns: Json
       }
+      medida_consultar_por_token: { Args: { p_token: string }; Returns: Json }
       medida_contestar: {
         Args: { _medida_id: string; _texto: string }
         Returns: {
@@ -24346,6 +24560,7 @@ export type Database = {
           data_aprovacao: string | null
           data_ciencia: string | null
           data_conhecimento_fato: string | null
+          data_inicio_efeito: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
@@ -24386,6 +24601,21 @@ export type Database = {
         }
       }
       medida_enviar_aprovacao: { Args: { _medida_id: string }; Returns: Json }
+      medida_gerar_link_ciencia: {
+        Args: { p_medida_id: string }
+        Returns: Json
+      }
+      medida_registrar_ciencia_publica: {
+        Args: {
+          p_acao: string
+          p_geo?: Json
+          p_ip?: string
+          p_motivo_recusa?: string
+          p_token: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
       medida_rejeitar: {
         Args: { _medida_id: string; _motivo: string }
         Returns: Json
@@ -24419,6 +24649,7 @@ export type Database = {
           data_aprovacao: string | null
           data_ciencia: string | null
           data_conhecimento_fato: string | null
+          data_inicio_efeito: string | null
           data_ocorrencia: string
           descricao: string
           dias_suspensao: number | null
@@ -24457,6 +24688,15 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      medida_verificar_ciencia_hash: { Args: { p_hash: string }; Returns: Json }
+      medidas_analytics_reincidencia: {
+        Args: {
+          p_data_fim: string
+          p_data_inicio: string
+          p_empresa_id: string
+        }
+        Returns: Json
       }
       next_cnab_sequencial: {
         Args: { p_banco_codigo: string; p_empresa_id: string }
