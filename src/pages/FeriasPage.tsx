@@ -6,6 +6,7 @@ import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { EmptyList } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
 import { FeriasKPIs, FeriasTable, FeriasDashboard, FeriasInsights } from '@/components/ferias';
+import { FeriasColetivasTab } from '@/components/ferias/FeriasColetivasTab';
 import { FeriasRelatorioDialog } from '@/components/ferias/FeriasRelatorioDialog';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { useFerias } from '@/hooks/useFerias';
@@ -226,6 +227,9 @@ export default function FeriasPage() {
           <TabsTrigger value="periodos" className="rounded-lg gap-2 font-display">
             <History className="h-4 w-4" /> Períodos Aquisitivos
           </TabsTrigger>
+          <TabsTrigger value="coletivas" className="rounded-lg gap-2 font-display">
+            <FileDown className="h-4 w-4" /> Coletivas
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard">
@@ -356,6 +360,10 @@ export default function FeriasPage() {
           <div className="grid gap-6">
             <GerenciamentoPeriodos />
           </div>
+        </TabsContent>
+
+        <TabsContent value="coletivas">
+          <FeriasColetivasTab />
         </TabsContent>
 
       </Tabs>
