@@ -23916,6 +23916,7 @@ export type Database = {
           notificacoes_criadas: number
         }[]
       }
+      notificar_ferias_pagamento_d5: { Args: never; Returns: number }
       pagar_desligamento: {
         Args: { _comprovante_url?: string; _desligamento_id: string }
         Returns: {
