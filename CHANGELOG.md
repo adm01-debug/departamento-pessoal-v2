@@ -1,5 +1,31 @@
 # Changelog - Sistema Departamento Pessoal
 
+## [18.0.1] - 2026-07-22
+
+### Infrastructure
+- Dockerfile: Node 18 → 22 LTS
+- nginx.conf: fix try_files + proxy vars
+- Branch protection workflow
+- CODEOWNERS atualizado
+- .gitignore aprimorado
+- LICENSE atualizado
+
+### Dependencies
+- @playwright/test: 1.60.0 → 1.61.1
+- vite: ^8.0.14 → ^8.1.4
+- recharts: ^2.10.4 → ^3.9.2
+- react-day-picker: ^9.6.0 → ^10.0.1
+- @radix-ui/react-tabs: 1.1.14
+- @radix-ui/react-avatar: 1.1.12
+- react-hook-form: ^7.79.0
+- dompurify: 3.4.7 → 3.4.12
+- @types/node: ^26.1.1
+
+### CI/CD
+- All Dependabot PRs resolved
+- Stale PRs closed
+- 0 open issues/PRs
+
 ## [21.0.0] - 2026-01-20
 
 ### Adicionado (V21)
