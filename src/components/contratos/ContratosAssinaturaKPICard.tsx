@@ -15,7 +15,7 @@ function fmtHoras(h: number | null): string {
 }
 
 export function ContratosAssinaturaKPICard() {
-  const { kpi, pendentes, revogar, reenviar } = useContratosAssinaturaKPI();
+  const { kpi, pendentes, revogar, reenviar, estender } = useContratosAssinaturaKPI();
 
   if (kpi.isLoading) {
     return (
