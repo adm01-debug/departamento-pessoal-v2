@@ -239,11 +239,50 @@ export default function AssinarContratoPage() {
               <p className="text-muted-foreground text-xs">Data e hora</p>
               <p>{new Date(assinado.em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
             </div>
+            <div className="rounded-md border border-primary/30 p-3 bg-primary/5">
+              <p className="text-muted-foreground text-xs mb-1 flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3" /> Link público de verificação
+              </p>
+              <a
+                href={`${window.location.origin}/verificar-contrato/${assinado.hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline break-all text-xs font-mono"
+              >
+                {window.location.origin}/verificar-contrato/{assinado.hash.substring(0, 16)}…
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  void navigator.clipboard.writeText(
+                    `${window.location.origin}/verificar-contrato/${assinado.hash}`,
+                  );
+                  toast.success('Link de verificação copiado');
+                }}
+                className="ml-2 text-[11px] underline text-primary"
+              >
+                copiar
+              </button>
+            </div>
             <p className="text-xs text-muted-foreground">
               Guarde este comprovante. Uma cópia foi arquivada na empresa contratante e pode ser
-              auditada externamente.
+              auditada externamente a qualquer momento pelo link acima.
             </p>
           </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!info) return <></>;
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-xl">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <FileSignature className="h-5 w-5 text-primary" />
+            <CardTitle>Assinatura Eletrônica de Contrato</CardTitle>
         </Card>
       </div>
     );
