@@ -74,7 +74,7 @@ export default function MedidasDisciplinaresPage() {
     },
     enabled: !!user?.id,
   });
-  const isRHOrAdmin = userRoles.some((r) => r === 'admin' || r === 'rh');
+  const isRHOrAdmin = (userRoles as string[]).some((r: string) => r === 'admin' || r === 'rh');
 
   const { data: medidas = [], isLoading } = useQuery({
     queryKey: ['medidas-disciplinares', empresaAtual?.id],
