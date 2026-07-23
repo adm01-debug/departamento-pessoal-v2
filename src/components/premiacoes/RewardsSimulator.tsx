@@ -163,7 +163,7 @@ export function RewardsSimulator() {
                   <YAxis hide />
                   <Tooltip 
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                    formatter={(val: number) => formatCurrency(val)}
+                    formatter={(val: any) => formatCurrency(Number(val))}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '20px' }} />
                   <Bar dataKey="Custo Bônus" fill="#f59e0b" radius={[4, 4, 0, 0]} />
