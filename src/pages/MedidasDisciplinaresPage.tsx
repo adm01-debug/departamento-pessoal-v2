@@ -371,6 +371,7 @@ export default function MedidasDisciplinaresPage() {
               onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
               onExcluir={(id) => excluir.mutate(id)}
               onGerarPDF={(id) => gerarPDF.mutate(id)}
+              onAbrirContestacao={(m) => setContestMedida(m)}
               gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
             />
           )}
@@ -379,6 +380,18 @@ export default function MedidasDisciplinaresPage() {
           <MedidasKanban />
         </TabsContent>
       </Tabs>
+
+      <MedidaContestacaoDialog
+        medida={contestMedida}
+        open={!!contestMedida}
+        onOpenChange={(v) => !v && setContestMedida(null)}
+        isRHOrAdmin={isRHOrAdmin}
+        colaboradorUserId={
+          contestMedida
+            ? (colaboradores.find((c: any) => c.id === contestMedida.colaborador_id)?.user_id ?? null)
+            : null
+        }
+      />
     </PageLayout>
     </>
   );
