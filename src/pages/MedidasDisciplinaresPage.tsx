@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { medidasDisciplinaresService } from '@/services';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
+import { useMedidasDisciplinaresRealtime } from '@/hooks/useMedidasDisciplinaresRealtime';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, AlertTriangle, Scale, Users, Sparkles } from 'lucide-react';
@@ -65,6 +66,7 @@ export default function MedidasDisciplinaresPage() {
   const [tipoFilter, setTipoFilter] = useState('');
   const [contestMedida, setContestMedida] = useState<any | null>(null);
   const { user } = useAuth();
+  useMedidasDisciplinaresRealtime(empresaAtual?.id);
 
   const { data: userRoles = [] } = useQuery({
     queryKey: ['user-roles-current', user?.id],
