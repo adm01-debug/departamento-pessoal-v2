@@ -11,6 +11,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { verifyCsrf } from "../_shared/csrf.ts";
 import { corsHeaders, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
+import {
+  isSafeTableName, isSafeColumnsExpr, isSafeOrderColumn, isSafeOrExpression, isSafeFilterColumn,
+  TABLE_DENYLIST, TENANT_SCOPED_TABLES, RPC_ALLOWLIST, FILTER_OPS, NOT_EXTRA_OPS,
+} from "./validation.ts";
 
 // -------------------- Headers --------------------
 const NO_STORE = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" };
@@ -21,127 +25,23 @@ const MAX_LIMIT = 1000;
 const SLOW_QUERY_THRESHOLD_MS = 3000;
 const VERY_SLOW_QUERY_THRESHOLD_MS = 8000;
 
-// -------------------- Validação de identificadores --------------------
-// Permite: letras, dígitos, _, ponto (schema.tab), vírgula/espaço (colunas
-// múltiplas em select), !, *, (, ) e :: para casts. Bloqueia ;, --, /*, comentários.
-const IDENTIFIER_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
-const COLUMNS_RE = /^[a-zA-Z0-9_,.\s*!():"-]+$/;
-const DANGEROUS_TOKENS = /(;|--|\/\*|\*\/|\bDROP\b|\bTRUNCATE\b|\bALTER\b|\bGRANT\b)/i;
-
-function isSafeTableName(t: unknown): t is string {
-  return typeof t === "string" && t.length > 0 && t.length <= 63 && IDENTIFIER_RE.test(t);
-}
-function isSafeColumnsExpr(c: unknown): c is string {
-  if (typeof c !== "string") return false;
-  if (c.length === 0 || c.length > 2000) return false;
-  if (DANGEROUS_TOKENS.test(c)) return false;
-  return COLUMNS_RE.test(c);
-}
-function isSafeOrderColumn(c: unknown): c is string {
-  if (typeof c !== "string") return false;
-  if (c.length === 0 || c.length > 120) return false;
-  if (DANGEROUS_TOKENS.test(c)) return false;
-  return /^[a-zA-Z_][a-zA-Z0-9_.]*$/.test(c);
+// -------------------- Timeout de consulta (Onda 37) --------------------
+// Evita que uma consulta ao banco externo pendure a invocação indefinidamente.
+// Cada request HTTP do supabase-js recebe um AbortSignal com timeout; ao estourar,
+// a consulta é abortada (libera recursos) e o handler responde 504.
+const BRIDGE_QUERY_TIMEOUT_MS = Number(Deno.env.get("BRIDGE_QUERY_TIMEOUT_MS") || "15000");
+const timeoutFetch: typeof fetch = (input, init) =>
+  fetch(input, { ...init, signal: (init as RequestInit | undefined)?.signal ?? AbortSignal.timeout(BRIDGE_QUERY_TIMEOUT_MS) });
+function isTimeoutError(e: unknown): boolean {
+  if (!(e instanceof Error)) return false;
+  return e.name === "TimeoutError" || e.name === "AbortError" || /timed out|aborted|timeout/i.test(e.message);
 }
 
-// -------------------- Denylist de tabelas --------------------
-// Estas tabelas nunca podem ser acessadas via bridge (nem leitura). Contêm
-// dados de segurança/roles que devem ser gerenciados apenas server-side.
-const TABLE_DENYLIST = new Set<string>([
-  "user_roles",
-  "secrets",
-  "vault",
-  "ip_whitelist",
-  "blocked_ips",
-  "rate_limit_config",
-  "rate_limit_logs",
-  "login_attempts",
-  "login_lockouts",
-  "login_rate_limits",
-  "password_policies",
-  "security_alerts",
-  "audit_log",
-  "geo_blocking_config",
-  "geo_allowed_countries",
-  "govbr_auth_state",
-]);
-
-// Tabelas em que writes são permitidos apenas com auth+tenant válido.
-// (Todas as tabelas de negócio; para leitura, RLS externo protege.)
-const TENANT_SCOPED_TABLES = new Set<string>([
-  "colaboradores", "empresas", "folhas_pagamento", "holerites", "batidas_ponto",
-  "registros_ponto", "admissoes", "candidaturas", "ferias_solicitacoes",
-  "periodos_aquisitivos", "provisoes_mensais", "provisoes_folha", "beneficios",
-  "documentos", "notificacoes", "workflows_execucoes", "workflows_definicoes",
-  "auditoria_logs", "ferias_audit_log", "esocial_eventos", "guias_impostos",
-]);
-
-// -------------------- Allowlist de RPCs --------------------
-// Somente RPCs explicitamente listadas são invocáveis via bridge.
-const RPC_ALLOWLIST = new Set<string>([
-  // segurança / login
-  "check_login_lock", "record_failed_login", "reset_login_attempts",
-  "check_account_lockout", "record_login_attempt", "reset_account_lockout",
-  "check_brute_force", "check_rate_limit", "is_ip_blocked", "is_ip_whitelisted",
-  "is_country_allowed",
-  // roles / tenant
-  "has_role", "is_admin", "get_user_roles", "get_user_empresas",
-  "get_user_default_empresa", "get_user_scope_empresas", "user_belongs_to_empresa",
-  "get_auth_empresa_id",
-  // gestão de papéis — único caminho de leitura/escrita para user_roles (a
-  // tabela está na TABLE_DENYLIST); as funções verificam is_admin(auth.uid())
-  // por dentro. Ver 20260718230000_admin_role_management_rpc.sql (achado R1).
-  "admin_set_user_role", "admin_list_user_roles",
-  // negócio
-  "get_personnel_cost_projection", "get_colaborador_banco_horas",
-  "calcular_dias_ferias", "fn_calculate_periodo_aquisitivo",
-  "fn_link_gov_br_account", "processar_ajuste_aprovado",
-  "gerar_alertas_preditivos_ia",
-  "run_rls_tests",
-  // rescisão — bloqueio de pagamento sem homologação/assinatura (achado
-  // N25); ambas verificam is_admin(auth.uid()) por dentro. Ver
-  // 20260719000000_bloqueio_pagamento_rescisao_lgpd.sql.
-  "assinar_desligamento", "pagar_desligamento",
-  // onboarding público (candidato) — lookup exato por token, ver
-  // 20260718220000_rls_remediacao_auditoria.sql (achado L3 da auditoria)
-  "get_admissao_por_token",
-]);
 const LOGIN_PROTECTION_RPC_FALLBACKS: Record<string, unknown> = {
   check_login_lock: false,
   record_failed_login: null,
   reset_login_attempts: null,
 };
-
-// -------------------- Allowlist de operadores --------------------
-const FILTER_OPS = new Set([
-  "eq", "neq", "gt", "gte", "lt", "lte",
-  "like", "ilike", "in", "is", "or", "not", "contains", "match",
-]);
-const NOT_EXTRA_OPS = new Set(["eq", "neq", "gt", "gte", "lt", "lte", "in", "is"]);
-
-// Validação de expressões .or() — permite apenas operadores seguros sobre colunas válidas
-// Formato PostgREST: "col.op.val,col.op.val" — bloqueia subqueries, parênteses aninhados, SQL keywords
-const OR_SAFE_OPS = /^(eq|neq|gt|gte|lt|lte|like|ilike|is|in)\./;
-const OR_DANGEROUS = /(;|--|\/\*|\*\/|\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b|\bEXEC\b)/i;
-function isSafeOrExpression(expr: unknown): boolean {
-  if (typeof expr !== "string" || expr.length === 0 || expr.length > 500) return false;
-  if (OR_DANGEROUS.test(expr)) return false;
-  const parts = expr.split(",");
-  for (const part of parts) {
-    const trimmed = part.trim();
-    if (!trimmed) return false;
-    // Each part must be: column_name.operator.value (or nested and/or with parens)
-    // Allow parentheses for grouping but validate each leaf
-    const leaf = trimmed.replace(/^\(+/, "").replace(/\)+$/, "");
-    const dotIdx = leaf.indexOf(".");
-    if (dotIdx < 1) return false;
-    const colName = leaf.substring(0, dotIdx);
-    if (!IDENTIFIER_RE.test(colName)) return false;
-    const rest = leaf.substring(dotIdx + 1);
-    if (!OR_SAFE_OPS.test(rest)) return false;
-  }
-  return true;
-}
 
 // -------------------- Zod schemas --------------------
 const MAX_FILTER_VALUE_BYTES = 8 * 1024; // 8 KB por valor escalar de filtro
@@ -507,7 +407,7 @@ Deno.serve(async (req) => {
     if (f.op === "not" && (!f.extraOp || !NOT_EXTRA_OPS.has(f.extraOp))) {
       return jsonError(400, "INVALID_NOT_OP", "Filter 'not' requires a valid extraOp");
     }
-    if (f.op !== "or" && !/^[a-zA-Z0-9_.,()->\s"-]+$/.test(f.column)) {
+    if (f.op !== "or" && !isSafeFilterColumn(f.column)) {
       return jsonError(400, "INVALID_COLUMN", `Filter column '${f.column}' is invalid`);
     }
   }
@@ -537,10 +437,10 @@ Deno.serve(async (req) => {
   if (!externalUrl || !externalKey) {
     return jsonError(500, "NOT_CONFIGURED", "External database not configured");
   }
-  const externalClient = createClient(externalUrl, externalKey);
+  const externalClient = createClient(externalUrl, externalKey, { global: { fetch: timeoutFetch } });
   // User-scoped client for RPCs that rely on auth.uid() inside the external DB
   const externalUserClient = authHeader
-    ? createClient(externalUrl, externalKey, { global: { headers: { Authorization: authHeader } } })
+    ? createClient(externalUrl, externalKey, { global: { headers: { Authorization: authHeader }, fetch: timeoutFetch } })
     : externalClient;
 
   // Cliente local (para verificação de tenant scope via RPC has_role/user_belongs_to_empresa)
@@ -723,6 +623,10 @@ Deno.serve(async (req) => {
     return jsonError(400, "UNKNOWN_ACTION", `Unknown action: ${action}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Internal server error";
+    if (isTimeoutError(err)) {
+      console.error("[external-db-bridge] Timeout:", msg);
+      return jsonError(504, "QUERY_TIMEOUT", "A consulta excedeu o tempo limite");
+    }
     console.error("[external-db-bridge] Error:", msg);
     return jsonError(500, "INTERNAL_ERROR", "Internal server error");
   }
