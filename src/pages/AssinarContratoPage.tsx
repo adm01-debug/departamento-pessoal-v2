@@ -276,17 +276,6 @@ export default function AssinarContratoPage() {
 
   if (!info) return <></>;
 
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <FileSignature className="h-5 w-5 text-primary" />
-            <CardTitle>Assinatura Eletrônica de Contrato</CardTitle>
-        </Card>
-      </div>
-    );
-  }
 
   if (!info) return <></>;
 
