@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle2, ShieldCheck, FileSignature, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, FileSignature, AlertTriangle, Ban, Clock, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ContratoInfo {
