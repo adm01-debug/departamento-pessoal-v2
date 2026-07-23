@@ -24251,6 +24251,10 @@ export type Database = {
           ok: boolean
         }[]
       }
+      enfileirar_esocial_medida_disciplinar: {
+        Args: { p_medida_id: string }
+        Returns: Json
+      }
       enforce_log_retention: { Args: never; Returns: Json }
       fn_calculate_periodo_aquisitivo: {
         Args: { _colaborador_id: string }
