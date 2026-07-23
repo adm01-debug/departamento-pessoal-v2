@@ -208,6 +208,28 @@ export default function MedidasDisciplinaresPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {sugestao && form.colaborador_id && (
+                <Alert className="border-primary/40 bg-primary/5">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <AlertDescription className="text-xs">
+                    <div className="font-medium mb-1">
+                      Sugestão CLT: <Badge variant="outline" className="ml-1">{tipoLabels[sugestao.tipo_sugerido] ?? sugestao.tipo_sugerido}</Badge>
+                    </div>
+                    <div className="text-muted-foreground">{sugestao.justificativa}</div>
+                    {form.tipo !== sugestao.tipo_sugerido && (
+                      <button
+                        type="button"
+                        className="mt-2 text-primary underline text-xs"
+                        onClick={() => setForm(p => ({ ...p, tipo: sugestao.tipo_sugerido }))}
+                      >
+                        Aplicar sugestão
+                      </button>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div>
                 <Label>Tipo *</Label>
                 <Select value={form.tipo} onValueChange={v => setForm(p => ({ ...p, tipo: v }))}>
@@ -219,10 +241,33 @@ export default function MedidasDisciplinaresPage() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
-                <Label>Data Ocorrência *</Label>
-                <Input type="date" value={form.data_ocorrencia} onChange={e => setForm(p => ({ ...p, data_ocorrencia: e.target.value }))} />
+                <Label>Gravidade</Label>
+                <Select value={form.gravidade} onValueChange={v => setForm(p => ({ ...p, gravidade: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a gravidade" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="leve">Leve</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="grave">Grave</SelectItem>
+                    <SelectItem value="gravissima">Gravíssima</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Data Ocorrência *</Label>
+                  <Input type="date" value={form.data_ocorrencia} onChange={e => setForm(p => ({ ...p, data_ocorrencia: e.target.value }))} />
+                </div>
+                <div>
+                  <Label>Data Conhecimento</Label>
+                  <Input type="date" value={form.data_conhecimento_fato} onChange={e => setForm(p => ({ ...p, data_conhecimento_fato: e.target.value }))} />
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground -mt-2">
+                CLT: prescrição em 60 dias após ocorrência • imediatidade em 30 dias após conhecimento.
+              </p>
 
               {form.tipo === 'suspensao' && (
                 <div>
@@ -230,6 +275,7 @@ export default function MedidasDisciplinaresPage() {
                   <Input type="number" min={1} max={30} value={form.dias_suspensao} onChange={e => setForm(p => ({ ...p, dias_suspensao: e.target.value }))} />
                 </div>
               )}
+
 
               <div className="space-y-3 p-3 rounded-xl bg-muted/50 border border-border/30">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
