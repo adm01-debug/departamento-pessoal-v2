@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import {
@@ -29,9 +30,29 @@ import {
   RefreshCw,
   FileSpreadsheet,
   Send,
+  History,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+type EventoContrato = {
+  id: string;
+  evento: string;
+  detalhes: Record<string, unknown> | null;
+  ip: string | null;
+  user_agent: string | null;
+  created_at: string;
+};
+
+const EVENTO_LABELS: Record<string, string> = {
+  token_gerado: 'Token de assinatura gerado',
+  token_revogado: 'Token revogado',
+  token_expiracao_estendida: 'Prazo estendido',
+  assinatura_visualizada: 'Página de assinatura acessada',
+  assinatura_concluida: 'Contrato assinado',
+  cpf_invalido: 'Tentativa com CPF inválido',
+  lembrete_enviado: 'Lembrete enviado ao gestor',
+};
 
 type StatusFilter = 'todos' | ContratoGerado['status'];
 
@@ -60,6 +81,24 @@ export default function ContratosGeradosPage() {
   const [status, setStatus] = useState<StatusFilter>('todos');
   const [busca, setBusca] = useState('');
   const [periodo, setPeriodo] = useState<'todos' | '30' | '90' | '365'>('todos');
+  const [drawerContrato, setDrawerContrato] = useState<ContratoGerado | null>(null);
+  const [eventos, setEventos] = useState<EventoContrato[]>([]);
+  const [loadingEventos, setLoadingEventos] = useState(false);
+
+  const abrirTimeline = async (c: ContratoGerado) => {
+    setDrawerContrato(c);
+    setLoadingEventos(true);
+    setEventos([]);
+    try {
+      const data = await contratoTemplateService.listarEventos(c.id);
+      setEventos(data);
+    } catch (e) {
+      console.error('[eventos-contrato]', e);
+      toast.error('Falha ao carregar histórico');
+    } finally {
+      setLoadingEventos(false);
+    }
+  };
 
   const carregar = async () => {
     if (!empresaAtual) return;
@@ -326,6 +365,14 @@ export default function ContratosGeradosPage() {
                           {c.sha256 ? `${c.sha256.substring(0, 12)}…` : '—'}
                         </TableCell>
                         <TableCell className="text-right whitespace-nowrap">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Ver histórico de eventos"
+                            onClick={() => void abrirTimeline(c)}
+                          >
+                            <History className="h-4 w-4" />
+                          </Button>
                           {c.storage_path && (
                             <Button
                               size="icon"
@@ -387,6 +434,77 @@ export default function ContratosGeradosPage() {
         <ShieldCheck className="h-3 w-3" /> Contratos assinados possuem verificação pública por hash
         SHA-256 (MP 2.200-2/2001)
       </p>
+
+      <Sheet open={!!drawerContrato} onOpenChange={(o) => !o && setDrawerContrato(null)}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" /> Histórico de Eventos
+            </SheetTitle>
+            <SheetDescription>
+              Trilha de auditoria completa (últimos 200 eventos).
+            </SheetDescription>
+          </SheetHeader>
+          {drawerContrato && (
+            <div className="mt-4 space-y-4">
+              <div className="rounded-md border p-3 text-xs space-y-1 bg-muted/30">
+                <div>
+                  <span className="text-muted-foreground">Colaborador: </span>
+                  <span className="font-medium">
+                    {drawerContrato.colaborador_id
+                      ? colaboradores[drawerContrato.colaborador_id]?.nome_completo ?? '—'
+                      : '—'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Status: </span>
+                  <Badge variant={STATUS_META[drawerContrato.status].variant}>
+                    {STATUS_META[drawerContrato.status].label}
+                  </Badge>
+                </div>
+                {drawerContrato.sha256 && (
+                  <div className="font-mono break-all">
+                    <span className="text-muted-foreground">SHA-256: </span>
+                    {drawerContrato.sha256}
+                  </div>
+                )}
+              </div>
+
+              {loadingEventos ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-14 w-full" />
+                  ))}
+                </div>
+              ) : eventos.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  Nenhum evento registrado ainda.
+                </p>
+              ) : (
+                <ol className="relative border-l border-border pl-4 space-y-3">
+                  {eventos.map((ev) => (
+                    <li key={ev.id} className="relative">
+                      <span className="absolute -left-[21px] top-1 h-3 w-3 rounded-full bg-primary ring-2 ring-background" />
+                      <div className="text-sm font-medium">
+                        {EVENTO_LABELS[ev.evento] ?? ev.evento}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {format(new Date(ev.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
+                        {ev.ip && <> · IP {ev.ip}</>}
+                      </div>
+                      {ev.detalhes && Object.keys(ev.detalhes).length > 0 && (
+                        <pre className="mt-1 text-[10px] bg-muted/40 rounded p-2 overflow-x-auto max-h-32">
+                          {JSON.stringify(ev.detalhes, null, 2)}
+                        </pre>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
