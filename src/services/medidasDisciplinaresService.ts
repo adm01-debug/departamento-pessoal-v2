@@ -177,4 +177,18 @@ export const medidasDisciplinaresService = {
     if (error) throw error;
     return data.signedUrl;
   },
+
+  // ===== Integração Folha/Ponto =====
+  async aplicarIntegracao(medidaId: string) {
+    const { data, error } = await (supabase as any).rpc('aplicar_medida_folha_ponto', { p_medida_id: medidaId });
+    if (error) throw error;
+    return data;
+  },
+  async listarIntegracao(medidaId: string) {
+    const { data, error } = await (supabase as any)
+      .from('medidas_disciplinares_integracao')
+      .select('*').eq('medida_id', medidaId).order('created_at', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
 };
