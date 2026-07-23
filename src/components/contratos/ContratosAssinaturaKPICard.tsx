@@ -188,6 +188,12 @@ export function ContratosAssinaturaKPICard() {
           </div>
         )}
       </CardContent>
+      <ContratoTokenTimelineDialog
+        tokenId={timelineTokenId}
+        open={!!timelineTokenId}
+        onOpenChange={(o) => !o && setTimelineTokenId(null)}
+      />
     </Card>
   );
 }
+
