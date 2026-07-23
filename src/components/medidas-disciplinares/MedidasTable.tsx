@@ -177,6 +177,25 @@ export function MedidasTable({ data, onMarcarCiencia, onExcluir, onGerarPDF, ger
                             <TooltipContent>Ver documento</TooltipContent>
                           </Tooltip>
                         )}
+                        {onGerarPDF && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 rounded-lg"
+                                onClick={() => onGerarPDF(m.id)}
+                                disabled={gerandoPDFId === m.id}
+                                aria-label="Gerar documento PDF"
+                              >
+                                {gerandoPDFId === m.id
+                                  ? <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                  : <FileDown className="h-3.5 w-3.5 text-primary" />}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{m.pdf_url ? 'Regerar documento assinável' : 'Gerar documento assinável (PDF)'}</TooltipContent>
+                          </Tooltip>
+                        )}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" onClick={() => onExcluir(m.id)}>
