@@ -52,6 +52,7 @@ const TreinamentosPage = lazy(() => import('@/pages/TreinamentosPage'));
 const RecrutamentoPage = lazy(() => import('@/pages/RecrutamentoPage'));
 const ContratacaoPage = lazy(() => import('@/pages/ContratacaoPage'));
 const AssinarContratoPage = lazy(() => import('@/pages/AssinarContratoPage'));
+const VerificarContratoPage = lazy(() => import('@/pages/VerificarContratoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const AssinaturasPage = lazy(() => import('@/pages/AssinaturasPage'));
 const HorasExtrasPage = lazy(() => import('@/pages/HorasExtrasPage'));
