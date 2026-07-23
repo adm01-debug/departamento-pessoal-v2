@@ -37,8 +37,17 @@ export default function VerificarContratoPage() {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('contrato_verificar_autenticidade', {
+      // Captura IP público (best-effort, para rate limit)
+      let ip: string | null = null;
+      try {
+        const res = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
+        if (res.ok) ip = (await res.json())?.ip ?? null;
+      } catch {
+        // ignore — servidor tratará como 'unknown'
+      }
+      const { data, error } = await supabase.rpc('contrato_verificar_autenticidade_v2', {
         p_hash: hashParaVerificar.trim(),
+        p_ip: ip,
       });
       if (error) throw error;
       setResult(data as unknown as VerificacaoResult);
