@@ -7,7 +7,7 @@
 // frontend atual — RLS no banco externo é a fonte de verdade), mas qualquer
 // operação de escrita exige JWT válido + verificação de tenant.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { verifyCsrf } from "../_shared/csrf.ts";
 import { corsHeaders, enforceOrigin, handlePreflight } from '../_shared/contract.ts';
@@ -244,12 +244,13 @@ function empresaIdColumnFor(table: string): string {
 }
 
 async function lookupEmpresaIdsForWrite(
-  externalClient: ReturnType<typeof createClient>,
+  externalClient: SupabaseClient<any, any, any>,
   table: string,
   filters: Array<{ column: string; op: string; value: unknown }>,
 ): Promise<{ ok: true; empresaIds: Set<string> } | { ok: false }> {
   const col = empresaIdColumnFor(table);
-  let query = externalClient.from(table).select(col);
+  // Query dinâmica (tabela/coluna vêm de string em runtime): tipo do proxy é any por natureza.
+  let query: any = externalClient.from(table).select(col);
   for (const f of filters) {
     if (f.op === "eq") query = query.eq(f.column, f.value);
   }
@@ -266,7 +267,7 @@ async function lookupEmpresaIdsForWrite(
 }
 
 async function assertTenantScope(
-  localClient: ReturnType<typeof createClient>,
+  localClient: SupabaseClient<any, any, any>,
   userId: string,
   empresaIds: Set<string>,
 ): Promise<{ ok: true } | { ok: false; msg: string }> {
@@ -317,7 +318,7 @@ Deno.serve(async (req) => {
         const localClient = createClient(supabaseUrl, supabaseAnonKey, {
           global: { headers: { Authorization: authHeader } },
         });
-        const { data, error } = await localClient.auth.getClaims(token);
+        const { data, error } = await (localClient.auth as unknown as { getClaims: (t: string) => Promise<{ data: { claims?: { sub?: string } } | null; error: unknown }> }).getClaims(token);
         if (!error && data?.claims?.sub) {
           user = { id: String(data.claims.sub) };
         }
@@ -382,7 +383,7 @@ Deno.serve(async (req) => {
     const rlIdentity = user?.id ?? (req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || 'anon');
     const rlKey = isWrite ? `bridge-write:${rlIdentity}` : `bridge-read:${rlIdentity}`;
     const rlLimit = isWrite ? 30 : (user ? 100 : 20);
-    const rl = await checkRateLimit(rlClient, { key: rlKey, limit: rlLimit, windowSec: 60 });
+    const rl = await checkRateLimit(rlClient as any, { key: rlKey, limit: rlLimit, windowSec: 60 });
     if (!rl.allowed) return rateLimitResponse(rl);
   }
 
@@ -482,7 +483,8 @@ Deno.serve(async (req) => {
     // -------- SELECT --------
     if (action === "select") {
       const t0 = performance.now();
-      let query = externalClient
+      // Query dinâmica: filtros/colunas resolvidos em runtime; tipo do proxy é any.
+      let query: any = externalClient
         .from(table!)
         .select(selectColumns, { count: queryCountMode === "none" ? undefined : queryCountMode });
       if (queryLimit !== -1) query = query.range(queryOffset, queryOffset + queryLimit - 1);
