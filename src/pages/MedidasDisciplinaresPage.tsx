@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { medidasDisciplinaresService } from '@/services';
 import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
+import { useMedidasDisciplinaresRealtime } from '@/hooks/useMedidasDisciplinaresRealtime';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { Plus, AlertTriangle, Scale, Users, Sparkles } from 'lucide-react';
