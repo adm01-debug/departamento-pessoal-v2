@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail } from 'lucide-react';
+import {
+  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban,
+} from 'lucide-react';
 import { useContratosAssinaturaKPI } from '@/hooks/useContratosAssinaturaKPI';
 
 function fmtHoras(h: number | null): string {
@@ -12,7 +15,7 @@ function fmtHoras(h: number | null): string {
 }
 
 export function ContratosAssinaturaKPICard() {
-  const { kpi, pendentes } = useContratosAssinaturaKPI();
+  const { kpi, pendentes, revogar, reenviar } = useContratosAssinaturaKPI();
 
   if (kpi.isLoading) {
     return (
