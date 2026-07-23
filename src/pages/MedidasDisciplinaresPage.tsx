@@ -388,7 +388,7 @@ export default function MedidasDisciplinaresPage() {
         isRHOrAdmin={isRHOrAdmin}
         colaboradorUserId={
           contestMedida
-            ? (colaboradores.find((c: any) => c.id === contestMedida.colaborador_id)?.user_id ?? null)
+            ? ((colaboradores as any[]).find((c: any) => c.id === contestMedida.colaborador_id)?.user_id ?? null)
             : null
         }
       />
