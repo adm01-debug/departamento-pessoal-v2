@@ -8584,6 +8584,13 @@ export type Database = {
             foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
             columns: ["origem_ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_adiant13_elegibilidade"
+            referencedColumns: ["ferias_id"]
+          },
+          {
+            foreignKeyName: "eventos_variaveis_origem_ferias_id_fkey"
+            columns: ["origem_ferias_id"]
+            isOneToOne: false
             referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
           },
@@ -9138,6 +9145,9 @@ export type Database = {
         Row: {
           abono_pecuniario: boolean | null
           adiantamento_13: boolean | null
+          adiantamento_13_ano_exercicio: number | null
+          adiantamento_13_solicitado_em: string | null
+          adiantamento_13_solicitado_por: string | null
           adiantamento_13o: boolean | null
           aprovado_em: string | null
           aprovado_gestor: boolean | null
@@ -9205,6 +9215,9 @@ export type Database = {
         Insert: {
           abono_pecuniario?: boolean | null
           adiantamento_13?: boolean | null
+          adiantamento_13_ano_exercicio?: number | null
+          adiantamento_13_solicitado_em?: string | null
+          adiantamento_13_solicitado_por?: string | null
           adiantamento_13o?: boolean | null
           aprovado_em?: string | null
           aprovado_gestor?: boolean | null
@@ -9272,6 +9285,9 @@ export type Database = {
         Update: {
           abono_pecuniario?: boolean | null
           adiantamento_13?: boolean | null
+          adiantamento_13_ano_exercicio?: number | null
+          adiantamento_13_solicitado_em?: string | null
+          adiantamento_13_solicitado_por?: string | null
           adiantamento_13o?: boolean | null
           aprovado_em?: string | null
           aprovado_gestor?: boolean | null
@@ -9462,6 +9478,13 @@ export type Database = {
             foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_adiant13_elegibilidade"
+            referencedColumns: ["ferias_id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
             referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
           },
@@ -9514,6 +9537,13 @@ export type Database = {
             foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
             columns: ["ferias_id"]
             isOneToOne: false
+            referencedRelation: "v_ferias_adiant13_elegibilidade"
+            referencedColumns: ["ferias_id"]
+          },
+          {
+            foreignKeyName: "ferias_aprovacoes_log_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
             referencedRelation: "v_ferias_alerta_pagamento_d2"
             referencedColumns: ["id"]
           },
@@ -9561,6 +9591,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ferias"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_arquivos_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_adiant13_elegibilidade"
+            referencedColumns: ["ferias_id"]
           },
           {
             foreignKeyName: "ferias_arquivos_ferias_id_fkey"
@@ -9821,6 +9858,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ferias"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_programacao_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_adiant13_elegibilidade"
+            referencedColumns: ["ferias_id"]
           },
           {
             foreignKeyName: "ferias_programacao_ferias_id_fkey"
@@ -11189,6 +11233,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ferias"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_ferias_ferias_id_fkey"
+            columns: ["ferias_id"]
+            isOneToOne: false
+            referencedRelation: "v_ferias_adiant13_elegibilidade"
+            referencedColumns: ["ferias_id"]
           },
           {
             foreignKeyName: "historico_ferias_ferias_id_fkey"
@@ -22101,6 +22152,110 @@ export type Database = {
         }
         Relationships: []
       }
+      v_ferias_adiant13_elegibilidade: {
+        Row: {
+          ano_exercicio: number | null
+          colaborador_id: string | null
+          data_inicio: string | null
+          dentro_do_prazo: boolean | null
+          empresa_id: string | null
+          ferias_id: string | null
+          ja_solicitado: boolean | null
+          sem_duplicidade: boolean | null
+        }
+        Insert: {
+          ano_exercicio?: never
+          colaborador_id?: string | null
+          data_inicio?: string | null
+          dentro_do_prazo?: never
+          empresa_id?: string | null
+          ferias_id?: string | null
+          ja_solicitado?: boolean | null
+          sem_duplicidade?: never
+        }
+        Update: {
+          ano_exercicio?: never
+          colaborador_id?: string | null
+          data_inicio?: string | null
+          dentro_do_prazo?: never
+          empresa_id?: string | null
+          ferias_id?: string | null
+          ja_solicitado?: boolean | null
+          sem_duplicidade?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ferias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "ferias_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_colaborador"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "fk_ferias_empresa"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_ferias_alerta_pagamento_d2: {
         Row: {
           colaborador_id: string | null
@@ -23896,6 +24051,9 @@ export type Database = {
         Returns: {
           abono_pecuniario: boolean | null
           adiantamento_13: boolean | null
+          adiantamento_13_ano_exercicio: number | null
+          adiantamento_13_solicitado_em: string | null
+          adiantamento_13_solicitado_por: string | null
           adiantamento_13o: boolean | null
           aprovado_em: string | null
           aprovado_gestor: boolean | null
@@ -24140,6 +24298,9 @@ export type Database = {
         Returns: {
           abono_pecuniario: boolean | null
           adiantamento_13: boolean | null
+          adiantamento_13_ano_exercicio: number | null
+          adiantamento_13_solicitado_em: string | null
+          adiantamento_13_solicitado_por: string | null
           adiantamento_13o: boolean | null
           aprovado_em: string | null
           aprovado_gestor: boolean | null
@@ -24304,6 +24465,10 @@ export type Database = {
           source_table: string
           user_id: string
         }[]
+      }
+      solicitar_adiantamento_13_ferias: {
+        Args: { p_ferias_id: string }
+        Returns: Json
       }
       sst_cat_dashboard: { Args: { p_empresa_id: string }; Returns: Json }
       sst_dashboard_sla: { Args: { p_empresa_id: string }; Returns: Json }
