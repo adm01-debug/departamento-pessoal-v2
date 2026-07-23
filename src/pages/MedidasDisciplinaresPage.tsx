@@ -73,12 +73,21 @@ export default function MedidasDisciplinaresPage() {
     enabled: !!empresaAtual?.id,
   });
 
+  const { data: sugestao } = useQuery({
+    queryKey: ['medida-sugestao', form.colaborador_id, empresaAtual?.id],
+    queryFn: () => medidasDisciplinaresService.sugerirProxima(form.colaborador_id, empresaAtual!.id),
+    enabled: !!form.colaborador_id && !!empresaAtual?.id && open,
+    staleTime: 60_000,
+  });
+
   const criar = useMutation({
     mutationFn: (d: Record<string, unknown>) => medidasDisciplinaresService.criar({
       ...d,
       empresa_id: empresaAtual?.id,
       dias_suspensao: d.dias_suspensao ? Number(d.dias_suspensao) : null,
       artigo_clt: d.artigo_clt || null,
+      gravidade: d.gravidade || null,
+      data_conhecimento_fato: d.data_conhecimento_fato || null,
       testemunha_1_nome: d.testemunha_1_nome || null,
       testemunha_1_cpf: d.testemunha_1_cpf || null,
       testemunha_2_nome: d.testemunha_2_nome || null,
@@ -94,6 +103,16 @@ export default function MedidasDisciplinaresPage() {
       toast.success('Medida registrada com sucesso!');
     },
     onError: (e: Error) => toast.error(safeErrorMessage(e, 'Erro ao registrar medida disciplinar.')),
+  });
+
+  const gerarPDF = useMutation({
+    mutationFn: (id: string) => medidasDisciplinaresService.gerarPDF(id),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ['medidas-disciplinares'] });
+      toast.success('Documento gerado com sucesso!');
+      if (data.signed_url) window.open(data.signed_url, '_blank', 'noopener,noreferrer');
+    },
+    onError: (e: Error) => toast.error(safeErrorMessage(e, 'Falha ao gerar documento.')),
   });
 
   const marcarCiencia = useMutation({
