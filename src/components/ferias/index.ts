@@ -10,3 +10,4 @@ export * from './FeriasAuditTimeline';
 // export * from './FeriasForm';
 export * from './FeriasSaldoReport';
 export * from './FeriasRelatorioDialog';
+export * from './FeriasAlertasPagamentoCard';
