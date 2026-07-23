@@ -59,6 +59,7 @@ export default function ContratosGeradosPage() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<StatusFilter>('todos');
   const [busca, setBusca] = useState('');
+  const [periodo, setPeriodo] = useState<'todos' | '30' | '90' | '365'>('todos');
 
   const carregar = async () => {
     if (!empresaAtual) return;
