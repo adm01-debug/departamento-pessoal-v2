@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '@/components/layout';
 import { DataTableToolbar } from '@/components/ui/data-table-toolbar';
 import { TableSkeleton } from '@/components/ui/module-skeleton';
-import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale } from '@/components/medidas-disciplinares';
+import { MedidasKPIs, MedidasTimeline, MedidasTable, MedidasGravityScale, MedidasKanban } from '@/components/medidas-disciplinares';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -342,17 +343,28 @@ export default function MedidasDisciplinaresPage() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <TableSkeleton rows={6} columns={9} />
-      ) : (
-        <MedidasTable
-          data={filtered}
-          onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
-          onExcluir={(id) => excluir.mutate(id)}
-          onGerarPDF={(id) => gerarPDF.mutate(id)}
-          gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
-        />
-      )}
+      <Tabs defaultValue="lista" className="mt-4">
+        <TabsList>
+          <TabsTrigger value="lista">Lista</TabsTrigger>
+          <TabsTrigger value="kanban">Workflow (Kanban)</TabsTrigger>
+        </TabsList>
+        <TabsContent value="lista" className="mt-4">
+          {isLoading ? (
+            <TableSkeleton rows={6} columns={9} />
+          ) : (
+            <MedidasTable
+              data={filtered}
+              onMarcarCiencia={(id) => marcarCiencia.mutate(id)}
+              onExcluir={(id) => excluir.mutate(id)}
+              onGerarPDF={(id) => gerarPDF.mutate(id)}
+              gerandoPDFId={gerarPDF.isPending ? (gerarPDF.variables as string) : null}
+            />
+          )}
+        </TabsContent>
+        <TabsContent value="kanban" className="mt-4">
+          <MedidasKanban />
+        </TabsContent>
+      </Tabs>
     </PageLayout>
     </>
   );
