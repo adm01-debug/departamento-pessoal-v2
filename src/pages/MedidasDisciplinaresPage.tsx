@@ -361,6 +361,7 @@ export default function MedidasDisciplinaresPage() {
         <TabsList>
           <TabsTrigger value="lista">Lista</TabsTrigger>
           <TabsTrigger value="kanban">Workflow (Kanban)</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
         <TabsContent value="lista" className="mt-4">
           {isLoading ? (
@@ -378,6 +379,9 @@ export default function MedidasDisciplinaresPage() {
         </TabsContent>
         <TabsContent value="kanban" className="mt-4">
           <MedidasKanban />
+        </TabsContent>
+        <TabsContent value="analytics" className="mt-4">
+          <MedidasAnalytics />
         </TabsContent>
       </Tabs>
 
