@@ -24337,6 +24337,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      purgar_ferias_reconciliacao_logs_antigos: { Args: never; Returns: number }
       purge_audit_log_old: { Args: { _dias?: number }; Returns: number }
       purge_expired_idempotency_keys: { Args: never; Returns: number }
       purge_expired_security_data: { Args: never; Returns: Json }
