@@ -9140,6 +9140,13 @@ export type Database = {
           aprovado_rh: boolean | null
           aprovado_rh_em: string | null
           aprovado_rh_por: string | null
+          aviso_assinatura_em: string | null
+          aviso_assinatura_hash: string | null
+          aviso_assinatura_ip: unknown
+          aviso_assinatura_por: string | null
+          aviso_assinatura_user_agent: string | null
+          aviso_gerado_em: string | null
+          aviso_pdf_url: string | null
           cancelado: boolean | null
           cancelado_em: string | null
           cancelado_por: string | null
@@ -9196,6 +9203,13 @@ export type Database = {
           aprovado_rh?: boolean | null
           aprovado_rh_em?: string | null
           aprovado_rh_por?: string | null
+          aviso_assinatura_em?: string | null
+          aviso_assinatura_hash?: string | null
+          aviso_assinatura_ip?: unknown
+          aviso_assinatura_por?: string | null
+          aviso_assinatura_user_agent?: string | null
+          aviso_gerado_em?: string | null
+          aviso_pdf_url?: string | null
           cancelado?: boolean | null
           cancelado_em?: string | null
           cancelado_por?: string | null
@@ -9252,6 +9266,13 @@ export type Database = {
           aprovado_rh?: boolean | null
           aprovado_rh_em?: string | null
           aprovado_rh_por?: string | null
+          aviso_assinatura_em?: string | null
+          aviso_assinatura_hash?: string | null
+          aviso_assinatura_ip?: unknown
+          aviso_assinatura_por?: string | null
+          aviso_assinatura_user_agent?: string | null
+          aviso_gerado_em?: string | null
+          aviso_pdf_url?: string | null
           cancelado?: boolean | null
           cancelado_em?: string | null
           cancelado_por?: string | null
@@ -23139,6 +23160,16 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      assinar_aviso_ferias: {
+        Args: {
+          p_ferias_id: string
+          p_hash: string
+          p_ip?: unknown
+          p_pdf_url: string
+          p_ua?: string
+        }
+        Returns: Json
       }
       assinar_desligamento: {
         Args: { _desligamento_id: string; _parte: string }
