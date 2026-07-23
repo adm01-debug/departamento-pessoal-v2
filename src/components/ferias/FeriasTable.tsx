@@ -92,11 +92,22 @@ export function FeriasTable({ data, ...actions }: FeriasTableProps) {
                 </span>
               </TableCell>
               <TableCell>
-                {s.cancelado ? (
-                  <Badge variant="destructive" className="text-xs">Cancelada</Badge>
-                ) : (
-                  <StatusBadge status={s.status} />
-                )}
+                <div className="flex flex-col gap-1">
+                  {s.cancelado ? (
+                    <Badge variant="destructive" className="text-xs w-fit">Cancelada</Badge>
+                  ) : (
+                    <StatusBadge status={s.status} />
+                  )}
+                  {(() => {
+                    const sev = calcularSeveridadePagamento(s);
+                    if (!sev) return null;
+                    return (
+                      <Badge variant="outline" className={`text-[10px] gap-1 w-fit font-body ${sev.className}`} title="Art. 145 CLT — pagamento devido até 2 dias antes do início">
+                        <AlertTriangle className="h-3 w-3" />{sev.label}
+                      </Badge>
+                    );
+                  })()}
+                </div>
               </TableCell>
               <TableCell>
                 {podeVerAuditoria ? (
