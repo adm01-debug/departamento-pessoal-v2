@@ -169,7 +169,11 @@ export default function AdminDiagnosticoMigracaoPage() {
     setRunning(false);
   };
 
-  useEffect(() => { run(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- diagnóstico dispara uma vez no mount; run() é assíncrono
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- executar apenas no mount
+  }, []);
 
   const grouped = {
     infra: checks.filter((c) => c.category === 'infra'),

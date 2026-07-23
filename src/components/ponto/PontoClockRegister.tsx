@@ -143,6 +143,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
       if (blob && user?.id && navigator.onLine) {
         setScanStage('Enviando foto...');
         setScanProgress(80);
+        // eslint-disable-next-line react-hooks/purity -- roda em handler assíncrono de captura de foto (ação do usuário), não em render
         const fileName = `${user.id}/${Date.now()}.jpg`;
         const { error } = await supabase.storage.from('ponto-biometria').upload(fileName, blob);
 
