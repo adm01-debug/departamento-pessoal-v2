@@ -28,6 +28,7 @@ import {
   Search,
   RefreshCw,
   FileSpreadsheet,
+  Send,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -126,6 +127,18 @@ export default function ContratosGeradosPage() {
     } catch (e) {
       console.error('[download-contrato]', e);
       toast.error('Não foi possível gerar o link de download');
+    }
+  };
+
+  const reenviarLink = async (contratoId: string) => {
+    try {
+      const { url } = await contratoTemplateService.gerarTokenAssinatura(contratoId, { validadeDias: 7 });
+      await navigator.clipboard.writeText(url);
+      toast.success('Novo link gerado e copiado (válido por 7 dias)');
+      void carregar();
+    } catch (e) {
+      console.error('[reenviar-link]', e);
+      toast.error('Falha ao gerar link de assinatura');
     }
   };
 
@@ -306,6 +319,16 @@ export default function ContratosGeradosPage() {
                               onClick={() => void baixarPdf(c.storage_path!)}
                             >
                               <Download className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {(c.status === 'gerado' || c.status === 'enviado') && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              title="Gerar/reenviar link de assinatura"
+                              onClick={() => void reenviarLink(c.id)}
+                            >
+                              <Send className="h-4 w-4" />
                             </Button>
                           )}
                           {c.status === 'assinado' && c.sha256 && (
