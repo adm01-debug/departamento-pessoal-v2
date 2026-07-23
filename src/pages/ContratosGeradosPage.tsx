@@ -365,6 +365,14 @@ export default function ContratosGeradosPage() {
                           {c.sha256 ? `${c.sha256.substring(0, 12)}…` : '—'}
                         </TableCell>
                         <TableCell className="text-right whitespace-nowrap">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Ver histórico de eventos"
+                            onClick={() => void abrirTimeline(c)}
+                          >
+                            <History className="h-4 w-4" />
+                          </Button>
                           {c.storage_path && (
                             <Button
                               size="icon"
