@@ -13227,7 +13227,15 @@ export type Database = {
       medidas_disciplinares: {
         Row: {
           aplicado_por: string | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_juridico_em: string | null
+          aprovado_juridico_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
           aprovador_id: string | null
+          arquivado_em: string | null
+          arquivado_por: string | null
           artigo_clt: string | null
           assinado_em: string | null
           colaborador_ciente: boolean | null
@@ -13250,6 +13258,7 @@ export type Database = {
           id: string
           id_registro_anterior: string | null
           motivo_recusa: string | null
+          motivo_rejeicao: string | null
           numero_sequencial: number | null
           pdf_gerado_em: string | null
           pdf_hash_sha256: string | null
@@ -13257,6 +13266,8 @@ export type Database = {
           prazo_ciencia_dias: number | null
           recorrencia_infrafacao: boolean | null
           recusa_assinatura: boolean | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
           status: string | null
           status_workflow: string | null
           testemunha_1: string | null
@@ -13270,7 +13281,15 @@ export type Database = {
         }
         Insert: {
           aplicado_por?: string | null
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
+          aprovado_juridico_em?: string | null
+          aprovado_juridico_por?: string | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
           aprovador_id?: string | null
+          arquivado_em?: string | null
+          arquivado_por?: string | null
           artigo_clt?: string | null
           assinado_em?: string | null
           colaborador_ciente?: boolean | null
@@ -13293,6 +13312,7 @@ export type Database = {
           id?: string
           id_registro_anterior?: string | null
           motivo_recusa?: string | null
+          motivo_rejeicao?: string | null
           numero_sequencial?: number | null
           pdf_gerado_em?: string | null
           pdf_hash_sha256?: string | null
@@ -13300,6 +13320,8 @@ export type Database = {
           prazo_ciencia_dias?: number | null
           recorrencia_infrafacao?: boolean | null
           recusa_assinatura?: boolean | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: string | null
           status_workflow?: string | null
           testemunha_1?: string | null
@@ -13313,7 +13335,15 @@ export type Database = {
         }
         Update: {
           aplicado_por?: string | null
+          aprovado_gestor_em?: string | null
+          aprovado_gestor_por?: string | null
+          aprovado_juridico_em?: string | null
+          aprovado_juridico_por?: string | null
+          aprovado_rh_em?: string | null
+          aprovado_rh_por?: string | null
           aprovador_id?: string | null
+          arquivado_em?: string | null
+          arquivado_por?: string | null
           artigo_clt?: string | null
           assinado_em?: string | null
           colaborador_ciente?: boolean | null
@@ -13336,6 +13366,7 @@ export type Database = {
           id?: string
           id_registro_anterior?: string | null
           motivo_recusa?: string | null
+          motivo_rejeicao?: string | null
           numero_sequencial?: number | null
           pdf_gerado_em?: string | null
           pdf_hash_sha256?: string | null
@@ -13343,6 +13374,8 @@ export type Database = {
           prazo_ciencia_dias?: number | null
           recorrencia_infrafacao?: boolean | null
           recusa_assinatura?: boolean | null
+          rejeitado_em?: string | null
+          rejeitado_por?: string | null
           status?: string | null
           status_workflow?: string | null
           testemunha_1?: string | null
@@ -13467,6 +13500,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medidas_disciplinares_anexos_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medidas_disciplinares_workflow_log: {
+        Row: {
+          acao: string
+          ator_id: string | null
+          created_at: string
+          de_status: string | null
+          empresa_id: string
+          id: string
+          medida_id: string
+          observacao: string | null
+          para_status: string
+        }
+        Insert: {
+          acao: string
+          ator_id?: string | null
+          created_at?: string
+          de_status?: string | null
+          empresa_id: string
+          id?: string
+          medida_id: string
+          observacao?: string | null
+          para_status: string
+        }
+        Update: {
+          acao?: string
+          ator_id?: string | null
+          created_at?: string
+          de_status?: string | null
+          empresa_id?: string
+          id?: string
+          medida_id?: string
+          observacao?: string | null
+          para_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_disciplinares_workflow_log_medida_id_fkey"
             columns: ["medida_id"]
             isOneToOne: false
             referencedRelation: "medidas_disciplinares"
@@ -24170,6 +24247,19 @@ export type Database = {
         }[]
       }
       maintenance_weekly_analyze: { Args: never; Returns: undefined }
+      medida_aprovar: {
+        Args: { _medida_id: string; _observacao?: string }
+        Returns: Json
+      }
+      medida_arquivar: {
+        Args: { _medida_id: string; _observacao?: string }
+        Returns: Json
+      }
+      medida_enviar_aprovacao: { Args: { _medida_id: string }; Returns: Json }
+      medida_rejeitar: {
+        Args: { _medida_id: string; _motivo: string }
+        Returns: Json
+      }
       next_cnab_sequencial: {
         Args: { p_banco_codigo: string; p_empresa_id: string }
         Returns: number
