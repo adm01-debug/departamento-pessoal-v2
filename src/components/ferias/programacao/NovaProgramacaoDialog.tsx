@@ -31,11 +31,13 @@ export function NovaProgramacaoDialog({ open, onOpenChange, ano, mesInicial }: P
 
   useEffect(() => {
     // Seleciona automaticamente o período aquisitivo mais antigo em aberto
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza período selecionado com a lista carregada (mount/prop)
     if (!periodos?.length) { setPeriodoId(''); return; }
     const aberto = periodos.find((p: any) => p.status !== 'gozado') ?? periodos[0];
     setPeriodoId(aberto.id);
   }, [periodos]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza mês com a prop mesInicial
   useEffect(() => { if (mesInicial) setMes(mesInicial); }, [mesInicial]);
 
   const handleSalvar = async () => {
